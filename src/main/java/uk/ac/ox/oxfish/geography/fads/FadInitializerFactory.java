@@ -15,11 +15,19 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 
 public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
 
-    private DoubleParameter attractionRateInPercent = new FixedDoubleParameter(1e-3);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.1);
     private Map<String, Double> carryingCapacities = new HashMap<>();
+    private Map<String, FixedDoubleParameter> attractionRates = new HashMap<>();
 
-    public Map<String, Double> getCarryingCapacities() {
+    @SuppressWarnings("unused") public Map<String, FixedDoubleParameter> getAttractionRates() {
+        return attractionRates;
+    }
+
+    @SuppressWarnings("unused") public void setAttractionRates(Map<String, FixedDoubleParameter> attractionRates) {
+        this.attractionRates = attractionRates;
+    }
+
+    @SuppressWarnings("unused") public Map<String, Double> getCarryingCapacities() {
         return carryingCapacities;
     }
 
@@ -37,16 +45,6 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
-    @SuppressWarnings("unused")
-    public DoubleParameter getAttractionRateInPercent() {
-        return attractionRateInPercent;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAttractionRateInPercent(DoubleParameter attractionRateInPercent) {
-        this.attractionRateInPercent = attractionRateInPercent;
-    }
-
     @Override
     public FadInitializer apply(FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
@@ -56,9 +54,11 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                 entry -> fishState.getBiology().getSpecie(entry.getKey()),
                 entry -> getQuantity(entry.getValue(), KILOGRAM)
             )),
-            attractionRateInPercent.apply(random) / 100d,
+            attractionRates.entrySet().stream().collect(toImmutableMap(
+                entry -> fishState.getBiology().getSpecie(entry.getKey()),
+                entry -> entry.getValue().getFixedValue()
+            )),
             fishReleaseProbabilityInPercent.apply(random) / 100d
         );
     }
-
 }

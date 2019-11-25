@@ -21,7 +21,7 @@ public class TunaMaximization {
         Path optimizationFile = Paths.get("inputs", "tuna", "calibration.yaml");
         GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
         Scenario scenario = optimization.buildScenario(new double[]{
-            -3.900, -2.747, -4.701, -8.053, 9.668, 3.558, -7.573
+            -7.062, -2.402, 1.071, -3.442, 8.029, -2.274, 5.356, 4.140, -9.300
         });
         Path outputFile = optimizationFile.getParent().resolve("tuna.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));

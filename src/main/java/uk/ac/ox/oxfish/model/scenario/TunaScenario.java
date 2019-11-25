@@ -79,6 +79,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
@@ -191,6 +192,9 @@ public class TunaScenario implements Scenario {
                     r -> speciesNames.get(r.getString("species_code")),
                     r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
                 ))
+        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(
+            speciesNames.values().stream().collect(toMap(identity(), __ -> new FixedDoubleParameter(0.01)))
         );
         purseSeineGearFactory.setUnassociatedSetParameters(
             parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()

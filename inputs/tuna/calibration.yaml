@@ -30,9 +30,22 @@ parameters:
   maximum: 0.1
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
-  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRateInPercent
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Bigeye
+    tuna
   minimum: 0.0
-  maximum: 100.0
+  maximum: 1.0
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Yellowfin
+    tuna
+  minimum: 0.0
+  maximum: 1.0
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Skipjack
+    tuna
+  minimum: 0.0
+  maximum: 1.0
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.gear.fadInitializerFactory.fishReleaseProbabilityInPercent
