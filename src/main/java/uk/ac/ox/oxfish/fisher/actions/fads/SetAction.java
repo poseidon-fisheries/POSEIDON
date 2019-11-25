@@ -36,6 +36,7 @@ public interface SetAction extends FadAction {
                     purseSeineGear, model.getBiology(), seaTile, model.getRandom()
                 );
                 fisher.fishHere(model.getBiology(), duration, model, targetBiology);
+                fisher.getYearlyCounter().count(counterName(), 1);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);
@@ -57,5 +58,6 @@ public interface SetAction extends FadAction {
     LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
     default void reactToFailedSet(FishState model, SeaTile locationOfSet) {}
     Action actionAfterSet();
+    String counterName();
 
 }

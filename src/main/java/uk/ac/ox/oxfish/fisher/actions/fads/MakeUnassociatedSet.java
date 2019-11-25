@@ -13,6 +13,10 @@ import java.util.Optional;
 
 public class MakeUnassociatedSet implements SetAction {
 
+    public static final String NUMBER_OF_UNASSOCIATED_SETS = "Number of unassociated sets";
+
+    @Override public String counterName() { return NUMBER_OF_UNASSOCIATED_SETS; }
+
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) {
         return Optional.of(fisher.getLocation());

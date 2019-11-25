@@ -79,7 +79,6 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
@@ -98,6 +97,9 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.NUMBER_OF_FAD_DEPLOYMENTS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.NUMBER_OF_FAD_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.NUMBER_OF_UNASSOCIATED_SETS;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -340,18 +342,26 @@ public class TunaScenario implements Scenario {
                 r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
             ));
 
+        final ImmutableList<String> yearlyFisherCounters = ImmutableList.of(
+            NUMBER_OF_FAD_SETS,
+            NUMBER_OF_UNASSOCIATED_SETS,
+            NUMBER_OF_FAD_DEPLOYMENTS
+        );
+
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher -> {
+            // Setup hourly costs as a function of capacity
             final ComparableQuantity<Mass> capacity = getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
             final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
             fisher.getAdditionalTripCosts().add(hourlyCost);
-        });
-        fisherFactory.getAdditionalSetups().add(fisher ->
-            ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher)
-        );
 
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
-        fisherFactory.getAdditionalSetups().add(fisher -> {
+            // Store a reference to the fisher in the FAD manager
+            ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher);
+
+            // Add purse-seine-specific yearly counters to the fisher's memory
+            yearlyFisherCounters.forEach(column -> fisher.getYearlyCounter().addColumn(column));
+
+            // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
             final int daysFromNow = 1 + dayOfYear(JULY, 15);
             Steppable assignClosurePeriod = simState -> {
                 if (fisher.getRegulation() instanceof MultipleRegulations) {
@@ -419,6 +429,12 @@ public class TunaScenario implements Scenario {
 
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
         model.registerStartable(exogenousCatches);
+
+        yearlyFisherCounters.forEach(column -> model.getYearlyDataSet().registerGatherer(
+            column,
+            fishState -> fishState.getFishers().stream().mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
+            0.0
+        ));
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 

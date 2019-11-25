@@ -65,4 +65,13 @@ targets:
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Average Trip Duration
   fixedTarget: 903.2562634
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Number of FAD sets
+  fixedTarget: 9724.0
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Number of unassociated sets
+  fixedTarget: 3303.0
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Number of FAD deployments
+  fixedTarget: 20238.0
 

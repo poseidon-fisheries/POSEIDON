@@ -104,9 +104,9 @@ Tuna:
         averageSetDurationInHours: '8.0219505805135'
         fadInitializerFactory:
           attractionRates:
-            Bigeye tuna: 0.01
-            Yellowfin tuna: 0.01
-            Skipjack tuna: 0.01
+            Bigeye tuna: '0.01'
+            Yellowfin tuna: '0.01'
+            Skipjack tuna: '0.01'
           carryingCapacities:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0

@@ -26,6 +26,8 @@ public class DeployFad implements FadAction {
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
 
+    public static final String NUMBER_OF_FAD_DEPLOYMENTS = "Number of FAD deployments";
+
     private final SeaTile seaTile;
 
     public DeployFad(SeaTile seaTile) { this.seaTile = seaTile; }
@@ -65,8 +67,10 @@ public class DeployFad implements FadAction {
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
         checkState(seaTile == fisher.getLocation());
-        if (isAllowed(model, fisher) && isPossible(model, fisher))
+        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
             getFadManager(fisher).deployFad(seaTile, model.getStep(), model.random);
+            fisher.getYearlyCounter().count(NUMBER_OF_FAD_DEPLOYMENTS, 1);
+        }
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration(fisher, model.getRandom())));
     }
 
