@@ -93,25 +93,25 @@ Tuna:
     discardingStrategy: No Discarding
     fishingStrategy:
       FAD Fishing Strategy:
-        fadsDeploymentCoefficient: '0.01'
-        otherFadsSettingCoefficient: '0.01'
-        ownFadsSettingCoefficient: '0.01'
-        probabilityDecayCoefficient: '0.01'
-        unassociatedSetCoefficient: '1.0E-8'
+        fadsDeploymentCoefficient: '0.013915000000000002'
+        otherFadsSettingCoefficient: '0.05582'
+        ownFadsSettingCoefficient: '0.0'
+        probabilityDecayCoefficient: '9.999500000000001'
+        unassociatedSetCoefficient: '0.0'
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
         averageSetDurationInHours: '8.0219505805135'
         fadInitializerFactory:
           attractionRates:
-            Bigeye tuna: '0.01'
-            Yellowfin tuna: '0.01'
-            Skipjack tuna: '0.01'
+            Bigeye tuna: '0.21860000000000002'
+            Yellowfin tuna: '0.38585'
+            Skipjack tuna: '0.14460000000000003'
           carryingCapacities:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0
             Skipjack tuna: 387000.0
-          fishReleaseProbabilityInPercent: '0.1'
+          fishReleaseProbabilityInPercent: '39.64'
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'
@@ -166,6 +166,9 @@ Tuna:
       latLong: true
       mapFile: inputs/tuna/depth.csv
       mapPaddingInDegrees: '0.5'
+  plugins:
+  - Biomass Snapshot Resetter:
+      yearsToReset: 1
   portFilePath: inputs/tuna/ports.csv
   targetYear: 2017
   weatherInitializer:

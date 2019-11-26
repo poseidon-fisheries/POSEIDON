@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
@@ -46,6 +47,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
@@ -78,6 +80,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -167,6 +170,10 @@ public class TunaScenario implements Scenario {
             false,
             false
         );
+
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = ImmutableList.of(
+        new SnapshotBiomassResetterFactory()
+    );
 
     TunaScenario() {
 
@@ -430,6 +437,8 @@ public class TunaScenario implements Scenario {
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
         model.registerStartable(exogenousCatches);
 
+        plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
+
         yearlyFisherCounters.forEach(column -> model.getYearlyDataSet().registerGatherer(
             column,
             fishState -> fishState.getFishers().stream().mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
@@ -509,4 +518,10 @@ public class TunaScenario implements Scenario {
 
         return factory;
     }
+
+    @SuppressWarnings("unused")
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() { return plugins; }
+
+    @SuppressWarnings("unused")
+    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
 }
