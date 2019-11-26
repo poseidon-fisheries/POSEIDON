@@ -4,12 +4,14 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.NoFishing;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
@@ -57,6 +59,7 @@ public class DeployFad implements FadAction {
      * Deploying a FAD is allowed if we can fish and if there is no closure kicking in within the buffer period.
      */
     @Override public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
+
         final Regulation regulation = fisher.getRegulation();
         return regulation.canFishHere(fisher, actionTile, model, actionStep) &&
             !isNoFishingAtStep(regulation, model, actionStep + BUFFER_PERIOD_BEFORE_CLOSURE);
@@ -76,7 +79,10 @@ public class DeployFad implements FadAction {
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {
-        return fisher.getLocation().isWater() && getFadManager(fisher).getNumFadsInStock() > 0;
+        final FadManager fadManager = getFadManager(fisher);
+        return fisher.getLocation().isWater() &&
+            fadManager.getNumDeployedFads() < IATTC.activeFadsLimit(fisher) &&
+            fadManager.getNumFadsInStock() > 0;
     }
 
     @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
