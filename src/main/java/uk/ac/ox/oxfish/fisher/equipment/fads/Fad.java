@@ -40,11 +40,11 @@ public class Fad {
             // Calculate the catches and add them to the FAD biology:
             double[] catches = new double[globalBiology.getSize()];
             for (Species species : globalBiology.getSpecies()) {
-                double currentBiomass = biology.getBiomass(species);
-                double maxBiomass = biology.getCarryingCapacity(species);
-                double maxCatch = max(0, maxBiomass - currentBiomass);
+                double currentFadBiomass = biology.getBiomass(species);
+                double maxFadBiomass = biology.getCarryingCapacity(species);
+                double maxCatch = max(0, maxFadBiomass - currentFadBiomass);
                 double caught = min(seaTileBiology.getBiomass(species) * attractionRates[species.getIndex()], maxCatch);
-                biology.setCurrentBiomass(species, min(currentBiomass + caught, maxBiomass));
+                biology.setCurrentBiomass(species, min(currentFadBiomass + caught, maxFadBiomass));
                 catches[species.getIndex()] = caught;
             }
             // Remove the catches from the underlying biology:
