@@ -11,6 +11,9 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
     private double fixedTarget;
     private String columnName = "";
 
+    private double exponent = 1;
+
+
     public ScaledFixedDataLastStepTarget() { }
 
     /**
@@ -22,7 +25,16 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
     @Override
     public double computeError(FishState model) {
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
-        return abs((simulationOutput.getLatest() - fixedTarget) / fixedTarget);
+//        System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//        System.out.println("column: " + columnName);
+//        System.out.println("output: " +simulationOutput.getLatest() );
+//        System.out.println("target : " +fixedTarget );
+//        System.out.println("error : " +abs((simulationOutput.getLatest() - fixedTarget) / fixedTarget) );
+        return abs(
+                Math.pow((simulationOutput.getLatest() - fixedTarget),exponent)
+                        /
+                        fixedTarget)
+                ;
     }
 
     public double getFixedTarget() { return fixedTarget; }
@@ -36,4 +48,22 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
 
     public void setColumnName(String columnName) { this.columnName = columnName; }
 
+
+    /**
+     * Getter for property 'exponent'.
+     *
+     * @return Value for property 'exponent'.
+     */
+    public double getExponent() {
+        return exponent;
+    }
+
+    /**
+     * Setter for property 'exponent'.
+     *
+     * @param exponent Value to set for property 'exponent'.
+     */
+    public void setExponent(double exponent) {
+        this.exponent = exponent;
+    }
 }

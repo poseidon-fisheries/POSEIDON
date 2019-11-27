@@ -1,11 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
+import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.tuple.Triple;
@@ -29,7 +25,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -171,8 +167,8 @@ public class TunaScenario implements Scenario {
             false
         );
 
-    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = ImmutableList.of(
-        new SnapshotBiomassResetterFactory()
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = Lists.newArrayList(
+            new SnapshotBiomassResetterFactory()
     );
 
     TunaScenario() {

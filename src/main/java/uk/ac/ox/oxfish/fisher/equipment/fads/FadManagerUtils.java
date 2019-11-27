@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.equipment.fads;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 

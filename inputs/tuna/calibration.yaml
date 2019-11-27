@@ -1,5 +1,5 @@
 !!uk.ac.ox.oxfish.maximization.GenericOptimization
-scenarioFile: /home/nicolas/workspace/POSEIDON/inputs/tuna/tuna.yaml
+scenarioFile: ./inputs/tuna/tuna.yaml
 maximization: no
 runsPerSetting: 1
 simulatedYears: 2
@@ -32,25 +32,25 @@ parameters:
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Bigeye
     tuna
-  minimum: 0.0
-  maximum: 1.0
+  minimum: 0.00001
+  maximum: 0.05
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Yellowfin
     tuna
-  minimum: 0.0
-  maximum: 1.0
+  minimum: 0.00001
+  maximum: 0.05
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Skipjack
     tuna
-  minimum: 0.0
-  maximum: 1.0
+  minimum: 0.00001
+  maximum: 0.05
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.gear.fadInitializerFactory.fishReleaseProbabilityInPercent
   minimum: 0.0
-  maximum: 100.0
+  maximum: 2.0
   alwaysPositive: yes
 targets:
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
@@ -62,16 +62,16 @@ targets:
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Yellowfin tuna Catches (kg)
   fixedTarget: 6.0008e+07
-- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
-  columnName: Average Trip Duration
-  fixedTarget: 903.2562634
-- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
-  columnName: Number of FAD sets
-  fixedTarget: 9724.0
-- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
-  columnName: Number of unassociated sets
-  fixedTarget: 3303.0
-- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
-  columnName: Number of FAD deployments
-  fixedTarget: 20238.0
+#- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+#  columnName: Average Trip Duration
+#  fixedTarget: 903.2562634
+#- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+#  columnName: Number of FAD sets
+#  fixedTarget: 9724.0
+#- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+#  columnName: Number of unassociated sets
+#  fixedTarget: 3303.0
+#- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+#  columnName: Number of FAD deployments
+#  fixedTarget: 20238.0
 

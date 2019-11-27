@@ -17,14 +17,21 @@ public class TunaMaximization {
      */
     public static void main(String[] args) throws IOException {
 
+        double[] optimalParameters = {
+                6.075, -2.655, -0.393, -5.264, -3.480, -1.399, -3.216, 1.140, 0.344
+        };
+
+
         FishYAML yaml = new FishYAML();
         Path optimizationFile = Paths.get("inputs", "tuna", "calibration.yaml");
         GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
-        Scenario scenario = optimization.buildScenario(new double[]{
-            7.885, -1.744, 4.189, -3.044, 7.519, 1.704, -2.796, 1.893, -9.973
-        });
-        Path outputFile = optimizationFile.getParent().resolve("tuna.yaml");
+
+        Scenario scenario = optimization.buildScenario(optimalParameters);
+        Path outputFile = optimizationFile.getParent().resolve("tuna_virgin_calibrated.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
+
+
+        optimization.evaluate(optimalParameters);
 
     }
 }

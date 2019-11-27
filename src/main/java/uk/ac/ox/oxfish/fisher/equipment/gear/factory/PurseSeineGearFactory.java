@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;

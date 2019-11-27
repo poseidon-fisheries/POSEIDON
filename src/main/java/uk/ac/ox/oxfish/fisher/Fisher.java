@@ -415,7 +415,7 @@ public class Fisher implements Steppable, Startable{
             //if you are out of time, continue tomorrow
             if(hoursLeft <= 0)
             {
-                assert  Math.abs(hoursLeft)<.001; //shouldn't be negative!
+                assert  Math.abs(hoursLeft)<.001 : hoursLeft; //shouldn't be negative!
                 break;
             }
         }
