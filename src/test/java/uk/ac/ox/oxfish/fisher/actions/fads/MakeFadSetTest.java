@@ -45,7 +45,7 @@ public class MakeFadSetTest {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
         final Fad fad = new Fad(fadManager, fadBiology, new double[3], 0);
-        final MakeFadSet makeFadSet = new MakeFadSet(fad);
+        final MakeFadSet makeFadSet = new MakeFadSet(purseSeineGear, mock(MersenneTwisterFast.class), fad);
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...

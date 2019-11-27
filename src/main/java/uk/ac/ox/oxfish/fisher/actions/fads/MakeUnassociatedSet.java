@@ -11,9 +11,13 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Optional;
 
-public class MakeUnassociatedSet implements SetAction {
+public class MakeUnassociatedSet extends SetAction {
 
-    public static final String NUMBER_OF_UNASSOCIATED_SETS = "Number of unassociated sets";
+    public static final String NUMBER_OF_UNASSOCIATED_SETS = "Total number of unassociated sets";
+
+    public MakeUnassociatedSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
+        super(purseSeineGear, rng);
+    }
 
     @Override public String counterName() { return NUMBER_OF_UNASSOCIATED_SETS; }
 

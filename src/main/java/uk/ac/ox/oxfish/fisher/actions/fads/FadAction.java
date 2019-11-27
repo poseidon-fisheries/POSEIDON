@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface FadAction extends Action, FadManagerUtils {
     Optional<SeaTile> getActionTile(Fisher fisher);
-    Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng);
+    Quantity<Time> getDuration();
     boolean isPossible(FishState model, Fisher fisher);
 
     default boolean isAllowed(FishState model, Fisher fisher) {

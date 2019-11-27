@@ -21,15 +21,20 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
  * Represents either a FAD set or an unassociated set. Dolphin sets will presumable fall under this interface too.
  * It's not lost on me that making unassociated/dolphin sets extend *Fad*Action is weird, so TODO: revise this.
  */
-public interface SetAction extends FadAction {
+abstract class SetAction implements FadAction {
 
-    @Override
-    default ActionResult act(
+    private Quantity<Time> duration;
+
+    SetAction(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
+        this.duration = purseSeineGear.nextSetDuration(rng);
+    }
+
+    @Override public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
         final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
         if (isAllowed(model, fisher) && isPossible(model, fisher)) {
-            final int duration = toHours(getDuration(fisher, model.getRandom()));
+            final int duration = toHours(this.duration);
             final SeaTile seaTile = fisher.getLocation();
             if (model.getRandom().nextDouble() < purseSeineGear.getSuccessfulSetProbability()) {
                 final LocalBiology targetBiology = targetBiology(
@@ -47,17 +52,15 @@ public interface SetAction extends FadAction {
         }
     }
 
-    default boolean isPossible(FishState model, Fisher fisher) {
+    public boolean isPossible(FishState model, Fisher fisher) {
         return fisher.getHold().getPercentageFilled() < 1 && fisher.getLocation().isWater();
     }
 
-    default Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
-        return ((PurseSeineGear) fisher.getGear()).nextSetDuration(rng);
-    }
+    public Quantity<Time> getDuration() { return duration; }
 
-    LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
-    default void reactToFailedSet(FishState model, SeaTile locationOfSet) {}
-    Action actionAfterSet();
-    String counterName();
+    abstract LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
+    abstract String counterName();
+    void reactToFailedSet(FishState model, SeaTile locationOfSet) {}
+    abstract Action actionAfterSet();
 
 }
