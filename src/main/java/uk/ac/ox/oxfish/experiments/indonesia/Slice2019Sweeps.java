@@ -57,28 +57,28 @@ public class Slice2019Sweeps {
 
         //effort control
         //all boats are controlled
-        effortControl("all",
-                new String[]{"big","small","medium","small10","small7"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
+//        effortControl("all",
+//                new String[]{"big","small","medium","small10","small7"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
 
 
 
 //
        //only boats >=7GT are controlled
-        effortControl("7",
-                      new String[]{"big","medium","small7","small10"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT);
+//        effortControl("7",
+//                      new String[]{"big","medium","small7","small10"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT);
 
 
 
 //
 //////        //only boats >10GT are controlled
-        effortControl("10",
-                new String[]{"big","medium","small10"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
+//        effortControl("10",
+//                new String[]{"big","medium","small10"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
 
 //////
 //////        //price premium
@@ -97,7 +97,7 @@ public class Slice2019Sweeps {
 //
 //
 //        //fleet reduction
-//        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
+        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 
 //        //delays
 //        delays("delay_all", new String[]{"big","small","medium","small10"},

@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -53,7 +52,7 @@ public class NoDataPolicy {
     /**
      * steppable whose job is to hunt down the FisherEntryByProfits and turning them off!
      */
-    private static Steppable removeEntryEvent = new Steppable(){
+    private static final Steppable REMOVE_ENTRY_EVENT = new Steppable(){
 
         @Override
         public void step(SimState simState) {
@@ -81,7 +80,7 @@ public class NoDataPolicy {
     };
 
 
-    private static Consumer<Scenario> removeEntry(int shockYear){
+    public static Consumer<Scenario> removeEntry(int shockYear){
         return new Consumer<Scenario>() {
             @Override
             public void accept(Scenario scenario) {
@@ -92,7 +91,7 @@ public class NoDataPolicy {
                             public void start(FishState model) {
 
                                 model.scheduleOnceAtTheBeginningOfYear(
-                                        removeEntryEvent,
+                                        REMOVE_ENTRY_EVENT,
                                         StepOrder.DAWN,
                                         shockYear
                                 );
@@ -117,7 +116,7 @@ public class NoDataPolicy {
     /**
      * adds a removeEntry steppable happening at year X
      */
-    private static Consumer<Scenario> buildMaxDaysRegulation(int shockYear, String[] tagsToRegulate, int maxDaysOut){
+    public static Consumer<Scenario> buildMaxDaysRegulation(int shockYear, String[] tagsToRegulate, int maxDaysOut){
         return new Consumer<Scenario>() {
             @Override
             public void accept(Scenario scenario) {
@@ -323,7 +322,7 @@ public class NoDataPolicy {
 
 
     @NotNull
-    public static BatchRunner setupRunner(
+    private static BatchRunner setupRunner(
             Path scenarioFile,
             final int yearsToRun,
             Path outputFolder) {

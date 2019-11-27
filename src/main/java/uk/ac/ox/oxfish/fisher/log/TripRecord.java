@@ -85,8 +85,14 @@ public class TripRecord {
      */
     private final HashMap<SeaTile,FishingRecord> tilesFished = new HashMap<>();
 
-  //  private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
+    private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
 
+
+    //updating the map "lastFishingRecordOfTile" becomes quite expensive when there are a lot of boats
+    //and a lot of that updating is actually pointless since it's just replacement
+    //here we keep a lazy "last thing checked" which we put in the map only when it's needed
+    private SeaTile lastCachedTile = null;
+    private FishingRecord lastCachedFishingRecord = null;
 
 
     private double litersOfGasConsumed = 0;
@@ -142,11 +148,37 @@ public class TripRecord {
                 totalCatch[i] += record.getFishCaught().getWeightCaught(i);
         }
 
+        SeaTile tileFished = record.getTileFished();
+        lastFishingRecordOfTile.put(tileFished, record);
 
-        tilesFished.merge(record.getTileFished(),
+
+        tilesFished.merge(tileFished,
                           record,
                           FishingRecord::sumRecords);
-      //  lastFishingRecordOfTile.put(record.getTileFished(),record);
+
+
+    }
+
+    private void updateLastFishingRecordOfTile(SeaTile tileFished, FishingRecord record)
+    {
+
+        if (lastCachedTile != null && lastCachedTile != tileFished) {
+            flushLastRecordOfTileCache();
+
+        }
+        lastCachedTile = tileFished;
+        lastCachedFishingRecord = record;
+
+    }
+
+
+    private void flushLastRecordOfTileCache(){
+
+        assert  lastCachedTile!=null;
+        assert  lastCachedFishingRecord!=null;
+        lastFishingRecordOfTile.put(lastCachedTile,lastCachedFishingRecord);
+        lastCachedTile = null;
+        lastCachedFishingRecord = null;
 
 
     }
@@ -409,12 +441,14 @@ public class TripRecord {
         return tilesFished.get(tile);
     }
 
-//    /**
-//     * Getter for property 'lastFishingRecordOfTile'.
-//     *
-//     * @return Value for property 'lastFishingRecordOfTile'.
-//     */
-//    public FishingRecord getLastFishingRecordOfTile(SeaTile tile) {
-//        return lastFishingRecordOfTile.get(tile);
-//    }
+    /**
+     * Getter for property 'lastFishingRecordOfTile'.
+     *
+     * @return Value for property 'lastFishingRecordOfTile'.
+     */
+    public FishingRecord getLastFishingRecordOfTile(SeaTile tile) {
+        if(lastCachedTile != null)
+            flushLastRecordOfTileCache();
+        return lastFishingRecordOfTile.get(tile);
+    }
 }
