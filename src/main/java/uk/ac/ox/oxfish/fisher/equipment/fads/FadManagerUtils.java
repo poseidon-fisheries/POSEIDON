@@ -1,10 +1,13 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
 import org.apache.commons.collections15.set.ListOrderedSet;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.market.Market;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -36,6 +39,12 @@ public interface FadManagerUtils {
 
     static Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
         return bagToStream(getFadManager(fisher).getFadMap().fadsAt(seaTile));
+    }
+
+    static double priceOfFishHere(LocalBiology biology, Collection<Market> markets) {
+        return markets.stream().mapToDouble(market ->
+            biology.getBiomass(market.getSpecies()) * market.getMarginalPrice()
+        ).sum();
     }
 
 }

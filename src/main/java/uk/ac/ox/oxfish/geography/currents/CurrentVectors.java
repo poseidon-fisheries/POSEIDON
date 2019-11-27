@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.abs;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectors {
 
@@ -27,7 +27,7 @@ public class CurrentVectors {
         TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
         int stepsPerDay
     ) {
-        this(vectorMaps, __ -> NEUTRAL, stepsPerDay);
+        this(vectorMaps, __ -> Y2017, stepsPerDay);
     }
 
     public CurrentVectors(

@@ -1,0 +1,178 @@
+Tuna:
+  biologyInitializers:
+    Multiple Species Biomass:
+      addImaginarySpecies: false
+      constantBiomass: false
+      factories:
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: '1.44094E9'
+          differentialPercentageToMove: '0.001'
+          grower:
+            FAD-Aware Common Logistic Grower:
+              distributionalWeight: '-1.0'
+              steepness: '0.265079184'
+          initialBiomassAllocator:
+            Equal Allocation:
+              constantValue: '0.2340305633822366'
+          initialCapacityAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Smoothed Allocator:
+                  biomassPath: inputs/tuna/2017_BET_DIST.csv
+                  inputFileHasHeader: true
+                  smoother:
+                    Nearest Neighbor:
+                      neighbors: '1.0'
+                      spaceBandwidth: '5.0'
+                      timeBandwidth: '500.0'
+              insidePolygon: true
+              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+          percentageLimitOnDailyMovement: '0.01'
+          speciesName: Bigeye tuna
+          unfishable: false
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: '4.776E9'
+          differentialPercentageToMove: '0.001'
+          grower:
+            FAD-Aware Common Logistic Grower:
+              distributionalWeight: '-1.0'
+              steepness: '1.1520938023450586'
+          initialBiomassAllocator:
+            Equal Allocation:
+              constantValue: '0.7468946817420435'
+          initialCapacityAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Smoothed Allocator:
+                  biomassPath: inputs/tuna/2017_SKJ_DIST.csv
+                  inputFileHasHeader: true
+                  smoother:
+                    Nearest Neighbor:
+                      neighbors: '1.0'
+                      spaceBandwidth: '5.0'
+                      timeBandwidth: '500.0'
+              insidePolygon: true
+              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+          percentageLimitOnDailyMovement: '0.01'
+          speciesName: Skipjack tuna
+          unfishable: false
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: '1.20277E9'
+          differentialPercentageToMove: '0.001'
+          grower:
+            FAD-Aware Common Logistic Grower:
+              distributionalWeight: '-1.0'
+              steepness: '0.878915170814038'
+          initialBiomassAllocator:
+            Equal Allocation:
+              constantValue: '0.42177224240711025'
+          initialCapacityAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Smoothed Allocator:
+                  biomassPath: inputs/tuna/2017_YFT_DIST.csv
+                  inputFileHasHeader: true
+                  smoother:
+                    Nearest Neighbor:
+                      neighbors: '1.0'
+                      spaceBandwidth: '5.0'
+                      timeBandwidth: '500.0'
+              insidePolygon: true
+              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+          percentageLimitOnDailyMovement: '0.01'
+          speciesName: Yellowfin tuna
+          unfishable: false
+  fisherDefinition:
+    departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '374.3583'
+    destinationStrategy: FAD Destination Strategy
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      FAD Fishing Strategy:
+        fadsDeploymentCoefficient: '0.013915000000000002'
+        otherFadsSettingCoefficient: '0.05582'
+        ownFadsSettingCoefficient: '0.0'
+        probabilityDecayCoefficient: '9.999500000000001'
+        unassociatedSetCoefficient: '0.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Purse Seine Gear:
+        averageSetDurationInHours: '8.0219505805135'
+        fadInitializerFactory:
+          attractionRates:
+            Bigeye tuna: '0.21860000000000002'
+            Yellowfin tuna: '0.38585'
+            Skipjack tuna: '0.14460000000000003'
+          carryingCapacities:
+            Bigeye tuna: 254700.0
+            Yellowfin tuna: 278370.0
+            Skipjack tuna: 387000.0
+          fishReleaseProbabilityInPercent: '39.64'
+        initialNumberOfFads: 999999
+        minimumSetDurationInHours: '3.03333333333333'
+        stdDevOfSetDurationInHours: '2.99113291538723'
+        successfulSetProbability: '0.957'
+        unassociatedSetParameters:
+          Bigeye tuna: normal 22.073684210526316 34.92679347228484
+          Yellowfin tuna: normal 22.58983406113537 30.517121559489127
+          Skipjack tuna: normal 28.926356345885633 34.75812387404913
+    gearStrategy: Never Change Gear
+    holdSize: '100.0'
+    hourlyVariableCost: '0.0'
+    initialFishersPerPort: {
+      }
+    literPerKilometer: '10.0'
+    logbook: No Logbook
+    regulation:
+      Multiple Regulations:
+        factories:
+        - Specific MPA from Shape File:
+            shapeFilePath: inputs/tuna/galapagos_eez/eez.shp
+        - Temporary Regulation:
+            delegate:
+              Specific MPA from Coordinates:
+                eastLongitude: '-96.0'
+                northLatitude: '4.0'
+                southLatitude: '-3.0'
+                westLongitude: '-110.0'
+            endDay: '312.0'
+            startDay: '282.0'
+        - Temporary Regulation:
+            delegate: No Fishing
+            endDay: '281.0'
+            startDay: '210.0'
+        - Temporary Regulation:
+            delegate: No Fishing
+            endDay: '19.0'
+            startDay: '313.0'
+        tags:
+        - all
+        - all
+        - closure A
+        - closure B
+    speedInKmh: '5.0'
+    tags: ''
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '0.01'
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '94.0'
+      header: true
+      latLong: true
+      mapFile: inputs/tuna/depth.csv
+      mapPaddingInDegrees: '0.5'
+  plugins:
+  - Biomass Snapshot Resetter:
+      yearsToReset: 1
+  portFilePath: inputs/tuna/ports.csv
+  targetYear: 2017
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

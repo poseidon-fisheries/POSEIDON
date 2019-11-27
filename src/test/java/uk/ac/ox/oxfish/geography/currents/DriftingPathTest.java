@@ -16,6 +16,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 
 public class DriftingPathTest {
 
@@ -30,8 +31,8 @@ public class DriftingPathTest {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
         final ImmutableMap<SeaTile, Double2D> tileVectors =
             seaTiles.values().stream().collect(toImmutableMap(identity(), __ -> new Double2D(1, 0)));
-        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(CurrentPattern.NEUTRAL, tileVectors)));
-        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, 1);
+        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, tileVectors)));
+        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
         BiFunction<Integer, Integer, SeaTile> getSeaTile = (x, y) -> seaTiles.get(x);
         final DriftingPath driftingPath = new DriftingPath(0, new Double2D(0, 0), currentVectors, getSeaTile);
 

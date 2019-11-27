@@ -1,58 +1,31 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.ActionResult;
-import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Time;
 import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class MakeFadSet implements FadAction {
+public class MakeFadSet implements SetAction {
 
+    public static final String NUMBER_OF_FAD_SETS = "Number of FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(Fad targetFad) { this.targetFad = targetFad; }
 
+    @Override public String counterName() { return NUMBER_OF_FAD_SETS; }
+
     @Override
-    public ActionResult act(
-        FishState model, Fisher fisher, Regulation regulation, double hoursLeft
-    ) {
-        final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
-            // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
-            final int duration = toHours(getDuration(fisher, model.getRandom()));
-            if (model.getRandom().nextDouble() < purseSeineGear.getSuccessfulSetProbability()) {
-                fisher.fishHere(model.getBiology(), duration, model, targetFad.getBiology());
-                model.recordFishing(fisher.getLocation());
-            } else {
-                targetFad.releaseFish(model.getBiology().getSpecies(), fisher.getLocation().getBiology());
-            }
-            return new ActionResult(new PickUpFad(targetFad), hoursLeft - duration);
-        } else {
-            // it can happen that the FAD has drifted away or the fishing season ended since the
-            // action was decided, in which case the fisher has to reconsider its course of action
-            return new ActionResult(new Arriving(), hoursLeft);
-        }
-    }
-
-    @Override public boolean isPossible(FishState model, Fisher fisher) {
-        return
-            fisher.getHold().getPercentageFilled() < 1 &&
-                isFadHere(fisher);
-    }
-
-    @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
-        return ((PurseSeineGear) fisher.getGear()).nextSetDuration(rng);
+    public boolean isPossible(FishState model, Fisher fisher) {
+        return SetAction.super.isPossible(model, fisher) && isFadHere(fisher);
     }
 
     private boolean isFadHere(Fisher fisher) {
@@ -64,6 +37,26 @@ public class MakeFadSet implements FadAction {
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
+    }
+
+    @Override public Action actionAfterSet() { return new PickUpFad(targetFad); }
+
+    /**
+     * When making a FAD set, the target biology is the biology of the target FAD.
+     * Fish has already been removed from the underlying sea tiles while the FAD
+     * was drifting so we don't need to do that now.
+     */
+    @Override public LocalBiology targetBiology(
+        PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng
+    ) {
+        return targetFad.getBiology();
+    }
+
+    /**
+     * When a FAD set fails, the fish is returned to the underlying sea tile biology.
+     */
+    @Override public void reactToFailedSet(FishState model, SeaTile locationOfSet) {
+        targetFad.releaseFish(model.getBiology().getSpecies(), locationOfSet.getBiology());
     }
 
 }

@@ -44,7 +44,7 @@ public class MakeFadSetTest {
         final double carryingCapacity = 0.0;
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
-        final Fad fad = new Fad(fadManager, fadBiology, 0, 0);
+        final Fad fad = new Fad(fadManager, fadBiology, new double[3], 0);
         final MakeFadSet makeFadSet = new MakeFadSet(fad);
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 

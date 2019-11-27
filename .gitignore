@@ -133,3 +133,9 @@ crashlytics-build.properties
 
 .Rproj.user
 .DS_Store
+
+# EVA optimizer generated files
+OptimizationParameters.yml
+Statistics.yml
+eva/flexible.yaml
+eva/generic.yaml
