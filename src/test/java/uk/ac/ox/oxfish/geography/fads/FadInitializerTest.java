@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -7,6 +8,9 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -17,10 +21,15 @@ public class FadInitializerTest {
 
     @Test
     public void fadBiomassInitializedToZero() {
-        final GlobalBiology globalBiology =
-            new GlobalBiology(new Species("A"), new Species("B"));
+        final Species speciesA = new Species("A");
+        final Species speciesB = new Species("B");
+        final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
+        final ImmutableMap<Species, Quantity<Mass>> carryingCapacities = ImmutableMap.of(
+            speciesA, getQuantity(1d, TONNE),
+            speciesB, getQuantity(2d, TONNE)
+        );
         final FadInitializer fadInitializer =
-            new FadInitializer(getQuantity(1d, TONNE), 0d, 0);
+            new FadInitializer(globalBiology, carryingCapacities, ImmutableMap.of(), 0);
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);

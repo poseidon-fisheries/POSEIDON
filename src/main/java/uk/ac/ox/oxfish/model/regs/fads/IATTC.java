@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
+
 import javax.measure.Quantity;
 import javax.measure.quantity.Volume;
 
@@ -13,6 +15,14 @@ public class IATTC {
      * according to IATTC resolution C-17-02.8. This is currently hard coded, but we'll most likely
      * want to make this changeable.
      */
+    public static int activeFadsLimit(Fisher fisher) {
+        return fisher.getHold().getVolume()
+            .map(IATTC::activeFadsLimit)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Hold volume needs to be known to get active FAD limit for fisher " + fisher
+            ));
+    }
+
     public static int activeFadsLimit(Quantity<Volume> holdVolume) {
         switch (capacityClass(holdVolume)) {
             case 1:

@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishHere;
 
 public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy implements FadManagerUtils {
 
@@ -65,7 +66,7 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
             .filter(entry -> fisher.getRegulation().canFishHere(fisher, entry.getKey(), fishState, timeStep))
             .collect(toImmutableMap(
                 Map.Entry::getKey,
-                entry -> entry.getValue().stream().mapToDouble(fad -> fad.priceOfFishHere(markets)).sum()
+                entry -> entry.getValue().stream().mapToDouble(fad -> priceOfFishHere(fad.getBiology(), markets)).sum()
             ));
     }
 }

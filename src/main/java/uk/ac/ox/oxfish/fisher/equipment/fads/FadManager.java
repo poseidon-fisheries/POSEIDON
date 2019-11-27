@@ -43,6 +43,8 @@ public class FadManager {
 
     ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
 
+    public int getNumDeployedFads() { return deployedFads.size(); }
+
     Optional<Fad> oneOfFadsHere() {
         final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
         return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();

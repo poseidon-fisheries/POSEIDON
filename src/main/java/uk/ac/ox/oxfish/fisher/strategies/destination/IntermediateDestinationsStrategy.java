@@ -23,7 +23,7 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
 
-    private static final double MAX_HOURS_AT_SEA = 3970.667; // longest trip from data
+    private static final double MAX_HOURS_AT_SEA = 3059.75; // longest trip from data
 
     protected NauticalMap map;
 

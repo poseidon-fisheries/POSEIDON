@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,10 +46,9 @@ public class TemporaryRegulationTest {
     private void isActiveTest(int startDay, int endDay, ImmutableMap<Integer, Boolean> cases) {
         final TemporaryRegulation temporaryRegulation =
             new TemporaryRegulation(startDay, endDay, mock(Regulation.class));
-        final FishState fishState = mock(FishState.class);
-        cases.forEach((day, expected) -> {
-            assertEquals("on day " + day, expected, temporaryRegulation.isActive(day));
-        });
+        cases.forEach((day, expected) ->
+            assertEquals("on day " + day, expected, temporaryRegulation.isActive(day))
+        );
     }
 
     @Test

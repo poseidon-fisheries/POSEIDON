@@ -12,11 +12,11 @@ import org.apache.commons.lang3.tuple.Triple;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
@@ -39,12 +40,14 @@ import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
@@ -65,6 +68,7 @@ import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -76,6 +80,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -95,17 +100,29 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.NUMBER_OF_FAD_DEPLOYMENTS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.NUMBER_OF_FAD_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.NUMBER_OF_UNASSOCIATED_SETS;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static uk.ac.ox.oxfish.utility.Measures.convert;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaScenario implements Scenario {
 
     private static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
-    public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
-    public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
+    public static final ImmutableMap<CurrentPattern, Path> currentFiles =
+        new ImmutableMap.Builder<CurrentPattern, Path>()
+            //.put(Y2015, input("currents_2015.csv"))
+            //.put(Y2016, input("currents_2016.csv"))
+            .put(Y2017, input("currents_2017.csv"))
+            //.put(Y2018, input("currents_2018.csv"))
+            //.put(NEUTRAL, input("currents_neutral.csv"))
+            //.put(EL_NINO, input("currents_el_nino.csv"))
+            //.put(LA_NINA, input("currents_la_nina.csv"))
+            .build();
     private static final Path MAP_FILE = input("depth.csv");
     private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
@@ -118,17 +135,19 @@ public class TunaScenario implements Scenario {
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
+    private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
+    private static final Path UNASSOCIATED_CATCH_MEANS = input("unassociated_catch_means.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
-        "BET", input("habitability_bet_2006-01-07.csv"),
-        "SKJ", input("biomass_skj_2006-01-15.csv"),
-        "YFT", input("biomass_yft_2006-01-15.csv")
+        "BET", input("2017_BET_DIST.csv"),
+        "SKJ", input("2017_SKJ_DIST.csv"),
+        "YFT", input("2017_YFT_DIST.csv")
     );
     private static final BiMap<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toImmutableBiMap(
-        r -> r.getString("code"),
-        r -> r.getString("name")
+        r -> r.getString("species_code"),
+        r -> r.getString("species_name")
     ));
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
-    private int targetYear = 2018;
+    private int targetYear = 2017;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             EXOGENOUS_CATCHES_FILE,
@@ -152,6 +171,10 @@ public class TunaScenario implements Scenario {
             false
         );
 
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = ImmutableList.of(
+        new SnapshotBiomassResetterFactory()
+    );
+
     TunaScenario() {
 
         AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
@@ -169,11 +192,36 @@ public class TunaScenario implements Scenario {
                 new NoFishingFactory()
             ), "closure B"
         ));
+
+        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
+        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
+            parseAllRecords(FAD_CARRYING_CAPACITIES).stream()
+                .filter(r -> r.getInt("year") == targetYear)
+                .collect(toMap(
+                    r -> speciesNames.get(r.getString("species_code")),
+                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
+                ))
+        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(
+            speciesNames.values().stream().collect(toMap(identity(), __ -> new FixedDoubleParameter(0.01)))
+        );
+        purseSeineGearFactory.setUnassociatedSetParameters(
+            parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()
+                .filter(r -> r.getInt("year") == targetYear)
+                .collect(toMap(
+                    r -> speciesNames.get(r.getString("species_code")),
+                    r -> new NormalDoubleParameter(r.getDouble("mean"), r.getDouble("sd"))
+                ))
+        );
+
         fisherDefinition.setRegulation(regulations);
-        fisherDefinition.setGear(new PurseSeineGearFactory());
+        fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
-
+        ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
+            // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
+            new FixedDoubleParameter(374.3583)
+        );
     }
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
@@ -301,18 +349,26 @@ public class TunaScenario implements Scenario {
                 r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
             ));
 
+        final ImmutableList<String> yearlyFisherCounters = ImmutableList.of(
+            NUMBER_OF_FAD_SETS,
+            NUMBER_OF_UNASSOCIATED_SETS,
+            NUMBER_OF_FAD_DEPLOYMENTS
+        );
+
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher -> {
+            // Setup hourly costs as a function of capacity
             final ComparableQuantity<Mass> capacity = getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
             final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
             fisher.getAdditionalTripCosts().add(hourlyCost);
-        });
-        fisherFactory.getAdditionalSetups().add(fisher ->
-            ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher)
-        );
 
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
-        fisherFactory.getAdditionalSetups().add(fisher -> {
+            // Store a reference to the fisher in the FAD manager
+            ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher);
+
+            // Add purse-seine-specific yearly counters to the fisher's memory
+            yearlyFisherCounters.forEach(column -> fisher.getYearlyCounter().addColumn(column));
+
+            // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
             final int daysFromNow = 1 + dayOfYear(JULY, 15);
             Steppable assignClosurePeriod = simState -> {
                 if (fisher.getRegulation() instanceof MultipleRegulations) {
@@ -381,6 +437,14 @@ public class TunaScenario implements Scenario {
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
         model.registerStartable(exogenousCatches);
 
+        plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
+
+        yearlyFisherCounters.forEach(column -> model.getYearlyDataSet().registerGatherer(
+            column,
+            fishState -> fishState.getFishers().stream().mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
+            0.0
+        ));
+
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
     }
@@ -444,8 +508,7 @@ public class TunaScenario implements Scenario {
         final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
         factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-        final FileBiomassAllocatorFactory initialCapacityAllocator =
-            speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
+        final FileBiomassAllocatorFactory initialCapacityAllocator = new SmootherFileAllocatorFactory();
         initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
         initialCapacityAllocator.setInputFileHasHeader(true);
         final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
@@ -455,4 +518,10 @@ public class TunaScenario implements Scenario {
 
         return factory;
     }
+
+    @SuppressWarnings("unused")
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() { return plugins; }
+
+    @SuppressWarnings("unused")
+    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
 }
