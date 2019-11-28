@@ -67,11 +67,11 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
         Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
     ) {
         if (!nextAction.isPresent()) {
-            nextAction = maybeMakeUnassociatedSet(model, fisher);
+            nextAction = maybeDeployFad(model, fisher);
             if (!nextAction.isPresent()) {
                 nextAction = maybeMakeFadSet(model, fisher);
                 if (!nextAction.isPresent()) {
-                    nextAction = maybeDeployFad(model, fisher);
+                    nextAction = maybeMakeUnassociatedSet(model, fisher);
                 }
             }
         }
