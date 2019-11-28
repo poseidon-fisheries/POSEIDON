@@ -25,14 +25,17 @@ abstract class IntermediateDestinationsStrategy {
 
     private static final double MAX_HOURS_AT_SEA = 3059.75; // longest trip from data
 
+    double travelSpeedMultiplier;
+
     protected NauticalMap map;
 
     @NotNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Deque<SeaTile>> currentRoute = Optional.empty();
 
-    IntermediateDestinationsStrategy(NauticalMap map) {
+    IntermediateDestinationsStrategy(NauticalMap map, double travelSpeedMultiplier) {
         this.map = map;
+        this.travelSpeedMultiplier = travelSpeedMultiplier;
     }
 
     void resetRoute() { currentRoute = Optional.empty(); }
@@ -108,9 +111,10 @@ abstract class IntermediateDestinationsStrategy {
         // and find the max travel time while we're looping
         final ImmutableList.Builder<Pair<Deque<SeaTile>, ImmutableList<Pair<SeaTile, Double>>>> builder = ImmutableList.builder();
         double greatestTravelTimeInHours = 0.0;
+        double travelSpeed = fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier;
         for (Deque<SeaTile> route : possibleRoutes) {
             final ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTime =
-                map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph());
+                map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, travelSpeed);
             final double totalRouteTravelTime = getLast(cumulativeTravelTime).getSecond();
             if (totalRouteTravelTime <= maxTravelTimeInHours) {
                 if (totalRouteTravelTime > greatestTravelTimeInHours) greatestTravelTimeInHours = totalRouteTravelTime;

@@ -23,9 +23,16 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishH
 
 public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy implements FadManagerUtils {
 
-    private final int NUM_STEPS_TO_LOOK_AHEAD = 30; // TODO: make this a parameter
+    private final int numberOfStepsToLookAheadForFadPositions;
 
-    public FadSettingDestinationStrategy(NauticalMap map) { super(map); }
+    public FadSettingDestinationStrategy(
+        NauticalMap map,
+        double travelSpeedMultiplier,
+        int numberOfStepsToLookAheadForFadPositions
+    ) {
+        super(map, travelSpeedMultiplier);
+        this.numberOfStepsToLookAheadForFadPositions = numberOfStepsToLookAheadForFadPositions;
+    }
 
     @Override
     protected Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile destination) {
@@ -42,7 +49,7 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
 
     @Override
     Set<SeaTile> possibleDestinations(Fisher fisher, int timeStep) {
-        return getFadManager(fisher).fadLocationsInTimeStepRange(timeStep, timeStep + NUM_STEPS_TO_LOOK_AHEAD);
+        return getFadManager(fisher).fadLocationsInTimeStepRange(timeStep, timeStep + numberOfStepsToLookAheadForFadPositions);
     }
 
     @Override ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(

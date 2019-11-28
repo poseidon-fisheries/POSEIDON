@@ -89,29 +89,32 @@ Tuna:
     departingStrategy:
       Fixed Rest:
         hoursBetweenEachDeparture: '374.3583'
-    destinationStrategy: FAD Destination Strategy
+    destinationStrategy:
+      FAD Destination Strategy:
+        numberOfStepsToLookAheadForFadPositions: 30
+        travelSpeedMultiplier: 1.0
     discardingStrategy: No Discarding
     fishingStrategy:
       FAD Fishing Strategy:
-        fadsDeploymentCoefficient: '0.08942499999999999'
-        otherFadsSettingCoefficient: '0.041280000000000004'
-        ownFadsSettingCoefficient: '0.07094500000000001'
-        probabilityDecayCoefficient: '8.7595'
-        unassociatedSetCoefficient: '0.03478'
+        fadsDeploymentCoefficient: '0.09'
+        otherFadsSettingCoefficient: '0.04'
+        ownFadsSettingCoefficient: '0.05'
+        probabilityDecayCoefficient: '1.36'
+        unassociatedSetCoefficient: '0.03'
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
         averageSetDurationInHours: '8.0219505805135'
         fadInitializerFactory:
           attractionRates:
-            Bigeye tuna: '0.5852'
-            Yellowfin tuna: '0.3602000000000001'
-            Skipjack tuna: '0.59465'
+            Bigeye tuna: '0.05'
+            Yellowfin tuna: '0.0321960615'
+            Skipjack tuna: '0.007183564999999999'
           carryingCapacities:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0
             Skipjack tuna: 387000.0
-          fishReleaseProbabilityInPercent: '0.13499999999999623'
+          fishReleaseProbabilityInPercent: '0.1'
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'

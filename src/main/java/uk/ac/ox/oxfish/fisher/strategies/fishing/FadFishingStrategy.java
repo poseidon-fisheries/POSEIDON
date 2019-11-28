@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -78,7 +79,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     }
 
     private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
-        return Optional.of(new MakeUnassociatedSet())
+        return Optional.of(new MakeUnassociatedSet((PurseSeineGear) fisher.getGear(), model.getRandom()))
             .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
             .filter(action -> {
                 final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
@@ -103,9 +104,9 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .map(fad -> new Pair<>(fad, fadSetProbability(fad, fisher)))
             .sorted(comparingDouble(Pair::getSecond))
             .filter(pair -> model.getRandom().nextDouble() < pair.getSecond())
-            .map(pair -> new MakeFadSet(pair.getFirst()))
-            .findFirst()
-            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
+            .map(pair -> new MakeFadSet((PurseSeineGear)fisher.getGear(), model.getRandom(), pair.getFirst()))
+            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
+            .findFirst();
     }
 
 
@@ -128,7 +129,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
-        nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration(fisher, model.getRandom())));
+        nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration()));
         numConsecutiveActions = nextAction.isPresent() ? numConsecutiveActions + 1 : 0;
         final ActionResult actionResult = nextAction
             .map(action -> new ActionResult(action, hoursLeft))
