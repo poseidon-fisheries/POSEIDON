@@ -58,4 +58,6 @@ public class PickUpFad implements FadAction {
         // this might need to be confirmed, but as far as I know, you can always pick up a FAD (without setting on it)
         return true;
     }
+
+    @Override public String actionName() { return "FAD pickups"; }
 }

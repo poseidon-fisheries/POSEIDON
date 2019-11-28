@@ -41,7 +41,8 @@ abstract class SetAction implements FadAction {
                     purseSeineGear, model.getBiology(), seaTile, model.getRandom()
                 );
                 fisher.fishHere(model.getBiology(), duration, model, targetBiology);
-                fisher.getYearlyCounter().count(counterName(), 1);
+                fisher.getYearlyCounter().count(totalCounterName(), 1);
+                //fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);
@@ -59,7 +60,6 @@ abstract class SetAction implements FadAction {
     public Quantity<Time> getDuration() { return duration; }
 
     abstract LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
-    abstract String counterName();
     void reactToFailedSet(FishState model, SeaTile locationOfSet) {}
     abstract Action actionAfterSet();
 

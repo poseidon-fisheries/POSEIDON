@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -28,7 +27,7 @@ public class DeployFad implements FadAction {
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
 
-    public static final String NUMBER_OF_FAD_DEPLOYMENTS = "Total number of FAD deployments";
+    public static final String TOTAL_NUMBER_OF_FAD_DEPLOYMENTS = "Total number of FAD deployments";
 
     private final SeaTile seaTile;
 
@@ -65,6 +64,8 @@ public class DeployFad implements FadAction {
             !isNoFishingAtStep(regulation, model, actionStep + BUFFER_PERIOD_BEFORE_CLOSURE);
     }
 
+    @Override public String actionName() { return "FAD deployments"; }
+
     @Override
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
@@ -72,7 +73,8 @@ public class DeployFad implements FadAction {
         checkState(seaTile == fisher.getLocation());
         if (isAllowed(model, fisher) && isPossible(model, fisher)) {
             getFadManager(fisher).deployFad(seaTile, model.getStep(), model.random);
-            fisher.getYearlyCounter().count(NUMBER_OF_FAD_DEPLOYMENTS, 1);
+            fisher.getYearlyCounter().count(totalCounterName(), 1);
+            //fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
         }
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }

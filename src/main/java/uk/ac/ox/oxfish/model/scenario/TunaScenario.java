@@ -1,7 +1,12 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.tuple.Triple;
@@ -25,8 +30,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
@@ -96,9 +101,9 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.NUMBER_OF_FAD_DEPLOYMENTS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.NUMBER_OF_FAD_SETS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.NUMBER_OF_UNASSOCIATED_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.TOTAL_NUMBER_OF_FAD_DEPLOYMENTS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.TOTAL_NUMBER_OF_FAD_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.TOTAL_NUMBER_OF_UNASSOCIATED_SETS;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -168,7 +173,7 @@ public class TunaScenario implements Scenario {
         );
 
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = Lists.newArrayList(
-            new SnapshotBiomassResetterFactory()
+        new SnapshotBiomassResetterFactory()
     );
 
     TunaScenario() {
@@ -198,9 +203,11 @@ public class TunaScenario implements Scenario {
                     r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
                 ))
         );
-        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(
-            speciesNames.values().stream().collect(toMap(identity(), __ -> new FixedDoubleParameter(0.01)))
-        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.05),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
+            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
+        ));
         purseSeineGearFactory.setUnassociatedSetParameters(
             parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()
                 .filter(r -> r.getInt("year") == targetYear)
@@ -346,9 +353,9 @@ public class TunaScenario implements Scenario {
             ));
 
         final ImmutableList<String> yearlyFisherCounters = ImmutableList.of(
-            NUMBER_OF_FAD_SETS,
-            NUMBER_OF_UNASSOCIATED_SETS,
-            NUMBER_OF_FAD_DEPLOYMENTS
+            TOTAL_NUMBER_OF_FAD_SETS,
+            TOTAL_NUMBER_OF_UNASSOCIATED_SETS,
+            TOTAL_NUMBER_OF_FAD_DEPLOYMENTS
         );
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);

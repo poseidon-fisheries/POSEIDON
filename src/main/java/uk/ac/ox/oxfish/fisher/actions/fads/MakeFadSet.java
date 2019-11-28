@@ -16,7 +16,7 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManage
 
 public class MakeFadSet extends SetAction {
 
-    public static final String NUMBER_OF_FAD_SETS = "Number of FAD sets";
+    public static final String TOTAL_NUMBER_OF_FAD_SETS = "Total number of FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng, Fad targetFad) {
@@ -24,7 +24,7 @@ public class MakeFadSet extends SetAction {
         this.targetFad = targetFad;
     }
 
-    @Override public String counterName() { return NUMBER_OF_FAD_SETS; }
+    @Override public String actionName() { return "FAD sets"; }
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {
