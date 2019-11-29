@@ -414,7 +414,7 @@ public class TunaScenario implements Scenario {
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
-                .limit(10)
+                //.limit(10)
                 .collect(toMap(
                     record -> record.getString("boat_id"),
                     record -> {
