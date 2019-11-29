@@ -437,7 +437,8 @@ public class TunaScenario implements Scenario {
 
         yearlyFisherCounters.forEach(column -> model.getYearlyDataSet().registerGatherer(
             column,
-            fishState -> fishState.getFishers().stream().mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
+            fishState -> fishState.getFishers().stream().mapToDouble(
+                    fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
             0.0
         ));
 

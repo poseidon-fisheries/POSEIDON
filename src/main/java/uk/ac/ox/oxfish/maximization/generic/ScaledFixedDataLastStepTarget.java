@@ -13,6 +13,7 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
 
     private double exponent = 1;
 
+    public static boolean VERBOSE = false;
 
     public ScaledFixedDataLastStepTarget() { }
 
@@ -25,11 +26,13 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
     @Override
     public double computeError(FishState model) {
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
-//        System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//        System.out.println("column: " + columnName);
-//        System.out.println("output: " +simulationOutput.getLatest() );
-//        System.out.println("target : " +fixedTarget );
-//        System.out.println("error : " +abs((simulationOutput.getLatest() - fixedTarget) / fixedTarget) );
+        if(VERBOSE) {
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            System.out.println("column: " + columnName);
+            System.out.println("output: " + simulationOutput.getLatest());
+            System.out.println("target : " + fixedTarget);
+            System.out.println("error : " + abs((simulationOutput.getLatest() - fixedTarget) / fixedTarget));
+        }
         return abs(
                 Math.pow((simulationOutput.getLatest() - fixedTarget),exponent)
                         /

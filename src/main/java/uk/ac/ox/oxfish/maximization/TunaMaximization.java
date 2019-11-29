@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -18,7 +19,7 @@ public class TunaMaximization {
     public static void main(String[] args) throws IOException {
 
         double[] optimalParameters = {
-                6.075, -2.655, -0.393, -5.264, -3.480, -1.399, -3.216, 1.140, 0.344
+                8.337,-1.984, 2.302,-3.536,-7.273, 10.000, 2.877,-7.130,-8.238
         };
 
 
@@ -27,10 +28,11 @@ public class TunaMaximization {
         GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
 
         Scenario scenario = optimization.buildScenario(optimalParameters);
-        Path outputFile = optimizationFile.getParent().resolve("tuna_virgin_calibrated.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("tuna_calibrated.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
 
+        ScaledFixedDataLastStepTarget.VERBOSE=true;
         optimization.evaluate(optimalParameters);
 
     }
