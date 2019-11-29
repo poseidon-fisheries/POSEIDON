@@ -37,24 +37,28 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
 
     private final AtomicLongMap<Class<? extends FadAction>> consecutiveActionCounts = AtomicLongMap.create();
     private Optional<? extends FadAction> nextAction = Optional.empty();
-    private double unassociatedSetCoefficient;
-    private double fadsDeploymentCoefficient;
-    private double ownFadsSettingCoefficient;
-    private double otherFadsSettingCoefficient;
-    private double probabilityDecayCoefficient;
+    private double fadDeploymentsCoefficient;
+    private double setsOnOwnFadsCoefficient;
+    private double setsOnOtherFadsCoefficient;
+    private double unassociatedSetsCoefficient;
+
+    private double fadDeploymentsProbabilityDecay;
+    private double fadSetsProbabilityDecay;
+    private double unassociatedSetsProbabilityDecay;
 
     public FadFishingStrategy(
-        double unassociatedSetCoefficient,
-        double fadsDeploymentCoefficient,
-        double ownFadsSettingCoefficient,
-        double otherFadsSettingCoefficient,
-        double probabilityDecayCoefficient
-    ) {
-        this.unassociatedSetCoefficient = unassociatedSetCoefficient;
-        this.fadsDeploymentCoefficient = fadsDeploymentCoefficient;
-        this.ownFadsSettingCoefficient = ownFadsSettingCoefficient;
-        this.otherFadsSettingCoefficient = otherFadsSettingCoefficient;
-        this.probabilityDecayCoefficient = probabilityDecayCoefficient;
+        double unassociatedSetsCoefficient,
+        double fadDeploymentsCoefficient,
+        double setsOnOwnFadsCoefficient,
+        double setsOnOtherFadsCoefficient,
+        double fadDeploymentsProbabilityDecay, double fadSetsProbabilityDecay, double unassociatedSetsProbabilityDecay) {
+        this.unassociatedSetsCoefficient = unassociatedSetsCoefficient;
+        this.fadDeploymentsCoefficient = fadDeploymentsCoefficient;
+        this.setsOnOwnFadsCoefficient = setsOnOwnFadsCoefficient;
+        this.setsOnOtherFadsCoefficient = setsOnOtherFadsCoefficient;
+        this.fadDeploymentsProbabilityDecay = fadDeploymentsProbabilityDecay;
+        this.fadSetsProbabilityDecay = fadSetsProbabilityDecay;
+        this.unassociatedSetsProbabilityDecay = unassociatedSetsProbabilityDecay;
     }
 
     @Override
@@ -81,7 +85,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
                 .getDeploymentLocationValues();
         return Optional
             .ofNullable(deploymentLocationValues.get(fisher.getLocation()))
-            .map(value -> probability(fadsDeploymentCoefficient, value, consecutiveActionCounts.get(DeployFad.class)))
+            .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
             .filter(p -> model.getRandom().nextDouble() < p)
             .map(__ -> new DeployFad(fisher.getLocation()))
             .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
@@ -103,22 +107,27 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .filter(action -> {
                 final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
                 final long numConsecutiveActions = consecutiveActionCounts.get(MakeUnassociatedSet.class);
-                final double probability = probability(unassociatedSetCoefficient, priceOfFishHere, numConsecutiveActions);
+                final double probability = probability(unassociatedSetsCoefficient, priceOfFishHere, numConsecutiveActions, unassociatedSetsProbabilityDecay);
                 return model.getRandom().nextDouble() < probability;
             });
     }
 
-    private double probability(double coefficient, double value, double numConsecutiveActions) {
+    private double probability(
+        double coefficient,
+        double value,
+        double numConsecutiveActions,
+        double probabilityDecayCoefficient
+    ) {
         return (1.0 - exp(-coefficient * (value + 1))) /
             (1.0 + (probabilityDecayCoefficient * numConsecutiveActions));
     }
 
     private double fadSetProbability(Fad fad, Fisher fisher) {
         final double coefficient = fad.getOwner() == getFadManager(fisher) ?
-            ownFadsSettingCoefficient :
-            otherFadsSettingCoefficient;
+            setsOnOwnFadsCoefficient :
+            setsOnOtherFadsCoefficient;
         final long numConsecutiveActions = consecutiveActionCounts.get(MakeFadSet.class);
-        return probability(coefficient, priceOfFishHere(fad.getBiology(), getMarkets(fisher)), numConsecutiveActions);
+        return probability(coefficient, priceOfFishHere(fad.getBiology(), getMarkets(fisher)), numConsecutiveActions, fadSetsProbabilityDecay);
     }
 
     private Collection<Market> getMarkets(Fisher fisher) {
@@ -139,14 +148,6 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .orElse(new ActionResult(new Arriving(), 0));
         nextAction = Optional.empty();
         return actionResult;
-    }
-
-    @Override
-    public void start(FishState model, Fisher fisher) {
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
     }
 
 }
