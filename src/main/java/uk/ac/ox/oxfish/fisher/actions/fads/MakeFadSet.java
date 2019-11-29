@@ -24,7 +24,8 @@ public class MakeFadSet extends SetAction {
         this.targetFad = targetFad;
     }
 
-    @Override public String actionName() { return "FAD sets"; }
+    public static String ACTION_NAME = "FAD sets";
+    public String getActionName() { return ACTION_NAME; }
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {

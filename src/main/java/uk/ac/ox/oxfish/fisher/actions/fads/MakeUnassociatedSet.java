@@ -19,7 +19,8 @@ public class MakeUnassociatedSet extends SetAction {
         super(purseSeineGear, rng);
     }
 
-    @Override public String actionName() { return "unassociated sets"; }
+    public static String ACTION_NAME = "unassociated sets";
+    public String getActionName() { return ACTION_NAME; }
 
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) {

@@ -18,7 +18,7 @@ import static tech.units.indriya.unit.Units.HOUR;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class PickUpFad implements FadAction {
+public class PickUpFad extends FadAction {
 
     private final Fad targetFad;
 
@@ -59,5 +59,7 @@ public class PickUpFad implements FadAction {
         return true;
     }
 
-    @Override public String actionName() { return "FAD pickups"; }
+    public static String ACTION_NAME = "FAD pickups";
+    @Override String getActionName() { return ACTION_NAME; }
+
 }

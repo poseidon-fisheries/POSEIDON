@@ -21,7 +21,7 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
  * Represents either a FAD set or an unassociated set. Dolphin sets will presumable fall under this interface too.
  * It's not lost on me that making unassociated/dolphin sets extend *Fad*Action is weird, so TODO: revise this.
  */
-abstract class SetAction implements FadAction {
+abstract class SetAction extends FadAction {
 
     private Quantity<Time> duration;
 
@@ -42,7 +42,7 @@ abstract class SetAction implements FadAction {
                 );
                 fisher.fishHere(model.getBiology(), duration, model, targetBiology);
                 fisher.getYearlyCounter().count(totalCounterName(), 1);
-                //fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
+                fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);

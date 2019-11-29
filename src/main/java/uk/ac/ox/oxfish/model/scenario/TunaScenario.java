@@ -26,6 +26,11 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalize
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
+import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.fads.Regions;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -84,8 +89,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
 import static java.time.Month.JANUARY;
 import static java.time.Month.JULY;
@@ -227,9 +234,9 @@ public class TunaScenario implements Scenario {
         );
     }
 
-    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
-
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
@@ -352,11 +359,18 @@ public class TunaScenario implements Scenario {
                 r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
             ));
 
-        final ImmutableList<String> yearlyFisherCounters = ImmutableList.of(
-            TOTAL_NUMBER_OF_FAD_SETS,
-            TOTAL_NUMBER_OF_UNASSOCIATED_SETS,
-            TOTAL_NUMBER_OF_FAD_DEPLOYMENTS
-        );
+        final ImmutableList<String> yearlyFisherCounters = Stream.concat(
+            Stream.of(
+                TOTAL_NUMBER_OF_FAD_DEPLOYMENTS,
+                TOTAL_NUMBER_OF_FAD_SETS,
+                TOTAL_NUMBER_OF_UNASSOCIATED_SETS
+            ),
+            Regions.REGION_NAMES.keySet().stream().flatMap(regionNumber -> ImmutableList.of(
+                DeployFad.ACTION_NAME,
+                MakeFadSet.ACTION_NAME,
+                MakeUnassociatedSet.ACTION_NAME
+            ).stream().map(actionName -> FadAction.regionCounterName(actionName, regionNumber)))
+        ).collect(toImmutableList());
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher -> {
@@ -400,7 +414,7 @@ public class TunaScenario implements Scenario {
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
-                //.limit(10)
+                .limit(10)
                 .collect(toMap(
                     record -> record.getString("boat_id"),
                     record -> {
