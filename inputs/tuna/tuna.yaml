@@ -91,16 +91,18 @@ Tuna:
         hoursBetweenEachDeparture: '374.3583'
     destinationStrategy:
       FAD Destination Strategy:
-        numberOfStepsToLookAheadForFadPositions: 30
-        travelSpeedMultiplier: 1.0
+        numberOfStepsToLookAheadForFadPositions: '30.0'
+        travelSpeedMultiplier: '1.0'
     discardingStrategy: No Discarding
     fishingStrategy:
       FAD Fishing Strategy:
-        fadsDeploymentCoefficient: '0.09'
-        otherFadsSettingCoefficient: '0.04'
-        ownFadsSettingCoefficient: '0.05'
-        probabilityDecayCoefficient: '1.36'
-        unassociatedSetCoefficient: '0.03'
+        fadDeploymentsCoefficient: '0.01'
+        fadDeploymentsProbabilityDecay: '0.01'
+        fadSetsProbabilityDecay: '0.01'
+        setsOnOtherFadsCoefficient: '0.01'
+        setsOnOwnFadsCoefficient: '0.01'
+        unassociatedSetsCoefficient: '1.0E-8'
+        unassociatedSetsProbabilityDecay: '0.01'
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
