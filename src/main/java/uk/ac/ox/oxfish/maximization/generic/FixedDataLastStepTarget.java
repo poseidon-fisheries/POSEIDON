@@ -28,6 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 /**
  * computes error by the last number in the column against a fixed number
  */
@@ -41,6 +43,9 @@ public class FixedDataLastStepTarget implements DataTarget {
 
     private String columnName = "Average Cash-Flow";
 
+    public static boolean VERBOSE = false;
+
+
     /**
      * computes distance from target (0 best, the higher the number the further away from optimum we are)
      *
@@ -51,6 +56,15 @@ public class FixedDataLastStepTarget implements DataTarget {
     public double computeError(FishState model) {
 
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
+
+
+        if(VERBOSE) {
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            System.out.println("column: " + columnName);
+            System.out.println("output: " + simulationOutput.getLatest());
+            System.out.println("target : " + fixedTarget);
+            System.out.println("error : " + Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponent));
+        }
 
         return Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponent);
 

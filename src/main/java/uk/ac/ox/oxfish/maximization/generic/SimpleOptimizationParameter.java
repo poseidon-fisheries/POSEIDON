@@ -79,10 +79,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         Preconditions.checkArgument(maximum>=minimum, "invalid bounds " + addressToModify);
         Preconditions.checkArgument(inputs.length==1);
 
-        double realValue =minimum+((maximum-minimum)/(10-(-10)))*(inputs[0]- (-10));
-        if(realValue < 0 & alwaysPositive)
-            realValue = 0;
-
+        double realValue = computeNumericValue(inputs[0]);
 
 
         //i am just going to do this the hackish way. The input could be a DoubleParameter or a straight up number. I will try the first, catch the exception
@@ -92,6 +89,13 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
         return String.valueOf(realValue);
 
+    }
+
+    public double computeNumericValue(double input) {
+        double realValue =minimum+((maximum-minimum)/(10-(-10)))*(input - (-10));
+        if(realValue < 0 & alwaysPositive)
+            realValue = 0;
+        return realValue;
     }
 
     public double parametrizeRealValue(Scenario scenario, double realValue)
