@@ -14,18 +14,22 @@ import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
-public class MakeFadSet implements SetAction {
+public class MakeFadSet extends SetAction {
 
-    public static final String NUMBER_OF_FAD_SETS = "Number of FAD sets";
+    public static final String TOTAL_NUMBER_OF_FAD_SETS = "Total number of FAD sets";
     private Fad targetFad;
 
-    public MakeFadSet(Fad targetFad) { this.targetFad = targetFad; }
+    public MakeFadSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng, Fad targetFad) {
+        super(purseSeineGear, rng);
+        this.targetFad = targetFad;
+    }
 
-    @Override public String counterName() { return NUMBER_OF_FAD_SETS; }
+    public static String ACTION_NAME = "FAD sets";
+    public String getActionName() { return ACTION_NAME; }
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {
-        return SetAction.super.isPossible(model, fisher) && isFadHere(fisher);
+        return super.isPossible(model, fisher) && isFadHere(fisher);
     }
 
     private boolean isFadHere(Fisher fisher) {

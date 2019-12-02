@@ -26,7 +26,7 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
     @Override
     public double computeError(FishState model) {
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
-        if(VERBOSE) {
+        if (VERBOSE) {
             System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
             System.out.println("column: " + columnName);
             System.out.println("output: " + simulationOutput.getLatest());
@@ -34,10 +34,9 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
             System.out.println("error : " + abs((simulationOutput.getLatest() - fixedTarget) / fixedTarget));
         }
         return abs(
-                Math.pow((simulationOutput.getLatest() - fixedTarget),exponent)
-                        /
-                        fixedTarget)
-                ;
+            Math.pow((simulationOutput.getLatest() - fixedTarget), exponent)
+                / fixedTarget
+        );
     }
 
     public double getFixedTarget() { return fixedTarget; }
@@ -50,7 +49,6 @@ public class ScaledFixedDataLastStepTarget implements DataTarget {
     public String getColumnName() { return columnName; }
 
     public void setColumnName(String columnName) { this.columnName = columnName; }
-
 
     /**
      * Getter for property 'exponent'.

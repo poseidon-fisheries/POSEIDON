@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -23,13 +22,12 @@ import static tech.units.indriya.unit.Units.HOUR;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class DeployFad implements FadAction {
+public class DeployFad extends FadAction {
 
+    public static final String TOTAL_NUMBER_OF_FAD_DEPLOYMENTS = "Total number of FAD deployments";
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
-
-    public static final String NUMBER_OF_FAD_DEPLOYMENTS = "Number of FAD deployments";
-
+    public static String ACTION_NAME = "FAD deployments";
     private final SeaTile seaTile;
 
     public DeployFad(SeaTile seaTile) { this.seaTile = seaTile; }
@@ -65,6 +63,8 @@ public class DeployFad implements FadAction {
             !isNoFishingAtStep(regulation, model, actionStep + BUFFER_PERIOD_BEFORE_CLOSURE);
     }
 
+    @Override String getActionName() { return ACTION_NAME; }
+
     @Override
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
@@ -72,24 +72,23 @@ public class DeployFad implements FadAction {
         checkState(seaTile == fisher.getLocation());
         if (isAllowed(model, fisher) && isPossible(model, fisher)) {
             getFadManager(fisher).deployFad(seaTile, model.getStep(), model.random);
-            fisher.getYearlyCounter().count(NUMBER_OF_FAD_DEPLOYMENTS, 1);
+            fisher.getYearlyCounter().count(totalCounterName(), 1);
+            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
         }
-        return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration(fisher, model.getRandom())));
+        return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
 
-    @Override
-    public boolean isPossible(FishState model, Fisher fisher) {
+    @Override public boolean isPossible(FishState model, Fisher fisher) {
         final FadManager fadManager = getFadManager(fisher);
         return fisher.getLocation().isWater() &&
             fadManager.getNumDeployedFads() < IATTC.activeFadsLimit(fisher) &&
             fadManager.getNumFadsInStock() > 0;
     }
 
-    @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
+    @Override public Quantity<Time> getDuration() {
         // see https://github.com/poseidon-fisheries/tuna/issues/6
         return getQuantity(0, HOUR);
     }
 
-    @Override
-    public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(seaTile); }
+    @Override public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(seaTile); }
 }

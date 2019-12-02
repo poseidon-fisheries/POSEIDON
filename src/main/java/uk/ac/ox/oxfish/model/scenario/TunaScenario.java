@@ -1,7 +1,12 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.tuple.Triple;
@@ -21,12 +26,17 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalize
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
+import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.fads.Regions;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
@@ -79,8 +89,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
 import static java.time.Month.JANUARY;
 import static java.time.Month.JULY;
@@ -96,9 +108,9 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.NUMBER_OF_FAD_DEPLOYMENTS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.NUMBER_OF_FAD_SETS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.NUMBER_OF_UNASSOCIATED_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.TOTAL_NUMBER_OF_FAD_DEPLOYMENTS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.TOTAL_NUMBER_OF_FAD_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.TOTAL_NUMBER_OF_UNASSOCIATED_SETS;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -168,7 +180,7 @@ public class TunaScenario implements Scenario {
         );
 
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = Lists.newArrayList(
-            new SnapshotBiomassResetterFactory()
+        new SnapshotBiomassResetterFactory()
     );
 
     TunaScenario() {
@@ -198,9 +210,11 @@ public class TunaScenario implements Scenario {
                     r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
                 ))
         );
-        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(
-            speciesNames.values().stream().collect(toMap(identity(), __ -> new FixedDoubleParameter(0.01)))
-        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.05),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
+            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
+        ));
         purseSeineGearFactory.setUnassociatedSetParameters(
             parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()
                 .filter(r -> r.getInt("year") == targetYear)
@@ -220,9 +234,9 @@ public class TunaScenario implements Scenario {
         );
     }
 
-    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
-
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
@@ -345,11 +359,18 @@ public class TunaScenario implements Scenario {
                 r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
             ));
 
-        final ImmutableList<String> yearlyFisherCounters = ImmutableList.of(
-            NUMBER_OF_FAD_SETS,
-            NUMBER_OF_UNASSOCIATED_SETS,
-            NUMBER_OF_FAD_DEPLOYMENTS
-        );
+        final ImmutableList<String> yearlyFisherCounters = Stream.concat(
+            Stream.of(
+                TOTAL_NUMBER_OF_FAD_DEPLOYMENTS,
+                TOTAL_NUMBER_OF_FAD_SETS,
+                TOTAL_NUMBER_OF_UNASSOCIATED_SETS
+            ),
+            Regions.REGION_NAMES.keySet().stream().flatMap(regionNumber -> ImmutableList.of(
+                DeployFad.ACTION_NAME,
+                MakeFadSet.ACTION_NAME,
+                MakeUnassociatedSet.ACTION_NAME
+            ).stream().map(actionName -> FadAction.regionCounterName(actionName, regionNumber)))
+        ).collect(toImmutableList());
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher -> {
@@ -382,7 +403,7 @@ public class TunaScenario implements Scenario {
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
 
-        final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
+        final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
         final Map<Integer, Quantity<Speed>> speedsPerClass =
             parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
@@ -405,7 +426,7 @@ public class TunaScenario implements Scenario {
                         final int capacityClass = IATTC.capacityClass(holdVolume);
                         final Engine engine = new Engine(
                             Double.NaN, // Unused
-                            0.0, // TODO
+                            1.0, // This is not realistic, but fuel costs are wrapped into daily costs
                             asDouble(speedsPerClass.get(capacityClass), KILOMETRE_PER_HOUR)
                         );
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));

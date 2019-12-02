@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -19,7 +18,7 @@ import static tech.units.indriya.unit.Units.HOUR;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class PickUpFad implements FadAction {
+public class PickUpFad extends FadAction {
 
     private final Fad targetFad;
 
@@ -31,7 +30,7 @@ public class PickUpFad implements FadAction {
     ) {
         if (isPossible(model, fisher)) {
             getFadManager(fisher).pickUpFad(targetFad);
-            return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration(fisher, model.getRandom())));
+            return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
         } else {
             // it can happen that the FAD has drifted away, in which case the fisher has to
             // reconsider its course of action
@@ -40,23 +39,27 @@ public class PickUpFad implements FadAction {
         }
     }
 
-    @Override @NotNull
-    public Optional<SeaTile> getActionTile(Fisher fisher) {
-        return getFadManager(fisher).getFadMap().getFadTile(targetFad);
-    }
-
-    @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
-        return getQuantity(1, HOUR); // TODO: how long does it take to pick up a FAD?
-    }
-
     @Override public boolean isPossible(FishState model, Fisher fisher) {
         return getActionTile(fisher)
             .filter(seaTile -> seaTile.equals(fisher.getLocation()))
             .isPresent();
     }
 
+    // Since FADs are (currently) always picked up after a set, we consider that the time
+    // to pick them up is included in the time it takes to make a set.
+    @Override public Quantity<Time> getDuration() { return getQuantity(0, HOUR); }
+
+    @Override @NotNull
+    public Optional<SeaTile> getActionTile(Fisher fisher) {
+        return getFadManager(fisher).getFadMap().getFadTile(targetFad);
+    }
+
     @Override public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
         // this might need to be confirmed, but as far as I know, you can always pick up a FAD (without setting on it)
         return true;
     }
+
+    public static String ACTION_NAME = "FAD pickups";
+    @Override String getActionName() { return ACTION_NAME; }
+
 }

@@ -22,8 +22,11 @@ public class FadDeploymentDestinationStrategy extends IntermediateDestinationsSt
     private final ImmutableList<SeaTile> possibleRouteTiles; // will serve as row keys for our ArrayTable of values
     private Map<SeaTile, Double> deploymentLocationValues = null;
 
-    public FadDeploymentDestinationStrategy(NauticalMap map) {
-        super(map);
+    public FadDeploymentDestinationStrategy(
+        NauticalMap map,
+        double travelSpeedMultiplier
+    ) {
+        super(map, travelSpeedMultiplier);
         possibleRouteTiles = Stream.concat(
             map.getPorts().stream().map(Port::getLocation),
             map.getAllSeaTilesExcludingLandAsList().stream()
