@@ -1,0 +1,94 @@
+!!uk.ac.ox.oxfish.maximization.GenericOptimization
+scenarioFile: inputs/tuna/tuna.yaml
+maximization: no
+runsPerSetting: 1
+simulatedYears: 2
+parameters:
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.fadDeploymentsCoefficient
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.setsOnOtherFadsCoefficient
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.setsOnOwnFadsCoefficient
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.unassociatedSetsCoefficient
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.fadDeploymentsProbabilityDecay
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.fadSetsProbabilityDecay
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.fishingStrategy.unassociatedSetsProbabilityDecay
+  minimum: 0.0
+  maximum: 0.1
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.destinationStrategy.numberOfStepsToLookAheadForFadPositions
+  minimum: 30.0
+  maximum: 100.0
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.destinationStrategy.travelSpeedMultiplier
+  minimum: 0.1
+  maximum: 0.9
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Bigeye
+    tuna
+  minimum: 0.0
+  maximum: 0.05
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Skipjack
+    tuna
+  minimum: 0.0
+  maximum: 0.05
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.attractionRates~Yellowfin
+    tuna
+  minimum: 0.0
+  maximum: 0.05
+  alwaysPositive: yes
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fisherDefinition.gear.fadInitializerFactory.fishReleaseProbabilityInPercent
+  minimum: 0.0
+  maximum: 2.0
+  alwaysPositive: yes
+targets:
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Bigeye tuna Landings
+  fixedTarget: 6.0487e+07
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Skipjack tuna Landings
+  fixedTarget: 2.40472e+08
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Yellowfin tuna Landings
+  fixedTarget: 6.0008e+07
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Total number of FAD deployments
+  fixedTarget: 19103.0
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Total number of FAD sets
+  fixedTarget: 9225.0
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Total number of unassociated sets
+  fixedTarget: 1927.0
+
