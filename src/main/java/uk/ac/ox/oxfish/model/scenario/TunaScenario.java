@@ -403,7 +403,7 @@ public class TunaScenario implements Scenario {
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
 
-        final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
+        final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
         final Map<Integer, Quantity<Speed>> speedsPerClass =
             parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
@@ -426,7 +426,7 @@ public class TunaScenario implements Scenario {
                         final int capacityClass = IATTC.capacityClass(holdVolume);
                         final Engine engine = new Engine(
                             Double.NaN, // Unused
-                            0.0, // TODO
+                            1.0, // This is not realistic, but fuel costs are wrapped into daily costs
                             asDouble(speedsPerClass.get(capacityClass), KILOMETRE_PER_HOUR)
                         );
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));

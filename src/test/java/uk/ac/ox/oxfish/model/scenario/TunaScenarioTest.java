@@ -31,8 +31,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import static org.junit.Assert.*;
-
 public class TunaScenarioTest {
 
 
@@ -72,7 +70,7 @@ public class TunaScenarioTest {
                                         System.out.println(landings);
                                         Assert.assertTrue(catches>1000);
                                         Assert.assertTrue(landings>1000);
-                                        Assert.assertTrue(Math.abs(catches - landings)<.01);
+                                        Assert.assertTrue(Math.abs(catches - landings) < .5);
                                         System.out.println(Math.abs(catches - landings));
                                     }
                                 }, StepOrder.AFTER_DATA);
