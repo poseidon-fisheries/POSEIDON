@@ -1,5 +1,5 @@
 !!uk.ac.ox.oxfish.maximization.GenericOptimization
-scenarioFile: inputs/tuna/tuna.yaml
+scenarioFile: inputs/tuna/tuna_.yaml
 maximization: no
 runsPerSetting: 1
 simulatedYears: 2
@@ -37,7 +37,7 @@ parameters:
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.fishingStrategy.unassociatedSetsProbabilityDecay
   minimum: 0.0
-  maximum: 0.1
+  maximum: 1.0
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.destinationStrategy.numberOfStepsToLookAheadForFadPositions

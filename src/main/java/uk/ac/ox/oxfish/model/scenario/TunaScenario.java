@@ -137,7 +137,6 @@ public class TunaScenario implements Scenario {
     private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
     private static final Path PORTS_FILE = input("ports.csv");
     private static final Path PRICES_FILE = input("prices.csv");
-    private static final Path COSTS_FILE = input("costs.csv");
     private static final Path BOATS_FILE = input("boats.csv");
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
@@ -182,6 +181,9 @@ public class TunaScenario implements Scenario {
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = Lists.newArrayList(
         new SnapshotBiomassResetterFactory()
     );
+
+    private Path costsFile = input("costs.csv");
+
 
     TunaScenario() {
 
@@ -351,7 +353,7 @@ public class TunaScenario implements Scenario {
         Preconditions.checkState(!ports.isEmpty());
 
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            parseAllRecords(COSTS_FILE).stream().collect(toImmutableRangeMap(
+            parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
                 r -> Range.openClosed(
                     getQuantity(r.getInt("lower_capacity"), TONNE),
                     getQuantity(r.getInt("upper_capacity"), TONNE)
@@ -542,4 +544,22 @@ public class TunaScenario implements Scenario {
 
     @SuppressWarnings("unused")
     public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
+
+    /**
+     * Getter for property 'costsFile'.
+     *
+     * @return Value for property 'costsFile'.
+     */
+    public Path getCostsFile() {
+        return costsFile;
+    }
+
+    /**
+     * Setter for property 'costsFile'.
+     *
+     * @param costsFile Value to set for property 'costsFile'.
+     */
+    public void setCostsFile(Path costsFile) {
+        this.costsFile = costsFile;
+    }
 }

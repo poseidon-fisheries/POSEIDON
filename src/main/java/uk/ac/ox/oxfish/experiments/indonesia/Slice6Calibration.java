@@ -7,14 +7,12 @@ import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbu
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
-import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,7 +47,8 @@ public class Slice6Calibration {
 //                "steve_TropFishR_calibrated.yaml",
 //                STEVE_TROPFISH_OPTIMAL_PARAMETERS);
 
-        buildLocalCalibrationProblem("steve_TropFishR_calibrationproblem.yaml",
+        GenericOptimization.buildLocalCalibrationProblem(
+                DIRECTORY.resolve("calibration").resolve("steve_TropFishR_calibrationproblem.yaml"),
                 STEVE_TROPFISH_OPTIMAL_PARAMETERS,
                 "steve_local_TropFishR_calibrationproblem.yaml",
                 .2d);
@@ -147,26 +146,4 @@ public class Slice6Calibration {
 
     }
 
-    /**
-     * create smaller optimization problem trying to climb within a small range of previously found optimal parameters
-     * this assumes however all parameters are simple
-     */
-    public static void buildLocalCalibrationProblem(String originalCalibrationFileName,
-                                                    double[] originalParameters,
-                                                    String newCalibraitonFileName,
-                                                    double range) throws IOException {
-        FishYAML yaml = new FishYAML();
-        Path optimizationFile = DIRECTORY.resolve("calibration").resolve(originalCalibrationFileName);
-        GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
-        for (int i = 0; i < optimization.getParameters().size(); i++) {
-            final SimpleOptimizationParameter parameter = ((SimpleOptimizationParameter) optimization.getParameters().get(i));
-            double optimalValue = parameter.computeNumericValue(originalParameters[i]);
-            parameter.setMaximum(optimalValue* (1d+range));
-            parameter.setMinimum(optimalValue* (1d-range));
-
-        }
-        yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibraitonFileName).toFile()));
-
-
-    }
 }

@@ -31,6 +31,6 @@ public class FadAwareCommonLogisticGrower extends CommonLogisticGrower {
             seaTileBiologies.stream(),
             model.getFadMap().allFads().map(Fad::getBiology)
         ).collect(toList());
-        grow(model, biologies);
+        grow(model, biologies,seaTileBiologies);
     }
 }

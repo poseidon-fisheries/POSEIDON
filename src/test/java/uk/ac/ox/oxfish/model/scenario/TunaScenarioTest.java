@@ -37,6 +37,7 @@ public class TunaScenarioTest {
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
         TunaScenario scenario = new TunaScenario();
+        scenario.setCostsFile(scenario.getCostsFile().getParent().resolve("no_costs.csv"));
         scenario.getPlugins().add(
                 new AlgorithmFactory<AdditionalStartable>() {
                     @Override

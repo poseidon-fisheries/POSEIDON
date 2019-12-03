@@ -241,6 +241,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     public static void allocateBiomassAtRandom(List<? extends VariableBiomassBasedBiology> biologyList, double toReallocate, MersenneTwisterFast random, int speciesIndex) {
         while(toReallocate > 0 && !biologyList.isEmpty())
         {
+            biologyList = new ArrayList<>(biologyList);
             //pick a biology at random
             VariableBiomassBasedBiology local = biologyList.get(random.nextInt(biologyList.size()));
             //give or take some biomass out

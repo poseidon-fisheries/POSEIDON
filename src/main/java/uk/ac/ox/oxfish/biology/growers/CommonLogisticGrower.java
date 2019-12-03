@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -51,15 +52,32 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
     protected void grow(FishState model, List<BiomassLocalBiology> biologies) {
 
+        grow(model,biologies,biologies);
+    }
+
+
+    protected void grow(FishState model, List<BiomassLocalBiology> allBiologies,
+                        List<BiomassLocalBiology> nonFadHabitats) {
+
         double current = 0;
         double capacity = 0;
         //for each place
-        for(VariableBiomassBasedBiology biology : biologies)
+        for(VariableBiomassBasedBiology biology : allBiologies)
         {
             current += biology.getBiomass(species);
+
+        }
+        //find all the biologies that are NOT FADS
+        //loop through them and get their carrying capacity
+        for(VariableBiomassBasedBiology biology : nonFadHabitats)
+        {
             capacity +=biology.getCarryingCapacity(species);
 
         }
+
+
+
+
         double recruitment = IndependentLogisticBiomassGrower.logisticRecruitment(
                 current,
                 capacity,
@@ -72,13 +90,13 @@ public class CommonLogisticGrower implements Startable, Steppable {
         if(recruitment>FishStateUtilities.EPSILON) {
             //distribute it
             if(distributionalWeight>0)
-                CommonLogisticGrower.allocateBiomassProportionally(biologies,
+                CommonLogisticGrower.allocateBiomassProportionally(nonFadHabitats,
                                                                    recruitment,
                                                                    species.getIndex(),
                                                                    distributionalWeight);
             else
                 DerisoSchnuteCommonGrower.allocateBiomassAtRandom(
-                        biologies,
+                        nonFadHabitats,
                         recruitment,
                         model.getRandom(),
                         species.getIndex()
@@ -92,7 +110,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
 
 
-        if(biologies.size()==0) //if you removed all the biologies then we are done
+        if(allBiologies.size()==0) //if you removed all the biologies then we are done
             turnOff();
     }
 

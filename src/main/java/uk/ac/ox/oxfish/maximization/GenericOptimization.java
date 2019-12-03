@@ -261,6 +261,33 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     private int simulatedYears = 4;
 
     /**
+     * create smaller optimization problem trying to climb within a small range of previously found optimal parameters
+     * this assumes however all parameters are simple
+     */
+    public static void buildLocalCalibrationProblem(
+            final Path optimizationFile, double[] originalParameters,
+            String newCalibrationName,
+            double range) throws IOException {
+        FishYAML yaml = new FishYAML();
+        GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
+        for (int i = 0; i < optimization.getParameters().size(); i++) {
+            final SimpleOptimizationParameter parameter = ((SimpleOptimizationParameter) optimization.getParameters().get(i));
+            double optimalValue = parameter.computeNumericValue(originalParameters[i]);
+            parameter.setMaximum(optimalValue* (1d+range));
+            parameter.setMinimum(optimalValue* (1d-range));
+            if(parameter.getMaximum()==parameter.getMinimum())
+            {
+                assert parameter.getMinimum()==0;
+                parameter.setMaximum(0.001);
+            }
+
+        }
+        yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile()));
+
+
+    }
+
+    /**
      * Return the problem dimension.
      *
      * @return the problem dimension

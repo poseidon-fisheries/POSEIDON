@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "steve_lime_hs";
+    private static final String SCENARIO_NAME = "steve_lime_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -64,59 +64,59 @@ public class Slice6Sweeps {
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
-
-
 //
-        effortControl("10",
-                      new String[]{"population1","population2","population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT);
-
-
-
 //
-//////        //only boats >10GT are controlled
+////
 //        effortControl("10",
-//                new String[]{"big","medium","small10"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, MIN_DAYS_OUT);
-
-//////
-//////        //price premium
-        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
-
-//        //selectivity test
-        selectivityTest("selectivity_sweep", SCENARIO_NAME);
-//
-//        //price penalty
-        pricePenalty("malus_malabaricus",
-                SCENARIO_NAME,
-                10,
-                "Lutjanus malabaricus");
-//
-//
-//
-//        //fleet reduction
-        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
-
-//        //delays
-        delays("delay_all",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
+//                      new String[]{"population1","population2","population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT);
 //
 //
 //
 ////
-        delays("delay_10",
-                new String[]{"population1","population2","population3"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
+////////        //only boats >10GT are controlled
+////        effortControl("10",
+////                new String[]{"big","medium","small10"},
+////                SCENARIO_NAME,
+////                SHOCK_YEAR, MIN_DAYS_OUT);
 //
+////////
+////////        //price premium
+//        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
 //
+////        //selectivity test
+//        selectivityTest("selectivity_sweep", SCENARIO_NAME);
+////
+////        //price penalty
+//        pricePenalty("malus_malabaricus",
+//                SCENARIO_NAME,
+//                10,
+//                "Lutjanus malabaricus");
+////
+////
+////
+////        //fleet reduction
+//        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 //
-//        delaysOnce("delay_once",
-//                new String[]{"big","small","medium","small10"},
-//                SCENARIO_NAME, SHOCK_YEAR, 200);
+////        //delays
+//        delays("delay_all",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+//////
+//        delays("delay_10",
+//                new String[]{"population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+////        delaysOnce("delay_once",
+////                new String[]{"big","small","medium","small10"},
+////                SCENARIO_NAME, SHOCK_YEAR, 200);
 
 
     }
@@ -894,23 +894,23 @@ public class Slice6Sweeps {
         }
 
 
-//        for(int i=0; i<25; i++) {
-//            columnsToPrint.add("Epinephelus areolatus Catches (kg) - age bin " + i);
-//            columnsToPrint.add("Pristipomoides multidens Catches (kg) - age bin " + i);
-//            columnsToPrint.add("Lutjanus malabaricus Catches (kg) - age bin " + i);
-//            columnsToPrint.add("Lutjanus erythropterus Catches (kg) - age bin " + i);
-//
-//            columnsToPrint.add("Epinephelus areolatus Abundance 0."+i+" at day " + 365);
-//            columnsToPrint.add("Lutjanus malabaricus Abundance 0."+i+" at day " + 365);
-//            columnsToPrint.add("Pristipomoides multidens Abundance 0."+i+" at day " + 365);
-//            columnsToPrint.add("Lutjanus erythropterus Abundance 0."+i+" at day " + 365);
-//
-//
-//            columnsToPrint.add("Epinephelus areolatus Catches(#) 0."+i+" 100_areolatus");
-//            columnsToPrint.add("Lutjanus malabaricus Catches(#) 0."+i+" 100_malabaricus");
-//            columnsToPrint.add("Pristipomoides multidens Catches(#) 0."+i+" 100_multidens");
-//            columnsToPrint.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
-//        }
+        for(int i=0; i<25; i++) {
+            columnsToPrint.add("Epinephelus areolatus Catches (kg) - age bin " + i);
+            columnsToPrint.add("Pristipomoides multidens Catches (kg) - age bin " + i);
+            columnsToPrint.add("Lutjanus malabaricus Catches (kg) - age bin " + i);
+            columnsToPrint.add("Lutjanus erythropterus Catches (kg) - age bin " + i);
+
+            columnsToPrint.add("Epinephelus areolatus Abundance 0."+i+" at day " + 365);
+            columnsToPrint.add("Lutjanus malabaricus Abundance 0."+i+" at day " + 365);
+            columnsToPrint.add("Pristipomoides multidens Abundance 0."+i+" at day " + 365);
+            columnsToPrint.add("Lutjanus erythropterus Abundance 0."+i+" at day " + 365);
+
+
+            columnsToPrint.add("Epinephelus areolatus Catches(#) 0."+i+" 100_areolatus");
+            columnsToPrint.add("Lutjanus malabaricus Catches(#) 0."+i+" 100_malabaricus");
+            columnsToPrint.add("Pristipomoides multidens Catches(#) 0."+i+" 100_multidens");
+            columnsToPrint.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
+        }
 
         return new BatchRunner(
                 Paths.get(DIRECTORY,
