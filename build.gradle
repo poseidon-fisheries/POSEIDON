@@ -173,6 +173,16 @@ task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJ
     }
 }
 
+task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'console_optimizer.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.OptimizerConsole'
+    }
+}
+
 task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveName = 'calicatch.jar'
