@@ -1,5 +1,5 @@
 !!uk.ac.ox.oxfish.maximization.GenericOptimization
-scenarioFile: inputs/tuna/tuna_.yaml
+scenarioFile: inputs/tuna/tuna.yaml
 maximization: no
 runsPerSetting: 1
 simulatedYears: 2
@@ -37,7 +37,7 @@ parameters:
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.fishingStrategy.unassociatedSetsProbabilityDecay
   minimum: 0.0
-  maximum: 1.0
+  maximum: 0.1
   alwaysPositive: yes
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
   addressToModify: fisherDefinition.destinationStrategy.numberOfStepsToLookAheadForFadPositions
@@ -76,19 +76,110 @@ targets:
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Bigeye tuna Landings
   fixedTarget: 6.0487e+07
+  exponent: 2.0
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Skipjack tuna Landings
   fixedTarget: 2.40472e+08
+  exponent: 2.0
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Yellowfin tuna Landings
   fixedTarget: 6.0008e+07
+  exponent: 2.0
+- !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
+  columnName: Average Trip Duration
+  fixedTarget: 903.2562634
+  exponent: 2.0
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Total number of FAD deployments
   fixedTarget: 19103.0
+  exponent: 2.0
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Total number of FAD sets
   fixedTarget: 9225.0
+  exponent: 2.0
 - !!uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget
   columnName: Total number of unassociated sets
   fixedTarget: 1927.0
+  exponent: 2.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (Central region)
+  fixedTarget: 0.4600325
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (East region)
+  fixedTarget: 0.465686
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (North region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (Northeast region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (Northwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (South region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (Southeast region)
+  fixedTarget: 0.0052871
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (Southwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD deployments (West region)
+  fixedTarget: 0.0689944
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (Central region)
+  fixedTarget: 0.3479675
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (East region)
+  fixedTarget: 0.4280759
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (North region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (Northeast region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (Northwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (South region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (Southeast region)
+  fixedTarget: 0.0199458
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (Southwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of FAD sets (West region)
+  fixedTarget: 0.2040108
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (Central region)
+  fixedTarget: 0.0928905
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (East region)
+  fixedTarget: 0.7244421
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (North region)
+  fixedTarget: 0.0960042
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (Northeast region)
+  fixedTarget: 0.0036326
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (Northwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (South region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (Southeast region)
+  fixedTarget: 0.0306175
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (Southwest region)
+  fixedTarget: 0.0
+- !!uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget
+  columnName: Proportion of unassociated sets (West region)
+  fixedTarget: 0.0524131
 

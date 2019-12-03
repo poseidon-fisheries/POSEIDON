@@ -13,8 +13,6 @@ import java.util.Optional;
 
 public class MakeUnassociatedSet extends SetAction {
 
-    public static final String TOTAL_NUMBER_OF_UNASSOCIATED_SETS = "Total number of unassociated sets";
-
     public MakeUnassociatedSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
         super(purseSeineGear, rng);
     }
