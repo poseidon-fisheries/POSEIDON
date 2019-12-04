@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 
 /**
- * like biomass location resetter but instead of shuffling the current biomass levels, it also randomly picks a new one
+ * like biomass location resetter but instead of shuffling the current biomass levels, it forces biomass back to the level it is given
  */
 public class BiomassTotalResetter extends BiomassLocationResetter {
 

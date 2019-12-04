@@ -9,9 +9,11 @@ public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<Snapsh
 
     private int yearsToReset = 1;
 
+    private boolean restoreOriginalLocations = false;
+
     @Override
     public SnapshotBiologyResetter apply(FishState state) {
-        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset);
+        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset,restoreOriginalLocations);
     }
 
 
@@ -21,5 +23,23 @@ public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<Snapsh
 
     public void setYearsToReset(int yearsToReset) {
         this.yearsToReset = yearsToReset;
+    }
+
+    /**
+     * Getter for property 'restoreOriginalLocations'.
+     *
+     * @return Value for property 'restoreOriginalLocations'.
+     */
+    public boolean isRestoreOriginalLocations() {
+        return restoreOriginalLocations;
+    }
+
+    /**
+     * Setter for property 'restoreOriginalLocations'.
+     *
+     * @param restoreOriginalLocations Value to set for property 'restoreOriginalLocations'.
+     */
+    public void setRestoreOriginalLocations(boolean restoreOriginalLocations) {
+        this.restoreOriginalLocations = restoreOriginalLocations;
     }
 }

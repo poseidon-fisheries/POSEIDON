@@ -19,24 +19,24 @@ public class TunaMaximization {
     public static void main(String[] args) throws IOException {
 
         double[] optimalParameters = {
-                -1.868,-10.000, 3.664,-10.000, 9.338,-5.807, 10.000,-6.909,-6.281,-6.881,-10.000,-4.382,-9.100
+                9.977,-8.007,-9.139,-10.000,-7.752,-0.713, 3.046, 9.466, 9.621,-5.917,-9.259, 8.974,-10.000
         };
 
         FishYAML yaml = new FishYAML();
-        Path optimizationFile = Paths.get("inputs", "tuna", "calibration_betty.yaml");
+        Path optimizationFile = Paths.get("inputs", "tuna", "calibration_landingsonly.yaml");
         GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
 
-        GenericOptimization.buildLocalCalibrationProblem(
-                optimizationFile,
-                optimalParameters,
-                "calibration_betty_local.yaml",
-                .2
-
-        );
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                optimizationFile,
+//                optimalParameters,
+//                "calibration_betty_local.yaml",
+//                .2
+//
+//        );
 
 
         Scenario scenario = optimization.buildScenario(optimalParameters);
-        Path outputFile = optimizationFile.getParent().resolve("tuna_betty_calibrated.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("tuna_landingsonly_calibrated.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
         ScaledFixedDataLastStepTarget.VERBOSE = true;

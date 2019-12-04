@@ -27,16 +27,27 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
     private final int yearsBeforeReset;
 
 
+    /**
+     * when this is true, the biomass is reset not just in total numbers but also geographically in the same way it started.
+     * When this is false, the biomass is reset to original numbers but the locations to which it is distributed are the current ones
+     */
+    private final boolean restoreOriginalLocations;
+
+
     private SnapshotBiologyResetter(int yearsBeforeReset,
-                                    HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters)
+                                    HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters,
+                                    boolean restoreOriginalLocations)
     {
         this.yearsBeforeReset = yearsBeforeReset;
         this.resetters = resetters;
+        this.restoreOriginalLocations=restoreOriginalLocations;
     }
 
 
-    public static SnapshotBiologyResetter abundanceResetter(GlobalBiology biology,
-                                                            int yearsBeforeReset){
+    public static SnapshotBiologyResetter abundanceResetter(
+            GlobalBiology biology,
+            int yearsBeforeReset,
+            boolean restoreOriginalLocations){
 
 
         LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
@@ -46,11 +57,12 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
             SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
             resetters.put(new AbundanceResetter(snapper,species),snapper);
         }
-        return new SnapshotBiologyResetter(yearsBeforeReset,resetters);
+        return new SnapshotBiologyResetter(yearsBeforeReset, resetters, restoreOriginalLocations);
     }
 
     public static SnapshotBiologyResetter biomassResetter(GlobalBiology biology,
-                                                            int yearsBeforeReset){
+                                                            int yearsBeforeReset,
+                                                          boolean restoreOriginalLocations){
 
 
         LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
@@ -60,19 +72,19 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
             SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
             resetters.put(new BiomassResetter(snapper,species),snapper);
         }
-        return new SnapshotBiologyResetter(yearsBeforeReset,resetters);
+        return new SnapshotBiologyResetter(yearsBeforeReset,resetters,restoreOriginalLocations);
     }
-
-    public SnapshotBiologyResetter(GlobalBiology biology, int yearsBeforeReset) {
-
-        this.yearsBeforeReset=yearsBeforeReset;
-        resetters = new LinkedHashMap<>();
-        for (Species species : biology.getSpecies()) {
-            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
-            resetters.put(new AbundanceResetter(snapper,species),snapper);
-        }
-
-    }
+//
+//    public SnapshotBiologyResetter(GlobalBiology biology, int yearsBeforeReset) {
+//
+//        this.yearsBeforeReset=yearsBeforeReset;
+//        resetters = new LinkedHashMap<>();
+//        for (Species species : biology.getSpecies()) {
+//            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
+//            resetters.put(new AbundanceResetter(snapper,species),snapper);
+//        }
+//
+//    }
 
 
     @Override
@@ -81,11 +93,20 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
         model.scheduleOnce(new Steppable() {
             @Override
             public void step(SimState simState) {
-                for (BiologyResetter resetter : resetters.keySet()) {
-                    resetter.recordAbundance(model.getMap());
+                for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
+                    resetter.getKey().recordAbundance(model.getMap());
+
+                    if(restoreOriginalLocations)
+                        resetter.getValue().takeSnapshort(
+                                model.getMap(),
+                                resetter.getKey().getSpecies());
+
                 }
+
             }
         },StepOrder.DAWN);
+
+
 
         //reset it at year X
         model.scheduleOnceAtTheBeginningOfYear(
@@ -96,9 +117,11 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
                         for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
                                 resetter : resetters.entrySet()) {
-                            resetter.getValue().takeSnapshort(
-                                    model.getMap(),
-                                    resetter.getKey().getSpecies());
+                            if(!restoreOriginalLocations) {
+                                resetter.getValue().takeSnapshort(
+                                        model.getMap(),
+                                        resetter.getKey().getSpecies());
+                            }
                             resetter.getKey().resetAbundance(model.getMap(),model.getRandom());
 
 

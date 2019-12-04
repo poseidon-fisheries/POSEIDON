@@ -61,12 +61,23 @@ public class OptimizerConsole {
         if(args.length>2)
             parallelThreads = Integer.parseInt(args[2]);
 
+        int populationSize = -1;
+        if(args.length>3)
+            populationSize = Integer.parseInt(args[3]);
+
         SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(optimization);
         problem.setParallelThreads(parallelThreads);
-        OptimizerRunnable runnable = new OptimizerRunnable(OptimizerFactory.getParams(type,
-                                                                                      problem
-                                                                                      ),
+
+        OptimizationParameters params = OptimizerFactory.getParams(type,
+                                                                   problem
+        );
+        if(populationSize>0) {
+            params.getOptimizer().getPopulation().setTargetPopSize(populationSize);
+            params.getOptimizer().getPopulation().initialize();
+
+        }
+        OptimizerRunnable runnable = new OptimizerRunnable(params,
                                                            "eva"); //ignored, we are outputting to window
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
