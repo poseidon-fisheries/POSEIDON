@@ -17,11 +17,9 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +27,7 @@ import static java.lang.StrictMath.exp;
 import static java.util.Comparator.comparingDouble;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.fadsHere;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getMarkets;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishHere;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
@@ -127,11 +126,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             setsOnOwnFadsCoefficient :
             setsOnOtherFadsCoefficient;
         final long numConsecutiveActions = consecutiveActionCounts.get(MakeFadSet.class);
-        return probability(coefficient, priceOfFishHere(fad.getBiology(), getMarkets(fisher)), numConsecutiveActions, fadSetsProbabilityDecay);
-    }
-
-    private Collection<Market> getMarkets(Fisher fisher) {
-        return fisher.getHomePort().getMarketMap(fisher).getMarkets();
+        return probability(coefficient, fad.valueOfSet(fisher), numConsecutiveActions, fadSetsProbabilityDecay);
     }
 
     @Override
