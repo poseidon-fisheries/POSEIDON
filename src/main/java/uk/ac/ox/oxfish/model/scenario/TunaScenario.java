@@ -246,8 +246,8 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
         ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
-            // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
-            new FixedDoubleParameter(374.3583)
+            // source: https://github.com/poseidon-fisheries/tuna/commit/d1d0fce68ec9dc49aa353ec63a5d9a1fd7eee481
+            new FixedDoubleParameter(340.3333)
         );
     }
 
