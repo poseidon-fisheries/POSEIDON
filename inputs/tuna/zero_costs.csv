@@ -1,0 +1,6 @@
+lower_capacity,upper_capacity,daily_cost
+180,300,0
+300,600,0
+600,700,0
+700,1100,0
+1100,9999,0
