@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
 import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -19,11 +20,11 @@ public class TunaMaximization {
     public static void main(String[] args) throws IOException {
 
         double[] optimalParameters = {
-                9.977,-8.007,-9.139,-10.000,-7.752,-0.713, 3.046, 9.466, 9.621,-5.917,-9.259, 8.974,-10.000
+            1.908, 0.380, -10.000, -9.988, 7.437, 2.922, 9.658, 4.225, -9.930, 5.809, 9.925, 4.132, -10.000
         };
 
         FishYAML yaml = new FishYAML();
-        Path optimizationFile = Paths.get("inputs", "tuna", "calibration_landingsonly.yaml");
+        Path optimizationFile = Paths.get("/home/nicolas/workspace/tuna/np/calibrations/2019-12-04_1-full_calibration_with_fixed_resetter", "calibration.yaml");
         GenericOptimization optimization = yaml.loadAs(new FileReader(optimizationFile.toFile()), GenericOptimization.class);
 
 //        GenericOptimization.buildLocalCalibrationProblem(
@@ -34,16 +35,14 @@ public class TunaMaximization {
 //
 //        );
 
-
         Scenario scenario = optimization.buildScenario(optimalParameters);
-        Path outputFile = optimizationFile.getParent().resolve("tuna_landingsonly_calibrated.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("tuna_calibrated.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
         ScaledFixedDataLastStepTarget.VERBOSE = true;
+        FixedDataLastStepTarget.VERBOSE = true;
         optimization.evaluate(optimalParameters);
 
     }
-
-
 
 }
