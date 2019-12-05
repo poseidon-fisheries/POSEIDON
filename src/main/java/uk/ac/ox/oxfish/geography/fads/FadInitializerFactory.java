@@ -15,7 +15,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 
 public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
 
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.1);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private Map<String, Double> carryingCapacities = new HashMap<>();
     private Map<String, FixedDoubleParameter> attractionRates = new HashMap<>();
 
