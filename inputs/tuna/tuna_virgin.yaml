@@ -85,19 +85,25 @@ Tuna:
           percentageLimitOnDailyMovement: '0.01'
           speciesName: Yellowfin tuna
           unfishable: false
+  costsFile: inputs/tuna/costs.csv
   fisherDefinition:
     departingStrategy:
       Fixed Rest:
         hoursBetweenEachDeparture: '374.3583'
-    destinationStrategy: FAD Destination Strategy
+    destinationStrategy:
+      FAD Destination Strategy:
+        numberOfStepsToLookAheadForFadPositions: '30.0'
+        travelSpeedMultiplier: '1.0'
     discardingStrategy: No Discarding
     fishingStrategy:
       FAD Fishing Strategy:
-        fadsDeploymentCoefficient: '0.091685'
-        otherFadsSettingCoefficient: '0.04008'
-        ownFadsSettingCoefficient: '0.06151'
-        probabilityDecayCoefficient: '1.3635000000000002'
-        unassociatedSetCoefficient: '0.03232'
+        fadDeploymentsCoefficient: '0.01'
+        fadDeploymentsProbabilityDecay: '0.01'
+        fadSetsProbabilityDecay: '0.01'
+        setsOnOtherFadsCoefficient: '0.01'
+        setsOnOwnFadsCoefficient: '0.01'
+        unassociatedSetsCoefficient: '1.0E-8'
+        unassociatedSetsProbabilityDecay: '0.01'
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
@@ -111,7 +117,7 @@ Tuna:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0
             Skipjack tuna: 387000.0
-          fishReleaseProbabilityInPercent: '0.17620000000000005'
+          fishReleaseProbabilityInPercent: '0.0'
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'
@@ -169,6 +175,7 @@ Tuna:
   plugins:
   - Biomass Snapshot Resetter:
       yearsToReset: 1
+      restoreOriginalLocations: true
   portFilePath: inputs/tuna/ports.csv
   targetYear: 2017
   weatherInitializer:
