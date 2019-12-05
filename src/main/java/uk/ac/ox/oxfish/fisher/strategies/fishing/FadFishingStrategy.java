@@ -93,8 +93,8 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
         return fadsHere(fisher)
             .map(fad -> new Pair<>(fad, fadSetProbability(fad, fisher)))
-            .sorted(comparingDouble(Pair::getSecond))
             .filter(pair -> model.getRandom().nextDouble() < pair.getSecond())
+            .sorted(comparingDouble(Pair::getSecond))
             .map(pair -> new MakeFadSet((PurseSeineGear) fisher.getGear(), model.getRandom(), pair.getFirst()))
             .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
             .findFirst();
