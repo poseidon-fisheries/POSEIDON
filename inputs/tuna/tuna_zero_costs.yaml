@@ -14,7 +14,7 @@ Tuna:
               steepness: '0.265079184'
           initialBiomassAllocator:
             Equal Allocation:
-              constantValue: '1'
+              constantValue: '0.2340305633822366'
           initialCapacityAllocator:
             Shape File Allocator:
               delegate:
@@ -68,7 +68,7 @@ Tuna:
               steepness: '0.878915170814038'
           initialBiomassAllocator:
             Equal Allocation:
-              constantValue: '1'
+              constantValue: '0.42177224240711025'
           initialCapacityAllocator:
             Shape File Allocator:
               delegate:
@@ -85,7 +85,7 @@ Tuna:
           percentageLimitOnDailyMovement: '0.01'
           speciesName: Yellowfin tuna
           unfishable: false
-  costsFile: inputs/tuna/costs.csv
+  costsFile: inputs/tuna/zero_costs.csv
   fisherDefinition:
     departingStrategy:
       Fixed Rest:

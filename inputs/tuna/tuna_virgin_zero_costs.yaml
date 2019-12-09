@@ -85,7 +85,7 @@ Tuna:
           percentageLimitOnDailyMovement: '0.01'
           speciesName: Yellowfin tuna
           unfishable: false
-  costsFile: inputs/tuna/costs.csv
+  costsFile: inputs/tuna/zero_costs.csv
   fisherDefinition:
     departingStrategy:
       Fixed Rest:

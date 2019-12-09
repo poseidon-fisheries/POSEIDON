@@ -10,6 +10,7 @@ import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -61,6 +62,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
@@ -93,6 +95,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -113,9 +116,9 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.fads.DeployFad.TOTAL_NUMBER_OF_FAD_DEPLOYMENTS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet.TOTAL_NUMBER_OF_FAD_SETS;
-import static uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet.TOTAL_NUMBER_OF_UNASSOCIATED_SETS;
+import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.regionCounterName;
+import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.proportionGathererName;
+import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.totalCounterName;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -158,6 +161,18 @@ public class TunaScenario implements Scenario {
         r -> r.getString("species_code"),
         r -> r.getString("species_name")
     ));
+    private final ImmutableList<String> actionNames = ImmutableList.of(
+        DeployFad.ACTION_NAME,
+        MakeFadSet.ACTION_NAME,
+        MakeUnassociatedSet.ACTION_NAME
+    );
+    private final Set<Integer> regionNumbers = Regions.REGION_NAMES.keySet();
+    private final ImmutableList<String> yearlyFisherCounters = Stream.concat(
+        actionNames.stream().map(FadAction::totalCounterName),
+        regionNumbers.stream().flatMap(regionNumber ->
+            actionNames.stream().map(actionName -> regionCounterName(actionName, regionNumber))
+        )
+    ).collect(toImmutableList());
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2017;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
@@ -237,14 +252,14 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory()
         );
         ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
-            // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
-            new FixedDoubleParameter(374.3583)
+            // source: https://github.com/poseidon-fisheries/tuna/commit/d1d0fce68ec9dc49aa353ec63a5d9a1fd7eee481
+            new FixedDoubleParameter(340.3333)
         );
     }
 
-    private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
-
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
+
+    private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
@@ -367,19 +382,6 @@ public class TunaScenario implements Scenario {
                 r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
             ));
 
-        final ImmutableList<String> yearlyFisherCounters = Stream.concat(
-            Stream.of(
-                TOTAL_NUMBER_OF_FAD_DEPLOYMENTS,
-                TOTAL_NUMBER_OF_FAD_SETS,
-                TOTAL_NUMBER_OF_UNASSOCIATED_SETS
-            ),
-            Regions.REGION_NAMES.keySet().stream().flatMap(regionNumber -> ImmutableList.of(
-                DeployFad.ACTION_NAME,
-                MakeFadSet.ACTION_NAME,
-                MakeUnassociatedSet.ACTION_NAME
-            ).stream().map(actionName -> FadAction.regionCounterName(actionName, regionNumber)))
-        ).collect(toImmutableList());
-
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher -> {
             // Setup hourly costs as a function of capacity
@@ -463,13 +465,7 @@ public class TunaScenario implements Scenario {
         model.registerStartable(exogenousCatches);
 
         plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
-
-        yearlyFisherCounters.forEach(column -> model.getYearlyDataSet().registerGatherer(
-            column,
-            fishState -> fishState.getFishers().stream().mapToDouble(
-                    fisher -> fisher.getYearlyCounter().getColumn(column)).sum(),
-            0.0
-        ));
+        registerGatherers(model);
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
@@ -524,6 +520,29 @@ public class TunaScenario implements Scenario {
             }
         });
 
+    }
+
+    private void registerGatherers(FishState fishState) {
+        yearlyFisherCounters.forEach(column ->
+            fishState.getYearlyDataSet().registerGatherer(column, yearlyCounterAdder(column), 0.0)
+        );
+        regionNumbers.forEach(regionNumber ->
+            actionNames.forEach(actionName ->
+                fishState.getYearlyDataSet().registerGatherer(
+                    proportionGathererName(actionName, regionNumber),
+                    model -> yearlyCounterAdder(regionCounterName(actionName, regionNumber)).apply(model) /
+                        yearlyCounterAdder(totalCounterName(actionName)).apply(model),
+                    0.0
+                )
+            )
+        );
+    }
+
+    @NotNull private Gatherer<FishState> yearlyCounterAdder(String column) {
+        return fishState ->
+            fishState.getFishers().stream()
+                .mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column))
+                .sum();
     }
 
     @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }
