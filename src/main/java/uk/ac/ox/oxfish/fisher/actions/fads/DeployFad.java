@@ -28,9 +28,9 @@ public class DeployFad extends FadAction {
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
     public static String ACTION_NAME = "FAD deployments";
-    private final SeaTile seaTile;
 
-    public DeployFad(SeaTile seaTile) { this.seaTile = seaTile; }
+    public DeployFad() {
+    }
 
     /**
      * This little piece of ugliness is my "solution" to the problem of disallowing FAD deployments 15 days before
@@ -69,11 +69,11 @@ public class DeployFad extends FadAction {
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
-        checkState(seaTile == fisher.getLocation());
         if (isAllowed(model, fisher) && isPossible(model, fisher)) {
-            getFadManager(fisher).deployFad(seaTile, model.getStep(), model.random);
+            SeaTile here = fisher.getLocation();
+            getFadManager(fisher).deployFad(here, model.getStep(), model.random);
             fisher.getYearlyCounter().count(totalCounterName(), 1);
-            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
+            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), here), 1);
         }
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
@@ -90,5 +90,5 @@ public class DeployFad extends FadAction {
         return getQuantity(0, HOUR);
     }
 
-    @Override public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(seaTile); }
+    @Override public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(fisher.getLocation()); }
 }

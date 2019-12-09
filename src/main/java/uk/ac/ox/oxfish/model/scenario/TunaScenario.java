@@ -39,8 +39,13 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FadDeploymentDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadGravityDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.GravitationalSearchDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -229,7 +234,8 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
-        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
+        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory()
+        );
         ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
             // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
             new FixedDoubleParameter(374.3583)
@@ -496,6 +502,8 @@ public class TunaScenario implements Scenario {
                 .distinct()
                 .collect(toMap(identity(), x -> 0.0));
 
+        //todo remove these soon
+
         fishersByBoatId.forEach((boatId, fisher) -> {
             if (fisher.getDestinationStrategy() instanceof FadDestinationStrategy) {
                 final Map<SeaTile, Double> deploymentValues =
@@ -505,6 +513,17 @@ public class TunaScenario implements Scenario {
                     .setDeploymentLocationValues(deploymentValues);
             }
         });
+
+        fishersByBoatId.forEach((boatId, fisher) -> {
+            if (fisher.getDestinationStrategy() instanceof FadGravityDestinationStrategy) {
+                final Map<SeaTile, Double> deploymentValues =
+                        deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
+                ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
+                        .getFadDeploymentDestinationStrategy()
+                        .setDeploymentLocationValues(deploymentValues);
+            }
+        });
+
     }
 
     @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -67,6 +68,7 @@ public class DestinationStrategies {
         NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
         NAMES.put(FadDestinationStrategyFactory.class, "FAD Destination Strategy");
+        NAMES.put(FadGravityDestinationFactory.class, "FAD Gravity Destination Strategy");
         NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

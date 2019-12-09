@@ -87,7 +87,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .ofNullable(deploymentLocationValues.get(fisher.getLocation()))
             .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
             .filter(p -> model.getRandom().nextDouble() < p)
-            .map(__ -> new DeployFad(fisher.getLocation()))
+            .map(__ -> new DeployFad())
             .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
     }
 
