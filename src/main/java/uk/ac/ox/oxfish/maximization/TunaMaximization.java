@@ -28,7 +28,7 @@ import static java.util.Arrays.stream;
 
 public class TunaMaximization {
 
-    static final String BASE_CALIBRATION_FOLDER_NAME = "/home/nicolas/workspace/tuna/np/calibrations/";
+    static final String baseCalibrationFolderName = "/home/nicolas/workspace/tuna/np/calibrations/";
     static final String logFileName = "log_calibration.log";
     static final String optimizationFileName = "calibration.yaml";
     static final String calibratedScenarioFileName = "tuna_calibrated.yaml";
@@ -62,7 +62,7 @@ public class TunaMaximization {
 
     static void evaluateCalibration(String calibrationFolderName) {
 
-        Path calibrationFolder = Paths.get(BASE_CALIBRATION_FOLDER_NAME, calibrationFolderName);
+        Path calibrationFolder = Paths.get(baseCalibrationFolderName, calibrationFolderName);
         System.out.println("Evaluating calibration from folder " + calibrationFolder);
 
         Path logFile = calibrationFolder.resolve(logFileName);

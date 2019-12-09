@@ -20,12 +20,10 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -34,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
@@ -42,17 +39,17 @@ import javax.measure.quantity.Time;
 import static java.lang.Math.min;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
+import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 public class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
+    final private HoldLimitingDecoratorGear delegate;
     private double minimumSetDurationInHours;
     private double averageSetDurationInHours;
     private double stdDevOfSetDurationInHours;
     private double successfulSetProbability;
-    private ImmutableMap<Species, DoubleParameter> unassociatedSetParameters;
-
-    final private HoldLimitingDecoratorGear delegate;
+    private double[][] unassociatedSetSamples;
 
     public PurseSeineGear(
         FadManager fadManager,
@@ -60,30 +57,29 @@ public class PurseSeineGear implements Gear {
         double averageSetDurationInHours,
         double stdDevOfSetDurationInHours,
         double successfulSetProbability,
-        ImmutableMap<Species, DoubleParameter> unassociatedSetParameters
-    ) {
+        double[][] unassociatedSetSamples) {
         this.fadManager = fadManager;
         this.minimumSetDurationInHours = minimumSetDurationInHours;
         this.averageSetDurationInHours = averageSetDurationInHours;
         this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
         this.successfulSetProbability = successfulSetProbability;
-        this.unassociatedSetParameters = unassociatedSetParameters;
+        this.unassociatedSetSamples = unassociatedSetSamples;
         this.delegate = new HoldLimitingDecoratorGear(
-                new PurseSeineGearActuator()
+            new PurseSeineGearActuator()
         );
     }
 
-
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing,
-            GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing,
+        GlobalBiology modelBiology) {
         return delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
     }
 
     /**
      * get how much gas is consumed by fishing a spot with this gear
-     *  @param fisher the dude fishing
+     *
+     * @param fisher the dude fishing
      * @param boat
      * @param where  the location being fished  @return liters of gas consumed for every hour spent fishing
      */
@@ -94,7 +90,7 @@ public class PurseSeineGear implements Gear {
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         return delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
     }
 
@@ -114,8 +110,6 @@ public class PurseSeineGear implements Gear {
 
     public FadManager getFadManager() { return fadManager; }
 
-
-
     public Quantity<Time> nextSetDuration(MersenneTwisterFast rng) {
         final double duration = Math.max(
             minimumSetDurationInHours,
@@ -134,12 +128,11 @@ public class PurseSeineGear implements Gear {
         LocalBiology seaTileBiology,
         MersenneTwisterFast rng
     ) {
-        final double[] biomasses = new double[globalBiology.getSize()];
-        unassociatedSetParameters.forEach((species, doubleParameter) -> {
-            final double biomassInTile = seaTileBiology.getBiomass(species);
-            final double biomassCaught = lowerBoundedResult(doubleParameter, rng, 0);
-            biomasses[species.getIndex()] = min(biomassInTile, biomassCaught);
-        });
+        final double[] biomasses = oneOf(unassociatedSetSamples, rng).clone();
+        for (int i = 0; i < biomasses.length; i++) {
+            final double biomassInTile = seaTileBiology.getBiomass(globalBiology.getSpecie(i));
+            biomasses[i] = min(biomassInTile, biomasses[i]);
+        }
         final VariableBiomassBasedBiology unassociatedSetBiology = new BiomassLocalBiology(biomasses, biomasses);
         // Remove the catches from the underlying biology:
         final Catch catchObject = new Catch(unassociatedSetBiology.getCurrentBiomass());
@@ -147,29 +140,16 @@ public class PurseSeineGear implements Gear {
         return unassociatedSetBiology;
     }
 
-    /**
-     * This is a very naive way to generate a truncated normal distribution. Less naive ways exist, but are not
-     * readily available in any libraries we use and I'd rather avoid adding a dependency or lifting code from
-     * somewhere so this should do unless otherwise proven too slow.
-     */
-    private double lowerBoundedResult(DoubleParameter doubleParameter, MersenneTwisterFast rng, double lowerBound) {
-        double result;
-        do { result = doubleParameter.apply(rng); } while (result < lowerBound);
-        return result;
-    }
-
-
-
-    private static class PurseSeineGearActuator implements  Gear{
+    private static class PurseSeineGearActuator implements Gear {
 
         @Override public Catch fish(
-                Fisher fisher, LocalBiology localBiology, SeaTile context,
-                int hoursSpentFishing, GlobalBiology modelBiology
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology
         ) {
             // For now, just assume we catch *all* the biomass from the FAD
             // TODO: should we revise this assumption?
             final double[] catches = modelBiology.getSpecies().stream()
-                    .mapToDouble(localBiology::getBiomass).toArray();
+                .mapToDouble(localBiology::getBiomass).toArray();
             return new Catch(catches);
         }
 
@@ -181,13 +161,14 @@ public class PurseSeineGear implements Gear {
 
         @Override
         public double[] expectedHourlyCatch(
-                Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
         ) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Gear makeCopy() { return new PurseSeineGearActuator();
+        public Gear makeCopy() {
+            return new PurseSeineGearActuator();
         }
 
         @Override
