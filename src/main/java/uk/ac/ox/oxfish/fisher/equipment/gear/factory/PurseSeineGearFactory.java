@@ -79,7 +79,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         double[][] unassociatedCatchSamples =
             parseAllRecords(unassociatedCatchSampleFile).stream()
                 .map(r ->
-                    IntStream.range(0, fishState.getBiology().getSize()).mapToDouble(i -> r.getDouble(i)).toArray()
+                    IntStream.range(0, fishState.getBiology().getSize())
+                        .mapToDouble(i -> r.getDouble(i) * 1000).toArray() // convert tonnes to kg
                 ).toArray(double[][]::new);
 
         return new PurseSeineGear(
