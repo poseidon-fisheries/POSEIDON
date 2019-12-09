@@ -24,7 +24,6 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class DeployFad extends FadAction {
 
-    public static final String TOTAL_NUMBER_OF_FAD_DEPLOYMENTS = "Total number of FAD deployments";
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
     public static String ACTION_NAME = "FAD deployments";

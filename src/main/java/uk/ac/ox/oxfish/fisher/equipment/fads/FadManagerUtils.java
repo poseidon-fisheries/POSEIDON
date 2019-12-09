@@ -41,6 +41,10 @@ public interface FadManagerUtils {
         return bagToStream(getFadManager(fisher).getFadMap().fadsAt(seaTile));
     }
 
+    static Collection<Market> getMarkets(Fisher fisher) {
+        return fisher.getHomePort().getMarketMap(fisher).getMarkets();
+    }
+
     static double priceOfFishHere(LocalBiology biology, Collection<Market> markets) {
         return markets.stream().mapToDouble(market ->
             biology.getBiomass(market.getSpecies()) * market.getMarginalPrice()

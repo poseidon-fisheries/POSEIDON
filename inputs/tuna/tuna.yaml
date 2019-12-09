@@ -85,6 +85,7 @@ Tuna:
           percentageLimitOnDailyMovement: '0.01'
           speciesName: Yellowfin tuna
           unfishable: false
+  costsFile: inputs/tuna/costs.csv
   fisherDefinition:
     departingStrategy:
       Fixed Rest:
@@ -116,7 +117,7 @@ Tuna:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0
             Skipjack tuna: 387000.0
-          fishReleaseProbabilityInPercent: '0.1'
+          fishReleaseProbabilityInPercent: '0.0'
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'

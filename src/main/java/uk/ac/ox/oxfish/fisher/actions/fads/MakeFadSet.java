@@ -16,7 +16,6 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManage
 
 public class MakeFadSet extends SetAction {
 
-    public static final String TOTAL_NUMBER_OF_FAD_SETS = "Total number of FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng, Fad targetFad) {

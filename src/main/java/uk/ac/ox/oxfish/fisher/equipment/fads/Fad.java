@@ -6,12 +6,18 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getMarkets;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishHere;
 
 public class Fad {
+
+    public static final double BUOY_VALUE = 1000.0; // Buoy value in dollars, TODO: should be a parameter
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
@@ -30,35 +36,39 @@ public class Fad {
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
-    public BiomassLocalBiology getBiology() { return biology; }
-
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
     */
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
-            // Calculate the catches and add them to the FAD biology:
-            double[] catches = new double[globalBiology.getSize()];
-            for (Species species : globalBiology.getSpecies()) {
-                double currentFadBiomass = biology.getBiomass(species);
-                double maxFadBiomass = biology.getCarryingCapacity(species);
-                double maxCatch = max(0, maxFadBiomass - currentFadBiomass);
-                double caught = min(seaTileBiology.getBiomass(species) * attractionRates[species.getIndex()], maxCatch);
-                biology.setCurrentBiomass(species, min(currentFadBiomass + caught, maxFadBiomass));
-                catches[species.getIndex()] = caught;
-            }
-            // Remove the catches from the underlying biology:
-            final Catch catchObject = new Catch(catches);
-            seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
+        // Calculate the catches and add them to the FAD biology:
+        double[] catches = new double[globalBiology.getSize()];
+        for (Species species : globalBiology.getSpecies()) {
+            double currentFadBiomass = biology.getBiomass(species);
+            double maxFadBiomass = biology.getCarryingCapacity(species);
+            double maxCatch = max(0, maxFadBiomass - currentFadBiomass);
+            double caught = min(seaTileBiology.getBiomass(species) * attractionRates[species.getIndex()], maxCatch);
+            biology.setCurrentBiomass(species, min(currentFadBiomass + caught, maxFadBiomass));
+            catches[species.getIndex()] = caught;
+        }
+        // Remove the catches from the underlying biology:
+        final Catch catchObject = new Catch(catches);
+        seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
     }
 
-    public FadManager getOwner() { return owner; }
+    public void maybeReleaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology, MersenneTwisterFast rng) {
+        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies, seaTileBiology);
+    }
 
     /**
-     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
+     * biomass based (most likely because we're outside the habitable zone), the fish is lost.
      */
-    private void releaseFish(Iterable<Species> allSpecies) {
-        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
+    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
+        if (seaTileBiology instanceof VariableBiomassBasedBiology)
+            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
+        else
+            releaseFish(allSpecies);
     }
 
     /**
@@ -77,22 +87,23 @@ public class Fad {
     }
 
     /**
-     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
-     * biomass based (most likely because we're outside the habitable zone), the fish is lost.
+     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
      */
-    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
-        if (seaTileBiology instanceof VariableBiomassBasedBiology)
-            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
-        else
-            releaseFish(allSpecies);
-    }
-
-    public void maybeReleaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology, MersenneTwisterFast rng) {
-        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies, seaTileBiology);
+    private void releaseFish(Iterable<Species> allSpecies) {
+        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
     }
 
     public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
         if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
     }
+
+    public double valueOfSet(Fisher fisher) {
+        double buoyValue = getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
+        return buoyValue + priceOfFishHere(getBiology(), getMarkets(fisher));
+    }
+
+    public FadManager getOwner() { return owner; }
+
+    public BiomassLocalBiology getBiology() { return biology; }
 
 }

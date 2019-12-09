@@ -25,6 +25,14 @@ public abstract class FadAction implements Action, FadManagerUtils {
         return "Number of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
     }
 
+    public static String proportionGathererName(String actionName, int regionNumber) {
+        return "Proportion of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
+    }
+
+    public static String totalCounterName(String actionName) {
+        return "Total number of " + actionName;
+    }
+
     String regionCounterName(NauticalMap map, SeaTile seaTile) {
         return regionCounterName(getActionName(), getRegionNumber(map, seaTile));
     }
