@@ -89,7 +89,7 @@ Tuna:
   fisherDefinition:
     departingStrategy:
       Fixed Rest:
-        hoursBetweenEachDeparture: '374.3583'
+        hoursBetweenEachDeparture: '340.3333'
     destinationStrategy:
       FAD Destination Strategy:
         numberOfStepsToLookAheadForFadPositions: '30.0'
