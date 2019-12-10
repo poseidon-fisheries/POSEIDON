@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.Regions;
+import uk.ac.ox.oxfish.fisher.actions.fads.SetAction;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -81,7 +82,6 @@ import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -116,7 +116,6 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.regionCounterName;
 import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.proportionGathererName;
 import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.totalCounterName;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
@@ -167,12 +166,19 @@ public class TunaScenario implements Scenario {
         MakeUnassociatedSet.ACTION_NAME
     );
     private final Set<Integer> regionNumbers = Regions.REGION_NAMES.keySet();
-    private final ImmutableList<String> yearlyFisherCounters = Stream.concat(
+
+    private final ImmutableList<String> yearlyFisherCounters = Stream.of(
         actionNames.stream().map(FadAction::totalCounterName),
         regionNumbers.stream().flatMap(regionNumber ->
-            actionNames.stream().map(actionName -> regionCounterName(actionName, regionNumber))
+            actionNames.stream().map(actionName -> FadAction.regionCounterName(actionName, regionNumber))
+        ),
+        speciesNames.values().stream().flatMap(speciesName ->
+            Stream.of(MakeFadSet.ACTION_NAME, MakeUnassociatedSet.ACTION_NAME).map(actionName ->
+                SetAction.catchesCounterName(speciesName, actionName)
+            )
         )
-    ).collect(toImmutableList());
+    ).flatMap(identity()).collect(toImmutableList());
+
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2017;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
@@ -203,7 +209,6 @@ public class TunaScenario implements Scenario {
     );
 
     private Path costsFile = input("costs.csv");
-
 
     TunaScenario() {
 
@@ -523,7 +528,7 @@ public class TunaScenario implements Scenario {
             actionNames.forEach(actionName ->
                 fishState.getYearlyDataSet().registerGatherer(
                     proportionGathererName(actionName, regionNumber),
-                    model -> yearlyCounterAdder(regionCounterName(actionName, regionNumber)).apply(model) /
+                    model -> yearlyCounterAdder(FadAction.regionCounterName(actionName, regionNumber)).apply(model) /
                         yearlyCounterAdder(totalCounterName(actionName)).apply(model),
                     0.0
                 )
