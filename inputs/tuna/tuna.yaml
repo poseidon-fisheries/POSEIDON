@@ -122,10 +122,7 @@ Tuna:
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'
         successfulSetProbability: '0.957'
-        unassociatedSetParameters:
-          Bigeye tuna: normal 22.073684210526316 34.92679347228484
-          Yellowfin tuna: normal 22.58983406113537 30.517121559489127
-          Skipjack tuna: normal 28.926356345885633 34.75812387404913
+        unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
     gearStrategy: Never Change Gear
     holdSize: '100.0'
     hourlyVariableCost: '0.0'
