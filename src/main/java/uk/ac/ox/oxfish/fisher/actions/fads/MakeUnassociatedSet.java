@@ -13,11 +13,18 @@ import java.util.Optional;
 
 public class MakeUnassociatedSet extends SetAction {
 
+    public static String ACTION_NAME = "unassociated sets";
+
     public MakeUnassociatedSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
         super(purseSeineGear, rng);
     }
 
-    public static String ACTION_NAME = "unassociated sets";
+    @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
+        // unassociated sets are always successful since we're sampling from an empirical distribution
+        // that includes failed sets with zeros for all species.
+        return true;
+    }
+
     public String getActionName() { return ACTION_NAME; }
 
     @Override

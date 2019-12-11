@@ -16,6 +16,7 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManage
 
 public class MakeFadSet extends SetAction {
 
+    public static String ACTION_NAME = "FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng, Fad targetFad) {
@@ -23,8 +24,11 @@ public class MakeFadSet extends SetAction {
         this.targetFad = targetFad;
     }
 
-    public static String ACTION_NAME = "FAD sets";
     public String getActionName() { return ACTION_NAME; }
+
+    @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
+        return rng.nextDouble() < purseSeineGear.getSuccessfulSetProbability();
+    }
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {
