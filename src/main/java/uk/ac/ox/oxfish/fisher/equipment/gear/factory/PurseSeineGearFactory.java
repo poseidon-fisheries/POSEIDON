@@ -9,9 +9,10 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.stream.IntStream;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
@@ -22,17 +23,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private DoubleParameter minimumSetDurationInHours = new FixedDoubleParameter(3.03333333333333);
     private DoubleParameter averageSetDurationInHours = new FixedDoubleParameter(8.0219505805135);
     private DoubleParameter stdDevOfSetDurationInHours = new FixedDoubleParameter(2.99113291538723);
-    private Map<String, DoubleParameter> unassociatedSetParameters;
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.957);
 
-    public Map<String, DoubleParameter> getUnassociatedSetParameters() {
-        return unassociatedSetParameters;
-    }
-
-    public void setUnassociatedSetParameters(Map<String, DoubleParameter> unassociatedSetParameters) {
-        this.unassociatedSetParameters = unassociatedSetParameters;
-    }
+    private Path unassociatedCatchSampleFile;
 
     public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
@@ -82,16 +76,28 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             initialNumberOfFads
         );
         final MersenneTwisterFast rng = fishState.getRandom();
+        double[][] unassociatedCatchSamples =
+            parseAllRecords(unassociatedCatchSampleFile).stream()
+                .map(r ->
+                    IntStream.range(0, fishState.getBiology().getSize())
+                        .mapToDouble(i -> r.getDouble(i) * 1000).toArray() // convert tonnes to kg
+                ).toArray(double[][]::new);
+
         return new PurseSeineGear(
             fadManager,
             minimumSetDurationInHours.apply(rng),
             averageSetDurationInHours.apply(rng),
             stdDevOfSetDurationInHours.apply(rng),
             successfulSetProbability.apply(rng),
-            unassociatedSetParameters.entrySet().stream().collect(toImmutableMap(
-                entry -> fishState.getBiology().getSpecie(entry.getKey()),
-                entry -> entry.getValue()
-            ))
+            unassociatedCatchSamples
         );
+    }
+
+    public Path getUnassociatedCatchSampleFile() {
+        return unassociatedCatchSampleFile;
+    }
+
+    public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
+        this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
     }
 }

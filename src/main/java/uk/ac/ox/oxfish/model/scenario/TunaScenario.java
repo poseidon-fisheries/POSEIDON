@@ -146,7 +146,7 @@ public class TunaScenario implements Scenario {
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
-    private static final Path UNASSOCIATED_CATCH_MEANS = input("unassociated_catch_means.csv");
+    private static final Path UNASSOCIATED_CATCH_SAMPLE = input("unassociated_catch_sample.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("2017_BET_DIST.csv"),
         "SKJ", input("2017_SKJ_DIST.csv"),
@@ -232,14 +232,7 @@ public class TunaScenario implements Scenario {
             "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
             "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
         ));
-        purseSeineGearFactory.setUnassociatedSetParameters(
-            parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()
-                .filter(r -> r.getInt("year") == targetYear)
-                .collect(toMap(
-                    r -> speciesNames.get(r.getString("species_code")),
-                    r -> new NormalDoubleParameter(r.getDouble("mean"), r.getDouble("sd"))
-                ))
-        );
+        purseSeineGearFactory.setUnassociatedCatchSampleFile(UNASSOCIATED_CATCH_SAMPLE);
 
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(purseSeineGearFactory);
