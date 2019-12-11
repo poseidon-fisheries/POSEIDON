@@ -50,6 +50,11 @@ public class MasonUtils {
     }
 
     @NotNull
+    public static <T> T oneOf(T[] candidates, MersenneTwisterFast random) {
+        return candidates[oneOfIndices(candidates, random)];
+    }
+
+    @NotNull
     public static <T> T oneOf(List<T> candidates, MersenneTwisterFast random) {
         return candidates.get(oneOfIndices(candidates, random));
     }
@@ -57,6 +62,12 @@ public class MasonUtils {
     @NotNull
     public static <T> T oneOf(ListOrderedSet<T> candidates, MersenneTwisterFast random) {
         return candidates.get(oneOfIndices(candidates, random));
+    }
+
+    private static <T> int oneOfIndices(T[] candidates, MersenneTwisterFast random) {
+        validateCandidates(candidates);
+        final int n = candidates.length;
+        return n == 1 ? 0 : random.nextInt(n);
     }
 
     private static int oneOfIndices(Collection candidates, MersenneTwisterFast random) {
@@ -117,6 +128,11 @@ public class MasonUtils {
     private static <E> void validateCandidates(Collection<E> candidates) {
         checkNotNull(candidates, "collection of candidates must not be null");
         checkArgument(!candidates.isEmpty(), "collection of must not be empty");
+    }
+
+    private static <T> void validateCandidates(T[] candidates) {
+        checkNotNull(candidates, "collection of candidates must not be null");
+        checkArgument(candidates.length > 0, "collection of must not be empty");
     }
 
 }
