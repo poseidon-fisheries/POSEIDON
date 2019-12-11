@@ -38,6 +38,8 @@ public abstract class SetAction extends FadAction {
         if (isAllowed(model, fisher) && isPossible(model, fisher)) {
             final int duration = toHours(this.duration);
             final SeaTile seaTile = fisher.getLocation();
+            fisher.getYearlyCounter().count(totalCounterName(), 1);
+            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
             if (model.getRandom().nextDouble() < purseSeineGear.getSuccessfulSetProbability()) {
                 final LocalBiology targetBiology = targetBiology(
                     purseSeineGear, model.getBiology(), seaTile, model.getRandom()
@@ -46,8 +48,6 @@ public abstract class SetAction extends FadAction {
                 model.getBiology().getSpecies().forEach(species ->
                     fisher.getYearlyCounter().count(catchesCounterName(species), catchesKept.getWeightCaught(species))
                 );
-                fisher.getYearlyCounter().count(totalCounterName(), 1);
-                fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);
