@@ -215,6 +215,12 @@ public class Slice6Calibration {
             1.352, 8.034, 2.733,-2.958,-0.425, 6.255,-0.334, 3.502,-2.122, 5.870,-3.211,-0.625, 1.152, 4.244, 1.519,-0.540, 1.118, 2.364, 6.605, 3.181
     };
 
+
+
+    public static final double[] MONTHLY_LIME2yr_OPTIMAL_PARAMETERS = new double[]{
+            -8.415, 7.343,-1.061,-6.324,-3.401, 5.507, 6.522,-7.030, 10.000,-0.725,-2.304,-10.000, 0.608,-10.000, 10.000,-10.000, 6.163,-5.500, 4.871,-1.810    };
+    //
+
     public static void main(String[] args) throws IOException {
 
         /////////////////////////////////////////////////////////
@@ -259,12 +265,26 @@ public class Slice6Calibration {
 //                MONTHLY_LIME_OPTIMAL_PARAMETERS,
 //                "LIME_monthly_LOCAL_calibrationproblem.yaml",
 //                .2d);
+//
+//        buildVariants("LIME_monthly_LOCAL_calibrationproblem.yaml",
+//                      "monthly_lime",MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
+//                 buildDumpAndRun("LIME_monthly_LOCAL_calibrationproblem.yaml",
+//                         "LIME_monthly_LOCAL_calibrated.yaml",
+//                                 MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
 
-        buildVariants("LIME_monthly_LOCAL_calibrationproblem.yaml",
-                      "monthly_lime",MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
-                 buildDumpAndRun("LIME_monthly_LOCAL_calibrationproblem.yaml",
-                         "LIME_monthly_LOCAL_calibrated.yaml",
-                                 MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
+
+
+        //////////////////////////////////////////////////////
+
+         buildDumpAndRun("LIME_monthly2yr_calibrationproblem.yaml",
+                         "LIME_monthly2yr_calibrated.yaml",
+                 MONTHLY_LIME2yr_OPTIMAL_PARAMETERS);
+        GenericOptimization.buildLocalCalibrationProblem(
+                DIRECTORY.resolve("calibration").resolve("LIME_monthly2yr_calibrationproblem.yaml"),
+                MONTHLY_LIME2yr_OPTIMAL_PARAMETERS,
+                "LIME_monthly2yr_LOCAL_calibrationproblem.yaml",
+                .2d);
+
     }
 
     /**

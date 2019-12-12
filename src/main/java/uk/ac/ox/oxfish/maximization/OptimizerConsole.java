@@ -72,7 +72,7 @@ public class OptimizerConsole {
         if(type.equals("ernesto_nelder_mead"))
         {
             params = OptimizerFactory.makeParams(NelderMeadSimplex.createNelderMeadSimplex(problem, null),
-                                                 populationSize == -1 ? 50 : populationSize,
+                                                 populationSize == -1 ? 25 : populationSize,
                                                  problem
             );
         }
