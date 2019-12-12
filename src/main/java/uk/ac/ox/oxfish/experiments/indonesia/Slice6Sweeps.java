@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "steve_lime_8h";
+    private static final String SCENARIO_NAME = "monthly_lime_7h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -64,59 +64,59 @@ public class Slice6Sweeps {
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
+
+
 //
+        effortControl("10",
+                      new String[]{"population1","population2","population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT);
+
+
+
 //
-////
+//////        //only boats >10GT are controlled
 //        effortControl("10",
-//                      new String[]{"population1","population2","population3"},
-//                      SCENARIO_NAME,
-//                      SHOCK_YEAR, MIN_DAYS_OUT);
-//
-//
-//
-////
-////////        //only boats >10GT are controlled
-////        effortControl("10",
-////                new String[]{"big","medium","small10"},
-////                SCENARIO_NAME,
-////                SHOCK_YEAR, MIN_DAYS_OUT);
-//
-////////
-////////        //price premium
-//        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
-//
-////        //selectivity test
-//        selectivityTest("selectivity_sweep", SCENARIO_NAME);
-////
-////        //price penalty
-//        pricePenalty("malus_malabaricus",
+//                new String[]{"big","medium","small10"},
 //                SCENARIO_NAME,
-//                10,
-//                "Lutjanus malabaricus");
-////
-////
-////
-////        //fleet reduction
-//        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
-//
-////        //delays
-//        delays("delay_all",
-//                new String[]{"population0","population1","population2","population3"},
-//                SCENARIO_NAME, SHOCK_YEAR, 50);
-////
-////
-////
+//                SHOCK_YEAR, MIN_DAYS_OUT);
+
 //////
-//        delays("delay_10",
-//                new String[]{"population1","population2","population3"},
-//                SCENARIO_NAME, SHOCK_YEAR, 50);
+//////        //price premium
+        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+
+//        //selectivity test
+        selectivityTest("selectivity_sweep", SCENARIO_NAME);
+//
+//        //price penalty
+        pricePenalty("malus_malabaricus",
+                SCENARIO_NAME,
+                10,
+                "Lutjanus malabaricus");
+//
+//
+//
+//        //fleet reduction
+        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
+
+//        //delays
+        delays("delay_all",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME, SHOCK_YEAR, 50);
+//
+//
+//
 ////
-////
-////
-////        delaysOnce("delay_once",
-////                new String[]{"big","small","medium","small10"},
-////                SCENARIO_NAME, SHOCK_YEAR, 200);
+        delays("delay_10",
+                new String[]{"population1","population2","population3"},
+                SCENARIO_NAME, SHOCK_YEAR, 50);
+//
+//
+//
+//        delaysOnce("delay_once",
+//                new String[]{"big","small","medium","small10"},
+//                SCENARIO_NAME, SHOCK_YEAR, 200);
 
 
     }
@@ -912,17 +912,18 @@ public class Slice6Sweeps {
             columnsToPrint.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
         }
 
-        return new BatchRunner(
+        BatchRunner batchRunner = new BatchRunner(
                 Paths.get(DIRECTORY,
-                        filename + ".yaml"),
+                          filename + ".yaml"),
                 yearsToRun,
                 columnsToPrint,
                 Paths.get(DIRECTORY,
-                        filename),
+                          filename),
                 null,
                 System.currentTimeMillis(),
                 -1
         );
+        return batchRunner;
     }
 
 

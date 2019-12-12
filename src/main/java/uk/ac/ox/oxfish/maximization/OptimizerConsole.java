@@ -30,9 +30,7 @@ import eva2.optimization.population.InterfacePopulationChangedEventListener;
 import eva2.optimization.population.Population;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.statistics.InterfaceTextListener;
-import eva2.optimization.strategies.AbstractOptimizer;
-import eva2.optimization.strategies.HillClimbing;
-import eva2.optimization.strategies.InterfaceOptimizer;
+import eva2.optimization.strategies.*;
 import eva2.problems.F1Problem;
 import eva2.problems.SimpleProblemWrapper;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -56,7 +54,8 @@ public class OptimizerConsole {
         GenericOptimization optimization = reader.loadAs(new FileReader(optimizationFilePath.toFile()),
                                                          GenericOptimization.class);
 
-        int type = Integer.parseInt(args[1]);
+        String type = args[1];
+        //  int type = Integer.parseInt();
         int parallelThreads = 4;
         if(args.length>2)
             parallelThreads = Integer.parseInt(args[2]);
@@ -69,14 +68,49 @@ public class OptimizerConsole {
         problem.setSimpleProblem(optimization);
         problem.setParallelThreads(parallelThreads);
 
-        OptimizationParameters params = OptimizerFactory.getParams(type,
-                                                                   problem
-        );
-        if(populationSize>0) {
-            params.getOptimizer().getPopulation().setTargetPopSize(populationSize);
-            params.getOptimizer().getPopulation().initialize();
+        OptimizationParameters params;
+        if(type.equals("ernesto_nelder_mead"))
+        {
+            params = OptimizerFactory.makeParams(NelderMeadSimplex.createNelderMeadSimplex(problem, null),
+                                                 populationSize == -1 ? 50 : populationSize,
+                                                 problem
+            );
+        }
+        else if(type.equals("ernesto_ada"))
+        {
+            params = OptimizerFactory.makeParams(
+
+                    new AdaptiveDifferentialEvolution(),
+                    populationSize == -1 ? 100 : populationSize,
+                    problem
+            );
+        }
+        else if(type.equals("ernesto_gd"))
+        {
+            params = OptimizerFactory.makeParams(
+
+                    new GradientDescentAlgorithm(),
+                    populationSize == -1 ? 5 : populationSize,
+                    problem
+            );
+        }
+        else if(type.equals("ernesto_default"))
+        {
+            params = OptimizerFactory.makeParams(
+
+                    new ClusterBasedNichingEA(),
+                    populationSize == -1 ? 200 : populationSize,
+                    problem
+            );
+        }
+        else {
+            params = OptimizerFactory.getParams(Integer.parseInt(type),
+                                                problem
+
+            );
 
         }
+
         OptimizerRunnable runnable = new OptimizerRunnable(params,
                                                            "eva"); //ignored, we are outputting to window
         runnable.setOutputFullStatsToText(true);

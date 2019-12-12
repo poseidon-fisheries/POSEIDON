@@ -227,6 +227,13 @@ public class NoDataSlice2Policy {
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
         System.out.println(filename);
+        if(OUTPUT_FOLDER.resolve(filename + ".csv").toFile().exists())
+        {
+            System.out.println(filename + " already exists!");
+            return;
+
+        }
+
 
         FileWriter fileWriter = new FileWriter(OUTPUT_FOLDER.resolve(filename + ".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
