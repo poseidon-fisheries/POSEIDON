@@ -2,8 +2,6 @@ package uk.ac.ox.oxfish.maximization;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.Constants;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
 import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -64,7 +62,6 @@ public class TunaMaximization {
             FixedDataLastStepTarget.VERBOSE = true;
             PrintStream stdOut = System.out;
             if (outputToFile) System.setOut(new PrintStream(new FileOutputStream(resultsFile)));
-            System.out.println("POSEIDON commit: " + new FileRepository("./.git").resolve(Constants.HEAD).getName());
             optimization.evaluate(optimalParameters);
             System.setOut(stdOut);
             System.out.println("Done.");
