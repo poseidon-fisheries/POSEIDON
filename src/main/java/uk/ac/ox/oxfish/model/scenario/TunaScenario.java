@@ -187,7 +187,7 @@ public class TunaScenario implements Scenario {
             targetYear,
             (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode))
         );
-    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
+    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 101, 0.5);
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
