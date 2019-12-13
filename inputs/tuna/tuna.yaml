@@ -121,7 +121,7 @@ Tuna:
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'
-        successfulSetProbability: '0.957'
+        successfulSetProbability: '0.9231701'
         unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
     gearStrategy: Never Change Gear
     holdSize: '100.0'
@@ -164,15 +164,15 @@ Tuna:
   gasPricePerLiter: '0.01'
   mapInitializer:
     From File Map:
-      gridWidthInCell: '94.0'
+      gridWidthInCell: '101.0'
       header: true
       latLong: true
       mapFile: inputs/tuna/depth.csv
       mapPaddingInDegrees: '0.5'
   plugins:
   - Biomass Snapshot Resetter:
-      yearsToReset: 1
       restoreOriginalLocations: true
+      yearsToReset: 1
   portFilePath: inputs/tuna/ports.csv
   targetYear: 2017
   weatherInitializer:

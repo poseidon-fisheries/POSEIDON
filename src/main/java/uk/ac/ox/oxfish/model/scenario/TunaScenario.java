@@ -204,13 +204,14 @@ public class TunaScenario implements Scenario {
             false
         );
 
-    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins = Lists.newArrayList(
-        new SnapshotBiomassResetterFactory()
-    );
-
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
     private Path costsFile = input("costs.csv");
 
     TunaScenario() {
+
+        final SnapshotBiomassResetterFactory snapshotBiomassResetterFactory = new SnapshotBiomassResetterFactory();
+        snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
+        plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
 
         AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
             new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE), "all",
