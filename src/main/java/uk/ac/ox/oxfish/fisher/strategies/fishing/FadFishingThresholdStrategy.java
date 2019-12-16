@@ -87,15 +87,15 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
 //        if(consecutiveActionCounts.sum()>10)
 //            return false;
 
-        if (nextAction.isEmpty()) {
+        if (!nextAction.isPresent()) {
             nextAction = maybeDeployFad(model, fisher);
         }
 
-        if(nextAction.isEmpty()) {
+        if(!nextAction.isPresent()) {
             if (random.nextDouble() < unassociatedSetsCoefficient)
                 nextAction = maybeMakeUnassociatedSet(model, fisher);
         }
-        if(nextAction.isEmpty()) {
+        if(!nextAction.isPresent()) {
             nextAction = maybeMakeFadSet(model, fisher);
         }
 
