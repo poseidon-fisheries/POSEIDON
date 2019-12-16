@@ -26,6 +26,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
 
+    private DoubleParameter dudProbability = new FixedDoubleParameter(0d);
+
     private Path unassociatedCatchSampleFile;
 
     public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
@@ -73,7 +75,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
-            initialNumberOfFads
+            initialNumberOfFads,
+            dudProbability.apply(fishState.getRandom())
         );
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
@@ -99,5 +102,23 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
         this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
+    }
+
+    /**
+     * Getter for property 'dudProbability'.
+     *
+     * @return Value for property 'dudProbability'.
+     */
+    public DoubleParameter getDudProbability() {
+        return dudProbability;
+    }
+
+    /**
+     * Setter for property 'dudProbability'.
+     *
+     * @param dudProbability Value to set for property 'dudProbability'.
+     */
+    public void setDudProbability(DoubleParameter dudProbability) {
+        this.dudProbability = dudProbability;
     }
 }

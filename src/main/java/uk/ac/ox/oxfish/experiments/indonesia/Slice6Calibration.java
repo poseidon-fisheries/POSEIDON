@@ -228,6 +228,9 @@ public class Slice6Calibration {
          //   -8.170, 3.979, 1.344, 4.002,-3.678, 10.000,-1.119, 5.176,-8.503, 0.405,-3.106,-7.122,-0.682, 9.191,-0.105,-8.848, 5.687,-4.989, 9.308, 4.335
             -8.352, 5.400,-4.518,-0.534,-2.782, 9.563, 4.350, 1.451,-7.475, 2.109, 7.264,-10.000,-10.000, 2.914,-0.683,-8.505, 4.915, 3.141,-0.808, 4.917
     };
+    public static final double[] MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS = new double[]{
+            -8.328, 10.000,-3.063,-7.427,-5.124, 3.037,-1.042, 0.983, 9.105, 1.558, 6.074, 10.000, 7.835, 4.453,-7.651,-7.794, 8.097,-1.811,-4.885,-2.874
+    };
 
     public static void main(String[] args) throws IOException {
 
@@ -295,11 +298,12 @@ public class Slice6Calibration {
 
 
 /////////////////////////
-        buildVariants("LIME_monthly2yr_cmsy_calibrationproblem.yaml",
-                      "lime_cmsy_monthly2yr",MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS);
-        buildDumpAndRun("LIME_monthly2yr_cmsy_calibrationproblem.yaml",
-                        "lime_cmsy_monthly2yr.yaml",
-                        MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS);
+
+        buildVariants("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
+                      "lime_cmsy_3yr",MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
+        buildDumpAndRun("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
+                        "test.yaml",
+                        MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
 
 
 

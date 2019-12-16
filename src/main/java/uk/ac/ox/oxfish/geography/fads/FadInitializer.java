@@ -21,13 +21,15 @@ public class FadInitializer implements Function<FadManager, Fad> {
     private final double[] carryingCapacities;
     private final double[] attractionRates;
     private final double fishReleaseProbability;
+    private final GlobalBiology biology;
 
-    FadInitializer(
+    public FadInitializer(
         GlobalBiology globalBiology,
         ImmutableMap<Species, Quantity<Mass>> carryingCapacities,
         ImmutableMap<Species, Double> attractionRates,
         double fishReleaseProbability
     ) {
+        this.biology = globalBiology;
         this.emptyBiomasses = new double[globalBiology.getSize()];
         this.carryingCapacities = new double[globalBiology.getSize()];
         carryingCapacities.forEach((species, qty) ->
@@ -43,5 +45,19 @@ public class FadInitializer implements Function<FadManager, Fad> {
     @Override public Fad apply(@NotNull FadManager fadManager) {
         final BiomassLocalBiology fadBiology = new BiomassLocalBiology(emptyBiomasses, carryingCapacities);
         return new Fad(fadManager, fadBiology, attractionRates, fishReleaseProbability);
+    }
+
+
+    public int getBiologicalSize(){
+        return carryingCapacities.length;
+    }
+
+    /**
+     * Getter for property 'biology'.
+     *
+     * @return Value for property 'biology'.
+     */
+    public GlobalBiology getBiology() {
+        return biology;
     }
 }

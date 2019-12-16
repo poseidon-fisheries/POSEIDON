@@ -1,11 +1,15 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.DriftingPath;
@@ -13,6 +17,9 @@ import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,11 +32,31 @@ public class FadManager {
     private final FadMap fadMap;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private FadInitializer fadInitializer;
+    private final FadInitializer dudInitializer;
     private Fisher fisher;
     private int numFadsInStock;
+    final private double dudProbability;
 
-    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock) {
+    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock,
+                      double dudProbability) {
         this.fadInitializer = fadInitializer;
+
+        HashMap<Species,Double> duds = new HashMap<>();
+        HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
+        for (Species species : fadInitializer.getBiology().getSpecies()) {
+
+            duds.put(species,0d);
+            dudsWeight.put(species, Quantities.getQuantity(0, Units.KILOGRAM));
+
+        }
+
+        this.dudInitializer = new FadInitializer(
+                fadInitializer.getBiology(),
+                ImmutableMap.copyOf(dudsWeight),
+                ImmutableMap.copyOf(duds),
+                0d
+        );
+        this.dudProbability = dudProbability;
         checkArgument(numFadsInStock >= 0);
         this.numFadsInStock = numFadsInStock;
         this.fadMap = fadMap;
@@ -72,7 +99,10 @@ public class FadManager {
     private Fad deployFad(Double2D location, int timeStep) {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
-        final Fad newFad = fadInitializer.apply(this);
+        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability) ?
+                dudInitializer.apply(this) :
+                fadInitializer.apply(this)
+                ;
         fadMap.deployFad(newFad, timeStep, location);
         deployedFads.add(newFad);
         return newFad;
