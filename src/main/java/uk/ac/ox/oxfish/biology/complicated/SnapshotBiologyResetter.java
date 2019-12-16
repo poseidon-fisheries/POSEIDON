@@ -47,7 +47,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
     public static SnapshotBiologyResetter abundanceResetter(
             GlobalBiology biology,
             int yearsBeforeReset,
-            boolean restoreOriginalLocations){
+            boolean restoreOriginalLocations,
+            boolean restoreOriginalLengthDistribution){
 
 
         LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
@@ -55,7 +56,13 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
             if(species.isImaginary())
                 continue;
             SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
-            resetters.put(new AbundanceResetter(snapper,species),snapper);
+            resetters.put(
+
+                    restoreOriginalLengthDistribution ?
+                        new AbundanceResetter(snapper,species) :
+                             new AbundanceScalingResetter(snapper,species)
+                    ,
+                    snapper);
         }
         return new SnapshotBiologyResetter(yearsBeforeReset, resetters, restoreOriginalLocations);
     }
@@ -94,7 +101,7 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
             @Override
             public void step(SimState simState) {
                 for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
-                    resetter.getKey().recordAbundance(model.getMap());
+                    resetter.getKey().recordHowMuchBiomassThereIs(model.getMap());
 
                     if(restoreOriginalLocations)
                         resetter.getValue().takeSnapshort(

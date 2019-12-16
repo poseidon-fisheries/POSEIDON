@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -52,8 +51,8 @@ public class BiomassResetter implements BiologyResetter {
      * @param map
      */
     @Override
-    public void recordAbundance(NauticalMap map) {
-        recordedBiomass = map.getTotalBiology(species);
+    public void recordHowMuchBiomassThereIs(NauticalMap map) {
+        recordedBiomass = map.getTotalBiomass(species);
     }
 
     /**

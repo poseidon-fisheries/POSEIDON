@@ -30,7 +30,7 @@ public interface BiologyResetter {
      * records how much biomass there is
      * @param map
      */
-    void recordAbundance(NauticalMap map);
+    void recordHowMuchBiomassThereIs(NauticalMap map);
 
     /**
      * returns biology layer to biomass recorded previously

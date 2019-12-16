@@ -28,7 +28,7 @@ public class AbundanceResetter implements BiologyResetter {
 
 
     @Override
-    public void recordAbundance(NauticalMap map)
+    public void recordHowMuchBiomassThereIs(NauticalMap map)
     {
         recordedAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 

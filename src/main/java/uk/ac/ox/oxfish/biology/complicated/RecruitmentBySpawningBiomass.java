@@ -166,14 +166,15 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
         }
 
         //turn it into recruits.
+        double recruits = FishStateUtilities.round(
+                (1d + noisemaker.get()) * (
+                        (4 * steepness * virginRecruits * spawningBiomass) /
+                                ((virginRecruits * cumulativePhi * (1 - steepness)) +
+                                        (((5 * steepness) - 1) * spawningBiomass))
+                )
+        );
         return
-                FishStateUtilities.round(
-                        (1d+noisemaker.get()) * (
-                                (4 * steepness * virginRecruits * spawningBiomass)/
-                                        ((virginRecruits*cumulativePhi*(1-steepness)) +
-                                                (((5*steepness)-1)*spawningBiomass))
-                        )
-                );
+                Math.min(virginRecruits,recruits);
 
 
 

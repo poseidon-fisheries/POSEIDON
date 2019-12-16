@@ -215,6 +215,20 @@ public class Slice6Calibration {
             1.352, 8.034, 2.733,-2.958,-0.425, 6.255,-0.334, 3.502,-2.122, 5.870,-3.211,-0.625, 1.152, 4.244, 1.519,-0.540, 1.118, 2.364, 6.605, 3.181
     };
 
+
+    public static final double[] STEVE_TROPFISH_2YR_OPTIMAL_PARAMETERS = new double[]{
+            -6.776,-5.786,-10.000,-4.141,-1.316, 6.773, 1.075,-9.863, 9.288,-4.519, 3.554,-6.341,-9.528, 4.016, 2.727,-3.836,-2.696,-10.000, 2.857,-10.000
+    };
+
+    public static final double[] STEVE_TROPFISH_SR_OPTIMAL_PARAMETERS = new double[]{
+            -2.563,-3.677,-10.000,-10.000,-4.524, 2.777, 5.553,-6.567,-5.051,-6.634,-6.678,-10.000,-7.340, 6.825,-6.893,-10.000,-4.533,-10.000, 0.550, 10.000
+    };
+
+    public static final double[] MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS = new double[]{
+         //   -8.170, 3.979, 1.344, 4.002,-3.678, 10.000,-1.119, 5.176,-8.503, 0.405,-3.106,-7.122,-0.682, 9.191,-0.105,-8.848, 5.687,-4.989, 9.308, 4.335
+            -8.352, 5.400,-4.518,-0.534,-2.782, 9.563, 4.350, 1.451,-7.475, 2.109, 7.264,-10.000,-10.000, 2.914,-0.683,-8.505, 4.915, 3.141,-0.808, 4.917
+    };
+
     public static void main(String[] args) throws IOException {
 
         /////////////////////////////////////////////////////////
@@ -260,11 +274,36 @@ public class Slice6Calibration {
 //                "LIME_monthly_LOCAL_calibrationproblem.yaml",
 //                .2d);
 
-        buildVariants("LIME_monthly_LOCAL_calibrationproblem.yaml",
-                      "monthly_lime",MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
-                 buildDumpAndRun("LIME_monthly_LOCAL_calibrationproblem.yaml",
-                         "LIME_monthly_LOCAL_calibrated.yaml",
-                                 MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
+//        buildVariants("LIME_monthly_LOCAL_calibrationproblem.yaml",
+//                      "monthly_lime",MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
+//                 buildDumpAndRun("LIME_monthly_LOCAL_calibrationproblem.yaml",
+//                         "LIME_monthly_LOCAL_calibrated.yaml",
+//                                 MONTHLY_LIME_LOCAL_OPTIMAL_PARAMETERS);
+
+
+
+        ///////////////////////////////
+
+
+//        buildVariants("steve_lime_specialreset_calibrationproblem.yaml",
+//                      "steve_limesr",STEVE_TROPFISH_SR_OPTIMAL_PARAMETERS);
+//        buildDumpAndRun("steve_lime_specialreset_calibrationproblem.yaml",
+//                        "steve_limesr.yaml",
+//                        STEVE_TROPFISH_SR_OPTIMAL_PARAMETERS);
+
+
+
+
+/////////////////////////
+        buildVariants("LIME_monthly2yr_cmsy_calibrationproblem.yaml",
+                      "lime_cmsy_monthly2yr",MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS);
+        buildDumpAndRun("LIME_monthly2yr_cmsy_calibrationproblem.yaml",
+                        "lime_cmsy_monthly2yr.yaml",
+                        MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS);
+
+
+
+
     }
 
     /**

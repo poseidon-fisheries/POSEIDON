@@ -64,7 +64,7 @@ public class AbundanceResetterTest {
 
         //record the abundance as it is
         AbundanceResetter resetter = new AbundanceResetter(biomassAllocator,species);
-        resetter.recordAbundance(fishState.getMap());
+        resetter.recordHowMuchBiomassThereIs(fishState.getMap());
 
 
         //reallocate!

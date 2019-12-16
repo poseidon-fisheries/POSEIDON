@@ -11,9 +11,12 @@ public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<Snapsh
 
     private boolean restoreOriginalLocations = false;
 
+    private boolean restoreOriginalLengthDistribution = true;
+
     @Override
     public SnapshotBiologyResetter apply(FishState state) {
-        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset,restoreOriginalLocations);
+        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset,restoreOriginalLocations,
+                                                         restoreOriginalLengthDistribution );
     }
 
 
@@ -41,5 +44,23 @@ public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<Snapsh
      */
     public void setRestoreOriginalLocations(boolean restoreOriginalLocations) {
         this.restoreOriginalLocations = restoreOriginalLocations;
+    }
+
+    /**
+     * Getter for property 'restoreOriginalLengthDistribution'.
+     *
+     * @return Value for property 'restoreOriginalLengthDistribution'.
+     */
+    public boolean isRestoreOriginalLengthDistribution() {
+        return restoreOriginalLengthDistribution;
+    }
+
+    /**
+     * Setter for property 'restoreOriginalLengthDistribution'.
+     *
+     * @param restoreOriginalLengthDistribution Value to set for property 'restoreOriginalLengthDistribution'.
+     */
+    public void setRestoreOriginalLengthDistribution(boolean restoreOriginalLengthDistribution) {
+        this.restoreOriginalLengthDistribution = restoreOriginalLengthDistribution;
     }
 }

@@ -55,10 +55,8 @@ import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -475,7 +473,7 @@ public class FishState  extends SimState{
     public double getTotalBiomass(Species species)
     {
         final double fadBiomass = fadMap == null ? 0 : fadMap.getTotalBiomass(species);
-        return fadBiomass + map.getTotalBiology(species);
+        return fadBiomass + map.getTotalBiomass(species);
     }
 
     public double getTotalAbundance(Species species,int bin)

@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "monthly_lime_7h";
+    private static final String SCENARIO_NAME = "lime_cmsy_monthly2yr_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =

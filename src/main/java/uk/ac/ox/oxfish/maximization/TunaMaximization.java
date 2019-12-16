@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
 import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -43,6 +44,7 @@ public class TunaMaximization {
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
         ScaledFixedDataLastStepTarget.VERBOSE = true;
+        FixedDataLastStepTarget.VERBOSE=true;
         optimization.evaluate(optimalParameters);
 
     }
