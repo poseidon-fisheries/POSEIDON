@@ -96,11 +96,6 @@ dependencies
     // maximizer
     compile group: 'de.openea', name : 'eva2', version : '2.2.0'
 
-    // JGit, so we can output commit hash when writing calibration results
-    // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
-
-
     //annotations
     compile group: 'com.intellij', name: 'annotations', version: '12.0'
 

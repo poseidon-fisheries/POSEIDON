@@ -24,7 +24,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private DoubleParameter averageSetDurationInHours = new FixedDoubleParameter(8.0219505805135);
     private DoubleParameter stdDevOfSetDurationInHours = new FixedDoubleParameter(2.99113291538723);
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
-    private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.957);
+    private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
 
     private Path unassociatedCatchSampleFile;
 

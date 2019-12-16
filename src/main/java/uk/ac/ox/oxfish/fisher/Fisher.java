@@ -805,7 +805,7 @@ public class Fisher implements Steppable, Startable{
      * @param localBiology this is what will need to "react" to the amount caught
      * @return the fish caught and stored (barring overcapacity)
      */
-    public void fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state, LocalBiology localBiology)
+    public Pair<Catch, Catch> fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state, LocalBiology localBiology)
     {
         //preamble
         SeaTile here = status.getLocation();
@@ -820,8 +820,7 @@ public class Fisher implements Steppable, Startable{
         removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
         //pull the fish up, store it, and burn fuel
         recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getFirst(), catchesAndKept.getSecond(), state);
-
-
+        return catchesAndKept;
     }
 
 
