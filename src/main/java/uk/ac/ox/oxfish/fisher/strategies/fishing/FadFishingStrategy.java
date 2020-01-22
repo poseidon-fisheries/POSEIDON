@@ -12,7 +12,6 @@ import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
-import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -86,8 +85,8 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .ofNullable(deploymentLocationValues.get(fisher.getLocation()))
             .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
             .filter(p -> model.getRandom().nextDouble() < p)
-            .map(__ -> new DeployFad())
-            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
+            .map(__ -> new DeployFad(model, fisher))
+            .filter(action -> action.isAllowed() && action.isPossible());
     }
 
     private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
@@ -95,14 +94,14 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .map(fad -> new Pair<>(fad, fadSetProbability(fad, fisher)))
             .filter(pair -> model.getRandom().nextDouble() < pair.getSecond())
             .sorted(comparingDouble(Pair::getSecond))
-            .map(pair -> new MakeFadSet((PurseSeineGear) fisher.getGear(), model.getRandom(), pair.getFirst()))
-            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
+            .map(pair -> new MakeFadSet(model, fisher, pair.getFirst()))
+            .filter(action -> action.isAllowed() && action.isPossible())
             .findFirst();
     }
 
     private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
-        return Optional.of(new MakeUnassociatedSet((PurseSeineGear) fisher.getGear(), model.getRandom()))
-            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
+        return Optional.of(new MakeUnassociatedSet(model, fisher))
+            .filter(action -> action.isAllowed() && action.isPossible())
             .filter(action -> {
                 final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
                 final long numConsecutiveActions = consecutiveActionCounts.get(MakeUnassociatedSet.class);

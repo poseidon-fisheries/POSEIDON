@@ -10,17 +10,13 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Optional;
-
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-
 public class MakeFadSet extends SetAction {
 
     public static String ACTION_NAME = "FAD sets";
     private Fad targetFad;
 
-    public MakeFadSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng, Fad targetFad) {
-        super(purseSeineGear, rng);
+    public MakeFadSet(FishState model, Fisher fisher, Fad targetFad) {
+        super(model, fisher);
         this.targetFad = targetFad;
     }
 
@@ -31,22 +27,11 @@ public class MakeFadSet extends SetAction {
     }
 
     @Override
-    public boolean isPossible(FishState model, Fisher fisher) {
-        return super.isPossible(model, fisher) && isFadHere(fisher);
+    public boolean isPossible() {
+        return super.isPossible() && isFadHere(targetFad);
     }
 
-    private boolean isFadHere(Fisher fisher) {
-        return getActionTile(fisher)
-            .filter(fadTile -> fadTile.equals(fisher.getLocation()))
-            .isPresent();
-    }
-
-    @Override
-    public Optional<SeaTile> getActionTile(Fisher fisher) {
-        return getFadManager(fisher).getFadMap().getFadTile(targetFad);
-    }
-
-    @Override public Action actionAfterSet() { return new PickUpFad(targetFad); }
+    @Override public Action actionAfterSet() { return new PickUpFad(getModel(), getFisher(), targetFad); }
 
     /**
      * When making a FAD set, the target biology is the biology of the target FAD.

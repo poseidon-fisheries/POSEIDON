@@ -31,30 +31,25 @@ public class FadManager {
 
     private final FadMap fadMap;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
-    private FadInitializer fadInitializer;
     private final FadInitializer dudInitializer;
+    final private double dudProbability;
+    private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
-    final private double dudProbability;
 
-    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock,
-                      double dudProbability) {
+    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock, double dudProbability) {
         this.fadInitializer = fadInitializer;
-
-        HashMap<Species,Double> duds = new HashMap<>();
+        HashMap<Species, Double> duds = new HashMap<>();
         HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
         for (Species species : fadInitializer.getBiology().getSpecies()) {
-
-            duds.put(species,0d);
+            duds.put(species, 0d);
             dudsWeight.put(species, Quantities.getQuantity(0, Units.KILOGRAM));
-
         }
-
         this.dudInitializer = new FadInitializer(
-                fadInitializer.getBiology(),
-                ImmutableMap.copyOf(dudsWeight),
-                ImmutableMap.copyOf(duds),
-                0d
+            fadInitializer.getBiology(),
+            ImmutableMap.copyOf(dudsWeight),
+            ImmutableMap.copyOf(duds),
+            0d
         );
         this.dudProbability = dudProbability;
         checkArgument(numFadsInStock >= 0);
@@ -99,10 +94,9 @@ public class FadManager {
     private Fad deployFad(Double2D location, int timeStep) {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
-        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability) ?
-                dudInitializer.apply(this) :
-                fadInitializer.apply(this)
-                ;
+        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability)
+            ? dudInitializer.apply(this)
+            : fadInitializer.apply(this);
         fadMap.deployFad(newFad, timeStep, location);
         deployedFads.add(newFad);
         return newFad;

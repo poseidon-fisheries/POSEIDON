@@ -27,8 +27,9 @@ public abstract class SetAction extends FadAction {
 
     private Quantity<Time> duration;
 
-    SetAction(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
-        this.duration = purseSeineGear.nextSetDuration(rng);
+    SetAction(FishState model, Fisher fisher) {
+        super(model, fisher);
+        this.duration = ((PurseSeineGear) fisher.getGear()).nextSetDuration(model.getRandom());
     }
 
     abstract boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng);
@@ -37,11 +38,11 @@ public abstract class SetAction extends FadAction {
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
         final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
+        if (isAllowed() && isPossible()) {
             final int duration = toHours(this.duration);
             final SeaTile seaTile = fisher.getLocation();
             fisher.getYearlyCounter().count(totalCounterName(), 1);
-            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), seaTile), 1);
+            fisher.getYearlyCounter().count(regionCounterName(), 1);
             if (isSuccessful(purseSeineGear, model.getRandom())) {
                 final LocalBiology targetBiology = targetBiology(
                     purseSeineGear, model.getBiology(), seaTile, model.getRandom()
@@ -60,8 +61,8 @@ public abstract class SetAction extends FadAction {
         }
     }
 
-    public boolean isPossible(FishState model, Fisher fisher) {
-        return fisher.getHold().getPercentageFilled() < 1 && fisher.getLocation().isWater();
+    public boolean isPossible() {
+        return getFisher().getHold().getPercentageFilled() < 1 && getSeaTile().isWater();
     }
 
     abstract LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);

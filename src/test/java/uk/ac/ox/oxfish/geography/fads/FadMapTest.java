@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -70,12 +71,16 @@ public class FadMapTest {
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
         final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
 
         final Schedule schedule = mock(Schedule.class);
         final FishState fishState = mock(FishState.class);
         fishState.random = new MersenneTwisterFast();
         fishState.schedule = schedule;
+
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0);
+        final Fisher fisher = mock(Fisher.class);
+        when(fisher.grabRandomizer()).thenReturn(fishState.random);
+        fadManager.setFisher(fisher);
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
