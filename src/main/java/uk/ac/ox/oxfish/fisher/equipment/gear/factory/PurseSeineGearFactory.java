@@ -1,10 +1,14 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveFadsLimit;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -72,12 +76,19 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     @Override
     public PurseSeineGear apply(FishState fishState) {
+        final ImmutableSet<ActionSpecificRegulation> regs =
+            ImmutableSet.of(new ActiveFadsLimit(ImmutableSortedMap.of(
+                0, 70,
+                213, 120,
+                426, 300,
+                1200, 450
+            )));
         final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
-            dudProbability.apply(fishState.getRandom())
-        );
+            dudProbability.apply(fishState.getRandom()),
+            regs);
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
             parseAllRecords(unassociatedCatchSampleFile).stream()

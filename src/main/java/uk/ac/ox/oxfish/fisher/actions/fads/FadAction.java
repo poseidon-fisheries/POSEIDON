@@ -40,8 +40,6 @@ public abstract class FadAction implements Action, FadManagerUtils {
         return "Total number of " + actionName;
     }
 
-    public FishState getModel() { return model; }
-
     public Fisher getFisher() { return fisher; }
 
     public SeaTile getSeaTile() { return seaTile; }
@@ -66,18 +64,23 @@ public abstract class FadAction implements Action, FadManagerUtils {
     abstract boolean isPossible();
 
     public boolean isAllowed() {
-        return fisher.isCheater() || fisher.getRegulation().canFishHere(fisher, seaTile, model, step);
+        return fisher.isCheater() || (
+            getFadManager().isAllowed(this) &&
+                fisher.getRegulation().canFishHere(fisher, seaTile, model, step)
+        );
     }
+
+    public FadManager getFadManager() { return FadManagerUtils.getFadManager(fisher); }
 
     String totalCounterName() {
         return "Total number of " + getActionName();
     }
-
-    FadManager getFadManager() { return FadManagerUtils.getFadManager(fisher); }
 
     boolean isFadHere(Fad targetFad) {
         return getModel().getFadMap().getFadTile(targetFad)
             .filter(fadTile -> fadTile.equals(seaTile))
             .isPresent();
     }
+
+    public FishState getModel() { return model; }
 }

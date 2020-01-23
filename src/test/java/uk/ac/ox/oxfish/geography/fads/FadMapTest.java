@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.engine.Schedule;
@@ -77,7 +78,7 @@ public class FadMapTest {
         fishState.random = new MersenneTwisterFast();
         fishState.schedule = schedule;
 
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0, ImmutableSet.of());
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabRandomizer()).thenReturn(fishState.random);
         fadManager.setFisher(fisher);
