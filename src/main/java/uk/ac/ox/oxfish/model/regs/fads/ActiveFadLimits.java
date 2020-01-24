@@ -10,12 +10,12 @@ import javax.measure.quantity.Volume;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class ActiveFadsLimit implements ActionSpecificRegulation {
+public class ActiveFadLimits implements ActionSpecificRegulation {
 
     private final ImmutableSet<Class<? extends FadAction>> applicableActions = ImmutableSet.of(DeployFad.class);
     private final ImmutableSortedMap<Integer, Integer> limits;
 
-    public ActiveFadsLimit(ImmutableSortedMap<Integer, Integer> limits) {
+    public ActiveFadLimits(ImmutableSortedMap<Integer, Integer> limits) {
         checkArgument(limits.keySet().contains(0));
         this.limits = limits;
     }

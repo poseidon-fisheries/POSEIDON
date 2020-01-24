@@ -1,38 +1,46 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveFadsLimit;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
+    private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories =
+        ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
-
     // see https://github.com/poseidon-fisheries/tuna/issues/7 re: set duration
     private DoubleParameter minimumSetDurationInHours = new FixedDoubleParameter(3.03333333333333);
     private DoubleParameter averageSetDurationInHours = new FixedDoubleParameter(8.0219505805135);
     private DoubleParameter stdDevOfSetDurationInHours = new FixedDoubleParameter(2.99113291538723);
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-
     private DoubleParameter dudProbability = new FixedDoubleParameter(0d);
-
     private Path unassociatedCatchSampleFile;
+
+    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulationFactories() {
+        return actionSpecificRegulationFactories;
+    }
+
+    public void setActionSpecificRegulationFactories(List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories) {
+        this.actionSpecificRegulationFactories = actionSpecificRegulationFactories;
+    }
 
     public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
@@ -76,19 +84,13 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     @Override
     public PurseSeineGear apply(FishState fishState) {
-        final ImmutableSet<ActionSpecificRegulation> regs =
-            ImmutableSet.of(new ActiveFadsLimit(ImmutableSortedMap.of(
-                0, 70,
-                213, 120,
-                426, 300,
-                1200, 450
-            )));
         final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
             dudProbability.apply(fishState.getRandom()),
-            regs);
+            actionSpecificRegulationFactories.stream().map(factory -> factory.apply(fishState)).collect(toImmutableSet())
+        );
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
             parseAllRecords(unassociatedCatchSampleFile).stream()

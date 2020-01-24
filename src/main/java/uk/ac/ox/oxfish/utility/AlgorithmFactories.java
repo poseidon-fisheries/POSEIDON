@@ -106,6 +106,7 @@ import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.PermitAllocationPolicies;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
+import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulations;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
@@ -211,6 +212,10 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(NetworkPredicate.class, NetworkPredicates.CONSTRUCTORS);
         NAMES_MAP.put(NetworkPredicate.class, NetworkPredicates.NAMES);
+
+        CONSTRUCTOR_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.CONSTRUCTORS);
+        NAMES_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.NAMES);
+
     }
 
 
