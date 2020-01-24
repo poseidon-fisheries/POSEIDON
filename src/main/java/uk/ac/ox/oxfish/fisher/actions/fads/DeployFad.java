@@ -65,6 +65,7 @@ public class DeployFad extends FadAction {
         if (isAllowed() && isPossible()) {
             SeaTile here = fisher.getLocation();
             getFadManager().deployFad(here, model.getStep(), model.random);
+            getFadManager().reactToAction(this);
             fisher.getYearlyCounter().count(totalCounterName(), 1);
             fisher.getYearlyCounter().count(regionCounterName(), 1);
         }

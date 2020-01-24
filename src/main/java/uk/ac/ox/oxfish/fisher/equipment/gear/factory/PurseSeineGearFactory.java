@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.GeneralSetLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -21,8 +22,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories =
-        ImmutableList.of(new ActiveFadLimitsFactory());
+    private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
+        ImmutableList.of(new ActiveFadLimitsFactory(), new GeneralSetLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
     // see https://github.com/poseidon-fisheries/tuna/issues/7 re: set duration
@@ -34,12 +35,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private DoubleParameter dudProbability = new FixedDoubleParameter(0d);
     private Path unassociatedCatchSampleFile;
 
-    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulationFactories() {
-        return actionSpecificRegulationFactories;
+    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
+        return actionSpecificRegulations;
     }
 
-    public void setActionSpecificRegulationFactories(List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories) {
-        this.actionSpecificRegulationFactories = actionSpecificRegulationFactories;
+    public void setActionSpecificRegulations(List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
     public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
@@ -89,7 +90,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
             dudProbability.apply(fishState.getRandom()),
-            actionSpecificRegulationFactories.stream().map(factory -> factory.apply(fishState)).collect(toImmutableSet())
+            actionSpecificRegulations.stream().map(factory -> factory.apply(fishState)).collect(toImmutableSet())
         );
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =

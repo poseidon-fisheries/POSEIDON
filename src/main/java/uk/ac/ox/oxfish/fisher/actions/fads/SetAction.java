@@ -51,6 +51,7 @@ public abstract class SetAction extends FadAction {
                 model.getBiology().getSpecies().forEach(species ->
                     fisher.getYearlyCounter().count(catchesCounterName(species), catchesKept.getWeightCaught(species))
                 );
+                getFadManager().reactToAction(this);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);

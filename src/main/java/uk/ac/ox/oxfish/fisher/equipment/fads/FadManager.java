@@ -24,6 +24,7 @@ import javax.measure.quantity.Mass;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -164,10 +165,16 @@ public class FadManager {
         return builder.build();
     }
 
+    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
+        return actionSpecificRegulations.get(fadAction.getClass()).stream();
+    }
+
     public boolean isAllowed(FadAction fadAction) {
-        return actionSpecificRegulations
-            .get(fadAction.getClass())
-            .stream().allMatch(reg -> reg.isAllowed(fadAction));
+        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
+    }
+
+    public void reactToAction(FadAction fadAction) {
+        regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
     }
 
 }

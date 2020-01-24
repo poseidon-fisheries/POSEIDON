@@ -9,9 +9,9 @@ import static org.junit.Assert.fail;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 
-public class ActiveFadLimitsTest {
-    final ActiveFadLimits activeFadLimits =
-        new ActiveFadLimits(ImmutableSortedMap.of(
+public class VolumeRelativeLimitsTest {
+    final VolumeRelativeLimits volumeRelativeLimits =
+        new VolumeRelativeLimits(ImmutableSortedMap.of(
             0, 70,
             213, 120,
             426, 300,
@@ -21,7 +21,7 @@ public class ActiveFadLimitsTest {
     @Test
     public void getLimit() {
         try {
-            activeFadLimits.getLimit(getQuantity(0.0, CUBIC_METRE));
+            volumeRelativeLimits.getLimit(getQuantity(0.0, CUBIC_METRE));
             fail("expected IllegalArgumentException");
         } catch (IllegalArgumentException e) { }
         ImmutableMap.<Double, Integer>builder()
@@ -35,7 +35,7 @@ public class ActiveFadLimitsTest {
             .put(99999.0, 450)
             .build()
             .forEach((volume, limit) ->
-                assertTrue(activeFadLimits.getLimit(getQuantity(volume, CUBIC_METRE)) == limit)
+                assertTrue(volumeRelativeLimits.getLimit(getQuantity(volume, CUBIC_METRE)) == limit)
             );
     }
 
