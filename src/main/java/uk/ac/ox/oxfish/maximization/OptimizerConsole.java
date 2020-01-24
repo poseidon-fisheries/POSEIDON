@@ -96,9 +96,11 @@ public class OptimizerConsole {
         }
         else if(type.equals("ernesto_default"))
         {
+            ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
+            opt.setPopulationSize(populationSize == -1 ? 200 : populationSize);
             params = OptimizerFactory.makeParams(
 
-                    new ClusterBasedNichingEA(),
+                    opt,
                     populationSize == -1 ? 200 : populationSize,
                     problem
             );
