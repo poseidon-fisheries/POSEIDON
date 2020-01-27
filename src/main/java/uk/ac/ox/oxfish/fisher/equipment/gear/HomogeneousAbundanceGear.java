@@ -232,7 +232,7 @@ public class HomogeneousAbundanceGear implements Gear {
         if (o == null || getClass() != o.getClass()) return false;
         HomogeneousAbundanceGear that = (HomogeneousAbundanceGear) o;
         return Double.compare(that.litersOfGasConsumedEachHourFishing, litersOfGasConsumedEachHourFishing) == 0 &&
-                Objects.equals(filters, that.filters);
+                Arrays.equals(filters, that.filters);
     }
 
     public double getLitersOfGasConsumedEachHourFishing() {

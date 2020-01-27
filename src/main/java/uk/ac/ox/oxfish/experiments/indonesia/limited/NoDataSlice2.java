@@ -258,16 +258,16 @@ public class NoDataSlice2 {
 
     public static void main(String[] args) throws IOException {
 
-//        for (int batch = 0; batch < BATCHES; batch++)
-//        {
-//
-//            final Path folder =
-//                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
-//            folder.toFile().mkdirs();
-//            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
-//                             System.currentTimeMillis(),SCENARIO_FILE);
-//
-//        }
+        for (int batch = BATCHES+1; batch < BATCHES+30; batch++)
+        {
+
+            final Path folder =
+                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
+            folder.toFile().mkdirs();
+            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
+                             System.currentTimeMillis(),SCENARIO_FILE);
+
+        }
 
 //        for (int batch = 0; batch < BATCHES; batch++)
      //     runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
@@ -275,9 +275,9 @@ public class NoDataSlice2 {
 //        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
 
 
-        System.out.println("scenario " + args[0]);
-        int directory = Integer.parseInt(args[0]);
-        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
+//        System.out.println("scenario " + args[0]);
+//        int directory = Integer.parseInt(args[0]);
+//        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
     }
 
 

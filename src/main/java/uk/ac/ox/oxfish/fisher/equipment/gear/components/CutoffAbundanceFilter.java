@@ -59,4 +59,25 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
             }
         return toReturn;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CutoffAbundanceFilter that = (CutoffAbundanceFilter) o;
+
+        if (Double.compare(that.cutoffLevel, cutoffLevel) != 0) return false;
+        return selectHigherThanCutoff == that.selectHigherThanCutoff;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(cutoffLevel);
+        result = (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (selectHigherThanCutoff ? 1 : 0);
+        return result;
+    }
 }

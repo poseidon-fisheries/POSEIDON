@@ -69,25 +69,29 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
     }
 
 
-
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         LogisticAbundanceFilter that = (LogisticAbundanceFilter) o;
-        return Double.compare(that.aParameter, aParameter) == 0 &&
-                Double.compare(that.bParameter, bParameter) == 0 &&
-                Boolean.compare(logBaseTen,that.logBaseTen) == 0 &&
-                isMemoization() == that.isMemoization();
+
+        if (Double.compare(that.aParameter, aParameter) != 0) return false;
+        if (Double.compare(that.bParameter, bParameter) != 0) return false;
+        return logBaseTen == that.logBaseTen;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
-        return Objects.hash(aParameter,bParameter,logBaseTen);
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(aParameter);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(bParameter);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (logBaseTen ? 1 : 0);
+        return result;
     }
-
 
     public double getaParameter() {
         return aParameter;
@@ -95,6 +99,11 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
 
     public double getbParameter() {
         return bParameter;
+    }
+
+
+    public boolean isLogBaseTen() {
+        return logBaseTen;
     }
 
 
