@@ -8,7 +8,15 @@ import java.util.Map;
 
 public class GeneralSetLimitsFactory implements AlgorithmFactory<GeneralSetLimits> {
 
-    public Map<Integer, Integer> limits = ImmutableSortedMap.of(0, 100);
+    public Map<Integer, Integer> limits;
+
+    public GeneralSetLimitsFactory() {
+        this(ImmutableSortedMap.of(0, 100));
+    }
+
+    public GeneralSetLimitsFactory(Map<Integer, Integer> limits) {
+        this.limits = limits;
+    }
 
     @SuppressWarnings("unused") public Map<Integer, Integer> getLimits() { return limits; }
 

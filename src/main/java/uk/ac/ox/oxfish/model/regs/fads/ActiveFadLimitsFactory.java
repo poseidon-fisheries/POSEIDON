@@ -11,13 +11,20 @@ public class ActiveFadLimitsFactory implements AlgorithmFactory<ActiveFadLimits>
 
     // since ActiveFadsLimit has no mutable internal state, we can cache and reuse instances
     private final HashMap<Map<Integer, Integer>, ActiveFadLimits> cache = new HashMap<>();
+    public Map<Integer, Integer> limits;
 
-    public Map<Integer, Integer> limits = ImmutableSortedMap.of(
-        0, 70,
-        213, 120,
-        426, 300,
-        1200, 450
-    );
+    public ActiveFadLimitsFactory() {
+        this(ImmutableSortedMap.of(
+            0, 70,
+            213, 120,
+            426, 300,
+            1200, 450
+        ));
+    }
+
+    public ActiveFadLimitsFactory(Map<Integer, Integer> limits) {
+        this.limits = limits;
+    }
 
     @SuppressWarnings("unused") public Map<Integer, Integer> getLimits() { return limits; }
 
