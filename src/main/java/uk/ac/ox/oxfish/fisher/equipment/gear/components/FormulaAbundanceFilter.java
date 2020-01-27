@@ -25,6 +25,9 @@ import com.google.common.collect.Table;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A general, if not really elegant, abundance filter that generates a probability matrix for male-female and age class
  * from a formula supplied by the subclass
@@ -118,6 +121,25 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
         }
         assert selectivity != null;
         return selectivity;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FormulaAbundanceFilter that = (FormulaAbundanceFilter) o;
+
+        if (memoization != that.memoization) return false;
+        return rounding == that.rounding;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (memoization ? 1 : 0);
+        result = 31 * result + (rounding ? 1 : 0);
+        return result;
     }
 
 

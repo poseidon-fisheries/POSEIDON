@@ -177,27 +177,6 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DoubleNormalFilter that = (DoubleNormalFilter) o;
-        return Double.compare(that.peak, peak) == 0 &&
-                Double.compare(that.top, top) == 0 &&
-                Double.compare(that.ascWidth, ascWidth) == 0 &&
-                Double.compare(that.dscWidth, dscWidth) == 0 &&
-                Double.compare(that.initialScaling, initialScaling) == 0 &&
-                Double.compare(that.finalScaling, finalScaling) == 0 &&
-                Double.compare(that.binMin, binMin) == 0 &&
-                Double.compare(that.binMax, binMax) == 0 &&
-                Double.compare(that.binWidth, binWidth) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(peak, top, ascWidth, dscWidth, initialScaling, finalScaling, binMin, binMax, binWidth);
-    }
-
     public double getPeak() {
         return peak;
     }
@@ -232,5 +211,49 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
     public double getBinWidth() {
         return binWidth;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DoubleNormalFilter that = (DoubleNormalFilter) o;
+
+        if (Double.compare(that.peak, peak) != 0) return false;
+        if (Double.compare(that.top, top) != 0) return false;
+        if (Double.compare(that.ascWidth, ascWidth) != 0) return false;
+        if (Double.compare(that.dscWidth, dscWidth) != 0) return false;
+        if (Double.compare(that.initialScaling, initialScaling) != 0) return false;
+        if (Double.compare(that.finalScaling, finalScaling) != 0) return false;
+        if (Double.compare(that.binMin, binMin) != 0) return false;
+        if (Double.compare(that.binMax, binMax) != 0) return false;
+        return Double.compare(that.binWidth, binWidth) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(peak);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(top);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(ascWidth);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(dscWidth);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(initialScaling);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(finalScaling);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(binMin);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(binMax);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(binWidth);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 }

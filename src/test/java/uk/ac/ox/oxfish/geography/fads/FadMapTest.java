@@ -70,7 +70,7 @@ public class FadMapTest {
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
         final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1,0d);
 
         final Schedule schedule = mock(Schedule.class);
         final FishState fishState = mock(FishState.class);

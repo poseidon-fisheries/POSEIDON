@@ -526,7 +526,7 @@ public class Slice5Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 
@@ -597,7 +597,7 @@ public class Slice5Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 

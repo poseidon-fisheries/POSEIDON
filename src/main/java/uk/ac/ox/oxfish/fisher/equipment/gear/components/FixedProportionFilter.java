@@ -77,4 +77,25 @@ public class FixedProportionFilter implements AbundanceFilter
     public double getProportion() {
         return proportion;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FixedProportionFilter that = (FixedProportionFilter) o;
+
+        if (Double.compare(that.proportion, proportion) != 0) return false;
+        return rounding == that.rounding;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(proportion);
+        result = (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (rounding ? 1 : 0);
+        return result;
+    }
 }

@@ -71,15 +71,25 @@ public class RetentionAbundanceFilter extends FormulaAbundanceFilter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
         RetentionAbundanceFilter that = (RetentionAbundanceFilter) o;
-        return Double.compare(that.inflection, inflection) == 0 &&
-                Double.compare(that.slope, slope) == 0 &&
-                Double.compare(that.asymptote, asymptote) == 0 &&
-                isMemoization() == that.isMemoization();
+
+        if (Double.compare(that.inflection, inflection) != 0) return false;
+        if (Double.compare(that.slope, slope) != 0) return false;
+        return Double.compare(that.asymptote, asymptote) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(inflection, slope, asymptote);
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(inflection);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(slope);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(asymptote);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 }

@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
 
@@ -41,12 +42,12 @@ import java.util.Map;
 public class ThreePricesMarketProxy  implements Market{
 
 
-    private ThreePricesMarket delegate = null;
+    private Market delegate = null;
 
     /**
      * price map containing species --> prices factory
      */
-    private final Map<String, ThreePricesMarketFactory> pricesMap;
+    private final Map<String, AlgorithmFactory<? extends Market>> pricesMap;
 
 
     private Species species;
@@ -54,7 +55,7 @@ public class ThreePricesMarketProxy  implements Market{
     private FishState state;
 
     public ThreePricesMarketProxy(
-            Map<String, ThreePricesMarketFactory> pricesMap) {
+            Map<String,  AlgorithmFactory<? extends Market>> pricesMap) {
         this.pricesMap = pricesMap;
     }
 
@@ -151,7 +152,7 @@ public class ThreePricesMarketProxy  implements Market{
             return;
 
         String speciesName = species.getName();
-        ThreePricesMarketFactory factory = pricesMap.get(speciesName);
+        AlgorithmFactory<? extends Market> factory = pricesMap.get(speciesName);
         Preconditions.checkArgument(factory!=null, "Can't create a market for " + species);
         delegate = factory.apply(state);
         delegate.setSpecies(species);
@@ -162,29 +163,11 @@ public class ThreePricesMarketProxy  implements Market{
 
 
     /**
-     * Getter for property 'delegate'.
-     *
-     * @return Value for property 'delegate'.
-     */
-    public ThreePricesMarket getDelegate() {
-        return delegate;
-    }
-
-    /**
-     * Setter for property 'delegate'.
-     *
-     * @param delegate Value to set for property 'delegate'.
-     */
-    public void setDelegate(ThreePricesMarket delegate) {
-        this.delegate = delegate;
-    }
-
-    /**
      * Getter for property 'pricesMap'.
      *
      * @return Value for property 'pricesMap'.
      */
-    public Map<String, ThreePricesMarketFactory> getPricesMap() {
+    public Map<String,  AlgorithmFactory<? extends Market>> getPricesMap() {
         return pricesMap;
     }
 }

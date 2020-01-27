@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.GearDecorator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.DiscreteRandomAlgorithm;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -37,8 +38,14 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
+import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK;
 
@@ -61,6 +68,11 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
     final private boolean yearly;
 
 
+    final static public String tag = "PERIODIC_UPDATE_GEAR";
+
+    @Nullable
+    final List<Gear> options;
+
 
     /**
      * given an exploration step, builds the adaptation algorithm around it
@@ -73,6 +85,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             RandomStep<Gear> explorationStep,
             AdaptationProbability probability
     ) {
+        options=null;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
                 new Predicate<Fisher>() {
@@ -118,6 +131,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             List<Gear> options,
             AdaptationProbability probability)
     {
+        this.options = options;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
                 new Predicate<Fisher>() {
@@ -132,6 +146,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                     public void apply(Fisher fisher,
                                       Gear change,
                                       FishState model) {
+                        tagYourself(fisher, change, options);
                         toReturn = change.makeCopy();
                     }
                 },
@@ -147,12 +162,48 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             public boolean test(Gear a) {
                 return true;
             }
-        }
+        },
+                //copy only from others who have one of these gears!
+                new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
+                    @Override
+                    public Collection<Fisher> apply(
+                            Pair<Fisher, MersenneTwisterFast> input) {
+                        return input.getFirst().getDirectedFriends().stream().filter(
+                                new Predicate<Fisher>() {
+                                    @Override
+                                    public boolean test(Fisher friend) {
+                                        return options.stream().anyMatch(new Predicate<Gear>() {
+                                            @Override
+                                            public boolean test(Gear gear) {
+                                                return friend.getGear().isSame(gear);
+                                            }
+                                        });
+                                    }
+                                }
+                        ).collect(Collectors.toList());
+                    }
+                }
         );
     }
 
+    public void tagYourself(Fisher fisher, Gear change, List<Gear> options) {
+        final List<String> newTags = fisher.getTags().stream().filter(new Predicate<String>() {
+            @Override
+            public boolean test(String s) {
+                return !s.startsWith(tag);
+            }
+        }).collect(Collectors.toList());
 
-
+        OptionalInt indexOpt = IntStream.range(0, options.size())
+                .filter(i ->
+                        change.isSame(options.get(i)))
+                .findFirst();
+        newTags.add(tag + "_" + indexOpt.orElse(-1));
+        options.get(0).isSame(change);
+        options.get(1).isSame(change);
+        fisher.getTags().clear();
+        fisher.getTags().addAll(newTags);
+    }
 
 
     /**
@@ -211,6 +262,12 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
     public void start(FishState model, Fisher fisher)
     {
         this.fisher=fisher;
+
+        if(options!=null)
+            tagYourself(fisher, fisher.getGear(), options);
+
+
+
         //if started, adapt!
         if(yearly)
             fisher.addYearlyAdaptation(gearAdaptation);

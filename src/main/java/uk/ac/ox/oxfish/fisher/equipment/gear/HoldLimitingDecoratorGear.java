@@ -121,7 +121,7 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HoldLimitingDecoratorGear that = (HoldLimitingDecoratorGear) o;
-        return Objects.equals(delegate, that.delegate);
+        return delegate.isSame(that.delegate);
     }
 
 

@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * A decorator that makes fishing happen every X hours rather than immediately.
  * Basically it waits X hours then call the original gear fish(.) once
  */
-public class DelayGearDecorator implements Gear {
+public class DelayGearDecorator implements GearDecorator {
 
 
     /**
@@ -22,7 +22,7 @@ public class DelayGearDecorator implements Gear {
     private Catch emptyCatchSingleton;
 
 
-    private final Gear delegate;
+    private Gear delegate;
 
 
     private final int hoursItTakeToFish;
@@ -42,12 +42,21 @@ public class DelayGearDecorator implements Gear {
 
 
     @Override
+    public Gear getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public void setDelegate(Gear delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
     public boolean isSame(Gear o) {
         if(o instanceof DelayGearDecorator)
         {
             return ((DelayGearDecorator) o).delegate.isSame(this.delegate) &&
-                    this.hoursItTakeToFish == ((DelayGearDecorator) o).hoursItTakeToFish &&
-                    this.hoursWaiting == ((DelayGearDecorator) o).hoursWaiting;
+                    this.hoursItTakeToFish == ((DelayGearDecorator) o).hoursItTakeToFish;
         }
         else
             return false;
@@ -112,4 +121,7 @@ public class DelayGearDecorator implements Gear {
                         this.hoursItTakeToFish
                 );
     }
+
+
+
 }

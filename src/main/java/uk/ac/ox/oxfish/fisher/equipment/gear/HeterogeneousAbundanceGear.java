@@ -172,7 +172,16 @@ public class HeterogeneousAbundanceGear implements Gear
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HeterogeneousAbundanceGear that = (HeterogeneousAbundanceGear) o;
-        return Objects.equals(gears, that.gears);
+        if(!that.gears.keySet().equals(this.gears.keySet()))
+            return false;
+        for (Species species : that.gears.keySet()) {
+            if(!that.gears.get(species).isSame(this.gears.get(species)))
+                return false;
+
+        }
+
+        return true;
+
     }
 
     /**
