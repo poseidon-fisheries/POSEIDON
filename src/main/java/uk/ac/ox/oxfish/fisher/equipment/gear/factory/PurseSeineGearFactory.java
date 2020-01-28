@@ -23,7 +23,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
-        ImmutableList.of(new ActiveFadLimitsFactory(), new GeneralSetLimitsFactory());
+        ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
     // see https://github.com/poseidon-fisheries/tuna/issues/7 re: set duration
