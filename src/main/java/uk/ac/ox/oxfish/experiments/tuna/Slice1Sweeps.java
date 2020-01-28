@@ -29,10 +29,15 @@ import static java.util.stream.Stream.concat;
 public class Slice1Sweeps {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1"));
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-28"));
 
     public static void main(String[] args) throws IOException {
         final ArrayList<String> columnsToPrint = newArrayList(
+            "Biomass Bigeye tuna",
+            "Biomass Skipjack tuna",
+            "Biomass Yellowfin tuna",
+            "Total Earnings",
+            "Total Variable Costs",
             "Bigeye tuna Landings",
             "Skipjack tuna Landings",
             "Yellowfin tuna Landings",
@@ -77,7 +82,7 @@ public class Slice1Sweeps {
 
         final BatchRunner batchRunner = new BatchRunner(
             scenarioPath.resolve("tuna_calibrated.yaml"),
-            5,
+            11,
             columnsToPrint,
             outputPath,
             null,
@@ -101,9 +106,14 @@ public class Slice1Sweeps {
                 1200, 315
             ));
 
-        final Optional<GeneralSetLimitsFactory> hundredSetsLimits =
+        final Optional<GeneralSetLimitsFactory> setLimit75 =
             Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
-                0, 100
+                0, 75
+            )));
+
+        final Optional<GeneralSetLimitsFactory> setLimit150 =
+            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
+                0, 150
             )));
 
         final ImmutableMap<ActiveFadLimitsFactory, String> fadLimits = ImmutableMap.of(
@@ -112,7 +122,8 @@ public class Slice1Sweeps {
         );
 
         final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
-            hundredSetsLimits, "100-set limit",
+            setLimit75, "75 sets limit",
+            setLimit150, "150 sets limit",
             Optional.empty(), "No set limit"
         );
 
@@ -127,7 +138,7 @@ public class Slice1Sweeps {
                     concat(Stream.of(activeFadLimitsFactory), stream(generalSetLimitsFactory)).collect(toList()),
                     fadLimitsName + " / " + setLimitsName
                 );
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 10; i++) {
                     StringBuffer outputBuffer = new StringBuffer();
                     try {
                         batchRunner.run(outputBuffer);
