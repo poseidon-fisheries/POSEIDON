@@ -187,7 +187,6 @@ public class TunaScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-
     private AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> biologyInitializers =
         new MultipleIndependentSpeciesBiomassFactory(
             parseAllRecords(SCHAEFER_PARAMS_FILE).stream().map(r -> makeBiomassInitializerFactory(
@@ -199,7 +198,6 @@ public class TunaScenario implements Scenario {
             false,
             false
         );
-
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
     private Path costsFile = input("costs.csv");
 
@@ -254,7 +252,11 @@ public class TunaScenario implements Scenario {
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
-    private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
+        return exogenousCatchesFactory;
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
@@ -508,10 +510,10 @@ public class TunaScenario implements Scenario {
         fishersByBoatId.forEach((boatId, fisher) -> {
             if (fisher.getDestinationStrategy() instanceof FadGravityDestinationStrategy) {
                 final Map<SeaTile, Double> deploymentValues =
-                        deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
+                    deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
-                        .getFadDeploymentDestinationStrategy()
-                        .setDeploymentLocationValues(deploymentValues);
+                    .getFadDeploymentDestinationStrategy()
+                    .setDeploymentLocationValues(deploymentValues);
             }
         });
 

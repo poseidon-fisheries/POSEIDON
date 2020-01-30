@@ -26,11 +26,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 @SuppressWarnings("UnstableApiUsage")
-public class Slice1Sweeps {
+public class Slice1SweepsWithFakeExoCatches {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-28"));
-    private static final int numberOfRunsPerPolicy = 10;
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-30_2_fake_exo"));
+    private static final int numberOfRunsPerPolicy = 2;
     private static final int yearsToRun = 11;
 
     public static void main(String[] args) throws IOException {
@@ -52,34 +52,7 @@ public class Slice1Sweeps {
             "Average Trip Duration",
             "Total number of FAD deployments",
             "Total number of FAD sets",
-            "Total number of unassociated sets",
-            "Proportion of FAD deployments (Central region)",
-            "Proportion of FAD deployments (East region)",
-            "Proportion of FAD deployments (North region)",
-            "Proportion of FAD deployments (Northeast region)",
-            "Proportion of FAD deployments (Northwest region)",
-            "Proportion of FAD deployments (South region)",
-            "Proportion of FAD deployments (Southeast region)",
-            "Proportion of FAD deployments (Southwest region)",
-            "Proportion of FAD deployments (West region)",
-            "Proportion of FAD sets (Central region)",
-            "Proportion of FAD sets (East region)",
-            "Proportion of FAD sets (North region)",
-            "Proportion of FAD sets (Northeast region)",
-            "Proportion of FAD sets (Northwest region)",
-            "Proportion of FAD sets (South region)",
-            "Proportion of FAD sets (Southeast region)",
-            "Proportion of FAD sets (Southwest region)",
-            "Proportion of FAD sets (West region)",
-            "Proportion of unassociated sets (Central region)",
-            "Proportion of unassociated sets (East region)",
-            "Proportion of unassociated sets (North region)",
-            "Proportion of unassociated sets (Northeast region)",
-            "Proportion of unassociated sets (Northwest region)",
-            "Proportion of unassociated sets (South region)",
-            "Proportion of unassociated sets (Southeast region)",
-            "Proportion of unassociated sets (Southwest region)",
-            "Proportion of unassociated sets (West region)"
+            "Total number of unassociated sets"
         );
 
         final BatchRunner batchRunner = new BatchRunner(
@@ -100,32 +73,11 @@ public class Slice1Sweeps {
                 1200, 450
             ));
 
-        final ActiveFadLimitsFactory proposedFadLimits =
-            new ActiveFadLimitsFactory(ImmutableSortedMap.of(
-                0, 50,
-                213, 85,
-                426, 210,
-                1200, 315
-            ));
-
-        final Optional<GeneralSetLimitsFactory> setLimit75 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
-                0, 75
-            )));
-
-        final Optional<GeneralSetLimitsFactory> setLimit150 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
-                0, 150
-            )));
-
         final ImmutableMap<ActiveFadLimitsFactory, String> fadLimits = ImmutableMap.of(
-            currentFadLimits, "Current FAD limits",
-            proposedFadLimits, "Proposed FAD limits"
+            currentFadLimits, "Current FAD limits"
         );
 
         final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
-            setLimit75, "75 sets limit",
-            setLimit150, "150 sets limit",
             Optional.empty(), "No set limit"
         );
 
@@ -161,8 +113,10 @@ public class Slice1Sweeps {
         String policyName
     ) {
         batchRunner.setScenarioSetup(scenario -> {
-            final AlgorithmFactory<? extends Gear> gearFactory = ((TunaScenario) scenario).getFisherDefinition().getGear();
+            final TunaScenario tunaScenario = (TunaScenario) scenario;
+            final AlgorithmFactory<? extends Gear> gearFactory = tunaScenario.getFisherDefinition().getGear();
             ((PurseSeineGearFactory) gearFactory).setActionSpecificRegulations(regulationFactories);
+            tunaScenario.getExogenousCatchesFactory().setCatchesFile(TunaScenario.input("fake_exo.csv"));
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")

@@ -45,6 +45,14 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
         this.speciesFromCode = speciesFromCode;
     }
 
+    @SuppressWarnings("unused") public int getStartingYear() { return startingYear; }
+
+    @SuppressWarnings("unused") public void setStartingYear(int startingYear) { this.startingYear = startingYear; }
+
+    @SuppressWarnings("unused") public Path getCatchesFile() { return catchesFile; }
+
+    public void setCatchesFile(Path catchesFile) { this.catchesFile = catchesFile; }
+
     /**
      * Reads from catchesFile to build the map of exogenous catches tobe passed to the
      * BiomassDrivenTimeSeriesExogenousCatches constructor. Since we don't want to depend on the input file
