@@ -220,16 +220,35 @@ public class Slice6Calibration {
             -6.776,-5.786,-10.000,-4.141,-1.316, 6.773, 1.075,-9.863, 9.288,-4.519, 3.554,-6.341,-9.528, 4.016, 2.727,-3.836,-2.696,-10.000, 2.857,-10.000
     };
 
+    public static final double[] STEVE_TROPFISH_3YR_OPTIMAL_PARAMETERS = new double[]{
+            -9.059,-8.210, 6.768, 8.080, 8.390,-1.773, 8.048,-7.891, 9.976,-0.018,-0.137,-10.000, 6.631, 2.561,-4.586,-0.031,-10.000,-9.881,-10.000,-8.771
+
+    };
+
+    public static final double[] LIME_MONTHLY_IMPLIED_2YR_OPTIMAL_PARAMETERS = new double[]{
+            -7.916,-8.419,-9.450,-3.011,-2.842, 10.000,-10.000,-5.293,-10.000, 8.950, 1.558,-8.162, 1.657,-1.321,-6.061,-9.018,-8.796,-4.117, 2.576,-5.997
+    };
+
     public static final double[] STEVE_TROPFISH_SR_OPTIMAL_PARAMETERS = new double[]{
             -2.563,-3.677,-10.000,-10.000,-4.524, 2.777, 5.553,-6.567,-5.051,-6.634,-6.678,-10.000,-7.340, 6.825,-6.893,-10.000,-4.533,-10.000, 0.550, 10.000
     };
+
+    public static final double[] TROPFISH_TL_2YR_OPTIMAL_PARAMETERS = new double[]{
+            -1.108,-7.843,-7.288, 2.988,-0.376,-4.638,-10.000,-3.300, 4.950, 3.011,-5.885,-2.064, 0.936, 4.905, 9.418, 10.000,-8.976,-8.513, 1.152, 10.000    };
 
     public static final double[] MONTHLY_CMSY_2YR_LIME_OPTIMAL_PARAMETERS = new double[]{
          //   -8.170, 3.979, 1.344, 4.002,-3.678, 10.000,-1.119, 5.176,-8.503, 0.405,-3.106,-7.122,-0.682, 9.191,-0.105,-8.848, 5.687,-4.989, 9.308, 4.335
             -8.352, 5.400,-4.518,-0.534,-2.782, 9.563, 4.350, 1.451,-7.475, 2.109, 7.264,-10.000,-10.000, 2.914,-0.683,-8.505, 4.915, 3.141,-0.808, 4.917
     };
     public static final double[] MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS = new double[]{
-            -8.328, 10.000,-3.063,-7.427,-5.124, 3.037,-1.042, 0.983, 9.105, 1.558, 6.074, 10.000, 7.835, 4.453,-7.651,-7.794, 8.097,-1.811,-4.885,-2.874
+            -8.194, 9.476,-2.253,-6.935,-5.158, 3.249, 2.115, 0.332, 8.257,-3.599, 3.965, 8.621, 6.010, 3.344,-10.000,-9.037, 10.000,-0.417,-9.684, 3.634
+    };
+
+    public static final double[] TROPFISH_TL_2YR_LOCAL_OPTIMAL_SQUARE = new double[]{
+            -7.253, 2.366,-2.280,-3.153,-2.663, 10.000, 10.000,-7.961, 2.422, 10.000, 9.306,-8.707, 1.861,-7.053, 4.577,-4.178, 1.418,-3.409,-6.668, 6.566
+    };
+    public static final double[] TROPFISH_TL_2YR_OPTIMAL_SQUARE = new double[]{
+            -6.528,-7.655, 5.369, 8.138, 1.067, 10.000,-10.000,-8.403, 8.017, 4.227,-8.387,-5.921, 6.268,-9.836, 6.187,-4.136,-8.409,-10.000, 1.574, 9.737
     };
 
     public static void main(String[] args) throws IOException {
@@ -299,14 +318,79 @@ public class Slice6Calibration {
 
 /////////////////////////
 
-        buildVariants("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
-                      "lime_cmsy_3yr",MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
-        buildDumpAndRun("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
-                        "test.yaml",
-                        MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
+//        buildVariants("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
+//                      "lime_cmsy_3yr",MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
+//        buildDumpAndRun("LIME_monthly3yr_cmsy_calibrationproblem.yaml",
+//                        "lime_cmsy_3yr.yaml",
+//                        MONTHLY_CMSY_3YR_LIME_OPTIMAL_PARAMETERS);
+/////////////////////////
+//        buildVariants("steve_TropFishR3yr_calibrationproblem.yaml",
+//                      "tropfish_cmsy_3yr",STEVE_TROPFISH_3YR_OPTIMAL_PARAMETERS);
+//        buildDumpAndRun("steve_TropFishR3yr_calibrationproblem.yaml",
+//                        "tropfish_cmsy.yaml",
+//                        STEVE_TROPFISH_3YR_OPTIMAL_PARAMETERS);
+
+///////////////////
+        //LIME_monthly2yr_implied_calibrationproblem
+//                buildVariants("TropFishR_tl_2yr_calibrationproblem.yaml",
+//                      "tropfishR_tl_2yr",TROPFISH_TL_2YR_OPTIMAL_PARAMETERS);
+//        buildDumpAndRun("TropFishR_tl_2yr_calibrationproblem.yaml",
+//                        "tropfishR_tl_2yr.yaml",
+//                        TROPFISH_TL_2YR_OPTIMAL_PARAMETERS);
+
+//                GenericOptimization.buildLocalCalibrationProblem(
+//                DIRECTORY.resolve("calibration").resolve("TropFishR_tl_2yr_calibrationproblem.yaml"),
+//                TROPFISH_TL_2YR_OPTIMAL_PARAMETERS,
+//                "TropFishR_tl_2yr_calibrationproblem_LOCAL.yaml",
+//                .2d);
+
+
+        ///////////////////
+        //LIME_monthly2yr_implied_calibrationproblem
+//                buildVariants("LIME_monthly2yr_implied_calibrationproblem.yaml",
+//                      "lime_implied_monthly_2yr",LIME_MONTHLY_IMPLIED_2YR_OPTIMAL_PARAMETERS);
+//        buildDumpAndRun("LIME_monthly2yr_implied_calibrationproblem.yaml",
+//                        "lime_implied_monthly_2yr.yaml",
+//                        LIME_MONTHLY_IMPLIED_2YR_OPTIMAL_PARAMETERS);
 
 
 
+        ////////////////////////////
+        // TROPFISH  LOCAL
+
+
+//        buildDumpAndRun("TropFishR_tl_2yr_onemoretime_LOCAL_square.yaml",
+//                        "local1.yaml",
+//                        TROPFISH_TL_2YR_LOCAL_OPTIMAL_SQUARE);
+//
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                DIRECTORY.resolve("calibration").resolve("TropFishR_tl_2yr_onemoretime_LOCAL_square.yaml"),
+//                TROPFISH_TL_2YR_LOCAL_OPTIMAL_SQUARE,
+//                "TropFishR_tl_2yr_calibrationproblem_LOCAL_square_2.yaml",
+//                .2d);
+//      //  TROPFISH_TL_2YR_LOCAL_SQUARE
+//        buildDumpAndRun("TropFishR_tl_2yr_onemoretime_square.yaml",
+//                        "square.yaml",
+//                        TROPFISH_TL_2YR_OPTIMAL_SQUARE);
+
+
+        //asymmetric, reset
+//        double[] assymmetric = {10.0, 6.946985348355879, -4.070880334062945, -0.39993284033361287, -4.665437254408304, 0.760754252454288, -5.488095597477981, -1.4657944426976162, -3.8307866223813902, -4.960560943421498, 9.349572245609385, 5.024023869450333, -0.630641655846433, 1.468378223691592, -8.831685814118083, 4.83016481516259, 5.847818369682752, -9.05702738458986, -4.804754704104122, 7.48564900937437};
+//
+//        buildDumpAndRun("TropFishR_tl_reset_calibrationproblem_asymmetric.yaml",
+//                        "asym-nospinup.yaml",
+//                        assymmetric);
+        //asymmetric, no spinup
+        double[] assymmetric2 = {
+                5.132, 6.985, 8.244, 9.007,-10.000,-0.118,-8.022, 8.130, 4.953,-4.059, 0.786, 7.554, 2.744,-3.464, 1.313,-4.138,-9.064,-1.519, 2.867,-1.599};
+
+//        buildDumpAndRun("TropFishR_tl_reset_calibrationproblem_asymmetric_noreboot.yaml",
+//                        "asym-norest.yaml",
+//                        assymmetric2);
+
+        buildVariants("TropFishR_tl_reset_calibrationproblem_asymmetric_noreboot.yaml",
+                      "tropfish-noreset",
+                      assymmetric2);
 
     }
 

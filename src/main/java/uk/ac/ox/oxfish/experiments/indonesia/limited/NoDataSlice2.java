@@ -253,33 +253,50 @@ public class NoDataSlice2 {
     }
 
 
+    /**
+     * like the original runs, but we accept depending only on landings, not SPR
+     */
+    public static void nullRuns(int batchNumber) throws IOException {
+
+        predicates.clear();
+        predicates.add(new AcceptableRangePredicate(
+                5000000,10000000,"Lutjanus malabaricus Landings"
+        ));
+        predicates.add(new AcceptableRangePredicate(
+                1000000,3000000,"Pristipomoides multidens Landings"
+        ));
+
+        runDirectory(MAIN_DIRECTORY.resolve("easier").resolve("scenarios").resolve("batch"+ batchNumber), 0);
+
+
+    }
 
 
 
     public static void main(String[] args) throws IOException {
 
-//        for (int batch = 0; batch < BATCHES; batch++)
-//        {
-//
-//            final Path folder =
-//                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
-//            folder.toFile().mkdirs();
-//            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
-//                             System.currentTimeMillis(),SCENARIO_FILE);
-//
-//        }
+        nullRuns(2);
 
-//        for (int batch = 0; batch < BATCHES; batch++)
-     //     runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
-      //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
-//        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
+       // buildScenarios();
 
 
-        System.out.println("scenario " + args[0]);
-        int directory = Integer.parseInt(args[0]);
-        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
+//        System.out.println("scenario " + args[0]);
+//        int directory = Integer.parseInt(args[0]);
+//        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
     }
 
+    private static void buildScenarios() throws IOException {
+        for (int batch = 10; batch < BATCHES+10; batch++)
+        {
+
+            final Path folder =
+                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
+            folder.toFile().mkdirs();
+            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
+                             System.currentTimeMillis(),SCENARIO_FILE);
+
+        }
+    }
 
 
     public static void runDirectory(Path directory, long seed) throws IOException {

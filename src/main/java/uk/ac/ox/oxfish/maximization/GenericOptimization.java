@@ -53,6 +53,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     private String scenarioFile =   DEFAULT_PATH.resolve("pessimistic_recruits_spinup.yaml").toString();
 
 
+    private double translateNANto = 10000000;
+
     private boolean maximization = false;
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -338,6 +340,11 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             double finalError = error / (double) runsPerSetting;
             if(maximization)
                 finalError = finalError * (-1);
+            if(!Double.isFinite(finalError)) {
+                System.out.println("was NAN!");
+                finalError = translateNANto;
+            }
+
             System.out.println(Arrays.toString(x) + " ---> " + finalError);
             return new double[]{finalError};
 
@@ -491,5 +498,23 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      */
     public void setMaximization(boolean maximization) {
         this.maximization = maximization;
+    }
+
+    /**
+     * Getter for property 'translateNANto'.
+     *
+     * @return Value for property 'translateNANto'.
+     */
+    public double getTranslateNANto() {
+        return translateNANto;
+    }
+
+    /**
+     * Setter for property 'translateNANto'.
+     *
+     * @param translateNANto Value to set for property 'translateNANto'.
+     */
+    public void setTranslateNANto(double translateNANto) {
+        this.translateNANto = translateNANto;
     }
 }

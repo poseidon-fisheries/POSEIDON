@@ -116,4 +116,36 @@ public class LinearSelectivityFilter extends FormulaAbundanceFilter {
     public double getMeanLengthCaughtAboveThresholdInCm() {
         return meanLengthCaughtAboveThresholdInCm;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LinearSelectivityFilter that = (LinearSelectivityFilter) o;
+
+        if (Double.compare(that.minLengthCaughtInCm, minLengthCaughtInCm) != 0) return false;
+        if (Double.compare(that.mostFrequentLengthCaughtInCm, mostFrequentLengthCaughtInCm) != 0) return false;
+        if (Double.compare(that.vonBertalanfyKParameter, vonBertalanfyKParameter) != 0) return false;
+        if (Double.compare(that.meanLengthCaughtAboveThresholdInCm, meanLengthCaughtAboveThresholdInCm) != 0)
+            return false;
+        return Double.compare(that.lengthInfinityInCm, lengthInfinityInCm) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(minLengthCaughtInCm);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(mostFrequentLengthCaughtInCm);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(vonBertalanfyKParameter);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(meanLengthCaughtAboveThresholdInCm);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(lengthInfinityInCm);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

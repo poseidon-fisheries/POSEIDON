@@ -83,9 +83,9 @@ public class TripRecord {
     /**
      * the places where fishing occured (and the hours spent fishing there)
      */
-    private final HashMap<SeaTile,FishingRecord> tilesFished = new HashMap<>();
+    private final HashMap<SeaTile,FishingRecord> tilesFished = new HashMap<>(1);
 
-    private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
+    private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>(1);
 
 
     //updating the map "lastFishingRecordOfTile" becomes quite expensive when there are a lot of boats

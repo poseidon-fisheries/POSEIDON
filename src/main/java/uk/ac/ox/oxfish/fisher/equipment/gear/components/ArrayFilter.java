@@ -20,9 +20,12 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.Arrays;
 
 /**
  * Simply provide arrays (one for each subdivision), each representing the age structure
@@ -68,5 +71,24 @@ public class ArrayFilter  implements AbundanceFilter{
             }
         }
         return abundance;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ArrayFilter that = (ArrayFilter) o;
+
+        if (round != that.round) return false;
+        return Arrays.deepEquals(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.deepHashCode(filters);
+        result = 31 * result + (round ? 1 : 0);
+        return result;
     }
 }

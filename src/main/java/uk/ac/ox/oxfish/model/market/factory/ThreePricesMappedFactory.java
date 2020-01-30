@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HomogeneousGearFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.AbstractMarket;
+import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.ThreePricesMarketProxy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -30,7 +32,7 @@ import java.util.*;
 
 public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMarketProxy> {
 
-    private LinkedHashMap<String,ThreePricesMarketFactory> markets = new LinkedHashMap<>();
+    private LinkedHashMap<String, AlgorithmFactory<? extends Market>> markets = new LinkedHashMap<>();
 
 
     /**
@@ -49,7 +51,7 @@ public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMar
      *
      * @return Value for property 'markets'.
      */
-    public LinkedHashMap<String, ThreePricesMarketFactory> getMarkets() {
+    public LinkedHashMap<String,  AlgorithmFactory<? extends Market>> getMarkets() {
         return markets;
     }
 
@@ -59,19 +61,19 @@ public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMar
      * @param markets Value to set for property 'markets'.
      */
     public void setMarkets(
-            LinkedHashMap<String, ThreePricesMarketFactory> markets) {
+            LinkedHashMap<String, ?> markets) {
 
         //useless cast, but it deals with YAML quirks
-        LinkedHashMap<String, ThreePricesMarketFactory> real = new LinkedHashMap<>();
+        LinkedHashMap<String,  AlgorithmFactory<? extends Market>> real = new LinkedHashMap<>();
 
         FishYAML  yaml = new FishYAML();
 
         //force it to go through YAML
-        for (Map.Entry<String, ThreePricesMarketFactory> entry : markets.entrySet()) {
+        for (Map.Entry<String,  ?> entry : markets.entrySet()) {
             Object factory = entry.getValue();
 
-            ThreePricesMarketFactory recast = yaml.loadAs(yaml.dump(factory),
-                                                          ThreePricesMarketFactory.class);
+            AlgorithmFactory<? extends Market> recast = (AlgorithmFactory<? extends Market>)
+                    yaml.loadAs(yaml.dump(factory), AlgorithmFactory.class);
             real.put(entry.getKey(),recast);
 
         }
@@ -104,4 +106,9 @@ public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMar
         FishYAML yaml = new FishYAML();
         System.out.println(yaml.dump(factory));
     }
+
+
+
+
+
 }

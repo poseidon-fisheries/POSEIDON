@@ -179,7 +179,7 @@ public class GarbageGearDecorator implements GearDecorator {
         GarbageGearDecorator that = (GarbageGearDecorator) o;
         return Double.compare(that.getRatioToRestOfCatch(), getRatioToRestOfCatch()) == 0 &&
                 Objects.equals(getGarbageSpecies(), that.getGarbageSpecies()) &&
-                Objects.equals(delegate, that.delegate);
+                delegate.isSame(that.delegate);
     }
 
     @Override

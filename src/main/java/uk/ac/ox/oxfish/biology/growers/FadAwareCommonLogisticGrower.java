@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class FadAwareCommonLogisticGrower extends CommonLogisticGrower {
+public class FadAwareCommonLogisticGrower extends SchaeferLogisticGrower {
     private final ImmutableList<BiomassLocalBiology> seaTileBiologies;
 
     FadAwareCommonLogisticGrower(
@@ -23,6 +23,7 @@ public class FadAwareCommonLogisticGrower extends CommonLogisticGrower {
     ) {
         super(malthusianParameter, species, distributionalWeight);
         this.seaTileBiologies = seaTileBiologies;
+        super.getBiologies().addAll(seaTileBiologies);
     }
 
     @Override public void step(SimState simState) {

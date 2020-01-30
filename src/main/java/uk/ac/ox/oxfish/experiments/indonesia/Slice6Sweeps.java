@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
+import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
 import uk.ac.ox.oxfish.model.regs.*;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "lime_cmsy_3yr_6h";
+    private static final String SCENARIO_NAME = "tropfish-noreset_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -50,22 +51,42 @@ public class Slice6Sweeps {
     public static  int POPULATIONS = 4;
 
 
-    public static  int SHOCK_YEAR = 3;//2;
+    public static  int SHOCK_YEAR = 2;
+    //public static  int SHOCK_YEAR = 3;
 
 
 
     public static void main(String[] args) throws IOException {
 
+//
+//        businessAsUsual("bau",
+//                        SCENARIO_NAME
+//        );
 
 //        effort control
 //        all boats are controlled
+
+
+
         effortControl("all",
                 new String[]{"population0","population1","population2","population3"},
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
+        effortControlShockYear("all_shock",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, 100);
 
 
+// no fishing
+        stopFishing("nofishing",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR);
+
+//
+//////        //only boats >10GT are controlled
 //
         effortControl("10",
                       new String[]{"population1","population2","population3"},
@@ -73,50 +94,42 @@ public class Slice6Sweeps {
                       SHOCK_YEAR, MIN_DAYS_OUT);
 
 
-
-//
-//////        //only boats >10GT are controlled
-//        effortControl("10",
-//                new String[]{"big","medium","small10"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, MIN_DAYS_OUT);
-
-//////
-//////        //price premium
-        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+////////
+////////        //price premium
+//        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
         pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
-
-//        //selectivity test
-        selectivityTest("selectivity_sweep", SCENARIO_NAME);
 //
-//        //price penalty
+////        //selectivity test
+        selectivityTest("selectivity_sweep", SCENARIO_NAME);
+////
+////        //price penalty
         pricePenalty("malus_malabaricus",
                 SCENARIO_NAME,
                 10,
                 "Lutjanus malabaricus");
-//
-//
-//
-//        //fleet reduction
-        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
-
-//        //delays
-        delays("delay_all",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
-//
-//
-//
 ////
-        delays("delay_10",
-                new String[]{"population1","population2","population3"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////        //fleet reduction
+        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 //
-//
-//
-//        delaysOnce("delay_once",
-//                new String[]{"big","small","medium","small10"},
-//                SCENARIO_NAME, SHOCK_YEAR, 200);
+////        //delays
+//        delays("delay_all",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+//////
+//        delays("delay_10",
+//                new String[]{"population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+////        delaysOnce("delay_once",
+////                new String[]{"big","small","medium","small10"},
+////                SCENARIO_NAME, SHOCK_YEAR, 200);
 
 
     }
@@ -164,6 +177,170 @@ public class Slice6Sweeps {
         }
         fileWriter.close();
     }
+
+
+
+    private static void stopFishing(
+            String name,
+            String[] modifiedTags, final String filename, final int shockYear) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            runner.setScenarioSetup(
+                    setupEffortControlConsumer(modifiedTags, shockYear, 0)
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(0).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+
+        fileWriter.close();
+    }
+
+
+
+
+    private static void effortControlShockYear(
+            String name,
+            String[] modifiedTags, final String filename, final int minShockYear,
+            final int daysOut) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(int shockYear = minShockYear; shockYear < 15; shockYear++) {
+
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            runner.setScenarioSetup(
+                    setupEffortControlConsumer(modifiedTags, shockYear, daysOut)
+            );
+
+
+            int finalShockYear = shockYear;
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalShockYear).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
+
+
+
+    private static void businessAsUsual(
+            String name,
+            final String filename) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(int entry = 0; entry <=1 ; entry++) {
+
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+
+
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            int finalEntry = entry;
+            runner.setScenarioSetup(
+                    new Consumer<Scenario>() {
+                        @Override
+                        public void accept(Scenario scenario) {
+
+                            if (finalEntry == 1) {
+                                FlexibleScenario current = (FlexibleScenario) scenario;
+                                FisherEntryConstantRateFactory pop0 = new FisherEntryConstantRateFactory();
+                                pop0.setPopulationName("population0");
+                                pop0.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                                pop0.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                                current.getPlugins().add(
+                                        pop0
+                                );
+
+                                FisherEntryConstantRateFactory pop1 = new FisherEntryConstantRateFactory();
+                                pop1.setPopulationName("population1");
+                                pop1.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                                pop1.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                                current.getPlugins().add(
+                                        pop1
+                                );
+                                FisherEntryConstantRateFactory pop2 = new FisherEntryConstantRateFactory();
+                                pop2.setPopulationName("population3");
+                                pop2.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                                pop2.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                                current.getPlugins().add(
+                                        pop2
+                                );
+                            }
+                        }
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalEntry).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
 
     @NotNull
     public static Consumer<Scenario> setupEffortControlConsumer(

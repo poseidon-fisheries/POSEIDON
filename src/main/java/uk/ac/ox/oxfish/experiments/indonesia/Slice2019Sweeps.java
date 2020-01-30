@@ -560,10 +560,10 @@ public class Slice2019Sweeps {
 
             FlexibleScenario flexible = (FlexibleScenario) scenario;
 
-            ThreePricesMarketFactory market =
-                    ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
-                            premiumSpecies
-                    );
+            ThreePricesMarketFactory market;
+            market = (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                    premiumSpecies
+            );
 
             market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
             double newPrice = ((FixedDoubleParameter) market.getPriceAboveThresholds()).getFixedValue() *
@@ -612,7 +612,7 @@ public class Slice2019Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 

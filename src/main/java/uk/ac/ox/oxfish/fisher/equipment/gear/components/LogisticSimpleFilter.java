@@ -41,4 +41,26 @@ public class LogisticSimpleFilter extends FormulaAbundanceFilter {
     public double getSelex2() {
         return selex2;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LogisticSimpleFilter that = (LogisticSimpleFilter) o;
+
+        if (Double.compare(that.selex1, selex1) != 0) return false;
+        return Double.compare(that.selex2, selex2) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(selex1);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(selex2);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

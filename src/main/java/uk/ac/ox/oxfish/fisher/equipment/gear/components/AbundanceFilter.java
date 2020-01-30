@@ -38,4 +38,7 @@ public interface AbundanceFilter {
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     double[][] filter(Species species, double[][] abundance);
+
+
+
 }

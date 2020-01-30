@@ -148,7 +148,7 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
-    private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
+    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
     private static final Path UNASSOCIATED_CATCH_SAMPLE = input("unassociated_catch_sample.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
@@ -207,7 +207,7 @@ public class TunaScenario implements Scenario {
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
     private Path costsFile = input("costs.csv");
 
-    TunaScenario() {
+    public TunaScenario() {
 
         final SnapshotBiomassResetterFactory snapshotBiomassResetterFactory = new SnapshotBiomassResetterFactory();
         snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);

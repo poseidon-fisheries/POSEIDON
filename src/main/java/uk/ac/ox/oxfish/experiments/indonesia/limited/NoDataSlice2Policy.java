@@ -52,6 +52,8 @@ public class NoDataSlice2Policy {
 
     private static final int POPULATIONS = 2;
 
+    private static final  long SEED = 0;
+
     @NotNull
     private static BatchRunner setupRunner(
             Path scenarioFile,
@@ -110,14 +112,16 @@ public class NoDataSlice2Policy {
                 columnsToPrint,
                 outputFolder,
                 null,
-                System.currentTimeMillis(),
+                SEED,
                 -1
         );
     }
 
 
 
-    private static Path OUTPUT_FOLDER = Paths.get("docs/20191025 limited_poseidon/slice2/output");
+    private static Path OUTPUT_FOLDER =
+            //Paths.get("docs/20191025 limited_poseidon/slice2/easier/output");
+            Paths.get("docs/20191025 limited_poseidon/slice2/output");
 
 
     /**
@@ -136,19 +140,13 @@ public class NoDataSlice2Policy {
 
         );
 
-        policies.put(
-                "BAU_noentry",
-                shockYear -> NoDataPolicy.removeEntry(shockYear)
-
-        );
-
 //        policies.put(
-//                "150_days_noentry",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,150).andThen(
-//                        NoDataPolicy.removeEntry(shockYear)
-//                )
+//                "BAU_noentry",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear)
 //
 //        );
+
+
         policies.put(
                 "100_days_noentry",
                 shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
@@ -156,28 +154,22 @@ public class NoDataSlice2Policy {
                 )
 
         );
-        policies.put(
-                "100_days",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100)
 
-        );
+
 //        policies.put(
-//                "150_days",
-//                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,150)
+//                "100_days",
+//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100)
+//
+//        );
+//
+//
+//
+//        policies.put(
+//                "100_days_big",
+//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},100)
 //
 //        );
 
-
-        policies.put(
-                "100_days_big",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},100)
-
-        );
-//        policies.put(
-//                "150_days_big",
-//                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150)
-//
-//        );
 
         policies.put(
                 "100_days_big_noentry",
@@ -185,12 +177,7 @@ public class NoDataSlice2Policy {
                         NoDataPolicy.removeEntry(shockYear))
 
         );
-//        policies.put(
-//                "150_days_big_noentry",
-//                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150).andThen(
-//                        removeEntry(shockYear))
-//
-//        );
+
 
     }
 
