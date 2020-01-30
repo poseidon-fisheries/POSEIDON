@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
     private final double malthusianParameter;
     private Stoppable receipt;
 
-    private final Species species;
+    protected final Species species;
 
     private final double distributionalWeight;
 
@@ -78,12 +77,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
 
 
-        double recruitment = IndependentLogisticBiomassGrower.logisticRecruitment(
-                current,
-                capacity,
-                malthusianParameter
-
-        );
+        double recruitment = recruit(current, capacity, malthusianParameter);
         //compute recruitment
         recruitment = Math.min(recruitment,capacity-current);
         assert recruitment>=-FishStateUtilities.EPSILON;
@@ -112,6 +106,25 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
         if(allBiologies.size()==0) //if you removed all the biologies then we are done
             turnOff();
+
+        afterRecruitmentHook();
+    }
+
+    /**
+     * ugly hook to get going
+     */
+    protected void afterRecruitmentHook(){
+
+    }
+
+    protected double recruit(double current, double capacity,
+                             final double malthusianParameter) {
+        return IndependentLogisticBiomassGrower.logisticRecruitment(
+                current,
+                capacity,
+                malthusianParameter
+
+        );
     }
 
     /**
