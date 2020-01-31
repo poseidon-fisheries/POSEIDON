@@ -144,7 +144,6 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
-    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
     private static final Path UNASSOCIATED_CATCH_SAMPLE = input("unassociated_catch_sample.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
@@ -156,6 +155,7 @@ public class TunaScenario implements Scenario {
         r -> r.getString("species_code"),
         r -> r.getString("species_name")
     ));
+    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private final ImmutableList<String> actionNames = ImmutableList.of(
         DeployFad.ACTION_NAME,
         MakeFadSet.ACTION_NAME,
@@ -531,6 +531,13 @@ public class TunaScenario implements Scenario {
                         yearlyCounterAdder(totalCounterName(actionName)).apply(model),
                     0.0
                 )
+            )
+        );
+        fishState.getBiology().getSpecies().forEach(species ->
+            fishState.getYearlyDataSet().registerGatherer(
+                "Total " + species.getName() + " biomass under FADs",
+                model -> model.getFadMap().getTotalBiomass(species),
+                0.0
             )
         );
     }

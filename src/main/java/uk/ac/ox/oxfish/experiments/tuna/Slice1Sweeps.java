@@ -29,8 +29,8 @@ import static java.util.stream.Stream.concat;
 public class Slice1Sweeps {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-28"));
-    private static final int numberOfRunsPerPolicy = 10;
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-31_new_limits"));
+    private static final int numberOfRunsPerPolicy = 25;
     private static final int yearsToRun = 11;
 
     public static void main(String[] args) throws IOException {
@@ -79,7 +79,13 @@ public class Slice1Sweeps {
             "Proportion of unassociated sets (South region)",
             "Proportion of unassociated sets (Southeast region)",
             "Proportion of unassociated sets (Southwest region)",
-            "Proportion of unassociated sets (West region)"
+            "Proportion of unassociated sets (West region)",
+            "Exogenous catches of Bigeye tuna",
+            "Exogenous catches of Skipjack tuna",
+            "Exogenous catches of Yellowfin tuna",
+            "Total Bigeye tuna biomass under FADs",
+            "Total Skipjack tuna biomass under FADs",
+            "Total Yellowfin tuna biomass under FADs"
         );
 
         final BatchRunner batchRunner = new BatchRunner(
@@ -107,15 +113,19 @@ public class Slice1Sweeps {
                 426, 210,
                 1200, 315
             ));
+        final Optional<GeneralSetLimitsFactory> setLimit25 =
+            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
+                0, 25
+            )));
+
+        final Optional<GeneralSetLimitsFactory> setLimit50 =
+            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
+                0, 50
+            )));
 
         final Optional<GeneralSetLimitsFactory> setLimit75 =
             Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
                 0, 75
-            )));
-
-        final Optional<GeneralSetLimitsFactory> setLimit150 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(
-                0, 150
             )));
 
         final ImmutableMap<ActiveFadLimitsFactory, String> fadLimits = ImmutableMap.of(
@@ -124,8 +134,9 @@ public class Slice1Sweeps {
         );
 
         final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
+            setLimit25, "25 sets limit",
+            setLimit50, "50 sets limit",
             setLimit75, "75 sets limit",
-            setLimit150, "150 sets limit",
             Optional.empty(), "No set limit"
         );
 

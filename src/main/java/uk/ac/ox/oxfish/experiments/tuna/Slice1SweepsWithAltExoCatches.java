@@ -26,11 +26,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 @SuppressWarnings("UnstableApiUsage")
-public class Slice1SweepsWithFakeExoCatches {
+public class Slice1SweepsWithAltExoCatches {
+    private static final Path exoCatchesPath = TunaScenario.input("exogenous_catches.csv");
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-30_2_fake_exo"));
-    private static final int numberOfRunsPerPolicy = 2;
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-31_normal_exo"));
+    private static final int numberOfRunsPerPolicy = 1;
     private static final int yearsToRun = 11;
 
     public static void main(String[] args) throws IOException {
@@ -52,7 +53,13 @@ public class Slice1SweepsWithFakeExoCatches {
             "Average Trip Duration",
             "Total number of FAD deployments",
             "Total number of FAD sets",
-            "Total number of unassociated sets"
+            "Total number of unassociated sets",
+            "Exogenous catches of Bigeye tuna",
+            "Exogenous catches of Skipjack tuna",
+            "Exogenous catches of Yellowfin tuna",
+            "Total Bigeye tuna biomass under FADs",
+            "Total Skipjack tuna biomass under FADs",
+            "Total Yellowfin tuna biomass under FADs"
         );
 
         final BatchRunner batchRunner = new BatchRunner(
@@ -87,12 +94,15 @@ public class Slice1SweepsWithFakeExoCatches {
 
         fadLimits.forEach((activeFadLimitsFactory, fadLimitsName) ->
             setLimits.forEach((generalSetLimitsFactory, setLimitsName) -> {
+                final String policyName = fadLimitsName + " / " + setLimitsName;
+                System.out.println(policyName);
                 setupRunner(
                     batchRunner,
                     concat(Stream.of(activeFadLimitsFactory), stream(generalSetLimitsFactory)).collect(toList()),
-                    fadLimitsName + " / " + setLimitsName
+                    policyName
                 );
                 for (int i = 0; i < numberOfRunsPerPolicy; i++) {
+                    System.out.println("Run " + i);
                     StringBuffer outputBuffer = new StringBuffer();
                     try {
                         batchRunner.run(outputBuffer);
@@ -116,7 +126,7 @@ public class Slice1SweepsWithFakeExoCatches {
             final TunaScenario tunaScenario = (TunaScenario) scenario;
             final AlgorithmFactory<? extends Gear> gearFactory = tunaScenario.getFisherDefinition().getGear();
             ((PurseSeineGearFactory) gearFactory).setActionSpecificRegulations(regulationFactories);
-            tunaScenario.getExogenousCatchesFactory().setCatchesFile(TunaScenario.input("fake_exo.csv"));
+            tunaScenario.getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")
