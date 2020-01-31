@@ -75,6 +75,8 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             List<SeaTile> tiles =  allTiles.stream().filter(
                     seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
 
+
+
             int steps = 0;
             //as long as there is fish to catch and places with fish
             while(steps < MAXSTEPS && toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty() )

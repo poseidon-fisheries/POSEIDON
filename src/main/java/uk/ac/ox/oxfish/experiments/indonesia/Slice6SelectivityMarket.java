@@ -1,14 +1,17 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.collect.Lists;
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.equipment.gear.DelayGearDecorator;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.PeriodicUpdateFromListFactory;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesWithPremium;
@@ -16,6 +19,7 @@ import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -23,15 +27,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.function.Consumer;
 
 public class Slice6SelectivityMarket {
 
-    private static final String SCENARIO_NAME = "tropfish_tl_2y_onemoretime_8h";
+ //   private static final String SCENARIO_NAME = "tropfish_tl_2y_onemoretime_8h";
+    private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
     private static final int YEARS_TO_RUN = 12;
     private static final int RUNS_PER_POLICY = 1;
     public static final int MAX_SELECTIVITY_SHIFT = 30;
+    private static final int MILLION = 1000000;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
             "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice6/calibration/sweeps/";
@@ -39,11 +44,31 @@ public class Slice6SelectivityMarket {
 
 
     public static void main(String[] args) throws IOException {
-        selectivityIncentive("selectivity_incentive", SCENARIO_NAME,
-                MAX_SELECTIVITY_SHIFT,
-                3,
-                "Lutjanus malabaricus",
-                10);
+
+
+//        selectivitySubsidy("selectivity_flat", SCENARIO_NAME,
+//                           MAX_SELECTIVITY_SHIFT,
+//                           500*MILLION,
+//                           "Lutjanus malabaricus", new int[]{0, 3});
+//
+
+        //THIS APPLIES EFFORT TO POP 1-2-3 (not 0)
+        //APPLIES SUBSIDY TO POP0 only (not 3)
+
+        selectivitySubsidyPlusEffortControl("selectivity_flat_season", SCENARIO_NAME,
+                           MAX_SELECTIVITY_SHIFT,
+                           500*MILLION,
+                           "Lutjanus malabaricus",
+                           new int[]{0},
+                                            3);
+
+
+
+//        selectivityIncentive("selectivity_incentive2", SCENARIO_NAME,
+//                MAX_SELECTIVITY_SHIFT,
+//                3,
+//                "Lutjanus malabaricus",
+//                10);
     }
 
 
@@ -83,6 +108,13 @@ public class Slice6SelectivityMarket {
 
                     );
 
+                    FixedProbabilityFactory probability = new FixedProbabilityFactory();
+                    probability.setImitationProbability(new FixedDoubleParameter(1));
+                    probability.setExplorationProbability(new FixedDoubleParameter(.05));
+                    factory.setProbability(
+                            probability
+                    );
+
                     fisherDefinition.setGearStrategy(
                             factory
                     );
@@ -117,6 +149,82 @@ public class Slice6SelectivityMarket {
                 newMarket.setPremiumThirdBin(premiumThird);
                 ((ThreePricesMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().put(species, 
                         newMarket);
+
+            }
+
+
+        };
+
+    }
+
+
+    /**
+     * adds an agent that pays every fisher who has switched gear a subsidy every year they use that gear
+     * @param subsidy
+     * @return
+     */
+    private static Consumer<Scenario> addFlatSubsidity(double subsidy) {
+
+
+        return new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario flexible) {
+
+                ((FlexibleScenario) flexible).getPlugins().add(
+                        new AlgorithmFactory<AdditionalStartable>() {
+                            @Override
+                            public AdditionalStartable apply(FishState state) {
+                               return new AdditionalStartable(){
+
+
+                                    @Override
+                                    public void start(FishState model) {
+
+
+                                        //middle of the year, pay people for their participation in the gear
+                                        model.scheduleOnceInXDays(
+                                                new Steppable() {
+                                                    @Override
+                                                    public void step(SimState simState) {
+                                                        model.scheduleEveryYear(
+                                                                new Steppable() {
+                                                                    @Override
+                                                                    public void step(SimState simState) {
+
+                                                                        for (Fisher fisher : model.getFishers()) {
+                                                                            if(fisher.getTags().contains(
+                                                                                    PeriodicUpdateGearStrategy.tag+"_1"
+
+                                                                            )){
+                                                                                fisher.earn(subsidy);
+                                                                            }
+                                                                        }
+
+                                                                    }
+                                                                },
+                                                                StepOrder.POLICY_UPDATE
+                                                        );
+                                                    }
+                                                }
+                                                ,
+                                                StepOrder.DAWN,
+                                                150
+                                        );
+
+                                    }
+
+                                    /**
+                                     * tell the startable to turnoff,
+                                     */
+                                    @Override
+                                    public void turnOff() {
+
+                                    }
+                                };
+
+                            }
+                        }
+                );
 
             }
 
@@ -284,4 +392,131 @@ public class Slice6SelectivityMarket {
         fileWriter.close();
     }
 
+
+    private static void selectivitySubsidy(
+            String name,
+            final String filename,
+            final int maxSelectivityShift,
+            final int maxSubsidy,
+            String species, final int[] populationsSubsidized) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,selectivity,subsidy,all,variable,value\n");
+        fileWriter.flush();
+
+        final boolean[] allSubsidized = {false, true};
+
+        for(int selectivityIncrease = 0; selectivityIncrease<= maxSelectivityShift; selectivityIncrease+=5) {
+            for (double subsidy = 0; subsidy < maxSubsidy; subsidy += 25 * MILLION) {
+                for (boolean isAllSubsidized :allSubsidized) {
+
+
+                    BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
+
+
+                    int currentShiftSelectivity = selectivityIncrease;
+                    double finalSubsidy = subsidy;
+
+
+                    runner.setScenarioSetup(
+                            addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
+                                    addFlatSubsidity(subsidy)
+                            )
+                    );
+
+                    System.out.println(" selectivity: " + selectivityIncrease +"; subsidy "+ subsidy +
+                                               "; allSubsidized: " + isAllSubsidized);
+
+                    runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                        @Override
+                        public void consume(StringBuffer writer, FishState model, Integer year) {
+                            writer.
+                                    append(currentShiftSelectivity).append(",").
+                                    append(finalSubsidy).append(",").
+                                    append(isAllSubsidized).append(",");
+                        }
+                    });
+
+
+                    //while (runner.getRunsDone() < 1) {
+                    for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                        StringBuffer tidy = new StringBuffer();
+                        runner.run(tidy);
+                        fileWriter.write(tidy.toString());
+                        fileWriter.flush();
+                    }
+                }
+            }
+        }
+        fileWriter.close();
+    }
+
+
+
+    private static void selectivitySubsidyPlusEffortControl(
+            String name,
+            final String filename,
+            final int maxSelectivityShift,
+            final int maxSubsidy,
+            String species, final int[] populationsSubsidized,
+            int shockYear) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
+        fileWriter.write("run,year,selectivity,subsidy,season_length,variable,value\n");
+        fileWriter.flush();
+
+        final boolean[] allSubsidized = {false, true};
+
+        for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
+            for (double subsidy = 0; subsidy < maxSubsidy; subsidy += 25 * MILLION) {
+                for (int maxDaysOut = 100; maxDaysOut < 250; maxDaysOut += 50) {
+
+
+                    BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
+
+
+                    int currentShiftSelectivity = selectivityIncrease;
+                    double finalSubsidy = subsidy;
+                    int finalMaxDaysOut = maxDaysOut;
+
+
+                    runner.setScenarioSetup(
+                            addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
+                                    addFlatSubsidity(subsidy)
+                            ).andThen(
+                                    Slice6Sweeps.setupEffortControlConsumer(
+                                            new String[]{"population1", "population2", "population3"},
+                                            shockYear,
+                                            finalMaxDaysOut
+                                    )
+                            )
+                    );
+
+                    System.out.println(" selectivity: " + selectivityIncrease + "; subsidy " + subsidy +
+                                               "; maxDaysOut: " + maxDaysOut);
+
+                    runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                        @Override
+                        public void consume(StringBuffer writer, FishState model, Integer year) {
+                            writer.
+                                    append(currentShiftSelectivity).append(",").
+                                    append(finalSubsidy).append(",").
+                                    append(finalMaxDaysOut).append(",");
+                        }
+                    });
+
+
+                    //while (runner.getRunsDone() < 1) {
+                    for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                        StringBuffer tidy = new StringBuffer();
+                        runner.run(tidy);
+                        fileWriter.write(tidy.toString());
+                        fileWriter.flush();
+                    }
+                }
+            }
+        }
+
+        fileWriter.close();
+    }
 }

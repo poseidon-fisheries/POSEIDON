@@ -7,6 +7,10 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.DelayGearDecorator;
+import uk.ac.ox.oxfish.fisher.equipment.gear.GarbageGearDecorator;
+import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -25,6 +29,7 @@ import uk.ac.ox.oxfish.model.regs.factory.TriggerRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -40,7 +45,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "tropfish-noreset_8h";
+    private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -68,50 +73,50 @@ public class Slice6Sweeps {
 
 
 
-        effortControl("all",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
-
-        effortControlShockYear("all_shock",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, 100);
-
-
-// no fishing
-        stopFishing("nofishing",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR);
-
+//        effortControl("all",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
 //
-//////        //only boats >10GT are controlled
+//        effortControlShockYear("all_shock",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, 100);
 //
-        effortControl("10",
-                      new String[]{"population1","population2","population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT);
-
-
-////////
-////////        //price premium
-//        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+//
+//// no fishing
+//        stopFishing("nofishing",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR);
+//
+////
+////////        //only boats >10GT are controlled
+////
+//        effortControl("10",
+//                      new String[]{"population1","population2","population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT);
+//
+//
+//////////
+//////////        //price premium
+////        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
 //
 ////        //selectivity test
-        selectivityTest("selectivity_sweep", SCENARIO_NAME);
+        selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
 ////
 ////        //price penalty
-        pricePenalty("malus_malabaricus",
-                SCENARIO_NAME,
-                10,
-                "Lutjanus malabaricus");
+//        pricePenalty("malus_malabaricus",
+//                SCENARIO_NAME,
+//                10,
+//                "Lutjanus malabaricus");
 ////
 ////
 ////
 ////        //fleet reduction
-        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
+//        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 //
 ////        //delays
 //        delays("delay_all",
@@ -189,33 +194,33 @@ public class Slice6Sweeps {
         fileWriter.flush();
 
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
-            //basically we want year 4 to change big boats regulations.
-            //because I coded "run" poorly, we have to go through this series of pirouettes
-            //to get it done right
-            runner.setScenarioSetup(
-                    setupEffortControlConsumer(modifiedTags, shockYear, 0)
-            );
+        //basically we want year 4 to change big boats regulations.
+        //because I coded "run" poorly, we have to go through this series of pirouettes
+        //to get it done right
+        runner.setScenarioSetup(
+                setupEffortControlConsumer(modifiedTags, shockYear, 0)
+        );
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(StringBuffer writer, FishState model, Integer year) {
-                    writer.append(0).append(",");
-                }
-            });
-
-
-            //while (runner.getRunsDone() < 1) {
-            for(int i = 0; i< RUNS_PER_POLICY; i++) {
-                StringBuffer tidy = new StringBuffer();
-                runner.run(tidy);
-                fileWriter.write(tidy.toString());
-                fileWriter.flush();
+        runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+            @Override
+            public void consume(StringBuffer writer, FishState model, Integer year) {
+                writer.append(0).append(",");
             }
+        });
+
+
+        //while (runner.getRunsDone() < 1) {
+        for(int i = 0; i< RUNS_PER_POLICY; i++) {
+            StringBuffer tidy = new StringBuffer();
+            runner.run(tidy);
+            fileWriter.write(tidy.toString());
+            fileWriter.flush();
+        }
 
         fileWriter.close();
     }
@@ -741,7 +746,7 @@ public class Slice6Sweeps {
             FlexibleScenario flexible = (FlexibleScenario) scenario;
 
             ThreePricesMarketFactory market =
-                    ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                    (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
                             premiumSpecies
                     );
 
@@ -792,7 +797,7 @@ public class Slice6Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 
@@ -1146,7 +1151,7 @@ public class Slice6Sweeps {
 
                                                                 Cost hourlyCost = fisher.getAdditionalTripCosts().remove();
                                                                 Preconditions.checkState(hourlyCost instanceof HourlyCost,
-                                                                        "I assumed here there would be only one additional cost! Careful with this sweep");
+                                                                                         "I assumed here there would be only one additional cost! Careful with this sweep");
                                                                 double newCosts = ((HourlyCost) hourlyCost).getHourlyCost() * finalIncrease;
 
                                                                 fisher.getAdditionalTripCosts().add(
@@ -1197,15 +1202,16 @@ public class Slice6Sweeps {
 
 
     //sweep selectivity of small boats, see if it makes a difference anyway
-    private static void selectivityTest(
+    private static void selectivityTest2(
             String name,
-            final String filename) throws IOException {
+            final String filename,
+            int yearsFromStart) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double increase=0; increase<=3; increase=FishStateUtilities.round5(increase+1)) {
+        for(double increase=0; increase<=30; increase=FishStateUtilities.round5(increase+1)) {
 
             BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
@@ -1216,49 +1222,104 @@ public class Slice6Sweeps {
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
             double finalIncrease = increase;
-            runner.setScenarioSetup(
-                    scenario -> {
-
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        Preconditions.checkArgument(flexible.getFisherDefinitions().get(0).getTags().contains("small"));
-                        ;
-                        DelayGearDecoratorFactory gear = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
-                                0).getGear();
-                        HomogeneousGearFactory malabaricus =
-                                ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) gear.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
-
-                        ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
-                                new FixedDoubleParameter(
-                                        ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
-                                                * finalIncrease
-                                )
-                        );
-
-
-                        if(flexible.getFisherDefinitions().size()==4)
-                        {
-                            Preconditions.checkArgument(flexible.getFisherDefinitions().get(3).getTags().contains("small10"));
-
-
-                            gear = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
-                                    3).getGear();
-                            malabaricus =
-                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) gear.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
-
-                            ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
-                                    new FixedDoubleParameter(
-                                            ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
-                                                    * finalIncrease
-                                    )
-                            );
-                        }
+            runner.setScenarioSetup(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    FlexibleScenario flexible = (FlexibleScenario) scenario;
+                    Preconditions.checkArgument(flexible.getFisherDefinitions().get(0).getTags().contains("small"));
+                    ;
+                    final DelayGearDecoratorFactory gearPopulation0 = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                            0).getGear();
+                    final DelayGearDecoratorFactory gearPopulation3 = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                            3).getGear();
 
 
 
+                    ((FlexibleScenario) scenario).getPlugins().add(
+
+                            new AlgorithmFactory<AdditionalStartable>() {
+                                @Override
+                                public AdditionalStartable apply(FishState state) {
+
+                                  return new AdditionalStartable(){
+                                      /**
+                                       * this gets called by the fish-state right after the scenario has started.
+                                       * It's useful to set up steppables
+                                       * or just to percolate a reference to the model
+                                       *
+                                       * @param model the model
+                                       */
+                                      @Override
+                                      public void start(FishState model) {
+                                          state.scheduleOnceAtTheBeginningOfYear(
+                                                  new Steppable() {
+                                                      @Override
+                                                      public void step(SimState simState) {
 
 
-                    }
-            );
+                                                          //modify gear factories
+
+                                                          HomogeneousGearFactory malabaricus =
+                                                                  ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                          gearPopulation0.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+
+                                                          ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
+                                                                  new FixedDoubleParameter(
+                                                                          ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
+                                                                                  + finalIncrease
+                                                                  )
+                                                          );
+
+                                                          malabaricus =
+                                                                  ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                          gearPopulation3.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+
+                                                          ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
+                                                                  new FixedDoubleParameter(
+                                                                          ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
+                                                                                  + finalIncrease
+                                                                  )
+                                                          );
+
+                                                          for (Fisher fisher : state.getFishers()) {
+
+                                                              if(fisher.getTags().contains("population0")) {
+                                                                  fisher.setGear(gearPopulation0.apply(state));
+
+                                                              }else
+                                                              if(fisher.getTags().contains("population3")){
+                                                                  fisher.setGear(gearPopulation3.apply(state));
+
+                                                              }
+
+                                                          }
+
+                                                      }
+                                                  }
+                                                  ,
+                                                  StepOrder.DAWN, yearsFromStart+1);
+                                      }
+
+                                      /**
+                                       * tell the startable to turnoff,
+                                       */
+                                      @Override
+                                      public void turnOff() {
+
+                                      }
+                                  };
+
+                                }
+                            }
+                    );
+
+
+
+
+
+                }
+            });
+
 
 
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {
