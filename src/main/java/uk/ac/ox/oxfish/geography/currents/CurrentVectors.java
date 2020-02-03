@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.currents;
 
+import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -40,7 +41,7 @@ public class CurrentVectors {
         this.stepsPerDay = stepsPerDay;
     }
 
-    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
+    int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
 
     int positiveDaysOffset(int sourceDay, int targetDay) {
         checkArgument(sourceDay >= 1 && sourceDay <= 365);
@@ -94,7 +95,7 @@ public class CurrentVectors {
             lookupVectorMap(newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
     }
 
-    private VectorMapAtStep getVectorMapBefore(int step) {
+    VectorMapAtStep getVectorMapBefore(int step) {
         return lookupVectorMap(
             step,
             vectorMaps::floorKey,
@@ -104,7 +105,7 @@ public class CurrentVectors {
         );
     }
 
-    private VectorMapAtStep getVectorMapAfter(int step) {
+    VectorMapAtStep getVectorMapAfter(int step) {
         return lookupVectorMap(
             step,
             vectorMaps::ceilingKey,
@@ -118,27 +119,31 @@ public class CurrentVectors {
      * Return the interpolated vector between the currents we have before and after step.
      * Returns null if we don't have currents for the desired sea tile.
      */
-    private Double2D getInterpolatedVector(SeaTile seaTile, int step) {
-
+    Double2D getInterpolatedVector(SeaTile seaTile, int step) {
         final VectorMapAtStep vectorMapBefore = getVectorMapBefore(step - 1);
         final Double2D vectorBefore = vectorMapBefore.vectorMap.get(seaTile);
         if (vectorBefore == null) return null;
         final int offsetBefore = abs(step - vectorMapBefore.step);
-
         final VectorMapAtStep vectorMapAfter = getVectorMapAfter(step + 1);
         final Double2D vectorAfter = vectorMapAfter.vectorMap.get(seaTile);
         if (vectorAfter == null) return null;
         final int offsetAfter = abs(step - vectorMapAfter.step);
+        return getInterpolatedVector(vectorBefore, offsetBefore, vectorAfter, offsetAfter);
+    }
 
+    @NotNull public static Double2D getInterpolatedVector(
+        Double2D vectorBefore, int offsetBefore,
+        Double2D vectorAfter, int offsetAfter
+    ) {
         final double totalOffset = (double) offsetBefore + offsetAfter;
-        final Double2D v1 = vectorBefore.multiply(offsetBefore / totalOffset);
-        final Double2D v2 = vectorAfter.multiply(offsetAfter / totalOffset);
+        final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
+        final Double2D v2 = vectorAfter.multiply((totalOffset - offsetAfter) / totalOffset);
         return v1.add(v2);
     }
 
     public void removeCachedVectors(int timeStep) { vectorCache.remove(timeStep); }
 
-    private static class VectorMapAtStep {
+    static class VectorMapAtStep {
         final int step;
         final Map<SeaTile, Double2D> vectorMap;
 

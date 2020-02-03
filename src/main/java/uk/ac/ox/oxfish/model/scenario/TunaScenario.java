@@ -144,7 +144,6 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
-    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
     private static final Path UNASSOCIATED_CATCH_SAMPLE = input("unassociated_catch_sample.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
@@ -156,6 +155,7 @@ public class TunaScenario implements Scenario {
         r -> r.getString("species_code"),
         r -> r.getString("species_name")
     ));
+    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private final ImmutableList<String> actionNames = ImmutableList.of(
         DeployFad.ACTION_NAME,
         MakeFadSet.ACTION_NAME,
@@ -187,7 +187,6 @@ public class TunaScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-
     private AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> biologyInitializers =
         new MultipleIndependentSpeciesBiomassFactory(
             parseAllRecords(SCHAEFER_PARAMS_FILE).stream().map(r -> makeBiomassInitializerFactory(
@@ -199,7 +198,6 @@ public class TunaScenario implements Scenario {
             false,
             false
         );
-
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
     private Path costsFile = input("costs.csv");
 
@@ -254,7 +252,11 @@ public class TunaScenario implements Scenario {
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
-    private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
+        return exogenousCatchesFactory;
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
@@ -508,10 +510,10 @@ public class TunaScenario implements Scenario {
         fishersByBoatId.forEach((boatId, fisher) -> {
             if (fisher.getDestinationStrategy() instanceof FadGravityDestinationStrategy) {
                 final Map<SeaTile, Double> deploymentValues =
-                        deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
+                    deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
-                        .getFadDeploymentDestinationStrategy()
-                        .setDeploymentLocationValues(deploymentValues);
+                    .getFadDeploymentDestinationStrategy()
+                    .setDeploymentLocationValues(deploymentValues);
             }
         });
 
@@ -529,6 +531,13 @@ public class TunaScenario implements Scenario {
                         yearlyCounterAdder(totalCounterName(actionName)).apply(model),
                     0.0
                 )
+            )
+        );
+        fishState.getBiology().getSpecies().forEach(species ->
+            fishState.getYearlyDataSet().registerGatherer(
+                "Total " + species.getName() + " biomass under FADs",
+                model -> model.getFadMap().getTotalBiomass(species),
+                0.0
             )
         );
     }

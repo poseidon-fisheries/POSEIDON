@@ -7,16 +7,14 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
-import uk.ac.ox.oxfish.geography.SeaTile;
-
-import java.util.Optional;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class MakeUnassociatedSet extends SetAction {
 
     public static String ACTION_NAME = "unassociated sets";
 
-    public MakeUnassociatedSet(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
-        super(purseSeineGear, rng);
+    public MakeUnassociatedSet(FishState model, Fisher fisher) {
+        super(model, fisher);
     }
 
     @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
@@ -26,11 +24,6 @@ public class MakeUnassociatedSet extends SetAction {
     }
 
     public String getActionName() { return ACTION_NAME; }
-
-    @Override
-    public Optional<SeaTile> getActionTile(Fisher fisher) {
-        return Optional.of(fisher.getLocation());
-    }
 
     @Override public Action actionAfterSet() { return new Arriving(); }
 

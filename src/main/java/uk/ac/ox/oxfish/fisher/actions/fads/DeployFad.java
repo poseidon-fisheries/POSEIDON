@@ -14,12 +14,9 @@ import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkState;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class DeployFad extends FadAction {
@@ -28,8 +25,7 @@ public class DeployFad extends FadAction {
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
     public static String ACTION_NAME = "FAD deployments";
 
-    public DeployFad() {
-    }
+    public DeployFad(FishState model, Fisher fisher) { super(model, fisher); }
 
     /**
      * This little piece of ugliness is my "solution" to the problem of disallowing FAD deployments 15 days before
@@ -39,15 +35,15 @@ public class DeployFad extends FadAction {
      * The proper way to handle something like this would be to build the concept of "action specific regulations"
      * into the whole regulation system, but I fear that would cross the line from refactoring to re-architecturing.
      */
-    private boolean isNoFishingAtStep(final Regulation regulation, FishState model, int step) {
+    private boolean isNoFishingAtStep(Regulation regulation, int step) {
         if (regulation instanceof NoFishing)
             return true;
         else if (regulation instanceof TemporaryRegulation)
-            return isNoFishingAtStep(((TemporaryRegulation) regulation).delegateAtStep(model, step), model, step);
+            return isNoFishingAtStep(((TemporaryRegulation) regulation).delegateAtStep(getModel(), step), step);
         else if (regulation instanceof MultipleRegulations)
             return ((MultipleRegulations) regulation)
                 .getRegulations().stream()
-                .anyMatch(r -> isNoFishingAtStep(r, model, step));
+                .anyMatch(r -> isNoFishingAtStep(r, step));
         else
             return false;
     }
@@ -55,11 +51,9 @@ public class DeployFad extends FadAction {
     /**
      * Deploying a FAD is allowed if we can fish and if there is no closure kicking in within the buffer period.
      */
-    @Override public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
-
-        final Regulation regulation = fisher.getRegulation();
-        return regulation.canFishHere(fisher, actionTile, model, actionStep) &&
-            !isNoFishingAtStep(regulation, model, actionStep + BUFFER_PERIOD_BEFORE_CLOSURE);
+    @Override public boolean isAllowed() {
+        return super.isAllowed() &&
+            !isNoFishingAtStep(getFisher().getRegulation(), getStep() + BUFFER_PERIOD_BEFORE_CLOSURE);
     }
 
     @Override String getActionName() { return ACTION_NAME; }
@@ -68,19 +62,20 @@ public class DeployFad extends FadAction {
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
-        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
+        if (isAllowed() && isPossible()) {
             SeaTile here = fisher.getLocation();
-            getFadManager(fisher).deployFad(here, model.getStep(), model.random);
+            getFadManager().deployFad(here, model.getStep(), model.random);
+            getFadManager().reactToAction(this);
             fisher.getYearlyCounter().count(totalCounterName(), 1);
-            fisher.getYearlyCounter().count(regionCounterName(model.getMap(), here), 1);
+            fisher.getYearlyCounter().count(regionCounterName(), 1);
         }
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
 
-    @Override public boolean isPossible(FishState model, Fisher fisher) {
-        final FadManager fadManager = getFadManager(fisher);
-        return fisher.getLocation().isWater() &&
-            fadManager.getNumDeployedFads() < IATTC.activeFadsLimit(fisher) &&
+    @Override public boolean isPossible() {
+        final FadManager fadManager = getFadManager();
+        return getSeaTile().isWater() &&
+            fadManager.getNumDeployedFads() < IATTC.activeFadsLimit(getFisher()) &&
             fadManager.getNumFadsInStock() > 0;
     }
 
@@ -89,5 +84,4 @@ public class DeployFad extends FadAction {
         return getQuantity(0, HOUR);
     }
 
-    @Override public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(fisher.getLocation()); }
 }

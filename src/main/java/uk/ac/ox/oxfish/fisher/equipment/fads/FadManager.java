@@ -11,50 +11,61 @@ import tech.units.indriya.quantity.Quantities;
 import tech.units.indriya.unit.Units;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 public class FadManager {
 
     private final FadMap fadMap;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
-    private FadInitializer fadInitializer;
     private final FadInitializer dudInitializer;
+    final private double dudProbability;
+    private final ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
+    private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
-    final private double dudProbability;
 
-    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock,
-                      double dudProbability) {
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock,
+        double dudProbability,
+        Collection<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
         this.fadInitializer = fadInitializer;
-
-        HashMap<Species,Double> duds = new HashMap<>();
+        this.actionSpecificRegulations = actionSpecificRegulations.stream()
+            .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
+            .inverse();
+        HashMap<Species, Double> duds = new HashMap<>();
         HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
         for (Species species : fadInitializer.getBiology().getSpecies()) {
-
-            duds.put(species,0d);
+            duds.put(species, 0d);
             dudsWeight.put(species, Quantities.getQuantity(0, Units.KILOGRAM));
-
         }
-
         this.dudInitializer = new FadInitializer(
-                fadInitializer.getBiology(),
-                ImmutableMap.copyOf(dudsWeight),
-                ImmutableMap.copyOf(duds),
-                0d
+            fadInitializer.getBiology(),
+            ImmutableMap.copyOf(dudsWeight),
+            ImmutableMap.copyOf(duds),
+            0d
         );
         this.dudProbability = dudProbability;
         checkArgument(numFadsInStock >= 0);
@@ -99,10 +110,9 @@ public class FadManager {
     private Fad deployFad(Double2D location, int timeStep) {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
-        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability) ?
-                dudInitializer.apply(this) :
-                fadInitializer.apply(this)
-                ;
+        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability)
+            ? dudInitializer.apply(this)
+            : fadInitializer.apply(this);
         fadMap.deployFad(newFad, timeStep, location);
         deployedFads.add(newFad);
         return newFad;
@@ -153,6 +163,18 @@ public class FadManager {
             }
         });
         return builder.build();
+    }
+
+    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
+        return actionSpecificRegulations.get(fadAction.getClass()).stream();
+    }
+
+    public boolean isAllowed(FadAction fadAction) {
+        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
+    }
+
+    public void reactToAction(FadAction fadAction) {
+        regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
     }
 
 }

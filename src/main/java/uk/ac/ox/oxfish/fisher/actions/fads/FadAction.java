@@ -2,27 +2,34 @@ package uk.ac.ox.oxfish.fisher.actions.fads;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.actions.fads.Regions.REGION_NAMES;
 import static uk.ac.ox.oxfish.fisher.actions.fads.Regions.getRegionNumber;
 
 public abstract class FadAction implements Action, FadManagerUtils {
 
-    /**
-     * Plural name of action, used to build counter names
-     */
-    abstract String getActionName();
+    private final FishState model;
+    private final Fisher fisher;
+    private final SeaTile seaTile;
+    private final int step;
 
-    public static String regionCounterName(String actionName, int regionNumber) {
-        return "Number of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
+    protected FadAction(FishState model, Fisher fisher) {
+        this(model, fisher, fisher.getLocation(), model.getStep());
+    }
+
+    protected FadAction(FishState model, Fisher fisher, SeaTile seaTile, int step) {
+        this.model = model;
+        this.fisher = fisher;
+        this.seaTile = seaTile;
+        this.step = step;
     }
 
     public static String proportionGathererName(String actionName, int regionNumber) {
@@ -33,26 +40,47 @@ public abstract class FadAction implements Action, FadManagerUtils {
         return "Total number of " + actionName;
     }
 
-    String regionCounterName(NauticalMap map, SeaTile seaTile) {
-        return regionCounterName(getActionName(), getRegionNumber(map, seaTile));
+    public Fisher getFisher() { return fisher; }
+
+    public SeaTile getSeaTile() { return seaTile; }
+
+    public int getStep() { return step; }
+
+    String regionCounterName() {
+        return regionCounterName(getActionName(), getRegionNumber(model.getMap(), seaTile));
     }
 
-    abstract Optional<SeaTile> getActionTile(Fisher fisher);
+    public static String regionCounterName(String actionName, int regionNumber) {
+        return "Number of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
+    }
+
+    /**
+     * Plural name of action, used to build counter names
+     */
+    abstract String getActionName();
 
     public abstract Quantity<Time> getDuration();
 
-    abstract boolean isPossible(FishState model, Fisher fisher);
+    abstract boolean isPossible();
 
-    public boolean isAllowed(FishState model, Fisher fisher) {
-        return isAllowed(model, fisher, fisher.getLocation(), model.getStep());
+    public boolean isAllowed() {
+        return fisher.isCheater() || (
+            getFadManager().isAllowed(this) &&
+                fisher.getRegulation().canFishHere(fisher, seaTile, model, step)
+        );
     }
 
-    public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
-        return fisher.isCheater() || fisher.getRegulation().canFishHere(fisher, actionTile, model, actionStep);
-    }
+    public FadManager getFadManager() { return FadManagerUtils.getFadManager(fisher); }
 
     String totalCounterName() {
         return "Total number of " + getActionName();
     }
 
+    boolean isFadHere(Fad targetFad) {
+        return getModel().getFadMap().getFadTile(targetFad)
+            .filter(fadTile -> fadTile.equals(seaTile))
+            .isPresent();
+    }
+
+    public FishState getModel() { return model; }
 }
