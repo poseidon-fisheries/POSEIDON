@@ -31,7 +31,11 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
 
 
     public void start(FishState model) {
-        model.scheduleEveryYear(this,StepOrder.BIOLOGY_PHASE);
+
+
+
+
+        model.scheduleEveryYear(this,StepOrder.AFTER_DATA);
     }
 
 

@@ -24,13 +24,17 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.complicated.BiologyResetter;
+import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+
+import java.util.Map;
 
 /**
  * like the common logistic grower but uses LAST year biomass for it
  */
-public class SchaeferLogisticGrower extends CommonLogisticGrower {
+public class SchaeferLogisticGrower extends CommonLogisticGrower  {
 
 
     double lastYearBiomass;
@@ -54,22 +58,45 @@ public class SchaeferLogisticGrower extends CommonLogisticGrower {
 
         super.start(model);
 
-
-        model.scheduleEveryYear(new Steppable() {
+        Steppable memorizer = new Steppable() {
             @Override
             public void step(SimState simState) {
-                double current = 0;
-                //for each place
-                for(VariableBiomassBasedBiology biology : getBiologies())
-                {
-                    current += biology.getBiomass(species);
-
-                }
-
-                lastYearBiomass = current;
+                System.out.println("memorized biomass at day " + model.getDay());
+                memorizeBiomass();
             }
-        },
-                           StepOrder.AFTER_DATA);
+        };
+
+
+
+        model.scheduleOnce(
+                new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+                        memorizer.step(((FishState) simState));
+                        model.scheduleEveryYear(memorizer,
+                                                StepOrder.AFTER_DATA);
+
+                        }
+
+
+                    },
+                StepOrder.AFTER_DATA);
+
+
+
+
+    }
+
+    private void memorizeBiomass() {
+        double current = 0;
+        //for each place
+        for(VariableBiomassBasedBiology biology : getBiologies())
+        {
+            current += biology.getBiomass(species);
+
+        }
+
+        lastYearBiomass = current;
     }
 
 

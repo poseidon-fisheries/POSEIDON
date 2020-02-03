@@ -137,7 +137,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
                     }
                 },
-                StepOrder.AFTER_DATA,
+                StepOrder.
+                DATA_RESET,
                 yearsBeforeReset
         );
 

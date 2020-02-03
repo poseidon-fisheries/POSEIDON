@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -31,11 +32,11 @@ import java.util.function.Consumer;
 
 public class Slice6SelectivityMarket {
 
- //   private static final String SCENARIO_NAME = "tropfish_tl_2y_onemoretime_8h";
-    private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
+    private static final String SCENARIO_NAME = "tropfish_tl_2y_onemoretime_8h";
+  //  private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
     private static final int YEARS_TO_RUN = 12;
     private static final int RUNS_PER_POLICY = 1;
-    public static final int MAX_SELECTIVITY_SHIFT = 30;
+    public static final int MAX_SELECTIVITY_SHIFT = 15;
     private static final int MILLION = 1000000;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -54,13 +55,13 @@ public class Slice6SelectivityMarket {
 
         //THIS APPLIES EFFORT TO POP 1-2-3 (not 0)
         //APPLIES SUBSIDY TO POP0 only (not 3)
-
-        selectivitySubsidyPlusEffortControl("selectivity_flat_season", SCENARIO_NAME,
-                           MAX_SELECTIVITY_SHIFT,
-                           500*MILLION,
-                           "Lutjanus malabaricus",
-                           new int[]{0},
-                                            3);
+//
+//        selectivitySubsidyPlusEffortControl("selectivity_flat_season", SCENARIO_NAME,
+//                           MAX_SELECTIVITY_SHIFT,
+//                           500*MILLION,
+//                           "Lutjanus malabaricus",
+//                           new int[]{0},
+//                                            3);
 
 
 
@@ -69,6 +70,17 @@ public class Slice6SelectivityMarket {
 //                3,
 //                "Lutjanus malabaricus",
 //                10);
+
+
+        selectivitySubsidyPlusPenalty("selectivity_subsidyandpenalty",
+                                      SCENARIO_NAME,
+                                      MAX_SELECTIVITY_SHIFT,
+                                      500*MILLION,
+                                      "Lutjanus malabaricus",
+                                      new int[]{0, 3},
+                                      3,
+                                      10);
+
     }
 
 
@@ -157,6 +169,36 @@ public class Slice6SelectivityMarket {
 
     }
 
+
+    private static Consumer<Scenario> addPenaltyForImmatureFish( String species, int maturityBin, double percentageOfTotalPrice){
+
+        return new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario scenario) {
+                FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+                ThreePricesMarketFactory market =
+                        (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                species
+                        );
+
+                market.setLowAgeThreshold(new FixedDoubleParameter(maturityBin));
+                if(((FixedDoubleParameter) market.getHighAgeThreshold()).getFixedValue()<=maturityBin)
+                    market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin+1));
+
+
+                double newPrice = ((FixedDoubleParameter) market.getPriceBelowThreshold()).getFixedValue() *
+                        (percentageOfTotalPrice);
+                market.setPriceBelowThreshold(
+                        new FixedDoubleParameter(
+                                newPrice
+                        )
+                );
+                System.out.println(newPrice);
+            }
+        };
+
+    }
 
     /**
      * adds an agent that pays every fisher who has switched gear a subsidy every year they use that gear
@@ -502,6 +544,75 @@ public class Slice6SelectivityMarket {
                                     append(currentShiftSelectivity).append(",").
                                     append(finalSubsidy).append(",").
                                     append(finalMaxDaysOut).append(",");
+                        }
+                    });
+
+
+                    //while (runner.getRunsDone() < 1) {
+                    for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                        StringBuffer tidy = new StringBuffer();
+                        runner.run(tidy);
+                        fileWriter.write(tidy.toString());
+                        fileWriter.flush();
+                    }
+                }
+            }
+        }
+
+        fileWriter.close();
+    }
+
+
+    private static void selectivitySubsidyPlusPenalty(
+            String name,
+            final String filename,
+            final int maxSelectivityShift,
+            final int maxSubsidy,
+            String species, final int[] populationsSubsidized,
+            int shockYear, final int maturityBin) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
+        fileWriter.write("run,year,selectivity,subsidy,penalty,variable,value\n");
+        fileWriter.flush();
+
+        final boolean[] allSubsidized = {false, true};
+
+        for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
+            for (double subsidy = 0; subsidy < maxSubsidy; subsidy += 25 * MILLION) {
+                for (double penalty = 0; penalty<=1; penalty = FishStateUtilities.round(penalty+.25)) {
+
+
+                    BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
+
+
+                    int currentShiftSelectivity = selectivityIncrease;
+                    double finalSubsidy = subsidy;
+                    double finalPenalty = penalty;
+
+
+                    runner.setScenarioSetup(
+                            addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
+                                    addFlatSubsidity(subsidy)
+                            ).andThen(
+                                    Slice6SelectivityMarket.addPenaltyForImmatureFish(
+                                            species,
+                                            maturityBin,
+                                            finalPenalty
+
+                                    )
+                            )
+                    );
+
+                    System.out.println(" selectivity: " + selectivityIncrease + "; subsidy " + subsidy +
+                                               "; penalty: " + finalPenalty);
+
+                    runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                        @Override
+                        public void consume(StringBuffer writer, FishState model, Integer year) {
+                            writer.
+                                    append(currentShiftSelectivity).append(",").
+                                    append(finalSubsidy).append(",").
+                                    append(finalPenalty).append(",");
                         }
                     });
 
