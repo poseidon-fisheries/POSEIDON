@@ -20,9 +20,9 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseWithoutRecruitmentBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -60,8 +60,8 @@ public class OsmoseBoundedExogenousCatches extends AbstractExogenousCatches {
      */
     @Override
     protected Catch mortalityEvent(
-            FishState simState, Species target, SeaTile tile, double step) {
-        LocalOsmoseWithoutRecruitmentBiology biology = (LocalOsmoseWithoutRecruitmentBiology) tile.getBiology();
+            FishState simState, Species target, LocalBiology tile, double step) {
+        LocalOsmoseWithoutRecruitmentBiology biology = (LocalOsmoseWithoutRecruitmentBiology) tile;
         System.out.println(step + " ---- " + getFishableBiomass(target,tile));
         double toKill = Math.min(step,getFishableBiomass(target,tile));
         Catch caught = new Catch(target, toKill, simState.getBiology());
@@ -78,8 +78,8 @@ public class OsmoseBoundedExogenousCatches extends AbstractExogenousCatches {
 
 
     @Override
-    protected Double getFishableBiomass(Species target, SeaTile seaTile) {
-        return ((LocalOsmoseWithoutRecruitmentBiology) seaTile.getBiology()).getBiomass(
+    protected Double getFishableBiomass(Species target, LocalBiology seaTile) {
+        return ((LocalOsmoseWithoutRecruitmentBiology) seaTile).getBiomass(
                 target.getIndex(),
                 ageBounds.get(target).getFirst(),
                 ageBounds.get(target).getSecond()

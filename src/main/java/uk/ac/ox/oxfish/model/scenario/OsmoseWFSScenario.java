@@ -64,7 +64,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.OsmoseBoundedExogenousCatches;
@@ -548,7 +547,8 @@ public class OsmoseWFSScenario implements Scenario{
                 recast.put(global.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
             }
             //start it!
-            BiomassDrivenFixedExogenousCatches recreationalMortality = new BiomassDrivenFixedExogenousCatches(recast);
+            BiomassDrivenFixedExogenousCatches recreationalMortality = new BiomassDrivenFixedExogenousCatches(recast,
+                                                                                                              false);
             model.registerStartable(recreationalMortality);
 
             //shrimp mortality

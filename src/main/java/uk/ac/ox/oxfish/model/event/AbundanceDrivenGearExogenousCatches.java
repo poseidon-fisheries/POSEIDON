@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.model.event;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
@@ -56,7 +55,7 @@ public class AbundanceDrivenGearExogenousCatches extends AbstractExogenousCatche
      */
     @Override
     protected Catch mortalityEvent(
-            FishState simState, Species target, SeaTile tile, double step) {
+            FishState simState, Species target, LocalBiology tile, double step) {
 
         HomogeneousAbundanceGear gear = gears.get(target);
         Preconditions.checkArgument(gear!=null, "Exogenous catches impossible without providing gear");

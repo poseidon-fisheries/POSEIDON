@@ -20,9 +20,9 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.LinkedHashMap;
@@ -44,7 +44,7 @@ public class MixedExogenousCatches extends AbstractExogenousCatches {
      */
     @Override
     protected Catch mortalityEvent(
-            FishState simState, Species target, SeaTile tile, double step) {
+            FishState simState, Species target, LocalBiology tile, double step) {
 
         if(target.getNumberOfBins()>1)
             return AbundanceDrivenFixedExogenousCatches.abundanceSimpleMortalityEvent(simState,

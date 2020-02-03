@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.actions;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Every action returns the next action to take and a boolean telling whether the action takes place this turn
  * or the next
@@ -32,6 +34,7 @@ public class ActionResult
     private final double hoursLeft;
 
     public ActionResult(Action nextState, double hoursLeft) {
+        Preconditions.checkArgument(hoursLeft>=0);
         this.nextState = nextState;
         this.hoursLeft = hoursLeft;
     }

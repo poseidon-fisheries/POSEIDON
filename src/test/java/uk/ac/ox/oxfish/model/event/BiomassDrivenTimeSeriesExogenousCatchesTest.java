@@ -89,7 +89,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
                 LinkedHashMap<Species, Queue<Double>> exogenous = new LinkedHashMap<>();
                 exogenous.put(state.getSpecies().get(0),exogenousLandings);
                 exogenous.put(state.getSpecies().get(1),exogenousLandingsSecondSpecies);
-                return new BiomassDrivenTimeSeriesExogenousCatches(exogenous);
+                return new BiomassDrivenTimeSeriesExogenousCatches(exogenous, false);
             }
         });
 

@@ -44,17 +44,21 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
 
     private Stoppable stoppable;
 
+
     public BiomassDrivenTimeSeriesExogenousCatches(
-            LinkedHashMap<Species, Queue<Double>> landingsTimeSeries) {
+            LinkedHashMap<Species, Queue<Double>> landingsTimeSeries, final boolean allowMortalityOnFads) {
 
         this.landingsTimeSeries = landingsTimeSeries;
 
         LinkedHashMap<Species,Double> exogenousCatches = new LinkedHashMap<>();
         for(Species species : landingsTimeSeries.keySet())
             exogenousCatches.put(species,Double.NaN); //start them at NaN
-        delegate = new BiomassDrivenFixedExogenousCatches(exogenousCatches);
+        delegate = new BiomassDrivenFixedExogenousCatches(exogenousCatches, allowMortalityOnFads);
 
     }
+
+
+
 
 
     @Override

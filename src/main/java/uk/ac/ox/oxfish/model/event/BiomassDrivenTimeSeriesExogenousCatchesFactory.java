@@ -33,16 +33,20 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     private BiFunction<FishState, String, Species> speciesFromCode =
         (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesCode);
 
+    private boolean fadMortality = false;
+
     @SuppressWarnings("unused") public BiomassDrivenTimeSeriesExogenousCatchesFactory() {}
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
         Path catchesFile,
         int startingYear,
-        BiFunction<FishState, String, Species> speciesFromCode
+        BiFunction<FishState, String, Species> speciesFromCode,
+        boolean fadMortalityIncluded
     ) {
         this.catchesFile = catchesFile;
         this.startingYear = startingYear;
         this.speciesFromCode = speciesFromCode;
+        this.fadMortality = fadMortalityIncluded;
     }
 
     @SuppressWarnings("unused") public int getStartingYear() { return startingYear; }
@@ -76,6 +80,24 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
                 catches.values().stream().map(q -> asDouble(q, KILOGRAM)).collect(toCollection(LinkedList::new))
             )
         );
-        return new BiomassDrivenTimeSeriesExogenousCatches(catchesTimeSeries);
+        return new BiomassDrivenTimeSeriesExogenousCatches(catchesTimeSeries, fadMortality);
+    }
+
+    /**
+     * Getter for property 'fadMortality'.
+     *
+     * @return Value for property 'fadMortality'.
+     */
+    public boolean isFadMortality() {
+        return fadMortality;
+    }
+
+    /**
+     * Setter for property 'fadMortality'.
+     *
+     * @param fadMortality Value to set for property 'fadMortality'.
+     */
+    public void setFadMortality(boolean fadMortality) {
+        this.fadMortality = fadMortality;
     }
 }

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
@@ -53,7 +54,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
      * @param step how much at most to kill
      * @return
      */
-    protected Catch mortalityEvent(FishState model, Species target, SeaTile tile, double step) {
+    protected Catch mortalityEvent(FishState model, Species target, LocalBiology tile, double step) {
        return abundanceSimpleMortalityEvent(model, target, tile, step, true);
     }
 
@@ -67,7 +68,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
      * @return
      */
     public static Catch abundanceSimpleMortalityEvent(
-            FishState model, Species target, SeaTile tile, double step, final boolean rounding) {
+            FishState model, Species target, LocalBiology tile, double step, final boolean rounding) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
         double proportionToCatch = Math.min(1,step/tile.getBiomass(target));
@@ -80,7 +81,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
                 new Pair<>(target, simulatedGear)
         );
         //catch it
-        Catch fish = gear.fish(null, tile,tile , 1, model.getBiology());
+        Catch fish = gear.fish(null, tile,null , 1, model.getBiology());
         tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
         return fish;
     }

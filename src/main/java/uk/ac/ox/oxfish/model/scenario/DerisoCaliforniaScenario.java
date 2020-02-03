@@ -20,21 +20,14 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Splitter;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
-import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesDerisoInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,7 +90,7 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
     protected ExogenousCatches turnIntoExogenousCatchesObject(
             LinkedHashMap<Species, Double> recast) {
 
-            return new BiomassDrivenFixedExogenousCatches(recast);
+            return new BiomassDrivenFixedExogenousCatches(recast, false);
 
     }
 

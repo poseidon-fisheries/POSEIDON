@@ -20,22 +20,61 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by carrknight on 5/25/17.
  */
 public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches {
+
+
+    private final boolean allowMortalityOnFads;
+
+
     public BiomassDrivenFixedExogenousCatches(
-            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg) {
+            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, boolean allowMortalityOnFads) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
+        this.allowMortalityOnFads = allowMortalityOnFads;
+    }
+
+
+    @Override
+    protected List<? extends LocalBiology> getAllCatchableBiologies(FishState model) {
+        List<? extends LocalBiology> seaTiles = super.getAllCatchableBiologies(model);
+
+        if(!allowMortalityOnFads) {
+
+            return seaTiles;
+        } else{
+            //
+            List<LocalBiology> locals = new LinkedList<>(seaTiles);
+            model.getFadMap().allFads().map(new Function<Fad, LocalBiology>() {
+                @Override
+                public LocalBiology apply(Fad fad) {
+                    return fad.getBiology();
+                }
+            }).forEach(new Consumer<LocalBiology>() {
+                @Override
+                public void accept(LocalBiology localBiology) {
+                    locals.add(localBiology);
+                }
+            });
+            return locals;
+
+        }
+
     }
 
     /**
@@ -49,7 +88,7 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches
      */
     @Override
     protected Catch mortalityEvent(
-            FishState model, Species target, SeaTile tile, double step) {
+            FishState model, Species target, LocalBiology tile, double step) {
         return biomassSimpleMortalityEvent(model,
                                            target,
                                            tile,
@@ -58,14 +97,14 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches
 
 
     public static Catch biomassSimpleMortalityEvent(
-            FishState model, Species target, SeaTile tile, double step) {
+            FishState model, Species target, LocalBiology tile, double step) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
         double proportionToCatch = Math.min(1,step/tile.getBiomass(target));
         //simulate the catches as a fixed proportion gear
         OneSpecieGear gear = new OneSpecieGear(target,proportionToCatch);
         //catch it
-        Catch fish = gear.fish(null, tile,tile , 1, model.getBiology());
+        Catch fish = gear.fish(null, tile,null , 1, model.getBiology());
         //round to be supersafe
         if(fish.totalCatchWeight()>tile.getBiomass(target)) {
             //should be by VERY little!

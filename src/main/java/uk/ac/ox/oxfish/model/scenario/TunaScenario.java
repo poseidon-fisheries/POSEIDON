@@ -177,11 +177,13 @@ public class TunaScenario implements Scenario {
 
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2017;
+    private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             EXOGENOUS_CATCHES_FILE,
             targetYear,
-            (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode))
+            (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode)),
+            fadMortalityIncludedInExogenousCatches
         );
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 101, 0.5);
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
@@ -603,5 +605,23 @@ public class TunaScenario implements Scenario {
      */
     public void setCostsFile(Path costsFile) {
         this.costsFile = costsFile;
+    }
+
+    /**
+     * Getter for property 'fadMortalityIncludedInExogenousCatches'.
+     *
+     * @return Value for property 'fadMortalityIncludedInExogenousCatches'.
+     */
+    public boolean isFadMortalityIncludedInExogenousCatches() {
+        return fadMortalityIncludedInExogenousCatches;
+    }
+
+    /**
+     * Setter for property 'fadMortalityIncludedInExogenousCatches'.
+     *
+     * @param fadMortalityIncludedInExogenousCatches Value to set for property 'fadMortalityIncludedInExogenousCatches'.
+     */
+    public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
+        this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
     }
 }

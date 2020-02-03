@@ -25,6 +25,7 @@ import org.jfree.util.Log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -33,7 +34,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
     @Override
     public void step(SimState simState) {
         FishState model = (FishState) simState;
-        List<SeaTile> allTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
+        List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
 
         lastExogenousCatches.clear();
 
@@ -72,7 +72,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             double toCatch = totalToCatch;
             final Species target = catches.getKey();
             //worry only about tiles that have this fish
-            List<SeaTile> tiles =  allTiles.stream().filter(
+            List<? extends LocalBiology> tiles =  allTiles.stream().filter(
                     seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
 
 
@@ -83,7 +83,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             {
 
                 //grab a tile at random
-                SeaTile tile = tiles.get(model.getRandom().nextInt(tiles.size()));
+                LocalBiology tile = tiles.get(model.getRandom().nextInt(tiles.size()));
 
 
                 //each tile we pick, grab this much fish out
@@ -117,7 +117,11 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
     }
 
-    protected Double getFishableBiomass(Species target, SeaTile seaTile) {
+    protected List<? extends LocalBiology> getAllCatchableBiologies(FishState model) {
+        return model.getMap().getAllSeaTilesExcludingLandAsList();
+    }
+
+    protected Double getFishableBiomass(Species target, LocalBiology seaTile) {
         return seaTile.getBiomass( target);
     }
 
@@ -129,7 +133,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
      * @param step how much at most to kill
      * @return
      */
-    abstract protected Catch mortalityEvent(FishState simState, Species target, SeaTile tile, double step);
+    abstract protected Catch mortalityEvent(FishState simState, Species target, LocalBiology tile, double step);
 
 
 

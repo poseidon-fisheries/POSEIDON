@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -45,7 +44,6 @@ import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
@@ -356,8 +354,8 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
         exogenousMortality.put(model.getSpecies().get(0),exogenousSablefishCatches);
         exogenousMortality.put(model.getSpecies().get(1),exogenousYelloweyeCatches);
         BiomassDrivenFixedExogenousCatches mortality = new BiomassDrivenFixedExogenousCatches(
-                exogenousMortality
-        );
+                exogenousMortality,
+                false);
         model.registerStartable(mortality);
 
 
