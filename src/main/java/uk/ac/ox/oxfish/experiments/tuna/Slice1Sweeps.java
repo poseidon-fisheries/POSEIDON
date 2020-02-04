@@ -29,9 +29,9 @@ import static java.util.stream.Stream.concat;
 public class Slice1Sweeps {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-01-31_new_limits"));
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-04"));
     private static final int numberOfRunsPerPolicy = 25;
-    private static final int yearsToRun = 11;
+    private static final int yearsToRun = 21;
 
     public static void main(String[] args) throws IOException {
         final ArrayList<String> columnsToPrint = newArrayList(
@@ -45,10 +45,13 @@ public class Slice1Sweeps {
             "Yellowfin tuna Landings",
             "Bigeye tuna catches from FAD sets",
             "Bigeye tuna catches from unassociated sets",
+            "Bigeye tuna biomass lost (kg)",
             "Skipjack tuna catches from FAD sets",
             "Skipjack tuna catches from unassociated sets",
+            "Skipjack tuna biomass lost (kg)",
             "Yellowfin tuna catches from FAD sets",
             "Yellowfin tuna catches from unassociated sets",
+            "Yellowfin tuna biomass lost (kg)",
             "Average Trip Duration",
             "Total number of FAD deployments",
             "Total number of FAD sets",
@@ -146,12 +149,15 @@ public class Slice1Sweeps {
 
         fadLimits.forEach((activeFadLimitsFactory, fadLimitsName) ->
             setLimits.forEach((generalSetLimitsFactory, setLimitsName) -> {
+                final String policyName = fadLimitsName + " / " + setLimitsName;
+                System.out.println(policyName);
                 setupRunner(
                     batchRunner,
                     concat(Stream.of(activeFadLimitsFactory), stream(generalSetLimitsFactory)).collect(toList()),
-                    fadLimitsName + " / " + setLimitsName
+                    policyName
                 );
                 for (int i = 0; i < numberOfRunsPerPolicy; i++) {
+                    System.out.println("Run " + i);
                     StringBuffer outputBuffer = new StringBuffer();
                     try {
                         batchRunner.run(outputBuffer);

@@ -37,6 +37,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -172,7 +173,8 @@ public class TunaScenario implements Scenario {
             Stream.of(MakeFadSet.ACTION_NAME, MakeUnassociatedSet.ACTION_NAME).map(actionName ->
                 SetAction.catchesCounterName(speciesName, actionName)
             )
-        )
+        ),
+        speciesNames.values().stream().map(Fad::biomassLostCounterName)
     ).flatMap(identity()).collect(toImmutableList());
 
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);

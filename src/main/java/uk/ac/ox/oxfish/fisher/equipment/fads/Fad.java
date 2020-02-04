@@ -86,23 +86,30 @@ public class Fad {
         releaseFish(allSpecies);
     }
 
-    /**
-     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
-     */
-    private void releaseFish(Iterable<Species> allSpecies) {
-        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
-    }
-
     public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
         if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
     }
+
+    /**
+     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
+     */
+    public void releaseFish(Iterable<Species> allSpecies) {
+        allSpecies.forEach(species -> {
+            getOwner().getFisher().getYearlyCounter().count(biomassLostCounterName(species), biology.getBiomass(species));
+            biology.setCurrentBiomass(species, 0);
+        });
+    }
+
+    public FadManager getOwner() { return owner; }
+
+    public static String biomassLostCounterName(Species species) { return biomassLostCounterName(species.getName()); }
+
+    public static String biomassLostCounterName(String speciesName) { return speciesName + " biomass lost (kg)"; }
 
     public double valueOfSet(Fisher fisher) {
         double buoyValue = getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
         return buoyValue + priceOfFishHere(getBiology(), getMarkets(fisher));
     }
-
-    public FadManager getOwner() { return owner; }
 
     public BiomassLocalBiology getBiology() { return biology; }
 

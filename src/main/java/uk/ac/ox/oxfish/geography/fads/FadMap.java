@@ -125,8 +125,9 @@ public class FadMap implements Startable, Steppable {
                 }
             } else {
                 // The FAD does not have a location anymore, either because is has drifted off the map
-                // or because it was explicitly removed. In that case, all that's left to do is to tell
-                // the FAD's owner about it.
+                // or because it was explicitly removed. In that case, all that's left to do is to
+                // release the fish into the void and tell the FAD's owner about it.
+                fad.releaseFish(globalBiology.getSpecies());
                 fad.getOwner().loseFad(fad);
             }
         };
