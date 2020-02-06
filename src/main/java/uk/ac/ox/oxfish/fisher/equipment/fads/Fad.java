@@ -79,10 +79,11 @@ public class Fad {
         allSpecies.forEach(species -> {
             final double seaTileBiomass = seaTileBiology.getBiomass(species);
             final double fadBiomass = biology.getBiomass(species);
-            final double availableSeaTileCapacity = seaTileBiology.getCarryingCapacity(species) - seaTileBiomass;
+            final double totalSeaTileCapacity = seaTileBiology.getCarryingCapacity(species);
+            final double availableSeaTileCapacity = totalSeaTileCapacity - seaTileBiomass;
             final double biomassToTransfer = min(availableSeaTileCapacity, fadBiomass);
-            biology.setCurrentBiomass(species, fadBiomass - biomassToTransfer);
-            seaTileBiology.setCurrentBiomass(species, seaTileBiomass + biomassToTransfer);
+            biology.setCurrentBiomass(species, max(0, fadBiomass - biomassToTransfer));
+            seaTileBiology.setCurrentBiomass(species, min(totalSeaTileCapacity, seaTileBiomass + biomassToTransfer));
         });
         // release whatever is left in the FAD if the sea tile could not absorb it
         releaseFish(allSpecies);
