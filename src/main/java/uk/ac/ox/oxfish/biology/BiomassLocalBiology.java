@@ -215,9 +215,11 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
         final int index = s.getIndex();
         if(index >=currentBiomass.length)
             growArrays(index +1);
-        Preconditions.checkArgument(newCurrentBiomass <= carryingCapacity[index],
-                                    "the new current biomass is higher than carrying capacity!");
-
+        Preconditions.checkArgument(
+            newCurrentBiomass <= carryingCapacity[index],
+            "the new current biomass " + newCurrentBiomass +
+                " is higher than carrying capacity (" + carryingCapacity[index] + ")!"
+        );
         currentBiomass[index] = newCurrentBiomass;
     }
 
