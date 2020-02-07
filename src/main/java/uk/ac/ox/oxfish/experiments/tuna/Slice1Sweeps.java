@@ -29,7 +29,7 @@ import static java.util.stream.Stream.concat;
 public class Slice1Sweeps {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-06"));
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-07"));
     private static final int numberOfRunsPerPolicy = 15;
     private static final int yearsToRun = 15;
 
@@ -120,10 +120,21 @@ public class Slice1Sweeps {
                 1200, 315
             ));
 
+        final ActiveFadLimitsFactory smallerFadLimits =
+            new ActiveFadLimitsFactory(ImmutableSortedMap.of(
+                0, 20,
+                213, 30,
+                426, 75,
+                1200, 115
+            ));
+
         final ImmutableMap<ActiveFadLimitsFactory, String> fadLimits = ImmutableMap.of(
             currentFadLimits, "Current FAD limits",
-            proposedFadLimits, "Proposed FAD limits"
+            smallerFadLimits, "Strict FAD limits"
         );
+
+        final Optional<GeneralSetLimitsFactory> setLimit0 =
+            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 0)));
 
         final Optional<GeneralSetLimitsFactory> setLimit25 =
             Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 25)));
@@ -132,6 +143,7 @@ public class Slice1Sweeps {
             Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 75)));
 
         final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
+            setLimit0, "No sets allowed",
             setLimit25, "25 sets limit",
             setLimit75, "75 sets limit",
             Optional.empty(), "No set limit"
