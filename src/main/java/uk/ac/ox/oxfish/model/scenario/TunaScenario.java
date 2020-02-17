@@ -1,3 +1,22 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
@@ -135,35 +154,23 @@ public class TunaScenario implements Scenario {
             //.put(EL_NINO, input("currents_el_nino.csv"))
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
-    private static final Path MAP_FILE = input("depth.csv");
-    private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
-    private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
-    private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
-    private static final Path PORTS_FILE = input("ports.csv");
-    private static final Path PRICES_FILE = input("prices.csv");
-    private static final Path BOATS_FILE = input("boats.csv");
-    private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
-    private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
-    private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
-    private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
-    private static final Path UNASSOCIATED_CATCH_SAMPLE = input("unassociated_catch_sample.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("2017_BET_DIST.csv"),
         "SKJ", input("2017_SKJ_DIST.csv"),
         "YFT", input("2017_YFT_DIST.csv")
     );
-    private static final BiMap<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toImmutableBiMap(
-        r -> r.getString("species_code"),
-        r -> r.getString("species_name")
-    ));
-    public static Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
+    private static final BiMap<String, String> speciesNames =
+        parseAllRecords(input("species_names.csv")).stream().collect(toImmutableBiMap(
+            r -> r.getString("species_code"),
+            r -> r.getString("species_name")
+        ));
+    private static final Path schaeferParamsFile = input("schaefer_params.csv");
     private final ImmutableList<String> actionNames = ImmutableList.of(
         DeployFad.ACTION_NAME,
         MakeFadSet.ACTION_NAME,
         MakeUnassociatedSet.ACTION_NAME
     );
     private final Set<Integer> regionNumbers = Regions.REGION_NAMES.keySet();
-
     private final ImmutableList<String> yearlyFisherCounters = Stream.of(
         actionNames.stream().map(FadAction::totalCounterName),
         regionNumbers.stream().flatMap(regionNumber ->
@@ -176,24 +183,33 @@ public class TunaScenario implements Scenario {
         ),
         speciesNames.values().stream().map(Fad::biomassLostCounterName)
     ).flatMap(identity()).collect(toImmutableList());
-
-    private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
+    private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(input("ports.csv"));
+    private Path mapFile = input("depth.csv");
+    private Path deploymentValuesFile = input("deployment_values.csv");
+    private Path iattcShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
+    private Path galapagosEezShapeFile = input("galapagos_eez").resolve("eez.shp");
+    private Path pricesFile = input("prices.csv");
+    private Path boatsFile = input("boats.csv");
+    private Path boatSpeedsFile = input("boat_speeds.csv");
+    private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
+    private Path unassociatedCatchSampleFile = input("unassociated_catch_sample.csv");
+    private Path costsFile = input("costs.csv");
     private int targetYear = 2017;
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
-            EXOGENOUS_CATCHES_FILE,
+            input("exogenous_catches.csv"),
             targetYear,
             (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode)),
             fadMortalityIncludedInExogenousCatches
         );
-    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 101, 0.5);
+    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(mapFile, 101, 0.5);
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
     private AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> biologyInitializers =
         new MultipleIndependentSpeciesBiomassFactory(
-            parseAllRecords(SCHAEFER_PARAMS_FILE).stream().map(r -> makeBiomassInitializerFactory(
+            parseAllRecords(schaeferParamsFile).stream().map(r -> makeBiomassInitializerFactory(
                 r.getString("species_code"),
                 r.getDouble("logistic_growth_rate"), // logistic growth rate (r)
                 getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE), // total carrying capacity (K)
@@ -203,7 +219,6 @@ public class TunaScenario implements Scenario {
             false
         );
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
-    private Path costsFile = input("costs.csv");
 
     public TunaScenario() {
 
@@ -212,7 +227,7 @@ public class TunaScenario implements Scenario {
         plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
 
         AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
-            new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE), "all",
+            new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile), "all",
             new TemporaryRegulationFactory( // El Corralito
                 dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
                 new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
@@ -229,7 +244,7 @@ public class TunaScenario implements Scenario {
 
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
         purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
-            parseAllRecords(FAD_CARRYING_CAPACITIES).stream()
+            parseAllRecords(fadCarryingCapacitiesFile).stream()
                 .filter(r -> r.getInt("year") == targetYear)
                 .collect(toMap(
                     r -> speciesNames.get(r.getString("species_code")),
@@ -241,7 +256,7 @@ public class TunaScenario implements Scenario {
             "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
             "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
         ));
-        purseSeineGearFactory.setUnassociatedCatchSampleFile(UNASSOCIATED_CATCH_SAMPLE);
+        purseSeineGearFactory.setUnassociatedCatchSampleFile(unassociatedCatchSampleFile);
 
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(purseSeineGearFactory);
@@ -257,6 +272,42 @@ public class TunaScenario implements Scenario {
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
     public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
+
+    @SuppressWarnings("unused") public void setMapFile(Path mapFile) { this.mapFile = mapFile; }
+
+    @SuppressWarnings("unused") public Path getDeploymentValuesFile() { return deploymentValuesFile; }
+
+    public void setDeploymentValuesFile(Path deploymentValuesFile) { this.deploymentValuesFile = deploymentValuesFile; }
+
+    @SuppressWarnings("unused") public Path getIattcShapeFile() { return iattcShapeFile; }
+
+    @SuppressWarnings("unused") public void setIattcShapeFile(Path iattcShapeFile) { this.iattcShapeFile = iattcShapeFile; }
+
+    @SuppressWarnings("unused") public Path getGalapagosEezShapeFile() { return galapagosEezShapeFile; }
+
+    @SuppressWarnings("unused") public void setGalapagosEezShapeFile(Path galapagosEezShapeFile) { this.galapagosEezShapeFile = galapagosEezShapeFile; }
+
+    @SuppressWarnings("unused") public Path getPricesFile() { return pricesFile; }
+
+    @SuppressWarnings("unused") public void setPricesFile(Path pricesFile) { this.pricesFile = pricesFile; }
+
+    @SuppressWarnings("unused") public Path getBoatsFile() { return boatsFile; }
+
+    public void setBoatsFile(Path boatsFile) { this.boatsFile = boatsFile; }
+
+    @SuppressWarnings("unused") public Path getBoatSpeedsFile() { return boatSpeedsFile; }
+
+    @SuppressWarnings("unused") public void setBoatSpeedsFile(Path boatSpeedsFile) { this.boatSpeedsFile = boatSpeedsFile; }
+
+    @SuppressWarnings("unused") public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
+
+    @SuppressWarnings("unused") public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) { this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile; }
+
+    @SuppressWarnings("unused") public Path getUnassociatedCatchSampleFile() { return unassociatedCatchSampleFile; }
+
+    @SuppressWarnings("unused") public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) { this.unassociatedCatchSampleFile = unassociatedCatchSampleFile; }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;
@@ -348,7 +399,7 @@ public class TunaScenario implements Scenario {
     }
 
     private MarketMap makeMarketMap(GlobalBiology globalBiology) {
-        Map<String, Double> prices = parseAllRecords(PRICES_FILE).stream()
+        Map<String, Double> prices = parseAllRecords(pricesFile).stream()
             .filter(
                 r -> r.getInt("year") == targetYear
             )
@@ -417,13 +468,13 @@ public class TunaScenario implements Scenario {
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
         final Map<Integer, Quantity<Speed>> speedsPerClass =
-            parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
+            parseAllRecords(boatSpeedsFile).stream().collect(toMap(
                 r -> r.getInt("class"),
                 r -> getQuantity(r.getDouble("speed"), KNOT))
             );
 
         final Map<String, Fisher> fishersByBoatId =
-            parseAllRecords(BOATS_FILE).stream()
+            parseAllRecords(boatsFile).stream()
                 .filter(record -> record.getInt("year") == targetYear)
                 //.limit(10)
                 .collect(toMap(
@@ -480,7 +531,7 @@ public class TunaScenario implements Scenario {
 
     private void assignDeploymentLocationValues(NauticalMap nauticalMap, Map<String, Fisher> fishersByBoatId) {
         final Map<String, Map<SeaTile, Double>> deploymentValuesPerBoatId =
-            parseAllRecords(DEPLOYMENT_VALUES_FILE).stream()
+            parseAllRecords(deploymentValuesFile).stream()
                 .filter(record -> record.getInt("year") == targetYear)
                 .map(record -> Triple.of( // oh, how I long for case classes...
                     record.getString("boat_id"),
@@ -578,7 +629,7 @@ public class TunaScenario implements Scenario {
         initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
         initialCapacityAllocator.setInputFileHasHeader(true);
         final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
-        polygonAllocatorFactory.setShapeFile(IATTC_SHAPE_FILE);
+        polygonAllocatorFactory.setShapeFile(iattcShapeFile);
         polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
         factory.setInitialCapacityAllocator(polygonAllocatorFactory);
 
@@ -591,39 +642,19 @@ public class TunaScenario implements Scenario {
     @SuppressWarnings("unused")
     public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
 
-    /**
-     * Getter for property 'costsFile'.
-     *
-     * @return Value for property 'costsFile'.
-     */
-    public Path getCostsFile() {
+    @SuppressWarnings("unused") public Path getCostsFile() {
         return costsFile;
     }
 
-    /**
-     * Setter for property 'costsFile'.
-     *
-     * @param costsFile Value to set for property 'costsFile'.
-     */
     public void setCostsFile(Path costsFile) {
         this.costsFile = costsFile;
     }
 
-    /**
-     * Getter for property 'fadMortalityIncludedInExogenousCatches'.
-     *
-     * @return Value for property 'fadMortalityIncludedInExogenousCatches'.
-     */
-    public boolean isFadMortalityIncludedInExogenousCatches() {
+    @SuppressWarnings("unused") public boolean isFadMortalityIncludedInExogenousCatches() {
         return fadMortalityIncludedInExogenousCatches;
     }
 
-    /**
-     * Setter for property 'fadMortalityIncludedInExogenousCatches'.
-     *
-     * @param fadMortalityIncludedInExogenousCatches Value to set for property 'fadMortalityIncludedInExogenousCatches'.
-     */
-    public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
+    @SuppressWarnings("unused") public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
         this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
     }
 }
