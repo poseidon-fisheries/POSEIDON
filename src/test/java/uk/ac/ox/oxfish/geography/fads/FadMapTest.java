@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
@@ -79,7 +80,7 @@ public class FadMapTest {
         fishState.schedule = schedule;
 
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0, ImmutableSet.of());
-        final Fisher fisher = mock(Fisher.class);
+        final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(fishState.random);
         fadManager.setFisher(fisher);
 
