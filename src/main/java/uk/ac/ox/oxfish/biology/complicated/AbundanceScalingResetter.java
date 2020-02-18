@@ -27,7 +27,6 @@ import eva2.optimization.OptimizationParameters;
 import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.problems.SimpleProblemWrapper;
-import eva2.problems.simple.InterfaceSimpleProblem;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -62,10 +61,10 @@ public class AbundanceScalingResetter implements BiologyResetter {
      * @param map
      */
     @Override
-    public void recordHowMuchBiomassThereIs(NauticalMap map) {
+    public void recordHowMuchBiomassThereIs(FishState map) {
 
 
-        recordedTotalBiomass = map.getTotalBiomass(species);
+        recordedTotalBiomass = map.getMap().getTotalBiomass(species);
     }
 
     /**

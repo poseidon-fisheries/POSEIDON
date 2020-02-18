@@ -81,18 +81,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
         }
         return new SnapshotBiologyResetter(yearsBeforeReset,resetters,restoreOriginalLocations);
     }
-//
-//    public SnapshotBiologyResetter(GlobalBiology biology, int yearsBeforeReset) {
-//
-//        this.yearsBeforeReset=yearsBeforeReset;
-//        resetters = new LinkedHashMap<>();
-//        for (Species species : biology.getSpecies()) {
-//            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
-//            resetters.put(new AbundanceResetter(snapper,species),snapper);
-//        }
-//
-//    }
 
+    
 
     @Override
     public void start(FishState model) {
@@ -101,7 +91,7 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
             @Override
             public void step(SimState simState) {
                 for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
-                    resetter.getKey().recordHowMuchBiomassThereIs(model.getMap());
+                    resetter.getKey().recordHowMuchBiomassThereIs(model);
 
                     if(restoreOriginalLocations)
                         resetter.getValue().takeSnapshort(

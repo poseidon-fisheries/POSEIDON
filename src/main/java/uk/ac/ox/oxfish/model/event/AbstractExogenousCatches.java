@@ -59,6 +59,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
     @Override
     public void step(SimState simState) {
+        System.out.println("catching exogenously now " + ((FishState) simState).getDay());
         FishState model = (FishState) simState;
         List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
 

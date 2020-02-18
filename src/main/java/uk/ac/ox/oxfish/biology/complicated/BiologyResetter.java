@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.FishState;
 
 public interface BiologyResetter {
 
@@ -30,7 +31,7 @@ public interface BiologyResetter {
      * records how much biomass there is
      * @param map
      */
-    void recordHowMuchBiomassThereIs(NauticalMap map);
+    void recordHowMuchBiomassThereIs(FishState map);
 
     /**
      * returns biology layer to biomass recorded previously

@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * memorizes abundance and then redistributes according to given allocator
@@ -28,11 +29,11 @@ public class AbundanceResetter implements BiologyResetter {
 
 
     @Override
-    public void recordHowMuchBiomassThereIs(NauticalMap map)
+    public void recordHowMuchBiomassThereIs(FishState state)
     {
         recordedAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList())
+        for (SeaTile seaTile : state.getMap().getAllSeaTilesExcludingLandAsList())
         {
 
             if(!seaTile.isFishingEvenPossibleHere())

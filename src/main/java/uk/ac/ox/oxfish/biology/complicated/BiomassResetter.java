@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassResetter implements BiologyResetter {
 
@@ -51,8 +52,8 @@ public class BiomassResetter implements BiologyResetter {
      * @param map
      */
     @Override
-    public void recordHowMuchBiomassThereIs(NauticalMap map) {
-        recordedBiomass = map.getTotalBiomass(species);
+    public void recordHowMuchBiomassThereIs(FishState map) {
+        recordedBiomass = map.getMap().getTotalBiomass(species);
     }
 
     /**

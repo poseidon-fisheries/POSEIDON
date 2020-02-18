@@ -55,11 +55,17 @@ public class BestGearWins {
         scenario.setFishers(100);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
-        gear.setGasPerHourFished(new UniformDoubleParameter(0, 20));
+        gear.setGasPerHourFished(new FixedDoubleParameter(10));
         scenario.setGear(gear);
         PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
         gearStrategy.setProbability(new FixedProbabilityFactory(.05,.25));
         gearStrategy.setYearly(false);
+        for(int i=0; i<20; i++)
+        {
+            gear = new RandomCatchabilityTrawlFactory();
+            gear.setGasPerHourFished(new FixedDoubleParameter(i));
+            gearStrategy.getAvailableGears().add(gear);
+        }
         scenario.setGearStrategy(gearStrategy);
         //start everything
         FishState state = new FishState(seed);

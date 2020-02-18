@@ -39,7 +39,7 @@ public class FadManager {
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer dudInitializer;
     final private double dudProbability;
-    private final ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
+    private ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
     private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
@@ -177,4 +177,22 @@ public class FadManager {
         regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
     }
 
+    /**
+     * Getter for property 'actionSpecificRegulations'.
+     *
+     * @return Value for property 'actionSpecificRegulations'.
+     */
+    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
+        return actionSpecificRegulations;
+    }
+
+    /**
+     * Setter for property 'actionSpecificRegulations'.
+     *
+     * @param actionSpecificRegulations Value to set for property 'actionSpecificRegulations'.
+     */
+    public void setActionSpecificRegulations(
+            ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
+    }
 }
