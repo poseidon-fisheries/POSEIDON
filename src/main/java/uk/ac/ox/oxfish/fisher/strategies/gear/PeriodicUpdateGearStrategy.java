@@ -263,7 +263,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
     {
         this.fisher=fisher;
 
-        if(options!=null)
+        if(options!=null && !options.isEmpty())
             tagYourself(fisher, fisher.getGear(), options);
 
 

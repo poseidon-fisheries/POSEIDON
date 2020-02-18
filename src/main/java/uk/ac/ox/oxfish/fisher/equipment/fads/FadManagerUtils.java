@@ -21,7 +21,12 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 public interface FadManagerUtils {
 
     static FadManager getFadManager(Fisher fisher) {
-        return ((PurseSeineGear) fisher.getGear()).getFadManager();
+        if (fisher.getGear() instanceof PurseSeineGear)
+            return ((PurseSeineGear) fisher.getGear()).getFadManager();
+        else throw new IllegalArgumentException(
+            "PurseSeineGear required to get FadManager instance. Fisher " +
+                fisher + " is using " + fisher.getGear().getClass() + "."
+        );
     }
 
     static Optional<Fad> oneOfFadsHere(Fisher fisher) {
