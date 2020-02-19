@@ -110,11 +110,12 @@ public class BestGearWins {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
-        //      System.out.println(average);
+   //     System.out.println(average);
 
         while(state.getYear() < simulationYears)
             state.schedule.step(state);
 
+        state.schedule.step(state);
         //average now? Ought to be more or less the same
         average = 0;
         for(Fisher fisher : state.getFishers())
@@ -122,7 +123,8 @@ public class BestGearWins {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
-        //   System.out.println(average);
+        System.out.println(average);
+        System.out.println(state.getDailyDataSet().getColumn("Thrawling Fuel Consumption").getLatest());
         return state.getDailyDataSet().getColumn("Thrawling Fuel Consumption");
 
     }
