@@ -17,8 +17,9 @@ public class GeneralSetLimits implements ActionSpecificRegulation {
     private final VolumeRelativeLimits limits;
     private int setCounter = 0;
 
-    public GeneralSetLimits(ImmutableSortedMap<Integer, Integer> limits) {
+    public GeneralSetLimits(FishState fishState, ImmutableSortedMap<Integer, Integer> limits) {
         this.limits = new VolumeRelativeLimits(limits);
+        fishState.registerStartable(this);
     }
 
     @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }

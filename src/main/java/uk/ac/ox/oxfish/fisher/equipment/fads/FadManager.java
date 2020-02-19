@@ -21,7 +21,6 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -49,12 +48,20 @@ public class FadManager {
         FadInitializer fadInitializer,
         int numFadsInStock,
         double dudProbability,
-        Collection<ActionSpecificRegulation> actionSpecificRegulations
+        Stream<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this(fadMap, fadInitializer, numFadsInStock, dudProbability, makeRegulationMultimap(actionSpecificRegulations));
+    }
+
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock,
+        double dudProbability,
+        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this.fadInitializer = fadInitializer;
-        this.actionSpecificRegulations = actionSpecificRegulations.stream()
-            .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
-            .inverse();
+        this.actionSpecificRegulations = actionSpecificRegulations;
         HashMap<Species, Double> duds = new HashMap<>();
         HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
         for (Species species : fadInitializer.getBiology().getSpecies()) {
@@ -71,6 +78,27 @@ public class FadManager {
         checkArgument(numFadsInStock >= 0);
         this.numFadsInStock = numFadsInStock;
         this.fadMap = fadMap;
+    }
+
+    private static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
+        Stream<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        return actionSpecificRegulations
+            .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
+            .inverse();
+    }
+
+    @SuppressWarnings("unused")
+    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
+        return actionSpecificRegulations;
+    }
+
+    public void setActionSpecificRegulations(ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
+    }
+
+    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+        setActionSpecificRegulations(makeRegulationMultimap(actionSpecificRegulations));
     }
 
     public Fisher getFisher() { return fisher; }
@@ -165,34 +193,16 @@ public class FadManager {
         return builder.build();
     }
 
-    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
-        return actionSpecificRegulations.get(fadAction.getClass()).stream();
-    }
-
     public boolean isAllowed(FadAction fadAction) {
         return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
+    }
+
+    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
+        return actionSpecificRegulations.get(fadAction.getClass()).stream();
     }
 
     public void reactToAction(FadAction fadAction) {
         regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
     }
 
-    /**
-     * Getter for property 'actionSpecificRegulations'.
-     *
-     * @return Value for property 'actionSpecificRegulations'.
-     */
-    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
-        return actionSpecificRegulations;
-    }
-
-    /**
-     * Setter for property 'actionSpecificRegulations'.
-     *
-     * @param actionSpecificRegulations Value to set for property 'actionSpecificRegulations'.
-     */
-    public void setActionSpecificRegulations(
-            ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
-        this.actionSpecificRegulations = actionSpecificRegulations;
-    }
 }

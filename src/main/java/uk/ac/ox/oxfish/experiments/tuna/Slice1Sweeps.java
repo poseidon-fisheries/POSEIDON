@@ -1,12 +1,16 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.BatchRunner;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimits;
 import uk.ac.ox.oxfish.model.regs.fads.GeneralSetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -16,20 +20,21 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Streams.stream;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1Sweeps {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
-    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-07"));
+
+    private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-18_policy_shock"));
     private static final int numberOfRunsPerPolicy = 15;
     private static final int yearsToRun = 15;
 
@@ -104,63 +109,47 @@ public class Slice1Sweeps {
             -1
         );
 
-        final ActiveFadLimitsFactory currentFadLimits =
-            new ActiveFadLimitsFactory(ImmutableSortedMap.of(
-                0, 70,
-                213, 120,
-                426, 300,
-                1200, 450
-            ));
+        final ActiveFadLimits currentFadLimits = new ActiveFadLimits(ImmutableSortedMap.of(
+            0, 70,
+            213, 120,
+            426, 300,
+            1200, 450
+        ));
 
-        final ActiveFadLimitsFactory proposedFadLimits =
-            new ActiveFadLimitsFactory(ImmutableSortedMap.of(
-                0, 50,
-                213, 85,
-                426, 210,
-                1200, 315
-            ));
+        final ActiveFadLimits smallerFadLimits = new ActiveFadLimits(ImmutableSortedMap.of(
+            0, 20,
+            213, 30,
+            426, 75,
+            1200, 115
+        ));
 
-        final ActiveFadLimitsFactory smallerFadLimits =
-            new ActiveFadLimitsFactory(ImmutableSortedMap.of(
-                0, 20,
-                213, 30,
-                426, 75,
-                1200, 115
-            ));
-
-        final ImmutableMap<ActiveFadLimitsFactory, String> fadLimits = ImmutableMap.of(
-            currentFadLimits, "Current FAD limits",
-            smallerFadLimits, "Strict FAD limits"
+        final ImmutableMap<AlgorithmFactory<? extends ActionSpecificRegulation>, String> fadLimits = ImmutableMap.of(
+            __ -> currentFadLimits, "Current FAD limits",
+            __ -> smallerFadLimits, "Strict FAD limits"
         );
 
-        final Optional<GeneralSetLimitsFactory> setLimit0 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 0)));
-
-        final Optional<GeneralSetLimitsFactory> setLimit25 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 25)));
-
-        final Optional<GeneralSetLimitsFactory> setLimit75 =
-            Optional.of(new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, 75)));
-
-        final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
-            setLimit0, "No sets allowed",
-            setLimit25, "25 sets limit",
-            setLimit75, "75 sets limit",
-            Optional.empty(), "No set limit"
-        );
+        final ImmutableMap<Optional<AlgorithmFactory<? extends ActionSpecificRegulation>>, String> setLimits = concat(
+            Stream.of(25, 50, 75).map(Optional::of),
+            Stream.of(Optional.<Integer>empty())
+        ).collect(toImmutableMap(
+            opt -> opt.map(limit -> new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, limit))),
+            opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
+        ));
 
         FileWriter fileWriter = new FileWriter(outputPath.resolve("results.csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        fadLimits.forEach((activeFadLimitsFactory, fadLimitsName) ->
-            setLimits.forEach((generalSetLimitsFactory, setLimitsName) -> {
-                final String policyName = fadLimitsName + " / " + setLimitsName;
-                System.out.println(policyName);
+        final ImmutableList<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual =
+            ImmutableList.of(__ -> currentFadLimits);
+
+        fadLimits.forEach((activeFadLimits, fadLimitsName) ->
+            setLimits.forEach((generalSetLimits, setLimitsName) -> {
                 setupRunner(
                     batchRunner,
-                    concat(Stream.of(activeFadLimitsFactory), stream(generalSetLimitsFactory)).collect(toList()),
-                    policyName
+                    businessAsUsual,
+                    concat(Stream.of(activeFadLimits), stream(generalSetLimits)).collect(toImmutableList()),
+                    fadLimitsName + " / " + setLimitsName
                 );
                 for (int i = 0; i < numberOfRunsPerPolicy; i++) {
                     System.out.println("Run " + i);
@@ -180,12 +169,26 @@ public class Slice1Sweeps {
 
     private static void setupRunner(
         BatchRunner batchRunner,
-        List<AlgorithmFactory<? extends ActionSpecificRegulation>> regulationFactories,
+        ImmutableList<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual,
+        ImmutableList<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
         String policyName
     ) {
+        Steppable setRegulations = simState -> {
+            System.out.println("Changing regulations to " + policyName + " for all fishers at day " + simState.schedule.getSteps());
+            final FishState fishState = (FishState) simState;
+            fishState.getFishers().forEach(fisher ->
+                ((PurseSeineGear) fisher.getGear()).getFadManager().setActionSpecificRegulations(
+                    policyRegulations.stream().map(factory -> factory.apply(fishState))
+                )
+            );
+        };
         batchRunner.setScenarioSetup(scenario -> {
-            final AlgorithmFactory<? extends Gear> gearFactory = ((TunaScenario) scenario).getFisherDefinition().getGear();
-            ((PurseSeineGearFactory) gearFactory).setActionSpecificRegulations(regulationFactories);
+            final TunaScenario tunaScenario = (TunaScenario) scenario;
+            PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) tunaScenario.getFisherDefinition().getGear();
+            purseSeineGearFactory.setActionSpecificRegulations(businessAsUsual);
+            tunaScenario.getPlugins().add(fishState ->
+                __ -> fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.DAWN, 1)
+            );
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")

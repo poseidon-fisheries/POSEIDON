@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.regs.fads.GeneralSetLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
@@ -35,7 +33,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private DoubleParameter dudProbability = new FixedDoubleParameter(0d);
     private Path unassociatedCatchSampleFile;
 
-    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
+    @SuppressWarnings("unused") public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
         return actionSpecificRegulations;
     }
 
@@ -43,27 +41,27 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
-    public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
+    @SuppressWarnings("unused") public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
-    public void setMinimumSetDurationInHours(DoubleParameter minimumSetDurationInHours) {
+    @SuppressWarnings("unused") public void setMinimumSetDurationInHours(DoubleParameter minimumSetDurationInHours) {
         this.minimumSetDurationInHours = minimumSetDurationInHours;
     }
 
-    public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
+    @SuppressWarnings("unused") public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
 
-    public void setAverageSetDurationInHours(DoubleParameter averageSetDurationInHours) {
+    @SuppressWarnings("unused") public void setAverageSetDurationInHours(DoubleParameter averageSetDurationInHours) {
         this.averageSetDurationInHours = averageSetDurationInHours;
     }
 
-    public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
+    @SuppressWarnings("unused") public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
 
-    public void setStdDevOfSetDurationInHours(DoubleParameter stdDevOfSetDurationInHours) {
+    @SuppressWarnings("unused") public void setStdDevOfSetDurationInHours(DoubleParameter stdDevOfSetDurationInHours) {
         this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
     }
 
-    public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
+    @SuppressWarnings("unused") public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
 
-    public void setSuccessfulSetProbability(DoubleParameter successfulSetProbability) {
+    @SuppressWarnings("unused") public void setSuccessfulSetProbability(DoubleParameter successfulSetProbability) {
         this.successfulSetProbability = successfulSetProbability;
     }
 
@@ -90,7 +88,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
             dudProbability.apply(fishState.getRandom()),
-            actionSpecificRegulations.stream().map(factory -> factory.apply(fishState)).collect(toImmutableSet())
+            actionSpecificRegulations.stream().map(factory -> factory.apply(fishState))
         );
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
@@ -110,7 +108,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         );
     }
 
-    public Path getUnassociatedCatchSampleFile() {
+    @SuppressWarnings("unused") public Path getUnassociatedCatchSampleFile() {
         return unassociatedCatchSampleFile;
     }
 
@@ -118,21 +116,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
     }
 
-    /**
-     * Getter for property 'dudProbability'.
-     *
-     * @return Value for property 'dudProbability'.
-     */
-    public DoubleParameter getDudProbability() {
+    @SuppressWarnings("unused") public DoubleParameter getDudProbability() {
         return dudProbability;
     }
 
-    /**
-     * Setter for property 'dudProbability'.
-     *
-     * @param dudProbability Value to set for property 'dudProbability'.
-     */
-    public void setDudProbability(DoubleParameter dudProbability) {
+    @SuppressWarnings("unused") public void setDudProbability(DoubleParameter dudProbability) {
         this.dudProbability = dudProbability;
     }
 }

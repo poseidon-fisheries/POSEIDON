@@ -10,7 +10,7 @@ public class GeneralSetLimitsFactory implements AlgorithmFactory<GeneralSetLimit
 
     public Map<Integer, Integer> limits;
 
-    public GeneralSetLimitsFactory() {
+    @SuppressWarnings("unused") public GeneralSetLimitsFactory() {
         this(ImmutableSortedMap.of(0, 100));
     }
 
@@ -23,8 +23,6 @@ public class GeneralSetLimitsFactory implements AlgorithmFactory<GeneralSetLimit
     @SuppressWarnings("unused") public void setLimits(Map<Integer, Integer> limits) { this.limits = limits; }
 
     @Override public GeneralSetLimits apply(FishState fishState) {
-        final GeneralSetLimits generalSetLimits = new GeneralSetLimits(ImmutableSortedMap.copyOf(limits));
-        fishState.registerStartable(generalSetLimits);
-        return generalSetLimits;
+        return new GeneralSetLimits(fishState, ImmutableSortedMap.copyOf(limits));
     }
 }
