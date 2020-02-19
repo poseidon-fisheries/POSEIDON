@@ -128,20 +128,24 @@ public class FadManager {
         deployedFads.remove(fad);
     }
 
-    /**
-     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
-     */
-    public Fad deployFad(SeaTile seaTile, int timeStep) {
-        return deployFad(new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5), timeStep);
+    public Fad deployFad(Double2D location, int timeStep) {
+        final Fad newFad = initFad();
+        fadMap.deployFad(newFad, timeStep, location);
+        return newFad;
     }
 
-    private Fad deployFad(Double2D location, int timeStep) {
+    public Fad deployFad(SeaTile seaTile, int timeStep) {
+        final Fad newFad = initFad();
+        fadMap.deployFad(newFad, timeStep, seaTile);
+        return newFad;
+    }
+
+    private Fad initFad() {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
         final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability)
             ? dudInitializer.apply(this)
             : fadInitializer.apply(this);
-        fadMap.deployFad(newFad, timeStep, location);
         deployedFads.add(newFad);
         return newFad;
     }

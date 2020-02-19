@@ -76,12 +76,13 @@ public class FadMapTest {
 
         final Schedule schedule = mock(Schedule.class);
         final FishState fishState = mock(FishState.class);
-        fishState.random = new MersenneTwisterFast();
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        when(fishState.getRandom()).thenReturn(rng);
         fishState.schedule = schedule;
 
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0, ImmutableSetMultimap.of());
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
-        when(fisher.grabRandomizer()).thenReturn(fishState.random);
+        when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);
 
         // Put a FAD at the East edge of the central row

@@ -35,8 +35,8 @@ public class Slice1Sweeps {
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets"));
 
     private static final Path outputPath = basePath.resolve(Paths.get("runs", "slice1_2020-02-18_policy_shock"));
-    private static final int numberOfRunsPerPolicy = 15;
-    private static final int yearsToRun = 15;
+    private static final int numberOfRunsPerPolicy = 2;
+    private static final int yearsToRun = 5;
 
     public static void main(String[] args) throws IOException {
         final ArrayList<String> columnsToPrint = newArrayList(
