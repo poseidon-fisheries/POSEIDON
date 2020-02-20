@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimits;
-import uk.ac.ox.oxfish.model.regs.fads.GeneralSetLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -132,7 +132,7 @@ public class Slice1Sweeps {
             Stream.of(25, 50, 75).map(Optional::of),
             Stream.of(Optional.<Integer>empty())
         ).collect(toImmutableMap(
-            opt -> opt.map(limit -> new GeneralSetLimitsFactory(ImmutableSortedMap.of(0, limit))),
+            opt -> opt.map(limit -> new SetLimitsFactory(ImmutableSortedMap.of(0, limit))),
             opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
         ));
 

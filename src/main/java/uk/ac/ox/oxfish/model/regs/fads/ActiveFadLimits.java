@@ -18,12 +18,7 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
 
     public boolean isAllowed(FadAction action) {
         assert applicableActions.contains(action.getClass());
-        return action.getFisher().getHold()
-            .getVolume()
-            .map(holdVolume -> action.getFadManager().getNumDeployedFads() < limits.getLimit(holdVolume))
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Hold volume needs to be known to get active FAD limit for fisher " + action.getFisher()
-            ));
+        return action.getFadManager().getNumDeployedFads() < limits.getLimit(action.getFisher());
     }
 
 }

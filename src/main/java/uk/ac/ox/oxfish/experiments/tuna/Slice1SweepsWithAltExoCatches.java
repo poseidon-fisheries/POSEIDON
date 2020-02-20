@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.regs.fads.GeneralSetLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -84,7 +84,7 @@ public class Slice1SweepsWithAltExoCatches {
             currentFadLimits, "Current FAD limits"
         );
 
-        final ImmutableMap<Optional<GeneralSetLimitsFactory>, String> setLimits = ImmutableMap.of(
+        final ImmutableMap<Optional<SetLimitsFactory>, String> setLimits = ImmutableMap.of(
             Optional.empty(), "No set limit"
         );
 

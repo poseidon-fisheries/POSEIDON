@@ -6,15 +6,15 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
 
-public class GeneralSetLimitsFactory implements AlgorithmFactory<GeneralSetLimits> {
+public class SetLimitsFactory implements AlgorithmFactory<SetLimits> {
 
     public Map<Integer, Integer> limits;
 
-    @SuppressWarnings("unused") public GeneralSetLimitsFactory() {
+    @SuppressWarnings("unused") public SetLimitsFactory() {
         this(ImmutableSortedMap.of(0, 100));
     }
 
-    public GeneralSetLimitsFactory(Map<Integer, Integer> limits) {
+    public SetLimitsFactory(Map<Integer, Integer> limits) {
         this.limits = limits;
     }
 
@@ -22,7 +22,7 @@ public class GeneralSetLimitsFactory implements AlgorithmFactory<GeneralSetLimit
 
     @SuppressWarnings("unused") public void setLimits(Map<Integer, Integer> limits) { this.limits = limits; }
 
-    @Override public GeneralSetLimits apply(FishState fishState) {
-        return new GeneralSetLimits(fishState, ImmutableSortedMap.copyOf(limits));
+    @Override public SetLimits apply(FishState fishState) {
+        return new SetLimits(fishState, ImmutableSortedMap.copyOf(limits));
     }
 }
