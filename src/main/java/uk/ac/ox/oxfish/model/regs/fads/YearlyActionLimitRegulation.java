@@ -42,6 +42,8 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
 
     public int getLimit(Fisher fisher) { return limits.getLimit(fisher); }
 
+    public int getNumRemainingActions(Fisher fisher) { return getLimit(fisher) - counter; }
+
     @Override public void reactToAction(FadAction action) {
         assert getApplicableActions().contains(action.getClass());
         counter++;

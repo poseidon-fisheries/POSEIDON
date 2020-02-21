@@ -1,3 +1,22 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
 import com.google.common.collect.ImmutableMap;
@@ -80,7 +99,7 @@ public class FadManager {
         this.fadMap = fadMap;
     }
 
-    private static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
+    public static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
         Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         return actionSpecificRegulations
@@ -128,12 +147,6 @@ public class FadManager {
         deployedFads.remove(fad);
     }
 
-    public Fad deployFad(Double2D location, int timeStep) {
-        final Fad newFad = initFad();
-        fadMap.deployFad(newFad, timeStep, location);
-        return newFad;
-    }
-
     public Fad deployFad(SeaTile seaTile, int timeStep) {
         final Fad newFad = initFad();
         fadMap.deployFad(newFad, timeStep, seaTile);
@@ -158,6 +171,11 @@ public class FadManager {
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
         ), timeStep);
+    }
+
+    public void deployFad(Double2D location, int timeStep) {
+        final Fad newFad = initFad();
+        fadMap.deployFad(newFad, timeStep, location);
     }
 
     public void pickUpFad(Fad fad) {

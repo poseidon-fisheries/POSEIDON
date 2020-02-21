@@ -60,7 +60,7 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
@@ -261,12 +261,8 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
-        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory()
-        );
-        ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
-            // source: https://github.com/poseidon-fisheries/tuna/commit/d1d0fce68ec9dc49aa353ec63a5d9a1fd7eee481
-            new FixedDoubleParameter(340.3333)
-        );
+        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
+        fisherDefinition.setDepartingStrategy(new PurseSeineDepartingStrategyFactory());
     }
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
