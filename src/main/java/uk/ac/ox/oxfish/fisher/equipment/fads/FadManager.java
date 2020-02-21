@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -37,6 +38,7 @@ import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.YearlyActionLimitRegulation;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -47,6 +49,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
@@ -99,31 +102,12 @@ public class FadManager {
         this.fadMap = fadMap;
     }
 
-    public static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
+    private static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
         Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         return actionSpecificRegulations
             .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
             .inverse();
-    }
-
-    @SuppressWarnings("unused")
-    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
-        return actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
-        this.actionSpecificRegulations = actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
-        setActionSpecificRegulations(makeRegulationMultimap(actionSpecificRegulations));
-    }
-
-    public Fisher getFisher() { return fisher; }
-
-    public void setFisher(Fisher fisher) {
-        this.fisher = fisher;
     }
 
     ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
@@ -173,7 +157,7 @@ public class FadManager {
         ), timeStep);
     }
 
-    public void deployFad(Double2D location, int timeStep) {
+    private void deployFad(Double2D location, int timeStep) {
         final Fad newFad = initFad();
         fadMap.deployFad(newFad, timeStep, location);
     }
@@ -227,4 +211,38 @@ public class FadManager {
         regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
     }
 
+    public boolean anyYearlyLimitedActionRemaining() {
+        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations = getYearlyActionLimitRegulations();
+        return yearlyActionLimitRegulations.isEmpty() ||
+            yearlyActionLimitRegulations.stream().anyMatch(reg ->
+                reg.getNumRemainingActions(getFisher()) > 0
+            );
+    }
+
+    public ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
+        return getActionSpecificRegulations()
+            .values()
+            .stream()
+            .filter(reg -> reg instanceof YearlyActionLimitRegulation)
+            .map(reg -> (YearlyActionLimitRegulation) reg)
+            .collect(toImmutableList());
+    }
+
+    public Fisher getFisher() { return fisher; }
+
+    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
+        return actionSpecificRegulations;
+    }
+
+    public void setActionSpecificRegulations(ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
+    }
+
+    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+        setActionSpecificRegulations(makeRegulationMultimap(actionSpecificRegulations));
+    }
+
+    public void setFisher(Fisher fisher) {
+        this.fisher = fisher;
+    }
 }

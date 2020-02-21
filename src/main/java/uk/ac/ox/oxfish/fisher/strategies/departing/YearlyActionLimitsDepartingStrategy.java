@@ -19,14 +19,11 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.fads.YearlyActionLimitRegulation;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
 public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
@@ -38,17 +35,7 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
         return shouldFisherLeavePort(getFadManager(fisher));
     }
 
-    public boolean shouldFisherLeavePort(FadManager fadManager) {
-        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations = fadManager
-            .getActionSpecificRegulations()
-            .values()
-            .stream()
-            .filter(reg -> reg instanceof YearlyActionLimitRegulation)
-            .map(reg -> (YearlyActionLimitRegulation) reg)
-            .collect(toImmutableList());
-        return yearlyActionLimitRegulations.isEmpty() ||
-            yearlyActionLimitRegulations.stream().anyMatch(reg ->
-                reg.getNumRemainingActions(fadManager.getFisher()) > 0
-            );
+    boolean shouldFisherLeavePort(FadManager fadManager) {
+        return fadManager.anyYearlyLimitedActionRemaining();
     }
 }

@@ -19,16 +19,14 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
 
     private static final double MAX_HOURS_AT_SEA = 3059.75; // longest trip from data
-
-    double travelSpeedMultiplier;
-
     protected NauticalMap map;
-
+    double travelSpeedMultiplier;
     @NotNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Deque<SeaTile>> currentRoute = Optional.empty();
@@ -41,18 +39,12 @@ abstract class IntermediateDestinationsStrategy {
     void resetRoute() { currentRoute = Optional.empty(); }
 
     Optional<SeaTile> nextDestination(Fisher fisher, FishState model) {
-        if (holdFull(fisher) & !goingToPort()) goToPort(fisher);
-        if (!currentRoute.isPresent()) { chooseNewRoute(fisher, model); }
+        if (!goingToPort() && shouldGoToPort(fisher)) goToPort(fisher);
+        if (!currentRoute.isPresent()) chooseNewRoute(fisher, model);
         currentRoute
             .filter(route -> fisher.isAtDestination() && (fisher.isAtPort() || !fisher.canAndWantToFishHere()))
             .ifPresent(Deque::poll);
         return currentRoute.flatMap(route -> Optional.ofNullable(route.peekFirst()));
-    }
-
-    private boolean holdFull(Fisher fisher) {
-        // TODO: this should be a parameter somewhere
-        double holdFillProportionConsideredFull = 0.99;
-        return fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
     }
 
     /**
@@ -65,6 +57,10 @@ abstract class IntermediateDestinationsStrategy {
             .map(Deque::peekLast)
             .filter(SeaTile::isPortHere)
             .isPresent();
+    }
+
+    private boolean shouldGoToPort(Fisher fisher) {
+        return holdFull(fisher) || !getFadManager(fisher).anyYearlyLimitedActionRemaining();
     }
 
     private void goToPort(Fisher fisher) {
@@ -82,6 +78,12 @@ abstract class IntermediateDestinationsStrategy {
             else
                 currentRoute = Optional.of(weightedOneOf(candidateRoutes, Pair::getSecond, model.getRandom())).map(Pair::getFirst);
         }
+    }
+
+    private boolean holdFull(Fisher fisher) {
+        // TODO: this should be a parameter somewhere
+        double holdFillProportionConsideredFull = 0.99;
+        return fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
     }
 
     protected Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile destination) {
