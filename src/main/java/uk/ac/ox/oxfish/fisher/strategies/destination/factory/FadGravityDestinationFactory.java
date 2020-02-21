@@ -20,8 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDeploymentDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDeploymentRouteSelector;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -29,17 +29,15 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FadGravityDestinationFactory implements AlgorithmFactory<FadGravityDestinationStrategy> {
 
-
     private DoubleParameter gravitationalConstraint = new FixedDoubleParameter(1d);
 
     @Override
     public FadGravityDestinationStrategy apply(FishState state) {
         return new FadGravityDestinationStrategy(
-                gravitationalConstraint.apply(state.getRandom()), new FadDeploymentDestinationStrategy(state.getMap(),
-                                                                              1)
+            gravitationalConstraint.apply(state.getRandom()),
+            new FadDeploymentRouteSelector(state, FadDestinationStrategyFactory.MAX_HOURS_AT_SEA, 1)
         );
     }
-
 
     /**
      * Getter for property 'gravitationalConstraint'.

@@ -34,8 +34,8 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -103,10 +103,10 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
         final Map<SeaTile, Double> deploymentLocationValues =
             fisher.getDestinationStrategy() instanceof FadDestinationStrategy ?
                 ((FadDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .getDeploymentLocationValues() :
                 ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .getDeploymentLocationValues();
 
         return Optional

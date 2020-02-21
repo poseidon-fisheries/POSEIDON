@@ -61,8 +61,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
@@ -553,7 +553,7 @@ public class TunaScenario implements Scenario {
                 final Map<SeaTile, Double> deploymentValues =
                     deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .setDeploymentLocationValues(deploymentValues);
             }
         });
@@ -563,7 +563,7 @@ public class TunaScenario implements Scenario {
                 final Map<SeaTile, Double> deploymentValues =
                     deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .setDeploymentLocationValues(deploymentValues);
             }
         });

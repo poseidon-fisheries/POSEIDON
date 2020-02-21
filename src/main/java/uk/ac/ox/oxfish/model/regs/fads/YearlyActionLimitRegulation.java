@@ -54,6 +54,6 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
     }
 
     @Override public void start(FishState model) {
-        model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
+        model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 }

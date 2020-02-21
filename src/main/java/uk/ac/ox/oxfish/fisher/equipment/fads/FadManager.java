@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -38,7 +37,7 @@ import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.YearlyActionLimitRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -49,9 +48,6 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
-import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 public class FadManager {
@@ -60,7 +56,7 @@ public class FadManager {
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer dudInitializer;
     final private double dudProbability;
-    private ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
+    private ActiveActionRegulations actionSpecificRegulations;
     private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
@@ -72,7 +68,7 @@ public class FadManager {
         double dudProbability,
         Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
-        this(fadMap, fadInitializer, numFadsInStock, dudProbability, makeRegulationMultimap(actionSpecificRegulations));
+        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
     }
 
     public FadManager(
@@ -80,7 +76,7 @@ public class FadManager {
         FadInitializer fadInitializer,
         int numFadsInStock,
         double dudProbability,
-        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
+        ActiveActionRegulations actionSpecificRegulations
     ) {
         this.fadInitializer = fadInitializer;
         this.actionSpecificRegulations = actionSpecificRegulations;
@@ -102,12 +98,14 @@ public class FadManager {
         this.fadMap = fadMap;
     }
 
-    private static ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> makeRegulationMultimap(
-        Stream<ActionSpecificRegulation> actionSpecificRegulations
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock,
+        double dudProbability,
+        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
-        return actionSpecificRegulations
-            .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
-            .inverse();
+        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
     }
 
     ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
@@ -199,50 +197,21 @@ public class FadManager {
         return builder.build();
     }
 
-    public boolean isAllowed(FadAction fadAction) {
-        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
-    }
-
-    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
-        return actionSpecificRegulations.get(fadAction.getClass()).stream();
-    }
-
-    public void reactToAction(FadAction fadAction) {
-        regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
-    }
-
-    public boolean anyYearlyLimitedActionRemaining() {
-        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations = getYearlyActionLimitRegulations();
-        return yearlyActionLimitRegulations.isEmpty() ||
-            yearlyActionLimitRegulations.stream().anyMatch(reg ->
-                reg.getNumRemainingActions(getFisher()) > 0
-            );
-    }
-
-    public ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
-        return getActionSpecificRegulations()
-            .values()
-            .stream()
-            .filter(reg -> reg instanceof YearlyActionLimitRegulation)
-            .map(reg -> (YearlyActionLimitRegulation) reg)
-            .collect(toImmutableList());
-    }
-
     public Fisher getFisher() { return fisher; }
-
-    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
-        return actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
-        this.actionSpecificRegulations = actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
-        setActionSpecificRegulations(makeRegulationMultimap(actionSpecificRegulations));
-    }
 
     public void setFisher(Fisher fisher) {
         this.fisher = fisher;
+    }
+
+    public ActiveActionRegulations getActionSpecificRegulations() {
+        return actionSpecificRegulations;
+    }
+
+    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+        setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
+    }
+
+    public void setActionSpecificRegulations(ActiveActionRegulations actionSpecificRegulations) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
     }
 }

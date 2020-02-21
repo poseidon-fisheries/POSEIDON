@@ -17,25 +17,26 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.strategies.departing;
+package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import java.util.Deque;
+import java.util.Optional;
 
-public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
+public class RouteToPortSelector implements RouteSelector {
 
-    /**
-     * Only leave port if fisher has remaining yearly-limited actions
-     */
-    @Override public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        return shouldFisherLeavePort(getFadManager(fisher).getActionSpecificRegulations(), fisher);
-    }
+    private final NauticalMap map;
 
-    boolean shouldFisherLeavePort(ActiveActionRegulations activeActionRegulations, Fisher fisher) {
-        return activeActionRegulations.anyYearlyLimitedActionRemaining(fisher);
+    public RouteToPortSelector(NauticalMap map) { this.map = map; }
+
+    @Override public Optional<Deque<SeaTile>> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng) {
+        return Optional.ofNullable(map.getPathfinder().getRoute(map,
+            fisher.getLocation(),
+            fisher.getHomePort().getLocation()
+        ));
     }
 }

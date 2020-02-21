@@ -32,8 +32,6 @@ public abstract class SetAction extends FadAction {
         this.duration = ((PurseSeineGear) fisher.getGear()).nextSetDuration(model.getRandom());
     }
 
-    abstract boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng);
-
     @Override public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
@@ -51,7 +49,7 @@ public abstract class SetAction extends FadAction {
                 model.getBiology().getSpecies().forEach(species ->
                     fisher.getYearlyCounter().count(catchesCounterName(species), catchesKept.getWeightCaught(species))
                 );
-                getFadManager().reactToAction(this);
+                getFadManager().getActionSpecificRegulations().reactToAction(this);
                 model.recordFishing(seaTile);
             } else {
                 reactToFailedSet(model, seaTile);
@@ -65,6 +63,8 @@ public abstract class SetAction extends FadAction {
     public boolean isPossible() {
         return getFisher().getHold().getPercentageFilled() < 1 && getSeaTile().isWater();
     }
+
+    abstract boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng);
 
     abstract LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
 

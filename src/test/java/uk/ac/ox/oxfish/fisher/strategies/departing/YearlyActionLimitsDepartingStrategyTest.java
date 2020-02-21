@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
 
 import java.util.Optional;
@@ -66,27 +67,28 @@ public class YearlyActionLimitsDepartingStrategyTest {
 
         FadManager fadManager = new FadManager(null, fadInitializer, 0, 0, Stream.of(setLimits));
         fadManager.setFisher(fisher);
+        final ActiveActionRegulations actionSpecificRegulations = fadManager.getActionSpecificRegulations();
 
         final YearlyActionLimitsDepartingStrategy strategy = new YearlyActionLimitsDepartingStrategy();
 
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
-        assertTrue(strategy.shouldFisherLeavePort(fadManager));
+        assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        fadManager.reactToAction(new DeployFad(fishState, fisher));
+        actionSpecificRegulations.reactToAction(new DeployFad(fishState, fisher));
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
-        assertTrue(strategy.shouldFisherLeavePort(fadManager));
+        assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        fadManager.reactToAction(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.reactToAction(new MakeFadSet(fishState, fisher, null));
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
-        assertTrue(strategy.shouldFisherLeavePort(fadManager));
+        assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        fadManager.reactToAction(new MakeUnassociatedSet(fishState, fisher));
+        actionSpecificRegulations.reactToAction(new MakeUnassociatedSet(fishState, fisher));
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
-        assertTrue(strategy.shouldFisherLeavePort(fadManager));
+        assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        fadManager.reactToAction(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.reactToAction(new MakeFadSet(fishState, fisher, null));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
-        assertFalse(strategy.shouldFisherLeavePort(fadManager));
+        assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
     }
 }

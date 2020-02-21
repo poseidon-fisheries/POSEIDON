@@ -65,7 +65,7 @@ public abstract class FadAction implements Action, FadManagerUtils {
 
     public boolean isAllowed() {
         return fisher.isCheater() || (
-            getFadManager().isAllowed(this) &&
+            getFadManager().getActionSpecificRegulations().isAllowed(this) &&
                 fisher.getRegulation().canFishHere(fisher, seaTile, model, step)
         );
     }

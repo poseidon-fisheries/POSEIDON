@@ -17,25 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.strategies.departing;
+package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import java.util.Deque;
+import java.util.Optional;
 
-public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
-
-    /**
-     * Only leave port if fisher has remaining yearly-limited actions
-     */
-    @Override public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        return shouldFisherLeavePort(getFadManager(fisher).getActionSpecificRegulations(), fisher);
-    }
-
-    boolean shouldFisherLeavePort(ActiveActionRegulations activeActionRegulations, Fisher fisher) {
-        return activeActionRegulations.anyYearlyLimitedActionRemaining(fisher);
-    }
+@FunctionalInterface
+public interface RouteSelector {
+    Optional<Deque<SeaTile>> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng);
 }
