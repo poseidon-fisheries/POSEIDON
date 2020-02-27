@@ -94,8 +94,7 @@ public class FadMap implements Startable, Steppable {
             .map(biology -> (VariableBiomassBasedBiology) biology);
     }
 
-    @NotNull
-    private Optional<Double2D> getFadLocation(Fad fad) {
+    @NotNull public Optional<Double2D> getFadLocation(Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
