@@ -28,8 +28,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Locker;
-import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +38,7 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FadDeploymentRouteSelector extends AbstractRouteSelector {
@@ -52,28 +53,22 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         double maxTravelTimeInHours,
         double travelSpeedMultiplier
     ) {
-        this(
-            fishState,
-            maxTravelTimeInHours,
-            travelSpeedMultiplier,
-            new HashMap<>(),
-            possibleRouteTilesLocker.presentKey(fishState.getMap(), () -> Stream.concat(
-                fishState.getMap().getPorts().stream().map(Port::getLocation),
-                fishState.getMap().getAllSeaTilesExcludingLandAsList().stream()
-            ).collect(toImmutableList()))
-        );
+        this(fishState, maxTravelTimeInHours, travelSpeedMultiplier, new HashMap<>());
     }
 
     public FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
         double travelSpeedMultiplier,
-        Map<SeaTile, Double> deploymentLocationValues,
-        ImmutableList<SeaTile> possibleRouteTiles
+        Map<SeaTile, Double> deploymentLocationValues
     ) {
         super(fishState, maxTravelTimeInHours, travelSpeedMultiplier);
         this.deploymentLocationValues = deploymentLocationValues;
-        this.possibleRouteTiles = possibleRouteTiles;
+        this.possibleRouteTiles =
+            possibleRouteTilesLocker.presentKey(fishState.getMap(), () -> Stream.concat(
+                fishState.getMap().getPorts().stream().map(Port::getLocation),
+                fishState.getMap().getAllSeaTilesExcludingLandAsList().stream()
+            ).collect(toImmutableList()));
     }
 
     @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
@@ -86,7 +81,9 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         this.deploymentLocationValues = deploymentLocationValues;
     }
 
-    @Override public Stream<Pair<Deque<SeaTile>, Double>> evaluateRoutes(Fisher fisher, ImmutableList<Route> routes, int timeStep) {
+    @Override public Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
+        Fisher fisher, ImmutableList<Route> routes, int timeStep
+    ) {
 
         final Table<SeaTile, Integer, Double> seaTileValuesByStep = ArrayTable.create(
             possibleRouteTiles, getTimeStepRange(timeStep, routes)
@@ -103,7 +100,7 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
                 return value;
             };
 
-        return routes.stream().map(route -> new Pair<>(
+        return routes.stream().map(route -> makeEntry(
             route.getRouteDeque(),
             route
                 .getSteps()

@@ -29,6 +29,7 @@ import java.util.function.BiFunction;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.getLast;
+import static java.util.stream.Collectors.joining;
 
 public class Route {
 
@@ -78,4 +79,7 @@ public class Route {
 
     public double getTotalTravelTimeInHours() { return totalTravelTimeInHours; }
 
+    @Override public String toString() {
+        return steps.stream().map(RouteStep::toString).collect(joining(" -> "));
+    }
 }

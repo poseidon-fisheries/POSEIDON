@@ -38,4 +38,14 @@ public class RouteStep {
     public double getCumulativeHours() { return cumulativeHours; }
 
     public int getTimeStep() { return timeStep; }
+
+    @Override public String toString() {
+        return String.format(
+            "[%d: %d, %d (%.2fh)]",
+            timeStep,
+            seaTile.getGridX(),
+            seaTile.getGridY(),
+            cumulativeHours
+        );
+    }
 }

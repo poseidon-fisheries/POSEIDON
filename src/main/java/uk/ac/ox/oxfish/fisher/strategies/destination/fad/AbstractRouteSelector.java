@@ -27,7 +27,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Deque;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -41,9 +43,9 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 public abstract class AbstractRouteSelector implements RouteSelector {
 
     final FishState fishState;
-    final double maxTravelTimeInHours;
     private final double hoursPerStep;
     private final double travelSpeedMultiplier;
+    double maxTravelTimeInHours;
 
     protected AbstractRouteSelector(
         FishState fishState,
@@ -55,6 +57,15 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         this.hoursPerStep = fishState.getHoursPerStep();
         this.travelSpeedMultiplier = travelSpeedMultiplier;
     }
+
+    static ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<Route> possibleRoutes) {
+        final int maxTimeStep = possibleRoutes.stream().mapToInt(Route::getLastTimeStep).max().orElse(0);
+        return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
+    }
+
+    public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
+
+    public void setMaxTravelTimeInHours(double maxTravelTimeInHours) { this.maxTravelTimeInHours = maxTravelTimeInHours; }
 
     boolean canFishAtStep(Fisher fisher, SeaTile seaTile, int timeStep) {
         return fisher.getRegulation().canFishHere(fisher, seaTile, fishState, timeStep);
@@ -68,14 +79,14 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         if (possibleRoutes.isEmpty())
             return Optional.empty();
         else {
-            final ImmutableList<Pair<Deque<SeaTile>, Double>> candidateRoutes =
+            final ImmutableList<Map.Entry<Deque<SeaTile>, Double>> candidateRoutes =
                 evaluateRoutes(fisher, possibleRoutes, timeStep)
-                    .filter(pair -> pair.getSecond() > 0)
+                    .filter(entry -> entry.getValue() > 0)
                     .collect(toImmutableList());
             if (candidateRoutes.isEmpty())
                 return Optional.empty();
             else
-                return Optional.of(weightedOneOf(candidateRoutes, Pair::getSecond, rng)).map(Pair::getFirst);
+                return Optional.of(weightedOneOf(candidateRoutes, Map.Entry::getValue, rng)).map(Map.Entry::getKey);
         }
     }
 
@@ -101,13 +112,15 @@ public abstract class AbstractRouteSelector implements RouteSelector {
                 fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier,
                 this::cumulativeTravelTimeAlongRouteInHours
             ))
-            .filter(route -> route.getTotalTravelTimeInHours() < maxTravelTimeInHours)
+            .filter(route -> route.getTotalTravelTimeInHours() <= maxTravelTimeInHours)
             .collect(toImmutableList());
     }
 
     abstract Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep);
 
-    abstract Stream<Pair<Deque<SeaTile>, Double>> evaluateRoutes(Fisher fisher, ImmutableList<Route> routes, int timeStep);
+    abstract Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
+        Fisher fisher, ImmutableList<Route> routes, int timeStep
+    );
 
     Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {
         NauticalMap map = fishState.getMap();
@@ -117,11 +130,6 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, Double speedInKph) {
         NauticalMap map = fishState.getMap();
         return map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
-    }
-
-    ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<Route> possibleRoutes) {
-        final int maxTimeStep = possibleRoutes.stream().mapToInt(Route::getLastTimeStep).max().orElse(0);
-        return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
     }
 
 }

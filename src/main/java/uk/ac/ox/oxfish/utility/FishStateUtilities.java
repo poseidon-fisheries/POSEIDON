@@ -1296,5 +1296,12 @@ public class FishStateUtilities {
         return (u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
     }
 
+    /**
+     * Just makes it nicer to create AbstractMap.SimpleImmutableEntry objects.
+     */
+    public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> makeEntry(K k, V v) {
+        return new AbstractMap.SimpleImmutableEntry<K, V>(k, v);
+    }
+
 }
 

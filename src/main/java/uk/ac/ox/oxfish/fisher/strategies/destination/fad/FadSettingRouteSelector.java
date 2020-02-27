@@ -29,8 +29,8 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
-import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Deque;
 import java.util.Optional;
 import java.util.Set;
@@ -40,6 +40,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
 
 public class FadSettingRouteSelector extends AbstractRouteSelector {
 
@@ -67,7 +68,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
             );
     }
 
-    @Override public Stream<Pair<Deque<SeaTile>, Double>> evaluateRoutes(
+    @Override public Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
         Fisher fisher,
         ImmutableList<Route> routes,
         int timeStep
@@ -84,7 +85,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
             .min()
             .orElse(Long.MAX_VALUE);
 
-        return routes.stream().map(route -> new Pair<>(
+        return routes.stream().map(route -> makeEntry(
             route.getRouteDeque(),
             route.getSteps().stream()
                 .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))

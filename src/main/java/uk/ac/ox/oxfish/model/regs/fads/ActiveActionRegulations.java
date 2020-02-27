@@ -33,18 +33,20 @@ import static java.util.function.Function.identity;
 public class ActiveActionRegulations {
     private ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
 
+    public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
+
+    public ActiveActionRegulations(
+        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this.actionSpecificRegulations = actionSpecificRegulations;
+    }
+
     public ActiveActionRegulations(
         Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this(actionSpecificRegulations
             .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
             .inverse());
-    }
-
-    public ActiveActionRegulations(
-        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
-    ) {
-        this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
     public boolean isAllowed(FadAction fadAction) {

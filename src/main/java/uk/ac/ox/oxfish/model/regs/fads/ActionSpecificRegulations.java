@@ -18,6 +18,6 @@ public class ActionSpecificRegulations {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private ActionSpecificRegulations() {}
+    public ActionSpecificRegulations() {}
 
 }
