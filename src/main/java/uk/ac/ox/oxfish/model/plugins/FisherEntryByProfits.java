@@ -41,14 +41,18 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
     private final int maxEntrantsPerYear;
 
+
+    private final double minProfitsToCoverFixedCosts;
+
     public FisherEntryByProfits(
             String profitDataColumnName, String costsFinalColumnName, String populationName,
-            double rateToEntryMultiplier, int maxEntrantsPerYear) {
+            double rateToEntryMultiplier, int maxEntrantsPerYear, double minProfitsToCoverFixedCosts) {
         this.profitDataColumnName = profitDataColumnName;
         this.costsFinalColumnName = costsFinalColumnName;
         this.populationName = populationName;
         this.rateToEntryMultiplier = rateToEntryMultiplier;
         this.maxEntrantsPerYear = maxEntrantsPerYear;
+        this.minProfitsToCoverFixedCosts = minProfitsToCoverFixedCosts;
     }
 
     private Stoppable stoppable;
@@ -97,7 +101,7 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
     public void step(SimState simState) {
         FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
-                model.getLatestYearlyObservation(profitDataColumnName),
+                model.getLatestYearlyObservation(profitDataColumnName)-minProfitsToCoverFixedCosts,
                 model.getLatestYearlyObservation(costsFinalColumnName)
         );
         if(newEntrants>0) {

@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 public class Slice6SelectivityMarket {
 
-    private static final String SCENARIO_NAME = "tropfish_tl_2y_onemoretime_8h";
+    private static final String SCENARIO_NAME = "cmsy_tropfishR_8h";
   //  private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
     private static final int YEARS_TO_RUN = 12;
     private static final int RUNS_PER_POLICY = 1;
@@ -47,11 +47,11 @@ public class Slice6SelectivityMarket {
     public static void main(String[] args) throws IOException {
 
 
-//        selectivitySubsidy("selectivity_flat", SCENARIO_NAME,
-//                           MAX_SELECTIVITY_SHIFT,
-//                           500*MILLION,
-//                           "Lutjanus malabaricus", new int[]{0, 3});
-//
+        selectivitySubsidy("selectivity_flat", SCENARIO_NAME,
+                           MAX_SELECTIVITY_SHIFT,
+                           500*MILLION,
+                           "Lutjanus malabaricus", new int[]{0, 3});
+
 
         //THIS APPLIES EFFORT TO POP 1-2-3 (not 0)
         //APPLIES SUBSIDY TO POP0 only (not 3)
@@ -65,11 +65,11 @@ public class Slice6SelectivityMarket {
 
 
 
-//        selectivityIncentive("selectivity_incentive2", SCENARIO_NAME,
-//                MAX_SELECTIVITY_SHIFT,
-//                3,
-//                "Lutjanus malabaricus",
-//                10);
+       selectivityIncentive("selectivity_incentive2", SCENARIO_NAME,
+                MAX_SELECTIVITY_SHIFT,
+                3,
+                "Lutjanus malabaricus",
+                10);
 
 
         selectivitySubsidyPlusPenalty("selectivity_subsidyandpenalty",
@@ -578,7 +578,7 @@ public class Slice6SelectivityMarket {
         final boolean[] allSubsidized = {false, true};
 
         for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
-            for (double subsidy = 0; subsidy < maxSubsidy; subsidy += 25 * MILLION) {
+            for (double subsidy = 0; subsidy < maxSubsidy; subsidy += 100 * MILLION) {
                 for (double penalty = 0; penalty<=1; penalty = FishStateUtilities.round(penalty+.25)) {
 
 

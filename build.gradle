@@ -251,6 +251,17 @@ task fatJarNoDataSlice2(type: com.github.jengelman.gradle.plugins.shadow.tasks.S
     }
 }
 
+
+task fatJar718NoDataSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'oxfish_nodata718slice1.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice1'
+    }
+}
+
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath

@@ -38,6 +38,8 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
 
     private DoubleParameter maxEntrantsPerYear = new FixedDoubleParameter(50);
 
+    private DoubleParameter fixedCostsToCover = new FixedDoubleParameter(0);
+
     /**
      * Applies this function to the given argument.
      *
@@ -51,8 +53,8 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
                 costsFinalColumnName,
                 populationName,
                 profitRatioToEntrantsMultiplier.apply(state.getRandom()),
-                maxEntrantsPerYear.apply(state.getRandom()).intValue()
-        );
+                maxEntrantsPerYear.apply(state.getRandom()).intValue(),
+                fixedCostsToCover.apply(state.getRandom()));
     }
 
     public String getProfitDataColumnName() {
@@ -95,5 +97,23 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
 
     public void setMaxEntrantsPerYear(DoubleParameter maxEntrantsPerYear) {
         this.maxEntrantsPerYear = maxEntrantsPerYear;
+    }
+
+    /**
+     * Getter for property 'fixedCostsToCover'.
+     *
+     * @return Value for property 'fixedCostsToCover'.
+     */
+    public DoubleParameter getFixedCostsToCover() {
+        return fixedCostsToCover;
+    }
+
+    /**
+     * Setter for property 'fixedCostsToCover'.
+     *
+     * @param fixedCostsToCover Value to set for property 'fixedCostsToCover'.
+     */
+    public void setFixedCostsToCover(DoubleParameter fixedCostsToCover) {
+        this.fixedCostsToCover = fixedCostsToCover;
     }
 }

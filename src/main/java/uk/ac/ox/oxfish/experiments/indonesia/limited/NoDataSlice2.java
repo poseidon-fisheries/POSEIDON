@@ -63,6 +63,10 @@ public class NoDataSlice2 {
     private static String[] validSpecies = new String[]{"Lutjanus malabaricus", "Pristipomoides multidens"};
     private static int NUMBER_OF_POPULATIONS = 2;
 
+    private static final double MINIMUM_CATCHABILITY = .000001;
+
+    private static final double MAXIMUM_CATCHABILITY = 0.0001;
+
     static {
 
 
@@ -73,8 +77,9 @@ public class NoDataSlice2 {
 
                 parameters.add(
                         new SimpleOptimizationParameter(
-                                "fisherDefinitions$" + pop + ".gear.delegate.delegate.gears~" + species + ".averageCatchability",
-                                .000001, 0.0001)
+                                "fisherDefinitions$" + pop + ".gear.delegate.delegate.gears~" + species +
+                                        ".averageCatchability",
+                                MINIMUM_CATCHABILITY, MAXIMUM_CATCHABILITY)
                 );
 
 

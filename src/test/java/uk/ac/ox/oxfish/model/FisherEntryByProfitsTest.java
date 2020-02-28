@@ -32,7 +32,8 @@ public class FisherEntryByProfitsTest {
     @Test
     public void directTest() {
 
-        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100,100 );
+        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c",
+                                                                100, 100, 0);
 
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
@@ -57,9 +58,29 @@ public class FisherEntryByProfitsTest {
 
     }
 
+
+    @Test
+    public void minProfits() {
+
+        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c",
+                                                                100, 100,
+                                                                1000);
+
+        //10% returns
+        int fishers = profits.newEntrants(100, 1000);
+        //There should be no new entrants because now you aren't even covering the profits you should cover
+        assertEquals(fishers,0);
+
+
+
+    }
+
+
+
     @Test
     public void testReadingComprehension() {
-        FisherEntryByProfits profits = new FisherEntryByProfits("a","b","c",100,100 );
+        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100, 100,
+                                                                0);
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(model.getLatestYearlyObservation("a")).thenReturn(100d);

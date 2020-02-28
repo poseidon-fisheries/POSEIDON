@@ -45,7 +45,7 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
+    private static final String SCENARIO_NAME = "cmsy_tropfishR_9h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -63,55 +63,55 @@ public class Slice6Sweeps {
 
     public static void main(String[] args) throws IOException {
 
-//
-//        businessAsUsual("bau",
-//                        SCENARIO_NAME
-//        );
 
-//        effort control
-//        all boats are controlled
+        businessAsUsual("bau",
+                        SCENARIO_NAME
+        );
+//
+////        effort control
+////        all boats are controlled
+//
+//
+//
+        effortControl("all",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, MIN_DAYS_OUT);
+
+        effortControlShockYear("all_shock",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, 100);
 
 
+// no fishing
+        stopFishing("nofishing",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR);
 
-//        effortControl("all",
-//                new String[]{"population0","population1","population2","population3"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, MIN_DAYS_OUT);
 //
-//        effortControlShockYear("all_shock",
-//                new String[]{"population0","population1","population2","population3"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, 100);
+//////        //only boats >10GT are controlled
 //
-//
-//// no fishing
-//        stopFishing("nofishing",
-//                new String[]{"population0","population1","population2","population3"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR);
-//
-////
-////////        //only boats >10GT are controlled
-////
-//        effortControl("10",
-//                      new String[]{"population1","population2","population3"},
-//                      SCENARIO_NAME,
-//                      SHOCK_YEAR, MIN_DAYS_OUT);
-//
+        effortControl("10",
+                      new String[]{"population1","population2","population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT);
+
 //
 //////////
 //////////        //price premium
 ////        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
 //
 ////        //selectivity test
         selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
 ////
 ////        //price penalty
-//        pricePenalty("malus_malabaricus",
-//                SCENARIO_NAME,
-//                10,
-//                "Lutjanus malabaricus");
+        pricePenalty("malus_malabaricus",
+                SCENARIO_NAME,
+                10,
+                "Lutjanus malabaricus");
 ////
 ////
 ////
