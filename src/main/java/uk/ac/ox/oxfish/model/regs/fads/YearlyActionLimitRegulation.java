@@ -23,16 +23,22 @@ import sim.engine.SimState;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+
+import java.util.function.Consumer;
 
 public abstract class YearlyActionLimitRegulation implements ActionSpecificRegulation {
 
     private final FisherRelativeLimits limits;
     private int counter = 0;
 
-    protected YearlyActionLimitRegulation(FishState fishState, FisherRelativeLimits limits) {
+    YearlyActionLimitRegulation(
+        Consumer<Startable> startableConsumer,
+        FisherRelativeLimits limits
+    ) {
         this.limits = limits;
-        fishState.registerStartable(this);
+        startableConsumer.accept(this);
     }
 
     @Override public boolean isAllowed(FadAction action) {

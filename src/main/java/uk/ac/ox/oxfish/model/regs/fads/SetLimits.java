@@ -24,7 +24,9 @@ import com.google.common.collect.ImmutableSortedMap;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+
+import java.util.function.Consumer;
 
 public class SetLimits extends YearlyActionLimitRegulation {
 
@@ -32,8 +34,11 @@ public class SetLimits extends YearlyActionLimitRegulation {
         MakeFadSet.class, MakeUnassociatedSet.class
     );
 
-    public SetLimits(FishState fishState, ImmutableSortedMap<Integer, Integer> limits) {
-        super(fishState, new VolumeRelativeLimits(limits));
+    public SetLimits(
+        Consumer<Startable> startableConsumer,
+        ImmutableSortedMap<Integer, Integer> limits
+    ) {
+        super(startableConsumer, new VolumeRelativeLimits(limits));
     }
 
     @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }
