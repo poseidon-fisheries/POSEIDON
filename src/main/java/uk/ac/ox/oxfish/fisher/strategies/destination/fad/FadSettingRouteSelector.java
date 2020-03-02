@@ -77,13 +77,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep =
             getTimeStepRange(timeStep, routes).stream()
                 .collect(toImmutableMap(identity(), fadManager::deployedFadsByTileAtStep));
-
-        final long fadSetsRemaining = fadManager.getActionSpecificRegulations()
-            .regulationStream(MakeFadSet.class)
-            .filter(reg -> reg instanceof SetLimits)
-            .mapToLong(reg -> ((SetLimits) reg).getNumRemainingActions(fisher))
-            .min()
-            .orElse(Long.MAX_VALUE);
+        final long fadSetsRemaining = getFadSetsRemaining(fadManager);
 
         return routes.stream().map(route -> makeEntry(
             route.getRouteDeque(),
@@ -103,6 +97,15 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         ));
     }
 
+    public static long getFadSetsRemaining(FadManager fadManager) {
+        return fadManager.getActionSpecificRegulations()
+            .regulationStream(MakeFadSet.class)
+            .filter(reg -> reg instanceof SetLimits)
+            .mapToLong(reg -> ((SetLimits) reg).getNumRemainingActions(fadManager.getFisher()))
+            .min()
+            .orElse(Long.MAX_VALUE);
+    }
+
     @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
         return getFadManager(fisher).fadLocationsInTimeStepRange(
             timeStep, timeStep + getNumberOfStepsToLookAheadForFadPositions()
@@ -115,5 +118,13 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
 
     public void setNumberOfStepsToLookAheadForFadPositions(int numberOfStepsToLookAheadForFadPositions) {
         this.numberOfStepsToLookAheadForFadPositions = numberOfStepsToLookAheadForFadPositions;
+    }
+
+    @Override boolean shouldGoToPort(Fisher fisher) {
+        double holdFillProportionConsideredFull = 0.99; // TODO: this should be a parameter somewhere
+        boolean holdFull = fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
+        final boolean anyLimitedActionsRemaining =
+            getFadManager(fisher).getActionSpecificRegulations().anyYearlyLimitedActionRemaining(fisher);
+        return holdFull || !anyLimitedActionsRemaining;
     }
 }

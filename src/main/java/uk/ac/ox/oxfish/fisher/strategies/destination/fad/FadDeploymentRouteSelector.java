@@ -38,6 +38,7 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -112,4 +113,5 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         ));
     }
 
+    @Override boolean shouldGoToPort(Fisher fisher) { return false; }
 }

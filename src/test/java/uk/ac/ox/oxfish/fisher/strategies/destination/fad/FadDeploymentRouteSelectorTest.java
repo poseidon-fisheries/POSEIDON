@@ -82,7 +82,6 @@ public class FadDeploymentRouteSelectorTest {
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fisher.getBoat().getSpeedInKph()).thenReturn(1.0);
-        when(fisher.getHold().getPercentageFilled()).thenReturn(0.0);
         when(fisher.getLocation()).thenReturn(port.getLocation());
         when(fisher.getRegulation()).thenReturn(regulation);
 

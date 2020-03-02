@@ -90,13 +90,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         }
     }
 
-    private boolean shouldGoToPort(Fisher fisher) {
-        double holdFillProportionConsideredFull = 0.99; // TODO: this should be a parameter somewhere
-        boolean holdFull = fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
-        final boolean anyLimitedActionsRemaining =
-            getFadManager(fisher).getActionSpecificRegulations().anyYearlyLimitedActionRemaining(fisher);
-        return holdFull || !anyLimitedActionsRemaining;
-    }
+    abstract boolean shouldGoToPort(Fisher fisher);
 
     @SuppressWarnings("UnstableApiUsage")
     ImmutableList<Route> getPossibleRoutes(
