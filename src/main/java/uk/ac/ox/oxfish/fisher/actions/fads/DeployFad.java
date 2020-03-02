@@ -10,7 +10,6 @@ import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.NoFishing;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
@@ -73,10 +72,7 @@ public class DeployFad extends FadAction {
     }
 
     @Override public boolean isPossible() {
-        final FadManager fadManager = getFadManager();
-        return getSeaTile().isWater() &&
-            fadManager.getNumDeployedFads() < IATTC.activeFadsLimit(getFisher()) &&
-            fadManager.getNumFadsInStock() > 0;
+        return getSeaTile().isWater() && getFadManager().getNumFadsInStock() > 0;
     }
 
     @Override public Quantity<Time> getDuration() {

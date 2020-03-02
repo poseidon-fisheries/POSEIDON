@@ -11,33 +11,6 @@ import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 public class IATTC {
 
     /**
-     * Return the number of FADs that can be active at the same time for purse seine vessels
-     * according to IATTC resolution C-17-02.8. This is currently hard coded, but we'll most likely
-     * want to make this changeable.
-     */
-    public static int activeFadsLimit(Fisher fisher) {
-        return fisher.getHold().getVolume()
-            .map(IATTC::activeFadsLimit)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Hold volume needs to be known to get active FAD limit for fisher " + fisher
-            ));
-    }
-
-    public static int activeFadsLimit(Quantity<Volume> holdVolume) {
-        switch (capacityClass(holdVolume)) {
-            case 1:
-            case 2:
-            case 3:
-                return 70;
-            case 4:
-            case 5:
-                return 120;
-            default:
-                return volumeInCubicMetres(holdVolume) < 1200 ? 300 : 450;
-        }
-    }
-
-    /**
      * I couldn't find the canonical source for this, but it's stated in a few places, notably
      * https://www.iattc.org/Meetings/Meetings2009/AIDCP-21/Docs/_English/MOP-21-07_Vessel%20capacity%20class%20definitions%20related%20to%20the%20requirement%20for%20carrying%20an%20on%20board%20observer.pdf
      * It seems that around 2010, IATTC changed from weight based capacity classes to volume based
