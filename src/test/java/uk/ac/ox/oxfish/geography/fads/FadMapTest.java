@@ -13,21 +13,16 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
@@ -39,7 +34,6 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiol
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 
 public class FadMapTest {
 
@@ -59,18 +53,12 @@ public class FadMapTest {
         final Quantity<Mass> k = getQuantity(1, TONNE);
         final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
 
-        // Make a current map that moves FADs west
-        final Double2D currentVector = new Double2D(-0.3, 0);
-        final Map<SeaTile, Double2D> vectors = nauticalMap
-            .getAllSeaTilesExcludingLandAsList().stream()
-            .collect(toMap(identity(), __ -> currentVector));
         for (SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
             tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
         }
 
-        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
-        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, vectors)));
-        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
+        // Make a current map that moves FADs west
+        final CurrentVectors currentVectors = TestUtilities.makeUniformCurrentVectors(nauticalMap, new Double2D(-0.3, 0), 1);
         final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
 
