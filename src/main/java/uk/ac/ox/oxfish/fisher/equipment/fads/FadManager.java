@@ -26,9 +26,6 @@ import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
-import tech.units.indriya.quantity.Quantities;
-import tech.units.indriya.unit.Units;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,9 +36,6 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -80,16 +74,10 @@ public class FadManager {
     ) {
         this.fadInitializer = fadInitializer;
         this.actionSpecificRegulations = actionSpecificRegulations;
-        HashMap<Species, Double> duds = new HashMap<>();
-        HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
-        for (Species species : fadInitializer.getBiology().getSpecies()) {
-            duds.put(species, 0d);
-            dudsWeight.put(species, Quantities.getQuantity(0, Units.KILOGRAM));
-        }
         this.dudInitializer = new FadInitializer(
-            fadInitializer.getBiology(),
-            ImmutableMap.copyOf(dudsWeight),
-            ImmutableMap.copyOf(duds),
+            fadInitializer.getGlobalBiology(),
+            ImmutableMap.of(),
+            ImmutableMap.of(),
             0d
         );
         this.dudProbability = dudProbability;
@@ -183,7 +171,7 @@ public class FadManager {
 
     private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
 
-    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y);}
+    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y); }
 
     public ImmutableSet<SeaTile> fadLocationsInTimeStepRange(int startStep, int endStep) {
         ImmutableSet.Builder<SeaTile> builder = new ImmutableSet.Builder<>();

@@ -21,7 +21,7 @@ public class FadInitializer implements Function<FadManager, Fad> {
     private final double[] carryingCapacities;
     private final double[] attractionRates;
     private final double fishReleaseProbability;
-    private final GlobalBiology biology;
+    private final GlobalBiology globalBiology;
 
     public FadInitializer(
         GlobalBiology globalBiology,
@@ -29,7 +29,7 @@ public class FadInitializer implements Function<FadManager, Fad> {
         ImmutableMap<Species, Double> attractionRates,
         double fishReleaseProbability
     ) {
-        this.biology = globalBiology;
+        this.globalBiology = globalBiology;
         this.emptyBiomasses = new double[globalBiology.getSize()];
         this.carryingCapacities = new double[globalBiology.getSize()];
         carryingCapacities.forEach((species, qty) ->
@@ -47,17 +47,5 @@ public class FadInitializer implements Function<FadManager, Fad> {
         return new Fad(fadManager, fadBiology, attractionRates, fishReleaseProbability);
     }
 
-
-    public int getBiologicalSize(){
-        return carryingCapacities.length;
-    }
-
-    /**
-     * Getter for property 'biology'.
-     *
-     * @return Value for property 'biology'.
-     */
-    public GlobalBiology getBiology() {
-        return biology;
-    }
+    public GlobalBiology getGlobalBiology() { return globalBiology; }
 }

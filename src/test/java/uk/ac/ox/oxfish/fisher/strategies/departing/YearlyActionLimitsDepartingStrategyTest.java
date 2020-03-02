@@ -61,8 +61,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         when(fisher.getHold().getVolume()).thenReturn(Optional.of(getQuantity(1, CUBIC_METRE)));
 
         FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
-        when(fadInitializer.getBiology().getSpecies()).thenReturn(ImmutableList.of());
-
+        when(fadInitializer.getGlobalBiology().getSpecies()).thenReturn(ImmutableList.of());
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, ImmutableSortedMap.of(0, 3));
 
         FadManager fadManager = new FadManager(null, fadInitializer, 0, 0, Stream.of(setLimits));
