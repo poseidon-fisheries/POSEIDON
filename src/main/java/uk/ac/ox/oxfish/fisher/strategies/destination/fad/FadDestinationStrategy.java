@@ -57,12 +57,12 @@ public class FadDestinationStrategy implements DestinationStrategy {
     public FadSettingRouteSelector getFadSettingRouteSelector() { return fadSettingRouteSelector; }
 
     @Override
-    public SeaTile chooseDestination(Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+    public SeaTile chooseDestination(Fisher fisher, MersenneTwisterFast rng, FishState model, Action currentAction) {
         // don't change destination while we're moving
         if (currentAction instanceof Moving) return fisher.getDestination();
         // if we don't have a current destination, loop through selectors until we find one
         while (!currentRoute.hasNext()) {
-            currentRoute.selectNewRoute(routeSelectors.next(), fisher, model.getStep(), model.getRandom());
+            currentRoute.selectNewRoute(routeSelectors.next(), fisher, model.getStep(), rng);
         }
         return currentRoute.next();
     }
