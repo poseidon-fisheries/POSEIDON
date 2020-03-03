@@ -73,8 +73,9 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
             currentFadDeploymentRoute.selectNewRoute(fadDeploymentRouteSelector, fisher, model.getStep(), model.getRandom());
         }
 
-        return currentFadDeploymentRoute.nextDestination(fisher)
-            .orElseGet(() -> greedyPull(fisher, model));
+        return currentFadDeploymentRoute.hasNext()
+            ? currentFadDeploymentRoute.next()
+            : greedyPull(fisher, model);
 
     }
 

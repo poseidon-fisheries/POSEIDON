@@ -43,35 +43,35 @@ public class CurrentRouteTest {
         when(fisher.getLocation()).thenReturn(map.getSeaTile(2, 2));
 
         final CurrentRoute currentRoute = new CurrentRoute();
-        assertFalse(currentRoute.nextDestination(fisher).isPresent());
+        assertFalse(currentRoute.hasNext());
 
         currentRoute.selectNewRoute(new RouteToPortSelector(map), fisher, 0, null);
 
         // we're at 2, 2 and want to fish there, so we should stay there
         when(fisher.canAndWantToFishHere()).thenReturn(true);
-        final SeaTile dest22 = currentRoute.nextDestination(fisher).get();
+        final SeaTile dest22 = currentRoute.next();
         when(fisher.getLocation()).thenReturn(dest22);
         assertEquals(map.getSeaTile(2, 2), fisher.getLocation());
 
         // we're at 2, 2 and we don't want to fish there anymore, so we should head for 1, 1
         when(fisher.canAndWantToFishHere()).thenReturn(false);
-        final SeaTile dest11a = currentRoute.nextDestination(fisher).get();
+        final SeaTile dest11a = currentRoute.next();
         when(fisher.getLocation()).thenReturn(dest11a);
         assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
         // we're at 1, 1 and want to fish there, so we should stay there
         when(fisher.canAndWantToFishHere()).thenReturn(true);
-        final SeaTile dest11b = currentRoute.nextDestination(fisher).get();
+        final SeaTile dest11b = currentRoute.next();
         when(fisher.getLocation()).thenReturn(dest11b);
         assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
         // we're at 1, 1 and we don't want to fish there anymore, so we should head for 0, 0
         when(fisher.canAndWantToFishHere()).thenReturn(false);
-        final SeaTile dest00 = currentRoute.nextDestination(fisher).get();
+        final SeaTile dest00 = currentRoute.next();
         when(fisher.getLocation()).thenReturn(dest00);
         assertEquals(map.getSeaTile(0, 0), fisher.getLocation());
 
         // we're now at port, so we should have exhausted our current route
-        assertFalse(currentRoute.nextDestination(fisher).isPresent());
+        assertFalse(currentRoute.hasNext());
     }
 }

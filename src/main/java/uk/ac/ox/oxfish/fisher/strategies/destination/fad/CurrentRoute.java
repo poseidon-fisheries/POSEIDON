@@ -24,14 +24,21 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class CurrentRoute {
+public class CurrentRoute implements Iterator<SeaTile> {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Deque<SeaTile>> route = Optional.empty();
+    private Fisher fisher = null;
 
-    public Optional<SeaTile> nextDestination(Fisher fisher) {
+    @Override public SeaTile next() {
+        return nextDestination().orElseThrow(NoSuchElementException::new);
+    }
+
+    private Optional<SeaTile> nextDestination() {
         return route.map(deque -> Optional
             // look at the head of the route
             .ofNullable(deque.peekFirst())
@@ -39,13 +46,19 @@ public class CurrentRoute {
             .filter(destination -> fisher.getLocation() != destination || fisher.canAndWantToFishHere())
             .orElseGet(() -> {
                 // otherwise, remove it from the return and return the next tile if there is one
-                deque.removeFirst();
+                deque.pollFirst();
                 return deque.peekFirst();
             })
         );
     }
 
-    public void selectNewRoute(RouteSelector routeSelector, Fisher fisher, int timeStep, MersenneTwisterFast rng) {
-        route = routeSelector.selectRoute(fisher, timeStep, rng);
+    @Override public boolean hasNext() {
+        return nextDestination().isPresent();
     }
+
+    public void selectNewRoute(RouteSelector routeSelector, Fisher fisher, int timeStep, MersenneTwisterFast rng) {
+        this.fisher = fisher;
+        this.route = routeSelector.selectRoute(fisher, timeStep, rng);
+    }
+
 }
