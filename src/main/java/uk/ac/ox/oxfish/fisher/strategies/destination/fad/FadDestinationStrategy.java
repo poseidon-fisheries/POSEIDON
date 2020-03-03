@@ -60,13 +60,11 @@ public class FadDestinationStrategy implements DestinationStrategy {
     public SeaTile chooseDestination(Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
         // don't change destination while we're moving
         if (currentAction instanceof Moving) return fisher.getDestination();
-        // remove destination from route once we've reached it and can't/won't fish there anymore
-        currentRoute.nextDestination(fisher);
         // if we don't have a current destination, loop through selectors until we find one
-        while (!currentRoute.currentDestination().isPresent()) {
+        while (!currentRoute.nextDestination(fisher).isPresent()) {
             currentRoute.selectNewRoute(routeSelectors.next(), fisher, model.getStep(), model.getRandom());
         }
-        return currentRoute.currentDestination().get();
+        return currentRoute.nextDestination(fisher).get();
     }
 
 }

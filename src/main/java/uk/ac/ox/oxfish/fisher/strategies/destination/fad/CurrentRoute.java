@@ -32,17 +32,18 @@ public class CurrentRoute {
     private Optional<Deque<SeaTile>> route = Optional.empty();
 
     public Optional<SeaTile> nextDestination(Fisher fisher) {
-        // remove current destination from route once we've reached it and can't/won't fish there anymore
-        if (isAtCurrentDestination(fisher) && !fisher.canAndWantToFishHere())
-            route.ifPresent(Deque::poll);
-        return currentDestination();
+        return route.map(deque -> Optional
+            // look at the head of the route
+            .ofNullable(deque.peekFirst())
+            // keep it if we're not there yet, or if we're there but still want to fish
+            .filter(destination -> fisher.getLocation() != destination || fisher.canAndWantToFishHere())
+            .orElseGet(() -> {
+                // otherwise, remove it from the return and return the next tile if there is one
+                deque.removeFirst();
+                return deque.peekFirst();
+            })
+        );
     }
-
-    private boolean isAtCurrentDestination(Fisher fisher) {
-        return currentDestination().filter(fisher.getLocation()::equals).isPresent();
-    }
-
-    public Optional<SeaTile> currentDestination() { return route.map(Deque::peekFirst); }
 
     public void selectNewRoute(RouteSelector routeSelector, Fisher fisher, int timeStep, MersenneTwisterFast rng) {
         route = routeSelector.selectRoute(fisher, timeStep, rng);

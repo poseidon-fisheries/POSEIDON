@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 
 import static org.junit.Assert.assertEquals;
@@ -43,36 +44,34 @@ public class CurrentRouteTest {
 
         final CurrentRoute currentRoute = new CurrentRoute();
         assertFalse(currentRoute.nextDestination(fisher).isPresent());
-        assertFalse(currentRoute.currentDestination().isPresent());
 
         currentRoute.selectNewRoute(new RouteToPortSelector(map), fisher, 0, null);
 
         // we're at 2, 2 and want to fish there, so we should stay there
         when(fisher.canAndWantToFishHere()).thenReturn(true);
-        currentRoute.nextDestination(fisher);
-        when(fisher.getLocation()).thenReturn(currentRoute.currentDestination().get());
+        final SeaTile dest22 = currentRoute.nextDestination(fisher).get();
+        when(fisher.getLocation()).thenReturn(dest22);
         assertEquals(map.getSeaTile(2, 2), fisher.getLocation());
 
         // we're at 2, 2 and we don't want to fish there anymore, so we should head for 1, 1
         when(fisher.canAndWantToFishHere()).thenReturn(false);
-        currentRoute.nextDestination(fisher);
-        when(fisher.getLocation()).thenReturn(currentRoute.currentDestination().get());
+        final SeaTile dest11a = currentRoute.nextDestination(fisher).get();
+        when(fisher.getLocation()).thenReturn(dest11a);
         assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
         // we're at 1, 1 and want to fish there, so we should stay there
         when(fisher.canAndWantToFishHere()).thenReturn(true);
-        currentRoute.nextDestination(fisher);
-        when(fisher.getLocation()).thenReturn(currentRoute.currentDestination().get());
+        final SeaTile dest11b = currentRoute.nextDestination(fisher).get();
+        when(fisher.getLocation()).thenReturn(dest11b);
         assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
         // we're at 1, 1 and we don't want to fish there anymore, so we should head for 0, 0
         when(fisher.canAndWantToFishHere()).thenReturn(false);
-        currentRoute.nextDestination(fisher);
-        when(fisher.getLocation()).thenReturn(currentRoute.currentDestination().get());
+        final SeaTile dest00 = currentRoute.nextDestination(fisher).get();
+        when(fisher.getLocation()).thenReturn(dest00);
         assertEquals(map.getSeaTile(0, 0), fisher.getLocation());
 
         // we're now at port, so we should have exhausted our current route
         assertFalse(currentRoute.nextDestination(fisher).isPresent());
-        assertFalse(currentRoute.currentDestination().isPresent());
     }
 }
