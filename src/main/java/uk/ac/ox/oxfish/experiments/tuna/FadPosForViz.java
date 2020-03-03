@@ -33,8 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import static java.util.stream.Collectors.joining;
-
 public class FadPosForViz {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets", "tuna_calibrated.yaml"));
@@ -64,11 +62,11 @@ public class FadPosForViz {
 
         @SuppressWarnings("unchecked") final Collection<Double2D> locations = fadMap.getField().doubleLocationHash.values();
         while (model.getYear() < 2) {
-            fileWriter.write(locations.stream().map(loc -> {
+            for (Double2D loc : locations) {
                 final double lon = minLon + (loc.x / maxX) * (maxLon - minLon);
                 final double lat = maxLat - (loc.y / maxY) * (maxLat - minLat);
-                return model.getStep() + "," + lon + "," + lat;
-            }).collect(joining("\n")));
+                fileWriter.write(model.getStep() + "," + lon + "," + lat + "\n");
+            }
             fileWriter.flush();
             model.schedule.step(model);
         }
