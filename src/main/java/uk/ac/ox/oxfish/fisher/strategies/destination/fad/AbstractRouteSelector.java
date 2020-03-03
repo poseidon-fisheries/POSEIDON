@@ -37,15 +37,14 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.IntStream.rangeClosed;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 public abstract class AbstractRouteSelector implements RouteSelector {
 
-    final FishState fishState;
+    private final FishState fishState;
     private final double hoursPerStep;
     private final double travelSpeedMultiplier;
-    double maxTravelTimeInHours;
+    private double maxTravelTimeInHours;
 
     protected AbstractRouteSelector(
         FishState fishState,

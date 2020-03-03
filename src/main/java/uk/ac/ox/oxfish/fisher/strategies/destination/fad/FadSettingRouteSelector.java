@@ -74,9 +74,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         int timeStep
     ) {
         final FadManager fadManager = getFadManager(fisher);
-        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep =
-            getTimeStepRange(timeStep, routes).stream()
-                .collect(toImmutableMap(identity(), fadManager::deployedFadsByTileAtStep));
+        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep = fadsByTileByStep(fadManager, routes, timeStep);
         final long fadSetsRemaining = getFadSetsRemaining(fadManager);
 
         return routes.stream().map(route -> makeEntry(
@@ -97,6 +95,15 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         ));
     }
 
+    private ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep(
+        FadManager fadManager,
+        ImmutableList<Route> routes,
+        int timeStep
+    ) {
+        return getTimeStepRange(timeStep, routes).stream()
+            .collect(toImmutableMap(identity(), fadManager::deployedFadsByTileAtStep));
+    }
+
     public static long getFadSetsRemaining(FadManager fadManager) {
         return fadManager.getActionSpecificRegulations()
             .regulationStream(MakeFadSet.class)
@@ -112,7 +119,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         );
     }
 
-    public int getNumberOfStepsToLookAheadForFadPositions() {
+    @SuppressWarnings("WeakerAccess") public int getNumberOfStepsToLookAheadForFadPositions() {
         return numberOfStepsToLookAheadForFadPositions;
     }
 

@@ -61,6 +61,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.strategies.destination.fad.AbstractRouteSelector.getTimeStepRange;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeRoute;
 
 public class FadDeploymentRouteSelectorTest {
     @SuppressWarnings("UnstableApiUsage") @Test
@@ -179,9 +180,4 @@ public class FadDeploymentRouteSelectorTest {
             .forEach(route -> assertEquals(longRoute, route));
     }
 
-    private Deque<SeaTile> makeRoute(NauticalMap map, int[]... points) {
-        LinkedList<SeaTile> route = new LinkedList<>();
-        for (int[] point : points) route.add(map.getSeaTile(point[0], point[1]));
-        return route;
-    }
 }
