@@ -41,53 +41,48 @@ public class DriftingPathTest {
             fail("should have thrown an IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {}
 
-        assertEquals(driftingPath.getPositions(), ImmutableMap.of(
-            0, Optional.of(new Double2D(0, 0)))
+        assertEquals(
+            ImmutableMap.of(0, Optional.of(new Double2D(0, 0))),
+            driftingPath.getPositions()
         );
 
         assertEquals(
-            driftingPath.position(0),
-            Optional.of(new Double2D(0, 0))
-        );
-
-        assertEquals(driftingPath.getPositions(), ImmutableMap.of(
-            0, Optional.of(new Double2D(0, 0)))
+            Optional.of(new Double2D(0, 0)),
+            driftingPath.position(0)
         );
 
         assertEquals(
-            driftingPath.position(1),
-            Optional.of(new Double2D(1, 0))
+            ImmutableMap.of(0, Optional.of(new Double2D(0, 0))),
+            driftingPath.getPositions()
         );
 
-        assertEquals(driftingPath.getPositions(), ImmutableMap.of(
-            0, Optional.of(new Double2D(0, 0)),
-            1, Optional.of(new Double2D(1, 0)))
+        assertEquals(
+            Optional.of(new Double2D(1, 0)),
+            driftingPath.position(1)
+        );
+
+        assertEquals(
+            ImmutableMap.of(
+                0, Optional.of(new Double2D(0, 0)),
+                1, Optional.of(new Double2D(1, 0))
+            ),
+            driftingPath.getPositions()
         );
 
         assertEquals(
             driftingPath.position(3),
-            Optional.of(new Double2D(3, 0))
-        );
-
-        assertEquals(driftingPath.getPositions(), ImmutableMap.of(
-            0, Optional.of(new Double2D(0, 0)),
-            1, Optional.of(new Double2D(1, 0)),
-            2, Optional.of(new Double2D(2, 0)),
-            3, Optional.of(new Double2D(3, 0)))
-        );
-
-        assertEquals(
-            driftingPath.position(4),
             Optional.empty()
         );
 
-        assertEquals(driftingPath.getPositions(), ImmutableMap.of(
-            0, Optional.of(new Double2D(0, 0)),
-            1, Optional.of(new Double2D(1, 0)),
-            2, Optional.of(new Double2D(2, 0)),
-            3, Optional.of(new Double2D(3, 0)),
-            4, Optional.empty()
-        ));
+        assertEquals(
+            ImmutableMap.of(
+                0, Optional.of(new Double2D(0, 0)),
+                1, Optional.of(new Double2D(1, 0)),
+                2, Optional.of(new Double2D(2, 0)),
+                3, Optional.empty()
+            ),
+            driftingPath.getPositions()
+        );
 
     }
 }
