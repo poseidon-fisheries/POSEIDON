@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -178,7 +179,11 @@ public class FadSettingRouteSelectorTest {
                 .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
         );
 
-        // TODO: test that no route is selected when no sets are left
+        // test that no route is selected when no sets are left
+        fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, ImmutableSortedMap.of(0, 0))));
+        assertEquals(0, getFadSetsRemaining(fadManager));
+        assertTrue(routeSelector.shouldGoToPort(fisher));
+        assertFalse(routeSelector.selectRoute(fisher, 0, new MersenneTwisterFast()).isPresent());
 
     }
 
