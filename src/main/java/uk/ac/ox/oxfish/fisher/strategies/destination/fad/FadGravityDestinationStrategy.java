@@ -24,10 +24,10 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
-import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -37,8 +37,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.function.ToDoubleFunction;
+
+import static java.util.Arrays.stream;
 
 public class FadGravityDestinationStrategy implements DestinationStrategy {
 
@@ -71,41 +71,33 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
 
         if (fisher.isAtPort()) {
             currentFadDeploymentRoute = fadDeploymentRouteSelector
-                .selectRoute(fisher, model.getStep(), model.getRandom())
+                .selectRoute(fisher, model.getStep(), random)
                 .orElse(Route.EMPTY);
         }
 
         return currentFadDeploymentRoute.hasNext()
             ? currentFadDeploymentRoute.next()
-            : greedyPull(fisher, model);
+            : greedyPull(fisher, model.getMap());
 
     }
 
-    private SeaTile greedyPull(Fisher fisher, FishState model) {
-        SeaTile here = fisher.getLocation();
+    private SeaTile greedyPull(Fisher fisher, NauticalMap map) {
 
+        SeaTile here = fisher.getLocation();
         HashMap<SeaTile, Double> valueMap = new HashMap<>();
 
         //get the map (you need to link back FADs to where they are)
-
         final FadMap fadMap = FadManagerUtils.getFadManager(fisher).getFadMap();
 
         //grab about 20 deployed fads
         for (int i = 0; i < 20; i++) {
-            Optional<Fad> fad = FadManagerUtils.oneOfDeployedFads(fisher);
             //find where they are, see which are is more valuable
-            if (fad.isPresent()) {
-                SeaTile there = fadMap.getFadTile(fad.get()).get();
-                valueMap.putIfAbsent(
-                    there,
-                    computeValueOfFad(fisher,
-                        model,
-                        here,
-                        there)
+            FadManagerUtils
+                .oneOfDeployedFads(fisher)
+                .flatMap(fadMap::getFadTile)
+                .ifPresent(there ->
+                    valueMap.putIfAbsent(there, computeValueOfFad(fisher, map, here, there))
                 );
-            } else {
-                //      System.out.println("failed to find a fad!");
-            }
         }
 
         try {
@@ -115,28 +107,15 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         }
     }
 
-    private double computeValueOfFad(Fisher fisher, FishState model, SeaTile here, SeaTile newTile) {
-        double distance = model.getMap().distance(here, newTile) + 1;
-
+    private double computeValueOfFad(Fisher fisher, NauticalMap map, SeaTile here, SeaTile newTile) {
+        double distance = map.distance(here, newTile) + 1;
         Preconditions.checkArgument(distance > 0);
         FadManager fadManager = FadManagerUtils.getFadManager(fisher);
-        double biomassValue = FadManagerUtils.fadsAt(fisher, newTile).filter(
-            fad -> fad.getOwner() == fadManager
-        ).
-            mapToDouble(new ToDoubleFunction<Fad>() {
-                @Override
-                public double applyAsDouble(Fad fad) {
-
-                    double[] currentBiomass = fad.getBiology().getCurrentBiomass();
-                    double sum = 0;
-                    for (int i = 0; i < currentBiomass.length; i++) {
-
-                        sum += currentBiomass[i];
-                    }
-                    return sum;
-                }
-            }).sum();
-
+        double biomassValue = FadManagerUtils
+            .fadsAt(fisher, newTile)
+            .filter(fad -> fad.getOwner() == fadManager)
+            .mapToDouble(fad -> stream(fad.getBiology().getCurrentBiomass()).sum())
+            .sum();
         return gravitationalConstraint * biomassValue / Math.pow(distance, 2);
     }
 
