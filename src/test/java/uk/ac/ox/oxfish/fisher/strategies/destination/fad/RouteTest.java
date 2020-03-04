@@ -19,53 +19,59 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.geography.ports.Port;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
 
 public class RouteTest {
 
-    @SuppressWarnings("UnstableApiUsage") @Test
+    @Test
     public void test() {
+        NauticalMap map = makeCornerPortMap(3, 3);
+        final Port port = map.getPorts().getFirst();
 
-        final LinkedList<SeaTile> tileDeque = Stream
-            .generate(() -> mock(SeaTile.class))
-            .limit(5)
-            .collect(toCollection(LinkedList::new));
+        final Fisher fisher = mock(Fisher.class);
+        when(fisher.getHomePort()).thenReturn(port);
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(2, 2));
 
-        BiFunction<Deque<SeaTile>, Double, ImmutableList<Pair<SeaTile, Double>>> travelTimes =
-            (tiles, __) -> Streams
-                .mapWithIndex(tiles.stream(), (tile, i) -> new Pair<>(tile, (double) i))
-                .collect(toImmutableList());
+        final Route currentRoute =
+            new RouteToPortSelector(map)
+                .selectRoute(fisher, 0, null)
+                .orElseThrow(() -> new IllegalStateException("No route to port!"));
 
-        Route route = new Route(tileDeque, 0, 1, 1, travelTimes);
+        // we're at 2, 2 and want to fish there, so we should stay there
+        when(fisher.canAndWantToFishHere()).thenReturn(true);
+        final SeaTile dest22 = currentRoute.next();
+        when(fisher.getLocation()).thenReturn(dest22);
+        assertEquals(map.getSeaTile(2, 2), fisher.getLocation());
 
-        assertEquals(tileDeque, route.getRouteDeque());
-        assertEquals(tileDeque, route.getSteps().stream().map(RouteStep::getSeaTile).collect(toCollection(LinkedList::new)));
-        assertEquals(4, route.getLastTimeStep());
-        assertEquals(4.0, route.getTotalTravelTimeInHours(), EPSILON);
-        assertEquals(ImmutableList.of(0, 1, 2, 3, 4), route.getSteps().stream().map(RouteStep::getTimeStep).collect(toImmutableList()));
-        assertEquals(ImmutableList.of(0d, 1d, 2d, 3d, 4d), route.getSteps().stream().map(RouteStep::getCumulativeHours).collect(toImmutableList()));
+        // we're at 2, 2 and we don't want to fish there anymore, so we should head for 1, 1
+        when(fisher.canAndWantToFishHere()).thenReturn(false);
+        final SeaTile dest11a = currentRoute.next();
+        when(fisher.getLocation()).thenReturn(dest11a);
+        assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
-        Fisher fisher = mock(Fisher.class);
-        when(fisher.getAdditionalTripCosts()).thenReturn(new LinkedList<>(ImmutableList.of(new HourlyCost(2))));
-        assertEquals(8.0, route.getCost(fisher), EPSILON);
+        // we're at 1, 1 and want to fish there, so we should stay there
+        when(fisher.canAndWantToFishHere()).thenReturn(true);
+        final SeaTile dest11b = currentRoute.next();
+        when(fisher.getLocation()).thenReturn(dest11b);
+        assertEquals(map.getSeaTile(1, 1), fisher.getLocation());
 
+        // we're at 1, 1 and we don't want to fish there anymore, so we should head for 0, 0
+        when(fisher.canAndWantToFishHere()).thenReturn(false);
+        final SeaTile dest00 = currentRoute.next();
+        when(fisher.getLocation()).thenReturn(dest00);
+        assertEquals(map.getSeaTile(0, 0), fisher.getLocation());
+
+        // we're now at port, so we should have exhausted our current route
+        assertFalse(currentRoute.hasNext());
     }
 }

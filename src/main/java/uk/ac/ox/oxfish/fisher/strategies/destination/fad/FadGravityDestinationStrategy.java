@@ -44,7 +44,7 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
 
     private final double gravitationalConstraint;
     private FadDeploymentRouteSelector fadDeploymentRouteSelector;
-    private CurrentRoute currentFadDeploymentRoute = new CurrentRoute();
+    private Route currentFadDeploymentRoute = Route.EMPTY;
 
     public FadGravityDestinationStrategy(
         double gravitationalConstraint,
@@ -70,7 +70,9 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         }
 
         if (fisher.isAtPort()) {
-            currentFadDeploymentRoute.selectNewRoute(fadDeploymentRouteSelector, fisher, model.getStep(), model.getRandom());
+            currentFadDeploymentRoute = fadDeploymentRouteSelector
+                .selectRoute(fisher, model.getStep(), model.getRandom())
+                .orElse(Route.EMPTY);
         }
 
         return currentFadDeploymentRoute.hasNext()

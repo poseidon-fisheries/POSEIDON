@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Deque;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -57,8 +57,8 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         this.travelSpeedMultiplier = travelSpeedMultiplier;
     }
 
-    static ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<Route> possibleRoutes) {
-        final int maxTimeStep = possibleRoutes.stream().mapToInt(Route::getLastTimeStep).max().orElse(0);
+    static ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<PossibleRoute> possibleRoutes) {
+        final int maxTimeStep = possibleRoutes.stream().mapToInt(PossibleRoute::getLastTimeStep).max().orElse(0);
         return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
     }
 
@@ -70,29 +70,31 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         return fisher.getRegulation().canFishHere(fisher, seaTile, fishState, timeStep);
     }
 
-    @Override public Optional<Deque<SeaTile>> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng) {
+    @Override public Optional<Route> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng) {
         if (shouldGoToPort(fisher)) return Optional.empty();
-        final ImmutableList<Route> possibleRoutes = getPossibleRoutes(
+        final ImmutableList<PossibleRoute> possibleRoutes = getPossibleRoutes(
             fisher, getPossibleDestinations(fisher, timeStep), timeStep
         );
         if (possibleRoutes.isEmpty())
             return Optional.empty();
         else {
-            final ImmutableList<Map.Entry<Deque<SeaTile>, Double>> candidateRoutes =
+            final ImmutableList<Entry<Route, Double>> candidateRoutes =
                 evaluateRoutes(fisher, possibleRoutes, timeStep)
                     .filter(entry -> entry.getValue() > 0)
                     .collect(toImmutableList());
             if (candidateRoutes.isEmpty())
                 return Optional.empty();
             else
-                return Optional.of(weightedOneOf(candidateRoutes, Map.Entry::getValue, rng)).map(Map.Entry::getKey);
+                return Optional
+                    .of(weightedOneOf(candidateRoutes, Entry::getValue, rng))
+                    .map(Entry::getKey);
         }
     }
 
     abstract boolean shouldGoToPort(Fisher fisher);
 
     @SuppressWarnings("UnstableApiUsage")
-    ImmutableList<Route> getPossibleRoutes(
+    ImmutableList<PossibleRoute> getPossibleRoutes(
         Fisher fisher,
         Set<SeaTile> possibleDestinations,
         int startingTimeStep
@@ -100,7 +102,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         return possibleDestinations
             .stream()
             .flatMap(destinationTile -> stream(getRoute(fisher, fisher.getLocation(), destinationTile)))
-            .map(routeDeque -> new Route(
+            .map(routeDeque -> new PossibleRoute(
                 routeDeque, startingTimeStep, hoursPerStep,
                 fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier,
                 this::cumulativeTravelTimeAlongRouteInHours
@@ -111,8 +113,8 @@ public abstract class AbstractRouteSelector implements RouteSelector {
 
     abstract Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep);
 
-    abstract Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
-        Fisher fisher, ImmutableList<Route> routes, int timeStep
+    abstract Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
+        Fisher fisher, ImmutableList<PossibleRoute> possibleRoutes, int timeStep
     );
 
     Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {

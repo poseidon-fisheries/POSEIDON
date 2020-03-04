@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +37,6 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -82,12 +80,12 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         this.deploymentLocationValues = deploymentLocationValues;
     }
 
-    @Override public Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
-        Fisher fisher, ImmutableList<Route> routes, int timeStep
+    @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
+        Fisher fisher, ImmutableList<PossibleRoute> possibleRoutes, int timeStep
     ) {
 
         final Table<SeaTile, Integer, Double> seaTileValuesByStep = ArrayTable.create(
-            possibleRouteTiles, getTimeStepRange(timeStep, routes)
+            possibleRouteTiles, getTimeStepRange(timeStep, possibleRoutes)
         );
 
         final ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction =
@@ -101,15 +99,15 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
                 return value;
             };
 
-        return routes.stream().map(route -> makeEntry(
-            route.getRouteDeque(),
-            route
+        return possibleRoutes.stream().map(possibleRoute -> makeEntry(
+            possibleRoute.makeRoute(fisher),
+            possibleRoute
                 .getSteps()
                 .stream()
                 .mapToDouble(routeStep ->
                     seaTileValueAtStepFunction.applyAsDouble(routeStep.getSeaTile(), routeStep.getTimeStep())
                 )
-                .sum() - route.getCost(fisher)
+                .sum() - possibleRoute.getCost(fisher)
         ));
     }
 

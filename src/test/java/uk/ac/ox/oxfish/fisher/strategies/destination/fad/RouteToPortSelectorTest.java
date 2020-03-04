@@ -48,20 +48,20 @@ public class RouteToPortSelectorTest {
 
         final RouteToPortSelector routeToPortSelector = new RouteToPortSelector(map);
         assertEquals(
-            makeRoute(port.getLocation()),
+            makeRoute(fisher, port.getLocation()),
             routeToPortSelector.selectRoute(fisher, 0, null)
         );
 
         when(fisher.getLocation()).thenReturn(map.getSeaTile(2, 2));
         assertEquals(
-            makeRoute(fisher.getLocation(), map.getSeaTile(1, 1), port.getLocation()),
+            makeRoute(fisher, fisher.getLocation(), map.getSeaTile(1, 1), port.getLocation()),
             routeToPortSelector.selectRoute(fisher, 0, null)
         );
 
     }
 
-    private static Optional<LinkedList<SeaTile>> makeRoute(SeaTile... tiles) {
-        return Optional.of(new LinkedList<>(Arrays.asList(tiles)));
+    private static Optional<Route> makeRoute(Fisher fisher, SeaTile... tiles) {
+        return Optional.of(new Route(new LinkedList<>(Arrays.asList(tiles)), fisher));
     }
 
 }

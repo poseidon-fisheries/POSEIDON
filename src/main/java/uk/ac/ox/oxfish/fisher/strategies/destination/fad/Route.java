@@ -19,67 +19,53 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
-import java.util.function.BiFunction;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Iterables.getLast;
-import static java.util.stream.Collectors.joining;
+public class Route implements Iterator<SeaTile> {
 
-public class Route {
-
+    public static final Route EMPTY = new Route(new LinkedList<>(), null);
     private final Deque<SeaTile> route;
-    private final ImmutableList<RouteStep> steps;
-    private final double totalTravelTimeInHours;
-    private final int lastTimeStep;
+    private final Fisher fisher;
 
-    public Route(
-        Deque<SeaTile> route,
-        int startingTimeStep,
-        double hoursPerStep,
-        double speedInKph,
-        BiFunction<Deque<SeaTile>, Double, ImmutableList<Pair<SeaTile, Double>>> getCumulativeTravelTimeAlongRoute
-    ) {
+    public Route(Deque<SeaTile> route, Fisher fisher) {
         this.route = route;
-        this.steps =
-            getCumulativeTravelTimeAlongRoute.apply(route, speedInKph)
-                .stream()
-                .map(pair -> new RouteStep(
-                    pair.getFirst(),
-                    pair.getSecond(),
-                    (int) (startingTimeStep + (pair.getSecond() / hoursPerStep))
-                ))
-                .collect(toImmutableList());
-        final RouteStep lastStep = getLast(steps);
-        this.totalTravelTimeInHours = lastStep.getCumulativeHours();
-        this.lastTimeStep = lastStep.getTimeStep();
+        this.fisher = fisher;
     }
 
-    /**
-     * Returns the original (mutable!) Deque<SeaTile> from which the Route was created.
-     */
-    public Deque<SeaTile> getRouteDeque() { return route; }
-
-    public ImmutableList<RouteStep> getSteps() { return steps; }
-
-    public int getLastTimeStep() { return lastTimeStep; }
-
-    public double getCost(Fisher fisher) {
-        return fisher
-            .getAdditionalTripCosts()
-            .stream()
-            .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, getTotalTravelTimeInHours()))
-            .sum();
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Route that = (Route) o;
+        return Objects.equals(route, that.route) &&
+            Objects.equals(fisher, that.fisher);
     }
 
-    public double getTotalTravelTimeInHours() { return totalTravelTimeInHours; }
-
-    @Override public String toString() {
-        return steps.stream().map(RouteStep::toString).collect(joining(" -> "));
+    @Override public int hashCode() {
+        return Objects.hash(route, fisher);
     }
+
+    @Override public SeaTile next() {
+        return nextDestination().orElseThrow(NoSuchElementException::new);
+    }
+
+    private Optional<SeaTile> nextDestination() {
+        // if we're at destination and don't want to fish there, move on
+        Optional.ofNullable(route.peekFirst())
+            .filter(dest -> fisher.getLocation() == dest && !fisher.canAndWantToFishHere())
+            .ifPresent(__ -> route.pollFirst());
+        return Optional.ofNullable(route.peekFirst());
+    }
+
+    @Override public boolean hasNext() {
+        return nextDestination().isPresent();
+    }
+
 }

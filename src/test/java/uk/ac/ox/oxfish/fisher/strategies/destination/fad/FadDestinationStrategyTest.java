@@ -50,11 +50,11 @@ public class FadDestinationStrategyTest {
 
         final FadDeploymentRouteSelector fadDeploymentRouteSelector = mock(FadDeploymentRouteSelector.class);
         when(fadDeploymentRouteSelector.selectRoute(any(), anyInt(), any()))
-            .thenAnswer(__ -> Optional.of(makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}})));
+            .thenAnswer(__ -> Optional.of(new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}}), fisher)));
 
         final FadSettingRouteSelector fadSettingRouteSelector = mock(FadSettingRouteSelector.class);
         when(fadSettingRouteSelector.selectRoute(any(), anyInt(), any()))
-            .thenAnswer(__ -> Optional.of(makeRoute(map, new int[][]{{0, 2}, {1, 2}, {2, 2}})));
+            .thenAnswer(__ -> Optional.of(new Route(makeRoute(map, new int[][]{{0, 2}, {1, 2}, {2, 2}}), fisher)));
 
         final FadDestinationStrategy fadDestinationStrategy =
             new FadDestinationStrategy(map, fadDeploymentRouteSelector, fadSettingRouteSelector);

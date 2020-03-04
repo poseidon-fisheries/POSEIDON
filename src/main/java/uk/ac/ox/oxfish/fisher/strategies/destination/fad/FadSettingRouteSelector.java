@@ -68,18 +68,18 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
             );
     }
 
-    @Override public Stream<SimpleImmutableEntry<Deque<SeaTile>, Double>> evaluateRoutes(
+    @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
         Fisher fisher,
-        ImmutableList<Route> routes,
+        ImmutableList<PossibleRoute> possibleRoutes,
         int timeStep
     ) {
         final FadManager fadManager = getFadManager(fisher);
-        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep = fadsByTileByStep(fadManager, routes, timeStep);
+        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep = fadsByTileByStep(fadManager, possibleRoutes, timeStep);
         final long fadSetsRemaining = getFadSetsRemaining(fadManager);
 
-        return routes.stream().map(route -> makeEntry(
-            route.getRouteDeque(),
-            route.getSteps().stream()
+        return possibleRoutes.stream().map(possibleRoute -> makeEntry(
+            possibleRoute.makeRoute(fisher),
+            possibleRoute.getSteps().stream()
                 .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))
                 .flatMap(routeStep ->
                     fadsByTileByStep
@@ -91,13 +91,13 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
                 .sorted(reverseOrder())
                 .limit(fadSetsRemaining)
                 .mapToDouble(Double::doubleValue)
-                .sum() - route.getCost(fisher)
+                .sum() - possibleRoute.getCost(fisher)
         ));
     }
 
     private ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep(
         FadManager fadManager,
-        ImmutableList<Route> routes,
+        ImmutableList<PossibleRoute> routes,
         int timeStep
     ) {
         return getTimeStepRange(timeStep, routes).stream()

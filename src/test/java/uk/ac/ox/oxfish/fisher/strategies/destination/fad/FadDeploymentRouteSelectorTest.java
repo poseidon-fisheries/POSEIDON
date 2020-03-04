@@ -37,7 +37,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -113,16 +112,16 @@ public class FadDeploymentRouteSelectorTest {
         final Set<SeaTile> possibleDestinations = routeSelector.getPossibleDestinations(fisher, 0);
         assertEquals(deploymentLocations, possibleDestinations);
 
-        final ImmutableList<Route> possibleRoutes =
+        final ImmutableList<PossibleRoute> possibleRoutes =
             routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
         assertEquals(ImmutableList.of(0, 1, 2), getTimeStepRange(0, possibleRoutes));
 
-        final Deque<SeaTile> shortRoute = makeRoute(map, new int[][]{{0, 0}, {0, 1}});
-        final Deque<SeaTile> longRoute = makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}});
+        final Route shortRoute = new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}}), fisher);
+        final Route longRoute = new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}}), fisher);
         // the route going to 2,2 should be excluded because travel time > 2.0h
         assertEquals(
             ImmutableSet.of(shortRoute, longRoute),
-            possibleRoutes.stream().map(Route::getRouteDeque).collect(toImmutableSet())
+            possibleRoutes.stream().map(possibleRoute -> possibleRoute.makeRoute(fisher)).collect(toImmutableSet())
         );
 
         // same as previous test, but with strings
@@ -131,18 +130,18 @@ public class FadDeploymentRouteSelectorTest {
                 "[0: 0, 0 (0.00h)] -> [1: 0, 1 (1.00h)]",
                 "[0: 0, 0 (0.00h)] -> [1: 0, 1 (1.00h)] -> [2: 0, 2 (2.00h)]"
             ),
-            possibleRoutes.stream().map(Route::toString).collect(toImmutableSet())
+            possibleRoutes.stream().map(PossibleRoute::toString).collect(toImmutableSet())
         );
 
         when(regulation.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
-        final ImmutableMap<Deque<SeaTile>, Double> routeValues =
+        final ImmutableMap<Route, Double> routeValues =
             routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
                 .collect(toImmutableMap(Entry::getKey, Entry::getValue));
         assertEquals(ImmutableMap.of(shortRoute, 3.0, longRoute, 4.0), routeValues);
 
         final MersenneTwisterFast rng = new MersenneTwisterFast();
 
-        final Map<Deque<SeaTile>, Long> routeSelectionCounts = Stream
+        final Map<Route, Long> routeSelectionCounts = Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
             .flatMap(Streams::stream)
             .limit(100)

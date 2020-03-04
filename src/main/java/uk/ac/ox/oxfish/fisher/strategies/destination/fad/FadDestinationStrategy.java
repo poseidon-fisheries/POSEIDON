@@ -36,7 +36,7 @@ public class FadDestinationStrategy implements DestinationStrategy {
     private final FadSettingRouteSelector fadSettingRouteSelector;
     private final LoopingIterator<RouteSelector> routeSelectors;
 
-    private CurrentRoute currentRoute = new CurrentRoute();
+    private Route currentRoute = Route.EMPTY;
 
     public FadDestinationStrategy(
         NauticalMap map,
@@ -61,9 +61,10 @@ public class FadDestinationStrategy implements DestinationStrategy {
         // don't change destination while we're moving
         if (currentAction instanceof Moving) return fisher.getDestination();
         // if we don't have a current destination, loop through selectors until we find one
-        while (!currentRoute.hasNext()) {
-            currentRoute.selectNewRoute(routeSelectors.next(), fisher, model.getStep(), rng);
-        }
+        while (!currentRoute.hasNext())
+            currentRoute = routeSelectors.next()
+                .selectRoute(fisher, model.getStep(), rng)
+                .orElse(Route.EMPTY);
         return currentRoute.next();
     }
 

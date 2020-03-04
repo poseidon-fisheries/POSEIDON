@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Iterables.getLast;
 import static java.util.Comparator.comparingDouble;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
@@ -80,7 +81,7 @@ public class FadSettingRouteSelectorTest {
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0.75, 0), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
 
-        FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), 0);
+        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), 0);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, 0, Stream.of());
 
         fadManager.setFisher(fisher);
@@ -146,16 +147,19 @@ public class FadSettingRouteSelectorTest {
             possibleDestinations
         );
 
-        final ImmutableList<Route> possibleRoutes =
+        final ImmutableList<PossibleRoute> possibleRoutes =
             routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
 
         // check that all possible routes go back to port
-        assertTrue(possibleRoutes.stream().allMatch(route -> route.getRouteDeque().peekLast() == port.getLocation()));
+        assertTrue(possibleRoutes.stream().allMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
 
         // given a route with two FADs and a route with one FAD, prefer the one with two FADs
         assertEquals(
-            Optional.of(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}, {1, 1}, {0, 0}})),
-            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0).max(comparingDouble(Entry::getValue)).map(Entry::getKey)
+            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}, {1, 1}, {0, 0}}), fisher),
+            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+                .max(comparingDouble(Entry::getValue))
+                .map(Entry::getKey)
+                .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
         );
 
         // No put a limit of just one FAD set
@@ -167,9 +171,14 @@ public class FadSettingRouteSelectorTest {
         final LinkedList<Cost> costs = Stream.of(new HourlyCost(2)).collect(toCollection(LinkedList::new));
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
         assertEquals(
-            Optional.of(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {0, 0}})),
-            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0).max(comparingDouble(Entry::getValue)).map(Entry::getKey)
+            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {0, 0}}), fisher),
+            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+                .max(comparingDouble(Entry::getValue))
+                .map(Entry::getKey)
+                .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
         );
+
+        // TODO: test that no route is selected when no sets are left
 
     }
 

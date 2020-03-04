@@ -21,12 +21,10 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Deque;
 import java.util.Optional;
 
 @FunctionalInterface
 public interface RouteSelector {
-    Optional<Deque<SeaTile>> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng);
+    Optional<Route> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng);
 }
