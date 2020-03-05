@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-
 import javax.measure.Quantity;
 import javax.measure.quantity.Volume;
 
@@ -19,9 +17,9 @@ public class IATTC {
     public static int capacityClass(Quantity<Volume> holdVolume) {
         final long v = volumeInCubicMetres(holdVolume);
         if (v < 54) return 1;
-        else if (v < 108) return 2;
-        else if (v < 213) return 3;
-        else if (v < 319) return 4;
+        else if (v <= 107) return 2;
+        else if (v <= 212) return 3;
+        else if (v <= 318) return 4;
         else if (v <= 425) return 5;
         else return 6;
     }
@@ -29,6 +27,20 @@ public class IATTC {
     private static long volumeInCubicMetres(Quantity<Volume> holdVolume) {
         // Hold volumes should normally be integers, but we round just in case
         return Math.round(asDouble(holdVolume, CUBIC_METRE));
+    }
+
+    /**
+     * Not used for now, but it might be what we need in the end
+     * (See: https://github.com/poseidon-fisheries/tuna/issues/117)
+     */
+    public static int capacityClassByMaximumLoad(double maximumLoadInKg) {
+        final int t = (int) (maximumLoadInKg / 1000);
+        if (t < 46) return 1;
+        else if (t <= 91) return 2;
+        else if (t <= 181) return 3;
+        else if (t <= 272) return 4;
+        else if (t <= 363) return 5;
+        else return 6;
     }
 
 }
