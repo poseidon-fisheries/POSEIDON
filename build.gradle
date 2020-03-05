@@ -3,7 +3,7 @@ plugins {
     id 'idea'
     id 'application'
     //id "us.kirchmeier.capsule" version "1.0.1"
-    //id "jacoco"
+    id 'jacoco'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
@@ -326,4 +326,11 @@ idea{
     }
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
 
+check.dependsOn jacocoTestReport
