@@ -87,7 +87,7 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
     public int newEntrants(double averageProfits, double averageCosts)
     {
 
-        double profitRate = averageProfits/averageCosts;
+        double profitRate = (averageProfits-minProfitsToCoverFixedCosts)/averageCosts;
 
         if(profitRate<=0 || !Double.isFinite(profitRate))
             return 0;
@@ -101,7 +101,7 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
     public void step(SimState simState) {
         FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
-                model.getLatestYearlyObservation(profitDataColumnName)-minProfitsToCoverFixedCosts,
+                model.getLatestYearlyObservation(profitDataColumnName),
                 model.getLatestYearlyObservation(costsFinalColumnName)
         );
         if(newEntrants>0) {
