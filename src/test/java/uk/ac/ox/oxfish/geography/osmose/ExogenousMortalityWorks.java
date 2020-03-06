@@ -79,8 +79,9 @@ public class ExogenousMortalityWorks
                          catches.getKey().getNdead(MortalityCause.FISHING),.1);
         }
 
-
-
+        // release memory from the simulation instance because
+        // fr.ird.osmose.Osmose statically holds on to it
+        simulation.destroy();
     }
 
     @Test
@@ -124,7 +125,8 @@ public class ExogenousMortalityWorks
         }
         assertTrue(osmoseKilled>0);
 
-
-
+        // release memory from the simulation instance because
+        // fr.ird.osmose.Osmose statically holds on to it
+        simulation.destroy();
     }
 }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.OsmoseGlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -74,6 +75,9 @@ public class LocalOsmoseWithoutRecruitmentBiologyTest {
         assertTrue(standard > FishStateUtilities.EPSILON);
         assertTrue(total> standard);
 
+        // release memory from the simulation instance because
+        // fr.ird.osmose.Osmose statically holds on to it
+        ((OsmoseGlobalBiology)state.getBiology()).getSimulation().destroy();
 
     }
 }
