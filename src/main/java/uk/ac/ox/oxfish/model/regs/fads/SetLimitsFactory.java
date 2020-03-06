@@ -19,29 +19,22 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableSortedMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.Map;
-
 public class SetLimitsFactory implements AlgorithmFactory<SetLimits> {
 
-    public Map<Integer, Integer> limits;
+    private int limit;
 
-    @SuppressWarnings("unused") public SetLimitsFactory() {
-        this(ImmutableSortedMap.of(0, 100));
-    }
+    public SetLimitsFactory() { this.limit = Integer.MAX_VALUE; }
 
-    public SetLimitsFactory(Map<Integer, Integer> limits) {
-        this.limits = limits;
-    }
-
-    @SuppressWarnings("unused") public Map<Integer, Integer> getLimits() { return limits; }
-
-    @SuppressWarnings("unused") public void setLimits(Map<Integer, Integer> limits) { this.limits = limits; }
+    public SetLimitsFactory(int limit) { this.limit = limit; }
 
     @Override public SetLimits apply(FishState fishState) {
-        return new SetLimits(fishState::registerStartable, ImmutableSortedMap.copyOf(limits));
+        return new SetLimits(fishState::registerStartable, __ -> limit);
     }
+
+    public int getLimit() { return limit; }
+
+    public void setLimit(int limit) { this.limit = limit; }
 }

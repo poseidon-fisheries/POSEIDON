@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
+@FunctionalInterface
 public interface FisherRelativeLimits {
     int getLimit(Fisher fisher);
 }

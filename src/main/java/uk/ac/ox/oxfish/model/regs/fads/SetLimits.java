@@ -19,14 +19,17 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.model.Startable;
 
+import java.util.AbstractMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SetLimits extends YearlyActionLimitRegulation {
 
@@ -36,9 +39,9 @@ public class SetLimits extends YearlyActionLimitRegulation {
 
     public SetLimits(
         Consumer<Startable> startableConsumer,
-        ImmutableSortedMap<Integer, Integer> limits
+        FisherRelativeLimits limits
     ) {
-        super(startableConsumer, new VolumeRelativeLimits(limits));
+        super(startableConsumer, limits);
     }
 
     @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }

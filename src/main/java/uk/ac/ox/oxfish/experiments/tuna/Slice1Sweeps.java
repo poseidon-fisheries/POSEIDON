@@ -1,8 +1,27 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSet;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -28,6 +47,8 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Stream.concat;
+import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
+import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.makeLimit;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1Sweeps {
@@ -109,18 +130,13 @@ public class Slice1Sweeps {
             -1
         );
 
-        final ActiveFadLimits currentFadLimits = new ActiveFadLimits(ImmutableSortedMap.of(
-            0, 70,
-            213, 120,
-            426, 300,
-            1200, 450
-        ));
+        final ActiveFadLimits currentFadLimits = new ActiveFadLimits(iattcLimits);
 
-        final ActiveFadLimits smallerFadLimits = new ActiveFadLimits(ImmutableSortedMap.of(
-            0, 20,
-            213, 30,
-            426, 75,
-            1200, 115
+        final ActiveFadLimits smallerFadLimits = new ActiveFadLimits(ImmutableList.of(
+            makeLimit(ImmutableSet.of(6), v -> v >= 1200, 115),
+            makeLimit(ImmutableSet.of(6), v -> v < 1200, 75),
+            makeLimit(ImmutableSet.of(4, 5), __ -> true, 30),
+            makeLimit(ImmutableSet.of(1, 2, 3), __ -> true, 20)
         ));
 
         final ImmutableMap<AlgorithmFactory<? extends ActionSpecificRegulation>, String> fadLimits = ImmutableMap.of(
@@ -132,7 +148,7 @@ public class Slice1Sweeps {
             Stream.of(0, 25, 50, 75).map(Optional::of),
             Stream.of(Optional.<Integer>empty())
         ).collect(toImmutableMap(
-            opt -> opt.map(limit -> new SetLimitsFactory(ImmutableSortedMap.of(0, limit))),
+            opt -> opt.map(SetLimitsFactory::new),
             opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
         ));
 

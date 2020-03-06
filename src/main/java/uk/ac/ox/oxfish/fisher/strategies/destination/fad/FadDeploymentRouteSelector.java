@@ -37,7 +37,7 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FadDeploymentRouteSelector extends AbstractRouteSelector {
@@ -99,7 +99,7 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
                 return value;
             };
 
-        return possibleRoutes.stream().map(possibleRoute -> makeEntry(
+        return possibleRoutes.stream().map(possibleRoute -> entry(
             possibleRoute.makeRoute(fisher),
             possibleRoute
                 .getSteps()

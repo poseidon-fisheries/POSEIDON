@@ -19,39 +19,28 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Volume;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Map.Entry;
 
-public class VolumeRelativeLimits implements FisherRelativeLimits {
+public class ConditionalFisherRelativeLimits implements FisherRelativeLimits {
+    private final ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits;
 
-    private final ImmutableSortedMap<Integer, Integer> limits;
-
-    public VolumeRelativeLimits(ImmutableSortedMap<Integer, Integer> limits) {
-        checkArgument(limits.containsKey(0));
+    public ConditionalFisherRelativeLimits(
+        ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits
+    ) {
         this.limits = limits;
     }
 
     @Override public int getLimit(Fisher fisher) {
-        return fisher.getHold()
-            .getVolume()
-            .map(this::getLimit)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Hold volume needs to be known to get limit for fisher " + fisher
-            ));
+        return limits.stream()
+            .filter(entry -> entry.getKey().test(fisher))
+            .findFirst()
+            .map(Entry::getValue)
+            .orElseThrow(() -> new IllegalArgumentException("No limit applies to fisher " + fisher));
     }
-
-    public int getLimit(Quantity<Volume> volume) {
-        return getLimit(volume.toSystemUnit().getValue().intValue());
-    }
-
-    public int getLimit(int volume) {
-        checkArgument(volume > 0);
-        return limits.floorEntry(volume).getValue();
-    }
-
 }

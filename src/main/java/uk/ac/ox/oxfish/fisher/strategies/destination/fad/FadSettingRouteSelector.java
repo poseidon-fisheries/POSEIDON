@@ -40,7 +40,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.makeEntry;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class FadSettingRouteSelector extends AbstractRouteSelector {
 
@@ -77,7 +77,7 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep = fadsByTileByStep(fadManager, possibleRoutes, timeStep);
         final long fadSetsRemaining = getFadSetsRemaining(fadManager);
 
-        return possibleRoutes.stream().map(possibleRoute -> makeEntry(
+        return possibleRoutes.stream().map(possibleRoute -> entry(
             possibleRoute.makeRoute(fisher),
             possibleRoute.getSteps().stream()
                 .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))

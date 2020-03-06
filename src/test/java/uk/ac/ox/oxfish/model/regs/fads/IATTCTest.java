@@ -21,26 +21,24 @@ package uk.ac.ox.oxfish.model.regs.fads;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class IATTCTest {
 
     @Test
     public void capacityClass() {
-        assertEquals(1, IATTC.capacityClass(getQuantity(0, CUBIC_METRE)));
-        assertEquals(1, IATTC.capacityClass(getQuantity(53, CUBIC_METRE)));
-        assertEquals(2, IATTC.capacityClass(getQuantity(54, CUBIC_METRE)));
-        assertEquals(2, IATTC.capacityClass(getQuantity(107, CUBIC_METRE)));
-        assertEquals(3, IATTC.capacityClass(getQuantity(108, CUBIC_METRE)));
-        assertEquals(3, IATTC.capacityClass(getQuantity(212, CUBIC_METRE)));
-        assertEquals(4, IATTC.capacityClass(getQuantity(213, CUBIC_METRE)));
-        assertEquals(4, IATTC.capacityClass(getQuantity(318, CUBIC_METRE)));
-        assertEquals(5, IATTC.capacityClass(getQuantity(319, CUBIC_METRE)));
-        assertEquals(5, IATTC.capacityClass(getQuantity(425, CUBIC_METRE)));
-        assertEquals(6, IATTC.capacityClass(getQuantity(436, CUBIC_METRE)));
-        assertEquals(6, IATTC.capacityClass(getQuantity(Double.MAX_VALUE, CUBIC_METRE)));
+        assertThrows(IllegalArgumentException.class, () -> IATTC.capacityClass(0));
+        assertEquals(1, IATTC.capacityClass(45000));
+        assertEquals(2, IATTC.capacityClass(46000));
+        assertEquals(2, IATTC.capacityClass(91000));
+        assertEquals(3, IATTC.capacityClass(92000));
+        assertEquals(3, IATTC.capacityClass(181000));
+        assertEquals(4, IATTC.capacityClass(182000));
+        assertEquals(4, IATTC.capacityClass(272000));
+        assertEquals(5, IATTC.capacityClass(273000));
+        assertEquals(5, IATTC.capacityClass(363000));
+        assertEquals(6, IATTC.capacityClass(364000));
+        assertEquals(6, IATTC.capacityClass(Double.MAX_VALUE));
     }
 }

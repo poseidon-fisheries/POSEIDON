@@ -164,7 +164,7 @@ public class FadSettingRouteSelectorTest {
         );
 
         // No put a limit of just one FAD set
-        fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, ImmutableSortedMap.of(0, 1))));
+        fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 1)));
         assertEquals(1, getFadSetsRemaining(fadManager));
         assertFalse(routeSelector.shouldGoToPort(fisher));
 
@@ -180,7 +180,7 @@ public class FadSettingRouteSelectorTest {
         );
 
         // test that no route is selected when no sets are left
-        fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, ImmutableSortedMap.of(0, 0))));
+        fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 0)));
         assertEquals(0, getFadSetsRemaining(fadManager));
         assertTrue(routeSelector.shouldGoToPort(fisher));
         assertFalse(routeSelector.selectRoute(fisher, 0, new MersenneTwisterFast()).isPresent());

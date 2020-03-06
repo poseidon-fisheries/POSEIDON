@@ -62,7 +62,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
 
         FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
         when(fadInitializer.getGlobalBiology().getSpecies()).thenReturn(ImmutableList.of());
-        final SetLimits setLimits = new SetLimits(fishState::registerStartable, ImmutableSortedMap.of(0, 3));
+        final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
         FadManager fadManager = new FadManager(null, fadInitializer, 0, 0, Stream.of(setLimits));
         fadManager.setFisher(fisher);
