@@ -23,7 +23,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class IATTC {
+public final class IATTC {
+
+    private IATTC() {}
 
     public static int capacityClass(Fisher fisher) { return capacityClass(fisher.getMaximumHold()); }
 
