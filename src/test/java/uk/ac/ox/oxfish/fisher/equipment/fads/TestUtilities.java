@@ -53,17 +53,6 @@ public class TestUtilities {
             biomassArray[i] = biology.getCarryingCapacity(i);
     }
 
-    public static void assertEmptyBiology(VariableBiomassBasedBiology biology) {
-        for (double biomass : biology.getCurrentBiomass())
-            assertEquals(0.0, biomass, 0.0);
-    }
-
-    public static void assertFullBiology(VariableBiomassBasedBiology biology) {
-        final double[] biomassArray = biology.getCurrentBiomass();
-        for (int i = 0; i < biomassArray.length; i++)
-            assertEquals(biology.getCarryingCapacity(i), biomassArray[i], 0.0);
-    }
-
     public static CurrentVectors makeUniformCurrentVectors(
         NauticalMap nauticalMap,
         Double2D currentVector,

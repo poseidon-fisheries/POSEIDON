@@ -20,14 +20,27 @@
 
 package uk.ac.ox.oxfish.biology;
 
-public interface VariableBiomassBasedBiology extends LocalBiology {
-    double getCarryingCapacity(Species species);
+import static java.util.Arrays.stream;
+import static java.util.stream.IntStream.range;
 
-    double getCarryingCapacity(int index);
+public interface VariableBiomassBasedBiology extends LocalBiology {
+
+    double getCarryingCapacity(Species species);
 
     void setCarryingCapacity(Species s, double newCarryingCapacity);
 
     void setCurrentBiomass(Species s, double newCurrentBiomass);
 
+    default double getTotalBiomass() { return stream(getCurrentBiomass()).sum(); }
+
     double[] getCurrentBiomass();
+
+    default boolean isEmpty() { return stream(getCurrentBiomass()).allMatch(b -> b == 0); }
+
+    default boolean isFull() {
+        return range(0, getCurrentBiomass().length)
+            .allMatch(i -> getCurrentBiomass()[i] == getCarryingCapacity(i));
+    }
+
+    double getCarryingCapacity(int index);
 }

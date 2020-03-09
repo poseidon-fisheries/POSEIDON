@@ -7,13 +7,11 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.*;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 
 public class FadTest {
 
@@ -35,7 +33,7 @@ public class FadTest {
         fad.releaseFish(globalBiology.getSpecies(), tileBiology);
 
         // Check that the FAD is now empty and the tile has received the fish
-        assertEmptyBiology(fadBiology);
+        assertTrue(fadBiology.isEmpty());
         for (Species species : globalBiology.getSpecies())
             assertEquals(tileBiology.getBiomass(species), fadBiology.getCarryingCapacity(species), 0d);
 
@@ -44,7 +42,7 @@ public class FadTest {
         fad.releaseFish(globalBiology.getSpecies(), tileBiology);
 
         // Check that the FAD is now empty and the tile is now at full carrying capacity
-        assertEmptyBiology(fadBiology);
-        assertFullBiology(tileBiology);
+        assertTrue(fadBiology.isEmpty());
+        assertTrue(tileBiology.isFull());
     }
 }

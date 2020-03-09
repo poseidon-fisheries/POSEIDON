@@ -24,13 +24,12 @@ import javax.measure.quantity.Mass;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -78,16 +77,17 @@ public class FadMapTest {
         final Fad fad = fadManager.deployFad(startTile, 0);
         fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getBiology());
-        assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        final VariableBiomassBasedBiology startTileBiology = (VariableBiomassBasedBiology) startTile.getBiology();
+        assertTrue(fad.getBiology().isFull());
+        assertTrue(startTileBiology.isEmpty());
 
         // If we step once, the FAD should still be in its starting tile
         // and the biologies should not have changed
         when(fishState.getStep()).thenReturn(1);
         fadMap.step(fishState);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getBiology());
-        assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        assertTrue(fad.getBiology().isFull());
+        assertTrue(startTileBiology.isEmpty());
 
         // Let it drift to the island
         when(fishState.getStep()).thenReturn(2);
@@ -96,8 +96,8 @@ public class FadMapTest {
         // The FAD should have been removed from the map
         assertEquals(Optional.empty(), fadMap.getFadTile(fad));
         // And the fish should be released in the starting cell
-        assertEmptyBiology(fad.getBiology());
-        assertFullBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        assertTrue(fad.getBiology().isEmpty());
+        assertTrue(startTileBiology.isFull());
     }
 
 }
