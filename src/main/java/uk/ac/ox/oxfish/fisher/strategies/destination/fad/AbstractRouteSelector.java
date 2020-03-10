@@ -107,7 +107,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
                 fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier,
                 this::cumulativeTravelTimeAlongRouteInHours
             ))
-            .filter(route -> route.getTotalTravelTimeInHours() <= maxTravelTimeInHours)
+            .filter(route -> route.getTotalTravelTimeInHours() <= getMaxTravelTimeInHours())
             .collect(toImmutableList());
     }
 

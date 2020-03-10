@@ -51,6 +51,7 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -71,6 +72,7 @@ public class FadDeploymentRouteSelectorTest {
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         final Regulation regulation = mock(Regulation.class);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
 
         final NauticalMap map = makeCornerPortMap(3, 3);
         final Port port = map.getPorts().getFirst();
@@ -95,6 +97,7 @@ public class FadDeploymentRouteSelectorTest {
         final Set<SeaTile> emptyDestinationSet = routeSelector.getPossibleDestinations(fisher, 0);
         assertTrue(emptyDestinationSet.isEmpty());
         assertTrue(routeSelector.getPossibleRoutes(fisher, emptyDestinationSet, 0).isEmpty());
+        assertFalse(routeSelector.selectRoute(fisher, 0, rng).isPresent());
 
         final ImmutableSet<SeaTile> deploymentLocations = ImmutableSet.of(
             map.getSeaTile(0, 1),
@@ -138,8 +141,6 @@ public class FadDeploymentRouteSelectorTest {
             routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
                 .collect(toImmutableMap(Entry::getKey, Entry::getValue));
         assertEquals(ImmutableMap.of(shortRoute, 3.0, longRoute, 4.0), routeValues);
-
-        final MersenneTwisterFast rng = new MersenneTwisterFast();
 
         final Map<Route, Long> routeSelectionCounts = Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
