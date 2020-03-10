@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -51,11 +52,12 @@ public class HoldLimitingDecoratorGearTest {
     @Test
     public void limits() throws Exception {
 
-
+        Hold hold = mock(Hold.class);
         Fisher fisher = mock(Fisher.class);
+        when(fisher.getHold()).thenReturn(hold);
         //only 50 units left!
-        when(fisher.getMaximumHold()).thenReturn(100d);
-        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
+        when(hold.getMaximumLoad()).thenReturn(100d);
+        when(hold.getTotalWeightOfCatchInHold()).thenReturn(50d);
 
         //catches 100 units
         Gear delegate = mock(Gear.class);
@@ -87,12 +89,13 @@ public class HoldLimitingDecoratorGearTest {
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
-
-
+        Hold hold = mock(Hold.class);
         Fisher fisher = mock(Fisher.class);
+        when(fisher.getHold()).thenReturn(hold);
         //only 200 units left!
-        when(fisher.getMaximumHold()).thenReturn(300d);
-        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(100d);
+        when(hold.getMaximumLoad()).thenReturn(300d);
+        when(hold.getTotalWeightOfCatchInHold()).thenReturn(100d);
+
         //caught 500kg in total
         StructuredAbundance firstCatch = new StructuredAbundance(new double[]{1, 1, 1});
         StructuredAbundance secondCatch = new StructuredAbundance(new double[]{1, 1});
