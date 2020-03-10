@@ -100,9 +100,10 @@ public class FadManager {
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
-    Optional<Fad> oneOfFadsHere() {
-        final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
-        return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();
+    public Optional<Fad> oneOfDeployedFads() {
+        return getDeployedFads().isEmpty() ?
+            Optional.empty() :
+            Optional.of(oneOf(getDeployedFads(), getFisher().grabRandomizer()));
     }
 
     Bag getFadsHere() {

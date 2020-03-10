@@ -87,13 +87,14 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         HashMap<SeaTile, Double> valueMap = new HashMap<>();
 
         //get the map (you need to link back FADs to where they are)
-        final FadMap fadMap = FadManagerUtils.getFadManager(fisher).getFadMap();
+        final FadManager fadManager = FadManagerUtils.getFadManager(fisher);
+        final FadMap fadMap = fadManager.getFadMap();
 
         //grab about 20 deployed fads
         for (int i = 0; i < 20; i++) {
             //find where they are, see which are is more valuable
-            FadManagerUtils
-                .oneOfDeployedFads(fisher)
+            fadManager
+                .oneOfDeployedFads()
                 .flatMap(fadMap::getFadTile)
                 .ifPresent(there ->
                     valueMap.putIfAbsent(there, computeValueOfFad(fisher, map, here, there))

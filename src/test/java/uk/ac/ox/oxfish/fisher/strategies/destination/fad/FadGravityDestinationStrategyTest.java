@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -92,6 +93,8 @@ public class FadGravityDestinationStrategyTest {
 
         when(fisher.isAtPort()).thenReturn(false);
         when(fisher.getLocation()).thenReturn(dest01);
+
+        assertFalse(fadManager.oneOfDeployedFads().isPresent());
 
         // put one FAD on the map and check that the strategy heads toward it
         fadManager.deployFad(map.getSeaTile(1, 1), 0);
