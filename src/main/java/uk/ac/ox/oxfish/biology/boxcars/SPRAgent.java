@@ -208,6 +208,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 StepOrder.DATA_RESET
         );
 
+        model.getFishers().addListener(sampler);
+
         model.getYearlyDataSet().registerGatherer("SPR " + species + " " + surveyTag,
                                                   new Gatherer<FishState>() {
                                                       @Override

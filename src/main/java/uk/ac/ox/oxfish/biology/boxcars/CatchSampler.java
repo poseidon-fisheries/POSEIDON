@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ import java.util.function.Predicate;
 /**
  * class that keeps track of what is caught per bin in a subset of fishers
  */
-public class CatchSampler {
+public class CatchSampler implements ListChangeListener<Fisher> {
 
 
     /**
@@ -104,17 +105,20 @@ public class CatchSampler {
 
         for(Fisher fisher : model.getFishers())
         {
-            if(samplingSelector.test(fisher))
-            {
-                if(surveyTag!=null)
-                    fisher.getTags().add(surveyTag+" "+species);
-                observedFishers.add(fisher);
-            }
+            checkIfAddFisherToSurvey(fisher);
         }
 
 
     }
 
+    public void checkIfAddFisherToSurvey(Fisher fisher) {
+        if(samplingSelector.test(fisher))
+        {
+            if(surveyTag!=null)
+                fisher.getTags().add(surveyTag+" "+species);
+            observedFishers.add(fisher);
+        }
+    }
 
 
     /**
@@ -254,5 +258,15 @@ public class CatchSampler {
      */
     public double[][] getLandings() {
         return landings;
+    }
+
+    @Override
+    public void onChanged(Change<? extends Fisher> c) {
+        while(c.next()) {
+            for (Fisher newFisher : c.getAddedSubList()) {
+                checkIfAddFisherToSurvey(newFisher);
+            }
+        }
+
     }
 }

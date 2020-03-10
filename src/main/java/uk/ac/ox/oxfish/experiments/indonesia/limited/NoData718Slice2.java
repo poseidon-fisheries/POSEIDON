@@ -144,6 +144,9 @@ public class NoData718Slice2 {
     private static final double[] PROFIT_RATIO_BOUNDS = new double[]{.7,20};
 
 
+    private static final double[] SPR_AGENT_COVERAGE = new double[]{.025,0.1};
+
+
     private static final int NUMBER_OF_POPULATIONS = 3;
 
     public static final List<OptimizationParameter> parameters = new LinkedList<>();
@@ -306,6 +309,16 @@ public class NoData718Slice2 {
                 new SimpleOptimizationParameter("market.marketPrice",
                         30000, 60000)
         );
+
+        parameters.add(
+                new MultipleOptimizationParameter(
+                        Lists.newArrayList(
+                                "plugins$"+3+".probabilityOfSamplingEachBoat",
+                                "plugins$"+4+".probabilityOfSamplingEachBoat",
+                                "plugins$"+5+".probabilityOfSamplingEachBoat"
+                        ),
+                        SPR_AGENT_COVERAGE[0],
+                        SPR_AGENT_COVERAGE[1]));
 
 
 
@@ -514,7 +527,7 @@ public class NoData718Slice2 {
     public static void main(String[] args) throws IOException {
 
 
-//      buildScenarios();
+//     buildScenarios();
 
 
 
