@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllocator> {
 
 
-    private int peakX = 1;
-    private int peakY = 1;
+    private DoubleParameter peakX = new FixedDoubleParameter(1);
+    private DoubleParameter peakY = new FixedDoubleParameter(1);
     private DoubleParameter smoothingValue = new FixedDoubleParameter(.7d);
 
     private int maxSpread = 6;
@@ -23,6 +23,8 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
     @Override
     public PyramidsAllocator apply(FishState fishState) {
         final ArrayList<int[]> singlePeak = Lists.newArrayList();
+        final int peakX = Math.round(this.peakX.apply(fishState.getRandom()).floatValue());
+        final int peakY = Math.round(this.peakY.apply(fishState.getRandom()).floatValue());
         singlePeak.add(new int[]{peakX,peakY});
         return new PyramidsAllocator(
                 smoothingValue.apply(fishState.getRandom()),
@@ -35,19 +37,20 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
     public SinglePeakAllocatorFactory() {
     }
 
-    public int getPeakX() {
+
+    public DoubleParameter getPeakX() {
         return peakX;
     }
 
-    public void setPeakX(int peakX) {
+    public void setPeakX(DoubleParameter peakX) {
         this.peakX = peakX;
     }
 
-    public int getPeakY() {
+    public DoubleParameter getPeakY() {
         return peakY;
     }
 
-    public void setPeakY(int peakY) {
+    public void setPeakY(DoubleParameter peakY) {
         this.peakY = peakY;
     }
 

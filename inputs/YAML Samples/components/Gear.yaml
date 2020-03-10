@@ -49,6 +49,14 @@ Simple Logistic Selectivity Gear:
   selexParameter1: '15.0948823'
   selexParameter2: '0.5391'
 -------
+Simple Dome Shaped Selectivity Gear:
+  averageCatchability: '0.0'
+  lengthFullSelectivity: '30.0'
+  litersOfGasConsumedPerHour: '0.0'
+  rounding: false
+  slopeLeft: '5.0'
+  slopeRight: '10.0'
+-------
 Double Normal Selectivity Gear:
   ascWidth: '3.77'
   averageCatchability: '0.0'

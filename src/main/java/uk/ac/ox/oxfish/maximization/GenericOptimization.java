@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.maximization;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
-import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
@@ -321,19 +320,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
                 Scenario scenario = buildScenario(x);
 
                 //run the model
-                FishState model = new FishState(System.currentTimeMillis());
-                model.setScenario(scenario);
-                model.start();
-                System.out.println("starting run");
-                while (model.getYear() < simulatedYears) {
-                    model.schedule.step(model);
-                }
-                model.schedule.step(model);
-
-                //collect error
-                for (DataTarget target : targets) {
-                    error+=target.computeError(model);
-                }
+                error += computeErrorGivenScenario(scenario, simulatedYears);
 
             }
 
@@ -351,6 +338,26 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         }catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public double computeErrorGivenScenario(Scenario scenario,
+                                            int simulatedYears) {
+        FishState model = new FishState(System.currentTimeMillis());
+
+        double error = 0;
+        model.setScenario(scenario);
+        model.start();
+        System.out.println("starting run");
+        while (model.getYear() < simulatedYears) {
+            model.schedule.step(model);
+        }
+        model.schedule.step(model);
+
+        //collect error
+        for (DataTarget target : targets) {
+            error+=target.computeError(model);
+        }
+        return error;
     }
 
     public Scenario buildScenario(double[] x) throws FileNotFoundException {

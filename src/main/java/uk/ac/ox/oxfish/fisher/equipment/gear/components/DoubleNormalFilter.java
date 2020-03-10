@@ -70,7 +70,11 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
 
     public DoubleNormalFilter(
-            boolean memoization, final boolean rounding, double peak, double top, double ascWidth, double dscWidth,
+            boolean memoization, final boolean rounding,
+            double peak,
+            double top,
+            double ascWidth,
+            double dscWidth,
             double binMin,
             double binMax,
             double binWidth) {
