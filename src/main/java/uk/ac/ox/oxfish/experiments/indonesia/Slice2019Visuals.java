@@ -60,7 +60,7 @@ public class Slice2019Visuals {
                 "mpa_rect",
                 "No Take Zone (Example)",
                 Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
+                1,
                 1,
                 0l,
                 new Consumer<Scenario>() {
@@ -83,226 +83,226 @@ public class Slice2019Visuals {
 
 
         );
-
 //
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "noquit",
-                "No Management (baseline), No Fishery Exit",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                new Consumer<Scenario>() {
-                    @Override
-                    public void accept(Scenario scenario) {
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-
-                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
-
-                            //large boats already never quit
-                            if(fisherDefinition.getDepartingStrategy() instanceof FullSeasonalRetiredDecoratorFactory)
-
-                                ((FullSeasonalRetiredDecoratorFactory) fisherDefinition.getDepartingStrategy()).
-                                        setInertia(new FixedDoubleParameter(100));
-                        }
-                    }
-                }, "Baseline scenario - no management. Vessels do not exit the fishery when profitability declines and we see a long term decline in the stock."
-
-
-        );
-//
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "baseline",
-                "No Management (baseline), No Fishery Exit",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                null,
-                "Baseline scenario: no management of fishing so we see stocks get depleted. Unprofitable boats leave the fishery, so eventually stocks recover."
-
-
-        );
-//
-//        //150 days
-//
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "150days",
-                "150 Fishing Days - All Boats",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupEffortControlConsumer(
-                        new String[]{"big","small","medium","small10"},
-                        2,
-                        150
-                ), "Season closure for all boats: boats are allowed 150 fishing days each year."
-
-        );
-
-
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "150days_10gt",
-                "150 Fishing Days - Boats 10GT+",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupEffortControlConsumer(
-                        new String[]{"big","medium","small10"},
-                        2,
-                        150
-                ), "Season closure for boats 10GT and above: these boats are allowed 150 fishing days each year. Small boats (5-9 GT) have no management."
-
-        );
-//
-//        //100 days
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "100days",
-                "100 Fishing Days - All Boats",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupEffortControlConsumer(
-                        new String[]{"big","small","medium","small10"},
-                        2,
-                        100
-                ), "Season closure for all boats: boats are allowed 100 fishing days each year."
-
-        );
-
-//
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "100days_10gt",
-                "100 Fishing Days - Boats 10GT+",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupEffortControlConsumer(
-                        new String[]{"big","medium","small10"},
-                        2,
-                        100
-                ), "Season closure for boats 10GT and above: these boats are allowed 100 fishing days each year. Small boats (5-9 GT) have no management."
-
-        );
-//
-//        //premium
-//
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "premium",
-                "Price Premium for Mature L. malabaricus",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupPremiumConsumer(
-                        10,"Lutjanus malabaricus",2
-
-
-                ), "Price Premium: Fishers (all boats 5GT and above) receive double the price for any mature Lutjanus malabaricus they catch."
-
-        );
-//
-//        //delays
+////
 //        runScenario(
 //                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-//                "delays",
-//                "10 Days Port Delay - All",
+//                "noquit",
+//                "No Management (baseline), No Fishery Exit",
 //                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
 //                YEARS_TO_RUN,
 //                1,
 //                0l,
-//                Slice2019Sweeps.setupDelaysConsumer(
+//                new Consumer<Scenario>() {
+//                    @Override
+//                    public void accept(Scenario scenario) {
+//                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+//
+//                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
+//
+//                            //large boats already never quit
+//                            if(fisherDefinition.getDepartingStrategy() instanceof FullSeasonalRetiredDecoratorFactory)
+//
+//                                ((FullSeasonalRetiredDecoratorFactory) fisherDefinition.getDepartingStrategy()).
+//                                        setInertia(new FixedDoubleParameter(100));
+//                        }
+//                    }
+//                }, "Baseline scenario - no management. Vessels do not exit the fishery when profitability declines and we see a long term decline in the stock."
+//
+//
+//        );
+////
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "baseline",
+//                "No Management (baseline), No Fishery Exit",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                null,
+//                "Baseline scenario: no management of fishing so we see stocks get depleted. Unprofitable boats leave the fishery, so eventually stocks recover."
+//
+//
+//        );
+////
+////        //150 days
+////
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "150days",
+//                "150 Fishing Days - All Boats",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                Slice2019Sweeps.setupEffortControlConsumer(
 //                        new String[]{"big","small","medium","small10"},
 //                        2,
-//                        10
-//                ), "Each boat is forced to spend 10 days at port between each trip"
-//
-//        );
-//
-//        //fleet reduction
-        runScenario(
-                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                "reduction",
-                "8% Annual Reduction in Fishing Fleet",
-                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                YEARS_TO_RUN,
-                1,
-                0l,
-                Slice2019Sweeps.setupFleetReductionConsumer(
-                        2,
-                        .08
-                ), "Fleet reduction: The fishing fleet (all boats 5GT and above) is reduced by 8% each year. Vessels may also exit the fishery voluntarily due to lack of profitability."
-
-        );
-//
-//
-//
-//
-//        runScenario(
-//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-//                "mpa75",
-//                "Marine Protected Area - >75m",
-//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-//                YEARS_TO_RUN,
-//                1,
-//                0l,
-//                new Consumer<Scenario>() {
-//                    @Override
-//                    public void accept(Scenario scenario) {
-//                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-//
-//                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
-//
-//                            //large boats already never quit
-//                            DepthMPAFactory regulation = new DepthMPAFactory();
-//                            regulation.setMaxDepth(new FixedDoubleParameter(10000));
-//                            regulation.setMinDepth(new FixedDoubleParameter(75));
-//                            fisherDefinition.setRegulation(regulation);
-//                        }
-//                    }
-//                }, "All areas whose depth is above 75m are closed to fishing. This protects somewhat Pristipomoides multidens and Lutjanus erythropterus; in the short run boats fish more Lutjanus malabaricus, in the long run they quit"
-//
+//                        150
+//                ), "Season closure for all boats: boats are allowed 150 fishing days each year."
 //
 //        );
 //
 //
 //        runScenario(
 //                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-//                "mpa_coastal",
-//                "Marine Protected Area - <75m",
+//                "150days_10gt",
+//                "150 Fishing Days - Boats 10GT+",
 //                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
 //                YEARS_TO_RUN,
 //                1,
 //                0l,
-//                new Consumer<Scenario>() {
-//                    @Override
-//                    public void accept(Scenario scenario) {
-//                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-//
-//                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
-//
-//                            //large boats already never quit
-//                            DepthMPAFactory regulation = new DepthMPAFactory();
-//                            regulation.setMaxDepth(new FixedDoubleParameter(75));
-//                            regulation.setMinDepth(new FixedDoubleParameter(-10000000));
-//                            fisherDefinition.setRegulation(regulation);
-//                        }
-//                    }
-//                }, "All areas whose depth is below 75m are closed to fishing. This makes Lutjanus malabaricus impossible to catch which results in the liquidation of the entire small fleet"
-//
+//                Slice2019Sweeps.setupEffortControlConsumer(
+//                        new String[]{"big","medium","small10"},
+//                        2,
+//                        150
+//                ), "Season closure for boats 10GT and above: these boats are allowed 150 fishing days each year. Small boats (5-9 GT) have no management."
 //
 //        );
+////
+////        //100 days
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "100days",
+//                "100 Fishing Days - All Boats",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                Slice2019Sweeps.setupEffortControlConsumer(
+//                        new String[]{"big","small","medium","small10"},
+//                        2,
+//                        100
+//                ), "Season closure for all boats: boats are allowed 100 fishing days each year."
+//
+//        );
+//
+////
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "100days_10gt",
+//                "100 Fishing Days - Boats 10GT+",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                Slice2019Sweeps.setupEffortControlConsumer(
+//                        new String[]{"big","medium","small10"},
+//                        2,
+//                        100
+//                ), "Season closure for boats 10GT and above: these boats are allowed 100 fishing days each year. Small boats (5-9 GT) have no management."
+//
+//        );
+////
+////        //premium
+////
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "premium",
+//                "Price Premium for Mature L. malabaricus",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                Slice2019Sweeps.setupPremiumConsumer(
+//                        10,"Lutjanus malabaricus",2
+//
+//
+//                ), "Price Premium: Fishers (all boats 5GT and above) receive double the price for any mature Lutjanus malabaricus they catch."
+//
+//        );
+////
+////        //delays
+////        runScenario(
+////                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+////                "delays",
+////                "10 Days Port Delay - All",
+////                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+////                YEARS_TO_RUN,
+////                1,
+////                0l,
+////                Slice2019Sweeps.setupDelaysConsumer(
+////                        new String[]{"big","small","medium","small10"},
+////                        2,
+////                        10
+////                ), "Each boat is forced to spend 10 days at port between each trip"
+////
+////        );
+////
+////        //fleet reduction
+//        runScenario(
+//                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+//                "reduction",
+//                "8% Annual Reduction in Fishing Fleet",
+//                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+//                YEARS_TO_RUN,
+//                1,
+//                0l,
+//                Slice2019Sweeps.setupFleetReductionConsumer(
+//                        2,
+//                        .08
+//                ), "Fleet reduction: The fishing fleet (all boats 5GT and above) is reduced by 8% each year. Vessels may also exit the fishery voluntarily due to lack of profitability."
+//
+//        );
+////
+////
+////
+////
+////        runScenario(
+////                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+////                "mpa75",
+////                "Marine Protected Area - >75m",
+////                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+////                YEARS_TO_RUN,
+////                1,
+////                0l,
+////                new Consumer<Scenario>() {
+////                    @Override
+////                    public void accept(Scenario scenario) {
+////                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+////
+////                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
+////
+////                            //large boats already never quit
+////                            DepthMPAFactory regulation = new DepthMPAFactory();
+////                            regulation.setMaxDepth(new FixedDoubleParameter(10000));
+////                            regulation.setMinDepth(new FixedDoubleParameter(75));
+////                            fisherDefinition.setRegulation(regulation);
+////                        }
+////                    }
+////                }, "All areas whose depth is above 75m are closed to fishing. This protects somewhat Pristipomoides multidens and Lutjanus erythropterus; in the short run boats fish more Lutjanus malabaricus, in the long run they quit"
+////
+////
+////        );
+////
+////
+////        runScenario(
+////                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+////                "mpa_coastal",
+////                "Marine Protected Area - <75m",
+////                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+////                YEARS_TO_RUN,
+////                1,
+////                0l,
+////                new Consumer<Scenario>() {
+////                    @Override
+////                    public void accept(Scenario scenario) {
+////                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+////
+////                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
+////
+////                            //large boats already never quit
+////                            DepthMPAFactory regulation = new DepthMPAFactory();
+////                            regulation.setMaxDepth(new FixedDoubleParameter(75));
+////                            regulation.setMinDepth(new FixedDoubleParameter(-10000000));
+////                            fisherDefinition.setRegulation(regulation);
+////                        }
+////                    }
+////                }, "All areas whose depth is below 75m are closed to fishing. This makes Lutjanus malabaricus impossible to catch which results in the liquidation of the entire small fleet"
+////
+////
+////        );
     }
 
 

@@ -70,8 +70,9 @@ public class NoDataPolicy {
 
             }
 
-            Preconditions.checkArgument(deactivated==POPULATIONS,"couldn't deactivate the right number of startables");
+            System.out.println("removed " + deactivated + " entry steppables");
 
+            //          Preconditions.checkArgument(deactivated==POPULATIONS,"couldn't deactivate the right number of startables");
 
         }
 

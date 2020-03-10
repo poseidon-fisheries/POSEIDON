@@ -115,6 +115,7 @@ public class JsonHeatmapManager implements OutputPlugin, Steppable, AdditionalSt
                                //after daily collectors?
                                StepOrder.YEARLY_DATA_GATHERING);
 
+        model.getOutputPlugins().add(this);
 
 
     }

@@ -54,6 +54,10 @@ public class NoData718Slice1 {
 
     //you need to pass all of these to be "accepted"!
     public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+
+    private static final String SCENARIO_DIRECTORY = "scenarios_censored";
+
+
     static {
         predicates.add(new AcceptableRangePredicate(
                 0.002,0.10,"SPR " + "Atrobucca brevis" + " " + "spr_agent"
@@ -102,8 +106,8 @@ public class NoData718Slice1 {
 
     //todo add an initial B_t/K shock
 
-    public static final int BATCHES = 5;
-    public static final int SCENARIOS_PER_BATCH = 2000;
+    public static final int BATCHES = 4;
+    public static final int SCENARIOS_PER_BATCH = 10000;
 
     private static Map<String,double[]> selexParameters = new HashMap<>();
     static {
@@ -138,7 +142,7 @@ public class NoData718Slice1 {
     /*
     these are in the order they appear in the biological listing scenario
      */
-    private static String[] validSpecies =
+    public final static String[] validSpecies =
             new String[]{
                     "Lethrinus laticaudis",
                     "Lutjanus malabaricus",
@@ -165,11 +169,11 @@ public class NoData718Slice1 {
     public static final List<OptimizationParameter> parameters = new LinkedList<>();
 
 
-    private static final String LATI_PARAMETERS_CSV = "lati_abc_parameters.csv";
+    private static final String LATI_PARAMETERS_CSV = "lati_parameters.csv";
 
-    private static final String MALABARICUS_PARAMETERS_CSV = "mala_abc_parameters.csv";
+    private static final String MALABARICUS_PARAMETERS_CSV = "mala_parameters.csv";
 
-    private static final String ATRO_PARAMETERS_CSV = "atro_abc_parameters.csv";
+    private static final String ATRO_PARAMETERS_CSV = "atro_parameters.csv";
 
     static {
 
@@ -395,11 +399,11 @@ public class NoData718Slice1 {
     }
 
     private static void buildScenarios() throws IOException {
-        for (int batch = 5; batch < 5+ BATCHES; batch++)
+        for (int batch = 101; batch < 104+ BATCHES; batch++)
         {
 
             final Path folder =
-                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
+                    MAIN_DIRECTORY.resolve(SCENARIO_DIRECTORY).resolve("batch"+batch);
             folder.toFile().mkdirs();
             produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
                              System.currentTimeMillis(),SCENARIO_FILE);
@@ -458,13 +462,13 @@ public class NoData718Slice1 {
     public static void main(String[] args) throws IOException {
 
 
- //    buildScenarios();
+//     buildScenarios();
 
 
 
         System.out.println("scenario " + args[0]);
         int directory = Integer.parseInt(args[0]);
-        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
+        runDirectory(MAIN_DIRECTORY.resolve(SCENARIO_DIRECTORY).resolve("batch"+ directory), 0);
 
 
 
@@ -498,23 +502,24 @@ public class NoData718Slice1 {
         List<String> summaryStatistics = new LinkedList<>();
 
 
-        Integer validYear = null;
-        for (validYear = model.getYear()-1; validYear > 0; validYear--) {
-            StringBuilder summaryStatisticsThisYear = new StringBuilder(nameOfScenario +"," + validYear);
+        Integer simulatedYear = null;
+        Integer actualValidYear = -1;
+        for (simulatedYear = model.getYear()-1; simulatedYear > 0; simulatedYear--) {
+            StringBuilder summaryStatisticsThisYear = new StringBuilder(nameOfScenario +"," + simulatedYear);
 
             boolean valid = true;
             for (AcceptableRangePredicate predicate : predicates) {
 
-                summaryStatisticsThisYear.append(",").append(predicate.measure(model,validYear));
-                valid= valid & predicate.test(model,validYear);
+                summaryStatisticsThisYear.append(",").append(predicate.measure(model,simulatedYear));
+                valid= valid & predicate.test(model,simulatedYear);
             }
             summaryStatistics.add(summaryStatisticsThisYear.toString());
-            System.out.println(validYear + " -- " + valid);
+            System.out.println(simulatedYear + " -- " + valid);
             System.out.println(summaryStatisticsThisYear);
 
 
-            if(valid)
-                break;;
+            if(valid && actualValidYear==-1)
+                actualValidYear=simulatedYear;;
 
 
         }
@@ -522,7 +527,7 @@ public class NoData718Slice1 {
         summaryStatisticsFile.write(String.join("\n",summaryStatistics));
         summaryStatisticsFile.write("\n");
 
-        return Optional.of(validYear);
+        return Optional.of(actualValidYear);
 
     }
 

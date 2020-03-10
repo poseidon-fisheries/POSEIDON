@@ -450,18 +450,45 @@ public class Slice6Calibration {
 //
 //        );
 //
-
-                double[] tropfishRNewCMSY = {2.324,-4.218, 1.553, 3.494, 4.637, 5.638,-8.044, 4.339, 2.344, 0.070,-2.449,-2.121, 2.268,-0.438,-3.765,-6.050,-4.285,-3.959, 1.782, 5.956};
-        buildDumpAndRun("TropFishR_tl_2yr_NEWcmsy_square.yaml",
+//
+//                double[] tropfishRNewCMSY = {2.324,-4.218, 1.553, 3.494, 4.637, 5.638,-8.044, 4.339, 2.344, 0.070,-2.449,-2.121, 2.268,-0.438,-3.765,-6.050,-4.285,-3.959, 1.782, 5.956};
+//        buildDumpAndRun("TropFishR_tl_2yr_NEWcmsy_square.yaml",
+//                        "test.yaml",
+//                        tropfishRNewCMSY);
+//
+//
+//        buildVariants(
+//
+//                "TropFishR_tl_2yr_NEWcmsy_square.yaml",
+//                "new_cmsy_tropfishR",
+//                tropfishRNewCMSY
+//
+//        );
+//
+//        double[] LIME1yrmonthly = {-1.960, 8.301, 2.100,-5.573,-2.853, 8.855, 5.481, 4.415, 3.192, 7.330, 5.670, 0.463,-0.486, 7.699,-5.471, 6.583, 2.854, 6.598, 7.246, 0.527};
+//        buildDumpAndRun("LIME_monthly1yr_actualcmsy_calibrationproblem.yaml",
+//                        "test.yaml",
+//                        LIME1yrmonthly);
+//
+//
+//        buildVariants(
+//
+//                "LIME_monthly1yr_actualcmsy_calibrationproblem.yaml",
+//                "lime_monthly1yr",
+//                LIME1yrmonthly
+//
+//        );
+        double[] LIME2yrmonthly = {-7.255, 4.413,-7.207, 3.353,-3.222, 9.547,-9.115, 8.571, 8.844, 0.873,-3.995,-8.569,-4.873,-2.593, 5.986,-4.296, 3.977,-8.123, 6.935, 3.333};
+        buildDumpAndRun("LIME_monthly2yr_actualcmsy_calibrationproblem.yaml",
                         "test.yaml",
-                        tropfishRNewCMSY);
+                        LIME2yrmonthly);
 
 
         buildVariants(
 
-                "TropFishR_tl_2yr_NEWcmsy_square.yaml",
-                "new_cmsy_tropfishR",
-                tropfishRNewCMSY
+                "LIME_monthly2yr_actualcmsy_calibrationproblem.yaml",
+                "lime_monthly2yr",
+                LIME2yrmonthly
 
         );
 
