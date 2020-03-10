@@ -53,6 +53,7 @@ public class Allocators {
         NAMES.put(KernelizedRandomFactory.class, "Random Kernel Allocator");
         NAMES.put(SimplexFactory.class, "Simplex Allocator");
         NAMES.put(PyramidsAllocatorFactory.class, "Pyramids Allocator");
+        NAMES.put(SinglePeakAllocatorFactory.class, "Single Peak Pyramid Allocator");
         NAMES.put(CoordinateFileAllocatorFactory.class, "From File Allocator");
         NAMES.put(SmootherFileAllocatorFactory.class, "From File Smoothed Allocator");
         NAMES.put(PolygonAllocatorFactory.class, "Shape File Allocator");

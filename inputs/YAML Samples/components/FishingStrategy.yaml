@@ -23,7 +23,25 @@ WFS Logit Return:
   ratioCatchToFishHold: '4.37828'
   weekendDummy: '-0.24437'
 -------
-Random FAD Fishing Strategy
+FAD Fishing Strategy:
+  fadDeploymentsCoefficient: '0.01'
+  fadDeploymentsProbabilityDecay: '0.01'
+  fadSetsProbabilityDecay: '0.01'
+  setsOnOtherFadsCoefficient: '0.01'
+  setsOnOwnFadsCoefficient: '0.01'
+  unassociatedSetsCoefficient: '1.0E-8'
+  unassociatedSetsProbabilityDecay: '0.01'
 -------
-Follow Plan FAD Fishing Strategy
+FAD Fishing Threshold Strategy:
+  fadDeploymentsCoefficient: '0.01'
+  fadDeploymentsProbabilityDecay: '0.01'
+  minFadValueInMoney: '100000.0'
+  setsOnOtherFadsCoefficient: '0.01'
+  unassociatedSetsCoefficient: '1.0E-8'
+-------
+Maximum Days a Year Decorator:
+  delegate:
+    Fish Until Full:
+      minimumPercentageFull: '1.0'
+  maxNumberOfDaysOutPerYear: '240.0'
 -------

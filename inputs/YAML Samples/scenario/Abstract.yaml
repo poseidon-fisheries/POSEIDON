@@ -71,6 +71,8 @@ Abstract:
       allowMutualFriendships: true
       degree: '2.0'
       equalOutDegree: true
+      predicates: [
+        ]
   plugins: [
     ]
   portPositionX: -1

@@ -27,3 +27,11 @@ Multiple Three Prices Markets:
   markets: {
     }
 -------
+Three Prices Market with premium:
+  nonPremiumMarket: null
+  premiumFirstBin: false
+  premiumInPercentage: '2.0'
+  premiumSecondBin: false
+  premiumThirdBin: false
+  tagNeededToAccessToPremium: PERIODIC_UPDATE_GEAR_1
+-------

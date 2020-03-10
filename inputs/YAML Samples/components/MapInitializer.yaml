@@ -20,4 +20,5 @@ From File Map:
   header: true
   latLong: true
   mapFile: inputs/indonesia/indonesia_latlong.csv
+  mapPaddingInDegrees: '1.0E-6'
 -------
