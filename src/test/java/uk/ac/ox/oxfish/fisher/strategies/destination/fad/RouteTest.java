@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -74,4 +75,5 @@ public class RouteTest {
         // we're now at port, so we should have exhausted our current route
         assertFalse(currentRoute.hasNext());
     }
+
 }

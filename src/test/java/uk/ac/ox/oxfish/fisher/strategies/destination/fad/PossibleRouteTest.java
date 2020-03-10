@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
@@ -57,7 +58,7 @@ public class PossibleRouteTest {
         PossibleRoute route = new PossibleRoute(tileDeque, 0, 1, 1, travelTimes);
 
         assertEquals(tileDeque, route.getSteps().stream().map(PossibleRoute.Step::getSeaTile).collect(toCollection(LinkedList::new)));
-        assertEquals(new Route(tileDeque, null), route.makeRoute(null));
+        assertTrue(new Route(tileDeque, null).isSameAs(route.makeRoute(null)));
         assertEquals(4, route.getLastTimeStep());
         assertEquals(4.0, route.getTotalTravelTimeInHours(), EPSILON);
         assertEquals(ImmutableList.of(0, 1, 2, 3, 4), route.getSteps().stream().map(PossibleRoute.Step::getTimeStep).collect(toImmutableList()));

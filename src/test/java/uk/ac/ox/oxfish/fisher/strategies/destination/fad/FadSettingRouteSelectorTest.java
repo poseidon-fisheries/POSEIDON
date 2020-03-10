@@ -150,12 +150,14 @@ public class FadSettingRouteSelectorTest {
         assertTrue(possibleRoutes.stream().allMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
 
         // given a route with two FADs and a route with one FAD, prefer the one with two FADs
-        assertEquals(
-            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}, {1, 1}, {0, 0}}), fisher),
-            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
-                .max(comparingDouble(Entry::getValue))
-                .map(Entry::getKey)
-                .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
+        assertTrue(
+            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}, {1, 1}, {0, 0}}), fisher)
+                .isSameAs(
+                    routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+                        .max(comparingDouble(Entry::getValue))
+                        .map(Entry::getKey)
+                        .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
+                )
         );
 
         // No put a limit of just one FAD set
@@ -166,12 +168,14 @@ public class FadSettingRouteSelectorTest {
         // Given travel costs and the 1 set limit, we should now prefer the shorter route, catching just one FAD
         final LinkedList<Cost> costs = Stream.of(new HourlyCost(2)).collect(toCollection(LinkedList::new));
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
-        assertEquals(
-            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {0, 0}}), fisher),
-            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
-                .max(comparingDouble(Entry::getValue))
-                .map(Entry::getKey)
-                .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
+        assertTrue(
+            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {0, 0}}), fisher)
+                .isSameAs(
+                    routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+                        .max(comparingDouble(Entry::getValue))
+                        .map(Entry::getKey)
+                        .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
+                )
         );
 
         // test that no route is selected when no sets are left

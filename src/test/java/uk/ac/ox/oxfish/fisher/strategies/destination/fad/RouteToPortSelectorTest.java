@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
@@ -47,17 +47,23 @@ public class RouteToPortSelectorTest {
         when(fisher.getLocation()).thenReturn(port.getLocation());
 
         final RouteToPortSelector routeToPortSelector = new RouteToPortSelector(map);
-        assertEquals(
+        assertTrue(isSame(
             makeRoute(fisher, port.getLocation()),
             routeToPortSelector.selectRoute(fisher, 0, null)
-        );
+        ));
 
         when(fisher.getLocation()).thenReturn(map.getSeaTile(2, 2));
-        assertEquals(
+        assertTrue(isSame(
             makeRoute(fisher, fisher.getLocation(), map.getSeaTile(1, 1), port.getLocation()),
             routeToPortSelector.selectRoute(fisher, 0, null)
-        );
+        ));
+    }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static boolean isSame(Optional<Route> route1, Optional<Route> route2) {
+        return route1
+            .flatMap(r1 -> route2.filter(r2 -> r2.isSameAs(r1)))
+            .isPresent();
     }
 
     private static Optional<Route> makeRoute(Fisher fisher, SeaTile... tiles) {
