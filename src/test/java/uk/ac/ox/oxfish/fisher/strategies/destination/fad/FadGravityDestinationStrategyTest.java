@@ -25,6 +25,7 @@ import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -58,6 +59,7 @@ public class FadGravityDestinationStrategyTest {
         final NauticalMap map = makeCornerPortMap(3, 3);
         final Port port = map.getPorts().getFirst();
         when(fisher.isAtPort()).thenReturn(true);
+        when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getLocation()).thenReturn(port.getLocation());
         when(fisher.canAndWantToFishHere()).thenReturn(false);
 
@@ -66,9 +68,8 @@ public class FadGravityDestinationStrategyTest {
             .thenAnswer(__ -> Optional.of(new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}}), fisher)));
 
         final FadGravityDestinationStrategy fadGravityDestinationStrategy =
-            new FadGravityDestinationStrategy(1, fadDeploymentRouteSelector);
-
-        assertEquals(fadDeploymentRouteSelector, fadGravityDestinationStrategy.getFadDeploymentRouteSelector());
+            new FadGravityDestinationStrategy(1, null);
+        fadGravityDestinationStrategy.setFadDeploymentRouteSelector(fadDeploymentRouteSelector);
 
         final GlobalBiology globalBiology = new GlobalBiology();
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0, 1), 1);
@@ -95,6 +96,17 @@ public class FadGravityDestinationStrategyTest {
         when(fisher.getLocation()).thenReturn(dest01);
 
         assertFalse(fadManager.oneOfDeployedFads().isPresent());
+
+        // Check that current destination is returned when fisher is moving
+        when(fisher.getDestination()).thenReturn(mock(SeaTile.class));
+        assertEquals(
+            fisher.getDestination(),
+            fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, new Moving())
+        );
+
+        // If no FAD has been deployed, the strategy should choose to go back to port
+        final SeaTile destPort = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
+        assertEquals(port.getLocation(), destPort);
 
         // put one FAD on the map and check that the strategy heads toward it
         fadManager.deployFad(map.getSeaTile(1, 1), 0);

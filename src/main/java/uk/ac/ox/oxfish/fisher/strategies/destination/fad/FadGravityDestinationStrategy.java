@@ -70,7 +70,7 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         }
 
         if (fisher.isAtPort()) {
-            currentFadDeploymentRoute = fadDeploymentRouteSelector
+            currentFadDeploymentRoute = getFadDeploymentRouteSelector()
                 .selectRoute(fisher, model.getStep(), random)
                 .orElse(Route.EMPTY);
         }
@@ -110,7 +110,6 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
 
     private double computeValueOfFad(Fisher fisher, NauticalMap map, SeaTile here, SeaTile newTile) {
         double distance = map.distance(here, newTile) + 1;
-        Preconditions.checkArgument(distance > 0);
         FadManager fadManager = FadManagerUtils.getFadManager(fisher);
         double biomassValue = FadManagerUtils
             .fadsAt(fisher, newTile)
