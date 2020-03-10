@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +80,7 @@ public class PerTripIterativeDestinationStrategyTest {
             when(record.isCutShort()).thenReturn(true);
             favoriteSpot = hill.chooseDestination(fisher,
                                                     random, fishState, new Moving());
-            when(record.getProfitPerHour(true)).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
+            when(record.getProfitPerHour(anyBoolean())).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
             hill.getAlgorithm().adapt(fisher,fishState,random);
 
