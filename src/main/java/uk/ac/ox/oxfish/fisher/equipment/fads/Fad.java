@@ -1,5 +1,25 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -21,13 +41,13 @@ public class Fad {
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
-    final private double[] attractionRates; // proportion of underlying biomass attracted per day
+    final private ImmutableMap<Species, Double> attractionRates; // proportion of underlying biomass attracted per day
     final private double fishReleaseProbability; // daily probability of releasing fish from the FAD
 
     public Fad(
         FadManager owner,
         BiomassLocalBiology biology,
-        double[] attractionRates,
+        ImmutableMap<Species, Double> attractionRates,
         double fishReleaseProbability
     ) {
         this.owner = owner;
@@ -47,7 +67,8 @@ public class Fad {
             double currentFadBiomass = biology.getBiomass(species);
             double maxFadBiomass = biology.getCarryingCapacity(species);
             double maxCatch = max(0, maxFadBiomass - currentFadBiomass);
-            double caught = min(seaTileBiology.getBiomass(species) * attractionRates[species.getIndex()], maxCatch);
+            final double attractionRate = attractionRates.getOrDefault(species, 0.0);
+            double caught = min(seaTileBiology.getBiomass(species) * attractionRate, maxCatch);
             biology.setCurrentBiomass(species, min(currentFadBiomass + caught, maxFadBiomass));
             catches[species.getIndex()] = caught;
         }

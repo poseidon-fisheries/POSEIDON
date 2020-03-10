@@ -21,14 +21,11 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
@@ -48,7 +45,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Iterables.getLast;
 import static java.util.Comparator.comparingDouble;
 import static java.util.stream.Collectors.toCollection;
@@ -75,6 +71,7 @@ public class FadSettingRouteSelectorTest {
 
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
         final GlobalBiology globalBiology = new GlobalBiology();
         final NauticalMap map = makeCornerPortMap(3, 3, globalBiology);
         final Port port = map.getPorts().getFirst();
@@ -82,8 +79,8 @@ public class FadSettingRouteSelectorTest {
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0.75, 0), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
 
-        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), 0);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, 0, Stream.of());
+        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, Stream.of());
 
         fadManager.setFisher(fisher);
 
@@ -125,9 +122,7 @@ public class FadSettingRouteSelectorTest {
         ).collect(toSet());
 
         // put a couple of FADs on the map at 1,0 and 1,1.
-        final ImmutableSet<Fad> fads = initialFadTiles.stream()
-            .map(seaTile -> fadManager.deployFad(seaTile, 0))
-            .collect(toImmutableSet());
+        initialFadTiles.forEach(seaTile -> fadManager.deployFad(seaTile, 0));
 
         // check that only initial positions are reported when not looking ahead
         routeSelector.setNumberOfStepsToLookAheadForFadPositions(0);
@@ -183,7 +178,7 @@ public class FadSettingRouteSelectorTest {
         fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 0)));
         assertEquals(0, getFadSetsRemaining(fadManager));
         assertTrue(routeSelector.shouldGoToPort(fisher));
-        assertFalse(routeSelector.selectRoute(fisher, 0, new MersenneTwisterFast()).isPresent());
+        assertFalse(routeSelector.selectRoute(fisher, 0, rng).isPresent());
 
     }
 

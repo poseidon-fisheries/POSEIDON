@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
@@ -48,8 +47,6 @@ public class FadManager {
 
     private final FadMap fadMap;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
-    private final FadInitializer dudInitializer;
-    final private double dudProbability;
     private ActiveActionRegulations actionSpecificRegulations;
     private FadInitializer fadInitializer;
     private Fisher fisher;
@@ -59,29 +56,20 @@ public class FadManager {
         FadMap fadMap,
         FadInitializer fadInitializer,
         int numFadsInStock,
-        double dudProbability,
         Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
-        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
+        this(fadMap, fadInitializer, numFadsInStock, new ActiveActionRegulations(actionSpecificRegulations));
     }
 
     public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
         int numFadsInStock,
-        double dudProbability,
         ActiveActionRegulations actionSpecificRegulations
     ) {
+        checkArgument(numFadsInStock >= 0);
         this.fadInitializer = fadInitializer;
         this.actionSpecificRegulations = actionSpecificRegulations;
-        this.dudInitializer = new FadInitializer(
-            fadInitializer.getGlobalBiology(),
-            ImmutableMap.of(),
-            ImmutableMap.of(),
-            0d
-        );
-        this.dudProbability = dudProbability;
-        checkArgument(numFadsInStock >= 0);
         this.numFadsInStock = numFadsInStock;
         this.fadMap = fadMap;
     }
@@ -90,13 +78,10 @@ public class FadManager {
         FadMap fadMap,
         FadInitializer fadInitializer,
         int numFadsInStock,
-        double dudProbability,
         ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
-        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
+        this(fadMap, fadInitializer, numFadsInStock, new ActiveActionRegulations(actionSpecificRegulations));
     }
-
-    ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
@@ -104,6 +89,14 @@ public class FadManager {
         return getDeployedFads().isEmpty() ?
             Optional.empty() :
             Optional.of(oneOf(getDeployedFads(), getFisher().grabRandomizer()));
+    }
+
+    ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
+
+    public Fisher getFisher() { return fisher; }
+
+    public void setFisher(Fisher fisher) {
+        this.fisher = fisher;
     }
 
     Bag getFadsHere() {
@@ -127,9 +120,7 @@ public class FadManager {
     private Fad initFad() {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
-        final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability)
-            ? dudInitializer.apply(this)
-            : fadInitializer.apply(this);
+        final Fad newFad = fadInitializer.apply(this);
         deployedFads.add(newFad);
         return newFad;
     }
@@ -184,12 +175,6 @@ public class FadManager {
             }
         });
         return builder.build();
-    }
-
-    public Fisher getFisher() { return fisher; }
-
-    public void setFisher(Fisher fisher) {
-        this.fisher = fisher;
     }
 
     public ActiveActionRegulations getActionSpecificRegulations() {

@@ -73,15 +73,15 @@ public class FadGravityDestinationStrategyTest {
         final GlobalBiology globalBiology = new GlobalBiology();
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0, 1), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
-        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), 0);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, 0, Stream.of());
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, Stream.of());
         fadManager.setFisher(fisher);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(purseSeineGear);
 
-        final MersenneTwisterFast rng = new MersenneTwisterFast();
         when(fisher.grabRandomizer()).thenReturn(rng);
         final FishState fishState = mock(FishState.class);
         when(fishState.getStep()).thenReturn(0);
