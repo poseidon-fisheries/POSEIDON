@@ -64,14 +64,10 @@ public class FadInitializer implements Function<FadManager, Fad> {
 
     @Override public Fad apply(@NotNull FadManager fadManager) {
         return new Fad(fadManager,
-            makeFadBiology(),
+            new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
             rng.nextBoolean(dudProbability) ? ImmutableMap.of() : this.attractionRates,
             fishReleaseProbability
         );
-    }
-
-    @NotNull private BiomassLocalBiology makeFadBiology() {
-        return new BiomassLocalBiology(emptyBiomasses, carryingCapacities);
     }
 
 }
