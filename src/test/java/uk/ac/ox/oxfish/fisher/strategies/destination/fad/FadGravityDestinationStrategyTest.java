@@ -26,6 +26,7 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
+import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -118,6 +119,14 @@ public class FadGravityDestinationStrategyTest {
         fadMap.getDriftingObjectsMap().applyDrift(1);
         final SeaTile dest12 = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
         assertEquals(map.getSeaTile(1, 2), dest12);
+
+        // Put a FAD owned by someone else on the map and check that destination doesn't change.
+        // Putting it there wouldn't change the destination anyway, so this is not a great test,
+        // but at least the coverage report tells us that the filter is exercised and the FAD excluded.
+        final Fad fad = new Fad(mock(FadManager.class), null, null, 0);
+        fadMap.deployFad(fad, 1, map.getSeaTile(1, 2));
+        final SeaTile dest12b = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
+        assertEquals(map.getSeaTile(1, 2), dest12b);
 
     }
 }
