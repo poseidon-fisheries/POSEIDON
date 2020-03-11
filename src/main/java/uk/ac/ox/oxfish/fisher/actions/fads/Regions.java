@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static java.lang.Math.floor;
 
-public class Regions {
+public final class Regions {
 
     public static final Map<Integer, String> REGION_NAMES = ImmutableMap.<Integer, String>builder()
         .put(11, "Northwest")
@@ -21,6 +21,8 @@ public class Regions {
         .put(23, "South")
         .put(33, "Southeast")
         .build();
+
+    private Regions() {} // prevent instantiation
 
     public static int getRegionNumber(NauticalMap map, SeaTile seaTile) {
         final double divisions = 3.0;
