@@ -46,11 +46,11 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 public class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
-    private double minimumSetDurationInHours;
-    private double averageSetDurationInHours;
-    private double stdDevOfSetDurationInHours;
-    private double successfulSetProbability;
-    private double[][] unassociatedSetSamples;
+    private final double minimumSetDurationInHours;
+    private final double averageSetDurationInHours;
+    private final double stdDevOfSetDurationInHours;
+    private final double successfulSetProbability;
+    private final double[][] unassociatedSetSamples;
 
     public PurseSeineGear(
         FadManager fadManager,
@@ -67,6 +67,14 @@ public class PurseSeineGear implements Gear {
         this.successfulSetProbability = successfulSetProbability;
         this.unassociatedSetSamples = unassociatedSetSamples;
     }
+
+    public double getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
+
+    public double getAverageSetDurationInHours() { return averageSetDurationInHours; }
+
+    public double getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
+
+    public double[][] getUnassociatedSetSamples() { return unassociatedSetSamples; }
 
     public double getSuccessfulSetProbability() {
         return successfulSetProbability;
