@@ -43,9 +43,9 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
 
     @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }
 
-    public boolean isAllowed(FadAction action) {
+    @Override public boolean isForbidden(FadAction action) {
         assert applicableActions.contains(action.getClass());
-        return action.getFadManager().getNumDeployedFads() < limits.getLimit(action.getFisher());
+        return action.getFadManager().getNumDeployedFads() >= limits.getLimit(action.getFisher());
     }
 
 }

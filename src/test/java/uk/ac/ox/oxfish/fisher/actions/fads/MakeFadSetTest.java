@@ -41,6 +41,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
@@ -54,7 +55,7 @@ public class MakeFadSetTest {
     public void act() {
 
         MersenneTwisterFast random = mock(MersenneTwisterFast.class);
-        FishState model = mock(FishState.class);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         SeaTile seaTile = mock(SeaTile.class);
         FadMap fadMap = mock(FadMap.class);
         FadManager fadManager = mock(FadManager.class);
@@ -69,13 +70,14 @@ public class MakeFadSetTest {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
         final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0);
-        final MakeFadSet makeFadSet = new MakeFadSet(model, fisher, fad);
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...
         when(seaTile.getBiology()).thenReturn(tileBiology);
+        when(seaTile.isWater()).thenReturn(true);
         when(model.getBiology()).thenReturn(globalBiology);
         when(model.getRandom()).thenReturn(random);
+        when(model.getFadMap().getFadTile(any())).thenReturn(Optional.of(seaTile));
         when(fadMap.getFadTile(fad)).thenReturn(Optional.of(seaTile));
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getActionSpecificRegulations()).thenReturn(new ActiveActionRegulations());
@@ -91,6 +93,7 @@ public class MakeFadSetTest {
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
+        final MakeFadSet makeFadSet = new MakeFadSet(model, fisher, fad);
         when(random.nextDouble()).thenReturn(1.0);
         makeFadSet.act(model, fisher, regulation, 0);
         assertTrue(fadBiology.isEmpty());

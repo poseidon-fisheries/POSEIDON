@@ -1,20 +1,19 @@
 /*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2019  CoHESyS Lab cohesys.lab@gmail.com
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -67,7 +66,8 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
         double fadDeploymentsCoefficient,
         double setsOnOtherFadsCoefficient,
         double fadDeploymentsProbabilityDecay,
-        double minFadValue) {
+        double minFadValue
+    ) {
         this.unassociatedSetsCoefficient = unassociatedSetsCoefficient;
         this.fadDeploymentsCoefficient = fadDeploymentsCoefficient;
         this.setsOnOtherFadsCoefficient = setsOnOtherFadsCoefficient;
@@ -114,12 +114,12 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
             .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
             .filter(p -> model.getRandom().nextDouble() < p)
             .map(__ -> new DeployFad(model, fisher))
-            .filter(action -> action.isAllowed() && action.isPossible());
+            .filter(FadAction::canHappen);
     }
 
     private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
         return Optional.of(new MakeUnassociatedSet(model, fisher))
-            .filter(action -> action.isAllowed() && action.isPossible());
+            .filter(FadAction::canHappen);
     }
 
     private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
@@ -130,7 +130,7 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
             .filter(fadDoublePair -> fadDoublePair.getSecond() > minFadValue)
             .sorted(comparingDouble(Pair::getSecond))
             .map(pair -> new MakeFadSet(model, fisher, pair.getFirst()))
-            .filter(action -> action.isAllowed() && action.isPossible())
+            .filter(FadAction::canHappen)
             .findFirst();
     }
 

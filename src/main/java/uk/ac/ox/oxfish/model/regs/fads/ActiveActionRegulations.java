@@ -49,8 +49,8 @@ public class ActiveActionRegulations {
             .inverse());
     }
 
-    public boolean isAllowed(FadAction fadAction) {
-        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
+    public boolean isForbidden(FadAction fadAction) {
+        return regulationStream(fadAction).anyMatch(reg -> reg.isForbidden(fadAction));
     }
 
     public Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {

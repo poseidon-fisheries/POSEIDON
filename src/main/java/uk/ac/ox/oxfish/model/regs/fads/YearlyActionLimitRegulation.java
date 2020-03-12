@@ -41,9 +41,9 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         startableConsumer.accept(this);
     }
 
-    @Override public boolean isAllowed(FadAction action) {
+    @Override public boolean isForbidden(FadAction action) {
         assert getApplicableActions().contains(action.getClass());
-        return counter < getLimit(action.getFisher());
+        return counter >= getLimit(action.getFisher());
     }
 
     public int getLimit(Fisher fisher) { return limits.getLimit(fisher); }
