@@ -55,23 +55,21 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "UnstableApiUsage"})
 public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
 
+    private final double fadDeploymentsCoefficient;
+    private final double setsOnOwnFadsCoefficient;
+    private final double setsOnOtherFadsCoefficient;
+    private final double unassociatedSetsCoefficient;
+    private final double fadDeploymentsProbabilityDecay;
+    private final double fadSetsProbabilityDecay;
+    private final double unassociatedSetsProbabilityDecay;
     private final AtomicLongMap<Class<? extends FadAction>> consecutiveActionCounts = AtomicLongMap.create();
-    private Optional<? extends FadAction> nextAction = Optional.empty();
-    private double fadDeploymentsCoefficient;
-    private double setsOnOwnFadsCoefficient;
-    private double setsOnOtherFadsCoefficient;
-    private double unassociatedSetsCoefficient;
-
-    private double fadDeploymentsProbabilityDecay;
-    private double fadSetsProbabilityDecay;
-    private double unassociatedSetsProbabilityDecay;
-
     private final ImmutableList<BiFunction<FishState, Fisher, Optional<? extends FadAction>>> actionSequence =
         ImmutableList.of(
             this::maybeDeployFad,
             this::maybeMakeFadSet,
             this::maybeMakeUnassociatedSet
         );
+    private Optional<? extends FadAction> nextAction = Optional.empty();
 
     public FadFishingStrategy(
         double unassociatedSetsCoefficient,
@@ -93,23 +91,32 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
 
     @Override
     public boolean shouldFish(
-        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+        @NotNull Fisher fisher, MersenneTwisterFast random, FishState fishState, TripRecord currentTrip
     ) {
         if (fisher.getLocation().isLand()) return false;
-        if (!nextAction.isPresent()) {
-            nextAction = actionSequence.stream().flatMap(a -> stream(a.apply(model, fisher))).findFirst();
-        }
-        return nextAction.isPresent();
+        return updateAndReturnNextAction(fishState, fisher).isPresent();
     }
 
-    Optional<? extends FadAction> maybeDeployFad(FishState model, Fisher fisher) {
+    Optional<? extends FadAction> updateAndReturnNextAction(FishState fishState, Fisher fisher) {
+        if (!nextAction.isPresent()) {
+            nextAction = actionSequence.stream().flatMap(a -> stream(a.apply(fishState, fisher))).findFirst();
+        }
+        return nextAction;
+    }
+
+    Optional<? extends FadAction> maybeDeployFad(@NotNull FishState model, @NotNull Fisher fisher) {
         final Map<SeaTile, Double> deploymentLocationValues =
             ((FadDestinationStrategy) fisher.getDestinationStrategy())
                 .getFadDeploymentRouteSelector()
                 .getDeploymentLocationValues();
         return Optional
             .ofNullable(deploymentLocationValues.get(fisher.getLocation()))
-            .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
+            .map(value -> probability(
+                fadDeploymentsCoefficient,
+                value,
+                consecutiveActionCounts.get(DeployFad.class),
+                fadDeploymentsProbabilityDecay
+            ))
             .filter(model.getRandom()::nextBoolean)
             .map(__ -> new DeployFad(model, fisher))
             .filter(FadAction::canHappen);
@@ -125,7 +132,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             (1.0 + (probabilityDecayCoefficient * numConsecutiveActions));
     }
 
-    private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
+    @NotNull private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
         return fadsHere(fisher)
             .map(fad -> new Pair<>(fad, fadSetProbability(fad, fisher)))
             .filter(pair -> model.getRandom().nextDouble() < pair.getSecond())
@@ -135,7 +142,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .findFirst();
     }
 
-    private double fadSetProbability(Fad fad, Fisher fisher) {
+    private double fadSetProbability(@NotNull Fad fad, Fisher fisher) {
         final double coefficient = fad.getOwner() == getFadManager(fisher) ?
             setsOnOwnFadsCoefficient :
             setsOnOtherFadsCoefficient;
@@ -149,7 +156,12 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .filter(action -> {
                 final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
                 final long numConsecutiveActions = consecutiveActionCounts.get(MakeUnassociatedSet.class);
-                final double probability = probability(unassociatedSetsCoefficient, priceOfFishHere, numConsecutiveActions, unassociatedSetsProbabilityDecay);
+                final double probability = probability(
+                    unassociatedSetsCoefficient,
+                    priceOfFishHere,
+                    numConsecutiveActions,
+                    unassociatedSetsProbabilityDecay
+                );
                 return model.getRandom().nextDouble() < probability;
             });
     }
@@ -157,7 +169,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     @Override
     @NotNull
     public ActionResult act(
-        FishState model, Fisher fisher, Regulation regulation, double hoursLeft
+        FishState model, Fisher fisher, Regulation ignored, double hoursLeft
     ) {
         nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration()));
         // If we have a next action, increment its counter

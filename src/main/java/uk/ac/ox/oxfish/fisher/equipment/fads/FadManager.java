@@ -99,7 +99,7 @@ public class FadManager {
         this.fisher = fisher;
     }
 
-    Bag getFadsHere() {
+    public Bag getFadsHere() {
         checkNotNull(fisher);
         return fadMap.fadsAt(fisher.getLocation());
     }
