@@ -159,7 +159,7 @@ public class TunaScenario implements Scenario {
         "SKJ", input("2017_SKJ_DIST.csv"),
         "YFT", input("2017_YFT_DIST.csv")
     );
-    private static final BiMap<String, String> speciesNames =
+    public static final BiMap<String, String> speciesNames =
         parseAllRecords(input("species_names.csv")).stream().collect(toImmutableBiMap(
             r -> r.getString("species_code"),
             r -> r.getString("species_name")
