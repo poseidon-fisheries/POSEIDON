@@ -34,7 +34,7 @@ public class FadMap implements Startable, Steppable {
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
     private Stoppable stoppable;
-    FadMap(
+    public FadMap(
         NauticalMap nauticalMap,
         CurrentVectors currentVectors,
         GlobalBiology globalBiology
@@ -62,15 +62,16 @@ public class FadMap implements Startable, Steppable {
 
     @Override
     public void step(SimState simState) {
-        driftingObjectsMap.applyDrift(((FishState) simState).getStep());
+        FishState fishState = (FishState) simState;
+        driftingObjectsMap.applyDrift(fishState.getStep());
         allFads().forEach(fad -> {
             final Optional<VariableBiomassBasedBiology> seaTileBiology =
                 getFadTile(fad).flatMap(FadMap::getVariableBiomassBasedBiology);
             if (seaTileBiology.isPresent()) {
                 fad.aggregateFish(seaTileBiology.get(), globalBiology);
-                fad.maybeReleaseFish(globalBiology.getSpecies(), seaTileBiology.get(), simState.random);
+                fad.maybeReleaseFish(globalBiology.getSpecies(), seaTileBiology.get(), fishState.getRandom());
             } else {
-                fad.maybeReleaseFish(globalBiology.getSpecies(), simState.random);
+                fad.maybeReleaseFish(globalBiology.getSpecies(), fishState.getRandom());
             }
         });
     }
@@ -93,8 +94,7 @@ public class FadMap implements Startable, Steppable {
             .map(biology -> (VariableBiomassBasedBiology) biology);
     }
 
-    @NotNull
-    private Optional<Double2D> getFadLocation(Fad fad) {
+    @NotNull public Optional<Double2D> getFadLocation(Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
@@ -107,6 +107,13 @@ public class FadMap implements Startable, Steppable {
 
     public void deployFad(Fad fad, int timeStep, Double2D location) {
         driftingObjectsMap.add(fad, timeStep, location, onMove(fad));
+    }
+
+    /**
+     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
+     */
+    public void deployFad(Fad fad, int timeStep, SeaTile seaTile) {
+        deployFad(fad, timeStep, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
     }
 
     @NotNull

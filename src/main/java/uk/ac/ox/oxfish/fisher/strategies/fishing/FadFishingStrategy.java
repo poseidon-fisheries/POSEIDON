@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -63,6 +63,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     public boolean shouldFish(
         Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
     ) {
+        if (fisher.getLocation().isLand()) return false;
         if (!nextAction.isPresent()) {
             nextAction = maybeDeployFad(model, fisher);
             if (!nextAction.isPresent()) {
@@ -79,7 +80,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
 
         final Map<SeaTile, Double> deploymentLocationValues =
             ((FadDestinationStrategy) fisher.getDestinationStrategy())
-                .getFadDeploymentDestinationStrategy()
+                .getFadDeploymentRouteSelector()
                 .getDeploymentLocationValues();
         return Optional
             .ofNullable(deploymentLocationValues.get(fisher.getLocation()))

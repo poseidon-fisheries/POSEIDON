@@ -1,7 +1,4 @@
 language: java
-#install: true
-#dist: trusty
-
 
 jdk:
   - openjdk8
@@ -9,7 +6,7 @@ jdk:
   - openjdk13
 
 script:
-- ./gradlew build --scan -s
+  - ./gradlew build --scan -s
 
 # The following options are taken from
 # https://docs.travis-ci.com/user/languages/java/#caching
@@ -20,3 +17,7 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+after_success:
+  # upload code coverage report to codecov.io
+  - bash <(curl -s https://codecov.io/bash)

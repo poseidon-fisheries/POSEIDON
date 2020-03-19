@@ -70,7 +70,10 @@ public class MasonUtils {
         return n == 1 ? 0 : random.nextInt(n);
     }
 
-    private static int oneOfIndices(Collection candidates, MersenneTwisterFast random) {
+    private static int oneOfIndices(
+        @SuppressWarnings("rawtypes") Collection candidates,
+        MersenneTwisterFast random
+    ) {
         //noinspection unchecked
         validateCandidates(candidates);
         final int n = candidates.size();

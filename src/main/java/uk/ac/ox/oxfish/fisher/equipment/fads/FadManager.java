@@ -1,3 +1,22 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
 import com.google.common.collect.ImmutableMap;
@@ -7,9 +26,6 @@ import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
-import tech.units.indriya.quantity.Quantities;
-import tech.units.indriya.unit.Units;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -18,19 +34,14 @@ import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
-import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 public class FadManager {
@@ -39,7 +50,7 @@ public class FadManager {
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer dudInitializer;
     final private double dudProbability;
-    private ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
+    private ActiveActionRegulations actionSpecificRegulations;
     private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
@@ -49,22 +60,24 @@ public class FadManager {
         FadInitializer fadInitializer,
         int numFadsInStock,
         double dudProbability,
-        Collection<ActionSpecificRegulation> actionSpecificRegulations
+        Stream<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
+    }
+
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock,
+        double dudProbability,
+        ActiveActionRegulations actionSpecificRegulations
     ) {
         this.fadInitializer = fadInitializer;
-        this.actionSpecificRegulations = actionSpecificRegulations.stream()
-            .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
-            .inverse();
-        HashMap<Species, Double> duds = new HashMap<>();
-        HashMap<Species, Quantity<Mass>> dudsWeight = new HashMap<>();
-        for (Species species : fadInitializer.getBiology().getSpecies()) {
-            duds.put(species, 0d);
-            dudsWeight.put(species, Quantities.getQuantity(0, Units.KILOGRAM));
-        }
+        this.actionSpecificRegulations = actionSpecificRegulations;
         this.dudInitializer = new FadInitializer(
-            fadInitializer.getBiology(),
-            ImmutableMap.copyOf(dudsWeight),
-            ImmutableMap.copyOf(duds),
+            fadInitializer.getGlobalBiology(),
+            ImmutableMap.of(),
+            ImmutableMap.of(),
             0d
         );
         this.dudProbability = dudProbability;
@@ -73,10 +86,14 @@ public class FadManager {
         this.fadMap = fadMap;
     }
 
-    public Fisher getFisher() { return fisher; }
-
-    public void setFisher(Fisher fisher) {
-        this.fisher = fisher;
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock,
+        double dudProbability,
+        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this(fadMap, fadInitializer, numFadsInStock, dudProbability, new ActiveActionRegulations(actionSpecificRegulations));
     }
 
     ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
@@ -100,20 +117,18 @@ public class FadManager {
         deployedFads.remove(fad);
     }
 
-    /**
-     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
-     */
     public Fad deployFad(SeaTile seaTile, int timeStep) {
-        return deployFad(new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5), timeStep);
+        final Fad newFad = initFad();
+        fadMap.deployFad(newFad, timeStep, seaTile);
+        return newFad;
     }
 
-    private Fad deployFad(Double2D location, int timeStep) {
+    private Fad initFad() {
         checkState(numFadsInStock >= 1);
         numFadsInStock--;
         final Fad newFad = fisher.grabRandomizer().nextBoolean(dudProbability)
             ? dudInitializer.apply(this)
             : fadInitializer.apply(this);
-        fadMap.deployFad(newFad, timeStep, location);
         deployedFads.add(newFad);
         return newFad;
     }
@@ -126,6 +141,11 @@ public class FadManager {
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
         ), timeStep);
+    }
+
+    private void deployFad(Double2D location, int timeStep) {
+        final Fad newFad = initFad();
+        fadMap.deployFad(newFad, timeStep, location);
     }
 
     public void pickUpFad(Fad fad) {
@@ -151,7 +171,7 @@ public class FadManager {
 
     private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
 
-    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y);}
+    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y); }
 
     public ImmutableSet<SeaTile> fadLocationsInTimeStepRange(int startStep, int endStep) {
         ImmutableSet.Builder<SeaTile> builder = new ImmutableSet.Builder<>();
@@ -165,34 +185,21 @@ public class FadManager {
         return builder.build();
     }
 
-    private Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
-        return actionSpecificRegulations.get(fadAction.getClass()).stream();
+    public Fisher getFisher() { return fisher; }
+
+    public void setFisher(Fisher fisher) {
+        this.fisher = fisher;
     }
 
-    public boolean isAllowed(FadAction fadAction) {
-        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
-    }
-
-    public void reactToAction(FadAction fadAction) {
-        regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
-    }
-
-    /**
-     * Getter for property 'actionSpecificRegulations'.
-     *
-     * @return Value for property 'actionSpecificRegulations'.
-     */
-    public ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> getActionSpecificRegulations() {
+    public ActiveActionRegulations getActionSpecificRegulations() {
         return actionSpecificRegulations;
     }
 
-    /**
-     * Setter for property 'actionSpecificRegulations'.
-     *
-     * @param actionSpecificRegulations Value to set for property 'actionSpecificRegulations'.
-     */
-    public void setActionSpecificRegulations(
-            ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations) {
+    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+        setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
+    }
+
+    public void setActionSpecificRegulations(ActiveActionRegulations actionSpecificRegulations) {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 }

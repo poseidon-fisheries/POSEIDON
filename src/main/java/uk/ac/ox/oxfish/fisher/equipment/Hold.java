@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.equipment;
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import javax.measure.Quantity;
+import javax.measure.Unit;
 import javax.measure.quantity.Volume;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -31,6 +32,8 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
+
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 /**
  * The inventory object of the ship. It has a maximum capacity. Any fish caught after reaching capacity is thrown overboard
@@ -294,6 +297,12 @@ public class Hold {
 
     public Optional<Quantity<Volume>> getVolume() {
         return volume;
+    }
+
+    public double getVolumeIn(Unit<Volume> unit) {
+        return volume
+            .map(v -> asDouble(v, unit))
+            .orElseThrow(() -> new IllegalStateException("Hold volume not defined."));
     }
 
 }

@@ -1,61 +1,47 @@
+/*
+ *  POSEIDON, an agent-based model of fisheries
+ *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.model.regs.fads;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Volume;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+public final class IATTC {
 
-public class IATTC {
+    private IATTC() {}
 
-    /**
-     * Return the number of FADs that can be active at the same time for purse seine vessels
-     * according to IATTC resolution C-17-02.8. This is currently hard coded, but we'll most likely
-     * want to make this changeable.
-     */
-    public static int activeFadsLimit(Fisher fisher) {
-        return fisher.getHold().getVolume()
-            .map(IATTC::activeFadsLimit)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Hold volume needs to be known to get active FAD limit for fisher " + fisher
-            ));
-    }
-
-    public static int activeFadsLimit(Quantity<Volume> holdVolume) {
-        switch (capacityClass(holdVolume)) {
-            case 1:
-            case 2:
-            case 3:
-                return 70;
-            case 4:
-            case 5:
-                return 120;
-            default:
-                return volumeInCubicMetres(holdVolume) < 1200 ? 300 : 450;
-        }
-    }
+    public static int capacityClass(Fisher fisher) { return capacityClass(fisher.getMaximumHold()); }
 
     /**
-     * I couldn't find the canonical source for this, but it's stated in a few places, notably
-     * https://www.iattc.org/Meetings/Meetings2009/AIDCP-21/Docs/_English/MOP-21-07_Vessel%20capacity%20class%20definitions%20related%20to%20the%20requirement%20for%20carrying%20an%20on%20board%20observer.pdf
-     * It seems that around 2010, IATTC changed from weight based capacity classes to volume based
-     * ones because the latter is more objective.
+     * Not used for now, but it might be what we need in the end
+     * (See: https://github.com/poseidon-fisheries/tuna/issues/117)
      */
-    public static int capacityClass(Quantity<Volume> holdVolume) {
-        final long v = volumeInCubicMetres(holdVolume);
-        if (v < 54) return 1;
-        else if (v < 108) return 2;
-        else if (v < 213) return 3;
-        else if (v < 319) return 4;
-        else if (v <= 425) return 5;
+    public static int capacityClass(double carryingCapacityInKg) {
+        checkArgument(carryingCapacityInKg > 0, carryingCapacityInKg);
+        final long t = Math.round(carryingCapacityInKg / 1000);
+        if (t < 46) return 1;
+        else if (t <= 91) return 2;
+        else if (t <= 181) return 3;
+        else if (t <= 272) return 4;
+        else if (t <= 363) return 5;
         else return 6;
-    }
-
-    private static long volumeInCubicMetres(Quantity<Volume> holdVolume) {
-        // Hold volumes should normally be integers, but we round just in case
-        return Math.round(asDouble(holdVolume, CUBIC_METRE));
     }
 
 }

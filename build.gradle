@@ -1,9 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id 'java'
     id 'idea'
     id 'application'
-    //id "us.kirchmeier.capsule" version "1.0.1"
-    //id "jacoco"
+    id 'jacoco'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
@@ -17,143 +18,128 @@ repositories {
     mavenCentral()
 }
 
-sourceSets
-        {
-  main {
-    java {
-      srcDir 'src/main/java'
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
     }
-    resources {
-      srcDir 'src/main/resources'
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/resources'
+        }
     }
-  }
-  test {
-    java {
-      srcDir 'src/test/java'
-    }
-    resources {
-      srcDir 'src/test/resources'
-    }
-  }
 }
 
-
-
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
-dependencies
-{
+dependencies {
     //mason libraries. They aren't on maven so we have to lug their jars around
-    compile fileTree(dir: 'libs/mason', include: '*.jar')
-    compile fileTree(dir: 'libs/geomason', include: '*.jar')
+    implementation fileTree(dir: 'libs/mason', include: '*.jar')
+    implementation fileTree(dir: 'libs/geomason', include: '*.jar')
     //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
-    compile fileTree(dir: 'libs/osmose', include: '*.jar')
+    implementation fileTree(dir: 'libs/osmose', include: '*.jar')
 
     //fx collections; needed for sanity
-    compile fileTree(dir: 'libs/fxbase/', include: '*.jar')
-
+    implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
 
     //metawidget + apache binders. Useful for the gui
-    compile "org.metawidget.modules:metawidget-all:4.1"
-    compile "commons-beanutils:commons-beanutils:1.8.3"
+    implementation "org.metawidget.modules:metawidget-all:4.1"
+    implementation "commons-beanutils:commons-beanutils:1.8.3"
 
     //csv helper
-    compile "com.opencsv:opencsv:3.8"
-    compile "com.univocity:univocity-parsers:2.8.3"
+    implementation "com.opencsv:opencsv:3.8"
+    implementation "com.univocity:univocity-parsers:2.8.4"
 
     // Google's JSON library
     implementation 'com.google.code.gson:gson:2.8.5'
 
     //logger:
-    compile "com.esotericsoftware:minlog:1.3.0"
+    implementation "com.esotericsoftware:minlog:1.3.0"
     //serializer
-    compile fileTree(dir: 'libs/xstream/lib', include: '*.jar')
-    compile "org.ogce:xpp3:1.1.6"
+    implementation fileTree(dir: 'libs/xstream/lib', include: '*.jar')
+    implementation "org.ogce:xpp3:1.1.6"
 
     //kd tree
-    compile fileTree(dir: 'libs/rednaxela', include: '*.jar')
+    implementation fileTree(dir: 'libs/rednaxela', include: '*.jar')
 
     //jung social network:
-    compile "net.sf.jung:jung-api:2.0.1"
-    compile 'net.sf.jung:jung-graph-impl:2.0.1'
-    compile 'net.sf.jung:jung-io:2.0.1'
-    compile 'net.sf.jung:jung-algorithms:2.0.1'
+    implementation "net.sf.jung:jung-api:2.0.1"
+    implementation 'net.sf.jung:jung-graph-impl:2.0.1'
+    implementation 'net.sf.jung:jung-io:2.0.1'
+    implementation 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files
-    compile 'org.yaml:snakeyaml:1.15'
+    implementation 'org.yaml:snakeyaml:1.15'
     //jcommander, useful to parse command line
-    compile "com.beust:jcommander:1.48"
+    implementation "com.beust:jcommander:1.48"
 
     //commons math
-    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
     //burlap : Reinforcement Learning helper
-    compile group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
+    implementation group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
 
     //discrete choosers
-    compile fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
-
+    implementation fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
 
     // maximizer
-    compile group: 'de.openea', name : 'eva2', version : '2.2.0'
+    implementation group: 'de.openea', name: 'eva2', version: '2.2.0'
 
     //annotations
-    compile group: 'com.intellij', name: 'annotations', version: '12.0'
+    implementation group: 'com.intellij', name: 'annotations', version: '12.0'
 
     //testing:
-    testCompile "junit:junit:4.12"
-//    testCompile "org.mockito:mockito-all:1.9.5"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
-
+    testImplementation "junit:junit:4.13"
+    testImplementation 'org.mockito:mockito-core:3.3.0'
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    compile "com.google.guava:guava:28.1-jre"
-    compile "com.google.code.findbugs:jsr305:3.0.2"
+    implementation "com.google.guava:guava:28.2-jre"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
 
     //json test
-    testCompile "com.google.code.gson:gson:2.8.5"
+    testImplementation "com.google.code.gson:gson:2.8.5"
 
     // Reference implementation of JSR-385 for units of measure
-    compile 'si.uom:si-quantity:2.0'
-    compile 'si.uom:si-units:2.0'
-
-
+    implementation 'si.uom:si-quantity:2.0.1'
+    implementation 'si.uom:si-units:2.0.1'
 }
 
-
-
-
+processTestResources.doFirst {
+    // explicitly allow overriding files when copying resources
+    duplicatesStrategy = "include"
+}
 
 //this makes tests multi-threaded when called from gradle. Useful!
-test{
-    minHeapSize = "2048m"
+test {
+    minHeapSize = "1024m"
     maxHeapSize = "2048m"
-    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 3)
 }
 
-
-
-
-
-task shadowJarFoo(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    archiveName = 'foo.jar'
+task shadowJarFoo(type: ShadowJar) {
+    archiveFileName = 'foo.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ configurations.runtime ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [configurations.runtime] //tells the task to shadow in the jars files in the 'runtime' scope
 }
-
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-
-task fatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task fatJar(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'oxfish_executable.jar'
+    archiveFileName = 'oxfish_executable.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.Main'
     }
 }
-
 
 task deployFatJar(type: Copy, dependsOn: fatJar) {
     from 'build/libs/'
@@ -162,56 +148,59 @@ task deployFatJar(type: Copy, dependsOn: fatJar) {
     include 'oxfish_executable.jar'
 }
 
-
-task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task optimizerJar(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'maximizer.jar'
+    archiveFileName = 'maximizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.MainOptimizer'
     }
 }
 
-task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task optimizerConsoleJar(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'console_optimizer.jar'
+    archiveFileName = 'console_optimizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.OptimizerConsole'
     }
 }
 
-task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task calicatchFatJar(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'calicatch.jar'
+    archiveFileName = 'calicatch.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.CaliCatchCalibration'
     }
 }
 
-task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task inferenceFatJar(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'indirectInference.jar'
+    archiveFileName = 'indirectInference.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
     }
 }
 
-
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task buildHeadless(type: ShadowJar) {
 
     mergeServiceFiles()
-    archiveName = 'yamler.jar'
+    archiveFileName = 'yamler.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.YamlMain'
     }
@@ -220,110 +209,107 @@ task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 
 //this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
 //to make optimization.py work correctly
-
 task deployHeadless(type: Copy, dependsOn: buildHeadless) {
     from 'build/libs/'
     into 'runs/optimization/'
     include 'yamler.jar'
 }
 
-
-
-task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task fatJarBatch(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'oxfish_batch.jar'
+    archiveFileName = 'oxfish_batch.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
     }
 }
 
-
-
-task fatJarNoDataSlice2(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task fatJarNoDataSlice2(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'oxfish_nodataslice2.jar'
+    archiveFileName = 'oxfish_nodataslice2.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataSlice2'
     }
 }
 
-
-task fatJar718NoDataSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task fatJar718NoDataSlice1(type: ShadowJar) {
     mergeServiceFiles()
-    archiveName = 'oxfish_nodata718slice1.jar'
+    archiveFileName = 'oxfish_nodata718slice1.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    configurations = [project.configurations.compile]
+    //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice1'
     }
 }
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
-task buildSampleFiles(type: JavaExec){
+task buildSampleFiles(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
 }
 
-task optimizer(type: JavaExec){
+task optimizer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'uk.ac.ox.oxfish.MainOptimizer'
 }
 
-
-task sample_inputs(type:JavaExec){
+task sample_inputs(type: JavaExec) {
     main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-
-task appendix(type:JavaExec){
+task appendix(type: JavaExec) {
     main = 'uk.ac.ox.oxfish.experiments.FirstPaper'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task execute(type:JavaExec) {
+task execute(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "package.MyDefaultMain"
 
 }
 
-
-task algorithms(type:JavaExec){
+task algorithms(type: JavaExec) {
     main = 'uk.ac.ox.oxfish.experiments.SocialTuningExercise'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task batch(type:JavaExec){
+task batch(type: JavaExec) {
     main = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-
 test {
-  useJUnit()
-  testLogging {
-    events "passed", "skipped", "failed"
-  }
+    useJUnit()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
-
 
 buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
     termsOfServiceAgree = 'yes'
 }
 
-idea{
-    project {
-
-    }
+idea {
+    project {}
     module {
         downloadJavadoc = true // defaults to false
         downloadSources = true
     }
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
 
+check.dependsOn jacocoTestReport

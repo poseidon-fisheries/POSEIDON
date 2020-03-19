@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.engine.Schedule;
@@ -13,33 +13,26 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 
 public class FadMapTest {
 
@@ -59,29 +52,24 @@ public class FadMapTest {
         final Quantity<Mass> k = getQuantity(1, TONNE);
         final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
 
-        // Make a current map that moves FADs west
-        final Double2D currentVector = new Double2D(-0.3, 0);
-        final Map<SeaTile, Double2D> vectors = nauticalMap
-            .getAllSeaTilesExcludingLandAsList().stream()
-            .collect(toMap(identity(), __ -> currentVector));
         for (SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
             tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
         }
 
-        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
-        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, vectors)));
-        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
+        // Make a current map that moves FADs west
+        final CurrentVectors currentVectors = TestUtilities.makeUniformCurrentVectors(nauticalMap, new Double2D(-0.3, 0), 1);
         final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
 
         final Schedule schedule = mock(Schedule.class);
         final FishState fishState = mock(FishState.class);
-        fishState.random = new MersenneTwisterFast();
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        when(fishState.getRandom()).thenReturn(rng);
         fishState.schedule = schedule;
 
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0, ImmutableSet.of());
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, 0, ImmutableSetMultimap.of());
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
-        when(fisher.grabRandomizer()).thenReturn(fishState.random);
+        when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);
 
         // Put a FAD at the East edge of the central row
@@ -89,16 +77,17 @@ public class FadMapTest {
         final Fad fad = fadManager.deployFad(startTile, 0);
         fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getBiology());
-        assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        final VariableBiomassBasedBiology startTileBiology = (VariableBiomassBasedBiology) startTile.getBiology();
+        assertTrue(fad.getBiology().isFull());
+        assertTrue(startTileBiology.isEmpty());
 
         // If we step once, the FAD should still be in its starting tile
         // and the biologies should not have changed
         when(fishState.getStep()).thenReturn(1);
         fadMap.step(fishState);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getBiology());
-        assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        assertTrue(fad.getBiology().isFull());
+        assertTrue(startTileBiology.isEmpty());
 
         // Let it drift to the island
         when(fishState.getStep()).thenReturn(2);
@@ -107,8 +96,8 @@ public class FadMapTest {
         // The FAD should have been removed from the map
         assertEquals(Optional.empty(), fadMap.getFadTile(fad));
         // And the fish should be released in the starting cell
-        assertEmptyBiology(fad.getBiology());
-        assertFullBiology((VariableBiomassBasedBiology) startTile.getBiology());
+        assertTrue(fad.getBiology().isEmpty());
+        assertTrue(startTileBiology.isFull());
     }
 
 }

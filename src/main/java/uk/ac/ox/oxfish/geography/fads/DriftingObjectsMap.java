@@ -53,7 +53,7 @@ public class DriftingObjectsMap {
 
     public DriftingPath getObjectPath(Object o) { return objectPaths.get(o); }
 
-    void applyDrift(int timeStep) {
+    public void applyDrift(int timeStep) {
         Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
         bagToStream(objects).forEach(o -> {
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);

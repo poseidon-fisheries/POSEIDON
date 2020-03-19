@@ -60,9 +60,9 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadGravityDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
@@ -261,12 +261,8 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
-        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory()
-        );
-        ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
-            // source: https://github.com/poseidon-fisheries/tuna/commit/d1d0fce68ec9dc49aa353ec63a5d9a1fd7eee481
-            new FixedDoubleParameter(340.3333)
-        );
+        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
+        fisherDefinition.setDepartingStrategy(new PurseSeineDepartingStrategyFactory());
     }
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
@@ -482,18 +478,20 @@ public class TunaScenario implements Scenario {
                     record -> {
                         final String portName = record.getString("port_name");
                         final Double length = record.getDouble("length_in_m");
-                        final double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
                         final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
+                        final double carryingCapacityInKg = asDouble(carryingCapacity, KILOGRAM);
+                        final int capacityClass = IATTC.capacityClass(carryingCapacityInKg);
                         final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
-                        final int capacityClass = IATTC.capacityClass(holdVolume);
                         final Engine engine = new Engine(
                             Double.NaN, // Unused
                             1.0, // This is not realistic, but fuel costs are wrapped into daily costs
                             asDouble(speedsPerClass.get(capacityClass), KILOMETRE_PER_HOUR)
                         );
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));
+                        // we don't have beam width in the data file, but it isn't used anyway
+                        final double beam = 1.0;
                         fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
-                        fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
+                        fisherFactory.setHoldSupplier(() -> new Hold(carryingCapacityInKg, holdVolume, model.getBiology()));
                         final Fisher fisher = fisherFactory.buildFisher(model);
                         fisher.getTags().add(record.getString("boat_id"));
                         chooseClosurePeriod(fisher, model.getRandom());
@@ -557,7 +555,7 @@ public class TunaScenario implements Scenario {
                 final Map<SeaTile, Double> deploymentValues =
                     deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .setDeploymentLocationValues(deploymentValues);
             }
         });
@@ -567,7 +565,7 @@ public class TunaScenario implements Scenario {
                 final Map<SeaTile, Double> deploymentValues =
                     deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadGravityDestinationStrategy) fisher.getDestinationStrategy())
-                    .getFadDeploymentDestinationStrategy()
+                    .getFadDeploymentRouteSelector()
                     .setDeploymentLocationValues(deploymentValues);
             }
         });

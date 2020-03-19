@@ -14,10 +14,10 @@ public class ActionSpecificRegulations {
 
     static {
         NAMES.put(ActiveFadLimitsFactory.class, "Active FAD limits");
-        NAMES.put(GeneralSetLimitsFactory.class, "General Set limits");
+        NAMES.put(SetLimitsFactory.class, "General Set limits");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private ActionSpecificRegulations() {}
+    public ActionSpecificRegulations() {}
 
 }

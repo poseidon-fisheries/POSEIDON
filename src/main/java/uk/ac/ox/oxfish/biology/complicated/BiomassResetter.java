@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassResetter implements BiologyResetter {
@@ -40,6 +41,7 @@ public class BiomassResetter implements BiologyResetter {
 
     private double recordedBiomass = Double.NaN;
 
+    private FadMap fadMap = null;
 
     public BiomassResetter(BiomassAllocator normalizedAllocator, Species species) {
         this.normalizedAllocator = normalizedAllocator;
@@ -49,11 +51,12 @@ public class BiomassResetter implements BiologyResetter {
     /**
      * records how much biomass there is
      *
-     * @param map
+     * @param fishState
      */
     @Override
-    public void recordHowMuchBiomassThereIs(FishState map) {
-        recordedBiomass = map.getMap().getTotalBiomass(species);
+    public void recordHowMuchBiomassThereIs(FishState fishState) {
+        fadMap = fishState.getFadMap();
+        recordedBiomass = fishState.getMap().getTotalBiomass(species);
     }
 
     /**
@@ -67,6 +70,10 @@ public class BiomassResetter implements BiologyResetter {
     public void resetAbundance(NauticalMap map, MersenneTwisterFast random) {
 
         Preconditions.checkState(Double.isFinite(recordedBiomass),"can't reset without recording!");
+
+        final double totalBiomassToAllocate = (fadMap == null)
+            ? recordedBiomass
+            : recordedBiomass - fadMap.getTotalBiomass(species);
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
 
@@ -84,7 +91,7 @@ public class BiomassResetter implements BiologyResetter {
                     ((VariableBiomassBasedBiology) seaTile.getBiology());
 
             double newBiomass = Math.min(
-                    recordedBiomass *
+                    totalBiomassToAllocate *
                             normalizedAllocator.allocate(seaTile, map, random),
                     biology.getCarryingCapacity(species)
 

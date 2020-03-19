@@ -15,14 +15,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.Optional;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 
@@ -58,6 +58,7 @@ public class MakeFadSetTest {
         when(model.getRandom()).thenReturn(random);
         when(fadMap.getFadTile(fad)).thenReturn(Optional.of(seaTile));
         when(fadManager.getFadMap()).thenReturn(fadMap);
+        when(fadManager.getActionSpecificRegulations()).thenReturn(new ActiveActionRegulations());
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.getLocation()).thenReturn(seaTile);
         when(fisher.getHold()).thenReturn(hold);
@@ -66,14 +67,14 @@ public class MakeFadSetTest {
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
         // Before the set, FAD biology should be full and tile biology should be empty
-        assertFullBiology(fadBiology);
-        assertEmptyBiology(tileBiology);
+        assertTrue(fadBiology.isFull());
+        assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
         when(random.nextDouble()).thenReturn(1.0);
         makeFadSet.act(model, fisher, regulation, 0);
-        assertEmptyBiology(fadBiology);
-        assertEmptyBiology(tileBiology);
+        assertTrue(fadBiology.isEmpty());
+        assertTrue(tileBiology.isEmpty());
 
         // Now we refill the FAD biology and make an unsuccessful set
         fillBiology(fadBiology);
@@ -81,7 +82,7 @@ public class MakeFadSetTest {
         makeFadSet.act(model, fisher, regulation, 0);
 
         // After that, the FAD biology should be empty and the tile biology should be full
-        assertEmptyBiology(fadBiology);
-        assertFullBiology(tileBiology);
+        assertTrue(fadBiology.isEmpty());
+        assertTrue(tileBiology.isFull());
     }
 }
