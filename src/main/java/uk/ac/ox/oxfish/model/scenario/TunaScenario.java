@@ -61,9 +61,9 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -85,6 +85,7 @@ import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
@@ -94,7 +95,6 @@ import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
 import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
-import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -190,7 +190,6 @@ public class TunaScenario implements Scenario {
     private Path galapagosEezShapeFile = input("galapagos_eez").resolve("eez.shp");
     private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
-    private Path boatSpeedsFile = input("boat_speeds.csv");
     private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
     private Path unassociatedCatchSampleFile = input("unassociated_catch_sample.csv");
     private Path costsFile = input("costs.csv");
@@ -265,9 +264,12 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setDepartingStrategy(new PurseSeineDepartingStrategyFactory());
     }
 
-    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
-
     public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    private int dayOfYear(Month month, int dayOfMonth) {
+        return LocalDate.of(targetYear, month, dayOfMonth)
+            .getDayOfYear();
+    }
 
     @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
 
@@ -279,11 +281,15 @@ public class TunaScenario implements Scenario {
 
     @SuppressWarnings("unused") public Path getIattcShapeFile() { return iattcShapeFile; }
 
-    @SuppressWarnings("unused") public void setIattcShapeFile(Path iattcShapeFile) { this.iattcShapeFile = iattcShapeFile; }
+    @SuppressWarnings("unused") public void setIattcShapeFile(Path iattcShapeFile) {
+        this.iattcShapeFile = iattcShapeFile;
+    }
 
     @SuppressWarnings("unused") public Path getGalapagosEezShapeFile() { return galapagosEezShapeFile; }
 
-    @SuppressWarnings("unused") public void setGalapagosEezShapeFile(Path galapagosEezShapeFile) { this.galapagosEezShapeFile = galapagosEezShapeFile; }
+    @SuppressWarnings("unused") public void setGalapagosEezShapeFile(Path galapagosEezShapeFile) {
+        this.galapagosEezShapeFile = galapagosEezShapeFile;
+    }
 
     @SuppressWarnings("unused") public Path getPricesFile() { return pricesFile; }
 
@@ -293,17 +299,17 @@ public class TunaScenario implements Scenario {
 
     public void setBoatsFile(Path boatsFile) { this.boatsFile = boatsFile; }
 
-    @SuppressWarnings("unused") public Path getBoatSpeedsFile() { return boatSpeedsFile; }
-
-    @SuppressWarnings("unused") public void setBoatSpeedsFile(Path boatSpeedsFile) { this.boatSpeedsFile = boatSpeedsFile; }
-
     @SuppressWarnings("unused") public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
 
-    @SuppressWarnings("unused") public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) { this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile; }
+    @SuppressWarnings("unused") public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) {
+        this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile;
+    }
 
     @SuppressWarnings("unused") public Path getUnassociatedCatchSampleFile() { return unassociatedCatchSampleFile; }
 
-    @SuppressWarnings("unused") public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) { this.unassociatedCatchSampleFile = unassociatedCatchSampleFile; }
+    @SuppressWarnings("unused") public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
+        this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
+    }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;
@@ -373,22 +379,21 @@ public class TunaScenario implements Scenario {
     public ScenarioEssentials start(FishState model) {
         final BiologyInitializer biologyInitializer = biologyInitializers.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
-        final WeatherInitializer weatherInitializer = this.weatherInitializer.apply(model);
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, globalBiology, model);
         nauticalMap.setDistance(new CumulativeTravelTimeCachingDecorator(nauticalMap.getDistance()));
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
 
         //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(
-            nauticalMap, model.random, biologyInitializer, weatherInitializer, globalBiology, model
+            nauticalMap, model.random, biologyInitializer, this.weatherInitializer.apply(model), globalBiology, model
         );
 
         final Double gasPrice = gasPricePerLiter.apply(model.random);
-        final FixedGasPrice fixedGasPrice = new FixedGasPrice(gasPrice);
+        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
 
         final MarketMap marketMap = makeMarketMap(globalBiology);
         portInitializer
-            .buildPorts(nauticalMap, model.random, seaTile -> marketMap, model, fixedGasPrice)
+            .buildPorts(nauticalMap, model.random, seaTile -> marketMap, model, gasPriceMaker)
             .forEach(port -> port.setGasPricePerLiter(gasPrice));
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
@@ -453,21 +458,17 @@ public class TunaScenario implements Scenario {
             };
             model.scheduleOnceInXDays(
                 assignClosurePeriod,
-                StepOrder.DAWN, daysFromNow);
+                StepOrder.DAWN, daysFromNow
+            );
             model.scheduleOnceInXDays(
                 simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-                StepOrder.DAWN, daysFromNow);
+                StepOrder.DAWN, daysFromNow
+            );
         });
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
 
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
-
-        final Map<Integer, Quantity<Speed>> speedsPerClass =
-            parseAllRecords(boatSpeedsFile).stream().collect(toMap(
-                r -> r.getInt("class"),
-                r -> getQuantity(r.getDouble("speed"), KNOT))
-            );
 
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(boatsFile).stream()
@@ -478,25 +479,32 @@ public class TunaScenario implements Scenario {
                     record -> {
                         final String portName = record.getString("port_name");
                         final Double length = record.getDouble("length_in_m");
-                        final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
+                        final Quantity<Mass> carryingCapacity =
+                            getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
                         final double carryingCapacityInKg = asDouble(carryingCapacity, KILOGRAM);
-                        final int capacityClass = IATTC.capacityClass(carryingCapacityInKg);
-                        final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                        final Quantity<Volume> holdVolume =
+                            getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                        final Quantity<Speed> speed = getQuantity(record.getDouble("speed_in_knots"), KNOT);
                         final Engine engine = new Engine(
                             Double.NaN, // Unused
                             1.0, // This is not realistic, but fuel costs are wrapped into daily costs
-                            asDouble(speedsPerClass.get(capacityClass), KILOMETRE_PER_HOUR)
+                            asDouble(speed, KILOMETRE_PER_HOUR)
                         );
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));
                         // we don't have beam width in the data file, but it isn't used anyway
                         final double beam = 1.0;
                         fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
-                        fisherFactory.setHoldSupplier(() -> new Hold(carryingCapacityInKg, holdVolume, model.getBiology()));
+                        fisherFactory.setHoldSupplier(() -> new Hold(
+                            carryingCapacityInKg,
+                            holdVolume,
+                            model.getBiology()
+                        ));
                         final Fisher fisher = fisherFactory.buildFisher(model);
                         fisher.getTags().add(record.getString("boat_id"));
                         chooseClosurePeriod(fisher, model.getRandom());
                         return fisher;
-                    }));
+                    }
+                ));
 
         assignDeploymentLocationValues(model.getMap(), fishersByBoatId);
 
@@ -527,7 +535,10 @@ public class TunaScenario implements Scenario {
         fisher.getTags().add(oneOf(periods, rng));
     }
 
-    private void assignDeploymentLocationValues(NauticalMap nauticalMap, Map<String, Fisher> fishersByBoatId) {
+    private void assignDeploymentLocationValues(
+        NauticalMap nauticalMap,
+        Map<String, ? extends Fisher> fishersByBoatId
+    ) {
         final Map<String, Map<SeaTile, Double>> deploymentValuesPerBoatId =
             parseAllRecords(deploymentValuesFile).stream()
                 .filter(record -> record.getInt("year") == targetYear)
@@ -652,7 +663,9 @@ public class TunaScenario implements Scenario {
         return fadMortalityIncludedInExogenousCatches;
     }
 
-    @SuppressWarnings("unused") public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
+    @SuppressWarnings("unused")
+    public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
         this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
     }
+
 }
