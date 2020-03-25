@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -60,6 +59,9 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
@@ -108,13 +110,14 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
@@ -154,16 +157,16 @@ public class TunaScenario implements Scenario {
             //.put(EL_NINO, input("currents_el_nino.csv"))
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
-    private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
-        "BET", input("2017_BET_DIST.csv"),
-        "SKJ", input("2017_SKJ_DIST.csv"),
-        "YFT", input("2017_YFT_DIST.csv")
-    );
     public static final BiMap<String, String> speciesNames =
         parseAllRecords(input("species_names.csv")).stream().collect(toImmutableBiMap(
             r -> r.getString("species_code"),
             r -> r.getString("species_name")
         ));
+    private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
+        "BET", input("2017_BET_DIST.csv"),
+        "SKJ", input("2017_SKJ_DIST.csv"),
+        "YFT", input("2017_YFT_DIST.csv")
+    );
     private static final Path schaeferParamsFile = input("schaefer_params.csv");
     private final ImmutableList<String> actionNames = ImmutableList.of(
         DeployFad.ACTION_NAME,
@@ -423,88 +426,57 @@ public class TunaScenario implements Scenario {
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);
 
-        final LinkedList<Port> ports = model.getMap().getPorts();
-        Preconditions.checkState(!ports.isEmpty());
-
-        final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
-                r -> Range.openClosed(
-                    getQuantity(r.getInt("lower_capacity"), TONNE),
-                    getQuantity(r.getInt("upper_capacity"), TONNE)
-                ),
-                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
-            ));
+        final List<Port> ports = model.getMap().getPorts();
+        checkState(!ports.isEmpty());
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
-        fisherFactory.getAdditionalSetups().add(fisher -> {
-            // Setup hourly costs as a function of capacity
-            final ComparableQuantity<Mass> capacity = getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
-            final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
-            fisher.getAdditionalTripCosts().add(hourlyCost);
-
-            // Store a reference to the fisher in the FAD manager
-            ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher);
-
-            // Add purse-seine-specific yearly counters to the fisher's memory
-            yearlyFisherCounters.forEach(column -> fisher.getYearlyCounter().addColumn(column));
-
-            // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
-            final int daysFromNow = 1 + dayOfYear(JULY, 15);
-            Steppable assignClosurePeriod = simState -> {
-                if (fisher.getRegulation() instanceof MultipleRegulations) {
-                    chooseClosurePeriod(fisher, model.getRandom());
-                    ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
-                }
-            };
-            model.scheduleOnceInXDays(
-                assignClosurePeriod,
-                StepOrder.DAWN, daysFromNow
-            );
-            model.scheduleOnceInXDays(
-                simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-                StepOrder.DAWN, daysFromNow
-            );
-        });
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
-
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
-        final Map<String, Fisher> fishersByBoatId =
-            parseAllRecords(boatsFile).stream()
-                .filter(record -> record.getInt("year") == targetYear)
-                //.limit(10)
-                .collect(toMap(
-                    record -> record.getString("boat_id"),
-                    record -> {
-                        final String portName = record.getString("port_name");
-                        final Double length = record.getDouble("length_in_m");
-                        final Quantity<Mass> carryingCapacity =
-                            getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
-                        final double carryingCapacityInKg = asDouble(carryingCapacity, KILOGRAM);
-                        final Quantity<Volume> holdVolume =
-                            getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
-                        final Quantity<Speed> speed = getQuantity(record.getDouble("speed_in_knots"), KNOT);
-                        final Engine engine = new Engine(
-                            Double.NaN, // Unused
-                            1.0, // This is not realistic, but fuel costs are wrapped into daily costs
-                            asDouble(speed, KILOMETRE_PER_HOUR)
-                        );
-                        fisherFactory.setPortSupplier(() -> portsByName.get(portName));
-                        // we don't have beam width in the data file, but it isn't used anyway
-                        final double beam = 1.0;
-                        fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
-                        fisherFactory.setHoldSupplier(() -> new Hold(
-                            carryingCapacityInKg,
-                            holdVolume,
-                            model.getBiology()
-                        ));
-                        final Fisher fisher = fisherFactory.buildFisher(model);
-                        fisher.getTags().add(record.getString("boat_id"));
-                        chooseClosurePeriod(fisher, model.getRandom());
-                        return fisher;
-                    }
-                ));
+        fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
+            addHourlyCosts(),
+            fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),
+            fisher -> yearlyFisherCounters.forEach(column -> fisher.getYearlyCounter().addColumn(column)),
+            fisher -> scheduleClosurePeriodChoice(model, fisher)
+        ));
+        final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
+            .filter(record -> record.getInt("year") == targetYear)
+            .collect(toMap(
+                record -> record.getString("boat_id"),
+                record -> {
+                    final String portName = record.getString("port_name");
+                    final Double length = record.getDouble("length_in_m");
+                    final Quantity<Mass> carryingCapacity =
+                        getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
+                    final double carryingCapacityInKg = asDouble(carryingCapacity, KILOGRAM);
+                    final Quantity<Volume> holdVolume =
+                        getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                    final Quantity<Speed> speed = getQuantity(record.getDouble("speed_in_knots"), KNOT);
+                    final Engine engine = new Engine(
+                        Double.NaN, // Unused
+                        1.0, // This is not realistic, but fuel costs are wrapped into daily costs
+                        asDouble(speed, KILOMETRE_PER_HOUR)
+                    );
+                    fisherFactory.setPortSupplier(() -> portsByName.get(portName));
+                    // we don't have beam width in the data file, but it isn't used anyway
+                    final double beam = 1.0;
+                    fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
+                    fisherFactory.setHoldSupplier(() -> new Hold(
+                        carryingCapacityInKg,
+                        holdVolume,
+                        model.getBiology()
+                    ));
+                    final Fisher fisher = fisherFactory.buildFisher(model);
+                    fisher.getTags().add(record.getString("boat_id"));
+                    setFixedRestTime(
+                        fisher.getDepartingStrategy(),
+                        record.getDouble("mean_time_at_port_in_hours")
+                    );
+                    chooseClosurePeriod(fisher, model.getRandom());
+                    return fisher;
+                }
+            ));
 
         assignDeploymentLocationValues(model.getMap(), fishersByBoatId);
 
@@ -527,6 +499,51 @@ public class TunaScenario implements Scenario {
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
+    }
+
+    /**
+     * Recursively find fixed rest time departing strategies and set minimumHoursToWait
+     */
+    private void setFixedRestTime(DepartingStrategy departingStrategy, double minimumHoursToWait) {
+        if (departingStrategy instanceof FixedRestTimeDepartingStrategy)
+            ((FixedRestTimeDepartingStrategy) departingStrategy).setMinimumHoursToWait(minimumHoursToWait);
+        else if (departingStrategy instanceof CompositeDepartingStrategy)
+            ((CompositeDepartingStrategy) departingStrategy).getStrategies()
+                .forEach(s -> setFixedRestTime(s, minimumHoursToWait));
+    }
+
+    private void scheduleClosurePeriodChoice(FishState model, Fisher fisher) {
+        // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
+        final int daysFromNow = 1 + dayOfYear(JULY, 15);
+        Steppable assignClosurePeriod = simState -> {
+            if (fisher.getRegulation() instanceof MultipleRegulations) {
+                chooseClosurePeriod(fisher, model.getRandom());
+                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
+            }
+        };
+        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
+        model.scheduleOnceInXDays(
+            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
+            StepOrder.DAWN,
+            daysFromNow
+        );
+    }
+
+    private Consumer<Fisher> addHourlyCosts() {
+        final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
+            parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
+                r -> Range.openClosed(
+                    getQuantity(r.getInt("lower_capacity"), TONNE),
+                    getQuantity(r.getInt("upper_capacity"), TONNE)
+                ),
+                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
+            ));
+        // Setup hourly costs as a function of capacity
+        return fisher -> {
+            final ComparableQuantity<Mass> capacity = getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
+            final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
+            fisher.getAdditionalTripCosts().add(hourlyCost);
+        };
     }
 
     private void chooseClosurePeriod(Fisher fisher, MersenneTwisterFast rng) {
