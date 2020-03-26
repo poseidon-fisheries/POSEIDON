@@ -21,9 +21,9 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;

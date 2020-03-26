@@ -2,13 +2,14 @@ package uk.ac.ox.oxfish.fisher.actions.fads;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple50x50Map;
 
-public class FadActionTest {
+public class PurseSeinerActionTest {
 
     @Test
     public void getRegionNumber() {

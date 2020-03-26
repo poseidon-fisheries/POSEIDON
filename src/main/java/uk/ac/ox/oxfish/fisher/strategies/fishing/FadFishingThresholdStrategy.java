@@ -25,10 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
@@ -53,9 +53,9 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerUtils {
 
-    private final AtomicLongMap<Class<? extends FadAction>> consecutiveActionCounts = AtomicLongMap.create();
+    private final AtomicLongMap<Class<? extends PurseSeinerAction>> consecutiveActionCounts = AtomicLongMap.create();
     final private double minFadValue;
-    private Optional<? extends FadAction> nextAction = Optional.empty();
+    private Optional<? extends PurseSeinerAction> nextAction = Optional.empty();
     private double fadDeploymentsCoefficient;
     private double setsOnOtherFadsCoefficient;
     private double unassociatedSetsCoefficient;
@@ -98,7 +98,7 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
         return nextAction.isPresent();
     }
 
-    private Optional<? extends FadAction> maybeDeployFad(FishState model, Fisher fisher) {
+    private Optional<? extends PurseSeinerAction> maybeDeployFad(FishState model, Fisher fisher) {
 
         final Map<SeaTile, Double> deploymentLocationValues =
             fisher.getDestinationStrategy() instanceof FadDestinationStrategy ?
@@ -114,15 +114,15 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
             .map(value -> probability(fadDeploymentsCoefficient, value, consecutiveActionCounts.get(DeployFad.class), fadDeploymentsProbabilityDecay))
             .filter(p -> model.getRandom().nextDouble() < p)
             .map(__ -> new DeployFad(model, fisher))
-            .filter(FadAction::canHappen);
+            .filter(PurseSeinerAction::canHappen);
     }
 
-    private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
+    private Optional<? extends PurseSeinerAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
         return Optional.of(new MakeUnassociatedSet(model, fisher))
-            .filter(FadAction::canHappen);
+            .filter(PurseSeinerAction::canHappen);
     }
 
-    private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
+    private Optional<? extends PurseSeinerAction> maybeMakeFadSet(FishState model, Fisher fisher) {
         final FadManager manager = FadManagerUtils.getFadManager(fisher);
         return fadsHere(fisher)
             .filter(fad -> fad.getOwner() == manager || model.getRandom().nextDouble() < setsOnOtherFadsCoefficient)
@@ -130,7 +130,7 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
             .filter(fadDoublePair -> fadDoublePair.getSecond() > minFadValue)
             .sorted(comparingDouble(Pair::getSecond))
             .map(pair -> new MakeFadSet(model, fisher, pair.getFirst()))
-            .filter(FadAction::canHappen)
+            .filter(PurseSeinerAction::canHappen)
             .findFirst();
     }
 
@@ -159,7 +159,7 @@ public class FadFishingThresholdStrategy implements FishingStrategy, FadManagerU
     ) {
         nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration()));
         // If we have a next action, increment its counter
-        nextAction.map(FadAction::getClass).ifPresent(consecutiveActionCounts::incrementAndGet);
+        nextAction.map(PurseSeinerAction::getClass).ifPresent(consecutiveActionCounts::incrementAndGet);
         if (!nextAction.isPresent()) consecutiveActionCounts.clear();
         final ActionResult actionResult = nextAction
             .map(action -> new ActionResult(action, hoursLeft))

@@ -45,12 +45,12 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalize
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.fisher.actions.fads.Regions;
-import uk.ac.ox.oxfish.fisher.actions.fads.SetAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -137,8 +137,8 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.proportionGathererName;
-import static uk.ac.ox.oxfish.fisher.actions.fads.FadAction.totalCounterName;
+import static uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction.proportionGathererName;
+import static uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction.totalCounterName;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -177,9 +177,9 @@ public class TunaScenario implements Scenario {
     );
     private final Set<Integer> regionNumbers = Regions.REGION_NAMES.keySet();
     private final ImmutableList<String> yearlyFisherCounters = Stream.of(
-        actionNames.stream().map(FadAction::totalCounterName),
+        actionNames.stream().map(PurseSeinerAction::totalCounterName),
         regionNumbers.stream().flatMap(regionNumber ->
-            actionNames.stream().map(actionName -> FadAction.regionCounterName(actionName, regionNumber))
+            actionNames.stream().map(actionName -> PurseSeinerAction.regionCounterName(actionName, regionNumber))
         ),
         speciesNames.values().stream().flatMap(speciesName ->
             Stream.of(MakeFadSet.ACTION_NAME, MakeUnassociatedSet.ACTION_NAME).map(actionName ->
@@ -624,7 +624,7 @@ public class TunaScenario implements Scenario {
             actionNames.forEach(actionName ->
                 fishState.getYearlyDataSet().registerGatherer(
                     proportionGathererName(actionName, regionNumber),
-                    model -> yearlyCounterAdder(FadAction.regionCounterName(actionName, regionNumber)).apply(model) /
+                    model -> yearlyCounterAdder(PurseSeinerAction.regionCounterName(actionName, regionNumber)).apply(model) /
                         yearlyCounterAdder(totalCounterName(actionName)).apply(model),
                     0.0
                 )

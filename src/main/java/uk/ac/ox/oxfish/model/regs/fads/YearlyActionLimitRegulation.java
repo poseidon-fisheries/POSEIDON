@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -41,7 +41,7 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         startableConsumer.accept(this);
     }
 
-    @Override public boolean isForbidden(FadAction action) {
+    @Override public boolean isForbidden(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         return counter >= getLimit(action.getFisher());
     }
@@ -50,7 +50,7 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
 
     public int getNumRemainingActions(Fisher fisher) { return getLimit(fisher) - counter; }
 
-    @Override public void reactToAction(FadAction action) {
+    @Override public void reactToAction(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         counter++;
     }

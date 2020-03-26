@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.actions.fads;
+package uk.ac.ox.oxfish.fisher.actions.purseseiner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -36,7 +36,7 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class DeployFad extends FadAction {
+public class DeployFad extends PurseSeinerAction {
 
     // TODO: that should probably be configurable, but there is no good place to put it...
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;

@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.actions.fads;
+package uk.ac.ox.oxfish.fisher.actions.purseseiner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -30,21 +30,21 @@ import uk.ac.ox.oxfish.model.FishState;
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
 
-import static uk.ac.ox.oxfish.fisher.actions.fads.Regions.REGION_NAMES;
-import static uk.ac.ox.oxfish.fisher.actions.fads.Regions.getRegionNumber;
+import static uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions.REGION_NAMES;
+import static uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions.getRegionNumber;
 
-public abstract class FadAction implements Action, FadManagerUtils {
+public abstract class PurseSeinerAction implements Action, FadManagerUtils {
 
     private final FishState model;
     private final Fisher fisher;
     private final SeaTile seaTile;
     private final int step;
 
-    protected FadAction(FishState model, Fisher fisher) {
+    protected PurseSeinerAction(FishState model, Fisher fisher) {
         this(model, fisher, fisher.getLocation(), model.getStep());
     }
 
-    protected FadAction(FishState model, Fisher fisher, SeaTile seaTile, int step) {
+    protected PurseSeinerAction(FishState model, Fisher fisher, SeaTile seaTile, int step) {
         this.model = model;
         this.fisher = fisher;
         this.seaTile = seaTile;

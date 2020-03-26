@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.actions.fads;
+package uk.ac.ox.oxfish.fisher.actions.purseseiner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -40,9 +40,8 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 /**
  * Represents either a FAD set or an unassociated set. Dolphin sets will presumable fall under this interface too.
- * It's not lost on me that making unassociated/dolphin sets extend *Fad*Action is weird, so TODO: revise this.
  */
-public abstract class SetAction extends FadAction {
+public abstract class SetAction extends PurseSeinerAction {
 
     private Quantity<Time> duration;
 

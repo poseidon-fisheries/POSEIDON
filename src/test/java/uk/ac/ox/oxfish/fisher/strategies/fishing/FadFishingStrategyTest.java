@@ -25,9 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -112,13 +112,13 @@ public class FadFishingStrategyTest {
 
         // The first action, when allowed by the rng, should be DeployFad
         when(rng.nextBoolean(anyDouble())).thenReturn(true);
-        final Optional<? extends FadAction> action1 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
+        final Optional<? extends PurseSeinerAction> action1 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
         assertTrue(action1.isPresent());
         assertTrue(action1.get() instanceof DeployFad);
         assertTrue(fadFishingStrategy.shouldFish(fisher, rng, fishState, tripRecord));
 
         // The second action, when nothing changes, should still be the same DeployFad
-        final Optional<? extends FadAction> action2 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
+        final Optional<? extends PurseSeinerAction> action2 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
         assertTrue(action2.isPresent());
         assertSame(action2.get(), action1.get());
         assertTrue(fadFishingStrategy.shouldFish(fisher, rng, fishState, tripRecord));
@@ -133,7 +133,7 @@ public class FadFishingStrategyTest {
         final Fad fad = mock(Fad.class);
         when(fadManager.getFadsHere()).thenReturn(new Bag(new Object[]{fad}));
         when(fadMap.getFadTile(any())).thenReturn(Optional.of(seaTile));
-        final Optional<? extends FadAction> action3 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
+        final Optional<? extends PurseSeinerAction> action3 = fadFishingStrategy.updateAndReturnNextAction(fishState, fisher);
         assertTrue(action3.isPresent());
         assertTrue(action3.get() instanceof MakeFadSet);
         assertTrue(fadFishingStrategy.shouldFish(fisher, rng, fishState, tripRecord));
