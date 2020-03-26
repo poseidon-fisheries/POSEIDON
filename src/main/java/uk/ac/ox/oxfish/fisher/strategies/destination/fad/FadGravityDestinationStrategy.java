@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;

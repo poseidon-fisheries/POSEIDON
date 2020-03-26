@@ -63,7 +63,9 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.PurseSeineDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.fad.AbstractRouteSelector;
 import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.fad.FadGravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
@@ -474,6 +476,7 @@ public class TunaScenario implements Scenario {
                         record.getDouble("mean_time_at_port_in_hours")
                     );
                     chooseClosurePeriod(fisher, model.getRandom());
+                    setMaxTravelTime(fisher, record.getDouble("max_trip_duration_in_hours"));
                     return fisher;
                 }
             ));
@@ -499,6 +502,19 @@ public class TunaScenario implements Scenario {
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
+    }
+
+    private void setMaxTravelTime(Fisher fisher, double maxTripDurationInHours) {
+        ImmutableList.Builder<AbstractRouteSelector> builder = new ImmutableList.Builder<>();
+        final DestinationStrategy strategy = fisher.getDestinationStrategy();
+        if (strategy instanceof FadDestinationStrategy) {
+            final FadDestinationStrategy fadDestinationStrategy = (FadDestinationStrategy) strategy;
+            builder.add(fadDestinationStrategy.getFadDeploymentRouteSelector());
+            builder.add(fadDestinationStrategy.getFadSettingRouteSelector());
+        } else if (strategy instanceof FadGravityDestinationStrategy) {
+            builder.add(((FadGravityDestinationStrategy) strategy).getFadDeploymentRouteSelector());
+        }
+        builder.build().forEach(routeSelector -> routeSelector.setMaxTravelTimeInHours(maxTripDurationInHours));
     }
 
     /**

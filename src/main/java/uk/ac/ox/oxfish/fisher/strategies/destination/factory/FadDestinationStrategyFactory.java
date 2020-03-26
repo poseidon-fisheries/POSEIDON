@@ -10,8 +10,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FadDestinationStrategyFactory implements AlgorithmFactory<FadDestinationStrategy> {
 
-    public static final double MAX_HOURS_AT_SEA = 3059.75; // longest trip from data
-
     private DoubleParameter numberOfStepsToLookAheadForFadPositions = new FixedDoubleParameter(30);
     private DoubleParameter travelSpeedMultiplier = new FixedDoubleParameter(1);
 
@@ -38,8 +36,9 @@ public class FadDestinationStrategyFactory implements AlgorithmFactory<FadDestin
 
         return new FadDestinationStrategy(
             fishState.getMap(),
-            new FadDeploymentRouteSelector(fishState, MAX_HOURS_AT_SEA, travelSpeedMultiplier),
-            new FadSettingRouteSelector(fishState, MAX_HOURS_AT_SEA, travelSpeedMultiplier, numberOfStepsToLookAheadForFadPositions)
+            // Travel times are initialized to zero and have to be set in the scenario
+            new FadDeploymentRouteSelector(fishState, 0, travelSpeedMultiplier),
+            new FadSettingRouteSelector(fishState, 0, travelSpeedMultiplier, numberOfStepsToLookAheadForFadPositions)
         );
     }
 

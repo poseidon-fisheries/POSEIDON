@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map.Entry;
@@ -48,7 +49,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     private final double travelSpeedMultiplier;
     private double maxTravelTimeInHours;
 
-    protected AbstractRouteSelector(
+    AbstractRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
         double travelSpeedMultiplier
@@ -59,12 +60,12 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         this.travelSpeedMultiplier = travelSpeedMultiplier;
     }
 
-    static ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<PossibleRoute> possibleRoutes) {
+    static ImmutableList<Integer> getTimeStepRange(int startingStep, Collection<PossibleRoute> possibleRoutes) {
         final int maxTimeStep = possibleRoutes.stream().mapToInt(PossibleRoute::getLastTimeStep).max().orElse(0);
         return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
     }
 
-    public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
+    @SuppressWarnings("WeakerAccess") public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
 
     public void setMaxTravelTimeInHours(double maxTravelTimeInHours) {
         this.maxTravelTimeInHours = maxTravelTimeInHours;
@@ -103,7 +104,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     @SuppressWarnings("UnstableApiUsage")
     ImmutableList<PossibleRoute> getPossibleRoutes(
         Fisher fisher,
-        Set<SeaTile> possibleDestinations,
+        Collection<SeaTile> possibleDestinations,
         int startingTimeStep
     ) {
         return possibleDestinations
