@@ -44,6 +44,8 @@ public class MakeUnassociatedSet extends SetAction {
 
     public String getActionName() { return ACTION_NAME; }
 
+    @Override void notifyFadManager() { getFadManager().reactTo(this); }
+
     @Override public Action actionAfterSet() { return new Arriving(); }
 
     /**

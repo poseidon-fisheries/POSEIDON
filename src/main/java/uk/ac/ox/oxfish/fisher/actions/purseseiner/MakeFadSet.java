@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 public class MakeFadSet extends SetAction {
 
-    public static String ACTION_NAME = "FAD sets";
+    private static String ACTION_NAME = "FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(FishState model, Fisher fisher, Fad targetFad) {
@@ -40,6 +40,8 @@ public class MakeFadSet extends SetAction {
     }
 
     public String getActionName() { return ACTION_NAME; }
+
+    @Override void notifyFadManager() { getFadManager().reactTo(this); }
 
     @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
         return rng.nextDouble() < purseSeineGear.getSuccessfulSetProbability();

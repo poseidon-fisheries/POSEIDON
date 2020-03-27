@@ -30,8 +30,6 @@ import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
-import java.util.stream.Stream;
-
 import static org.junit.Assert.assertThrows;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeUniformCurrentVectors;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -55,13 +53,14 @@ public class FadManagerTest {
     @Test
     public void cantConstructWithNegativeFadsInStock() {
         assertThrows(IllegalArgumentException.class, () ->
-            new FadManager(fadMap, fadInitializer, -1, Stream.of())
+            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(-1).build()
         );
     }
 
     @Test
     public void cantInitFadWhenZeroFADsInStock() {
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0, Stream.of());
+        final FadManager fadManager =
+            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(0).build();
         assertThrows(IllegalStateException.class, () ->
             fadManager.deployFad(nauticalMap.getSeaTile(0, 0), 0)
         );

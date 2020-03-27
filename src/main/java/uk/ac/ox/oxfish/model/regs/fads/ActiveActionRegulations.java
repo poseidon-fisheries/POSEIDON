@@ -28,17 +28,26 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
+import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 
 public class ActiveActionRegulations {
-    private ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations;
+
+    private ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
+        actionSpecificRegulations;
 
     public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
 
-    public ActiveActionRegulations(
+    private ActiveActionRegulations(
         ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this.actionSpecificRegulations = actionSpecificRegulations;
+    }
+
+    public ActiveActionRegulations(
+        Iterable<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this(stream(actionSpecificRegulations));
     }
 
     public ActiveActionRegulations(
@@ -53,7 +62,7 @@ public class ActiveActionRegulations {
         return regulationStream(purseSeinerAction).anyMatch(reg -> reg.isForbidden(purseSeinerAction));
     }
 
-    public Stream<ActionSpecificRegulation> regulationStream(PurseSeinerAction purseSeinerAction) {
+    private Stream<ActionSpecificRegulation> regulationStream(PurseSeinerAction purseSeinerAction) {
         return regulationStream(purseSeinerAction.getClass());
     }
 
@@ -66,14 +75,15 @@ public class ActiveActionRegulations {
     }
 
     public boolean anyYearlyLimitedActionRemaining(Fisher fisher) {
-        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations = getYearlyActionLimitRegulations();
+        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations =
+            getYearlyActionLimitRegulations();
         return yearlyActionLimitRegulations.isEmpty() ||
             yearlyActionLimitRegulations.stream().anyMatch(reg ->
                 reg.getNumRemainingActions(fisher) > 0
             );
     }
 
-    public ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
+    private ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
         return actionSpecificRegulations
             .values()
             .stream()

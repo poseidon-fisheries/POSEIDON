@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -35,10 +34,11 @@ public class FadInitializerTest {
             new FadInitializer(globalBiology, carryingCapacities, ImmutableMap.of(), rng, 0, 0);
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0, ImmutableSetMultimap.of());
+        final FadManager fadManager = new FadManager.Builder(fadMap, fadInitializer).build();
 
         final Fad fad = fadInitializer.apply(fadManager);
         for (Species species : globalBiology.getSpecies())
             assertEquals(fad.getBiology().getBiomass(species), 0, 0);
     }
+
 }

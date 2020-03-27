@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.actions.purseseiner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -35,6 +34,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
+import java.util.Optional;
 
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
@@ -44,11 +44,14 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 public abstract class SetAction extends PurseSeinerAction {
 
     private Quantity<Time> duration;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType") private Optional<Catch> catchesKept = Optional.empty();
 
     SetAction(FishState model, Fisher fisher) {
         super(model, fisher);
         this.duration = ((PurseSeineGear) fisher.getGear()).nextSetDuration(model.getRandom());
     }
+
+    public Optional<Catch> getCatchesKept() { return catchesKept; }
 
     @Override public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
@@ -57,45 +60,41 @@ public abstract class SetAction extends PurseSeinerAction {
         if (canHappen()) {
             final int duration = toHours(this.duration);
             final SeaTile seaTile = fisher.getLocation();
-            fisher.getYearlyCounter().count(totalCounterName(), 1);
-            fisher.getYearlyCounter().count(regionCounterName(), 1);
             if (isSuccessful(purseSeineGear, model.getRandom())) {
                 final LocalBiology targetBiology = targetBiology(
                     purseSeineGear, model.getBiology(), seaTile, model.getRandom()
                 );
-                final Catch catchesKept = fisher.fishHere(model.getBiology(), duration, model, targetBiology).getFirst();
-                model.getBiology().getSpecies().forEach(species ->
-                    fisher.getYearlyCounter().count(catchesCounterName(species), catchesKept.getWeightCaught(species))
+                catchesKept = Optional.of(
+                    fisher.fishHere(model.getBiology(), duration, model, targetBiology).getFirst()
                 );
-                getFadManager().getActionSpecificRegulations().reactToAction(this);
-                model.recordFishing(seaTile);
+                model.recordFishing(seaTile); // TODO: make listener
             } else {
                 reactToFailedSet(model, seaTile);
             }
+            notifyFadManager();
             return new ActionResult(actionAfterSet(), hoursLeft - duration);
         } else {
             return new ActionResult(new Arriving(), hoursLeft);
         }
     }
 
+    abstract void notifyFadManager();
+
     abstract boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng);
 
-    abstract LocalBiology targetBiology(PurseSeineGear purseSeineGear, GlobalBiology globalBiology, LocalBiology seaTileBiology, MersenneTwisterFast rng);
-
-    public String catchesCounterName(Species species) {
-        return catchesCounterName(species.getName(), getActionName());
-    }
+    abstract LocalBiology targetBiology(
+        PurseSeineGear purseSeineGear,
+        GlobalBiology globalBiology,
+        LocalBiology seaTileBiology,
+        MersenneTwisterFast rng
+    );
 
     void reactToFailedSet(FishState model, SeaTile locationOfSet) {}
 
     abstract Action actionAfterSet();
 
-    public static String catchesCounterName(String speciesName, String actionName) {
-        return speciesName + " catches from " + actionName;
-    }
-
     public boolean isPossible() {
-        return getFisher().getHold().getPercentageFilled() < 1 && getSeaTile().isWater();
+        return getFisher().getHold().getPercentageFilled() < 1 && getLocation().isWater();
     }
 
     public Quantity<Time> getDuration() { return duration; }

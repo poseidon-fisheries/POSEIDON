@@ -2,10 +2,17 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
+import uk.ac.ox.oxfish.fisher.equipment.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.Observer;
+import uk.ac.ox.oxfish.model.data.monitors.PerSpeciesMonitor;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -16,10 +23,16 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
+    private Iterable<? extends Observer<DeployFad>> fadDeploymentObservers;
+    private Iterable<? extends Observer<SetAction>> setObservers;
+    private Iterable<? extends Observer<MakeFadSet>> fadSetObservers;
+    private Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers;
+    private PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
@@ -32,7 +45,15 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path unassociatedCatchSampleFile;
 
-    @SuppressWarnings("unused") public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
+    @SuppressWarnings("unused")
+    public PerSpeciesMonitor<BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
+
+    public void setBiomassLostMonitor(PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor) {
+        this.biomassLostMonitor = biomassLostMonitor;
+    }
+
+    @SuppressWarnings("unused")
+    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
         return actionSpecificRegulations;
     }
 
@@ -40,25 +61,29 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
     @SuppressWarnings("unused") public void setMinimumSetDurationInHours(DoubleParameter minimumSetDurationInHours) {
         this.minimumSetDurationInHours = minimumSetDurationInHours;
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
 
     @SuppressWarnings("unused") public void setAverageSetDurationInHours(DoubleParameter averageSetDurationInHours) {
         this.averageSetDurationInHours = averageSetDurationInHours;
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
 
     @SuppressWarnings("unused") public void setStdDevOfSetDurationInHours(DoubleParameter stdDevOfSetDurationInHours) {
         this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
 
     @SuppressWarnings("unused") public void setSuccessfulSetProbability(DoubleParameter successfulSetProbability) {
         this.successfulSetProbability = successfulSetProbability;
@@ -80,14 +105,43 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.initialNumberOfFads = initialNumberOfFads;
     }
 
+    @SuppressWarnings("unused")
+    public Iterable<? extends Observer<DeployFad>> getFadDeploymentObservers() { return fadDeploymentObservers; }
+
+    public void setFadDeploymentObservers(Iterable<? extends Observer<DeployFad>> fadDeploymentObservers) {
+        this.fadDeploymentObservers = fadDeploymentObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public Iterable<? extends Observer<MakeFadSet>> getFadSetObservers() { return fadSetObservers; }
+
+    public void setFadSetObservers(Iterable<? extends Observer<MakeFadSet>> fadSetObservers) {
+        this.fadSetObservers = fadSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public Iterable<? extends Observer<MakeUnassociatedSet>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
+
+    public void setUnassociatedSetObservers(Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers) {
+        this.unassociatedSetObservers = unassociatedSetObservers;
+    }
+
     @Override
     public PurseSeineGear apply(FishState fishState) {
-        final FadManager fadManager = new FadManager(
-            fishState.getFadMap(),
-            fadInitializerFactory.apply(fishState),
-            initialNumberOfFads,
-            actionSpecificRegulations.stream().map(factory -> factory.apply(fishState))
-        );
+
+        final FadManager fadManager =
+            new FadManager
+                .Builder(fishState.getFadMap(), fadInitializerFactory.apply(fishState))
+                .setInitialNumberOfFadsInStock(initialNumberOfFads)
+                .addFadDeploymentObservers(fadDeploymentObservers)
+                .addSetObservers(setObservers)
+                .addFadSetObservers(fadSetObservers)
+                .addUnassociatedSetObservers(unassociatedSetObservers)
+                .setBiomassLostMonitor(biomassLostMonitor)
+                .addActionSpecificRegulations(
+                    actionSpecificRegulations.stream().map(factory -> factory.apply(fishState)).collect(toList())
+                )
+                .build();
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
             parseAllRecords(unassociatedCatchSampleFile).stream()
@@ -112,6 +166,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
         this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
+    }
+
+    public void setSetObservers(Iterable<? extends Observer<SetAction>> setObservers) {
+        this.setObservers = setObservers;
     }
 
 }

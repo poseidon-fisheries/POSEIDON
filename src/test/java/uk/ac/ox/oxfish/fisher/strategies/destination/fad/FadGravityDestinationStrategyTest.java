@@ -38,7 +38,6 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -76,8 +75,10 @@ public class FadGravityDestinationStrategyTest {
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0, 1), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, Stream.of());
+        final FadInitializer fadInitializer =
+            new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadManager fadManager =
+            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(Integer.MAX_VALUE).build();
         fadManager.setFisher(fisher);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
@@ -129,4 +130,5 @@ public class FadGravityDestinationStrategyTest {
         assertEquals(map.getSeaTile(1, 2), dest12b);
 
     }
+
 }

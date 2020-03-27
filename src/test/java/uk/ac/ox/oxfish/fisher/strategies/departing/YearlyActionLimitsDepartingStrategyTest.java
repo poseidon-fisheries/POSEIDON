@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -61,7 +60,9 @@ public class YearlyActionLimitsDepartingStrategyTest {
         FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
-        FadManager fadManager = new FadManager(null, fadInitializer, 0, Stream.of(setLimits));
+        FadManager fadManager = new FadManager.Builder(null, fadInitializer)
+            .addActionSpecificRegulations(setLimits)
+            .build();
         fadManager.setFisher(fisher);
         final ActiveActionRegulations actionSpecificRegulations = fadManager.getActionSpecificRegulations();
 
@@ -87,4 +88,5 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
     }
+
 }

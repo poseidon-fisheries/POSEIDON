@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.engine.Schedule;
@@ -58,8 +57,10 @@ public class FadMapTest {
 
         // Make a current map that moves FADs west
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final CurrentVectors currentVectors = TestUtilities.makeUniformCurrentVectors(nauticalMap, new Double2D(-0.3, 0), 1);
-        final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), rng, 0, 0);
+        final CurrentVectors currentVectors =
+            TestUtilities.makeUniformCurrentVectors(nauticalMap, new Double2D(-0.3, 0), 1);
+        final FadInitializer fadInitializer =
+            new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), rng, 0, 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
 
         final Schedule schedule = mock(Schedule.class);
@@ -67,7 +68,8 @@ public class FadMapTest {
         when(fishState.getRandom()).thenReturn(rng);
         fishState.schedule = schedule;
 
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1, ImmutableSetMultimap.of());
+        final FadManager fadManager =
+            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(1).build();
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);

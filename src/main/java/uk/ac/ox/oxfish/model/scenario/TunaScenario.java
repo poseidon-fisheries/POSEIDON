@@ -28,7 +28,6 @@ import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.tuple.Triple;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -46,16 +45,16 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
+import uk.ac.ox.oxfish.fisher.equipment.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -83,7 +82,18 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.Monitor;
+import uk.ac.ox.oxfish.model.data.monitors.ObservingOnGatherMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.PerRegionMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.PerSpeciesMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.PerSpeciesPerRegionMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.IncrementingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.IterativeAveragingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.SummingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
+import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
@@ -112,17 +122,16 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
+import static com.google.common.collect.Iterables.concat;
 import static java.time.Month.JANUARY;
 import static java.time.Month.JULY;
 import static java.time.Month.NOVEMBER;
@@ -137,9 +146,8 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction.proportionGathererName;
-import static uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction.totalCounterName;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.Measures.convert;
@@ -170,24 +178,6 @@ public class TunaScenario implements Scenario {
         "YFT", input("2017_YFT_DIST.csv")
     );
     private static final Path schaeferParamsFile = input("schaefer_params.csv");
-    private final ImmutableList<String> actionNames = ImmutableList.of(
-        DeployFad.ACTION_NAME,
-        MakeFadSet.ACTION_NAME,
-        MakeUnassociatedSet.ACTION_NAME
-    );
-    private final Set<Integer> regionNumbers = Regions.REGION_NAMES.keySet();
-    private final ImmutableList<String> yearlyFisherCounters = Stream.of(
-        actionNames.stream().map(PurseSeinerAction::totalCounterName),
-        regionNumbers.stream().flatMap(regionNumber ->
-            actionNames.stream().map(actionName -> PurseSeinerAction.regionCounterName(actionName, regionNumber))
-        ),
-        speciesNames.values().stream().flatMap(speciesName ->
-            Stream.of(MakeFadSet.ACTION_NAME, MakeUnassociatedSet.ACTION_NAME).map(actionName ->
-                SetAction.catchesCounterName(speciesName, actionName)
-            )
-        ),
-        speciesNames.values().stream().map(Fad::biomassLostCounterName)
-    ).flatMap(identity()).collect(toImmutableList());
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(input("ports.csv"));
     private Path mapFile = input("depth.csv");
     private Path deploymentValuesFile = input("deployment_values.csv");
@@ -433,13 +423,20 @@ public class TunaScenario implements Scenario {
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
 
+        final PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) fisherDefinition.getGear();
+        final Observers observers = new Observers(model);
+        purseSeineGearFactory.setFadDeploymentObservers(observers.fadDeploymentMonitors);
+        purseSeineGearFactory.setSetObservers(observers.setMonitors);
+        purseSeineGearFactory.setFadSetObservers(observers.fadSetMonitors);
+        purseSeineGearFactory.setUnassociatedSetObservers(observers.unassociatedSetMonitors);
+        purseSeineGearFactory.setBiomassLostMonitor(observers.biomassLostMonitor);
+
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
             addHourlyCosts(),
             fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> yearlyFisherCounters.forEach(column -> fisher.getYearlyCounter().addColumn(column)),
             fisher -> scheduleClosurePeriodChoice(model, fisher)
         ));
         final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
@@ -498,7 +495,6 @@ public class TunaScenario implements Scenario {
         model.registerStartable(exogenousCatches);
 
         plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
-        registerGatherers(model);
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
@@ -616,36 +612,6 @@ public class TunaScenario implements Scenario {
 
     }
 
-    private void registerGatherers(FishState fishState) {
-        yearlyFisherCounters.forEach(column ->
-            fishState.getYearlyDataSet().registerGatherer(column, yearlyCounterAdder(column), 0.0)
-        );
-        regionNumbers.forEach(regionNumber ->
-            actionNames.forEach(actionName ->
-                fishState.getYearlyDataSet().registerGatherer(
-                    proportionGathererName(actionName, regionNumber),
-                    model -> yearlyCounterAdder(PurseSeinerAction.regionCounterName(actionName, regionNumber)).apply(model) /
-                        yearlyCounterAdder(totalCounterName(actionName)).apply(model),
-                    0.0
-                )
-            )
-        );
-        fishState.getBiology().getSpecies().forEach(species ->
-            fishState.getYearlyDataSet().registerGatherer(
-                "Total " + species.getName() + " biomass under FADs",
-                model -> model.getFadMap().getTotalBiomass(species),
-                0.0
-            )
-        );
-    }
-
-    @NotNull private Gatherer<FishState> yearlyCounterAdder(String column) {
-        return fishState ->
-            fishState.getFishers().stream()
-                .mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(column))
-                .sum();
-    }
-
     @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }
 
     @SuppressWarnings("unused") public void setTargetYear(int targetYear) {
@@ -699,6 +665,115 @@ public class TunaScenario implements Scenario {
     @SuppressWarnings("unused")
     public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
         this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
+    }
+
+    private static class Observers {
+
+        private final RegionalDivision regionalDivision;
+        private final Collection<Monitor<DeployFad, ?>> fadDeploymentMonitors;
+        private final Collection<Monitor<SetAction, ?>> setMonitors;
+        private final Collection<Monitor<MakeFadSet, ?>> fadSetMonitors;
+        private final Collection<Monitor<MakeUnassociatedSet, ?>> unassociatedSetMonitors;
+        private final PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor;
+
+        Observers(FishState fishState) {
+
+            regionalDivision = new TicTacToeRegionalDivision(fishState.getMap());
+            final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
+
+            fadDeploymentMonitors = ImmutableList.of(
+                makeActionCounter("FAD deployments")
+            );
+
+            setMonitors = ImmutableList.of(
+                makeCatchFromSetAccumulator(
+                    fishState, "catches by set", IterativeAveragingAccumulator::new)
+            );
+
+            fadSetMonitors = ImmutableList.of(
+                makeActionCounter("FAD sets"),
+                makeCatchFromSetAccumulator(
+                    fishState, "catches from FAD sets", SummingAccumulator::new),
+                makeCatchFromSetAccumulator(
+                    fishState, "catches by FAD sets", IterativeAveragingAccumulator::new)
+            );
+
+            unassociatedSetMonitors = ImmutableList.of(
+                makeActionCounter("unassociated sets"),
+                makeCatchFromSetAccumulator(
+                    fishState, "catches from unassociated sets", SummingAccumulator::new),
+                makeCatchFromSetAccumulator(
+                    fishState, "catches by unassociated sets", IterativeAveragingAccumulator::new)
+            );
+
+            biomassLostMonitor = new PerSpeciesMonitor<>(
+                EVERY_YEAR,
+                "biomass lost",
+                fishState.getSpecies(),
+                species -> event -> event.getBiomassLost().get(species),
+                SummingAccumulator::new
+            );
+            biomassLostMonitor.registerWith(yearlyTimeSeries);
+
+            concat(
+                fadDeploymentMonitors,
+                setMonitors,
+                fadSetMonitors,
+                unassociatedSetMonitors
+            ).forEach(acc -> acc.registerWith(yearlyTimeSeries));
+
+            new ObservingOnGatherMonitor<>(
+                model -> model.getFadMap().allFads()::iterator,
+                new PerRegionMonitor<>(
+                    EVERY_YEAR,
+                    "active FADs",
+                    regionalDivision,
+                    region -> identity(),
+                    IncrementingAccumulator::new
+                )
+            ).registerWith(yearlyTimeSeries);
+
+            new ObservingOnGatherMonitor<>(
+                model -> model.getFadMap().allFads()::iterator,
+                new PerSpeciesPerRegionMonitor<>(
+                    EVERY_YEAR,
+                    "biomass under FADs",
+                    species -> region -> fad -> fad.getBiology().getBiomass(species),
+                    fishState.getSpecies(),
+                    regionalDivision,
+                    SummingAccumulator::new
+                )
+            ).registerWith(yearlyTimeSeries);
+
+        }
+
+        private <A extends SetAction> Monitor<A, Double> makeCatchFromSetAccumulator(
+            FishState fishState,
+            String baseName,
+            Supplier<Accumulator<Double>> accumulatorSupplier
+        ) {
+            return new PerSpeciesPerRegionMonitor<>(
+                EVERY_YEAR,
+                baseName,
+                species -> region -> action -> action.getCatchesKept().map(Catch::getTotalWeight).orElse(0.0),
+                fishState.getSpecies(),
+                regionalDivision,
+                accumulatorSupplier
+            );
+        }
+
+        private <E extends PurseSeinerAction> Monitor<E, E> makeActionCounter(
+            String actionName
+        ) {
+            return new PerRegionMonitor<>(
+                EVERY_YEAR,
+                actionName,
+                regionalDivision,
+                region -> identity(),
+                IncrementingAccumulator::new
+            );
+        }
+
     }
 
 }

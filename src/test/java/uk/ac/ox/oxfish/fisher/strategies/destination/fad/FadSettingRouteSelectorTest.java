@@ -79,9 +79,12 @@ public class FadSettingRouteSelectorTest {
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0.75, 0), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
 
-        final FadInitializer fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE, Stream.of());
-
+        final FadInitializer fadInitializer =
+            new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadManager fadManager =
+            new FadManager.Builder(fadMap, fadInitializer)
+                .setInitialNumberOfFadsInStock(Integer.MAX_VALUE)
+                .build();
         fadManager.setFisher(fisher);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
@@ -147,7 +150,8 @@ public class FadSettingRouteSelectorTest {
             routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
 
         // check that all possible routes go back to port
-        assertTrue(possibleRoutes.stream().allMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
+        assertTrue(possibleRoutes.stream()
+            .allMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
 
         // given a route with two FADs and a route with one FAD, prefer the one with two FADs
         assertTrue(

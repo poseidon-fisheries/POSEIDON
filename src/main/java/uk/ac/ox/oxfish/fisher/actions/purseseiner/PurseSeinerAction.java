@@ -26,14 +26,12 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
 
-import static uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions.REGION_NAMES;
-import static uk.ac.ox.oxfish.fisher.actions.purseseiner.Regions.getRegionNumber;
-
-public abstract class PurseSeinerAction implements Action, FadManagerUtils {
+public abstract class PurseSeinerAction implements Action, Locatable, FadManagerUtils {
 
     private final FishState model;
     private final Fisher fisher;
@@ -51,27 +49,11 @@ public abstract class PurseSeinerAction implements Action, FadManagerUtils {
         this.step = step;
     }
 
-    public static String proportionGathererName(String actionName, int regionNumber) {
-        return "Proportion of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
-    }
-
-    public static String totalCounterName(String actionName) {
-        return "Total number of " + actionName;
-    }
-
     public Fisher getFisher() { return fisher; }
 
-    public SeaTile getSeaTile() { return seaTile; }
+    @Override public SeaTile getLocation() { return seaTile; }
 
     public int getStep() { return step; }
-
-    String regionCounterName() {
-        return regionCounterName(getActionName(), getRegionNumber(model.getMap(), seaTile));
-    }
-
-    public static String regionCounterName(String actionName, int regionNumber) {
-        return "Number of " + actionName + " (" + REGION_NAMES.get(regionNumber) + " region)";
-    }
 
     /**
      * Plural name of action, used to build counter names
@@ -88,15 +70,11 @@ public abstract class PurseSeinerAction implements Action, FadManagerUtils {
         return !isForbidden() && fisher.getRegulation().canFishHere(fisher, seaTile, model, step);
     }
 
-    public boolean isForbidden() {
+    private boolean isForbidden() {
         return getFadManager().getActionSpecificRegulations().isForbidden(this);
     }
 
     public FadManager getFadManager() { return FadManagerUtils.getFadManager(fisher); }
-
-    String totalCounterName() {
-        return "Total number of " + getActionName();
-    }
 
     boolean isFadHere(Fad targetFad) {
         return getModel().getFadMap().getFadTile(targetFad)
@@ -105,4 +83,5 @@ public abstract class PurseSeinerAction implements Action, FadManagerUtils {
     }
 
     public FishState getModel() { return model; }
+
 }

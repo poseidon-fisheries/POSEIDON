@@ -81,10 +81,8 @@ public class DeployFad extends PurseSeinerAction {
     ) {
         if (canHappen()) {
             SeaTile here = fisher.getLocation();
-            getFadManager().deployFad(here, model.getStep(), model.random);
-            getFadManager().getActionSpecificRegulations().reactToAction(this);
-            fisher.getYearlyCounter().count(totalCounterName(), 1);
-            fisher.getYearlyCounter().count(regionCounterName(), 1);
+            getFadManager().deployFad(here, model.getStep(), model.random); // TODO: make this a listener?
+            getFadManager().reactTo(this);
         }
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
@@ -95,7 +93,7 @@ public class DeployFad extends PurseSeinerAction {
     }
 
     @Override public boolean isPossible() {
-        return getSeaTile().isWater() && getFadManager().getNumFadsInStock() > 0;
+        return getLocation().isWater() && getFadManager().getNumFadsInStock() > 0;
     }
 
 }

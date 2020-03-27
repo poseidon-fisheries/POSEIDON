@@ -207,25 +207,14 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param newCurrentBiomass the new biomass in lbs
      */
     @Override
-    public void setCurrentBiomass(Species s, double newCurrentBiomass)
-    {
-
-        Preconditions.checkArgument(newCurrentBiomass >= 0, "new biomass can't be negative; you gave me " +
-        newCurrentBiomass + " for species " + s + " and carrying capacity: " + carryingCapacity[s.getIndex()]);
+    public void setCurrentBiomass(Species s, double newCurrentBiomass) {
+        Preconditions.checkArgument(newCurrentBiomass >= 0);
         final int index = s.getIndex();
-        if(index >=currentBiomass.length)
-            growArrays(index +1);
-        Preconditions.checkArgument(
-            newCurrentBiomass <= carryingCapacity[index],
-            "the new current biomass " + newCurrentBiomass +
-                " is higher than carrying capacity (" + carryingCapacity[index] + ")!"
-        );
+        Preconditions.checkArgument(newCurrentBiomass <= carryingCapacity[index]);
+        if (index >= currentBiomass.length)
+            growArrays(index + 1);
         currentBiomass[index] = newCurrentBiomass;
     }
-
-
-
-
 
     /**
      * proof that you have started

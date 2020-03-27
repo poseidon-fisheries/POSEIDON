@@ -28,16 +28,23 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
+import java.util.Map;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getMarkets;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishHere;
 
-public class Fad {
+public class Fad implements Locatable {
 
-    public static final double BUOY_VALUE = 1000.0; // Buoy value in dollars, TODO: should be a parameter
+    private static final double BUOY_VALUE = 1000.0; // Buoy value in dollars, TODO: should be a parameter
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
@@ -55,6 +62,10 @@ public class Fad {
         this.attractionRates = attractionRates;
         this.fishReleaseProbability = fishReleaseProbability;
     }
+
+    public static String biomassLostCounterName(Species species) { return biomassLostCounterName(species.getName()); }
+
+    public static String biomassLostCounterName(String speciesName) { return speciesName + " biomass lost (kg)"; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
@@ -118,17 +129,13 @@ public class Fad {
      * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
      */
     public void releaseFish(Iterable<Species> allSpecies) {
-        allSpecies.forEach(species -> {
-            getOwner().getFisher().getYearlyCounter().count(biomassLostCounterName(species), biology.getBiomass(species));
-            biology.setCurrentBiomass(species, 0);
-        });
+        final Map<Species, Double> biomassLost =
+            stream(allSpecies).collect(toImmutableMap(identity(), biology::getBiomass));
+        getOwner().reactTo(new BiomassLostEvent(biomassLost));
+        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
     }
 
     public FadManager getOwner() { return owner; }
-
-    public static String biomassLostCounterName(Species species) { return biomassLostCounterName(species.getName()); }
-
-    public static String biomassLostCounterName(String speciesName) { return speciesName + " biomass lost (kg)"; }
 
     public double valueOfSet(Fisher fisher) {
         double buoyValue = getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
@@ -136,5 +143,9 @@ public class Fad {
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
+
+    @Override public SeaTile getLocation() {
+        return owner.getFadMap().getFadTile(this).orElseThrow(() -> new RuntimeException(this + " not on map!"));
+    }
 
 }
