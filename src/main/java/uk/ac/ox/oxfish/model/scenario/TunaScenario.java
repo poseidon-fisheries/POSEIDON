@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFa
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
@@ -633,7 +634,7 @@ public class TunaScenario implements Scenario {
         final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
         factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-        final FileBiomassAllocatorFactory initialCapacityAllocator = new SmootherFileAllocatorFactory();
+        final FileBiomassAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
         initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
         initialCapacityAllocator.setInputFileHasHeader(true);
         final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
