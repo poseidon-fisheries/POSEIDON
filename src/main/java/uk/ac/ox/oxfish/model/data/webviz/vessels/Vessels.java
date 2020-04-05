@@ -22,17 +22,17 @@ package uk.ac.ox.oxfish.model.data.webviz.vessels;
 import java.util.Collection;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-public final class Vessels {
+final class Vessels {
 
     private final Collection<? extends Collection<Integer>> vesselTypeMap;
-    private final Collection<Timestep> timeSteps;
+    private final Collection<Timestep> timesteps;
 
     Vessels(
         final Collection<? extends Collection<Integer>> vesselTypeMap,
-        final Collection<Timestep> timeSteps
+        final Collection<Timestep> timesteps
     ) {
         this.vesselTypeMap = vesselTypeMap;
-        this.timeSteps = timeSteps;
+        this.timesteps = timesteps;
     }
 
 }

@@ -78,8 +78,8 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
 
         final GridDefinition gridDefinition = new GridDefinition(
             ImmutableList.of(map.getWidth(), map.getHeight()),
-            ImmutableList.of(mbr.getMinX(), mbr.getMinY()),
-            ImmutableList.of(mbr.getMaxX(), mbr.getMaxY())
+            ImmutableList.of(mbr.getMinX(), mbr.getMaxY()),
+            ImmutableList.of(mbr.getMaxX(), mbr.getMinY())
         );
 
         return new Scenario(
