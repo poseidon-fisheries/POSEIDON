@@ -57,8 +57,8 @@ public final class HeatmapBuilder implements SteppableJsonBuilder<Heatmap> {
         final NauticalMap map = fishState.getMap();
 
         final double[] cellValues =
-            range(0, map.getWidth()).boxed().flatMapToDouble(x ->
-                range(0, map.getHeight()).mapToDouble(y ->
+            range(0, map.getHeight()).boxed().flatMapToDouble(y ->
+                range(0, map.getWidth()).mapToDouble(x ->
                     round(numericExtractor.applyAsDouble(map.getSeaTile(x, y)))
                 )
             ).toArray();
