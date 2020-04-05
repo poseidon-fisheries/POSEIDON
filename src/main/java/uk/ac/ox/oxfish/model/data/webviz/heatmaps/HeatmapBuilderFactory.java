@@ -41,8 +41,10 @@ public interface HeatmapBuilderFactory extends
 
     @Override default String getBaseName() { return getTitle() + " Heatmap"; }
 
+    TimestepsBuilder makeTimestepsBuilder();
+
     @Override default HeatmapBuilder apply(final FishState fishState) {
-        return new HeatmapBuilder(makeNumericExtractor(fishState));
+        return new HeatmapBuilder(makeNumericExtractor(fishState), makeTimestepsBuilder());
     }
 
     @Override default HeatmapDefinition buildJsonObject(final FishState fishState) {

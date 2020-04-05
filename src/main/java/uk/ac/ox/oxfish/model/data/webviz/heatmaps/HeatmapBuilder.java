@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import com.google.common.collect.ImmutableList;
 import sim.engine.SimState;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -35,13 +34,15 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 public final class HeatmapBuilder implements SteppableJsonBuilder<Heatmap> {
 
     private final ToDoubleFunction<? super SeaTile> numericExtractor;
-    private final ImmutableList.Builder<Timestep> timestepsBuilder = new ImmutableList.Builder<>();
+    private final TimestepsBuilder timestepsBuilder;
     private Stoppable stoppable;
 
     HeatmapBuilder(
-        final ToDoubleFunction<? super SeaTile> numericExtractor
+        final ToDoubleFunction<? super SeaTile> numericExtractor,
+        final TimestepsBuilder timestepsBuilder
     ) {
         this.numericExtractor = numericExtractor;
+        this.timestepsBuilder = timestepsBuilder;
     }
 
     @Override

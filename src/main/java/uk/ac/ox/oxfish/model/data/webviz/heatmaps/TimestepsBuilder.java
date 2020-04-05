@@ -19,19 +19,9 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-final class Timestep {
+import java.util.Collection;
 
-    private final int timeInDays;
-    private final double[] cellValues;
-
-    Timestep(final int timeInDays, final double[] cellValues) {
-        this.timeInDays = timeInDays;
-        this.cellValues = cellValues;
-    }
-
-    int getTimeInDays() { return timeInDays; }
-
-    double[] getCellValues() { return cellValues; }
-
+public interface TimestepsBuilder {
+    void add(Timestep timestep);
+    Collection<Timestep> build();
 }

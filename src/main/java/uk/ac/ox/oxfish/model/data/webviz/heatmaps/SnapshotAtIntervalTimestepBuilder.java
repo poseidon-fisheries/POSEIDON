@@ -19,19 +19,21 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-final class Timestep {
+public class SnapshotAtIntervalTimestepBuilder extends AbstractTimestepBuilder {
 
-    private final int timeInDays;
-    private final double[] cellValues;
+    private final int interval;
+    private Integer initialDay = null;
 
-    Timestep(final int timeInDays, final double[] cellValues) {
-        this.timeInDays = timeInDays;
-        this.cellValues = cellValues;
+    public SnapshotAtIntervalTimestepBuilder(int interval) { this.interval = interval; }
+
+    @Override public void add(Timestep timestep) {
+
+        if (initialDay == null)
+            initialDay = timestep.getTimeInDays();
+
+        if ((timestep.getTimeInDays() - initialDay) % interval == 0)
+            builder.add(timestep);
+
     }
-
-    int getTimeInDays() { return timeInDays; }
-
-    double[] getCellValues() { return cellValues; }
 
 }

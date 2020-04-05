@@ -33,14 +33,15 @@ import java.util.function.ToDoubleFunction;
 
 import static java.util.Objects.requireNonNull;
 
-public final class BiomassHeatmapBuilderFactory implements HeatmapBuilderFactory {
+public final class BiomassSnapshotHeatmapBuilderFactory implements HeatmapBuilderFactory {
 
     private String speciesName = "Species 0";
+    private int interval = 30;
     private GradientColourMapBuilderFactory colourMapBuilderFactory =
         new GradientColourMapBuilderFactory();
 
-    public static BiomassHeatmapBuilderFactory newInstance(final String speciesName) {
-        final BiomassHeatmapBuilderFactory instance = new BiomassHeatmapBuilderFactory();
+    public static BiomassSnapshotHeatmapBuilderFactory newInstance(final String speciesName) {
+        final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
         instance.speciesName = speciesName;
         return instance;
     }
@@ -51,6 +52,7 @@ public final class BiomassHeatmapBuilderFactory implements HeatmapBuilderFactory
         return colourMapBuilderFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setColourMapBuilderFactory(final GradientColourMapBuilderFactory colourMapBuilderFactory) {
         this.colourMapBuilderFactory = colourMapBuilderFactory;
     }
@@ -76,10 +78,18 @@ public final class BiomassHeatmapBuilderFactory implements HeatmapBuilderFactory
         return seaTile -> seaTile.getBiomass(specie);
     }
 
+    @Override public TimestepsBuilder makeTimestepsBuilder() {
+        return new SnapshotAtIntervalTimestepBuilder(interval);
+    }
+
     @NotNull private Species getSpecies(final FishState fishState) {
         final Species species = fishState.getBiology().getSpecie(speciesName);
         requireNonNull(species, speciesName + " not defined in global biology.");
         return species;
     }
+
+    @SuppressWarnings("unused") public int getInterval() { return interval; }
+
+    @SuppressWarnings("unused") public void setInterval(int interval) { this.interval = interval; }
 
 }

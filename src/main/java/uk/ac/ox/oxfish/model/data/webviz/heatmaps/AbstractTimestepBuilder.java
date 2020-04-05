@@ -19,19 +19,16 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-final class Timestep {
+import com.google.common.collect.ImmutableList;
 
-    private final int timeInDays;
-    private final double[] cellValues;
+import java.util.Collection;
 
-    Timestep(final int timeInDays, final double[] cellValues) {
-        this.timeInDays = timeInDays;
-        this.cellValues = cellValues;
+public abstract class AbstractTimestepBuilder implements TimestepsBuilder {
+
+    final ImmutableList.Builder<Timestep> builder = new ImmutableList.Builder<>();
+
+    @Override public Collection<Timestep> build() {
+        return builder.build();
     }
-
-    int getTimeInDays() { return timeInDays; }
-
-    double[] getCellValues() { return cellValues; }
 
 }
