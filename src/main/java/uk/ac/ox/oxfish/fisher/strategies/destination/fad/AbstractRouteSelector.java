@@ -88,14 +88,24 @@ public abstract class AbstractRouteSelector implements RouteSelector {
 
         if (candidateRoutes.isEmpty()) return Optional.empty();
 
-        final List<Entry<Route, Double>> routeWeights =
-            (candidateRoutes.stream().anyMatch(entry -> entry.getValue() > 0)
-                ? candidateRoutes.stream().filter(entry -> entry.getValue() > 0)
-                : candidateRoutes.stream().map(entry -> entry(entry.getKey(), 1.0 / -entry.getValue()))
-            ).collect(toImmutableList());
+        final Stream<Entry<Route, Double>> routeWeights;
+
+        if (candidateRoutes.stream().anyMatch(entry -> entry.getValue() > 0))
+            // we have at least one positive, so we can get rid of the negatives
+            routeWeights = candidateRoutes.stream()
+                .filter(entry -> entry.getValue() > 0);
+        else if (candidateRoutes.stream().anyMatch(entry -> entry.getValue() == 0))
+            // we have no positives, but at least one zero: keep only the zeros and weight them to one
+            routeWeights = candidateRoutes.stream()
+                .filter(entry -> entry.getValue() == 0)
+                .map(entry -> entry(entry.getKey(), 1.0));
+        else
+            // if we're left with only negatives, just minimize the cost by weighting them to 1/-value
+            routeWeights = candidateRoutes.stream()
+                .map(entry -> entry(entry.getKey(), 1.0 / -entry.getValue()));
 
         return Optional
-            .of(weightedOneOf(routeWeights, Entry::getValue, rng))
+            .of(weightedOneOf(routeWeights.collect(toImmutableList()), Entry::getValue, rng))
             .map(Entry::getKey);
     }
 
