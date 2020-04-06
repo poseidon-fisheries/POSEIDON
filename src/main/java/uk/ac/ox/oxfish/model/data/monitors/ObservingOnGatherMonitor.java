@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import java.util.function.Function;
 
@@ -33,6 +34,17 @@ public class ObservingOnGatherMonitor<O, V> extends MonitorDecorator<O, V> {
     ) {
         super(delegate);
         this.observablesExtractor = observablesExtractor;
+    }
+
+    @Override public void registerWith(TimeSeries<FishState> timeSeries) {
+        timeSeries.registerGatherer(
+            getAccumulator().makeName(getBaseName()),
+            this::asGatherer,
+            0.0
+        );
+        if (getDelegate() instanceof GroupingMonitor)
+            // ugh... surely there is a way to do this without a cast...
+            ((GroupingMonitor<?, O, V>) getDelegate()).registerSubMonitorsWith(timeSeries);
     }
 
     @Override public double asGatherer(FishState fishState) {

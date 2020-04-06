@@ -88,6 +88,10 @@ public class GroupingMonitor<G, O, V> extends AbstractMonitor<O, V> {
 
     @Override public void registerWith(TimeSeries<FishState> timeSeries) {
         super.registerWith(timeSeries);
+        registerSubMonitorsWith(timeSeries);
+    }
+
+    void registerSubMonitorsWith(TimeSeries<FishState> timeSeries) {
         subMonitors.values().forEach(subMonitor -> subMonitor.registerWith(timeSeries));
     }
 

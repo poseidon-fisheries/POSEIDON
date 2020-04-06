@@ -22,12 +22,17 @@ package uk.ac.ox.oxfish.model.data.monitors;
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
 public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
 
     private final Monitor<O, V> delegate;
 
     MonitorDecorator(Monitor<O, V> delegate) { this.delegate = delegate; }
+
+    Monitor<O, V> getDelegate() { return delegate; }
+
+    @Override public Accumulator<V> getAccumulator() { return delegate.getAccumulator(); }
 
     @Override public String getBaseName() { return delegate.getBaseName(); }
 

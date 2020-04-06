@@ -49,6 +49,8 @@ abstract public class AbstractMonitor<O, V> implements Monitor<O, V> {
         this.accumulator = accumulatorSupplier.get();
     }
 
+    public Accumulator<V> getAccumulator() { return accumulator; }
+
     public String getBaseName() { return baseName; }
 
     @Override public double getCurrentValue() { return accumulator.get(); }

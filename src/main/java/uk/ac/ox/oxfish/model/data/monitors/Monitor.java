@@ -23,12 +23,14 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
 public interface Monitor<O, V> extends Observer<O>, Startable, Steppable {
 
     Iterable<V> extractValues(O observable);
     double getCurrentValue();
     String getBaseName();
+    Accumulator<V> getAccumulator();
     void registerWith(TimeSeries<FishState> timeSeries);
     double asGatherer(FishState fishState);
 
