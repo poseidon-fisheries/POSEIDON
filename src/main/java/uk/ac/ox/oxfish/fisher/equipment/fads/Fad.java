@@ -48,7 +48,7 @@ public class Fad implements Locatable {
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
-    final private ImmutableMap<Species, Double> attractionRates; // proportion of underlying biomass attracted per day
+    final private double[] attractionRates; // proportion of underlying biomass attracted per day
     final private double fishReleaseProbability; // daily probability of releasing fish from the FAD
 
     public Fad(
@@ -59,7 +59,10 @@ public class Fad implements Locatable {
     ) {
         this.owner = owner;
         this.biology = biology;
-        this.attractionRates = attractionRates;
+        this.attractionRates = new double[biology.getCurrentBiomass().length];
+        attractionRates.forEach((species, rate) ->
+            this.attractionRates[species.getIndex()] = rate
+        );
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
@@ -69,15 +72,15 @@ public class Fad implements Locatable {
     */
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
         // Calculate the catches and add them to the FAD biology:
-        double[] catches = new double[globalBiology.getSize()];
-        for (Species species : globalBiology.getSpecies()) {
-            double currentFadBiomass = biology.getBiomass(species);
-            double maxFadBiomass = biology.getCarryingCapacity(species);
-            double maxCatch = max(0, maxFadBiomass - currentFadBiomass);
-            final double attractionRate = attractionRates.getOrDefault(species, 0.0);
-            double caught = min(seaTileBiology.getBiomass(species) * attractionRate, maxCatch);
-            biology.setCurrentBiomass(species, min(currentFadBiomass + caught, maxFadBiomass));
-            catches[species.getIndex()] = caught;
+        final double[] tileBiomass = seaTileBiology.getCurrentBiomass();
+        final double[] fadBiomass = this.biology.getCurrentBiomass();
+        final double[] catches = new double[tileBiomass.length];
+        for (int i = 0; i < catches.length; i++) {
+            final double maxFadBiomass = this.biology.getCarryingCapacity(i);
+            final double maxCatch = max(0, maxFadBiomass - fadBiomass[i]);
+            final double caught = min(tileBiomass[i] * attractionRates[i], maxCatch);
+            fadBiomass[i] = min(fadBiomass[i] + caught, maxFadBiomass);
+            catches[i] = caught;
         }
         // Remove the catches from the underlying biology:
         final Catch catchObject = new Catch(catches);
