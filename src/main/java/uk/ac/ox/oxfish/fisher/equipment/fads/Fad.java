@@ -63,10 +63,6 @@ public class Fad implements Locatable {
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
-    public static String biomassLostCounterName(Species species) { return biomassLostCounterName(species.getName()); }
-
-    public static String biomassLostCounterName(String speciesName) { return speciesName + " biomass lost (kg)"; }
-
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
