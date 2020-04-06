@@ -38,7 +38,6 @@ abstract public class AbstractMonitor<O, V> implements Monitor<O, V> {
     private final Supplier<Accumulator<V>> accumulatorSupplier;
     private Accumulator<V> accumulator;
     private Stoppable stoppable = null;
-
     AbstractMonitor(
         IntervalPolicy resetInterval,
         String baseName,
@@ -49,6 +48,8 @@ abstract public class AbstractMonitor<O, V> implements Monitor<O, V> {
         this.accumulatorSupplier = accumulatorSupplier;
         this.accumulator = accumulatorSupplier.get();
     }
+
+    public String getBaseName() { return baseName; }
 
     @Override public double getCurrentValue() { return accumulator.get(); }
 

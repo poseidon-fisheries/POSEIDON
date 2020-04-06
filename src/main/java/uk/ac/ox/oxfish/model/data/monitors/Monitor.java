@@ -28,6 +28,7 @@ public interface Monitor<O, V> extends Observer<O>, Startable, Steppable {
 
     Iterable<V> extractValues(O observable);
     double getCurrentValue();
+    String getBaseName();
     void registerWith(TimeSeries<FishState> timeSeries);
     double asGatherer(FishState fishState);
 

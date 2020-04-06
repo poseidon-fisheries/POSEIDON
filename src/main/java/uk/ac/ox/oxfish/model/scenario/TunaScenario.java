@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -39,7 +40,6 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
@@ -84,6 +84,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.ObservingOnGatherMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.PerRegionMonitor;
@@ -94,6 +95,7 @@ import uk.ac.ox.oxfish.model.data.monitors.accumulators.IncrementingAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.IterativeAveragingAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.SummingAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision.Region;
 import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
@@ -133,6 +135,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
 import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Streams.stream;
 import static java.time.Month.JANUARY;
 import static java.time.Month.JULY;
 import static java.time.Month.NOVEMBER;
@@ -716,12 +719,19 @@ public class TunaScenario implements Scenario {
             );
             biomassLostMonitor.registerWith(yearlyTimeSeries);
 
-            concat(
+            final Iterable<Monitor<?, ?>> actionMonitors = concat(
                 fadDeploymentMonitors,
                 setMonitors,
                 fadSetMonitors,
                 unassociatedSetMonitors
-            ).forEach(acc -> acc.registerWith(yearlyTimeSeries));
+            );
+            actionMonitors
+                .forEach(monitor -> monitor.registerWith(yearlyTimeSeries));
+            stream(actionMonitors)
+                .filter(monitor -> monitor instanceof PerRegionMonitor)
+                .forEach(monitor ->
+                    ((PerRegionMonitor<?, ?>) monitor).registerProportionalGatherersWith(yearlyTimeSeries)
+                );
 
             new ObservingOnGatherMonitor<>(
                 model -> model.getFadMap().allFads()::iterator,
@@ -748,7 +758,7 @@ public class TunaScenario implements Scenario {
 
         }
 
-        private <A extends SetAction> Monitor<A, Double> makeCatchFromSetAccumulator(
+        private <A extends SetAction> GroupingMonitor<Species, A, Double> makeCatchFromSetAccumulator(
             FishState fishState,
             String baseName,
             Supplier<Accumulator<Double>> accumulatorSupplier
@@ -763,7 +773,7 @@ public class TunaScenario implements Scenario {
             );
         }
 
-        private <E extends PurseSeinerAction> Monitor<E, E> makeActionCounter(
+        private <E extends PurseSeinerAction> GroupingMonitor<Region, E, E> makeActionCounter(
             String actionName
         ) {
             return new PerRegionMonitor<>(

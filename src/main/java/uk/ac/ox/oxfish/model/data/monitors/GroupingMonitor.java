@@ -91,6 +91,16 @@ public class GroupingMonitor<G, O, V> extends AbstractMonitor<O, V> {
         subMonitors.values().forEach(subMonitor -> subMonitor.registerWith(timeSeries));
     }
 
+    public void registerProportionalGatherersWith(TimeSeries<FishState> timeSeries) {
+        subMonitors.values().forEach(subMonitor ->
+            timeSeries.registerGatherer(
+                "Proportion of " + subMonitor.getBaseName(),
+                __ -> subMonitor.getCurrentValue() / getCurrentValue(),
+                0.0
+            )
+        );
+    }
+
     public Optional<Monitor<O, V>> getSubMonitor(G group) {
         return Optional.ofNullable(subMonitors.get(group));
     }

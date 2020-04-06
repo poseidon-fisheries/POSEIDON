@@ -29,6 +29,8 @@ public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
 
     MonitorDecorator(Monitor<O, V> delegate) { this.delegate = delegate; }
 
+    @Override public String getBaseName() { return delegate.getBaseName(); }
+
     @Override public double getCurrentValue() { return delegate.getCurrentValue(); }
 
     @Override public Iterable<V> extractValues(O observable) { return delegate.extractValues(observable); }
@@ -37,9 +39,7 @@ public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
         delegate.registerWith(timeSeries);
     }
 
-    @Override public double asGatherer(FishState fishState) {
-        return delegate.asGatherer(fishState);
-    }
+    @Override public double asGatherer(FishState fishState) { return delegate.asGatherer(fishState); }
 
     @Override public void step(SimState simState) {
         delegate.step(simState);

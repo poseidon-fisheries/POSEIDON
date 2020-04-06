@@ -20,9 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
@@ -68,22 +66,6 @@ public class PerRegionMonitor<O extends Locatable, V> extends GroupingMonitor<Re
             regionalDivision.getRegions(),
             groupMonitorBuilder
         );
-    }
-
-    @Override public void registerWith(TimeSeries<FishState> timeSeries) {
-        super.registerWith(timeSeries);
-        // Also register proportional gatherers
-        // TODO: move this to separate class
-        /*
-        super.getSubMonitors().values()
-            .forEach(regionalMonitor ->
-                timeSeries.registerGatherer(
-                    String.format("Proportional %s", regionalMonitor.getColumnName()),
-                    __ -> regionalMonitor.getValue() / this.getValue(),
-                    0.0
-                )
-            );
-            */
     }
 
 }
