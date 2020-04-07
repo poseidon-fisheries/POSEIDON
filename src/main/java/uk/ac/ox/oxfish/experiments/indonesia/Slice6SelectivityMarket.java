@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
+import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesWithPremium;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
@@ -148,7 +148,7 @@ public class Slice6SelectivityMarket {
             @Override
             public void accept(Scenario flexible) {
                 ThreePricesMarketFactory nonPremium =
-                        (ThreePricesMarketFactory) ((ThreePricesMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().get(
+                        (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().get(
                                 species
                         );
 
@@ -159,7 +159,7 @@ public class Slice6SelectivityMarket {
                 newMarket.setPremiumFirstBin(premiumFirst);
                 newMarket.setPremiumSecondBin(premiumSecond);
                 newMarket.setPremiumThirdBin(premiumThird);
-                ((ThreePricesMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().put(species, 
+                ((SpeciesMarketMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().put(species,
                         newMarket);
 
             }
@@ -178,7 +178,7 @@ public class Slice6SelectivityMarket {
                 FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                 ThreePricesMarketFactory market =
-                        (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                        (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) flexible.getMarket()).getMarkets().get(
                                 species
                         );
 

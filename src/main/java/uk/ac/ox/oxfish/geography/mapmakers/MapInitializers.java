@@ -48,6 +48,7 @@ public class MapInitializers {
         NAMES.put(TwoSidedMapFactory.class, "Two Sided Map");
         NAMES.put(OsmoseMapInitializerFactory.class, "OSMOSE Map");
         NAMES.put(OsmoseBoundedMapInitializerFactory.class, "OSMOSE Bounded Map");
+        NAMES.put(MapWithFarOffPortsInitializerFactory.class, "Map with far-off ports");
         NAMES.put(FromFileMapInitializerFactory.class, "From File Map");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

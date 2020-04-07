@@ -32,7 +32,9 @@ import uk.ac.ox.oxfish.model.FishState;
 public interface MapInitializer {
 
 
-    NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model);
+    NauticalMap makeMap(MersenneTwisterFast random,
+                        GlobalBiology biology,
+                        FishState model);
 
 
 }

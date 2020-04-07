@@ -43,9 +43,14 @@ public class EquirectangularDistanceByCoordinate implements Distance {
     public double distance(SeaTile start, SeaTile end, NauticalMap map) {
 
         Coordinate startCoordinates = map.getCoordinates(start);
+
+        Coordinate endCoordinates = map.getCoordinates(end);
+        return distanceInCoordinates(startCoordinates, endCoordinates);
+    }
+
+    public static double distanceInCoordinates(Coordinate startCoordinates, Coordinate endCoordinates) {
         double x1 = Math.toRadians(startCoordinates.x);
         double y1 = Math.toRadians(startCoordinates.y);
-        Coordinate endCoordinates = map.getCoordinates(end);
         double x2 = Math.toRadians(endCoordinates.x);
         double y2 = Math.toRadians(endCoordinates.y);
         double radius = EquirectangularDistance.EARTH_RADIUS;

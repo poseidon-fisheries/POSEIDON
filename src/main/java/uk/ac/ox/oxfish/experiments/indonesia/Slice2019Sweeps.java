@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
+import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.*;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
@@ -561,7 +561,7 @@ public class Slice2019Sweeps {
             FlexibleScenario flexible = (FlexibleScenario) scenario;
 
             ThreePricesMarketFactory market;
-            market = (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+            market = (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) flexible.getMarket()).getMarkets().get(
                     premiumSpecies
             );
 
@@ -612,7 +612,7 @@ public class Slice2019Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 

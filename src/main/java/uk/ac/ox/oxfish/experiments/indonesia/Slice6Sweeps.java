@@ -7,10 +7,6 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.DelayGearDecorator;
-import uk.ac.ox.oxfish.fisher.equipment.gear.GarbageGearDecorator;
-import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -19,7 +15,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
+import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
 import uk.ac.ox.oxfish.model.regs.*;
@@ -819,7 +815,7 @@ public class Slice6Sweeps {
             FlexibleScenario flexible = (FlexibleScenario) scenario;
 
             ThreePricesMarketFactory market =
-                    (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                    (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) flexible.getMarket()).getMarkets().get(
                             premiumSpecies
                     );
 
@@ -870,7 +866,7 @@ public class Slice6Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
-                                (ThreePricesMarketFactory) ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) flexible.getMarket()).getMarkets().get(
                                         premiumSpecies
                                 );
 

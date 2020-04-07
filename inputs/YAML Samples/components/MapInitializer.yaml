@@ -6,6 +6,11 @@ Simple Map:
   maxLandWidth: '10.0'
   width: '50.0'
 -------
+Two Sided Map:
+  cellSizeInKilometers: '40.0'
+  height: '20.0'
+  width: '20.0'
+-------
 OSMOSE Map:
   cellSizeInKilometers: '10.0'
 -------
@@ -14,6 +19,25 @@ OSMOSE Bounded Map:
   lowRightNorthing: 2791787.489
   upLeftEasting: -73291.664
   upLeftNorthing: 3445097.299
+-------
+Map with far-off ports:
+  delegate:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '1.0'
+      depthSmoothing: '1.0'
+      height: '20.0'
+      maxLandWidth: '10.0'
+      width: '20.0'
+  farOffPorts:
+  - distanceFromExitInKm: 100.0
+    exitGridX: 20
+    exitGridY: 20
+    gasPriceAtPort: 0.0
+    marketMaker:
+      Fixed Price Market:
+        marketPrice: '10.0'
+    portName: Ahoy
 -------
 From File Map:
   gridWidthInCell: '100.0'

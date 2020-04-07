@@ -115,10 +115,14 @@ Purse Seine Gear:
   actionSpecificRegulations:
   - Active FAD limits:
       limits:
-        0: 70
-        213: 120
-        426: 300
-        1200: 450
+      - {
+        }
+      - {
+        }
+      - {
+        }
+      - {
+        }
   averageSetDurationInHours: '8.0219505805135'
   dudProbability: '0.0'
   fadInitializerFactory:

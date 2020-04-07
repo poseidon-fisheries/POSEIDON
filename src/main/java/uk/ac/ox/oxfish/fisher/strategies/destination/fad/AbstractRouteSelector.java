@@ -119,12 +119,12 @@ public abstract class AbstractRouteSelector implements RouteSelector {
 
     Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {
         NauticalMap map = fishState.getMap();
-        return Optional.ofNullable(map.getPathfinder().getRoute(map, startingTile, destination));
+        return Optional.ofNullable(map.getRoute(startingTile, destination));
     }
 
     private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, Double speedInKph) {
         NauticalMap map = fishState.getMap();
-        return map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
+        return map.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
     }
 
 }

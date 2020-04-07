@@ -20,17 +20,15 @@
 
 package uk.ac.ox.oxfish.model.market.factory;
 
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HomogeneousGearFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarketProxy;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.*;
 
-public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMarketProxy> {
+public class SpeciesMarketMappedFactory implements AlgorithmFactory<MarketProxy> {
 
     private LinkedHashMap<String, AlgorithmFactory<? extends Market>> markets = new LinkedHashMap<>();
 
@@ -42,8 +40,8 @@ public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMar
      * @return the function result
      */
     @Override
-    public ThreePricesMarketProxy apply(FishState fishState) {
-        return new ThreePricesMarketProxy(new LinkedHashMap<>(markets));
+    public MarketProxy apply(FishState fishState) {
+        return new MarketProxy(new LinkedHashMap<>(markets));
     }
 
     /**
@@ -85,7 +83,7 @@ public class ThreePricesMappedFactory implements AlgorithmFactory<ThreePricesMar
 
 
     public static void main(String[] args){
-        ThreePricesMappedFactory factory = new ThreePricesMappedFactory();
+        SpeciesMarketMappedFactory factory = new SpeciesMarketMappedFactory();
         factory.getMarkets().put(
                 "Lutjanus malabaricus",
                 new ThreePricesMarketFactory(7,9,42900,66000,52800)

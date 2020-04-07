@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
+import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -128,7 +128,7 @@ public class ThreePricesMarketTest {
                 )
         );
 
-        ThreePricesMappedFactory factory = new ThreePricesMappedFactory();
+        SpeciesMarketMappedFactory factory = new SpeciesMarketMappedFactory();
         factory.getMarkets().put(
                 "first",
                 new ThreePricesMarketFactory(

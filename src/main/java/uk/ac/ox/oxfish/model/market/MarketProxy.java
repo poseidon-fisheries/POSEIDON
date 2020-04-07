@@ -33,13 +33,13 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.Map;
 
 /**
- * its delegate is a three prices market, but it only instantiate it (and start it) when it is given the species
+ * its delegate is a market, but it only instantiates it (and start it)  at start or when it is given the species
  * it is supposed to study by the market map.
  * This class exists because the way market initialize is quite dumb since factories cannot be told what species they
  * need to create their market for. If we ever bother making a better initialization process for markets, this class
  * should probably die off
  */
-public class ThreePricesMarketProxy  implements Market{
+public class MarketProxy implements Market{
 
 
     private Market delegate = null;
@@ -47,18 +47,27 @@ public class ThreePricesMarketProxy  implements Market{
     /**
      * price map containing species --> prices factory
      */
-    private final Map<String, AlgorithmFactory<? extends Market>> pricesMap;
+    private Map<String, AlgorithmFactory<? extends Market>> pricesMap;
+
+
+    /**
+     * if this is set, ignore the price map; call the same algorithm factory every time
+     */
+    private AlgorithmFactory<? extends Market>  overrideMarketMaker;
 
 
     private Species species;
 
     private FishState state;
 
-    public ThreePricesMarketProxy(
+    public MarketProxy(
             Map<String,  AlgorithmFactory<? extends Market>> pricesMap) {
         this.pricesMap = pricesMap;
     }
 
+    public MarketProxy(AlgorithmFactory<? extends Market> overrideMarketMaker) {
+        this.overrideMarketMaker = overrideMarketMaker;
+    }
 
     @Override
     public Species getSpecies() {
@@ -152,22 +161,21 @@ public class ThreePricesMarketProxy  implements Market{
             return;
 
         String speciesName = species.getName();
-        AlgorithmFactory<? extends Market> factory = pricesMap.get(speciesName);
-        Preconditions.checkArgument(factory!=null, "Can't create a market for " + species);
-        delegate = factory.apply(state);
-        delegate.setSpecies(species);
-        delegate.start(state);
-
+        if(overrideMarketMaker != null)
+        {
+            delegate = overrideMarketMaker.apply(state);
+            delegate.setSpecies(species);
+            delegate.start(state);
+        }
+        else {
+            AlgorithmFactory<? extends Market> factory = pricesMap.get(speciesName);
+            Preconditions.checkArgument(factory != null, "Can't create a market for " + species);
+            delegate = factory.apply(state);
+            delegate.setSpecies(species);
+            delegate.start(state);
+        }
     }
 
 
 
-    /**
-     * Getter for property 'pricesMap'.
-     *
-     * @return Value for property 'pricesMap'.
-     */
-    public Map<String,  AlgorithmFactory<? extends Market>> getPricesMap() {
-        return pricesMap;
-    }
 }

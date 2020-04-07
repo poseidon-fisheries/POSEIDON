@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.geography;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
@@ -48,6 +49,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.MasonUtils;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collections;
 import java.util.Deque;
@@ -79,6 +81,8 @@ public class NauticalMap implements Startable
      * this holds the bathymetry raster grid
      */
     private GeomGridField rasterBathymetry;
+
+
 
     /**
      * the proper grid behind raster bathymetry. You can get it by rasterBathymetry.getGrid() and cast but this skips the
@@ -124,6 +128,8 @@ public class NauticalMap implements Startable
      * holds the MPAs
      */
     private GeomVectorField mpaVectorField;
+
+
 
 
     /**
@@ -488,6 +494,15 @@ public Coordinate getCoordinates(int gridX, int gridY) {
         this.distance = distance;
     }
 
+
+    public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, NauticalMap map, double speedInKph) {
+        return distance.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
+    }
+
+
+    /**
+     * do not call directly, if not for decorating. Use delegate functions
+     */
     public Distance getDistance() { return distance; }
 
     public boolean recordFisherLocation(Fisher fisher, int x, int y) {
@@ -527,9 +542,6 @@ public Coordinate getCoordinates(int gridX, int gridY) {
         return receipt;
     }
 
-    public Pathfinder getPathfinder() {
-        return pathfinder;
-    }
 
     public void setPathfinder(Pathfinder pathfinder) {
         this.pathfinder = pathfinder;
@@ -583,5 +595,10 @@ public Coordinate getCoordinates(int gridX, int gridY) {
             return lineTiles;
 
 
+    }
+
+
+    public Pathfinder getPathfinder() {
+        return pathfinder;
     }
 }

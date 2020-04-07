@@ -33,7 +33,7 @@ public class RouteToPortSelector implements RouteSelector {
 
     @Override public Optional<Route> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng) {
         return Optional
-            .ofNullable(map.getPathfinder().getRoute(map, fisher.getLocation(), fisher.getHomePort().getLocation()))
+            .ofNullable(map.getRoute(fisher.getLocation(), fisher.getHomePort().getLocation()))
             .map(deque -> new Route(deque, fisher));
     }
 }
