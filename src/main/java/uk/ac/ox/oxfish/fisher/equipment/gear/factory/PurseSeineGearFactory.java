@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
@@ -11,8 +12,8 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Observer;
-import uk.ac.ox.oxfish.model.data.monitors.PerSpeciesMonitor;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -32,7 +33,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private Iterable<? extends Observer<SetAction>> setObservers;
     private Iterable<? extends Observer<MakeFadSet>> fadSetObservers;
     private Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers;
-    private PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor;
+    private GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
@@ -46,9 +47,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private Path unassociatedCatchSampleFile;
 
     @SuppressWarnings("unused")
-    public PerSpeciesMonitor<BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public GroupingMonitor<Species, BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
 
-    public void setBiomassLostMonitor(PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor) {
+    public void setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor) {
         this.biomassLostMonitor = biomassLostMonitor;
     }
 

@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -67,7 +66,7 @@ public class FadAwareCommonLogisticGrower extends SchaeferLogisticGrower {
             .flatMap(fadManager -> stream(
                 fadManager.getBiomassLostMonitor().flatMap(monitor -> monitor.getSubMonitor(species))
             ))
-            .mapToDouble(Monitor::getCurrentValue)
+            .mapToDouble(monitor -> monitor.getAccumulator().get())
             .sum();
         return biomassLost + super.recruit(current, capacity, malthusianParameter);
     }

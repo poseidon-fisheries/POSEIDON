@@ -41,6 +41,8 @@ public interface RegionalDivision {
             this.number = number;
         }
 
+        @Override public String toString() { return getName(); }
+
         public int getNumber() { return number; }
 
         public String getName() { return name; }

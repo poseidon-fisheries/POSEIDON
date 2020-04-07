@@ -24,10 +24,10 @@ import java.util.Collection;
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public final class Heatmap {
 
-    private final Collection<Timestep> timeSteps;
+    private final Collection<Timestep> timesteps;
 
-    Heatmap(final Collection<Timestep> timeSteps) {
-        this.timeSteps = timeSteps;
+    Heatmap(final Collection<Timestep> timesteps) {
+        this.timesteps = timesteps;
     }
 
 }

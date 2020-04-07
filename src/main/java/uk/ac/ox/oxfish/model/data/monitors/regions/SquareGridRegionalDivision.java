@@ -35,8 +35,11 @@ abstract class SquareGridRegionalDivision implements RegionalDivision {
     private final int numberOfDivisions;
     private final List<Region> regions;
 
-    @SuppressWarnings("SameParameterValue")
-    SquareGridRegionalDivision(NauticalMap map, int numberOfDivisions, List<String> regionNames) {
+    @SuppressWarnings("SameParameterValue") SquareGridRegionalDivision(
+        NauticalMap map,
+        int numberOfDivisions,
+        List<String> regionNames
+    ) {
         final int numberOfRegions = numberOfDivisions * numberOfDivisions;
         checkArgument(regionNames.size() == numberOfRegions);
         this.regions = IntStream

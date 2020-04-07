@@ -17,20 +17,20 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.monitors;
+package uk.ac.ox.oxfish.utility;
 
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
-import java.util.Optional;
+/**
+ * A Steppable that handles the cast to FishState and can be used as a functional interface.
+ */
+@FunctionalInterface
+public
+interface FishStateSteppable extends Steppable {
 
-public interface Monitor<O, V> extends Observer<O>, Startable {
-
-    String getBaseName();
-    Iterable<V> extractValues(O observable);
-    Accumulator<V> getAccumulator();
-    void registerWith(TimeSeries<FishState> timeSeries);
+    void step(FishState fishState);
+    @Override default void step(SimState simState) { step((FishState) simState); }
 
 }

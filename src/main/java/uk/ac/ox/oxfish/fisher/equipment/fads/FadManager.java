@@ -26,6 +26,7 @@ import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
@@ -36,8 +37,8 @@ import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Observer;
-import uk.ac.ox.oxfish.model.data.monitors.PerSpeciesMonitor;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
@@ -58,7 +59,7 @@ public class FadManager {
     private final Iterable<Observer<SetAction>> setObservers;
     private final Iterable<Observer<MakeFadSet>> fadSetObservers;
     private final Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers;
-    private final Optional<PerSpeciesMonitor<BiomassLostEvent, Double>> biomassLostMonitor;
+    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor;
     private ActiveActionRegulations actionSpecificRegulations;
     private FadInitializer fadInitializer;
     private Fisher fisher;
@@ -72,7 +73,7 @@ public class FadManager {
         Iterable<Observer<SetAction>> setObservers,
         Iterable<Observer<MakeFadSet>> fadSetObservers,
         Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
-        Optional<PerSpeciesMonitor<BiomassLostEvent, Double>> biomassLostMonitor,
+        Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor,
         ActiveActionRegulations actionSpecificRegulations
     ) {
         this.fadMap = fadMap;
@@ -86,7 +87,7 @@ public class FadManager {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
-    public Optional<PerSpeciesMonitor<BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
@@ -224,7 +225,7 @@ public class FadManager {
             new ImmutableList.Builder<>();
         ImmutableList.Builder<Observer<MakeUnassociatedSet>> unassociatedSetObservers =
             new ImmutableList.Builder<>();
-        Optional<PerSpeciesMonitor<BiomassLostEvent, Double>> biomassLostMonitor = Optional.empty();
+        Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor = Optional.empty();
         ImmutableSet.Builder<ActionSpecificRegulation> actionSpecificRegulations =
             new ImmutableSet.Builder<>();
         private int initialNumberOfFadsInStock = 0;
@@ -266,7 +267,7 @@ public class FadManager {
         }
 
         @SuppressWarnings("unused")
-        public Builder setBiomassLostMonitor(PerSpeciesMonitor<BiomassLostEvent, Double> biomassLostMonitor) {
+        public Builder setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor) {
             this.biomassLostMonitor = Optional.ofNullable(biomassLostMonitor);
             return this;
         }

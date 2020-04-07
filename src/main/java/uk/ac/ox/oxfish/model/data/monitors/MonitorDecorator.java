@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.model.data.monitors;
 
-import sim.engine.SimState;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
@@ -30,13 +29,9 @@ public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
 
     MonitorDecorator(Monitor<O, V> delegate) { this.delegate = delegate; }
 
-    Monitor<O, V> getDelegate() { return delegate; }
-
     @Override public Accumulator<V> getAccumulator() { return delegate.getAccumulator(); }
 
     @Override public String getBaseName() { return delegate.getBaseName(); }
-
-    @Override public double getCurrentValue() { return delegate.getCurrentValue(); }
 
     @Override public Iterable<V> extractValues(O observable) { return delegate.extractValues(observable); }
 
@@ -44,18 +39,8 @@ public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
         delegate.registerWith(timeSeries);
     }
 
-    @Override public double asGatherer(FishState fishState) { return delegate.asGatherer(fishState); }
-
-    @Override public void step(SimState simState) {
-        delegate.step(simState);
-    }
-
     @Override public void start(FishState model) {
         delegate.start(model);
-    }
-
-    @Override public void turnOff() {
-        delegate.turnOff();
     }
 
     @Override public void observe(O observable) {

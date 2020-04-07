@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 public class MakeFadSet extends SetAction {
 
-    private static String ACTION_NAME = "FAD sets";
     private Fad targetFad;
 
     public MakeFadSet(FishState model, Fisher fisher, Fad targetFad) {
@@ -39,7 +38,9 @@ public class MakeFadSet extends SetAction {
         this.targetFad = targetFad;
     }
 
-    public String getActionName() { return ACTION_NAME; }
+    public Fad getTargetFad() { return targetFad; }
+
+    public String getActionName() { return "FAD sets"; }
 
     @Override void notifyFadManager() { getFadManager().reactTo(this); }
 

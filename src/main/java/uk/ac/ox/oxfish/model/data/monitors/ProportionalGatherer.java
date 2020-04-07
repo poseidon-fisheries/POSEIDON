@@ -22,34 +22,25 @@ package uk.ac.ox.oxfish.model.data.monitors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-import java.util.function.Function;
+public class ProportionalGatherer<G, O, V> extends MonitorDecorator<O, V> {
 
-public class ObservingOnGatherMonitor<O, V> extends MonitorDecorator<O, V> {
+    private final GroupingMonitor<G, O, V> delegate;
 
-    private final Function<FishState, Iterable<O>> observablesExtractor;
-
-    public ObservingOnGatherMonitor(
-        Function<FishState, Iterable<O>> observablesExtractor,
-        Monitor<O, V> delegate
-    ) {
+    public ProportionalGatherer(GroupingMonitor<G, O, V> delegate) {
         super(delegate);
-        this.observablesExtractor = observablesExtractor;
+        this.delegate = delegate;
     }
 
     @Override public void registerWith(TimeSeries<FishState> timeSeries) {
-        timeSeries.registerGatherer(
-            getAccumulator().makeName(getBaseName()),
-            this::asGatherer,
-            0.0
-        );
-        if (getDelegate() instanceof GroupingMonitor)
-            // ugh... surely there is a way to do this without a cast...
-            ((GroupingMonitor<?, O, V>) getDelegate()).registerSubMonitorsWith(timeSeries);
-    }
-
-    @Override public double asGatherer(FishState fishState) {
-        observablesExtractor.apply(fishState).forEach(this::observe);
-        return super.asGatherer(fishState);
+        delegate.getSubMonitors().values().forEach(subMonitor -> {
+            if (subMonitor.getBaseName() != null)
+                timeSeries.registerGatherer(
+                    "Proportion of " + subMonitor.getBaseName(),
+                    __ -> subMonitor.getAccumulator().get() / getAccumulator().get(),
+                    0.0
+                );
+        });
+        super.registerWith(timeSeries);
     }
 
 }

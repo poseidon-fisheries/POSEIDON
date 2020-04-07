@@ -30,13 +30,13 @@ public class BasicMonitor<O, V> extends AbstractMonitor<O, V> {
 
     private final Function<? super O, V> valueExtractor;
 
-    BasicMonitor(
-        IntervalPolicy resetInterval,
+    public BasicMonitor(
         String baseName,
+        IntervalPolicy resetInterval,
         Supplier<Accumulator<V>> accumulatorSupplier,
         Function<? super O, V> valueExtractor
     ) {
-        super(resetInterval, baseName, accumulatorSupplier);
+        super(baseName, resetInterval, accumulatorSupplier);
         this.valueExtractor = valueExtractor;
     }
 
