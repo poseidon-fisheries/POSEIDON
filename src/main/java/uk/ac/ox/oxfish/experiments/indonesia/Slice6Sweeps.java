@@ -36,16 +36,13 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "lime_monthly2yr_8h";
+    private static final String SCENARIO_NAME = "tropfishR_tl_2yr_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -64,60 +61,63 @@ public class Slice6Sweeps {
     public static void main(String[] args) throws IOException {
 
 
-        businessAsUsual("bau",
-                        SCENARIO_NAME
-        );
-//
-////        effort control
-////        all boats are controlled
-//
-//
-//
-        effortControl("all",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
-
-        effortControlShockYear("all_shock",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, 100);
-
-
-// no fishing
-        stopFishing("nofishing",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR);
-
-//
-//////        //only boats >10GT are controlled
-//
-        effortControl("10",
-                      new String[]{"population1","population2","population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT);
-
-//
-//////////
-//////////        //price premium
-////        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
-//
-////        //selectivity test
-        selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
+//        businessAsUsual("bau",
+//                        SCENARIO_NAME
+//        );
 ////
-////        //price penalty
-        pricePenalty("malus_malabaricus",
-                SCENARIO_NAME,
-                10,
-                "Lutjanus malabaricus");
+//////        effort control
+//////        all boats are controlled
+////
+////
+////
+//        effortControl("all",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
+//
+//        effortControlShockYear("all_shock",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, 100);
+//
+//
+//// no fishing
+//        stopFishing("nofishing",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR);
+//
+////
+////////        //only boats >10GT are controlled
+////
+//        effortControl("10",
+//                      new String[]{"population1","population2","population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT);
+//
+////
+////////////
+////////////        //price premium
+//////        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+////
+//////        //selectivity test
+//        selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
+//////
+//////        //price penalty
+//        pricePenalty("malus_malabaricus",
+//                SCENARIO_NAME,
+//                10,
+//                "Lutjanus malabaricus");
 ////
 ////
 ////
 ////        //fleet reduction
 //        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 //
+        //        //fleet reduction
+        fleetReduction("fleetreduction10", SCENARIO_NAME, 1,"population1","population2","population3"
+                );
 ////        //delays
 //        delays("delay_all",
 //                new String[]{"population0","population1","population2","population3"},
@@ -598,7 +598,8 @@ public class Slice6Sweeps {
 
     private static void fleetReduction(
             String name,
-            final String filename, final int shockYear) throws IOException {
+            final String filename, final int shockYear,
+            String... tagsToCheck) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
@@ -615,9 +616,15 @@ public class Slice6Sweeps {
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
             double finalProbability = probability;
-            runner.setScenarioSetup(
+            if(tagsToCheck == null)
+                runner.setScenarioSetup(
                     setupFleetReductionConsumer(shockYear, finalProbability)
             );
+            else
+                runner.setScenarioSetup(
+                        setupFleetReductionConsumerSelective(shockYear, finalProbability,
+                                tagsToCheck)
+                );
 
 
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {
@@ -638,6 +645,8 @@ public class Slice6Sweeps {
         }
         fileWriter.close();
     }
+
+
 
     @NotNull
     public static Consumer<Scenario> setupFleetReductionConsumer(int shockYear,
@@ -690,6 +699,70 @@ public class Slice6Sweeps {
 
         };
     }
+
+
+    @NotNull
+    public static Consumer<Scenario> setupFleetReductionConsumerSelective(int shockYear,
+                                                                 double yearlyReductionProbability,
+                                                                          String[] validTags
+
+
+                                                                          ) {
+        return scenario -> {
+
+            //at year 4, impose regulation
+            final List<String> validTagsString = Arrays.asList(validTags);
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+            flexible.getPlugins().add(
+                    fishState -> new AdditionalStartable() {
+                        /**
+                         * this gets called by the fish-state right after the scenario has started. It's
+                         * useful to set up steppables
+                         * or just to percolate a reference to the model
+                         *
+                         * @param model the model
+                         */
+                        @Override
+                        public void start(FishState model) {
+                            model.scheduleEveryYear(new Steppable() {
+                                @Override
+                                public void step(SimState simState) {
+                                    if(model.getYear()<shockYear)
+                                        return;
+                                    List<Fisher> toKill = new LinkedList<>();
+
+                                    for(Fisher fisher : model.getFishers()) {
+
+                                        if(Collections.disjoint(fisher.getTags(),
+                                                validTagsString))
+                                            continue;
+
+                                        if (model.getRandom().nextDouble() < yearlyReductionProbability)
+                                            toKill.add(fisher);
+                                    }
+                                    for (Fisher sacrifice : toKill) {
+                                        model.killSpecificFisher(sacrifice);
+
+                                    }
+
+
+                                }
+                            }, StepOrder.DAWN);
+                        }
+
+                        /**
+                         * tell the startable to turnoff,
+                         */
+                        @Override
+                        public void turnOff() {
+
+                        }
+                    }
+            );
+
+        };
+    }
+
 
 
     private static void pricePremium(

@@ -148,7 +148,7 @@ task deployFatJar(type: Copy, dependsOn: fatJar) {
     include 'oxfish_executable.jar'
 }
 
-task optimizerJar(type: ShadowJar) {
+task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'maximizer.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -159,7 +159,7 @@ task optimizerJar(type: ShadowJar) {
     }
 }
 
-task optimizerConsoleJar(type: ShadowJar) {
+task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'console_optimizer.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -170,7 +170,7 @@ task optimizerConsoleJar(type: ShadowJar) {
     }
 }
 
-task calicatchFatJar(type: ShadowJar) {
+task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'calicatch.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -181,7 +181,7 @@ task calicatchFatJar(type: ShadowJar) {
     }
 }
 
-task inferenceFatJar(type: ShadowJar) {
+task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'indirectInference.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -194,7 +194,7 @@ task inferenceFatJar(type: ShadowJar) {
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-task buildHeadless(type: ShadowJar) {
+task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
 
     mergeServiceFiles()
     archiveFileName = 'yamler.jar'
@@ -215,7 +215,7 @@ task deployHeadless(type: Copy, dependsOn: buildHeadless) {
     include 'yamler.jar'
 }
 
-task fatJarBatch(type: ShadowJar) {
+task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_batch.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -226,7 +226,7 @@ task fatJarBatch(type: ShadowJar) {
     }
 }
 
-task fatJarNoDataSlice2(type: ShadowJar) {
+task fatJarNoDataSlice2(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodataslice2.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -237,7 +237,7 @@ task fatJarNoDataSlice2(type: ShadowJar) {
     }
 }
 
-task fatJar718NoDataSlice1(type: ShadowJar) {
+task fatJar718NoDataSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodata718slice1.jar'
     from sourceSets.main.output //tells the task to include the project code

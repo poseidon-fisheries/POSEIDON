@@ -45,6 +45,7 @@ public class MapInitializers {
 
     static {
         NAMES.put(SimpleMapInitializerFactory.class, "Simple Map");
+        NAMES.put(TwoSidedMapFactory.class, "Two Sided Map");
         NAMES.put(OsmoseMapInitializerFactory.class, "OSMOSE Map");
         NAMES.put(OsmoseBoundedMapInitializerFactory.class, "OSMOSE Bounded Map");
         NAMES.put(FromFileMapInitializerFactory.class, "From File Map");
