@@ -2,7 +2,7 @@ Flexible:
   allowFriendshipsAcrossPorts: false
   biologyInitializer:
     Diffusing Logistic:
-      carryingCapacity: '5000.0'
+      carryingCapacity: '50000.0'
       differentialPercentageToMove: '0.001'
       grower:
         Independent Logistic Grower:
@@ -84,12 +84,12 @@ Flexible:
         gasPriceAtPort: 0.0
         marketMaker:
           Fixed Price Market:
-            marketPrice: '10.0'
+            marketPrice: '100.0'
         portName: "Far-off1"
   mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
-      marketPrice: '10.0'
+      marketPrice: '100.0'
   networkBuilder:
     Equal Out Degree:
       allowMutualFriendships: true

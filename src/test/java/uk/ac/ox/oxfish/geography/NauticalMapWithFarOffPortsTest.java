@@ -118,13 +118,13 @@ public class NauticalMapWithFarOffPortsTest {
                         getFarOffPorts().get(0);
 
         //expensive gas!
-        information.setGasPriceAtPort(10);
+        information.setGasPriceAtPort(100);
         //far away
         information.setDistanceFromExitInKm(50);
 
         scenario.setPortSwitching(true);
 
-        FishState state = new FishState();
+        FishState state = new FishState(1);
         state.setScenario(scenario);
         state.start();
         final Port farOffPort = ((NauticalMapWithFarOffPorts) state.getMap()).

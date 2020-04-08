@@ -97,8 +97,11 @@ public class SimplePortAdaptation extends AbstractAdaptation<Port> {
                 new Function<Integer, Double>() {
                     @Override
                     public Double apply(Integer integer) {
-                        return (state.getYearlyDataSet().
-                                getLatestObservation("Average Cash-Flow at " + ports.get(integer).getName()))/(365d)
+
+                        final Double latestProfitsAtPort = state.getYearlyDataSet().
+                                getLatestObservation("Average Cash-Flow at " + ports.get(integer).getName()) /(365d);
+
+                        return Double.isFinite(latestProfitsAtPort) ? latestProfitsAtPort : 0
                                 ;
                     }
                 },
