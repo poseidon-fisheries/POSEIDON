@@ -1,0 +1,111 @@
+Flexible:
+  allowFriendshipsAcrossPorts: false
+  biologyInitializer:
+    Diffusing Logistic:
+      carryingCapacity: '5000.0'
+      differentialPercentageToMove: '0.001'
+      grower:
+        Independent Logistic Grower:
+          steepness: uniform 0.6 0.8
+      maxInitialCapacity: '1.0'
+      minInitialCapacity: '0.0'
+      percentageLimitOnDailyMovement: '0.01'
+      speciesName: Species 0
+  cheaters: false
+  exogenousCatches:
+    Simple Exogenous Catches:
+      yearlyBiomassToExtract: {
+        }
+  fisherDefinitions:
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: false
+        automaticallyIgnoreMPAs: false
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Adaptive Probability:
+            explorationProbability: '0.2'
+            explorationProbabilityMinimum: '0.01'
+            imitationProbability: '1.0'
+            incrementMultiplier: '0.02'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '5.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Random Catchability:
+        gasPerHourFished: '5.0'
+        meanCatchabilityFirstSpecies: '0.01'
+        meanCatchabilityOtherSpecies: '0.01'
+        standardDeviationCatchabilityFirstSpecies: '0.0'
+        standardDeviationCatchabilityOtherSpecies: '0.0'
+    gearStrategy: Never Change Gear
+    holdSize: '100.0'
+    hourlyVariableCost: '0.0'
+    initialFishersPerPort:
+      Far-off1: 20
+      Port 0: 20
+    literPerKilometer: '10.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '5.0'
+    tags: ''
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '0.01'
+  habitatInitializer: All Sand
+  mapInitializer:
+    Map with far-off ports:
+      delegate:
+        Simple Map:
+          cellSizeInKilometers: '10.0'
+          coastalRoughness: '0'
+          depthSmoothing: '0'
+          height: '20.0'
+          maxLandWidth: '1.0'
+          width: '20.0'
+      farOffPorts:
+      - distanceFromExitInKm: 100.0
+        exitGridX: 0
+        exitGridY: 0
+        gasPriceAtPort: 0.0
+        marketMaker:
+          Fixed Price Market:
+            marketPrice: '10.0'
+        portName: "Far-off1"
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '10.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+      predicates: [
+        ]
+  plugins: [
+    ]
+  portInitializer:
+    Random Ports:
+      numberOfPorts: '1.0'
+  portSwitching: false
+  tagsToTrackSeparately: ''
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
