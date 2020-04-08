@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Double2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
@@ -124,7 +125,9 @@ public class FadGravityDestinationStrategyTest {
         // Put a FAD owned by someone else on the map and check that destination doesn't change.
         // Putting it there wouldn't change the destination anyway, so this is not a great test,
         // but at least the coverage report tells us that the filter is exercised and the FAD excluded.
-        final Fad fad = new Fad(mock(FadManager.class), null, null, 0);
+        final BiomassLocalBiology biomassLocalBiology = mock(BiomassLocalBiology.class);
+        when(biomassLocalBiology.getCurrentBiomass()).thenReturn(new double[0]);
+        final Fad fad = new Fad(mock(FadManager.class), biomassLocalBiology, ImmutableMap.of(), 0);
         fadMap.deployFad(fad, 1, map.getSeaTile(1, 2));
         final SeaTile dest12b = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
         assertEquals(map.getSeaTile(1, 2), dest12b);
