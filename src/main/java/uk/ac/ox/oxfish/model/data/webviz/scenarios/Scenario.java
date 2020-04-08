@@ -19,6 +19,8 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.scenarios;
 
+import uk.ac.ox.oxfish.model.data.webviz.events.EventDefinition;
+
 import java.util.Collection;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
@@ -32,6 +34,7 @@ public final class Scenario {
     private final FadsDefinition fads;
     private final GridDefinition grid;
     private final RegionsDefinition regions;
+    private final Collection<EventDefinition> events;
     private final Collection<HeatmapDefinition> heatmaps;
     private final Collection<ChartDefinition> charts;
 
@@ -44,6 +47,7 @@ public final class Scenario {
         final FadsDefinition fadsDefinition,
         final GridDefinition gridDefinition,
         final RegionsDefinition regionsDefinition,
+        Collection<EventDefinition> events,
         final Collection<HeatmapDefinition> heatmapDefinitions,
         final Collection<ChartDefinition> chartDefinitions
     ) {
@@ -55,6 +59,7 @@ public final class Scenario {
         this.fads = fadsDefinition;
         this.grid = gridDefinition;
         this.regions = regionsDefinition;
+        this.events = events;
         this.heatmaps = heatmapDefinitions;
         this.charts = chartDefinitions;
     }

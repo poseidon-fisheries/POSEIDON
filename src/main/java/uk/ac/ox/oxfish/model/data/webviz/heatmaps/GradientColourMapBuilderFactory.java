@@ -30,9 +30,9 @@ import java.util.Collection;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class GradientColourMapBuilderFactory implements JsonBuilderFactory<Collection<ColourMapEntry>> {
 
-    private String minColour = "white";
-    private String maxColour = "red";
-    private double minOpacity = 0.25;
+    private String minColour = "green";
+    private String maxColour = "green";
+    private double minOpacity = 0.0;
     private double maxOpacity = 0.75;
     private double minValue = 0;
     private double maxValue = 1;

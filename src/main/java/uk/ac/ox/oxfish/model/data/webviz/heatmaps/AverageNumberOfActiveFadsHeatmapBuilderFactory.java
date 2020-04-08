@@ -35,10 +35,13 @@ public class AverageNumberOfActiveFadsHeatmapBuilderFactory implements HeatmapBu
 
     public AverageNumberOfActiveFadsHeatmapBuilderFactory() {
         colourMapBuilderFactory.setMaxValue(10);
+        colourMapBuilderFactory.setMinColour("yellow");
         colourMapBuilderFactory.setMaxColour("yellow");
     }
 
     @Override public String getTitle() { return "Average number of active FADs"; }
+
+    @Override public String getLegend() { return getTitle(); }
 
     @Override public JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
         return this.colourMapBuilderFactory;

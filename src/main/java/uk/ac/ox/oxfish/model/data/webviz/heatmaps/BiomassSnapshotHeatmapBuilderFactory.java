@@ -48,6 +48,8 @@ public final class BiomassSnapshotHeatmapBuilderFactory implements HeatmapBuilde
 
     @Override public String getTitle() { return speciesName + " biomass"; }
 
+    @Override public String getLegend() { return getTitle() + " (kg)"; }
+
     @Override public JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
         return colourMapBuilderFactory;
     }

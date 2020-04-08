@@ -35,6 +35,8 @@ public interface HeatmapBuilderFactory extends
 
     String getTitle();
 
+    String getLegend();
+
     JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory();
 
     ToDoubleFunction<SeaTile> makeNumericExtractor(FishState fishState);
@@ -51,6 +53,7 @@ public interface HeatmapBuilderFactory extends
         return new HeatmapDefinition(
             getTitle(),
             getFileName(),
+            getLegend(),
             getColourMapBuilderFactory().apply(fishState).buildJsonObject(fishState)
         );
     }

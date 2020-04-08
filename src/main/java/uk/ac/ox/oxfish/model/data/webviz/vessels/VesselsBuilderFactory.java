@@ -26,13 +26,13 @@ import uk.ac.ox.oxfish.model.data.webviz.scenarios.VesselTypeDefinition;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.VesselsDefinition;
 
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
-import static java.awt.Color.BLACK;
+import static java.awt.Color.CYAN;
 import static java.util.Comparator.comparingInt;
 
 public final class VesselsBuilderFactory
     implements JsonBuilderFactory<Vessels>, JsonBuilder<VesselsDefinition> {
 
-    private VesselClassifier vesselClassifier = new SingleTypeVesselClassifier(1, "Vessel", BLACK);
+    private VesselClassifier vesselClassifier = new SingleTypeVesselClassifier(1, "Vessels", CYAN);
 
     @SuppressWarnings("unused") public VesselClassifier getVesselClassifier() { return vesselClassifier; }
 

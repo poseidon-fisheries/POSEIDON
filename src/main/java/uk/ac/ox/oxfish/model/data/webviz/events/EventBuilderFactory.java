@@ -17,28 +17,9 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.scenarios;
+package uk.ac.ox.oxfish.model.data.webviz.events;
 
-import java.util.Collection;
+import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-public final class HeatmapDefinition {
-
-    private final String title;
-    private final String path;
-    private final String legend;
-    private final Collection<ColourMapEntry> colourMap;
-
-    public HeatmapDefinition(
-        final String title,
-        final String path,
-        final String legend,
-        final Collection<ColourMapEntry> colourMap
-    ) {
-        this.title = title;
-        this.path = path;
-        this.legend = legend;
-        this.colourMap = colourMap;
-    }
-
-}
+@FunctionalInterface
+public interface EventBuilderFactory extends JsonBuilder<EventDefinition> { }

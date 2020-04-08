@@ -24,8 +24,10 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.AverageNumberOfActiveFadsHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.BiomassSnapshotHeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.vessels.SingleTypeVesselClassifier;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -38,16 +40,17 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Stream.concat;
+import static org.jfree.chart.ChartColor.LIGHT_BLUE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.writeAdditionalOutputsToFolder;
 
 public final class WebVizTest {
 
     private static final Path basePath =
-        Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
+        Paths.get(System.getProperty("user.home"), "workspace");
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets", "tuna_calibrated.yaml"));
+        basePath.resolve(Paths.get("tuna", "np", "runs", "webviz_test", "tuna.yaml"));
     private static final Path outputPath =
-        basePath.resolve(Paths.get("runs", "webviz_test"));
+        basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
     public static void main(final String[] args) throws IOException {
 
@@ -57,9 +60,22 @@ public final class WebVizTest {
 
         final JsonOutputManagerFactory jsonOutputManagerFactory = new JsonOutputManagerFactory();
         jsonOutputManagerFactory.setScenarioTitle("Tuna test");
+        jsonOutputManagerFactory.setScenarioDescription(
+            "This is sample output from the current tuna simulation, " +
+                "over a period of three years after one year of 'spin up'.");
         jsonOutputManagerFactory.setStartDate("2017-01-01");
         jsonOutputManagerFactory.setNumYearsToSkip(1);
         jsonOutputManagerFactory.setPrettyPrinting(true);
+
+        jsonOutputManagerFactory.setVesselClassifier(
+            new SingleTypeVesselClassifier(1, "Class 6 vessels", LIGHT_BLUE)
+        );
+
+        jsonOutputManagerFactory.setEventBuilderFactories(ImmutableList.of(
+            new SinglePeriodEventBuilderFactory("Closure period A", 210, 281),
+            new SinglePeriodEventBuilderFactory("El Corralito closure", 282, 312),
+            new SinglePeriodEventBuilderFactory("Closure period B", 313, 364 + 19)
+        ));
 
         final ImmutableList.Builder<ChartBuilderFactory> chartBuilderFactories = new ImmutableList.Builder<>();
         ImmutableMap.of(
@@ -84,6 +100,7 @@ public final class WebVizTest {
         model.start();
         do {
             model.schedule.step(model);
+            System.out.println(model.getDay());
         } while (model.getYear() < 4);
 
         writeAdditionalOutputsToFolder(outputPath, model);

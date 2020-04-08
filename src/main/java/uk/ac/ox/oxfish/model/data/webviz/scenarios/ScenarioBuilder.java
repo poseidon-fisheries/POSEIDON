@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.events.EventBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
 
 import java.time.Instant;
@@ -41,6 +42,7 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
     private final JsonBuilder<FadsDefinition> fadsDefinitionBuilder;
     private final JsonBuilder<RegionsDefinition> regionsDefinitionBuilder;
     private final JsonBuilder<VesselsDefinition> vesselsDefinitionBuilder;
+    private final Collection<? extends EventBuilderFactory> eventBuilderFactories;
     private final Collection<? extends HeatmapBuilderFactory> heatmapDefinitionBuilders;
     private final Collection<? extends ChartBuilderFactory> chartDefinitionBuilders;
 
@@ -51,6 +53,7 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
         final JsonBuilder<FadsDefinition> fadsDefinitionBuilder,
         final JsonBuilder<RegionsDefinition> regionsDefinitionBuilder,
         final JsonBuilder<VesselsDefinition> vesselsDefinitionBuilder,
+        Collection<? extends EventBuilderFactory> eventBuilderFactories,
         final Collection<? extends HeatmapBuilderFactory> heatmapDefinitionBuilders,
         final Collection<? extends ChartBuilderFactory> chartDefinitionBuilders
     ) {
@@ -60,6 +63,7 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
         this.fadsDefinitionBuilder = fadsDefinitionBuilder;
         this.regionsDefinitionBuilder = regionsDefinitionBuilder;
         this.vesselsDefinitionBuilder = vesselsDefinitionBuilder;
+        this.eventBuilderFactories = eventBuilderFactories;
         this.heatmapDefinitionBuilders = heatmapDefinitionBuilders;
         this.chartDefinitionBuilders = chartDefinitionBuilders;
     }
@@ -91,6 +95,7 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
             fadsDefinitionBuilder.buildJsonObject(fishState),
             gridDefinition,
             regionsDefinitionBuilder.buildJsonObject(fishState),
+            eventBuilderFactories.stream().map(b -> b.buildJsonObject(fishState)).collect(toImmutableList()),
             heatmapDefinitionBuilders.stream().map(b -> b.buildJsonObject(fishState)).collect(toImmutableList()),
             chartDefinitionBuilders.stream().map(b -> b.buildJsonObject(fishState)).collect(toImmutableList())
         );

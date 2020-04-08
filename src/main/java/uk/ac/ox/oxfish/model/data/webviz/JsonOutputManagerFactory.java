@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.events.EventBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.fads.FadsBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.fads.FadsBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilder;
@@ -58,10 +59,16 @@ public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutp
     private FadsBuilderFactory fadsBuilderFactory = new FadsBuilderFactory();
     private RegionsBuilderFactory regionsBuilderFactory = new SingleFixedRegionBuilderFactory();
     private VesselsBuilderFactory vesselsBuilderFactory = new VesselsBuilderFactory();
-
+    private Collection<? extends EventBuilderFactory> eventBuilderFactories = ImmutableList.of();
     private Collection<? extends ChartBuilderFactory> chartBuilderFactories = ImmutableList.of();
     private Collection<? extends HeatmapBuilderFactory> heatmapBuilderFactories = ImmutableList.of();
     private VesselClassifier vesselClassifier = new SingleTypeVesselClassifier(1, "Vessel", BLACK);
+
+    public Collection<? extends EventBuilderFactory> getEventBuilderFactories() { return eventBuilderFactories; }
+
+    public void setEventBuilderFactories(Collection<? extends EventBuilderFactory> eventBuilderFactories) {
+        this.eventBuilderFactories = eventBuilderFactories;
+    }
 
     @Override public JsonOutputManager apply(final FishState fishState) {
 
@@ -87,6 +94,7 @@ public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutp
                     fadsBuilderFactory,
                     regionsBuilderFactory,
                     vesselsBuilderFactory,
+                    eventBuilderFactories,
                     heatmapBuilderFactories,
                     chartBuilderFactories
                 );

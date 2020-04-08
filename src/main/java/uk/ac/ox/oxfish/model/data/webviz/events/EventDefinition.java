@@ -17,28 +17,35 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.scenarios;
+package uk.ac.ox.oxfish.model.data.webviz.events;
 
 import java.util.Collection;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-public final class HeatmapDefinition {
+public class EventDefinition {
 
-    private final String title;
-    private final String path;
-    private final String legend;
-    private final Collection<ColourMapEntry> colourMap;
+    private final String description;
+    private final Collection<Period> periods;
 
-    public HeatmapDefinition(
-        final String title,
-        final String path,
-        final String legend,
-        final Collection<ColourMapEntry> colourMap
+    EventDefinition(
+        String description,
+        Collection<Period> periods
     ) {
-        this.title = title;
-        this.path = path;
-        this.legend = legend;
-        this.colourMap = colourMap;
+        this.description = description;
+        this.periods = periods;
+    }
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    static class Period {
+
+        private final int startTimeDays;
+        private final int endTimeDays;
+
+        Period(int startTimeDays, int endTimeDays) {
+            this.startTimeDays = startTimeDays;
+            this.endTimeDays = endTimeDays;
+        }
+
     }
 
 }
