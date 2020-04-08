@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FadDestinationStrategyFactory implements AlgorithmFactory<FadDestinationStrategy> {
 
-    private DoubleParameter numberOfStepsToLookAheadForFadPositions = new FixedDoubleParameter(30);
+    private DoubleParameter numberOfStepsToLookAheadForFadPositions = new FixedDoubleParameter(10);
     private DoubleParameter travelSpeedMultiplier = new FixedDoubleParameter(1);
 
     @SuppressWarnings("unused") public DoubleParameter getNumberOfStepsToLookAheadForFadPositions() {

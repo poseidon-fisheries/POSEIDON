@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
+import java.util.Map;
 import java.util.function.Function;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
@@ -46,8 +47,8 @@ public class FadInitializer implements Function<FadManager, Fad> {
 
     public FadInitializer(
         GlobalBiology globalBiology,
-        ImmutableMap<Species, Quantity<Mass>> carryingCapacities,
-        ImmutableMap<Species, Double> attractionRates,
+        Map<Species, Quantity<Mass>> carryingCapacities,
+        Map<Species, Double> attractionRates,
         MersenneTwisterFast rng, double fishReleaseProbability,
         double dudProbability
     ) {
@@ -58,12 +59,13 @@ public class FadInitializer implements Function<FadManager, Fad> {
         carryingCapacities.forEach((species, qty) ->
             this.carryingCapacities[species.getIndex()] = asDouble(qty, KILOGRAM)
         );
-        this.attractionRates = attractionRates;
+        this.attractionRates = ImmutableMap.copyOf(attractionRates);
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
     @Override public Fad apply(@NotNull FadManager fadManager) {
-        return new Fad(fadManager,
+        return new Fad(
+            fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
             rng.nextBoolean(dudProbability) ? ImmutableMap.of() : this.attractionRates,
             fishReleaseProbability
