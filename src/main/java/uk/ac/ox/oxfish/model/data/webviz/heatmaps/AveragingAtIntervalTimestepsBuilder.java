@@ -26,6 +26,7 @@ public class AveragingAtIntervalTimestepsBuilder extends AbstractTimestepBuilder
     private final int interval;
 
     private int numObservations = 0;
+    private int intervalStartDay = 0;
     private double[] cellValues = null;
 
     public AveragingAtIntervalTimestepsBuilder(int interval) { this.interval = interval; }
@@ -33,10 +34,12 @@ public class AveragingAtIntervalTimestepsBuilder extends AbstractTimestepBuilder
     @Override public void add(Timestep timestep) {
 
         numObservations++;
-        if (numObservations == 1)
+        if (numObservations == 1) {
             // The first observation resets the array of cell values
+            // and make note of the starting day for the new interval
             cellValues = timestep.getCellValues();
-        else
+            intervalStartDay = timestep.getTimeInDays();
+        } else
             // Afterwards, we update the array with the iterative average
             range(0, cellValues.length).forEach(i ->
                 cellValues[i] += (timestep.getCellValues()[i] - cellValues[i]) / numObservations
@@ -45,7 +48,7 @@ public class AveragingAtIntervalTimestepsBuilder extends AbstractTimestepBuilder
         // When we have all the observations we need, we store the aggregate timestep
         // and reset the number of observations in order to start anew on the next call
         if (numObservations == interval) {
-            builder.add(new Timestep(timestep.getTimeInDays(), cellValues));
+            builder.add(new Timestep(intervalStartDay, cellValues));
             numObservations = 0;
         }
     }
