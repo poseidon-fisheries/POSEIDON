@@ -20,8 +20,8 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventBuilderFactory;
@@ -39,10 +39,13 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.zip;
 import static java.util.stream.Stream.concat;
 import static org.jfree.chart.ChartColor.LIGHT_BLUE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.writeAdditionalOutputsToFolder;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class WebVizTest {
 
     private static final Path basePath =
@@ -74,34 +77,73 @@ public final class WebVizTest {
         jsonOutputManagerFactory.setEventBuilderFactories(ImmutableList.of(
             new SinglePeriodEventBuilderFactory("Closure period A", 210, 281),
             new SinglePeriodEventBuilderFactory("El Corralito closure", 282, 312),
-            new SinglePeriodEventBuilderFactory("Closure period B", 313, 364 + 19)
+            new SinglePeriodEventBuilderFactory("Closure period B", 313, 364 + 19),
+
+            new SinglePeriodEventBuilderFactory("Closure period A", (364 * 1) + 210, (364 * 1) + 281),
+            new SinglePeriodEventBuilderFactory("El Corralito closure", (364 * 1) + 282, (364 * 1) + 312),
+            new SinglePeriodEventBuilderFactory("Closure period B", (364 * 1) + 313, (364 * 1) + 364 + 19),
+
+            new SinglePeriodEventBuilderFactory("Closure period A", (364 * 2) + 210, (364 * 2) + 281),
+            new SinglePeriodEventBuilderFactory("El Corralito closure", (364 * 2) + 282, (364 * 2) + 312),
+            new SinglePeriodEventBuilderFactory("Closure period B", (364 * 2) + 313, (364 * 2) + 364 + 19)
+
         ));
 
         final ImmutableList.Builder<ChartBuilderFactory> chartBuilderFactories = new ImmutableList.Builder<>();
-        ImmutableMap.of(
-            "Biomass (kg)", "Biomass %s",
-            "Landings (kg)", "%s Landings"
-        ).forEach((title, pattern) -> chartBuilderFactories.add(
-            ChartBuilderFactory.forPattern(title, pattern, speciesNames)
+        ImmutableList.of(
+            entry("Biomass (kg)", "Biomass %s"),
+            entry("Landings (kg)", "%s Landings"),
+            entry("Recruitment (kg)", "%s Recruitment"),
+            entry("Average catch per set (kg)", "Average %s catches by set"),
+            entry("Total catch from FAD sets (kg)", "Sum of %s catches from FAD sets"),
+            entry("Total catch from unassociated sets (kg)", "Sum of %s catches from unassociated sets"),
+            entry("Total biomass under FADs (kg)", "Sum of %s biomass under FADs")
+        ).forEach(entry -> chartBuilderFactories.add(
+            ChartBuilderFactory.forPattern(entry.getKey(), entry.getValue(), speciesNames)
         ));
+        ImmutableList.of(
+            entry("Number of FAD deployments", "Number of FAD deployments (%s)"),
+            entry("Number of FAD sets", "Number of FAD sets (%s)"),
+            entry("Number of unassociated sets", "Number of unassociated sets (%s)")
+        ).forEach(entry -> chartBuilderFactories.add(
+            ChartBuilderFactory.forPattern(
+                entry.getKey(), entry.getValue(),
+                TicTacToeRegionalDivision.REGION_NAMES
+            )
+        ));
+
+        chartBuilderFactories.add(
+            ChartBuilderFactory.forPattern(
+                "Number of actions", "Number of %s",
+                ImmutableList.of("FAD deployments", "FAD sets", "unassociated sets")
+            )
+        );
 
         jsonOutputManagerFactory.setChartBuilderFactories(chartBuilderFactories.build());
 
         jsonOutputManagerFactory.setHeatmapBuilderFactories(concat(
-            speciesNames.stream().map(BiomassSnapshotHeatmapBuilderFactory::newInstance),
+            zip(
+                speciesNames.stream(),
+                Stream.generate(() -> "green"),
+                BiomassSnapshotHeatmapBuilderFactory::newInstance
+            ),
             Stream.of(new AverageNumberOfActiveFadsHeatmapBuilderFactory())
         ).collect(toImmutableList()));
-
-        scenario.getPlugins().add(jsonOutputManagerFactory);
 
         final FishState model = new FishState();
 
         model.setScenario(scenario);
+
+        scenario.getPlugins().add(jsonOutputManagerFactory);
+
         model.start();
+
+        model.getYearlyDataSet().getColumns().forEach(col -> System.out.println(col.getName()));
+
         do {
             model.schedule.step(model);
             System.out.println(model.getDay());
-        } while (model.getYear() < 4);
+        } while (model.getYear() < 2);
 
         writeAdditionalOutputsToFolder(outputPath, model);
 

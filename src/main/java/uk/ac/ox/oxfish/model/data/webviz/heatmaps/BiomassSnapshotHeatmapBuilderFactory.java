@@ -40,9 +40,11 @@ public final class BiomassSnapshotHeatmapBuilderFactory implements HeatmapBuilde
     private GradientColourMapBuilderFactory colourMapBuilderFactory =
         new GradientColourMapBuilderFactory();
 
-    public static BiomassSnapshotHeatmapBuilderFactory newInstance(final String speciesName) {
+    public static BiomassSnapshotHeatmapBuilderFactory newInstance(final String speciesName, final String colour) {
         final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
         instance.speciesName = speciesName;
+        instance.colourMapBuilderFactory.setMinColour(colour);
+        instance.colourMapBuilderFactory.setMaxColour(colour);
         return instance;
     }
 

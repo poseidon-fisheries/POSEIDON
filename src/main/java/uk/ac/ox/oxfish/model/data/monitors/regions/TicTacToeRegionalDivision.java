@@ -26,7 +26,7 @@ import java.util.List;
 
 public final class TicTacToeRegionalDivision extends SquareGridRegionalDivision {
 
-    private static final List<String> REGION_NAMES = ImmutableList.of(
+    public static final List<String> REGION_NAMES = ImmutableList.of(
         "Northwest",
         "North",
         "Northeast",
