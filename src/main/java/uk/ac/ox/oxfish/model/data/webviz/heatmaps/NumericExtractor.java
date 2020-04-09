@@ -19,28 +19,16 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 
-import java.util.Collection;
+import java.util.function.ToDoubleFunction;
 
-import static java.lang.Double.NEGATIVE_INFINITY;
+@FunctionalInterface
+public interface NumericExtractor extends ToDoubleFunction<SeaTile>, Startable {
 
-abstract class AbstractTimestepBuilder implements TimestepsBuilder {
-
-    private final ImmutableList.Builder<Timestep> builder = new ImmutableList.Builder<>();
-    private double maxValueSeen = NEGATIVE_INFINITY;
-
-    @Override public void add(Timestep timestep) {
-        timestep.getCellValues().max().ifPresent(value -> {
-            if (value > maxValueSeen) maxValueSeen = value;
-        });
-        builder.add(timestep);
-    }
-
-    public double getMaxValueSeen() { return maxValueSeen; }
-
-    @Override public Collection<Timestep> build() {
-        return builder.build();
-    }
+    @Override default void start(FishState model) { }
+    @Override default void turnOff() { }
 
 }

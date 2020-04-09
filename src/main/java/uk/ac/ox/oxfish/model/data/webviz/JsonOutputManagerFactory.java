@@ -23,19 +23,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.events.EventBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.fads.FadsBuilder;
+import uk.ac.ox.oxfish.model.data.webviz.events.EventDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.fads.FadsBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.regions.RegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.regions.SingleFixedRegionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.Scenario;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ScenarioBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.vessels.SingleTypeVesselClassifier;
-import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier;
 import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselsBuilderFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -44,10 +39,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.awt.Color.BLACK;
-
-@SuppressWarnings("unused")
 public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutputManager> {
 
     private String scenarioTitle = "Scenario title";
@@ -55,127 +46,119 @@ public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutp
     private String startDate = LocalDate.now().toString();
     private int numYearsToSkip = 0;
     private boolean prettyPrinting = false;
-
     private FadsBuilderFactory fadsBuilderFactory = new FadsBuilderFactory();
     private RegionsBuilderFactory regionsBuilderFactory = new SingleFixedRegionBuilderFactory();
     private VesselsBuilderFactory vesselsBuilderFactory = new VesselsBuilderFactory();
-    private Collection<? extends EventBuilderFactory> eventBuilderFactories = ImmutableList.of();
+    private Collection<? extends EventDefinitionBuilderFactory> eventBuilderFactories = ImmutableList.of();
     private Collection<? extends ChartBuilderFactory> chartBuilderFactories = ImmutableList.of();
     private Collection<? extends HeatmapBuilderFactory> heatmapBuilderFactories = ImmutableList.of();
-    private VesselClassifier vesselClassifier = new SingleTypeVesselClassifier(1, "Vessel", BLACK);
 
-    public Collection<? extends EventBuilderFactory> getEventBuilderFactories() { return eventBuilderFactories; }
+    @SuppressWarnings("unused")
+    public Collection<? extends EventDefinitionBuilderFactory> getEventBuilderFactories() { return eventBuilderFactories; }
 
-    public void setEventBuilderFactories(Collection<? extends EventBuilderFactory> eventBuilderFactories) {
+    public void setEventBuilderFactories(Collection<? extends EventDefinitionBuilderFactory> eventBuilderFactories) {
         this.eventBuilderFactories = eventBuilderFactories;
     }
 
     @Override public JsonOutputManager apply(final FishState fishState) {
 
-        final FadsBuilder fadsBuilder = new FadsBuilder();
-
         final Instant startTime = LocalDate.parse(startDate).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
-        final ImmutableList<HeatmapBuilder> heatmapBuilders =
-            heatmapBuilderFactories.stream().map(factory -> factory.apply(fishState)).collect(toImmutableList());
-
-        final ImmutableList<ChartBuilder> chartBuilders =
-            chartBuilderFactories.stream().map(factory -> factory.apply(fishState)).collect(toImmutableList());
-
-        final JsonBuilderFactory<Scenario> scenarioBuilderFactory = new JsonBuilderFactory<Scenario>() {
+        final JsonDataBuilderFactory<Scenario> scenarioBuilderFactory = new JsonDataBuilderFactory<Scenario>() {
 
             @Override public String getBaseName() { return Scenario.class.getSimpleName(); }
 
-            @Override public JsonBuilder<Scenario> apply(final FishState fishState) {
+            @Override public JsonBuilder<Scenario> makeDataBuilder(FishState ignored) {
                 return new ScenarioBuilder(
                     scenarioTitle,
                     scenarioDescription,
                     startTime,
-                    fadsBuilderFactory,
-                    regionsBuilderFactory,
-                    vesselsBuilderFactory,
-                    eventBuilderFactories,
-                    heatmapBuilderFactories,
-                    chartBuilderFactories
+                    fadsBuilderFactory.makeDefinitionBuilder(scenarioTitle),
+                    regionsBuilderFactory.makeDefinitionBuilder(scenarioTitle),
+                    vesselsBuilderFactory.makeDefinitionBuilder(scenarioTitle),
+                    eventBuilderFactories.stream().map(bf -> bf.makeDefinitionBuilder(scenarioTitle))::iterator,
+                    heatmapBuilderFactories.stream().map(bf -> bf.makeDefinitionBuilder(scenarioTitle))::iterator,
+                    chartBuilderFactories.stream().map(bf -> bf.makeDefinitionBuilder(scenarioTitle))::iterator
                 );
             }
         };
 
-        final Gson gson = prettyPrinting
-            ? new GsonBuilder().setPrettyPrinting().create()
-            : new GsonBuilder().create();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        if (prettyPrinting) gsonBuilder.setPrettyPrinting();
+        final Gson gson = gsonBuilder.create();
 
         return new JsonOutputManager(
             numYearsToSkip,
             new ImmutableList.Builder<JsonOutputPlugin<?>>()
-                .add(vesselsBuilderFactory.makeJsonOutputPlugin(gson, fishState))
-                .add(fadsBuilderFactory.makeJsonOutputPlugin(gson, fishState))
-                .add(regionsBuilderFactory.makeJsonOutputPlugin(gson, fishState))
-                .add(scenarioBuilderFactory.makeJsonOutputPlugin(gson, fishState))
-                .addAll(heatmapBuilderFactories.stream().map(bf -> bf.makeJsonOutputPlugin(gson, fishState)).iterator())
-                .addAll(chartBuilderFactories.stream().map(bf -> bf.makeJsonOutputPlugin(gson, fishState)).iterator())
+                .add(scenarioBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                .add(vesselsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                .add(fadsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                .add(regionsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                .addAll(heatmapBuilderFactories.stream()
+                    .map(bf -> bf.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                    .iterator())
+                .addAll(chartBuilderFactories.stream()
+                    .map(bf -> bf.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                    .iterator())
                 .build()
         );
     }
 
-    public String getScenarioTitle() { return scenarioTitle; }
+    @SuppressWarnings("unused") public String getScenarioTitle() { return scenarioTitle; }
 
     public void setScenarioTitle(final String scenarioTitle) { this.scenarioTitle = scenarioTitle; }
 
-    public String getScenarioDescription() { return scenarioDescription; }
+    @SuppressWarnings("unused") public String getScenarioDescription() { return scenarioDescription; }
 
     public void setScenarioDescription(final String scenarioDescription) {
         this.scenarioDescription = scenarioDescription;
     }
 
-    public String getStartDate() { return startDate; }
+    @SuppressWarnings("unused") public String getStartDate() { return startDate; }
 
     public void setStartDate(final String startDate) { this.startDate = startDate; }
 
-    public int getNumYearsToSkip() { return numYearsToSkip; }
+    @SuppressWarnings("unused") public int getNumYearsToSkip() { return numYearsToSkip; }
 
     public void setNumYearsToSkip(final int numYearsToSkip) { this.numYearsToSkip = numYearsToSkip; }
 
-    public boolean isPrettyPrinting() { return prettyPrinting; }
+    @SuppressWarnings("unused") public boolean isPrettyPrinting() { return prettyPrinting; }
 
     public void setPrettyPrinting(final boolean prettyPrinting) { this.prettyPrinting = prettyPrinting; }
 
-    public FadsBuilderFactory getFadsBuilderFactory() { return fadsBuilderFactory; }
+    @SuppressWarnings("unused") public FadsBuilderFactory getFadsBuilderFactory() { return fadsBuilderFactory; }
 
-    public void setFadsBuilderFactory(final FadsBuilderFactory fadsBuilderFactory) {
+    @SuppressWarnings("unused") public void setFadsBuilderFactory(final FadsBuilderFactory fadsBuilderFactory) {
         this.fadsBuilderFactory = fadsBuilderFactory;
     }
 
+    @SuppressWarnings("unused")
     public RegionsBuilderFactory getRegionsBuilderFactory() { return regionsBuilderFactory; }
 
+    @SuppressWarnings("unused")
     public void setRegionsBuilderFactory(final RegionsBuilderFactory regionsBuilderFactory) {
         this.regionsBuilderFactory = regionsBuilderFactory;
     }
 
     public VesselsBuilderFactory getVesselsBuilderFactory() { return vesselsBuilderFactory; }
 
+    @SuppressWarnings("unused")
     public void setVesselsBuilderFactory(final VesselsBuilderFactory vesselsBuilderFactory) {
         this.vesselsBuilderFactory = vesselsBuilderFactory;
     }
 
+    @SuppressWarnings("unused")
     public Collection<? extends ChartBuilderFactory> getChartBuilderFactories() { return chartBuilderFactories; }
 
     public void setChartBuilderFactories(final Collection<? extends ChartBuilderFactory> chartBuilderFactories) {
         this.chartBuilderFactories = chartBuilderFactories;
     }
 
+    @SuppressWarnings("unused")
     public Collection<? extends HeatmapBuilderFactory> getHeatmapBuilderFactories() { return heatmapBuilderFactories; }
 
     public void setHeatmapBuilderFactories(final Collection<? extends HeatmapBuilderFactory> heatmapBuilderFactories) {
         this.heatmapBuilderFactories = heatmapBuilderFactories;
     }
-
-    public VesselClassifier getVesselClassifier() { return vesselClassifier; }
-
-    public void setVesselClassifier(final VesselClassifier vesselClassifier) {
-        this.vesselClassifier = vesselClassifier;
-    }
-
-    private String makeOutputFileName(final Class<?> clazz) { return clazz.getSimpleName() + ".json"; }
 
 }

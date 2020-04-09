@@ -25,9 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.events.EventBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.events.EventDefinition;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -42,9 +40,9 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
     private final JsonBuilder<FadsDefinition> fadsDefinitionBuilder;
     private final JsonBuilder<RegionsDefinition> regionsDefinitionBuilder;
     private final JsonBuilder<VesselsDefinition> vesselsDefinitionBuilder;
-    private final Collection<? extends EventBuilderFactory> eventBuilderFactories;
-    private final Collection<? extends HeatmapBuilderFactory> heatmapDefinitionBuilders;
-    private final Collection<? extends ChartBuilderFactory> chartDefinitionBuilders;
+    private final Collection<? extends JsonBuilder<EventDefinition>> eventBuilderFactories;
+    private final Collection<? extends JsonBuilder<HeatmapDefinition>> heatmapDefinitionBuilders;
+    private final Collection<? extends JsonBuilder<ChartDefinition>> chartDefinitionBuilders;
 
     public ScenarioBuilder(
         final String title,
@@ -53,9 +51,9 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
         final JsonBuilder<FadsDefinition> fadsDefinitionBuilder,
         final JsonBuilder<RegionsDefinition> regionsDefinitionBuilder,
         final JsonBuilder<VesselsDefinition> vesselsDefinitionBuilder,
-        Collection<? extends EventBuilderFactory> eventBuilderFactories,
-        final Collection<? extends HeatmapBuilderFactory> heatmapDefinitionBuilders,
-        final Collection<? extends ChartBuilderFactory> chartDefinitionBuilders
+        final Iterable<? extends JsonBuilder<EventDefinition>> eventBuilderFactories,
+        final Iterable<? extends JsonBuilder<HeatmapDefinition>> heatmapDefinitionBuilders,
+        final Iterable<? extends JsonBuilder<ChartDefinition>> chartDefinitionBuilders
     ) {
         this.title = title;
         this.description = description;
@@ -63,9 +61,9 @@ public final class ScenarioBuilder implements JsonBuilder<Scenario> {
         this.fadsDefinitionBuilder = fadsDefinitionBuilder;
         this.regionsDefinitionBuilder = regionsDefinitionBuilder;
         this.vesselsDefinitionBuilder = vesselsDefinitionBuilder;
-        this.eventBuilderFactories = eventBuilderFactories;
-        this.heatmapDefinitionBuilders = heatmapDefinitionBuilders;
-        this.chartDefinitionBuilders = chartDefinitionBuilders;
+        this.eventBuilderFactories = ImmutableList.copyOf(eventBuilderFactories);
+        this.heatmapDefinitionBuilders = ImmutableList.copyOf(heatmapDefinitionBuilders);
+        this.chartDefinitionBuilders = ImmutableList.copyOf(chartDefinitionBuilders);
     }
 
     @Override public Scenario buildJsonObject(final FishState fishState) {

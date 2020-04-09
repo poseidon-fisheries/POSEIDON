@@ -42,7 +42,7 @@ abstract public class AbstractMonitor<O, V> implements Monitor<O, V> {
     private Stoppable stoppable = null;
     private Accumulator<V> accumulator;
 
-    AbstractMonitor(
+    protected AbstractMonitor(
         @Nullable String baseName,
         IntervalPolicy resetInterval,
         Supplier<Accumulator<V>> accumulatorSupplier

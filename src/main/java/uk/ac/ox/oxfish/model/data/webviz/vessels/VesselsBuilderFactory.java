@@ -21,22 +21,24 @@ package uk.ac.ox.oxfish.model.data.webviz.vessels;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.VesselTypeDefinition;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.VesselsDefinition;
 
-import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
-import static java.awt.Color.CYAN;
-import static java.util.Comparator.comparingInt;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.awt.Color.WHITE;
+import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
 
-public final class VesselsBuilderFactory
-    implements JsonBuilderFactory<Vessels>, JsonBuilder<VesselsDefinition> {
+public final class VesselsBuilderFactory implements
+    JsonDataBuilderFactory<Vessels>,
+    JsonDefinitionBuilderFactory<VesselsDefinition> {
 
-    private VesselClassifier vesselClassifier = new SingleTypeVesselClassifier(1, "Vessels", CYAN);
+    private VesselClassifier<?> vesselClassifier = singleTypeClassifier("Vessels", WHITE);
 
-    @SuppressWarnings("unused") public VesselClassifier getVesselClassifier() { return vesselClassifier; }
+    @SuppressWarnings("unused") public VesselClassifier<?> getVesselClassifier() { return vesselClassifier; }
 
-    @SuppressWarnings("unused") public void setVesselClassifier(final VesselClassifier vesselClassifier) {
+    @SuppressWarnings("unused") public void setVesselClassifier(final VesselClassifier<?> vesselClassifier) {
         this.vesselClassifier = vesselClassifier;
     }
 
@@ -44,24 +46,21 @@ public final class VesselsBuilderFactory
         return Vessels.class.getSimpleName();
     }
 
-    @Override public VesselsBuilder apply(final FishState fishState) {
-        return new VesselsBuilder(vesselClassifier);
-    }
-
-    @Override public VesselsDefinition buildJsonObject(final FishState fishState) {
-        return new VesselsDefinition(
-            getFileName(),
-            fishState.getFishers().stream()
-                .mapToInt(vesselClassifier)
-                .distinct()
-                .mapToObj(typeId -> new VesselTypeDefinition(
+    @Override public JsonBuilder<VesselsDefinition> makeDefinitionBuilder(final String scenarioTitle) {
+        return __ -> new VesselsDefinition(
+            makeFileName(scenarioTitle),
+            vesselClassifier.getTypeIds().stream()
+                .map(typeId -> new VesselTypeDefinition(
                     typeId,
                     vesselClassifier.getLegend(typeId),
-                    makeHtmlColorCode(vesselClassifier.getColour(typeId))
+                    vesselClassifier.getJavaColor(typeId)
                 ))
-                .collect(toImmutableSortedSet(comparingInt(VesselTypeDefinition::getTypeId)))
+                .collect(toImmutableList())
         );
+    }
 
+    @Override public JsonBuilder<Vessels> makeDataBuilder(FishState ignored) {
+        return new VesselsBuilder(vesselClassifier);
     }
 
 }

@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.RegionTypeDefinition;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.RegionsDefinition;
 
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.colourStringToHtmlCode;
+
 public final class SingleFixedRegionBuilderFactory implements RegionsBuilderFactory {
 
     private int typeId;
@@ -40,13 +42,13 @@ public final class SingleFixedRegionBuilderFactory implements RegionsBuilderFact
 
     @Override public String getBaseName() { return Regions.class.getSimpleName(); }
 
-    @Override public JsonBuilder<Regions> apply(final FishState fishState) {
+    @Override public JsonBuilder<Regions> makeDataBuilder(FishState ignored) {
         return new SingleFixedRegionBuilder(typeId);
     }
 
-    @Override public RegionsDefinition buildJsonObject(final FishState fishState) {
-        return new RegionsDefinition(
-            getFileName(),
+    @Override public JsonBuilder<RegionsDefinition> makeDefinitionBuilder(final String scenarioTitle) {
+        return fishState -> new RegionsDefinition(
+            makeFileName(scenarioTitle),
             ImmutableList.of(new RegionTypeDefinition(typeId, colourStringToHtmlCode(colour)))
         );
     }

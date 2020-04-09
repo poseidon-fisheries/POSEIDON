@@ -171,8 +171,9 @@ public class TimeSeries<T> implements Steppable
      */
     public DataColumn getColumn(String name){
         ColumnGatherer<T> current = data.get(name);
-        if(current==null)
+        if(current==null) {
             return null;
+        }
         return current.getColumn();
     }
 

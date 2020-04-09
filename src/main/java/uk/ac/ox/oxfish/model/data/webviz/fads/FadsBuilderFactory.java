@@ -21,12 +21,15 @@ package uk.ac.ox.oxfish.model.data.webviz.fads;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.FadsDefinition;
 
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.colourStringToHtmlCode;
+
 public final class FadsBuilderFactory implements
-    JsonBuilderFactory<Fads>,
-    JsonBuilder<FadsDefinition> {
+    JsonDataBuilderFactory<Fads>,
+    JsonDefinitionBuilderFactory<FadsDefinition> {
 
     private String fadsColour = "yellow";
 
@@ -38,10 +41,10 @@ public final class FadsBuilderFactory implements
 
     @Override public String getBaseName() { return Fads.class.getSimpleName(); }
 
-    @Override public FadsBuilder apply(final FishState fishState) { return new FadsBuilder(); }
+    @Override public FadsBuilder makeDataBuilder(FishState ignored) { return new FadsBuilder(); }
 
-    @Override public FadsDefinition buildJsonObject(final FishState fishState) {
-        return new FadsDefinition(getFileName(), colourStringToHtmlCode(fadsColour));
+    @Override public JsonBuilder<FadsDefinition> makeDefinitionBuilder(String scenarioTitle) {
+        return fishState -> new FadsDefinition(makeFileName(scenarioTitle), colourStringToHtmlCode(fadsColour));
     }
 
 }

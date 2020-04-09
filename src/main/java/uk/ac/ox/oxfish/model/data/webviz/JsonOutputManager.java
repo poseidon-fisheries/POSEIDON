@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.webviz;
 
 import com.google.common.collect.ImmutableList;
-import sim.engine.Stoppable;
+import sim.engine.SimState;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -32,7 +32,6 @@ public final class JsonOutputManager implements AdditionalStartable {
 
     private final int numYearsToSkip;
     private final ImmutableList<JsonOutputPlugin<?>> outputPlugins;
-    private Stoppable stoppable;
 
     JsonOutputManager(
         final int numYearsToSkip,
@@ -43,16 +42,22 @@ public final class JsonOutputManager implements AdditionalStartable {
     }
 
     @Override public void start(final FishState fishState) {
-        stoppable =
+        if (numYearsToSkip == 0)
+            startOutputPlugins(fishState);
+        else
             fishState.scheduleOnceAtTheBeginningOfYear(
-                simState -> outputPlugins.forEach(plugin -> plugin.start(((FishState) simState))),
+                this::startOutputPlugins,
                 StepOrder.DATA_RESET,
                 numYearsToSkip
             );
     }
 
+    private void startOutputPlugins(SimState simState) {
+        final FishState fishState = (FishState) simState;
+        outputPlugins.forEach(plugin -> plugin.start(fishState));
+    }
+
     @Override public void turnOff() {
-        if (stoppable != null) stoppable.stop();
         outputPlugins.forEach(Startable::turnOff);
     }
 

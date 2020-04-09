@@ -19,43 +19,30 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.HeatmapDefinition;
 
 import java.util.Collection;
-import java.util.function.ToDoubleFunction;
 
 public interface HeatmapBuilderFactory extends
-    JsonBuilderFactory<Heatmap>,
-    JsonBuilder<HeatmapDefinition> {
+    JsonDataBuilderFactory<Heatmap>,
+    JsonDefinitionBuilderFactory<HeatmapDefinition> {
 
-    String getTitle();
-
-    String getLegend();
-
-    JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory();
-
-    ToDoubleFunction<SeaTile> makeNumericExtractor(FishState fishState);
-
-    @Override default String getBaseName() { return getTitle() + " Heatmap"; }
-
-    TimestepsBuilder makeTimestepsBuilder();
-
-    @Override default HeatmapBuilder apply(final FishState fishState) {
-        return new HeatmapBuilder(makeNumericExtractor(fishState), makeTimestepsBuilder());
-    }
-
-    @Override default HeatmapDefinition buildJsonObject(final FishState fishState) {
-        return new HeatmapDefinition(
+    @Override default JsonBuilder<HeatmapDefinition> makeDefinitionBuilder(String scenarioTitle) {
+        return fishState -> new HeatmapDefinition(
             getTitle(),
-            getFileName(),
+            makeFileName(scenarioTitle),
             getLegend(),
-            getColourMapBuilderFactory().apply(fishState).buildJsonObject(fishState)
+            getColourMapBuilderFactory().makeDefinitionBuilder(scenarioTitle).buildJsonObject(fishState)
         );
     }
+
+    String getTitle();
+    default String getLegend() { return getTitle(); }
+    JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory();
+    @Override default String getBaseName() { return "Heatmap of " + getTitle(); }
 
 }

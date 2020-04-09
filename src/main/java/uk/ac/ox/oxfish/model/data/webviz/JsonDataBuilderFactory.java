@@ -17,30 +17,21 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.webviz;
 
-import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
+import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Collection;
+public interface JsonDataBuilderFactory<T> extends FileNameMaker {
 
-import static java.lang.Double.NEGATIVE_INFINITY;
-
-abstract class AbstractTimestepBuilder implements TimestepsBuilder {
-
-    private final ImmutableList.Builder<Timestep> builder = new ImmutableList.Builder<>();
-    private double maxValueSeen = NEGATIVE_INFINITY;
-
-    @Override public void add(Timestep timestep) {
-        timestep.getCellValues().max().ifPresent(value -> {
-            if (value > maxValueSeen) maxValueSeen = value;
-        });
-        builder.add(timestep);
+    default JsonOutputPlugin<T> makeJsonOutputPlugin(
+        final FishState fishState,
+        final Gson gson,
+        final String scenarioTitle
+    ) {
+        return new JsonOutputPlugin<>(gson, makeDataBuilder(fishState), makeFileName(scenarioTitle));
     }
 
-    public double getMaxValueSeen() { return maxValueSeen; }
-
-    @Override public Collection<Timestep> build() {
-        return builder.build();
-    }
+    JsonBuilder<T> makeDataBuilder(FishState fishState);
 
 }

@@ -53,14 +53,13 @@ public class FadManagerTest {
     @Test
     public void cantConstructWithNegativeFadsInStock() {
         assertThrows(IllegalArgumentException.class, () ->
-            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(-1).build()
+            new FadManager(fadMap, fadInitializer, -1)
         );
     }
 
     @Test
     public void cantInitFadWhenZeroFADsInStock() {
-        final FadManager fadManager =
-            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(0).build();
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
         assertThrows(IllegalStateException.class, () ->
             fadManager.deployFad(nauticalMap.getSeaTile(0, 0), 0)
         );

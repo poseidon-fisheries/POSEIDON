@@ -20,14 +20,18 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.AverageNumberOfActiveFadsHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.BiomassSnapshotHeatmapBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.vessels.SingleTypeVesselClassifier;
+import uk.ac.ox.oxfish.model.data.webviz.heatmaps.FadDeploymentCountingHeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.heatmaps.FadSetCountingHeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.heatmaps.UnassociatedSetCountingHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -36,16 +40,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.zip;
-import static java.util.stream.Stream.concat;
-import static org.jfree.chart.ChartColor.LIGHT_BLUE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.writeAdditionalOutputsToFolder;
+import static java.awt.Color.GREEN;
+import static java.awt.Color.WHITE;
+import static uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision.REGION_NAMES;
+import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class WebVizTest {
 
     private static final Path basePath =
@@ -56,13 +56,24 @@ public final class WebVizTest {
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
     public static void main(final String[] args) throws IOException {
-
         final TunaScenario scenario = new FishYAML().loadAs(new FileReader(scenarioPath.toFile()), TunaScenario.class);
+        final FishState model = new FishState();
+        model.setScenario(scenario);
+        scenario.getPlugins().add(makeJsonOutputManagerFactory());
+        model.start();
+        do {
+            model.schedule.step(model);
+            System.out.println(model.getDay());
+        } while (model.getYear() < 2);
+        JsonOutputPlugin.writeOutputsToFolder(model, outputPath);
+    }
+
+    @NotNull private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {
 
         final Set<String> speciesNames = TunaScenario.speciesNames.values();
 
         final JsonOutputManagerFactory jsonOutputManagerFactory = new JsonOutputManagerFactory();
-        jsonOutputManagerFactory.setScenarioTitle("Tuna test");
+        jsonOutputManagerFactory.setScenarioTitle("Tuna - Baseline Scenario");
         jsonOutputManagerFactory.setScenarioDescription(
             "This is sample output from the current tuna simulation, " +
                 "over a period of three years after one year of 'spin up'.");
@@ -70,83 +81,110 @@ public final class WebVizTest {
         jsonOutputManagerFactory.setNumYearsToSkip(1);
         jsonOutputManagerFactory.setPrettyPrinting(true);
 
-        jsonOutputManagerFactory.setVesselClassifier(
-            new SingleTypeVesselClassifier(1, "Class 6 vessels", LIGHT_BLUE)
+        jsonOutputManagerFactory.getVesselsBuilderFactory().setVesselClassifier(
+            singleTypeClassifier("Class 6 vessels", WHITE)
         );
 
         jsonOutputManagerFactory.setEventBuilderFactories(ImmutableList.of(
-            new SinglePeriodEventBuilderFactory("Closure period A", 210, 281),
-            new SinglePeriodEventBuilderFactory("El Corralito closure", 282, 312),
-            new SinglePeriodEventBuilderFactory("Closure period B", 313, 364 + 19),
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", 210, 281),
+            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", 282, 312),
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", 313, 364 + 19),
 
-            new SinglePeriodEventBuilderFactory("Closure period A", (364 * 1) + 210, (364 * 1) + 281),
-            new SinglePeriodEventBuilderFactory("El Corralito closure", (364 * 1) + 282, (364 * 1) + 312),
-            new SinglePeriodEventBuilderFactory("Closure period B", (364 * 1) + 313, (364 * 1) + 364 + 19),
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", (364) + 210, (364) + 281),
+            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", (364) + 282, (364) + 312),
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", (364) + 313, (364) + 364 + 19),
 
-            new SinglePeriodEventBuilderFactory("Closure period A", (364 * 2) + 210, (364 * 2) + 281),
-            new SinglePeriodEventBuilderFactory("El Corralito closure", (364 * 2) + 282, (364 * 2) + 312),
-            new SinglePeriodEventBuilderFactory("Closure period B", (364 * 2) + 313, (364 * 2) + 364 + 19)
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", (364 * 2) + 210, (364 * 2) + 281),
+            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", (364 * 2) + 282, (364 * 2) + 312),
+            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", (364 * 2) + 313, (364 * 2) + 364 + 19)
 
         ));
 
-        final ImmutableList.Builder<ChartBuilderFactory> chartBuilderFactories = new ImmutableList.Builder<>();
-        ImmutableList.of(
-            entry("Biomass (kg)", "Biomass %s"),
-            entry("Landings (kg)", "%s Landings"),
-            entry("Recruitment (kg)", "%s Recruitment"),
-            entry("Average catch per set (kg)", "Average %s catches by set"),
-            entry("Total catch from FAD sets (kg)", "Sum of %s catches from FAD sets"),
-            entry("Total catch from unassociated sets (kg)", "Sum of %s catches from unassociated sets"),
-            entry("Total biomass under FADs (kg)", "Sum of %s biomass under FADs")
-        ).forEach(entry -> chartBuilderFactories.add(
-            ChartBuilderFactory.forPattern(entry.getKey(), entry.getValue(), speciesNames)
-        ));
-        ImmutableList.of(
-            entry("Number of FAD deployments", "Number of FAD deployments (%s)"),
-            entry("Number of FAD sets", "Number of FAD sets (%s)"),
-            entry("Number of unassociated sets", "Number of unassociated sets (%s)")
-        ).forEach(entry -> chartBuilderFactories.add(
-            ChartBuilderFactory.forPattern(
-                entry.getKey(), entry.getValue(),
-                TicTacToeRegionalDivision.REGION_NAMES
-            )
-        ));
-
-        chartBuilderFactories.add(
-            ChartBuilderFactory.forPattern(
-                "Number of actions", "Number of %s",
-                ImmutableList.of("FAD deployments", "FAD sets", "unassociated sets")
-            )
-        );
-
-        jsonOutputManagerFactory.setChartBuilderFactories(chartBuilderFactories.build());
-
-        jsonOutputManagerFactory.setHeatmapBuilderFactories(concat(
-            zip(
-                speciesNames.stream(),
-                Stream.generate(() -> "green"),
-                BiomassSnapshotHeatmapBuilderFactory::newInstance
+        jsonOutputManagerFactory.setChartBuilderFactories(ImmutableList.of(
+            ChartBuilderFactory.fromValues(
+                "Biomass per species",
+                "Biomass (kg)",
+                speciesNames,
+                "Biomass %s"
             ),
-            Stream.of(new AverageNumberOfActiveFadsHeatmapBuilderFactory())
-        ).collect(toImmutableList()));
+            ChartBuilderFactory.fromValues(
+                "Landings per species",
+                "Landings (kg)",
+                speciesNames,
+                "%s Landings"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Recruitment per species",
+                "Recruitment (kg)",
+                speciesNames,
+                "%s Recruitment"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Average catch per set per species",
+                "Average catch (kg)",
+                speciesNames,
+                "Average %s catches by set"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Catch from FAD sets per species",
+                "Catch (kg)",
+                speciesNames,
+                "Sum of %s catches from FAD sets"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Catch from unassociated sets per species",
+                "Catch (kg)",
+                speciesNames,
+                "Sum of %s catches from unassociated sets"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Catch from unassociated sets (kg)",
+                "Catch (kg)",
+                speciesNames,
+                "Sum of %s catches from unassociated sets"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Biomass under FADs per species",
+                "Biomass (kg)",
+                speciesNames,
+                "Sum of %s biomass under FADs"
+            ),
+            ChartBuilderFactory.fromValues(
+                "FAD deployments per region",
+                "Number of FAD deployments",
+                REGION_NAMES,
+                "Number of FAD deployments (%s)"
+            ),
+            ChartBuilderFactory.fromValues(
+                "FAD sets per region",
+                "Number of FAD sets",
+                REGION_NAMES,
+                "Number of FAD sets (%s)"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Unassociated sets per region",
+                "Number of unassociated sets",
+                REGION_NAMES,
+                "Number of unassociated sets (%s)"
+            ),
+            ChartBuilderFactory.fromValues(
+                "Number of actions per action type",
+                "Number of actions",
+                ImmutableList.of("FAD deployments", "FAD sets", "unassociated sets"),
+                "Number of %s"
+            )
+        ));
 
-        final FishState model = new FishState();
-
-        model.setScenario(scenario);
-
-        scenario.getPlugins().add(jsonOutputManagerFactory);
-
-        model.start();
-
-        model.getYearlyDataSet().getColumns().forEach(col -> System.out.println(col.getName()));
-
-        do {
-            model.schedule.step(model);
-            System.out.println(model.getDay());
-        } while (model.getYear() < 2);
-
-        writeAdditionalOutputsToFolder(outputPath, model);
-
+        jsonOutputManagerFactory.setHeatmapBuilderFactories(
+            new ImmutableList.Builder<HeatmapBuilderFactory>()
+                .addAll(BiomassSnapshotHeatmapBuilderFactory.forSpecies(speciesNames, GREEN, 30))
+                .add(new AverageNumberOfActiveFadsHeatmapBuilderFactory())
+                .add(new FadDeploymentCountingHeatmapBuilderFactory())
+                .add(new FadSetCountingHeatmapBuilderFactory())
+                .add(new UnassociatedSetCountingHeatmapBuilderFactory())
+                .build()
+        );
+        return jsonOutputManagerFactory;
     }
 
 }

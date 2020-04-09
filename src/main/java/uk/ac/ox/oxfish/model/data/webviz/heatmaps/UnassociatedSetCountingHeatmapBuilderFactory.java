@@ -17,20 +17,18 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz;
+package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 
-import java.util.List;
+public class UnassociatedSetCountingHeatmapBuilderFactory extends ActionCountingHeatmapBuilderFactory<MakeUnassociatedSet> {
 
-public enum ColourSeries {
+    @Override ActionCountingExtractor<MakeUnassociatedSet> makeExtractor() {
+        return new UnassociatedSetCountingExtractor();
+    }
 
-    // https://colorbrewer2.org/#type=qualitative&scheme=Set1&n=9
-    SET1("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999");
+    @Override public String getTitle() {
+        return "Number of unassociated sets over " + getInterval() + " day intervals";
+    }
 
-    private final List<String> colours;
-
-    ColourSeries(String... colours) { this.colours = ImmutableList.copyOf(colours); }
-
-    public List<String> getColours() { return colours; }
 }

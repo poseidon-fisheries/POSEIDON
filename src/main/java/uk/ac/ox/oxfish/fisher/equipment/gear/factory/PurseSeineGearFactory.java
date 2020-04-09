@@ -15,13 +15,18 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -29,10 +34,10 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private Iterable<? extends Observer<DeployFad>> fadDeploymentObservers;
-    private Iterable<? extends Observer<SetAction>> setObservers;
-    private Iterable<? extends Observer<MakeFadSet>> fadSetObservers;
-    private Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers;
+    private Set<Observer<DeployFad>> fadDeploymentObservers = new HashSet<>();
+    private Set<Observer<SetAction>> setObservers = new HashSet<>();
+    private Set<Observer<MakeFadSet>> fadSetObservers = new HashSet<>();
+    private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new HashSet<>();
     private GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
@@ -45,6 +50,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path unassociatedCatchSampleFile;
+
+    public Collection<Observer<SetAction>> getSetObservers() { return setObservers; }
+
+    @SuppressWarnings("unused") public void setSetObservers(Set<Observer<SetAction>> setObservers) {
+        this.setObservers = setObservers;
+    }
 
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
@@ -107,42 +118,48 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     @SuppressWarnings("unused")
-    public Iterable<? extends Observer<DeployFad>> getFadDeploymentObservers() { return fadDeploymentObservers; }
+    public Set<Observer<DeployFad>> getFadDeploymentObservers() { return fadDeploymentObservers; }
 
-    public void setFadDeploymentObservers(Iterable<? extends Observer<DeployFad>> fadDeploymentObservers) {
+    @SuppressWarnings("unused") public void setFadDeploymentObservers(Set<Observer<DeployFad>> fadDeploymentObservers) {
         this.fadDeploymentObservers = fadDeploymentObservers;
     }
 
     @SuppressWarnings("unused")
-    public Iterable<? extends Observer<MakeFadSet>> getFadSetObservers() { return fadSetObservers; }
+    public Set<Observer<MakeFadSet>> getFadSetObservers() { return fadSetObservers; }
 
-    public void setFadSetObservers(Iterable<? extends Observer<MakeFadSet>> fadSetObservers) {
+    @SuppressWarnings("unused") public void setFadSetObservers(Set<Observer<MakeFadSet>> fadSetObservers) {
         this.fadSetObservers = fadSetObservers;
     }
 
     @SuppressWarnings("unused")
-    public Iterable<? extends Observer<MakeUnassociatedSet>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
+    public Set<Observer<MakeUnassociatedSet>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
 
-    public void setUnassociatedSetObservers(Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers) {
+    @SuppressWarnings("unused")
+    public void setUnassociatedSetObservers(Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers) {
         this.unassociatedSetObservers = unassociatedSetObservers;
     }
 
     @Override
     public PurseSeineGear apply(FishState fishState) {
 
-        final FadManager fadManager =
-            new FadManager
-                .Builder(fishState.getFadMap(), fadInitializerFactory.apply(fishState))
-                .setInitialNumberOfFadsInStock(initialNumberOfFads)
-                .addFadDeploymentObservers(fadDeploymentObservers)
-                .addSetObservers(setObservers)
-                .addFadSetObservers(fadSetObservers)
-                .addUnassociatedSetObservers(unassociatedSetObservers)
-                .setBiomassLostMonitor(biomassLostMonitor)
-                .addActionSpecificRegulations(
-                    actionSpecificRegulations.stream().map(factory -> factory.apply(fishState)).collect(toList())
-                )
-                .build();
+        final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
+            this.actionSpecificRegulations.stream()
+                .map(factory -> factory.apply(fishState))
+                .collect(toList())
+        );
+
+        final FadManager fadManager = new FadManager(
+            fishState.getFadMap(),
+            fadInitializerFactory.apply(fishState),
+            initialNumberOfFads,
+            fadDeploymentObservers,
+            setObservers,
+            fadSetObservers,
+            unassociatedSetObservers,
+            Optional.of(biomassLostMonitor),
+            actionSpecificRegulations
+        );
+
         final MersenneTwisterFast rng = fishState.getRandom();
         double[][] unassociatedCatchSamples =
             parseAllRecords(unassociatedCatchSampleFile).stream()
@@ -167,10 +184,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
         this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
-    }
-
-    public void setSetObservers(Iterable<? extends Observer<SetAction>> setObservers) {
-        this.setObservers = setObservers;
     }
 
 }

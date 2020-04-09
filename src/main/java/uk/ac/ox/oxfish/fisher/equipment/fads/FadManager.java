@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
@@ -42,7 +41,10 @@ import uk.ac.ox.oxfish.model.data.monitors.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -55,37 +57,70 @@ public class FadManager {
 
     private final FadMap fadMap;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
-    private final Iterable<Observer<DeployFad>> fadDeploymentObservers;
-    private final Iterable<Observer<SetAction>> setObservers;
-    private final Iterable<Observer<MakeFadSet>> fadSetObservers;
-    private final Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers;
+    private final Set<Observer<DeployFad>> fadDeploymentObservers;
+    private final Set<Observer<SetAction>> setObservers;
+    private final Set<Observer<MakeFadSet>> fadSetObservers;
+    private final Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers;
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor;
+    private final FadInitializer fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
-    private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
 
-    private FadManager(
+    public FadManager(
+        FadMap fadMap,
+        FadInitializer fadInitializer,
+        int numFadsInStock
+    ) {
+        this(
+            fadMap,
+            fadInitializer,
+            numFadsInStock,
+            new HashSet<>(),
+            new HashSet<>(),
+            new HashSet<>(),
+            new HashSet<>(),
+            Optional.empty(),
+            new ActiveActionRegulations()
+        );
+    }
+
+    public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
         int numFadsInStock,
-        Iterable<Observer<DeployFad>> fadDeploymentObservers,
-        Iterable<Observer<SetAction>> setObservers,
-        Iterable<Observer<MakeFadSet>> fadSetObservers,
-        Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
+        Collection<Observer<DeployFad>> fadDeploymentObservers,
+        Collection<Observer<SetAction>> setObservers,
+        Collection<Observer<MakeFadSet>> fadSetObservers,
+        Collection<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
         Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor,
         ActiveActionRegulations actionSpecificRegulations
     ) {
+        checkArgument(numFadsInStock >= 0);
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
         this.numFadsInStock = numFadsInStock;
-        this.fadDeploymentObservers = fadDeploymentObservers;
-        this.setObservers = setObservers;
-        this.fadSetObservers = fadSetObservers;
-        this.unassociatedSetObservers = unassociatedSetObservers;
+        this.fadDeploymentObservers = new HashSet<>(fadDeploymentObservers);
+        this.setObservers = new HashSet<>(setObservers);
+        this.fadSetObservers = new HashSet<>(fadSetObservers);
+        this.unassociatedSetObservers = new HashSet<>(unassociatedSetObservers);
         this.biomassLostMonitor = biomassLostMonitor;
         this.actionSpecificRegulations = actionSpecificRegulations;
+
+        this.fadDeploymentObservers.add(actionSpecificRegulations::reactToAction);
+        this.setObservers.add(actionSpecificRegulations::reactToAction);
+        this.fadSetObservers.add(actionSpecificRegulations::reactToAction);
+        this.unassociatedSetObservers.add(actionSpecificRegulations::reactToAction);
+
     }
+
+    public Set<Observer<DeployFad>> getFadDeploymentObservers() { return fadDeploymentObservers; }
+
+    public Set<Observer<SetAction>> getSetObservers() { return setObservers; }
+
+    public Set<Observer<MakeFadSet>> getFadSetObservers() { return fadSetObservers; }
+
+    public Set<Observer<MakeUnassociatedSet>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
 
     public Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
 
@@ -211,103 +246,6 @@ public class FadManager {
 
     void reactTo(BiomassLostEvent event) {
         biomassLostMonitor.ifPresent(monitor -> monitor.observe(event));
-    }
-
-    public static class Builder {
-
-        private final FadMap fadMap;
-        private final FadInitializer fadInitializer;
-        ImmutableList.Builder<Observer<DeployFad>> fadDeploymentObservers =
-            new ImmutableList.Builder<>();
-        ImmutableList.Builder<Observer<SetAction>> setObservers =
-            new ImmutableList.Builder<>();
-        ImmutableList.Builder<Observer<MakeFadSet>> fadSetObservers =
-            new ImmutableList.Builder<>();
-        ImmutableList.Builder<Observer<MakeUnassociatedSet>> unassociatedSetObservers =
-            new ImmutableList.Builder<>();
-        Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor = Optional.empty();
-        ImmutableSet.Builder<ActionSpecificRegulation> actionSpecificRegulations =
-            new ImmutableSet.Builder<>();
-        private int initialNumberOfFadsInStock = 0;
-
-        public Builder(
-            FadMap fadMap,
-            FadInitializer fadInitializer
-        ) {
-            this.fadMap = fadMap;
-            this.fadInitializer = fadInitializer;
-        }
-
-        public Builder addFadDeploymentObservers(
-            Iterable<? extends Observer<DeployFad>> fadDeploymentObservers
-        ) {
-            this.fadDeploymentObservers.addAll(fadDeploymentObservers);
-            return this;
-        }
-
-        public Builder addSetObservers(
-            Iterable<? extends Observer<SetAction>> setObservers
-        ) {
-            this.setObservers.addAll(setObservers);
-            return this;
-        }
-
-        public Builder addFadSetObservers(
-            Iterable<? extends Observer<MakeFadSet>> fadSetObservers
-        ) {
-            this.fadSetObservers.addAll(fadSetObservers);
-            return this;
-        }
-
-        public Builder addUnassociatedSetObservers(
-            Iterable<? extends Observer<MakeUnassociatedSet>> unassociatedSetObservers
-        ) {
-            this.unassociatedSetObservers.addAll(unassociatedSetObservers);
-            return this;
-        }
-
-        @SuppressWarnings("unused")
-        public Builder setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor) {
-            this.biomassLostMonitor = Optional.ofNullable(biomassLostMonitor);
-            return this;
-        }
-
-        public Builder addActionSpecificRegulations(
-            ActionSpecificRegulation... actionSpecificRegulations
-        ) {
-            this.actionSpecificRegulations.add(actionSpecificRegulations);
-            return this;
-        }
-
-        @SuppressWarnings("unused")
-        public Builder addActionSpecificRegulations(
-            Iterable<? extends ActionSpecificRegulation> actionSpecificRegulations
-        ) {
-            this.actionSpecificRegulations.addAll(actionSpecificRegulations);
-            return this;
-        }
-
-        public FadManager build() {
-            final ActiveActionRegulations regulations = new ActiveActionRegulations(actionSpecificRegulations.build());
-            return new FadManager(
-                fadMap,
-                fadInitializer,
-                initialNumberOfFadsInStock,
-                fadDeploymentObservers.add(regulations::reactToAction).build(),
-                setObservers.add(regulations::reactToAction).build(),
-                fadSetObservers.add(regulations::reactToAction).build(),
-                unassociatedSetObservers.add(regulations::reactToAction).build(),
-                biomassLostMonitor,
-                regulations
-            );
-        }
-
-        public Builder setInitialNumberOfFadsInStock(int initialNumberOfFadsInStock) {
-            checkArgument(initialNumberOfFadsInStock >= 0);
-            this.initialNumberOfFadsInStock = initialNumberOfFadsInStock;
-            return this;
-        }
-
     }
 
 }

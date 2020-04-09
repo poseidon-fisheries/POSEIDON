@@ -21,7 +21,10 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import java.util.Collection;
 
-public interface TimestepsBuilder {
+interface TimestepsBuilder {
+
     void add(Timestep timestep);
+    double getMaxValueSeen();
     Collection<Timestep> build();
+
 }

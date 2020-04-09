@@ -19,8 +19,10 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-public final class AccumulatingTimestepsBuilder extends AbstractTimestepBuilder {
+final class SummingTimestepsBuilder extends SummarizingTimestepBuilder {
 
-    @Override public void add(Timestep timestep) { builder.add(timestep); }
+    SummingTimestepsBuilder(final int interval) { super(interval); }
+
+    @Override double merge(final double oldValue, final double newValue) { return oldValue + newValue; }
 
 }

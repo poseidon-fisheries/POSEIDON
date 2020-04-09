@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.model.data.webviz.fads;
 
 import com.google.common.collect.ImmutableList;
 import sim.engine.SimState;
-import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -31,14 +30,15 @@ import uk.ac.ox.oxfish.model.data.webviz.SteppableJsonBuilder;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 
 public final class FadsBuilder implements SteppableJsonBuilder<Fads> {
 
     private final ImmutableList.Builder<Timestep> timestepsBuilder = new ImmutableList.Builder<>();
-    private Stoppable stoppable;
 
     @Override public Fads buildJsonObject(final FishState fishState) {
         return new Fads(timestepsBuilder.build());
@@ -46,9 +46,18 @@ public final class FadsBuilder implements SteppableJsonBuilder<Fads> {
 
     @Override public void step(final SimState simState) {
         final FishState fishState = (FishState) simState;
-        Optional.ofNullable(fishState.getFadMap())
+        final Timestep timestep = Optional.ofNullable(fishState.getFadMap())
             .map(fadMap -> new Timestep(fishState.getDay(), fadLocations(fishState.getMap(), fadMap)))
-            .ifPresent(timestepsBuilder::add);
+            .orElseGet(() -> {
+                // Need to add at least 1000 dummy FADs to satisfy the web app
+                // https://github.com/poseidon-fisheries/poseidon-webviz/issues/34 and
+                // https://github.com/poseidon-fisheries/poseidon-webviz/issues/35
+                return new Timestep(
+                    fishState.getDay(),
+                    Stream.generate(() -> new double[]{0, 0}).limit(1000).collect(toList())
+                );
+            });
+        timestepsBuilder.add(timestep);
     }
 
     private Collection<double[]> fadLocations(final NauticalMap nauticalMap, final FadMap fadMap) {
@@ -68,9 +77,5 @@ public final class FadsBuilder implements SteppableJsonBuilder<Fads> {
             })
             .collect(toImmutableList());
     }
-
-    @Override public Stoppable getStoppable() { return stoppable; }
-
-    @Override public void setStoppable(final Stoppable stoppable) { this.stoppable = stoppable; }
 
 }

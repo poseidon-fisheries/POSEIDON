@@ -19,28 +19,16 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 
-import java.util.Collection;
+public class FadSetCountingHeatmapBuilderFactory extends ActionCountingHeatmapBuilderFactory<MakeFadSet> {
 
-import static java.lang.Double.NEGATIVE_INFINITY;
-
-abstract class AbstractTimestepBuilder implements TimestepsBuilder {
-
-    private final ImmutableList.Builder<Timestep> builder = new ImmutableList.Builder<>();
-    private double maxValueSeen = NEGATIVE_INFINITY;
-
-    @Override public void add(Timestep timestep) {
-        timestep.getCellValues().max().ifPresent(value -> {
-            if (value > maxValueSeen) maxValueSeen = value;
-        });
-        builder.add(timestep);
+    @Override ActionCountingExtractor<MakeFadSet> makeExtractor() {
+        return new FadSetCountingExtractor();
     }
 
-    public double getMaxValueSeen() { return maxValueSeen; }
-
-    @Override public Collection<Timestep> build() {
-        return builder.build();
+    @Override public String getTitle() {
+        return "Number of FAD sets over " + getInterval() + " day intervals";
     }
 
 }

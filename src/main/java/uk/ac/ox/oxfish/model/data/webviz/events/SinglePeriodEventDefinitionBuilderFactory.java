@@ -20,37 +20,27 @@
 package uk.ac.ox.oxfish.model.data.webviz.events;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 
-public class SinglePeriodEventBuilderFactory implements EventBuilderFactory {
+public class SinglePeriodEventDefinitionBuilderFactory implements EventDefinitionBuilderFactory {
 
-    private String description;
-    private int startTimeInDays;
-    private int endTimeInDays;
+    private final String description;
+    private final int startTimeInDays;
+    private final int endTimeInDays;
 
-    public SinglePeriodEventBuilderFactory(String description, int startTimeInDays, int endTimeInDays) {
+    public SinglePeriodEventDefinitionBuilderFactory(String description, int startTimeInDays, int endTimeInDays) {
         this.description = description;
         this.startTimeInDays = startTimeInDays;
         this.endTimeInDays = endTimeInDays;
     }
 
-    @Override public EventDefinition buildJsonObject(FishState fishState) {
-        return new EventDefinition(
-            description,
+    @Override public String getBaseName() { return description; }
+
+    @Override public JsonBuilder<EventDefinition> makeDefinitionBuilder(final String scenarioTitle) {
+        return fishState -> new EventDefinition(
+            makeFileName(scenarioTitle),
             ImmutableList.of(new EventDefinition.Period(startTimeInDays, endTimeInDays))
         );
     }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public int getStartTimeInDays() { return startTimeInDays; }
-
-    public void setStartTimeInDays(int startTimeInDays) { this.startTimeInDays = startTimeInDays; }
-
-    public int getEndTimeInDays() { return endTimeInDays; }
-
-    public void setEndTimeInDays(int endTimeInDays) { this.endTimeInDays = endTimeInDays; }
 
 }

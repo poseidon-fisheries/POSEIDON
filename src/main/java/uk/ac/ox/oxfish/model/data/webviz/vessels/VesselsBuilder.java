@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
-import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -39,20 +38,20 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 public final class VesselsBuilder implements SteppableJsonBuilder<Vessels> {
 
     private final ImmutableList.Builder<Timestep> timeStepsBuilder = new ImmutableList.Builder<>();
-    private final VesselClassifier vesselClassifier;
-    private Stoppable stoppable;
+    private final VesselClassifier<?> vesselClassifier;
 
-    public VesselsBuilder(final VesselClassifier vesselClassifier) {
+    VesselsBuilder(final VesselClassifier<?> vesselClassifier) {
         this.vesselClassifier = vesselClassifier;
     }
 
     @Override public Vessels buildJsonObject(final FishState fishState) {
-
         final ImmutableList<ImmutableList<Integer>> vesselTypeMap =
-            fishState.getFishers().stream()
-                .map(fisher -> ImmutableList.of(fisher.getID(), vesselClassifier.applyAsInt(fisher)))
+            vesselClassifier
+                .getVesselTypes()
+                .entrySet()
+                .stream()
+                .map(entry -> ImmutableList.of(entry.getKey().getID(), entry.getValue())) // fisher id, type id
                 .collect(toImmutableList());
-
         return new Vessels(vesselTypeMap, timeStepsBuilder.build());
     }
 
@@ -75,6 +74,7 @@ public final class VesselsBuilder implements SteppableJsonBuilder<Vessels> {
                 })
                 .collect(toImmutableList());
 
+        fishState.getFishers().forEach(vesselClassifier::classify);
         timeStepsBuilder.add(new Timestep(fishState.getDay(), vesselLocations));
     }
 
@@ -99,9 +99,5 @@ public final class VesselsBuilder implements SteppableJsonBuilder<Vessels> {
             round(coordinates.y + (rng.nextDouble() - 0.5) * seaTileHeight)
         );
     }
-
-    @Override public Stoppable getStoppable() { return stoppable; }
-
-    @Override public void setStoppable(final Stoppable stoppable) { this.stoppable = stoppable; }
 
 }

@@ -20,19 +20,14 @@
 package uk.ac.ox.oxfish.model.data.webviz;
 
 import sim.engine.Steppable;
-import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 public interface SteppableJsonBuilder<T> extends Startable, Steppable, JsonBuilder<T> {
 
-    Stoppable getStoppable();
-    void setStoppable(Stoppable stoppable);
-    @Override default void turnOff() { if (getStoppable() != null) getStoppable().stop(); }
-
     @Override default void start(final FishState fishState) {
-        setStoppable(fishState.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING));
+        fishState.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
     }
 
 }

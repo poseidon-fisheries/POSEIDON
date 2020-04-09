@@ -36,10 +36,6 @@ public final class SingleFixedRegionBuilder implements JsonBuilder<Regions> {
 
     public SingleFixedRegionBuilder(final int typeId) { this.typeId = typeId; }
 
-    private Collection<Integer> seaTileToGridXY(final SeaTile seaTile) {
-        return ImmutableList.of(seaTile.getGridX(), seaTile.getGridY());
-    }
-
     @Override public Regions buildJsonObject(final FishState fishState) {
         final NauticalMap map = fishState.getMap();
         final Collection<Collection<Integer>> cells =
@@ -50,6 +46,10 @@ public final class SingleFixedRegionBuilder implements JsonBuilder<Regions> {
                 .collect(toImmutableList());
         final Collection<Period> periods = ImmutableList.of(new Period(0, fishState.getDay()));
         return new Regions(ImmutableList.of(new Region(typeId, periods, cells)));
+    }
+
+    private Collection<Integer> seaTileToGridXY(final SeaTile seaTile) {
+        return ImmutableList.of(seaTile.getGridX(), seaTile.getGridY());
     }
 
 }

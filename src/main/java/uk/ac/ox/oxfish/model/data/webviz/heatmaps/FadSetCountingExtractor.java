@@ -17,28 +17,17 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.vessels;
+package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.model.FishState;
 
-import java.awt.*;
+class FadSetCountingExtractor extends ActionCountingExtractor<MakeFadSet> {
 
-public final class SingleTypeVesselClassifier implements VesselClassifier {
-
-    private final int typeId;
-    private final String legend;
-    private final Color colour;
-
-    public SingleTypeVesselClassifier(final int typeId, final String legend, final Color colour) {
-        this.typeId = typeId;
-        this.legend = legend;
-        this.colour = colour;
+    @Override public void start(final FishState model) {
+        getFadManagers(model).forEach(fadManager ->
+            fadManager.getFadSetObservers().add(this)
+        );
     }
-
-    @Override public int applyAsInt(final Fisher fisher) { return typeId; }
-
-    @Override public Color getColour(final int typeId) { return colour; }
-
-    @Override public String getLegend(final int typeId) { return legend; }
 
 }

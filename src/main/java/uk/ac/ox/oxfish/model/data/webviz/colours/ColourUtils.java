@@ -17,36 +17,27 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz;
+package uk.ac.ox.oxfish.model.data.webviz.colours;
 
-import com.google.common.escape.Escaper;
-import com.google.common.net.PercentEscaper;
-import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.awt.*;
 import java.lang.reflect.Field;
 
-public interface JsonBuilderFactory<T> extends AlgorithmFactory<JsonBuilder<T>> {
+public class ColourUtils {
 
-    @SuppressWarnings("UnstableApiUsage") default Escaper getFileNameEscaper() {
-        return new PercentEscaper("(),-_ ", false);
+    private ColourUtils() {}
+
+    public static String colourStringToHtmlCode(final String colour) {
+        return javaColorToHtmlCode(colourStringToJavaColor(colour));
     }
 
-    String getBaseName();
-
-    default String getFileName() { return getFileNameEscaper().escape(getBaseName()) + ".json"; }
-
-    default String colourStringToHtmlCode(final String colour) { return makeHtmlColorCode(readColour(colour)); }
-
-    default String makeHtmlColorCode(@NotNull final Color color) {
+    public static String javaColorToHtmlCode(@NotNull final Color javaColor) {
         // https://stackoverflow.com/a/15114020/487946
-        return String.format("#%06x", color.getRGB() & 0x00FFFFFF);
+        return String.format("#%06x", javaColor.getRGB() & 0x00FFFFFF);
     }
 
-    default Color readColour(final String colour) {
+    static Color colourStringToJavaColor(final String colour) {
         // adapted from https://stackoverflow.com/a/2854058/487946
         Color color;
         try {
@@ -56,10 +47,6 @@ public interface JsonBuilderFactory<T> extends AlgorithmFactory<JsonBuilder<T>> 
             color = Color.decode(colour);
         }
         return color;
-    }
-
-    default JsonOutputPlugin<T> makeJsonOutputPlugin(final Gson gson, final FishState fishState) {
-        return new JsonOutputPlugin<>(gson, apply(fishState), getFileName());
     }
 
 }

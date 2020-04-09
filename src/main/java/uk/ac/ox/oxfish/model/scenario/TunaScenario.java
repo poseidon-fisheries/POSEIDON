@@ -421,6 +421,8 @@ public class TunaScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
+        System.out.println("populating model");
+
         final FadMap fadMap = (new FadMapFactory()).apply(model);
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);
@@ -434,10 +436,10 @@ public class TunaScenario implements Scenario {
         final Monitors monitors = new Monitors(model);
         monitors.getMonitors().forEach(model::registerStartable);
 
-        purseSeineGearFactory.setFadDeploymentObservers(monitors.fadDeploymentMonitors);
-        purseSeineGearFactory.setSetObservers(monitors.setMonitors);
-        purseSeineGearFactory.setFadSetObservers(monitors.fadSetMonitors);
-        purseSeineGearFactory.setUnassociatedSetObservers(monitors.unassociatedSetMonitors);
+        purseSeineGearFactory.getFadDeploymentObservers().addAll(monitors.fadDeploymentMonitors);
+        purseSeineGearFactory.getSetObservers().addAll(monitors.setMonitors);
+        purseSeineGearFactory.getFadSetObservers().addAll(monitors.fadSetMonitors);
+        purseSeineGearFactory.getUnassociatedSetObservers().addAll(monitors.unassociatedSetMonitors);
         purseSeineGearFactory.setBiomassLostMonitor(monitors.biomassLostMonitor);
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));

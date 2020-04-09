@@ -19,10 +19,10 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.regions;
 
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.RegionsDefinition;
 
 public interface RegionsBuilderFactory extends
-    JsonBuilderFactory<Regions>,
-    JsonBuilder<RegionsDefinition> { }
+    JsonDataBuilderFactory<Regions>,
+    JsonDefinitionBuilderFactory<RegionsDefinition> { }

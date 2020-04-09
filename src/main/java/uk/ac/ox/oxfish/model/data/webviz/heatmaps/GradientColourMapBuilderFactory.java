@@ -20,22 +20,36 @@
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 
 import java.util.Collection;
+import java.util.function.DoubleSupplier;
+
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.colourStringToHtmlCode;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public final class GradientColourMapBuilderFactory implements JsonBuilderFactory<Collection<ColourMapEntry>> {
+public final class GradientColourMapBuilderFactory implements JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> {
 
     private String minColour = "green";
     private String maxColour = "green";
-    private double minOpacity = 0.0;
+    private double minOpacity = 0.00;
     private double maxOpacity = 0.75;
-    private double minValue = 0;
-    private double maxValue = 1;
+    private DoubleSupplier minValueFunction = () -> 0;
+    private DoubleSupplier maxValueFunction = () -> 1;
+
+    public DoubleSupplier getMinValueFunction() { return minValueFunction; }
+
+    public void setMinValueFunction(final DoubleSupplier minValueFunction) {
+        this.minValueFunction = minValueFunction;
+    }
+
+    public DoubleSupplier getMaxValueFunction() { return maxValueFunction; }
+
+    public void setMaxValueFunction(final DoubleSupplier maxValueFunction) {
+        this.maxValueFunction = maxValueFunction;
+    }
 
     public String getMinColour() { return minColour; }
 
@@ -53,24 +67,26 @@ public final class GradientColourMapBuilderFactory implements JsonBuilderFactory
 
     public void setMaxOpacity(final double maxOpacity) { this.maxOpacity = maxOpacity; }
 
-    public double getMinValue() { return minValue; }
-
-    public void setMinValue(final double minValue) { this.minValue = minValue; }
-
-    public double getMaxValue() { return maxValue; }
-
-    public void setMaxValue(final double maxValue) { this.maxValue = maxValue; }
-
-    @Override public JsonBuilder<Collection<ColourMapEntry>> apply(final FishState fishState) {
-        return __ -> ImmutableList.of(
-            new ColourMapEntry(minValue, makeHtmlColorCode(readColour(minColour)), minOpacity, true),
-            new ColourMapEntry(maxValue, makeHtmlColorCode(readColour(maxColour)), maxOpacity, true)
-        );
-    }
-
     /**
      * Colour maps do not have their own file names
      */
     @Override public String getBaseName() { throw new UnsupportedOperationException(); }
+
+    @Override public JsonBuilder<Collection<ColourMapEntry>> makeDefinitionBuilder(final String scenarioTitle) {
+        return fishState -> ImmutableList.of(
+            new ColourMapEntry(
+                minValueFunction.getAsDouble(),
+                colourStringToHtmlCode(minColour),
+                minOpacity,
+                true
+            ),
+            new ColourMapEntry(
+                maxValueFunction.getAsDouble(),
+                colourStringToHtmlCode(maxColour),
+                maxOpacity,
+                true
+            )
+        );
+    }
 
 }

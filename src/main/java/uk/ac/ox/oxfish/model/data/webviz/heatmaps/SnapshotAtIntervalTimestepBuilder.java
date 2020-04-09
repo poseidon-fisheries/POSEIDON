@@ -24,7 +24,7 @@ public class SnapshotAtIntervalTimestepBuilder extends AbstractTimestepBuilder {
     private final int interval;
     private Integer initialDay = null;
 
-    public SnapshotAtIntervalTimestepBuilder(int interval) { this.interval = interval; }
+    SnapshotAtIntervalTimestepBuilder(int interval) { this.interval = interval; }
 
     @Override public void add(Timestep timestep) {
 
@@ -32,7 +32,7 @@ public class SnapshotAtIntervalTimestepBuilder extends AbstractTimestepBuilder {
             initialDay = timestep.getTimeInDays();
 
         if ((timestep.getTimeInDays() - initialDay) % interval == 0)
-            builder.add(timestep);
+            super.add(timestep);
 
     }
 

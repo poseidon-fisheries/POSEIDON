@@ -81,10 +81,7 @@ public class FadSettingRouteSelectorTest {
 
         final FadInitializer fadInitializer =
             new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
-        final FadManager fadManager =
-            new FadManager.Builder(fadMap, fadInitializer)
-                .setInitialNumberOfFadsInStock(Integer.MAX_VALUE)
-                .build();
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE);
         fadManager.setFisher(fisher);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);

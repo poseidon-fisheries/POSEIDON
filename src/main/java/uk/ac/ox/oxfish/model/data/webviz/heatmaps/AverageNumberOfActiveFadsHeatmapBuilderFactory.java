@@ -19,49 +19,41 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 
 import java.util.Collection;
-import java.util.function.ToDoubleFunction;
 
 public class AverageNumberOfActiveFadsHeatmapBuilderFactory implements HeatmapBuilderFactory {
 
     private int interval = 30;
-    private GradientColourMapBuilderFactory colourMapBuilderFactory =
-        new GradientColourMapBuilderFactory();
+    private String colour = "yellow";
+    private AveragingTimestepsBuilder timestepsBuilder = null;
 
-    public AverageNumberOfActiveFadsHeatmapBuilderFactory() {
-        colourMapBuilderFactory.setMaxValue(10);
-        colourMapBuilderFactory.setMinColour("yellow");
-        colourMapBuilderFactory.setMaxColour("yellow");
-    }
+    @Override public String getTitle() { return "Average daily number of active FADs"; }
 
-    @Override public String getTitle() { return "Average number of active FADs"; }
-
-    @Override public String getLegend() { return getTitle(); }
-
-    @Override public JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
-        return this.colourMapBuilderFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setColourMapBuilderFactory(GradientColourMapBuilderFactory colourMapBuilderFactory) {
-        this.colourMapBuilderFactory = colourMapBuilderFactory;
-    }
-
-    @Override public ToDoubleFunction<SeaTile> makeNumericExtractor(FishState fishState) {
-        return seaTile -> fishState.getFadMap().fadsAt(seaTile).numObjs;
-    }
-
-    @Override public TimestepsBuilder makeTimestepsBuilder() {
-        return new AveragingAtIntervalTimestepsBuilder(interval);
+    @Override public JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new MonochromeGradientColourMapBuilderFactory(colour, () -> timestepsBuilder.getMaxValueSeen());
     }
 
     @SuppressWarnings("unused") public int getInterval() { return interval; }
 
     @SuppressWarnings("unused") public void setInterval(int interval) { this.interval = interval; }
+
+    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
+        final FadMap fadMap = fishState.getFadMap();
+        timestepsBuilder = new AveragingTimestepsBuilder(interval);
+        return new ExtractorBasedHeatmapBuilder(
+            seaTile -> fadMap.fadsAt(seaTile).numObjs,
+            timestepsBuilder
+        );
+    }
+
+    public String getColour() { return colour; }
+
+    public void setColour(final String colour) { this.colour = colour; }
 
 }

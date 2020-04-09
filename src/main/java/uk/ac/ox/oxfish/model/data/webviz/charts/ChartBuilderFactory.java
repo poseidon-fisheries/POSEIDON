@@ -20,60 +20,181 @@
 package uk.ac.ox.oxfish.model.data.webviz.charts;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.collections15.iterators.LoopingIterator;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ChartDefinition;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.SeriesDefinition;
+import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static com.google.common.collect.Streams.zip;
-import static uk.ac.ox.oxfish.model.data.webviz.ColourSeries.SET1;
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourSeries.SET1;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 
 @SuppressWarnings("WeakerAccess")
 public final class ChartBuilderFactory implements
-    JsonBuilderFactory<Chart>,
-    JsonBuilder<ChartDefinition> {
+    JsonDataBuilderFactory<Chart>,
+    JsonDefinitionBuilderFactory<ChartDefinition> {
+
+    public static final DoubleUnaryOperator PERCENTILE_TRANSFORMER = value -> round(value * 100d);
 
     private String title = "Chart title";
     private String xLabel = "Year";
     private String yLabel = "Value";
-    private Collection<String> seriesColours = SET1.getColours();
+    private Collection<String> seriesColours = SET1.getHtmlColours();
     private boolean xAxisIsSimulationTimeInYears = true;
     private Collection<Double> yLines = ImmutableList.of();
-    private Collection<String> columns = ImmutableList.of(); // TODO: allow renaming columns
+    private Map<String, String> columnNamesAndLegends = ImmutableMap.of();
+    private DoubleUnaryOperator valueTransformer = v -> v;
 
-    /**
-     * @param title             The title of the chart to be produced by the factory.
-     * @param columnNamePattern The pattern to be passed to {@code String.format} to generate column names using {@code values}.
-     * @param values            The used to generate the column names.
-     * @return A new {@code ChartBuilderFactory}.
-     */
-    @NotNull public static ChartBuilderFactory forPattern(
+    @NotNull public static <T> ChartBuilderFactory fromVesselClassifier(
         final String title,
-        final String columnNamePattern,
-        final Iterable<String> values
+        final String yLabel,
+        final VesselClassifier<T> vesselClassifier,
+        final Function<T, String> columnNameExtractor
     ) {
-        return forColumns(title, stream(values).map(s -> String.format(columnNamePattern, s))::iterator);
+
+        final ChartBuilderFactory chartBuilderFactory = ChartBuilderFactory.fromValues(
+            title,
+            yLabel,
+            vesselClassifier.getTypes(),
+            columnNameExtractor,
+            vesselClassifier::getLegend
+        );
+        chartBuilderFactory.setSeriesColours(
+            vesselClassifier.getTypes().stream()
+                .map(vesselClassifier::getJavaColor)
+                .map(ColourUtils::javaColorToHtmlCode)
+                ::iterator
+        );
+
+        return chartBuilderFactory;
     }
 
-    @NotNull public static ChartBuilderFactory forColumns(final String title, final Iterable<String> columnNames) {
+    @NotNull public static <T> ChartBuilderFactory fromValues(
+        final String title,
+        final String yLabel,
+        final Iterable<T> values,
+        final Function<T, String> columnNameExtractor,
+        final Function<T, String> columnLegendExtractor
+    ) {
+        return fromColumnNamesAndLegends(
+            title,
+            yLabel,
+            stream(values).collect(toImmutableMap(columnNameExtractor, columnLegendExtractor))
+        );
+    }
+
+    @NotNull public static ChartBuilderFactory fromColumnNamesAndLegends(
+        final String title,
+        final String yLabel,
+        Map<String, String> columnNamesAndLegends
+    ) {
         final ChartBuilderFactory chartBuilderFactory = new ChartBuilderFactory();
         chartBuilderFactory.setTitle(title);
-        chartBuilderFactory.setColumns(ImmutableList.copyOf(columnNames));
+        chartBuilderFactory.setYLabel(yLabel);
+        chartBuilderFactory.setColumnNamesAndLegends(ImmutableMap.copyOf(columnNamesAndLegends));
         return chartBuilderFactory;
+    }
+
+    @NotNull public static ChartBuilderFactory fromValues(
+        final String title,
+        final String yLabel,
+        final Iterable<String> strings,
+        final String columnNameFormatPattern
+    ) {
+        return fromValues(
+            title,
+            yLabel,
+            strings,
+            columnNameFormatPattern,
+            "%s"
+        );
+    }
+
+    @NotNull public static ChartBuilderFactory fromValues(
+        final String title,
+        final String yLabel,
+        final Iterable<String> strings,
+        final String columnNameFormatPattern,
+        final String columnLegendFormatPattern
+    ) {
+        return fromValues(
+            title,
+            yLabel,
+            strings,
+            v -> String.format(columnNameFormatPattern, v),
+            v -> String.format(columnLegendFormatPattern, v)
+        );
+    }
+
+    @SuppressWarnings("unused") public DoubleUnaryOperator getValueTransformer() { return valueTransformer; }
+
+    public void setValueTransformer(DoubleUnaryOperator valueTransformer) {
+        this.valueTransformer = valueTransformer;
     }
 
     @SuppressWarnings("unused")
     public Collection<String> getSeriesColours() { return seriesColours; }
 
     @SuppressWarnings("unused")
-    public void setSeriesColours(final Collection<String> seriesColours) { this.seriesColours = seriesColours; }
+    public void setSeriesColours(final Iterable<String> seriesColours) {
+        this.seriesColours = ImmutableList.copyOf(seriesColours);
+    }
+
+    @SuppressWarnings("unused") public boolean isXAxisIsSimulationTimeInYears() { return xAxisIsSimulationTimeInYears; }
+
+    @SuppressWarnings("unused")
+    public void setXAxisIsSimulationTimeInYears(final boolean xAxisIsSimulationTimeInYears) {
+        this.xAxisIsSimulationTimeInYears = xAxisIsSimulationTimeInYears;
+    }
+
+    @SuppressWarnings("unused") public Collection<Double> getYLines() { return yLines; }
+
+    @SuppressWarnings("unused") public void setYLines(final Collection<Double> yLines) { this.yLines = yLines; }
+
+    @SuppressWarnings("unused") public Map<String, String> getColumnNamesAndLegends() { return columnNamesAndLegends; }
+
+    public void setColumnNamesAndLegends(final Map<String, String> columnNamesAndLegends) {
+        this.columnNamesAndLegends = columnNamesAndLegends;
+    }
+
+    @Override public JsonBuilder<Chart> makeDataBuilder(FishState ignored) {
+        return new ChartBuilder(
+            columnNamesAndLegends.keySet(),
+            yLines,
+            xAxisIsSimulationTimeInYears,
+            valueTransformer
+        );
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override public JsonBuilder<ChartDefinition> makeDefinitionBuilder(final String scenarioTitle) {
+        return fishState -> new ChartDefinition(
+            makeFileName(scenarioTitle),
+            getTitle(),
+            getXLabel(),
+            getYLabel(),
+            zip(
+                columnNamesAndLegends.values().stream(),
+                stream(new LoopingIterator<>(seriesColours)).map(ColourUtils::colourStringToHtmlCode),
+                SeriesDefinition::new
+            ).collect(toImmutableList())
+        );
+    }
 
     public String getTitle() { return title; }
 
@@ -87,42 +208,6 @@ public final class ChartBuilderFactory implements
 
     @SuppressWarnings("unused") public void setYLabel(final String yLabel) { this.yLabel = yLabel; }
 
-    @SuppressWarnings("unused") public boolean isXAxisIsSimulationTimeInYears() { return xAxisIsSimulationTimeInYears; }
-
-    @SuppressWarnings("unused")
-    public void setXAxisIsSimulationTimeInYears(final boolean xAxisIsSimulationTimeInYears) {
-        this.xAxisIsSimulationTimeInYears = xAxisIsSimulationTimeInYears;
-    }
-
-    @SuppressWarnings("unused") public Collection<Double> getYLines() { return yLines; }
-
-    @SuppressWarnings("unused") public void setYLines(final Collection<Double> yLines) { this.yLines = yLines; }
-
-    public Collection<String> getColumns() { return columns; }
-
-    public void setColumns(final Collection<String> columns) {
-        this.columns = columns;
-    }
-
-    @Override public ChartBuilder apply(final FishState fishState) {
-        return new ChartBuilder(columns, yLines, xAxisIsSimulationTimeInYears);
-    }
-
-    @Override public String getBaseName() { return title + " Chart"; }
-
-    @SuppressWarnings("UnstableApiUsage")
-    @Override public ChartDefinition buildJsonObject(final FishState fishState) {
-        return new ChartDefinition(
-            getFileName(),
-            getTitle(),
-            getXLabel(),
-            getYLabel(),
-            zip(
-                columns.stream(),
-                stream(new LoopingIterator<>(seriesColours)).map(this::colourStringToHtmlCode),
-                SeriesDefinition::new
-            ).collect(toImmutableList())
-        );
-    }
+    @Override public String getBaseName() { return "Chart of " + getTitle(); }
 
 }

@@ -19,11 +19,13 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.charts;
 
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 
 import java.util.Collection;
+import java.util.function.DoubleUnaryOperator;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
@@ -32,20 +34,25 @@ public final class ChartBuilder implements JsonBuilder<Chart>, Startable {
 
     private final boolean xAxisIsSimulationTimeInYears;
     private final Collection<Double> yLines;
-    private final Collection<String> columns; // TODO: allow renaming columns
+    private final Collection<String> columns;
+    private final DoubleUnaryOperator valueTransformer;
+
     private int numYearsToSkip; // will be recorded at start time
 
     ChartBuilder(
         final Collection<String> columns,
         final Collection<Double> yLines,
-        final boolean xAxisIsSimulationTimeInYears
+        final boolean xAxisIsSimulationTimeInYears,
+        final DoubleUnaryOperator valueTransformer
     ) {
-        this.columns = columns;
-        this.yLines = yLines;
+        this.columns = ImmutableList.copyOf(columns);
+        this.yLines = ImmutableList.copyOf(yLines);
         this.xAxisIsSimulationTimeInYears = xAxisIsSimulationTimeInYears;
+        this.valueTransformer = valueTransformer;
     }
 
     @Override public Chart buildJsonObject(final FishState fishState) {
+
         final Collection<Integer> xData =
             range(numYearsToSkip, fishState.getYear())
                 .boxed()
@@ -54,7 +61,11 @@ public final class ChartBuilder implements JsonBuilder<Chart>, Startable {
         final Collection<Series> series =
             columns.stream()
                 .map(fishState.getYearlyDataSet()::getColumn)
-                .map(col -> col.stream().skip(numYearsToSkip).collect(toList()))
+                .map(col -> col.stream()
+                    .skip(numYearsToSkip)
+                    .map(valueTransformer::applyAsDouble)
+                    .collect(toList())
+                )
                 .map(Series::new)
                 .collect(toList());
 

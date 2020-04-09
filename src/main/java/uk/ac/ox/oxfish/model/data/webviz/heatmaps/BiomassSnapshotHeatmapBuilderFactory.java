@@ -21,69 +21,48 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
-import uk.ac.ox.oxfish.model.data.webviz.scenarios.HeatmapDefinition;
+import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 
+import java.awt.*;
 import java.util.Collection;
-import java.util.function.ToDoubleFunction;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 import static java.util.Objects.requireNonNull;
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.javaColorToHtmlCode;
 
-public final class BiomassSnapshotHeatmapBuilderFactory implements HeatmapBuilderFactory {
+public final class BiomassSnapshotHeatmapBuilderFactory extends AbstractIntervalHeatmapBuilderFactory {
 
     private String speciesName = "Species 0";
-    private int interval = 30;
-    private GradientColourMapBuilderFactory colourMapBuilderFactory =
-        new GradientColourMapBuilderFactory();
 
-    public static BiomassSnapshotHeatmapBuilderFactory newInstance(final String speciesName, final String colour) {
-        final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
-        instance.speciesName = speciesName;
-        instance.colourMapBuilderFactory.setMinColour(colour);
-        instance.colourMapBuilderFactory.setMaxColour(colour);
-        return instance;
-    }
-
-    @Override public String getTitle() { return speciesName + " biomass"; }
-
-    @Override public String getLegend() { return getTitle() + " (kg)"; }
-
-    @Override public JsonBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
-        return colourMapBuilderFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setColourMapBuilderFactory(final GradientColourMapBuilderFactory colourMapBuilderFactory) {
-        this.colourMapBuilderFactory = colourMapBuilderFactory;
+    public static Collection<BiomassSnapshotHeatmapBuilderFactory> forSpecies(
+        Iterable<String> speciesNames,
+        Color javaColor,
+        int interval
+    ) {
+        return stream(speciesNames)
+            .map(speciesName -> {
+                final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
+                instance.speciesName = speciesName;
+                instance.setColour(javaColorToHtmlCode(javaColor));
+                instance.setInterval(interval);
+                return instance;
+            })
+            .collect(toImmutableList());
     }
 
     public String getSpeciesName() { return speciesName; }
 
     public void setSpeciesName(final String speciesName) { this.speciesName = speciesName; }
 
-    @Override public HeatmapDefinition buildJsonObject(final FishState fishState) {
+    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
         final Species species = getSpecies(fishState);
-        fishState.getMap().getAllSeaTilesExcludingLandAsList().stream()
-            .map(SeaTile::getBiology)
-            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
-            .map(biology -> (VariableBiomassBasedBiology) biology)
-            .mapToDouble(biology -> biology.getCarryingCapacity(species))
-            .max()
-            .ifPresent(colourMapBuilderFactory::setMaxValue);
-        return HeatmapBuilderFactory.super.buildJsonObject(fishState);
-    }
-
-    @Override public ToDoubleFunction<SeaTile> makeNumericExtractor(final FishState fishState) {
-        final Species specie = getSpecies(fishState);
-        return seaTile -> seaTile.getBiomass(specie);
-    }
-
-    @Override public TimestepsBuilder makeTimestepsBuilder() {
-        return new SnapshotAtIntervalTimestepBuilder(interval);
+        setTimestepsBuilder(new SnapshotAtIntervalTimestepBuilder(getInterval()));
+        return new ExtractorBasedHeatmapBuilder(
+            seaTile -> seaTile.getBiomass(species),
+            getTimestepsBuilder()
+        );
     }
 
     @NotNull private Species getSpecies(final FishState fishState) {
@@ -92,8 +71,15 @@ public final class BiomassSnapshotHeatmapBuilderFactory implements HeatmapBuilde
         return species;
     }
 
-    @SuppressWarnings("unused") public int getInterval() { return interval; }
+    @Override public String getTitle() { return speciesName + " biomass"; }
 
-    @SuppressWarnings("unused") public void setInterval(int interval) { this.interval = interval; }
+    @Override public String getLegend() { return getTitle() + " (kg)"; }
+
+    @Override public MonochromeGradientColourMapBuilderFactory getColourMapBuilderFactory() {
+        return new MonochromeGradientColourMapBuilderFactory(
+            getColour(),
+            () -> getTimestepsBuilder().getMaxValueSeen()
+        );
+    }
 
 }

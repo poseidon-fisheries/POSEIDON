@@ -19,7 +19,11 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
+import java.util.Arrays;
+import java.util.stream.DoubleStream;
+
+import static java.util.Arrays.stream;
+
 final class Timestep {
 
     private final int timeInDays;
@@ -27,11 +31,13 @@ final class Timestep {
 
     Timestep(final int timeInDays, final double[] cellValues) {
         this.timeInDays = timeInDays;
-        this.cellValues = cellValues;
+        this.cellValues = Arrays.copyOf(cellValues, cellValues.length);
     }
 
     int getTimeInDays() { return timeInDays; }
 
-    double[] getCellValues() { return cellValues; }
+    DoubleStream getCellValues() { return stream(cellValues); }
+
+    double get(int index) { return cellValues[index]; }
 
 }

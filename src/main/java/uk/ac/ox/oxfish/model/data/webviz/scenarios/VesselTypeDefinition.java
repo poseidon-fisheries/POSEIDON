@@ -19,23 +19,21 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.scenarios;
 
-@SuppressWarnings({"unused"})
+import java.awt.*;
+
+import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.javaColorToHtmlCode;
+
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public final class VesselTypeDefinition {
 
-    final int typeId;
+    private final int typeId;
     private final String legend;
     private final String colour;
 
-    public VesselTypeDefinition(final int typeId, final String legend, final String colour) {
+    public VesselTypeDefinition(final int typeId, final String legend, final Color javaColor) {
         this.typeId = typeId;
         this.legend = legend;
-        this.colour = colour;
+        this.colour = javaColorToHtmlCode(javaColor);
     }
-
-    public int getTypeId() { return typeId; }
-
-    public String getLegend() { return legend; }
-
-    public String getColour() { return colour; }
 
 }

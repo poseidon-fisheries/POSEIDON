@@ -68,8 +68,7 @@ public class FadMapTest {
         when(fishState.getRandom()).thenReturn(rng);
         fishState.schedule = schedule;
 
-        final FadManager fadManager =
-            new FadManager.Builder(fadMap, fadInitializer).setInitialNumberOfFadsInStock(1).build();
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);

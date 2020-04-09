@@ -17,9 +17,10 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.events;
+package uk.ac.ox.oxfish.model.data.webviz;
 
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
+public interface JsonDefinitionBuilderFactory<T> extends FileNameMaker {
 
-@FunctionalInterface
-public interface EventBuilderFactory extends JsonBuilder<EventDefinition> { }
+    JsonBuilder<T> makeDefinitionBuilder(String scenarioTitle);
+
+}
