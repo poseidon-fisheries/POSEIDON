@@ -33,6 +33,7 @@ import java.util.Collection;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static com.google.common.collect.Streams.zip;
+import static uk.ac.ox.oxfish.model.data.webviz.ColourSeries.SET1;
 
 @SuppressWarnings("WeakerAccess")
 public final class ChartBuilderFactory implements
@@ -42,10 +43,7 @@ public final class ChartBuilderFactory implements
     private String title = "Chart title";
     private String xLabel = "Year";
     private String yLabel = "Value";
-    private Collection<String> seriesColours = ImmutableList.of(
-        // https://colorbrewer2.org/#type=qualitative&scheme=Set1&n=9
-        "#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"
-    );
+    private Collection<String> seriesColours = SET1.getColours();
     private boolean xAxisIsSimulationTimeInYears = true;
     private Collection<Double> yLines = ImmutableList.of();
     private Collection<String> columns = ImmutableList.of(); // TODO: allow renaming columns
