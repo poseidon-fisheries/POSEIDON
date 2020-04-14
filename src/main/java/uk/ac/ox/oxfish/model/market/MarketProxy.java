@@ -177,5 +177,7 @@ public class MarketProxy implements Market{
     }
 
 
-
+    public Market getDelegate() {
+        return delegate;
+    }
 }

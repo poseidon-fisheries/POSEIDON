@@ -39,8 +39,6 @@ import static org.mockito.Mockito.*;
 public class SPRAgentTest {
 
     //numbers from the SPR test
-
-
     @Test
     public void computesCorrectly() {
 
@@ -112,6 +110,7 @@ public class SPRAgentTest {
         double spr = agent.computeSPR();
         assertEquals(0.08894,spr,.0001);
 
-
+        assertEquals(agent.computeMaturityRatio(),.995,.001);
+        assertEquals(agent.computeLoptRatio(),.245,.001);
     }
 }

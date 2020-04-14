@@ -11,10 +11,14 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
@@ -39,6 +43,8 @@ public class Slice6Sweeps {
 
 
     private static final String SCENARIO_NAME = "tropfishR_tl_2yr_8h";
+    // "lime_monthly2yr_8h"
+    // "new_cmsy_tropfishR_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY =
@@ -50,7 +56,89 @@ public class Slice6Sweeps {
 
 
     public static  int SHOCK_YEAR = 3;
-    //public static  int SHOCK_YEAR = 3;
+    private ArrayList<String> columnsToPrint;
+
+    public static final ArrayList<String> DEFAULT_COLUMNS_TO_PRINT = Lists.newArrayList(
+            "Actual Average Cash-Flow",
+            "Lutjanus malabaricus Earnings",
+            "Lutjanus malabaricus Landings",
+            "Epinephelus areolatus Earnings",
+            "Epinephelus areolatus Landings",
+            "Lutjanus erythropterus Earnings",
+            "Lutjanus erythropterus Landings",
+            "Pristipomoides multidens Earnings",
+            "Pristipomoides multidens Landings",
+            "Actual Average Hours Out",
+
+            "Full-time fishers",
+            "Seasonal fishers",
+            "Retired fishers",
+            "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
+            "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
+            "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
+            "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
+            "Biomass Epinephelus areolatus",
+            "Biomass Pristipomoides multidens",
+            "Biomass Lutjanus malabaricus",
+            "Biomass Lutjanus erythropterus",
+            "SPR Oracle - " + "Epinephelus areolatus",
+            "SPR Oracle - " + "Pristipomoides multidens",
+            "SPR Oracle - " + "Lutjanus malabaricus",
+            "SPR Oracle - " + "Lutjanus erythropterus",
+            "Yearly Fishing Mortality Lutjanus malabaricus",
+            //not all scenarios have these
+            "Yearly Fishing Mortality Epinephelus areolatus",
+            "Yearly Fishing Mortality Pristipomoides multidens",
+            "Yearly Fishing Mortality Lutjanus erythropterus",
+            //====================
+            "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
+            "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
+            "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
+            "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus");
+
+    static{
+        for(int i=0; i<POPULATIONS; i++){
+
+            DEFAULT_COLUMNS_TO_PRINT.add("Total Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Full-time fishers of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Retired fishers of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Seasonal fishers of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Actual Average Cash-Flow of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Average Number of Trips of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Number Of Active Fishers of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Average Distance From Port of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Average Trip Duration of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Epinephelus areolatus Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Pristipomoides multidens Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus malabaricus Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus erythropterus Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Others Landings of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Actual Average Distance From Port of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Actual Average Variable Costs of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Total Variable Costs of population"+i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Total Hours Out of population"+i);
+        }
+
+
+        for(int i=0; i<25; i++) {
+            DEFAULT_COLUMNS_TO_PRINT.add("Epinephelus areolatus Catches (kg) - age bin " + i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Pristipomoides multidens Catches (kg) - age bin " + i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus malabaricus Catches (kg) - age bin " + i);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus erythropterus Catches (kg) - age bin " + i);
+
+            DEFAULT_COLUMNS_TO_PRINT.add("Epinephelus areolatus Abundance 0."+i+" at day " + 365);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus malabaricus Abundance 0."+i+" at day " + 365);
+            DEFAULT_COLUMNS_TO_PRINT.add("Pristipomoides multidens Abundance 0."+i+" at day " + 365);
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus erythropterus Abundance 0."+i+" at day " + 365);
+
+
+            DEFAULT_COLUMNS_TO_PRINT.add("Epinephelus areolatus Catches(#) 0."+i+" 100_areolatus");
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus malabaricus Catches(#) 0."+i+" 100_malabaricus");
+            DEFAULT_COLUMNS_TO_PRINT.add("Pristipomoides multidens Catches(#) 0."+i+" 100_multidens");
+            DEFAULT_COLUMNS_TO_PRINT.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
+        }
+    }
+
 
 
 
@@ -112,8 +200,12 @@ public class Slice6Sweeps {
 //        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 //
         //        //fleet reduction
-        fleetReduction("fleetreduction10", SCENARIO_NAME, 1,"population1","population2","population3"
-                );
+        //     fleetReduction("fleetreduction10", SCENARIO_NAME, 1,"population1","population2","population3" );
+
+
+        priceShock("price_shock",SCENARIO_NAME,18*30,SHOCK_YEAR);
+        priceAndCostShock("price_and_cost_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR);
+        priceAndCostShock("price_and_cost_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR);
 ////        //delays
 //        delays("delay_all",
 //                new String[]{"population0","population1","population2","population3"},
@@ -147,7 +239,7 @@ public class Slice6Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
             int finalMaxDaysOut = maxDaysOut;
@@ -190,7 +282,7 @@ public class Slice6Sweeps {
         fileWriter.flush();
 
 
-        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -235,7 +327,7 @@ public class Slice6Sweeps {
 
         for(int shockYear = minShockYear; shockYear < 15; shockYear++) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
             //basically we want year 4 to change big boats regulations.
@@ -279,7 +371,7 @@ public class Slice6Sweeps {
 
         for(int entry = 0; entry <=1 ; entry++) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -402,7 +494,7 @@ public class Slice6Sweeps {
 
         for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=5) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
             int finalWaitTime = waitTimes *24;
@@ -507,7 +599,7 @@ public class Slice6Sweeps {
 
         for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=10) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
             int finalWaitTime = waitTimes;
@@ -603,7 +695,7 @@ public class Slice6Sweeps {
 
         for(double probability=0; probability<=.05; probability= FishStateUtilities.round5(probability+.005)) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -614,8 +706,8 @@ public class Slice6Sweeps {
             double finalProbability = probability;
             if(tagsToCheck == null)
                 runner.setScenarioSetup(
-                    setupFleetReductionConsumer(shockYear, finalProbability)
-            );
+                        setupFleetReductionConsumer(shockYear, finalProbability)
+                );
             else
                 runner.setScenarioSetup(
                         setupFleetReductionConsumerSelective(shockYear, finalProbability,
@@ -699,11 +791,11 @@ public class Slice6Sweeps {
 
     @NotNull
     public static Consumer<Scenario> setupFleetReductionConsumerSelective(int shockYear,
-                                                                 double yearlyReductionProbability,
+                                                                          double yearlyReductionProbability,
                                                                           String[] validTags
 
 
-                                                                          ) {
+    ) {
         return scenario -> {
 
             //at year 4, impose regulation
@@ -773,7 +865,7 @@ public class Slice6Sweeps {
 
         for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+1)) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -833,6 +925,274 @@ public class Slice6Sweeps {
     }
 
 
+
+    @NotNull
+    public static Consumer<Scenario> setupPriceShock(int durationInDays,
+                                                     int yearStart,
+                                                     double percentageOfTotalPrice) {
+        return scenario -> {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            ((FlexibleScenario) scenario).getPlugins().add(
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState state) {
+
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    state.scheduleOnceAtTheBeginningOfYear(
+                                            new Steppable() {
+                                                @Override
+                                                public void step(SimState simState) {
+
+                                                    //shock the prices
+                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                            thisMarket.setPriceAboveThresholds(
+                                                                    thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
+                                                            );
+                                                            System.out.println(thisMarket.getPriceAboveThresholds());
+
+                                                        }
+                                                    }
+
+                                                    //restore prices
+                                                    ((FishState) simState).scheduleOnceInXDays(
+                                                            new Steppable() {
+                                                                @Override
+                                                                public void step(SimState simState) {
+                                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                                            thisMarket.setPriceAboveThresholds(
+                                                                                    thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            , StepOrder.DAWN, durationInDays
+                                                    );
+
+                                                }
+                                            },
+                                            StepOrder.DAWN,
+                                            yearStart
+                                    );
+
+                                }
+                            };
+
+                        }
+                    }
+
+            );
+
+
+
+        };
+    }
+
+
+
+    @NotNull
+    public static Consumer<Scenario> setupVariableCostShock(int durationInDays,
+                                                     int yearStart,
+                                                     double percentageOfTotalCost) {
+        return scenario -> {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            ((FlexibleScenario) scenario).getPlugins().add(
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState state) {
+
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    state.scheduleOnceAtTheBeginningOfYear(
+                                            new Steppable() {
+                                                @Override
+                                                public void step(SimState simState) {
+
+                                                    //shock the costs
+                                                    for (Fisher fisher : ((FishState) simState).getFishers()) {
+                                                        //ugly, but I assume the first and only cost in this list is the hourly variable cost
+                                                        Preconditions.checkState(fisher.getAdditionalTripCosts().size()==1);
+                                                        assert fisher.getAdditionalTripCosts().getFirst() instanceof HourlyCost;
+                                                        final HourlyCost first = (HourlyCost) fisher.getAdditionalTripCosts().removeFirst();
+                                                        HourlyCost replacement = new HourlyCost(first.getHourlyCost() * percentageOfTotalCost);
+                                                        fisher.getAdditionalTripCosts().add(replacement);
+                                                    }
+
+                                                    //restore prices
+                                                    ((FishState) simState).scheduleOnceInXDays(
+                                                            new Steppable() {
+                                                                @Override
+                                                                public void step(SimState simState) {
+
+                                                                    //shock the costs
+                                                                    for (Fisher fisher : ((FishState) simState).getFishers()) {
+                                                                        //ugly, but I assume the first and only cost in this list is the hourly variable cost
+                                                                        Preconditions.checkState(fisher.getAdditionalTripCosts().size()==1);
+                                                                        assert fisher.getAdditionalTripCosts().getFirst() instanceof HourlyCost;
+                                                                        final HourlyCost first = (HourlyCost) fisher.getAdditionalTripCosts().removeFirst();
+                                                                        HourlyCost replacement = new HourlyCost(first.getHourlyCost() / percentageOfTotalCost);
+                                                                        fisher.getAdditionalTripCosts().add(replacement);
+                                                                    }
+                                                                }
+                                                            }
+                                                            , StepOrder.DAWN, durationInDays
+                                                    );
+
+                                                }
+                                            },
+                                            StepOrder.DAWN,
+                                            yearStart
+                                    );
+
+                                }
+                            };
+
+                        }
+                    }
+
+            );
+
+
+
+        };
+    }
+
+
+
+
+    /**
+     * lowers the price of fish caught below the maturity value
+     * @param name
+     * @param filename
+     * @throws IOException
+     */
+    private static void priceShock(
+            String name,
+            final String filename,
+            final int durationInDays,
+            int yearStart
+    )throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(double markup=1; markup>=.5; markup=FishStateUtilities.round(markup-.1)) {
+
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
+
+
+
+            double finalMarkup = markup;
+            //add markup in the scenario
+            runner.setScenarioSetup(
+                    setupPriceShock(durationInDays,
+                            yearStart,
+                            markup)
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalMarkup).append(",");
+                }
+            });
+
+
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
+
+    /**
+     * lowers the price of fish caught below the maturity value
+     * @param name
+     * @param filename
+     * @throws IOException
+     */
+    private static void priceAndCostShock(
+            String name,
+            final String filename,
+            final int durationInDays,
+            int yearStart
+    )throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,sale_price_percentage,cost_percentage,duration,variable,value\n");
+        fileWriter.flush();
+
+        for(double percentageOfTotalSalePrice=1;
+            percentageOfTotalSalePrice>=.5;
+            percentageOfTotalSalePrice=FishStateUtilities.round(percentageOfTotalSalePrice-.1)) {
+
+            for (double percentageOfTotalCosts = 1;
+                 percentageOfTotalCosts <= 1.5;
+                 percentageOfTotalCosts = FishStateUtilities.round(percentageOfTotalCosts + .1)) {
+
+
+                BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
+
+
+                //this cast is needed to write to buffer
+                final double finalPercentageOfTotalPrice = percentageOfTotalSalePrice;
+                final double finalPercentageOfTotalCosts = percentageOfTotalCosts;
+
+                //add both change in price and costs
+                runner.setScenarioSetup(
+                        setupPriceShock(durationInDays,
+                                yearStart,
+                                percentageOfTotalSalePrice).andThen(
+                                        setupVariableCostShock(
+                                                durationInDays,
+                                                yearStart,
+                                                percentageOfTotalCosts
+                                        )
+                        )
+                );
+
+
+                runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                    @Override
+                    public void consume(StringBuffer writer, FishState model, Integer year) {
+                        writer.
+                                append(finalPercentageOfTotalPrice).append(",")
+                                .append(finalPercentageOfTotalCosts).append(",")
+                                .append(durationInDays).append(",");
+                    }
+                });
+
+
+                for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                    StringBuffer tidy = new StringBuffer();
+                    runner.run(tidy);
+                    fileWriter.write(tidy.toString());
+                    fileWriter.flush();
+                }
+            }
+        }
+        fileWriter.close();
+    }
+
+
+
     /**
      * lowers the price of fish caught below the maturity value
      * @param name
@@ -852,7 +1212,7 @@ public class Slice6Sweeps {
 
         for(double markup=0; markup<=1; markup=FishStateUtilities.round(markup+.25)) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -924,7 +1284,7 @@ public class Slice6Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -988,7 +1348,7 @@ public class Slice6Sweeps {
         fileWriter.flush();
 
 
-        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
         for(int failure = 1; failure>=0; failure--) {
 
@@ -1074,102 +1434,21 @@ public class Slice6Sweeps {
 
 
 
+
     @NotNull
     public static BatchRunner setupRunner(String filename, final int yearsToRun,
-                                          final int populations) {
-        ArrayList<String> columnsToPrint = Lists.newArrayList(
-                "Actual Average Cash-Flow",
-                "Lutjanus malabaricus Earnings",
-                "Lutjanus malabaricus Landings",
-                "Epinephelus areolatus Earnings",
-                "Epinephelus areolatus Landings",
-                "Lutjanus erythropterus Earnings",
-                "Lutjanus erythropterus Landings",
-                "Pristipomoides multidens Earnings",
-                "Pristipomoides multidens Landings",
-                "Actual Average Hours Out",
-
-                "Full-time fishers",
-                "Seasonal fishers",
-                "Retired fishers",
-
-//                "Depletion Epinephelus areolatus",
-//                "Depletion Pristipomoides multidens",
-//                "Depletion Lutjanus malabaricus",
-//                "Depletion Lutjanus erythropterus",
+                                          ArrayList<String> columnsToPrint) {
 
 
-//                "Actual Average Hours Out of population0",
-//                "Actual Average Hours Out of population1",
-//                "Actual Average Hours Out of population2",
-//                "Actual Average Hours Out of population3",
-                "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
-                "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
-                "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
-                "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
-                "Biomass Epinephelus areolatus",
-                "Biomass Pristipomoides multidens",
-                "Biomass Lutjanus malabaricus",
-                "Biomass Lutjanus erythropterus",
-                "SPR Oracle - " + "Epinephelus areolatus",
-                "SPR Oracle - " + "Pristipomoides multidens" ,
-                "SPR Oracle - " + "Lutjanus malabaricus",
-                "SPR Oracle - " + "Lutjanus erythropterus",
-                //  "Average Daily Fishing Mortality Lutjanus malabaricus",
-                "Yearly Fishing Mortality Lutjanus malabaricus",
-                "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
-                "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
-                "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
-                "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus");
 
-        for(int i=0; i<populations; i++){
-
-            columnsToPrint.add("Total Landings of population"+i);
-            columnsToPrint.add("Full-time fishers of population"+i);
-            columnsToPrint.add("Retired fishers of population"+i);
-            columnsToPrint.add("Seasonal fishers of population"+i);
-            columnsToPrint.add("Actual Average Cash-Flow of population"+i);
-            columnsToPrint.add("Average Number of Trips of population"+i);
-            columnsToPrint.add("Number Of Active Fishers of population"+i);
-            columnsToPrint.add("Average Distance From Port of population"+i);
-            columnsToPrint.add("Average Trip Duration of population"+i);
-            columnsToPrint.add("Epinephelus areolatus Landings of population"+i);
-            columnsToPrint.add("Pristipomoides multidens Landings of population"+i);
-            columnsToPrint.add("Lutjanus malabaricus Landings of population"+i);
-            columnsToPrint.add("Lutjanus erythropterus Landings of population"+i);
-            columnsToPrint.add("Others Landings of population"+i);
-            columnsToPrint.add("Actual Average Distance From Port of population"+i);
-            columnsToPrint.add("Actual Average Variable Costs of population"+i);
-            columnsToPrint.add("Total Variable Costs of population"+i);
-            columnsToPrint.add("Total Hours Out of population"+i);
-        }
-
-
-        for(int i=0; i<25; i++) {
-            columnsToPrint.add("Epinephelus areolatus Catches (kg) - age bin " + i);
-            columnsToPrint.add("Pristipomoides multidens Catches (kg) - age bin " + i);
-            columnsToPrint.add("Lutjanus malabaricus Catches (kg) - age bin " + i);
-            columnsToPrint.add("Lutjanus erythropterus Catches (kg) - age bin " + i);
-
-            columnsToPrint.add("Epinephelus areolatus Abundance 0."+i+" at day " + 365);
-            columnsToPrint.add("Lutjanus malabaricus Abundance 0."+i+" at day " + 365);
-            columnsToPrint.add("Pristipomoides multidens Abundance 0."+i+" at day " + 365);
-            columnsToPrint.add("Lutjanus erythropterus Abundance 0."+i+" at day " + 365);
-
-
-            columnsToPrint.add("Epinephelus areolatus Catches(#) 0."+i+" 100_areolatus");
-            columnsToPrint.add("Lutjanus malabaricus Catches(#) 0."+i+" 100_malabaricus");
-            columnsToPrint.add("Pristipomoides multidens Catches(#) 0."+i+" 100_multidens");
-            columnsToPrint.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
-        }
 
         BatchRunner batchRunner = new BatchRunner(
                 Paths.get(DIRECTORY,
-                          filename + ".yaml"),
+                        filename + ".yaml"),
                 yearsToRun,
                 columnsToPrint,
                 Paths.get(DIRECTORY,
-                          filename),
+                        filename),
                 null,
                 System.currentTimeMillis(),
                 -1
@@ -1188,7 +1467,7 @@ public class Slice6Sweeps {
 
         for (double increase = 1; increase <= 3; increase = FishStateUtilities.round5(increase + .25)) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
             //basically we want year 4 to change big boats regulations.
@@ -1220,7 +1499,7 @@ public class Slice6Sweeps {
 
                                                                 Cost hourlyCost = fisher.getAdditionalTripCosts().remove();
                                                                 Preconditions.checkState(hourlyCost instanceof HourlyCost,
-                                                                                         "I assumed here there would be only one additional cost! Careful with this sweep");
+                                                                        "I assumed here there would be only one additional cost! Careful with this sweep");
                                                                 double newCosts = ((HourlyCost) hourlyCost).getHourlyCost() * finalIncrease;
 
                                                                 fisher.getAdditionalTripCosts().add(
@@ -1282,7 +1561,7 @@ public class Slice6Sweeps {
 
         for(double increase=0; increase<=30; increase=FishStateUtilities.round5(increase+1)) {
 
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
 
@@ -1310,73 +1589,73 @@ public class Slice6Sweeps {
                                 @Override
                                 public AdditionalStartable apply(FishState state) {
 
-                                  return new AdditionalStartable(){
-                                      /**
-                                       * this gets called by the fish-state right after the scenario has started.
-                                       * It's useful to set up steppables
-                                       * or just to percolate a reference to the model
-                                       *
-                                       * @param model the model
-                                       */
-                                      @Override
-                                      public void start(FishState model) {
-                                          state.scheduleOnceAtTheBeginningOfYear(
-                                                  new Steppable() {
-                                                      @Override
-                                                      public void step(SimState simState) {
+                                    return new AdditionalStartable(){
+                                        /**
+                                         * this gets called by the fish-state right after the scenario has started.
+                                         * It's useful to set up steppables
+                                         * or just to percolate a reference to the model
+                                         *
+                                         * @param model the model
+                                         */
+                                        @Override
+                                        public void start(FishState model) {
+                                            state.scheduleOnceAtTheBeginningOfYear(
+                                                    new Steppable() {
+                                                        @Override
+                                                        public void step(SimState simState) {
 
 
-                                                          //modify gear factories
+                                                            //modify gear factories
 
-                                                          HomogeneousGearFactory malabaricus =
-                                                                  ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
-                                                                          gearPopulation0.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+                                                            HomogeneousGearFactory malabaricus =
+                                                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                            gearPopulation0.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
 
-                                                          ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
-                                                                  new FixedDoubleParameter(
-                                                                          ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
-                                                                                  + finalIncrease
-                                                                  )
-                                                          );
+                                                            ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
+                                                                    new FixedDoubleParameter(
+                                                                            ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
+                                                                                    + finalIncrease
+                                                                    )
+                                                            );
 
-                                                          malabaricus =
-                                                                  ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
-                                                                          gearPopulation3.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+                                                            malabaricus =
+                                                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                            gearPopulation3.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
 
-                                                          ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
-                                                                  new FixedDoubleParameter(
-                                                                          ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
-                                                                                  + finalIncrease
-                                                                  )
-                                                          );
+                                                            ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
+                                                                    new FixedDoubleParameter(
+                                                                            ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
+                                                                                    + finalIncrease
+                                                                    )
+                                                            );
 
-                                                          for (Fisher fisher : state.getFishers()) {
+                                                            for (Fisher fisher : state.getFishers()) {
 
-                                                              if(fisher.getTags().contains("population0")) {
-                                                                  fisher.setGear(gearPopulation0.apply(state));
+                                                                if(fisher.getTags().contains("population0")) {
+                                                                    fisher.setGear(gearPopulation0.apply(state));
 
-                                                              }else
-                                                              if(fisher.getTags().contains("population3")){
-                                                                  fisher.setGear(gearPopulation3.apply(state));
+                                                                }else
+                                                                if(fisher.getTags().contains("population3")){
+                                                                    fisher.setGear(gearPopulation3.apply(state));
 
-                                                              }
+                                                                }
 
-                                                          }
+                                                            }
 
-                                                      }
-                                                  }
-                                                  ,
-                                                  StepOrder.DAWN, yearsFromStart+1);
-                                      }
+                                                        }
+                                                    }
+                                                    ,
+                                                    StepOrder.DAWN, yearsFromStart+1);
+                                        }
 
-                                      /**
-                                       * tell the startable to turnoff,
-                                       */
-                                      @Override
-                                      public void turnOff() {
+                                        /**
+                                         * tell the startable to turnoff,
+                                         */
+                                        @Override
+                                        public void turnOff() {
 
-                                      }
-                                  };
+                                        }
+                                    };
 
                                 }
                             }
@@ -1425,7 +1704,7 @@ public class Slice6Sweeps {
             for(double probabilityOfCheating = 0; probabilityOfCheating<=1; probabilityOfCheating+=.2) {
 
                 probabilityOfCheating = FishStateUtilities.round(probabilityOfCheating);
-                BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
+                BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
 
                 int finalMaxDaysOut = maxDaysOut;

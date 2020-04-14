@@ -33,7 +33,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
 
 
     /**
-     * the selectivity parameter A for the logistic
+     * the selectivity parameter A for the logistic (simple version)
      */
     private DoubleParameter selexParameter1 = new FixedDoubleParameter(23.5035);
 

@@ -67,6 +67,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     private final double assumedLenghtAtMaturity;
 
+    private final Function<Pair<Integer, Integer>, Double> binLengthToWeightFunction;
+
     /**
      * object sampling fishers to keep track of their landings
      */
@@ -93,6 +95,14 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         this.assumedVarA = assumedVarA;
         this.assumedVarB = assumedVarB;
         this.assumedLenghtAtMaturity = assumedLenghtAtMaturity;
+        binLengthToWeightFunction = new Function<>() {
+            @Override
+            public Double apply(Pair<Integer, Integer> subBinPair) {
+
+                return assumedVarA / 1000 * Math.pow(species.getLength(subBinPair.getFirst(),
+                        subBinPair.getSecond()), assumedVarB);
+            }
+        };
     }
 
 
@@ -103,14 +113,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
         double spr = SPR.computeSPR(
                 new StructuredAbundance(sampler.getAbundance(
-                        new Function<Pair<Integer, Integer>, Double>() {
-                            @Override
-                            public Double apply(Pair<Integer, Integer> subBinPair) {
-
-                                return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
-                                        subBinPair.getSecond()), assumedVarB);
-                            }
-                        }
+                        binLengthToWeightFunction
                 )),
                 species,
                 assumedNaturalMortality,
@@ -142,30 +145,67 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     }
 
 
+    /**
+     * computes % of ABUNDANCE (raw number) of the catch above Lmat
+     * @return
+     */
     @VisibleForTesting
     public double computeMaturityRatio(){
         double matureCatch = 0;
         double allCatches = 0;
         double[][] abundance = sampler.getAbundance(
-                new Function<Pair<Integer, Integer>, Double>() {
-                    @Override
-                    public Double apply(Pair<Integer, Integer> subBinPair) {
-
-                        return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
-                                subBinPair.getSecond()), assumedVarB);
-                    }
-                }
+                binLengthToWeightFunction
         );
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                allCatches += abundance[subdivision][bin];
-                if(species.getLength(subdivision,bin)>= assumedLenghtAtMaturity)
-                    matureCatch+=abundance[subdivision][bin];
+                assert Double.isFinite(abundance[subdivision][bin]) || bin==0; //for some formulas weight at 0 length is undefined
+                if(Double.isFinite(abundance[subdivision][bin])) {
+                    allCatches += abundance[subdivision][bin];
+                    if (species.getLength(subdivision, bin) >= assumedLenghtAtMaturity)
+                        matureCatch += abundance[subdivision][bin];
+                }
             }
         }
         assert matureCatch <= allCatches;
         return matureCatch/allCatches;
     }
+
+    /**
+     * computes % of ABUNDANCE (raw number) of the catch above Lmat
+     * @return
+     */
+    @VisibleForTesting
+    public double computeLoptRatio(){
+        /**
+         * the guessed length at which you'd catch it if you had perfect info would be...
+         *
+         * formula is embedded in the sql computations but you can find it, for example, in https://doi.org/10.1093/icesjms/fsy078
+         * rounded to keep it consistent
+         */
+        int lopt = (int) Math.round(assumedLinf * (3/(3+assumedNaturalMortality/assumedKParameter)));
+
+
+
+        double superMatureCatch = 0;
+        double allCatches = 0;
+        //weight abundance for each bin
+        double[][] abundance = sampler.getAbundance(
+                binLengthToWeightFunction
+        );
+        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                assert Double.isFinite(abundance[subdivision][bin]) || bin == 0; //for some formulas weight at 0 length is undefined
+                if (Double.isFinite(abundance[subdivision][bin])) {
+                    allCatches += abundance[subdivision][bin];
+                    if (species.getLength(subdivision, bin) >= lopt)
+                        superMatureCatch += abundance[subdivision][bin];
+                }
+            }
+        }
+        assert superMatureCatch <= allCatches;
+        return superMatureCatch/allCatches;
+    }
+
 
 
     /**
@@ -222,6 +262,16 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
 
         model.getYearlyDataSet().registerGatherer("Percentage Mature Catches " + species + " " + surveyTag,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        double ratio = computeMaturityRatio();
+                        return ratio;
+
+                    }
+                },Double.NaN);
+
+        model.getYearlyDataSet().registerGatherer("Percentage Lopt Catches " + species + " " + surveyTag,
                 new Gatherer<FishState>() {
                     @Override
                     public Double apply(FishState fishState) {
