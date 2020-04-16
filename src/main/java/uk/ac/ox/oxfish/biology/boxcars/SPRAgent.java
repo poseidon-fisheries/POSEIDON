@@ -95,7 +95,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         this.assumedVarA = assumedVarA;
         this.assumedVarB = assumedVarB;
         this.assumedLenghtAtMaturity = assumedLenghtAtMaturity;
-        binLengthToWeightFunction = new Function<>() {
+        binLengthToWeightFunction = new Function<Pair<Integer, Integer>, Double>() {
             @Override
             public Double apply(Pair<Integer, Integer> subBinPair) {
 
