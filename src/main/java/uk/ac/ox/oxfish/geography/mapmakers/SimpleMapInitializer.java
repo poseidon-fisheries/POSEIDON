@@ -58,6 +58,12 @@ public class SimpleMapInitializer implements MapInitializer {
     private final  double cellSizeInKilometers;
     private final int maxLandWidth;
 
+
+    private final double minInitialDepth;
+
+    private final double maxInitialDepth;
+
+
     public SimpleMapInitializer(
             int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
             int maxLandWidth) {
@@ -67,8 +73,24 @@ public class SimpleMapInitializer implements MapInitializer {
         this.depthSmoothing = depthSmoothing;
         this.cellSizeInKilometers = cellSizeInKilometers;
         this.maxLandWidth = maxLandWidth;
+        this.minInitialDepth = 5000;
+        this.maxInitialDepth = 5000;
     }
 
+
+    public SimpleMapInitializer(
+            int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
+            int maxLandWidth, double minDepth, double maxDepth) {
+        this.width = width;
+        this.height = height;
+        this.coastalRoughness = coastalRoughness;
+        this.depthSmoothing = depthSmoothing;
+        this.cellSizeInKilometers = cellSizeInKilometers;
+        this.maxLandWidth = maxLandWidth;
+        this.maxInitialDepth = maxDepth;
+        this.minInitialDepth = minDepth;
+
+    }
     /**
      * creates the map. Because there are no real obstacles I am going to assume straight pathfinder and cartesian distance
      * @param random the randomizer
@@ -88,8 +110,9 @@ public class SimpleMapInitializer implements MapInitializer {
 
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {
+                double depth = random.nextDouble()*(maxInitialDepth-minInitialDepth) + minInitialDepth;
                 baseGrid.field[x][y] = x <width- actualLandWidth ?
-                        new SeaTile(x, y, -random.nextInt(5000), new TileHabitat(0d)) :
+                        new SeaTile(x, y, -depth, new TileHabitat(0d)) :
                         new SeaTile(x,y,2000, new TileHabitat(0d));
             }
         /***

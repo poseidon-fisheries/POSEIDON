@@ -43,6 +43,11 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
 
     private DoubleParameter maxLandWidth= new FixedDoubleParameter(10);
 
+    private DoubleParameter minInitialDepth = new FixedDoubleParameter(5000);
+
+    private DoubleParameter maxInitialDepth = new FixedDoubleParameter(5000);
+
+
 
     public SimpleMapInitializerFactory() {
     }
@@ -73,7 +78,11 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
                 coastalRoughness.apply(fishState.getRandom()).intValue(),
                 depthSmoothing.apply(fishState.getRandom()).intValue(),
                 cellSizeInKilometers.apply(fishState.getRandom()),
-                maxLandWidth.apply(fishState.getRandom()).intValue());
+                maxLandWidth.apply(fishState.getRandom()).intValue(),
+                minInitialDepth.apply(fishState.getRandom()),
+                maxInitialDepth.apply(fishState.getRandom())
+
+        );
 
     }
 
@@ -134,5 +143,21 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
      */
     public void setMaxLandWidth(DoubleParameter maxLandWidth) {
         this.maxLandWidth = maxLandWidth;
+    }
+
+    public DoubleParameter getMinInitialDepth() {
+        return minInitialDepth;
+    }
+
+    public void setMinInitialDepth(DoubleParameter minInitialDepth) {
+        this.minInitialDepth = minInitialDepth;
+    }
+
+    public DoubleParameter getMaxInitialDepth() {
+        return maxInitialDepth;
+    }
+
+    public void setMaxInitialDepth(DoubleParameter maxInitialDepth) {
+        this.maxInitialDepth = maxInitialDepth;
     }
 }
