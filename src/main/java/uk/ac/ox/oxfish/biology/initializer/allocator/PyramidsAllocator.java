@@ -159,4 +159,20 @@ public class PyramidsAllocator implements BiomassAllocator {
 
         }
     }
+
+    public int getNumberOfPeaks() {
+        return numberOfPeaks;
+    }
+
+    public double getSmoothingValue() {
+        return smoothingValue;
+    }
+
+    public int getMaxSpread() {
+        return maxSpread;
+    }
+
+    public double getPeakBiomass() {
+        return peakBiomass;
+    }
 }
