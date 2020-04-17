@@ -249,6 +249,8 @@ public class NoData718Slice3 {
 
         }
 
+        genericPopSetup(2);
+
 
         //single peak for all three, since it is automatically reversed for atrobucca
         parameters.add(
@@ -574,7 +576,8 @@ public class NoData718Slice3 {
 
         System.out.println("scenario " + args[0]);
         int directory = Integer.parseInt(args[0]);
-        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
+        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0,
+                predicates);
 
 
 
