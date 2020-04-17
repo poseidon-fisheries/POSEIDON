@@ -53,7 +53,7 @@ public class NoData718Slice1 {
 
 
     //you need to pass all of these to be "accepted"!
-    public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+    private static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
 
     private static final String SCENARIO_DIRECTORY = "scenarios_censored";
 
@@ -468,17 +468,18 @@ public class NoData718Slice1 {
 
         System.out.println("scenario " + args[0]);
         int directory = Integer.parseInt(args[0]);
-        runDirectory(MAIN_DIRECTORY.resolve(SCENARIO_DIRECTORY).resolve("batch"+ directory), 0);
+        runDirectory(MAIN_DIRECTORY.resolve(SCENARIO_DIRECTORY).resolve("batch"+ directory), 0, predicates);
 
 
 
     }
 
 
-    public static Optional<Integer> runModelOnce(Scenario scenarioToRun,
-                                                 int maxYearsToRun, long seed,
-                                                 String nameOfScenario,
-                                                 FileWriter summaryStatisticsFile) throws IOException {
+    public static Optional<Integer> runModelOnce(
+            Scenario scenarioToRun,
+            int maxYearsToRun, long seed,
+            String nameOfScenario,
+            FileWriter summaryStatisticsFile, final List<AcceptableRangePredicate> predicates) throws IOException {
 
         //run the model
         FishState model = new FishState(seed);
@@ -533,7 +534,7 @@ public class NoData718Slice1 {
 
 
 
-    public static void runDirectory(Path directory, long seed) throws IOException {
+    public static void runDirectory(Path directory, long seed, final List<AcceptableRangePredicate> predicates) throws IOException {
 
         File[] scenarios = directory.toFile().listFiles(new FilenameFilter() {
             @Override
@@ -567,7 +568,7 @@ public class NoData718Slice1 {
                 long start = System.currentTimeMillis();
                 result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed,
                                       scenarioFile.getAbsolutePath(),
-                                      writer2);
+                                      writer2, predicates);
                 long end = System.currentTimeMillis();
                 System.out.println( "Run lasted: " + (end-start)/1000 + " seconds");
             }
