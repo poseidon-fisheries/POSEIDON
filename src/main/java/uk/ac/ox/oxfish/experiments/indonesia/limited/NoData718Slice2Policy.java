@@ -26,7 +26,7 @@ public class NoData718Slice2Policy {
 
     private static Map<String,String> speciesToSprAgent =
             new HashMap<>(3);
-    {
+    static {
         speciesToSprAgent.put("Atrobucca brevis","spr_agent3");
         speciesToSprAgent.put("Lutjanus malabaricus","spr_agent2");
         speciesToSprAgent.put("Lethrinus laticaudis","spr_agent1");
@@ -118,37 +118,37 @@ public class NoData718Slice2Policy {
 
         );
 //
-//        policies.put(
-//                "BAU_noentry",
-//                shockYear -> NoDataPolicy.removeEntry(shockYear)
-//
-//        );
+        policies.put(
+                "BAU_noentry",
+                shockYear -> NoDataPolicy.removeEntry(shockYear)
+
+        );
 
 
-//        policies.put(
-//                "100_days_noentry",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
-//                        NoDataPolicy.removeEntry(shockYear)
-//                )
-//
-//        );
-//
+        policies.put(
+                "100_days_noentry",
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
+                        NoDataPolicy.removeEntry(shockYear)
+                )
 
-//        policies.put(
-//                "180_days_noentry",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,180).andThen(
-//                        NoDataPolicy.removeEntry(shockYear)
-//                )
-//
-//        );
-//
-//        policies.put(
-//                "150_days_noentry",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,150).andThen(
-//                        NoDataPolicy.removeEntry(shockYear)
-//                )
-//
-//        );
+        );
+
+
+        policies.put(
+                "180_days_noentry",
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,180).andThen(
+                        NoDataPolicy.removeEntry(shockYear)
+                )
+
+        );
+
+        policies.put(
+                "150_days_noentry",
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,150).andThen(
+                        NoDataPolicy.removeEntry(shockYear)
+                )
+
+        );
 ////
 
 

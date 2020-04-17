@@ -37,25 +37,25 @@ public class NoData718Slice2 {
 
 
     //you need to pass all of these to be "accepted"!
-    public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+    private static final List<AcceptableRangePredicate> PREDICATES = new LinkedList<>();
     static {
-        predicates.add(new AcceptableRangePredicate(
-                0.002,0.10,"SPR " + "Atrobucca brevis" + " " + "spr_agent"
+        PREDICATES.add(new AcceptableRangePredicate(
+                0.002,0.10,"SPR " + "Atrobucca brevis" + " " + "spr_agent3"
         ));
-        predicates.add(new AcceptableRangePredicate(
-                0.025,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent"
+        PREDICATES.add(new AcceptableRangePredicate(
+                0.025,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent2"
         ));
-        predicates.add(new AcceptableRangePredicate(
-                0.4,100,"SPR " + "Lethrinus laticaudis" + " " + "spr_agent"
+        PREDICATES.add(new AcceptableRangePredicate(
+                0.4,100,"SPR " + "Lethrinus laticaudis" + " " + "spr_agent1"
         ));
-        predicates.add(new AcceptableRangePredicate(
+        PREDICATES.add(new AcceptableRangePredicate(
                 2500000,5000000,"Lutjanus malabaricus Landings"
         ));
-        predicates.add(new AcceptableRangePredicate(
+        PREDICATES.add(new AcceptableRangePredicate(
                 400000, 2000000, //1200000,
                 "Lethrinus laticaudis Landings"
         ));
-        predicates.add(new AcceptableRangePredicate(
+        PREDICATES.add(new AcceptableRangePredicate(
                 600000,2000000,"Atrobucca brevis Landings"
         ));
 
@@ -84,7 +84,6 @@ public class NoData718Slice2 {
 
 
 
-    //todo add an initial B_t/K shock
 
     public static final int BATCHES = 5;
     public static final int SCENARIOS_PER_BATCH = 10000;
@@ -239,6 +238,7 @@ public class NoData718Slice2 {
 
         }
 
+        genericPopSetup(2);
 
 
         for (int i = 0; i < validSpecies.length; i++)
@@ -464,7 +464,7 @@ public class NoData718Slice2 {
     }
 
     private static void buildScenarios() throws IOException {
-        for (int batch = 5; batch < 5+ BATCHES; batch++)
+        for (int batch = 10; batch < 10+ BATCHES; batch++)
         {
 
             final Path folder =
@@ -527,14 +527,15 @@ public class NoData718Slice2 {
     public static void main(String[] args) throws IOException {
 
 
-//     buildScenarios();
+     buildScenarios();
 
 
-
+/*
         System.out.println("scenario " + args[0]);
         int directory = Integer.parseInt(args[0]);
-        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
-
+        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0,
+                                     PREDICATES);
+*/
 
 
     }
