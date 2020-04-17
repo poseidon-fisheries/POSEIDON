@@ -42,8 +42,10 @@ import java.util.function.Consumer;
 public class Slice6Sweeps {
 
 
-    private static final String SCENARIO_NAME = "tropfishR_tl_2yr_8h";
-    // "lime_monthly2yr_8h"
+    private static final String SCENARIO_NAME = //"tropfishR_tl_2yr_8h";
+     "lime_monthly2yr_8h";
+
+
     // "new_cmsy_tropfishR_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";

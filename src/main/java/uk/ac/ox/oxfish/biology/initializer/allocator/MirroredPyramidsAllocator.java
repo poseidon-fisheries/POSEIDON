@@ -22,6 +22,10 @@ public class MirroredPyramidsAllocator implements BiomassAllocator{
 
     @Override
     public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        if(tile.isLand())
+            return 0d;
+
+
         return 1d-originalPyramid.allocate(tile, map, random)/originalPyramid.getPeakBiomass() +
                 random.nextDouble()*noiseLevel;
 

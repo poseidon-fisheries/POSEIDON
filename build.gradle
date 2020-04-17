@@ -237,14 +237,14 @@ task fatJarNoDataSlice2(type: com.github.jengelman.gradle.plugins.shadow.tasks.S
     }
 }
 
-task fatJar718NoDataSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task fatJar718NoData(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
-    archiveFileName = 'oxfish_nodata718slice1.jar'
+    archiveFileName = 'oxfish_nodata718slice3.jar'
     from sourceSets.main.output //tells the task to include the project code
     configurations = [project.configurations.compile]
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
-        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice1'
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice3'
     }
 }
 
