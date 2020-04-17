@@ -134,7 +134,9 @@ task fatJar(type: ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_executable.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.Main'
@@ -152,7 +154,9 @@ task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJ
     mergeServiceFiles()
     archiveFileName = 'maximizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.MainOptimizer'
@@ -163,7 +167,9 @@ task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.
     mergeServiceFiles()
     archiveFileName = 'console_optimizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.OptimizerConsole'
@@ -174,7 +180,9 @@ task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     mergeServiceFiles()
     archiveFileName = 'calicatch.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.CaliCatchCalibration'
@@ -185,7 +193,9 @@ task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     mergeServiceFiles()
     archiveFileName = 'indirectInference.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
@@ -199,7 +209,9 @@ task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
     mergeServiceFiles()
     archiveFileName = 'yamler.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.YamlMain'
@@ -219,7 +231,9 @@ task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJa
     mergeServiceFiles()
     archiveFileName = 'oxfish_batch.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+        project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
@@ -230,7 +244,8 @@ task fatJarNoDataSlice2(type: com.github.jengelman.gradle.plugins.shadow.tasks.S
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodataslice2.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataSlice2'
@@ -241,7 +256,8 @@ task fatJar718NoData(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodata718slice3.jar'
     from sourceSets.main.output //tells the task to include the project code
-    configurations = [project.configurations.compile]
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
         attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice3'
