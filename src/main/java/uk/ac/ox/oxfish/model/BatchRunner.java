@@ -181,6 +181,11 @@ public class BatchRunner
         return yamlFile.getFileName().toString().split("\\.")[0];
     }
 
+
+    public Path getFolderWhereSingleFilesAreDumped(){
+        return getOutputFolder().resolve(guessSimulationName());
+    }
+
     /**
      * Getter for property 'yamlFile'.
      *

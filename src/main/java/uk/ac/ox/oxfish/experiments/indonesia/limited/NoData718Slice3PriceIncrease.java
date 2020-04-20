@@ -21,6 +21,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -221,7 +222,7 @@ public class NoData718Slice3PriceIncrease {
             );
 
 
-            BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, outputFolder,SEED);
+            BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, null,SEED);
 
             //give it the scenario
             runner.setScenarioSetup(policy);
@@ -239,9 +240,9 @@ public class NoData718Slice3PriceIncrease {
             fileWriter.write(tidy.toString());
             fileWriter.flush();
 
+
         }
         fileWriter.close();
-
 
     }
 
