@@ -47,14 +47,14 @@ public class NoData718Slice3 {
     //you need to pass all of these to be "accepted"!
     public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
     static {
-//        predicates.add(new AcceptableRangePredicate(
-//                0.002,0.10,"SPR " + "Atrobucca brevis" + " " + "spr_agent"
-//        ));
         predicates.add(new AcceptableRangePredicate(
-                0.025,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent"
+                0,99999,"SPR " + "Atrobucca brevis" + " " + "spr_agent3"
         ));
         predicates.add(new AcceptableRangePredicate(
-                0.4,100,"SPR " + "Lethrinus laticaudis" + " " + "spr_agent"
+                0.025,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent2"
+        ));
+        predicates.add(new AcceptableRangePredicate(
+                0.4,100,"SPR " + "Lethrinus laticaudis" + " " + "spr_agent1"
         ));
         predicates.add(new AcceptableRangePredicate(
                 2500000,5000000,"Lutjanus malabaricus Landings"
@@ -63,9 +63,9 @@ public class NoData718Slice3 {
                 400000, 2000000, //1200000,
                 "Lethrinus laticaudis Landings"
         ));
-//        predicates.add(new AcceptableRangePredicate(
-//                600000,2000000,"Atrobucca brevis Landings"
-//        ));
+        predicates.add(new AcceptableRangePredicate(
+                0,992000000,"Atrobucca brevis Landings"
+        ));
 
 
 

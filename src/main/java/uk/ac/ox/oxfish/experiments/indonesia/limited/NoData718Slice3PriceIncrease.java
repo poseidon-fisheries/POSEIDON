@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -26,107 +27,25 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class NoData718Slice2PriceIncrease {
+public class NoData718Slice3PriceIncrease {
 
 
-    private static final int POPULATIONS = 3;
-
-    private static Map<String,String> speciesToSprAgent =
-            new HashMap<>(3);
-    static {
-        speciesToSprAgent.put("Atrobucca brevis","spr_agent3");
-        speciesToSprAgent.put("Lutjanus malabaricus","spr_agent2");
-        speciesToSprAgent.put("Lethrinus laticaudis","spr_agent1");
-    }
-
-
-
-
-    private static final  long SEED = 0;
-
-    @NotNull
-    public static BatchRunner setupRunner(
-            Path scenarioFile,
-            final int yearsToRun,
-            Path outputFolder, long seed) {
-        ArrayList<String> columnsToPrint = Lists.newArrayList(
-                "Actual Average Cash-Flow",
-                "Actual Average Hours Out",
-
-                "Full-time fishers",
-                "Seasonal fishers",
-
-                "Retired fishers"
-
-
-        );
-
-
-        for (String species : NoData718Slice1.validSpecies) {
-            final String agent = speciesToSprAgent.get(species);
-            Preconditions.checkNotNull(agent, "species has no agent!");
-            columnsToPrint.add("SPR " + species + " " + agent);
-            columnsToPrint.add("Biomass " + species);
-            columnsToPrint.add("Bt/K " + species);
-            columnsToPrint.add("Percentage Mature Catches " + species + " "+ agent);
-            columnsToPrint.add(species + " Earnings");
-            columnsToPrint.add(species + " Landings");
-
-        }
-
-        for(int i = 0; i< POPULATIONS; i++){
-            columnsToPrint.add("Total Hours Out of population"+i);
-            columnsToPrint.add("Seasonal fishers of population"+i);
-            columnsToPrint.add("Retired fishers of population"+i);
-            columnsToPrint.add("Full-time fishers of population"+i);
-            columnsToPrint.add("Total Landings of population"+i);
-            columnsToPrint.add("Actual Average Cash-Flow of population"+i);
-            columnsToPrint.add("Average Number of Trips of population"+i);
-            columnsToPrint.add("Number Of Active Fishers of population"+i);
-            columnsToPrint.add("Average Distance From Port of population"+i);
-            columnsToPrint.add("Average Trip Duration of population"+i);
-            for (String species : NoData718Slice1.validSpecies) {
-                columnsToPrint.add(species+ " Landings of population" + i);
-                columnsToPrint.add(species+" Landings of population" + i);
-            }
-        }
-
-
-        return new BatchRunner(
-                scenarioFile,
-                yearsToRun,
-                columnsToPrint,
-                outputFolder,
-                null,
-                seed,
-                -1
-        );
-    }
-
-
+    public static final String CANDIDATES_CSV_FILE = "price_shock_candidates_max_highspr.csv";
     private static Path OUTPUT_FOLDER =
-                NoData718Slice2.MAIN_DIRECTORY.resolve("price_test_success");
+            NoData718Slice3.MAIN_DIRECTORY.resolve("price_shock_max_highspr");
 
 
-    static final private double newCroakerPrice = 350000; //glaudy's report
+    static final private double newCroakerPriceDobo = 80000; //glaudy's report
 
-    /**
-     * give me a year and I will give you a policy
-     */
+    static final private double newCroakerPriceProbolinggo = 350000; //glaudy's report
+
     static private LinkedHashMap<String,
-            Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
+            Function<Integer, Consumer<Scenario>>> priceIncreasePolicies = new LinkedHashMap();
 
     static {
 
-        policies.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
 
-        );
-
-
-        policies.put(
+        priceIncreasePolicies.put(
                 "Price Shock",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
@@ -147,7 +66,7 @@ public class NoData718Slice2PriceIncrease {
 
         );
 
-        policies.put(
+        priceIncreasePolicies.put(
                 "Price Shock minus 2",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
@@ -168,7 +87,7 @@ public class NoData718Slice2PriceIncrease {
 
         );
 
-        policies.put(
+        priceIncreasePolicies.put(
                 "Price Shock minus 5",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
@@ -188,7 +107,16 @@ public class NoData718Slice2PriceIncrease {
                 }
 
         );
+
+        priceIncreasePolicies.put(
+                "BAU",
+                shockYear -> scenario -> {
+                }
+
+        );
+
     }
+
 
     @NotNull
     public static AlgorithmFactory<AdditionalStartable> priceIncreaseEvent(Integer shockYear) {
@@ -203,10 +131,18 @@ public class NoData718Slice2PriceIncrease {
                                     @Override
                                     public void step(SimState simState) {
                                         for (Port port : model.getPorts()) {
+                                            System.out.println(port.getName());
                                             //assuming here all fishers get the same treatment
-                                            ((FixedPriceMarket) port.getMarketMap(null).getMarket(
-                                                    model.getBiology().getSpecie("Atrobucca brevis")
-                                            )).setPrice(newCroakerPrice);
+                                            if(port.getName() == "Port 0") {
+                                                ((FixedPriceMarket) port.getMarketMap(null).getMarket(
+                                                        model.getBiology().getSpecie("Atrobucca brevis")
+                                                )).setPrice(newCroakerPriceDobo);
+                                            }
+                                            else{
+                                                ((FixedPriceMarket) ((MarketProxy) port.getMarketMap(null).getMarket(
+                                                        model.getBiology().getSpecie("Atrobucca brevis")
+                                                )).getDelegate()).setPrice(newCroakerPriceProbolinggo);
+                                            }
                                         }
                                     }
                                 },
@@ -222,10 +158,10 @@ public class NoData718Slice2PriceIncrease {
     }
 
 
-        public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         CSVReader reader = new CSVReader(new FileReader(
-                OUTPUT_FOLDER.getParent().resolve("success.csv").toFile()
+                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile()
         ));
 
         List<String[]> strings = reader.readAll();
@@ -240,15 +176,12 @@ public class NoData718Slice2PriceIncrease {
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
                     OUTPUT_FOLDER,
-                    policies
+                    priceIncreasePolicies
             );
         }
 
 
     }
-
-
-
 
 
 
@@ -288,7 +221,7 @@ public class NoData718Slice2PriceIncrease {
             );
 
 
-            BatchRunner runner = setupRunner(scenarioFile, shockYear+5, outputFolder, SEED);
+            BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, outputFolder,SEED);
 
             //give it the scenario
             runner.setScenarioSetup(policy);
@@ -311,6 +244,10 @@ public class NoData718Slice2PriceIncrease {
 
 
     }
+
+
+    private static final  long SEED = 0;
+
 
 
 }

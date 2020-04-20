@@ -534,7 +534,9 @@ public class NoData718Slice1 {
 
 
 
-    public static void runDirectory(Path directory, long seed, final List<AcceptableRangePredicate> predicates) throws IOException {
+    public static void runDirectory(Path directory, long seed,
+                                    final List<AcceptableRangePredicate> predicates) throws
+            IOException {
 
         File[] scenarios = directory.toFile().listFiles(new FilenameFilter() {
             @Override
