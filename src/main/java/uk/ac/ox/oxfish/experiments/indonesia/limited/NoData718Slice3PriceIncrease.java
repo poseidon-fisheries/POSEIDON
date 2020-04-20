@@ -68,6 +68,31 @@ public class NoData718Slice3PriceIncrease {
         );
 
         priceIncreasePolicies.put(
+                "Price Shock from 0",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+
+                        return new Consumer<Scenario>() {
+                            @Override
+                            public void accept(Scenario scenario) {
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        priceIncreaseEvent(shockYear)
+                                );
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        zeroPriceEvent()
+                                );
+                            }
+                        };
+
+
+                    }
+                }
+
+        );
+
+
+        priceIncreasePolicies.put(
                 "Price Shock minus 2",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
@@ -78,6 +103,29 @@ public class NoData718Slice3PriceIncrease {
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
                                         priceIncreaseEvent(shockYear-2)
+                                );
+                            }
+                        };
+
+
+                    }
+                }
+
+        );
+        priceIncreasePolicies.put(
+                "Price Shock minus 2 from 0",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+
+                        return new Consumer<Scenario>() {
+                            @Override
+                            public void accept(Scenario scenario) {
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        priceIncreaseEvent(shockYear-2)
+                                );
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        zeroPriceEvent()
                                 );
                             }
                         };
@@ -99,6 +147,29 @@ public class NoData718Slice3PriceIncrease {
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
                                         priceIncreaseEvent(shockYear-5)
+                                );
+                            }
+                        };
+
+
+                    }
+                }
+
+        );
+        priceIncreasePolicies.put(
+                "Price Shock minus 5 from 0",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+
+                        return new Consumer<Scenario>() {
+                            @Override
+                            public void accept(Scenario scenario) {
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        priceIncreaseEvent(shockYear-5)
+                                );
+                                ((FlexibleScenario) scenario).getPlugins().add(
+                                        zeroPriceEvent()
                                 );
                             }
                         };
@@ -158,6 +229,45 @@ public class NoData718Slice3PriceIncrease {
         };
     }
 
+
+    @NotNull
+    public static AlgorithmFactory<AdditionalStartable> zeroPriceEvent() {
+        return new AlgorithmFactory<AdditionalStartable>() {
+            @Override
+            public AdditionalStartable apply(FishState fishState) {
+                return new AdditionalStartable() {
+                    @Override
+                    public void start(FishState model) {
+                        model.scheduleOnceAtTheBeginningOfYear(
+                                new Steppable() {
+                                    @Override
+                                    public void step(SimState simState) {
+                                        for (Port port : model.getPorts()) {
+                                            System.out.println(port.getName());
+                                            //assuming here all fishers get the same treatment
+                                            if(port.getName() == "Port 0") {
+                                                ((FixedPriceMarket) port.getMarketMap(null).getMarket(
+                                                        model.getBiology().getSpecie("Atrobucca brevis")
+                                                )).setPrice(0);
+                                            }
+                                            else{
+                                                ((FixedPriceMarket) ((MarketProxy) port.getMarketMap(null).getMarket(
+                                                        model.getBiology().getSpecie("Atrobucca brevis")
+                                                )).getDelegate()).setPrice(0);
+                                            }
+                                        }
+                                    }
+                                },
+                                StepOrder.DAWN,
+                                1
+                        );
+                    }
+                };
+
+
+            }
+        };
+    }
 
     public static void main(String[] args) throws IOException {
 
