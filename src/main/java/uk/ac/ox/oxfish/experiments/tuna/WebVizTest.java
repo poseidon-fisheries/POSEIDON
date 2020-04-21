@@ -101,73 +101,73 @@ public final class WebVizTest {
         ));
 
         jsonOutputManagerFactory.setChartBuilderFactories(ImmutableList.of(
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass per species",
                 "Biomass (kg)",
                 speciesNames,
                 "Biomass %s"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Landings per species",
                 "Landings (kg)",
                 speciesNames,
                 "%s Landings"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Recruitment per species",
                 "Recruitment (kg)",
                 speciesNames,
                 "%s Recruitment"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Average catch per set per species",
                 "Average catch (kg)",
                 speciesNames,
                 "Average %s catches by set"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from FAD sets per species",
                 "Catch (kg)",
                 speciesNames,
                 "Sum of %s catches from FAD sets"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from unassociated sets per species",
                 "Catch (kg)",
                 speciesNames,
                 "Sum of %s catches from unassociated sets"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from unassociated sets (kg)",
                 "Catch (kg)",
                 speciesNames,
                 "Sum of %s catches from unassociated sets"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass under FADs per species",
                 "Biomass (kg)",
                 speciesNames,
                 "Sum of %s biomass under FADs"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "FAD deployments per region",
                 "Number of FAD deployments",
                 REGION_NAMES,
                 "Number of FAD deployments (%s)"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "FAD sets per region",
                 "Number of FAD sets",
                 REGION_NAMES,
                 "Number of FAD sets (%s)"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Unassociated sets per region",
                 "Number of unassociated sets",
                 REGION_NAMES,
                 "Number of unassociated sets (%s)"
             ),
-            ChartBuilderFactory.fromValues(
+            ChartBuilderFactory.fromColumnNamePattern(
                 "Number of actions per action type",
                 "Number of actions",
                 ImmutableList.of("FAD deployments", "FAD sets", "unassociated sets"),

@@ -57,7 +57,7 @@ public final class ChartBuilderFactory implements
     private Collection<String> seriesColours = SET1.getHtmlColours();
     private boolean xAxisIsSimulationTimeInYears = true;
     private Collection<Double> yLines = ImmutableList.of();
-    private Map<String, String> columnNamesAndLegends = ImmutableMap.of();
+    private Map<String, String> dataColumnNamesAndLegends = ImmutableMap.of();
     private DoubleUnaryOperator valueTransformer = v -> v;
 
     @NotNull public static <T> ChartBuilderFactory fromVesselClassifier(
@@ -67,7 +67,7 @@ public final class ChartBuilderFactory implements
         final Function<T, String> columnNameExtractor
     ) {
 
-        final ChartBuilderFactory chartBuilderFactory = ChartBuilderFactory.fromValues(
+        final ChartBuilderFactory chartBuilderFactory = ChartBuilderFactory.fromSeriesIdentifiers(
             title,
             yLabel,
             vesselClassifier.getTypes(),
@@ -84,58 +84,61 @@ public final class ChartBuilderFactory implements
         return chartBuilderFactory;
     }
 
-    @NotNull public static <T> ChartBuilderFactory fromValues(
+    @NotNull public static <T> ChartBuilderFactory fromSeriesIdentifiers(
         final String title,
         final String yLabel,
-        final Iterable<T> values,
-        final Function<T, String> columnNameExtractor,
-        final Function<T, String> columnLegendExtractor
+        final Iterable<T> seriesIdentifiers,
+        final Function<T, String> seriesIdentifierToDataColumnName,
+        final Function<T, String> seriesIdentifierToLegend
     ) {
-        return fromColumnNamesAndLegends(
+        return fromDataColumnNames(
             title,
             yLabel,
-            stream(values).collect(toImmutableMap(columnNameExtractor, columnLegendExtractor))
+            stream(seriesIdentifiers).collect(toImmutableMap(
+                seriesIdentifierToDataColumnName,
+                seriesIdentifierToLegend
+            ))
         );
     }
 
-    @NotNull public static ChartBuilderFactory fromColumnNamesAndLegends(
+    @NotNull public static ChartBuilderFactory fromDataColumnNames(
         final String title,
         final String yLabel,
-        Map<String, String> columnNamesAndLegends
+        Map<String, String> dataColumnNamesAndLegends
     ) {
         final ChartBuilderFactory chartBuilderFactory = new ChartBuilderFactory();
         chartBuilderFactory.setTitle(title);
         chartBuilderFactory.setYLabel(yLabel);
-        chartBuilderFactory.setColumnNamesAndLegends(ImmutableMap.copyOf(columnNamesAndLegends));
+        chartBuilderFactory.setDataColumnNamesAndLegends(ImmutableMap.copyOf(dataColumnNamesAndLegends));
         return chartBuilderFactory;
     }
 
-    @NotNull public static ChartBuilderFactory fromValues(
+    @NotNull public static ChartBuilderFactory fromColumnNamePattern(
         final String title,
         final String yLabel,
-        final Iterable<String> strings,
+        final Iterable<String> baseNames,
         final String columnNameFormatPattern
     ) {
-        return fromValues(
+        return fromColumnNamePattern(
             title,
             yLabel,
-            strings,
+            baseNames,
             columnNameFormatPattern,
             "%s"
         );
     }
 
-    @NotNull public static ChartBuilderFactory fromValues(
+    @NotNull public static ChartBuilderFactory fromColumnNamePattern(
         final String title,
         final String yLabel,
-        final Iterable<String> strings,
+        final Iterable<String> baseNames,
         final String columnNameFormatPattern,
         final String columnLegendFormatPattern
     ) {
-        return fromValues(
+        return fromSeriesIdentifiers(
             title,
             yLabel,
-            strings,
+            baseNames,
             v -> String.format(columnNameFormatPattern, v),
             v -> String.format(columnLegendFormatPattern, v)
         );
@@ -166,15 +169,16 @@ public final class ChartBuilderFactory implements
 
     @SuppressWarnings("unused") public void setYLines(final Collection<Double> yLines) { this.yLines = yLines; }
 
-    @SuppressWarnings("unused") public Map<String, String> getColumnNamesAndLegends() { return columnNamesAndLegends; }
+    @SuppressWarnings("unused")
+    public Map<String, String> getDataColumnNamesAndLegends() { return dataColumnNamesAndLegends; }
 
-    public void setColumnNamesAndLegends(final Map<String, String> columnNamesAndLegends) {
-        this.columnNamesAndLegends = columnNamesAndLegends;
+    public void setDataColumnNamesAndLegends(final Map<String, String> dataColumnNamesAndLegends) {
+        this.dataColumnNamesAndLegends = dataColumnNamesAndLegends;
     }
 
     @Override public JsonBuilder<Chart> makeDataBuilder(FishState ignored) {
         return new ChartBuilder(
-            columnNamesAndLegends.keySet(),
+            dataColumnNamesAndLegends.keySet(),
             yLines,
             xAxisIsSimulationTimeInYears,
             valueTransformer
@@ -189,7 +193,7 @@ public final class ChartBuilderFactory implements
             getXLabel(),
             getYLabel(),
             zip(
-                columnNamesAndLegends.values().stream(),
+                dataColumnNamesAndLegends.values().stream(),
                 stream(new LoopingIterator<>(seriesColours)).map(ColourUtils::colourStringToHtmlCode),
                 SeriesDefinition::new
             ).collect(toImmutableList())

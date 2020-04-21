@@ -31,8 +31,7 @@ import uk.ac.ox.oxfish.model.data.webviz.SteppableJsonBuilder;
 import java.util.Collection;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileHeight;
-import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileWidth;
+import static java.lang.StrictMath.abs;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 
 public final class VesselsBuilder implements SteppableJsonBuilder<Vessels> {
@@ -76,6 +75,18 @@ public final class VesselsBuilder implements SteppableJsonBuilder<Vessels> {
 
         fishState.getFishers().forEach(vesselClassifier::classify);
         timeStepsBuilder.add(new Timestep(fishState.getDay(), vesselLocations));
+    }
+
+    private double seaTileWidth(NauticalMap map) {
+        final Coordinate c0 = map.getCoordinates(0, 0);
+        final Coordinate c1 = map.getCoordinates(1, 0);
+        return abs(c1.x - c0.x);
+    }
+
+    private double seaTileHeight(NauticalMap map) {
+        final Coordinate c0 = map.getCoordinates(0, 0);
+        final Coordinate c1 = map.getCoordinates(0, 1);
+        return abs(c1.y - c0.y);
     }
 
     private Coordinate getRoundedCoordinates(

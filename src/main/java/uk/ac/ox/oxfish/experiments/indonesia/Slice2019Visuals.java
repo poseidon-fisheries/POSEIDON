@@ -314,21 +314,21 @@ public class Slice2019Visuals {
 
         ImmutableList.Builder<ChartBuilderFactory> chartBuilderFactories = new ImmutableList.Builder<>();
 
-        chartBuilderFactories.add(ChartBuilderFactory.fromValues(
+        chartBuilderFactories.add(ChartBuilderFactory.fromColumnNamePattern(
             "Landings",
             "Landings (kg)",
             speciesNames,
             "%s Landings"
         ));
 
-        chartBuilderFactories.add(ChartBuilderFactory.fromValues(
+        chartBuilderFactories.add(ChartBuilderFactory.fromColumnNamePattern(
             "Biomass",
             "Biomass (kg)",
             speciesNames,
             "Biomass %s"
         ));
 
-        final ChartBuilderFactory sprChartBuilderFactory = ChartBuilderFactory.fromValues(
+        final ChartBuilderFactory sprChartBuilderFactory = ChartBuilderFactory.fromColumnNamePattern(
             "SPR",
             "SPR (%)",
             speciesNames,
@@ -361,7 +361,7 @@ public class Slice2019Visuals {
             population -> "Average Cash-Flow of " + population
         ));
 
-        final ChartBuilderFactory pctMatureCatchesChartBuilderFactory = ChartBuilderFactory.fromValues(
+        final ChartBuilderFactory pctMatureCatchesChartBuilderFactory = ChartBuilderFactory.fromSeriesIdentifiers(
             "Percentage of mature catches",
             "Mature catches (%)",
             speciesNames,
