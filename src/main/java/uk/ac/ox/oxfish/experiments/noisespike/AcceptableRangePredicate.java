@@ -20,18 +20,31 @@
 
 package uk.ac.ox.oxfish.experiments.noisespike;
 
+import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class AcceptableRangePredicate  {
 
 
 
-    private final double minimum;
+    private double minimum;
 
-    private final double maximum;
+    private double maximum;
 
-    private final String columnName;
+    private String columnName;
 
+
+    /**
+     * building with setters is pointless, but it works for YAML constructors
+     */
+    @Deprecated
+    @VisibleForTesting
+    public AcceptableRangePredicate() {
+        minimum = 0;
+        maximum = -1;
+        columnName = "No column";
+
+    }
 
     public AcceptableRangePredicate(double minimum, double maximum, String columnName) {
         this.minimum = minimum;
@@ -100,5 +113,18 @@ public class AcceptableRangePredicate  {
      */
     public String getColumnName() {
         return columnName;
+    }
+
+
+    public void setMinimum(double minimum) {
+        this.minimum = minimum;
+    }
+
+    public void setMaximum(double maximum) {
+        this.maximum = maximum;
+    }
+
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 }

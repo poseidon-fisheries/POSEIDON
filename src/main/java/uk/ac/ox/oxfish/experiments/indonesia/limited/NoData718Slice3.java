@@ -12,14 +12,13 @@ import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -608,27 +607,10 @@ public class NoData718Slice3 {
 
     }
 
-    private static String getComputerName()
-    {
-        try {
-            InetAddress addr;
-            addr = InetAddress.getLocalHost();
-            return addr.getHostName();
-        }
-        catch (UnknownHostException ex)
-        {
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("COMPUTERNAME"))
-            return env.get("COMPUTERNAME");
-        else return env.getOrDefault("HOSTNAME",
-                "UNKNOWN");
-        }
-    }
-
 
     public static void main(String[] args) throws IOException {
 
-        String computerName = getComputerName();
+        String computerName = FishStateUtilities.getComputerName();
         MersenneTwisterFast random = new MersenneTwisterFast();
         int directoryIndex =  random.nextInt(999999);
         Path scenarioDirectory = MAIN_DIRECTORY.resolve("prices_scenario").resolve(computerName+"_"+directoryIndex);

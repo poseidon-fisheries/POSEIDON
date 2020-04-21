@@ -55,9 +55,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -435,6 +433,23 @@ public class FishStateUtilities {
         }
         catch (IOException e){
             e.printStackTrace();
+        }
+    }
+
+    public static String getComputerName()
+    {
+        try {
+            InetAddress addr;
+            addr = InetAddress.getLocalHost();
+            return addr.getHostName();
+        }
+        catch (UnknownHostException ex)
+        {
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("COMPUTERNAME"))
+            return env.get("COMPUTERNAME");
+        else return env.getOrDefault("HOSTNAME",
+                "UNKNOWN");
         }
     }
 

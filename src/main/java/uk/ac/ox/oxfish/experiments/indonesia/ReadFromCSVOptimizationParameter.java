@@ -20,52 +20,100 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     /**
      * scenario address, one for each column read!
      */
-    private final String[] addressForEachColumn;
+    private String[] addressForEachColumn;
 
 
+    private Path csvPathFile;
 
-    private final List<String> csvContent;
+    private boolean csvHasHeader;
+
+
+    /**
+     * while technically possible to create this and then use setters, you might as well call the right constructor
+     */
+    @Deprecated
+    public ReadFromCSVOptimizationParameter() {
+        csvPathFile  = null;
+        csvHasHeader = false;
+        addressForEachColumn = null;
+
+    }
 
     public ReadFromCSVOptimizationParameter(Path csvPathFile, String[] addressForEachColumn, boolean hasHeader) throws IOException {
         this.addressForEachColumn = addressForEachColumn;
+        this.csvPathFile = csvPathFile;
+        this.csvHasHeader = hasHeader;
 
-        csvContent = Files.readAllLines(csvPathFile);
-        if(hasHeader)
-            csvContent.remove(0);
+
     }
 
 
-    public ReadFromCSVOptimizationParameter(List<String> csvContent,String[] addressForEachColumn) throws IOException {
-
-        this.addressForEachColumn =addressForEachColumn;
-        this.csvContent = csvContent;
-    }
 
 
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
-        Preconditions.checkState(inputs.length==1);
-        //normalize it 0 to 1
-        double input = (inputs[0]+10d)/20d;
-        Preconditions.checkState(input>=0);
-        Preconditions.checkState(input<=1);
 
-        int row = (int) Math.floor(input * csvContent.size());
+        try {
+            List<String> csvContent  = Files.readAllLines(csvPathFile);
+            if(csvHasHeader)
+                csvContent.remove(0);
 
-        final String[] selectedRow = csvContent.get(row).split(",");
-        Preconditions.checkState(selectedRow.length == addressForEachColumn.length);
-        for (int i = 0; i < selectedRow.length; i++) {
-            SimpleOptimizationParameter.quickParametrize(
-                    scenario,
-                    Double.parseDouble(selectedRow[i]),
-                    addressForEachColumn[i]
-            );
+            Preconditions.checkState(inputs.length==1);
+            //normalize it 0 to 1
+            double input = (inputs[0]+10d)/20d;
+            Preconditions.checkState(input>=0);
+            Preconditions.checkState(input<=1);
+
+            int row = (int) Math.floor(input * csvContent.size());
+
+            final String[] selectedRow = csvContent.get(row).split(",");
+            Preconditions.checkState(selectedRow.length == addressForEachColumn.length);
+            for (int i = 0; i < selectedRow.length; i++) {
+                SimpleOptimizationParameter.quickParametrize(
+                        scenario,
+                        Double.parseDouble(selectedRow[i]),
+                        addressForEachColumn[i]
+                );
+            }
+
+            return Strings.join(selectedRow,";");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to find csv file: " + csvPathFile);
         }
 
-        return Strings.join(selectedRow,";");
 
 
 
+
+
+    }
+
+
+    public String[] getAddressForEachColumn() {
+        return addressForEachColumn;
+    }
+
+    public void setAddressForEachColumn(String[] addressForEachColumn) {
+        this.addressForEachColumn = addressForEachColumn;
+    }
+
+    public Path getCsvPathFile() {
+        return csvPathFile;
+    }
+
+    public void setCsvPathFile(Path csvPathFile) {
+        this.csvPathFile = csvPathFile;
+    }
+
+    public boolean isCsvHasHeader() {
+        return csvHasHeader;
+    }
+
+    public void setCsvHasHeader(boolean csvHasHeader) {
+        this.csvHasHeader = csvHasHeader;
     }
 
     @Override

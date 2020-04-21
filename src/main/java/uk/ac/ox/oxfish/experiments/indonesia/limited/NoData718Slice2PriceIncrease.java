@@ -69,6 +69,7 @@ public class NoData718Slice2PriceIncrease {
             columnsToPrint.add("Biomass " + species);
             columnsToPrint.add("Bt/K " + species);
             columnsToPrint.add("Percentage Mature Catches " + species + " "+ agent);
+            columnsToPrint.add("Percentage Lopt Catches " + species + " "+ agent);
             columnsToPrint.add(species + " Earnings");
             columnsToPrint.add(species + " Landings");
 

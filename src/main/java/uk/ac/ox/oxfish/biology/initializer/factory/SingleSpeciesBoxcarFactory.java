@@ -218,25 +218,6 @@ public class SingleSpeciesBoxcarFactory implements AlgorithmFactory<SingleSpecie
     public void setSpeciesName(String speciesName) {
         this.speciesName = speciesName;
     }
-
-    /**
-     * Getter for property 'abundanceSimulator'.
-     *
-     * @return Value for property 'abundanceSimulator'.
-     */
-    public BoxCarSimulator getAbundanceSimulator() {
-        return abundanceSimulator;
-    }
-
-    /**
-     * Setter for property 'abundanceSimulator'.
-     *
-     * @param abundanceSimulator Value to set for property 'abundanceSimulator'.
-     */
-    public void setAbundanceSimulator(BoxCarSimulator abundanceSimulator) {
-        this.abundanceSimulator = abundanceSimulator;
-    }
-
     /**
      * Getter for property 'initialBtOverK'.
      *
