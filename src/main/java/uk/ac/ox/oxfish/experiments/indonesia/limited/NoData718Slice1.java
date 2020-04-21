@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import ec.util.MersenneTwisterFast;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.experiments.indonesia.ReadFromCSVOptimizationParameter;
 import uk.ac.ox.oxfish.experiments.noisespike.AcceptableRangePredicate;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
@@ -550,35 +551,11 @@ public class NoData718Slice1 {
         writer.write("\n");
 
 
-        FileWriter writer2 = new FileWriter(directory.resolve("summary_statistics_" + seed + ".csv").toFile());
-        writer2.write("scenario,validYear");
-        for (AcceptableRangePredicate predicate : predicates) {
-            writer2.write(",");
-            writer2.write(predicate.getColumnName());
-        }
-        writer2.write("\n");
+        FileWriter writer2 = prepareSummaryStatisticsMasterFile(directory, seed, predicates);
 
 
-        FishYAML yaml = new FishYAML();
         for (File scenarioFile : scenarios) {
-
-            Scenario scenario = yaml.loadAs(new FileReader(scenarioFile), Scenario.class);
-            Optional<Integer> result;
-            System.out.println(scenarioFile.getAbsolutePath() );
-
-            try {
-                long start = System.currentTimeMillis();
-                result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed,
-                                      scenarioFile.getAbsolutePath(),
-                                      writer2, predicates);
-                long end = System.currentTimeMillis();
-                System.out.println( "Run lasted: " + (end-start)/1000 + " seconds");
-            }
-            catch (OutOfMemoryError e){
-                result = Optional.of(-1000);
-            }
-            System.out.println(scenarioFile.getAbsolutePath() + "," + result.orElse(-1) );
-            System.out.println("--------------------------------------------------------------");
+            Optional<Integer> result = runOneScenario(seed, predicates, writer2, scenarioFile, MAX_YEARS_TO_RUN);
 
             writer.write(scenarioFile.getAbsolutePath().toString() + ",");
             writer.write(String.valueOf(result.orElse(-1)));
@@ -590,6 +567,40 @@ public class NoData718Slice1 {
 
     }
 
+    @NotNull
+    public static Optional<Integer> runOneScenario(long randomSeed, List<AcceptableRangePredicate> predicates, FileWriter summaryStatisticsWriter, File scenarioFile, int maxYearsToRun) throws IOException {
+        FishYAML yaml = new FishYAML();
+
+        Scenario scenario = yaml.loadAs(new FileReader(scenarioFile), Scenario.class);
+        Optional<Integer> result;
+        System.out.println(scenarioFile.getAbsolutePath() );
+
+        try {
+            long start = System.currentTimeMillis();
+            result = runModelOnce(scenario, maxYearsToRun, randomSeed,
+                                  scenarioFile.getAbsolutePath(),
+                    summaryStatisticsWriter, predicates);
+            long end = System.currentTimeMillis();
+            System.out.println( "Run lasted: " + (end-start)/1000 + " seconds");
+        }
+        catch (OutOfMemoryError e){
+            result = Optional.of(-1000);
+        }
+        System.out.println(scenarioFile.getAbsolutePath() + "," + result.orElse(-1) );
+        System.out.println("--------------------------------------------------------------");
+        return result;
+    }
+
+    public static FileWriter prepareSummaryStatisticsMasterFile(Path directory, long seed, List<AcceptableRangePredicate> predicates) throws IOException {
+        FileWriter writer2 = new FileWriter(directory.resolve("summary_statistics_" + seed + ".csv").toFile());
+        writer2.write("scenario,validYear");
+        for (AcceptableRangePredicate predicate : predicates) {
+            writer2.write(",");
+            writer2.write(predicate.getColumnName());
+        }
+        writer2.write("\n");
+        return writer2;
+    }
 
 
 }

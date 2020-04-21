@@ -18,6 +18,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -37,7 +39,7 @@ public class NoData718Slice3 {
                     "runs", "718",
                     "slice3limited");
 
-    final static public Path SCENARIO_FILE = MAIN_DIRECTORY.resolve("base.yaml");
+    final static public Path BASELINE_SCENARIO_FILE = MAIN_DIRECTORY.resolve("base_prices.yaml");
 
 
     public static final int MAX_YEARS_TO_RUN = 30;
@@ -46,6 +48,8 @@ public class NoData718Slice3 {
 
     //you need to pass all of these to be "accepted"!
     public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+    public static final String SCENARIOS_FOLDER = "scenarios_lowsmoothing";
+
     static {
         predicates.add(new AcceptableRangePredicate(
                 0,99999,"SPR " + "Atrobucca brevis" + " " + "spr_agent3"
@@ -168,6 +172,8 @@ public class NoData718Slice3 {
     //in the inverted pyramid; the higher the weaker the negative correlaction
     public static final double[] NOISE_LEVEL_BOUNDS = new double[]{0,0.5};
 
+    public static final double[] SMOOTHING_PARAMETER_BOUNDS = {.001, .3d};
+
     static {
 
 
@@ -281,6 +287,8 @@ public class NoData718Slice3 {
                         1,4
                 )
         );
+
+
         parameters.add(
                 new MultipleOptimizationParameter(
                         Lists.newArrayList(
@@ -292,7 +300,7 @@ public class NoData718Slice3 {
                                 "biologyInitializer.factories$"+2+".initialAbundanceAllocator.smoothingValue",
                                 "biologyInitializer.factories$"+2+".recruitAllocator.smoothingValue"
                         ),
-                        .3,.999));
+                        SMOOTHING_PARAMETER_BOUNDS[0],SMOOTHING_PARAMETER_BOUNDS[1]));
 
         //noise level
         parameters.add(
@@ -347,8 +355,14 @@ public class NoData718Slice3 {
         parameters.add(
                         new MultipleOptimizationParameter(
                                 Lists.newArrayList(
-                        "market.marketPrice",
-                                        "mapInitializer.farOffPorts$0.marketMaker.marketPrice"
+                        "market.markets~Lethrinus laticaudis.marketPrice",
+                                        "market.markets~Lutjanus malabaricus.marketPrice",
+                                        "market.markets~Others.marketPrice",
+
+                                        "mapInitializer.farOffPorts$0.marketMaker.markets~Lethrinus laticaudis.marketPrice",
+                                        "mapInitializer.farOffPorts$0.marketMaker.markets~Lutjanus malabaricus.marketPrice",
+                                        "mapInitializer.farOffPorts$0.marketMaker.markets~Others.marketPrice"
+
                                         ),
                         30000, 60000)
         );
@@ -507,14 +521,14 @@ public class NoData718Slice3 {
     }
 
     private static void buildScenarios() throws IOException {
-        for (int batch = 5; batch < 5+ BATCHES; batch++)
+        for (int batch = 0; batch < 5+ BATCHES; batch++)
         {
 
             final Path folder =
-                    MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+batch);
+                    MAIN_DIRECTORY.resolve(SCENARIOS_FOLDER).resolve("batch"+batch);
             folder.toFile().mkdirs();
             produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,
-                    System.currentTimeMillis(),SCENARIO_FILE);
+                    System.currentTimeMillis(), BASELINE_SCENARIO_FILE);
 
         }
     }
@@ -527,6 +541,44 @@ public class NoData718Slice3 {
                                         Path scenarioFile) throws IOException {
 
         //store all parameters in a master file, for ease of visiting
+        FileWriter masterFile = initializeParameterMasterFile(folder, parameters);
+
+        MersenneTwisterFast random = new MersenneTwisterFast(originalSeed);
+
+        for (int i = 0; i < numberToProduce; i++) {
+
+            writeToFileOneScenario(folder, parameters, scenarioFile, masterFile, random, i);
+
+
+        }
+
+
+    }
+
+    public static Path writeToFileOneScenario(Path destinationFolder, List<OptimizationParameter> parameters, Path pathToBaselineScenario, FileWriter parameterMasterFileWriter, MersenneTwisterFast randomizer, int scenarioID) throws IOException {
+        FishYAML yaml = new FishYAML();
+
+        double[] randomValues = new double[parameters.size()];
+        for (int h = 0; h < randomValues.length; h++) {
+            randomValues[h] = randomizer.nextDouble() * 20 - 10;
+        }
+        Scenario scenario = yaml.loadAs(new FileReader(pathToBaselineScenario.toFile()), Scenario.class);
+        final Pair<Scenario, String[]> scenarioPair = setupScenario(scenario, randomValues, parameters);
+        final Path pathToScenario = destinationFolder.resolve("scenario_" + scenarioID + ".yaml");
+        yaml.dump(scenarioPair.getFirst(),new FileWriter(pathToScenario.toFile()));
+
+        for (String value : scenarioPair.getSecond()) {
+            parameterMasterFileWriter.write(value);
+            parameterMasterFileWriter.write(",");
+        }
+        parameterMasterFileWriter.write(pathToScenario.toString());
+        parameterMasterFileWriter.write("\n");
+
+        parameterMasterFileWriter.flush();
+        return pathToScenario;
+    }
+
+    public static FileWriter initializeParameterMasterFile(Path folder, List<OptimizationParameter> parameters) throws IOException {
         FileWriter masterFile = new FileWriter(folder.resolve("masterfile.csv").toFile());
         for (OptimizationParameter parameter : parameters) {
             masterFile.write(parameter.getName());
@@ -536,51 +588,81 @@ public class NoData718Slice3 {
         masterFile.write("filename");
         masterFile.write("\n");
         masterFile.flush();
-
-        MersenneTwisterFast random = new MersenneTwisterFast(originalSeed);
-
-        FishYAML yaml = new FishYAML();
-        for (int i = 0; i < numberToProduce; i++) {
-
-
-            double[] randomValues = new double[parameters.size()];
-            for (int h = 0; h < randomValues.length; h++) {
-                randomValues[h] = random.nextDouble() * 20 - 10;
-            }
-            Scenario scenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), Scenario.class);
-            final Pair<Scenario, String[]> scenarioPair = setupScenario(scenario, randomValues, parameters);
-            yaml.dump(scenarioPair.getFirst(),new FileWriter(folder.resolve("scenario_" + i + ".yaml").toFile()));
-
-            for (String value : scenarioPair.getSecond()) {
-                masterFile.write(value);
-                masterFile.write(",");
-            }
-            masterFile.write(folder.resolve("scenario_" + i + ".yaml").toString());
-            masterFile.write("\n");
-
-            masterFile.flush();
-
-
-
-        }
-
-
+        return masterFile;
     }
 
 
+    public static void oldmain(String[] args) throws IOException {
 
 
-    public static void main(String[] args) throws IOException {
-
-
-   //  buildScenarios();
+    buildScenarios();
 
 
 
         System.out.println("scenario " + args[0]);
         int directory = Integer.parseInt(args[0]);
-        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0,
+        NoData718Slice1.runDirectory(MAIN_DIRECTORY.resolve(SCENARIOS_FOLDER).resolve("batch"+ directory), 0,
                 predicates);
+
+
+
+    }
+
+    private static String getComputerName()
+    {
+        try {
+            InetAddress addr;
+            addr = InetAddress.getLocalHost();
+            return addr.getHostName();
+        }
+        catch (UnknownHostException ex)
+        {
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("COMPUTERNAME"))
+            return env.get("COMPUTERNAME");
+        else return env.getOrDefault("HOSTNAME",
+                "UNKNOWN");
+        }
+    }
+
+
+    public static void main(String[] args) throws IOException {
+
+        String computerName = getComputerName();
+        MersenneTwisterFast random = new MersenneTwisterFast();
+        int directoryIndex =  random.nextInt(999999);
+        Path scenarioDirectory = MAIN_DIRECTORY.resolve("prices_scenario").resolve(computerName+"_"+directoryIndex);
+        scenarioDirectory.toFile().mkdirs();
+        Path summaryDirectory = scenarioDirectory.resolve("summaries");
+        summaryDirectory.toFile().mkdir();
+
+
+        final FileWriter summaryStatisticsWriter =
+                NoData718Slice1.prepareSummaryStatisticsMasterFile(summaryDirectory,
+                0l,
+                predicates);
+
+        System.out.println("working in directory: " + scenarioDirectory);
+
+        FileWriter parameterMasterFile = initializeParameterMasterFile(summaryDirectory, parameters);
+
+
+        for(int i=0; i<50000; i++) {
+            final Path writtenScenario = writeToFileOneScenario(scenarioDirectory,
+                    parameters,
+                    BASELINE_SCENARIO_FILE,
+                    parameterMasterFile,
+                    new MersenneTwisterFast(),
+                    i
+            );
+            NoData718Slice1.runOneScenario(
+                    0l,
+                    predicates,
+                    summaryStatisticsWriter,
+                    writtenScenario.toFile(),
+                    MAX_YEARS_TO_RUN
+            );
+        }
 
 
 
