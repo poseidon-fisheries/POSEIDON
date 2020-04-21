@@ -19,15 +19,15 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.regions;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Collection;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-final public class Regions {
+final class Regions {
 
     private final Collection<Region> regions;
 
-    Regions(final Collection<Region> regions) {
-        this.regions = regions;
-    }
+    Regions(final Iterable<Region> regions) { this.regions = ImmutableList.copyOf(regions); }
 
 }

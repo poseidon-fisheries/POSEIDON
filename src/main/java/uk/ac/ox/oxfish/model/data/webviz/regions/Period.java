@@ -19,15 +19,19 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.regions;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
 final class Period {
 
     private final int startTimeDays;
     private final int endTimeDays;
 
     Period(final int startTimeDays, final int endTimeDays) {
+        assert startTimeDays <= endTimeDays;
         this.startTimeDays = startTimeDays;
         this.endTimeDays = endTimeDays;
     }
+
+    public int getStartTimeDays() { return startTimeDays; }
+
+    public int getEndTimeDays() { return endTimeDays; }
 
 }

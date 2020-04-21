@@ -22,10 +22,10 @@ package uk.ac.ox.oxfish.model.data.webviz.scenarios;
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public final class RegionTypeDefinition {
 
-    private final int typeId;
+    private final long typeId;
     private final String colour;
 
-    public RegionTypeDefinition(final int typeId, final String colour) {
+    public RegionTypeDefinition(final long typeId, final String colour) {
         this.typeId = typeId;
         this.colour = colour;
     }

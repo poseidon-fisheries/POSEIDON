@@ -14,7 +14,7 @@ abstract public class SpecificProtectedAreaFactory implements AlgorithmFactory<S
 
     abstract ImmutableSet<MasonGeometry> buildGeometries(FishState fishState);
 
-    SpecificProtectedArea buildSpecificProtectedArea(FishState fishState) {
+    private SpecificProtectedArea buildSpecificProtectedArea(FishState fishState) {
         ImmutableSet<MasonGeometry> geometries = buildGeometries(fishState);
         fishState.registerStartable(model -> {
             final NauticalMap map = model.getMap();

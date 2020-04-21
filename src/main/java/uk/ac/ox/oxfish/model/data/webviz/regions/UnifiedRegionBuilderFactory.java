@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.data.webviz.scenarios.RegionsDefinition;
 
 import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.colourStringToHtmlCode;
 
-public final class SingleFixedRegionBuilderFactory implements RegionsBuilderFactory {
+public final class UnifiedRegionBuilderFactory implements RegionsBuilderFactory {
 
     private int typeId;
     private String colour = "gray";
@@ -40,10 +40,8 @@ public final class SingleFixedRegionBuilderFactory implements RegionsBuilderFact
 
     @SuppressWarnings("unused") public void setTypeId(final int typeId) { this.typeId = typeId; }
 
-    @Override public String getBaseName() { return Regions.class.getSimpleName(); }
-
     @Override public JsonBuilder<Regions> makeDataBuilder(FishState ignored) {
-        return new SingleFixedRegionBuilder(typeId);
+        return new UnifiedRegionBuilder(typeId);
     }
 
     @Override public JsonBuilder<RegionsDefinition> makeDefinitionBuilder(final String scenarioTitle) {

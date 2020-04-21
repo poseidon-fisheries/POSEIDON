@@ -30,11 +30,14 @@ import java.util.Collection;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-public final class SingleFixedRegionBuilder implements JsonBuilder<Regions> {
+/**
+ * This is a region builder that lumps every protected into a single, permanent, unified region.
+ */
+public final class UnifiedRegionBuilder implements JsonBuilder<Regions> {
 
     private final int typeId;
 
-    public SingleFixedRegionBuilder(final int typeId) { this.typeId = typeId; }
+    UnifiedRegionBuilder(final int typeId) { this.typeId = typeId; }
 
     @Override public Regions buildJsonObject(final FishState fishState) {
         final NauticalMap map = fishState.getMap();

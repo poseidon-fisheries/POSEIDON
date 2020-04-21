@@ -38,7 +38,7 @@ public class SinglePeriodEventDefinitionBuilderFactory implements EventDefinitio
 
     @Override public JsonBuilder<EventDefinition> makeDefinitionBuilder(final String scenarioTitle) {
         return fishState -> new EventDefinition(
-            makeFileName(scenarioTitle),
+            description,
             ImmutableList.of(new EventDefinition.Period(startTimeInDays, endTimeInDays))
         );
     }

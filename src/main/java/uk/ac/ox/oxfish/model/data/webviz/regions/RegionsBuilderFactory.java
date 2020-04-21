@@ -25,4 +25,6 @@ import uk.ac.ox.oxfish.model.data.webviz.scenarios.RegionsDefinition;
 
 public interface RegionsBuilderFactory extends
     JsonDataBuilderFactory<Regions>,
-    JsonDefinitionBuilderFactory<RegionsDefinition> { }
+    JsonDefinitionBuilderFactory<RegionsDefinition> {
+    @Override default String getBaseName() { return Regions.class.getSimpleName(); }
+}

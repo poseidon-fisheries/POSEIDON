@@ -105,6 +105,8 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
+import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
@@ -155,6 +157,7 @@ import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerRegion
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerSpeciesMonitor;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perRegionMonitor;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesPerRegionMonitor;
+import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.Measures.convert;
@@ -227,20 +230,26 @@ public class TunaScenario implements Scenario {
         snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
         plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
 
+        final AlgorithmFactory<TemporaryRegulation> elCorralitoReg = new TemporaryRegulationFactory(
+            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
+            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
+        );
+        final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
+            new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile);
+        final AlgorithmFactory<TemporaryRegulation> closureAReg = new TemporaryRegulationFactory(
+            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
+            new NoFishingFactory()
+        );
+        final AlgorithmFactory<TemporaryRegulation> closureBReg = new TemporaryRegulationFactory(
+            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
+            new NoFishingFactory()
+        );
+
         AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
-            new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile), "all",
-            new TemporaryRegulationFactory( // El Corralito
-                dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
-                new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
-            ), "all",
-            new TemporaryRegulationFactory(
-                dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
-                new NoFishingFactory()
-            ), "closure A",
-            new TemporaryRegulationFactory(
-                dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
-                new NoFishingFactory()
-            ), "closure B"
+            galapagosEezReg, TAG_FOR_ALL,
+            elCorralitoReg, TAG_FOR_ALL,
+            closureAReg, "closure A",
+            closureBReg, "closure B"
         ));
 
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
@@ -702,7 +711,8 @@ public class TunaScenario implements Scenario {
                     fishState, "catches by set", IterativeAveragingAccumulator::new)
             );
 
-            final Function<Region, ProportionalGatherer<Boolean, MakeFadSet, MakeFadSet>> makeProportionOfSetsOnOwnFadsMonitor =
+            final Function<Region, ProportionalGatherer<Boolean, MakeFadSet, MakeFadSet>>
+                makeProportionOfSetsOnOwnFadsMonitor =
                 region -> new ProportionalGatherer<>(basicGroupingMonitor(
                     null, // we already have the total number of sets and don't want to gather it from here
                     EVERY_YEAR,

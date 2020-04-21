@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.model.data.webviz.events.EventDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.fads.FadsBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.regions.RegionsBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.regions.SingleFixedRegionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.regions.UnifiedRegionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.Scenario;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ScenarioBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselsBuilderFactory;
@@ -47,7 +47,7 @@ public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutp
     private int numYearsToSkip = 0;
     private boolean prettyPrinting = false;
     private FadsBuilderFactory fadsBuilderFactory = new FadsBuilderFactory();
-    private RegionsBuilderFactory regionsBuilderFactory = new SingleFixedRegionBuilderFactory();
+    private RegionsBuilderFactory regionsBuilderFactory = new UnifiedRegionBuilderFactory();
     private VesselsBuilderFactory vesselsBuilderFactory = new VesselsBuilderFactory();
     private Collection<? extends EventDefinitionBuilderFactory> eventBuilderFactories = ImmutableList.of();
     private Collection<? extends ChartBuilderFactory> chartBuilderFactories = ImmutableList.of();

@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.data.webviz.heatmaps.FadDeploymentCountingHeatmapBu
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.FadSetCountingHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.UnassociatedSetCountingHeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.regions.SpecificRegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -40,13 +41,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.awt.Color.GREEN;
 import static java.awt.Color.WHITE;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision.REGION_NAMES;
 import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
 
-public final class WebVizTest {
+public final class WebVizExporter {
+
+    private static final int NUM_YEARS_TO_RUN = 5;
 
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace");
@@ -63,8 +69,8 @@ public final class WebVizTest {
         model.start();
         do {
             model.schedule.step(model);
-            System.out.println(model.getDay());
-        } while (model.getYear() < 2);
+            System.out.printf("%5d (year %d, day %3d)\n", model.getStep(), model.getYear(), model.getDayOfTheYear());
+        } while (model.getYear() < NUM_YEARS_TO_RUN);
         JsonOutputPlugin.writeOutputsToFolder(model, outputPath);
     }
 
@@ -80,25 +86,30 @@ public final class WebVizTest {
         jsonOutputManagerFactory.setStartDate("2017-01-01");
         jsonOutputManagerFactory.setNumYearsToSkip(1);
         jsonOutputManagerFactory.setPrettyPrinting(true);
-
+        jsonOutputManagerFactory.setRegionsBuilderFactory(new SpecificRegionsBuilderFactory());
         jsonOutputManagerFactory.getVesselsBuilderFactory().setVesselClassifier(
             singleTypeClassifier("Class 6 vessels", WHITE)
         );
 
-        jsonOutputManagerFactory.setEventBuilderFactories(ImmutableList.of(
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", 210, 281),
-            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", 282, 312),
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", 313, 364 + 19),
-
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", (364) + 210, (364) + 281),
-            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", (364) + 282, (364) + 312),
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", (364) + 313, (364) + 364 + 19),
-
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period A", (364 * 2) + 210, (364 * 2) + 281),
-            new SinglePeriodEventDefinitionBuilderFactory("El Corralito closure", (364 * 2) + 282, (364 * 2) + 312),
-            new SinglePeriodEventDefinitionBuilderFactory("Closure period B", (364 * 2) + 313, (364 * 2) + 364 + 19)
-
-        ));
+        jsonOutputManagerFactory.setEventBuilderFactories(
+            range(0, NUM_YEARS_TO_RUN).boxed().flatMap(i -> Stream.of(
+                new SinglePeriodEventDefinitionBuilderFactory(
+                    "Closure period A",
+                    (365 * i) + 209,
+                    (365 * i) + 280
+                ),
+                new SinglePeriodEventDefinitionBuilderFactory(
+                    "El Corralito closure",
+                    (365 * i) + 281,
+                    (365 * i) + 311
+                ),
+                new SinglePeriodEventDefinitionBuilderFactory(
+                    "Closure period B",
+                    (365 * i) + 312,
+                    (365 * (i + 1)) + 18
+                )
+            )).collect(toList())
+        );
 
         jsonOutputManagerFactory.setChartBuilderFactories(ImmutableList.of(
             ChartBuilderFactory.fromColumnNamePattern(
