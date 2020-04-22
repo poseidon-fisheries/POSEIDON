@@ -275,7 +275,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 new Gatherer<FishState>() {
                     @Override
                     public Double apply(FishState fishState) {
-                        double ratio = computeMaturityRatio();
+                        double ratio = computeLoptRatio();
                         return ratio;
 
                     }
