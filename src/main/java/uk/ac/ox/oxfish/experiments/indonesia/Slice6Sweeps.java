@@ -205,9 +205,9 @@ public class Slice6Sweeps {
         //     fleetReduction("fleetreduction10", SCENARIO_NAME, 1,"population1","population2","population3" );
 
 
-        priceShock("price_shock",SCENARIO_NAME,18*30,SHOCK_YEAR);
-        priceAndCostShock("price_and_cost_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR);
-        priceAndCostShock("price_and_cost_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR);
+        priceShock("price_shock2",SCENARIO_NAME,18*30,SHOCK_YEAR);
+        priceAndCostShock("price_and_cost2_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR);
+        priceAndCostShock("price_and_cost2_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR);
 ////        //delays
 //        delays("delay_all",
 //                new String[]{"population0","population1","population2","population3"},
@@ -1090,7 +1090,7 @@ public class Slice6Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double markup=1; markup>=.5; markup=FishStateUtilities.round(markup-.1)) {
+        for(double markup=1; markup>=0; markup=FishStateUtilities.round(markup-.1)) {
 
             BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 
@@ -1142,7 +1142,7 @@ public class Slice6Sweeps {
         fileWriter.flush();
 
         for(double percentageOfTotalSalePrice=1;
-            percentageOfTotalSalePrice>=.5;
+            percentageOfTotalSalePrice>=0;
             percentageOfTotalSalePrice=FishStateUtilities.round(percentageOfTotalSalePrice-.1)) {
 
             for (double percentageOfTotalCosts = 1;
