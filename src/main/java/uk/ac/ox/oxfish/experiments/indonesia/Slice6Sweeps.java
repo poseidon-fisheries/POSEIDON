@@ -956,6 +956,12 @@ public class Slice6Sweeps {
                                                             thisMarket.setPriceAboveThresholds(
                                                                     thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
                                                             );
+                                                            thisMarket.setPriceBetweenThresholds(
+                                                                    thisMarket.getPriceBetweenThresholds() * percentageOfTotalPrice
+                                                            );
+                                                            thisMarket.setPriceBelowThreshold(
+                                                                    thisMarket.getPriceBelowThreshold() * percentageOfTotalPrice
+                                                            );
                                                             System.out.println(thisMarket.getPriceAboveThresholds());
 
                                                         }
@@ -969,8 +975,15 @@ public class Slice6Sweeps {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
                                                                             ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+
                                                                             thisMarket.setPriceAboveThresholds(
                                                                                     thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
+                                                                            );
+                                                                            thisMarket.setPriceBetweenThresholds(
+                                                                                    thisMarket.getPriceBetweenThresholds() / percentageOfTotalPrice
+                                                                            );
+                                                                            thisMarket.setPriceBelowThreshold(
+                                                                                    thisMarket.getPriceBelowThreshold() / percentageOfTotalPrice
                                                                             );
                                                                         }
                                                                     }
@@ -997,7 +1010,6 @@ public class Slice6Sweeps {
 
         };
     }
-
 
 
     @NotNull
