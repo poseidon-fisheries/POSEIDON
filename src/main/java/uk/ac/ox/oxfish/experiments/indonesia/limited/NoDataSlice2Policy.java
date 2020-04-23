@@ -25,12 +25,14 @@ import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
@@ -145,44 +147,120 @@ public class NoDataSlice2Policy {
                 shockYear -> scenario -> { }
 
         );
-
+//
+////        policies.put(
+////                "BAU_noentry",
+////                shockYear -> NoDataPolicy.removeEntry(shockYear)
+////
+////        );
+//
+//
 //        policies.put(
-//                "BAU_noentry",
-//                shockYear -> NoDataPolicy.removeEntry(shockYear)
+//                "100_days_noentry",
+//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
+//                        NoDataPolicy.removeEntry(shockYear)
+//                )
+//
+//        );
+//
+//
+//
+//        policies.put(
+//                "100_days_big_noentry",
+//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},100).andThen(
+//                        NoDataPolicy.removeEntry(shockYear))
 //
 //        );
 
 
-        policies.put(
-                "100_days_noentry",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
-                        NoDataPolicy.removeEntry(shockYear)
-                )
+        policies.put("price_shock_33_18mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(18*30,shockYear,.33);
+                    }
+                }
 
         );
 
-
-//        policies.put(
-//                "100_days",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,100)
-//
-//        );
-//
-//
-//
-//        policies.put(
-//                "100_days_big",
-//                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},100)
-//
-//        );
-
-
-        policies.put(
-                "100_days_big_noentry",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},100).andThen(
-                        NoDataPolicy.removeEntry(shockYear))
+        policies.put("price_shock_33_32mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(32*30,shockYear,.33);
+                    }
+                }
 
         );
+
+        policies.put("price_shock_50_18mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(18*30,shockYear,.50);
+                    }
+                }
+
+        );
+
+        policies.put("price_shock_50_32mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(32*30,shockYear,.50);
+                    }
+                }
+
+        );
+
+        ///////////////////////////////////////////////////////////////////////////////
+
+
+        policies.put("cost_shock_33_price_shock_33_18mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(18*30,shockYear,.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33)
+                        );
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_33_price_shock_33_32mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(32*30,shockYear,.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_33_price_shock_50_18mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(18*30,shockYear,.50).andThen(
+                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_33_price_shock_50_32mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(32*30,shockYear,.50).andThen(
+                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+                    }
+                }
+
+        );
+
 
 
     }
@@ -193,7 +271,7 @@ public class NoDataSlice2Policy {
 
 
     @NotNull
-    public static Consumer<Scenario> setupPriceShock(int durationInDays,
+    private static Consumer<Scenario> setupPriceShock(int durationInDays,
                                                      int yearStart,
                                                      double percentageOfTotalPrice) {
         return scenario -> {
@@ -216,18 +294,10 @@ public class NoDataSlice2Policy {
                                                     //shock the prices
                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
-                                                            thisMarket.setPriceAboveThresholds(
-                                                                    thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
+                                                            final FixedPriceMarket delegate = (FixedPriceMarket) market;
+                                                            delegate.setPrice(
+                                                            delegate.getPrice() * percentageOfTotalPrice
                                                             );
-                                                            thisMarket.setPriceBetweenThresholds(
-                                                                    thisMarket.getPriceBetweenThresholds() * percentageOfTotalPrice
-                                                            );
-                                                            thisMarket.setPriceBelowThreshold(
-                                                                    thisMarket.getPriceBelowThreshold() * percentageOfTotalPrice
-                                                            );
-                                                            System.out.println(thisMarket.getPriceAboveThresholds());
-
                                                         }
                                                     }
 
@@ -238,16 +308,9 @@ public class NoDataSlice2Policy {
                                                                 public void step(SimState simState) {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
-
-                                                                            thisMarket.setPriceAboveThresholds(
-                                                                                    thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBetweenThresholds(
-                                                                                    thisMarket.getPriceBetweenThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBelowThreshold(
-                                                                                    thisMarket.getPriceBelowThreshold() / percentageOfTotalPrice
+                                                                            final FixedPriceMarket delegate = (FixedPriceMarket) market;
+                                                                            delegate.setPrice(
+                                                                                    delegate.getPrice() * percentageOfTotalPrice
                                                                             );
                                                                         }
                                                                     }
