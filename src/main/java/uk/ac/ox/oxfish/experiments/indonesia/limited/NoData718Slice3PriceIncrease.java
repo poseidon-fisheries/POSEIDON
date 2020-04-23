@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -21,7 +19,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -56,7 +53,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear)
+                                        priceIncreaseEvent(shockYear, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                             }
                         };
@@ -77,7 +74,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear)
+                                        priceIncreaseEvent(shockYear, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                                 ((FlexibleScenario) scenario).getPlugins().add(
                                         zeroPriceEvent()
@@ -102,7 +99,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear-2)
+                                        priceIncreaseEvent(shockYear-2, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                             }
                         };
@@ -122,7 +119,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear-2)
+                                        priceIncreaseEvent(shockYear-2, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                                 ((FlexibleScenario) scenario).getPlugins().add(
                                         zeroPriceEvent()
@@ -146,7 +143,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear-5)
+                                        priceIncreaseEvent(shockYear-5, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                             }
                         };
@@ -166,7 +163,7 @@ public class NoData718Slice3PriceIncrease {
                             @Override
                             public void accept(Scenario scenario) {
                                 ((FlexibleScenario) scenario).getPlugins().add(
-                                        priceIncreaseEvent(shockYear-5)
+                                        priceIncreaseEvent(shockYear-5, newCroakerPriceDobo, newCroakerPriceProbolinggo)
                                 );
                                 ((FlexibleScenario) scenario).getPlugins().add(
                                         zeroPriceEvent()
@@ -191,7 +188,8 @@ public class NoData718Slice3PriceIncrease {
 
 
     @NotNull
-    public static AlgorithmFactory<AdditionalStartable> priceIncreaseEvent(Integer shockYear) {
+    public static AlgorithmFactory<AdditionalStartable> priceIncreaseEvent(Integer shockYear,
+                                                                           final double newCroakerPriceDobo, final double newCroakerPriceProbolinggo) {
         return new AlgorithmFactory<AdditionalStartable>() {
             @Override
             public AdditionalStartable apply(FishState fishState) {
@@ -206,14 +204,17 @@ public class NoData718Slice3PriceIncrease {
                                             System.out.println(port.getName());
                                             //assuming here all fishers get the same treatment
                                             if(port.getName() == "Port 0") {
-                                                ((FixedPriceMarket) port.getMarketMap(null).getMarket(
-                                                        model.getBiology().getSpecie("Atrobucca brevis")
-                                                )).setPrice(newCroakerPriceDobo);
-                                            }
-                                            else{
                                                 ((FixedPriceMarket) ((MarketProxy) port.getMarketMap(null).getMarket(
                                                         model.getBiology().getSpecie("Atrobucca brevis")
-                                                )).getDelegate()).setPrice(newCroakerPriceProbolinggo);
+                                                )).getDelegate()).setPrice(newCroakerPriceDobo);
+                                            }
+                                            else{
+
+
+                                                //look at this piece of code and weep!
+                                                ((FixedPriceMarket) ((MarketProxy) ((MarketProxy) port.getMarketMap(null).getMarket(
+                                                        model.getBiology().getSpecie("Atrobucca brevis")
+                                                )).getDelegate()).getDelegate()).setPrice(newCroakerPriceProbolinggo);
                                             }
                                         }
                                     }
