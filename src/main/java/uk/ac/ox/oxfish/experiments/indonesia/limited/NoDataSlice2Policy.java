@@ -23,17 +23,23 @@ package uk.ac.ox.oxfish.experiments.indonesia.limited;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
+import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -180,6 +186,95 @@ public class NoDataSlice2Policy {
 
 
     }
+
+
+
+
+
+
+    @NotNull
+    public static Consumer<Scenario> setupPriceShock(int durationInDays,
+                                                     int yearStart,
+                                                     double percentageOfTotalPrice) {
+        return scenario -> {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            ((FlexibleScenario) scenario).getPlugins().add(
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState state) {
+
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    state.scheduleOnceAtTheBeginningOfYear(
+                                            new Steppable() {
+                                                @Override
+                                                public void step(SimState simState) {
+
+                                                    //shock the prices
+                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                            thisMarket.setPriceAboveThresholds(
+                                                                    thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
+                                                            );
+                                                            thisMarket.setPriceBetweenThresholds(
+                                                                    thisMarket.getPriceBetweenThresholds() * percentageOfTotalPrice
+                                                            );
+                                                            thisMarket.setPriceBelowThreshold(
+                                                                    thisMarket.getPriceBelowThreshold() * percentageOfTotalPrice
+                                                            );
+                                                            System.out.println(thisMarket.getPriceAboveThresholds());
+
+                                                        }
+                                                    }
+
+                                                    //restore prices
+                                                    ((FishState) simState).scheduleOnceInXDays(
+                                                            new Steppable() {
+                                                                @Override
+                                                                public void step(SimState simState) {
+                                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+
+                                                                            thisMarket.setPriceAboveThresholds(
+                                                                                    thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
+                                                                            );
+                                                                            thisMarket.setPriceBetweenThresholds(
+                                                                                    thisMarket.getPriceBetweenThresholds() / percentageOfTotalPrice
+                                                                            );
+                                                                            thisMarket.setPriceBelowThreshold(
+                                                                                    thisMarket.getPriceBelowThreshold() / percentageOfTotalPrice
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            , StepOrder.DAWN, durationInDays
+                                                    );
+
+                                                }
+                                            },
+                                            StepOrder.DAWN,
+                                            yearStart
+                                    );
+
+                                }
+                            };
+
+                        }
+                    }
+
+            );
+
+
+
+        };
+    }
+
 
 
 
