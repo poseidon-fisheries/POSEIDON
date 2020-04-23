@@ -146,7 +146,7 @@ public class FadDeploymentRouteSelectorTest {
         final Map<Boolean, Long> routeSelectionCounts = Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
             .flatMap(Streams::stream)
-            .limit(100)
+            .limit(500)
             .collect(groupingBy(r -> r.isSameAs(shortRoute), counting()));
 
         // with no travel costs the shortest route should be picked roughly 43% of the time
