@@ -17,17 +17,25 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 
-class FadDeploymentCountingExtractor extends ActionCountingExtractor<DeployFad> {
+import java.util.function.ToDoubleFunction;
 
-    @Override public void start(final FishState model) {
-        getFadManagers(model).forEach(fadManager ->
-            fadManager.getFadDeploymentObservers().add(this)
-        );
+public class FadDensityExtractor implements ToDoubleFunction<SeaTile>, Startable {
+
+    private FadMap fadMap = null;
+
+    @Override public void start(final FishState fishState) {
+        fadMap = fishState.getFadMap();
+    }
+
+    @Override public double applyAsDouble(final SeaTile seaTile) {
+        return fadMap.fadsAt(seaTile).numObjs;
     }
 
 }

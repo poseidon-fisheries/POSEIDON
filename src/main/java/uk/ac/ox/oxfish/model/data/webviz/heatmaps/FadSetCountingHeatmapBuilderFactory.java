@@ -20,6 +20,8 @@
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadSetCountingExtractor;
 
 public class FadSetCountingHeatmapBuilderFactory extends ActionCountingHeatmapBuilderFactory<MakeFadSet> {
 

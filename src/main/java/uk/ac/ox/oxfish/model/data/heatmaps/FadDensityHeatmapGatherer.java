@@ -17,17 +17,23 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDensityExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.mergers.IterativeAverageMerger;
 
-public class FadDeploymentCountingHeatmapBuilderFactory
-    extends ActionCountingHeatmapBuilderFactory<DeployFad> {
+public class FadDensityHeatmapGatherer extends HeatmapGatherer {
 
-    @Override ActionCountingExtractor<DeployFad> makeExtractor() { return new FadDeploymentCountingExtractor(); }
-
-    @Override public String getTitle() { return "Number of FAD deployments over " + getInterval() + " day intervals"; }
+    public FadDensityHeatmapGatherer(
+        final int interval
+    ) {
+        super(
+            "FAD density",
+            "Average number of FADs",
+            interval,
+            new FadDensityExtractor(),
+            heatmapGatherer -> new IterativeAverageMerger(heatmapGatherer::getNumObservations)
+        );
+    }
 
 }

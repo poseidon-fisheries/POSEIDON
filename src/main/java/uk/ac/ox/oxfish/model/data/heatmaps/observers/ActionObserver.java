@@ -17,41 +17,26 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps.observers;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.Observer;
 
-import java.util.stream.Stream;
+public interface ActionObserver<A extends PurseSeinerAction> extends Startable, Observer<A> {
 
-abstract class ActionCountingExtractor<A extends PurseSeinerAction>
-    implements NumericExtractor, Observer<A> {
-
-    private final Multiset<SeaTile> actionsPerTile = HashMultiset.create();
-
-    Stream<FadManager> getFadManagers(FishState fishState) {
-        return fishState.getFishers().stream()
+    @Override default void start(final FishState fishState) {
+        fishState.getFishers().stream()
             .map(Fisher::getGear)
             .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> ((PurseSeineGear) gear).getFadManager());
+            .map(gear -> ((PurseSeineGear) gear).getFadManager())
+            .forEach(this::registerWith);
     }
 
-    /**
-     * Returns the number of times an action was observed for the tile and resets the count to zero for that tile.
-     */
-    @Override public double applyAsDouble(final SeaTile seaTile) {
-        return actionsPerTile.setCount(seaTile, 0);
-    }
-
-    @Override public void observe(final A action) {
-        actionsPerTile.add(action.getLocation());
-    }
+    void registerWith(FadManager fadManager);
 
 }

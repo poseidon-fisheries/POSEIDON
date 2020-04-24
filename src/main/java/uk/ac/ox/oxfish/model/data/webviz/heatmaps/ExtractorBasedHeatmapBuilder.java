@@ -21,18 +21,22 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+
+import java.util.function.ToDoubleFunction;
 
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 
 public final class ExtractorBasedHeatmapBuilder implements HeatmapBuilder {
 
-    private final NumericExtractor numericExtractor;
+    private final ToDoubleFunction<SeaTile> numericExtractor;
     private final TimestepsBuilder timestepsBuilder;
 
     ExtractorBasedHeatmapBuilder(
-        final NumericExtractor numericExtractor,
+        final ToDoubleFunction<SeaTile> numericExtractor,
         final TimestepsBuilder timestepsBuilder
     ) {
         this.numericExtractor = numericExtractor;
@@ -59,7 +63,8 @@ public final class ExtractorBasedHeatmapBuilder implements HeatmapBuilder {
 
     @Override public void start(final FishState fishState) {
         HeatmapBuilder.super.start(fishState);
-        numericExtractor.start(fishState);
+        if (numericExtractor instanceof Startable)
+            ((Startable) numericExtractor).start(fishState);
     }
 
 }

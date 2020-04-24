@@ -17,17 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps.mergers;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.model.FishState;
+import java.util.function.DoubleBinaryOperator;
 
-class UnassociatedSetCountingExtractor extends ActionCountingExtractor<MakeUnassociatedSet> {
+public enum SnapshotMerger implements DoubleBinaryOperator {
 
-    @Override public void start(final FishState model) {
-        getFadManagers(model).forEach(fadManager ->
-            fadManager.getUnassociatedSetObservers().add(this)
-        );
+    INSTANCE;
+
+    @Override public double applyAsDouble(final double oldValue, final double newValue) {
+        return newValue;
     }
 
 }

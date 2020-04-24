@@ -17,17 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps.mergers;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import java.util.function.DoubleBinaryOperator;
 
-public class FadDeploymentCountingHeatmapBuilderFactory
-    extends ActionCountingHeatmapBuilderFactory<DeployFad> {
+public enum SummingMerger implements DoubleBinaryOperator {
 
-    @Override ActionCountingExtractor<DeployFad> makeExtractor() { return new FadDeploymentCountingExtractor(); }
+    INSTANCE;
 
-    @Override public String getTitle() { return "Number of FAD deployments over " + getInterval() + " day intervals"; }
+    @Override public double applyAsDouble(final double oldValue, final double newValue) {
+        return oldValue + newValue;
+    }
 
 }

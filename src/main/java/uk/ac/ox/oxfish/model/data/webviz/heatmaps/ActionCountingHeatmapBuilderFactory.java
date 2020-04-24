@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 
 abstract class ActionCountingHeatmapBuilderFactory<A extends PurseSeinerAction>

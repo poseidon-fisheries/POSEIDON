@@ -17,16 +17,22 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
-import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
-class FadSetCountingExtractor extends ActionCountingExtractor<MakeFadSet> {
+public class FadDeploymentHeatmapGatherer extends HeatmapGatherer {
 
-    @Override public void start(final FishState model) {
-        getFadManagers(model).forEach(fadManager ->
-            fadManager.getFadSetObservers().add(this)
+    public FadDeploymentHeatmapGatherer(
+        final int interval
+    ) {
+        super(
+            "FAD deployments",
+            "Number of deployments",
+            interval,
+            new FadDeploymentCountingExtractor(),
+            SummingMerger.INSTANCE
         );
     }
 

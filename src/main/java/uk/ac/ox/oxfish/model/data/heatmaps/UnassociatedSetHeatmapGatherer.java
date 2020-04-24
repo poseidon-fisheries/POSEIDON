@@ -17,17 +17,23 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.UnassociatedSetCountingExtractor;
+import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
-public class FadDeploymentCountingHeatmapBuilderFactory
-    extends ActionCountingHeatmapBuilderFactory<DeployFad> {
+public class UnassociatedSetHeatmapGatherer extends HeatmapGatherer {
 
-    @Override ActionCountingExtractor<DeployFad> makeExtractor() { return new FadDeploymentCountingExtractor(); }
-
-    @Override public String getTitle() { return "Number of FAD deployments over " + getInterval() + " day intervals"; }
+    public UnassociatedSetHeatmapGatherer(
+        final int interval
+    ) {
+        super(
+            "Unassociated sets",
+            "Number of sets",
+            interval,
+            new UnassociatedSetCountingExtractor(),
+            SummingMerger.INSTANCE
+        );
+    }
 
 }

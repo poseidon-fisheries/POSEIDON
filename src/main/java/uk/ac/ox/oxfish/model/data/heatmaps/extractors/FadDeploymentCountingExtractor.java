@@ -17,18 +17,11 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
 
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.model.data.heatmaps.observers.FadDeploymentActionObserver;
 
-import java.util.function.ToDoubleFunction;
-
-@FunctionalInterface
-public interface NumericExtractor extends ToDoubleFunction<SeaTile>, Startable {
-
-    @Override default void start(FishState model) { }
-    @Override default void turnOff() { }
-
-}
+public class FadDeploymentCountingExtractor
+    extends ActionCountingExtractor<DeployFad>
+    implements FadDeploymentActionObserver { }

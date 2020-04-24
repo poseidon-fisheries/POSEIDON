@@ -17,17 +17,24 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SnapshotMerger;
 
-public class FadDeploymentCountingHeatmapBuilderFactory
-    extends ActionCountingHeatmapBuilderFactory<DeployFad> {
+public class BiomassHeatmapGatherer extends HeatmapGatherer {
 
-    @Override ActionCountingExtractor<DeployFad> makeExtractor() { return new FadDeploymentCountingExtractor(); }
-
-    @Override public String getTitle() { return "Number of FAD deployments over " + getInterval() + " day intervals"; }
+    public BiomassHeatmapGatherer(
+        final int interval,
+        final Species species
+    ) {
+        super(
+            species.getName() + " biomass",
+            "Biomass (t)",
+            interval,
+            seaTile -> seaTile.getBiomass(species) / 1000,
+            SnapshotMerger.INSTANCE
+        );
+    }
 
 }
