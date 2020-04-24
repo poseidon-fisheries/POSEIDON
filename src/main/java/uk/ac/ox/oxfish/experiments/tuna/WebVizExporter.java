@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
@@ -34,9 +33,7 @@ import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.UnassociatedSetCountingHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.regions.SpecificRegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,16 +59,12 @@ public final class WebVizExporter {
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
     public static void main(final String[] args) throws IOException {
-        final TunaScenario scenario = new FishYAML().loadAs(new FileReader(scenarioPath.toFile()), TunaScenario.class);
-        final FishState model = new FishState();
-        model.setScenario(scenario);
-        scenario.getPlugins().add(makeJsonOutputManagerFactory());
-        model.start();
-        do {
-            model.schedule.step(model);
-            System.out.printf("%5d (year %d, day %3d)\n", model.getStep(), model.getYear(), model.getDayOfTheYear());
-        } while (model.getYear() < NUM_YEARS_TO_RUN);
-        JsonOutputPlugin.writeOutputsToFolder(model, outputPath);
+        final TunaRunner tunaRunner = new TunaRunner(scenarioPath);
+        tunaRunner.getScenario().getPlugins().add(makeJsonOutputManagerFactory());
+        tunaRunner.runUntilYear(NUM_YEARS_TO_RUN, model ->
+            System.out.printf("%5d (year %d, day %3d)\n", model.getStep(), model.getYear(), model.getDayOfTheYear())
+        );
+        JsonOutputPlugin.writeOutputsToFolder(tunaRunner.getModel(), outputPath);
     }
 
     @NotNull private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {
