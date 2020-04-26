@@ -29,62 +29,58 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Objects;
-
 /**
  * Blocks agents from ever fishing more than their hold
  * Created by carrknight on 6/1/17.
  */
 public class HoldLimitingDecoratorGear implements GearDecorator {
 
-
     private Gear delegate;
-
 
     public HoldLimitingDecoratorGear(Gear delegate) {
         this.delegate = delegate;
     }
 
-    @Override
-    public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology) {
-        Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
-
+    public static Catch limitToHoldCapacity(Catch original, Hold hold, GlobalBiology globalBiology) {
         double[] biomassArray = original.getBiomassArray();
-        double spaceLeft = fisher.getMaximumHold() - fisher.getTotalWeightOfCatchInHold();
-        assert  spaceLeft>=0;
+        double spaceLeft = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
+        assert spaceLeft >= 0;
         if (spaceLeft == 0) {
             return original.hasAbundanceInformation() ?
-                    new Catch(new StructuredAbundance[original.numberOfSpecies()],modelBiology) :
-                    new Catch(new double[biomassArray.length]);
+                new Catch(new StructuredAbundance[original.numberOfSpecies()], globalBiology) :
+                new Catch(new double[biomassArray.length]);
         } else {
-
             //biomassArray gets changed as a side effect!
             double proportionKept = Hold.throwOverboard(biomassArray, spaceLeft);
             //if there isn't abundance information you are already done
-            if(!original.hasAbundanceInformation())
+            if (!original.hasAbundanceInformation())
                 return new Catch(biomassArray);
-            else
-            {
+            else {
                 //otherwise reweigh
-                if(proportionKept >=1)
+                if (proportionKept >= 1)
                     return original;
-
                 StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
-                for(int i=0; i<modelBiology.getSpecies().size(); i++)
-                {
+                for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
                     //multiply every item by the proportion kept
                     abundances[i] = new StructuredAbundance(original.getAbundance(i));
                     double[][] structuredAbundance = abundances[i].asMatrix();
-                    for(int j=0; j<structuredAbundance.length; j++)
-                        for(int k=0; k<structuredAbundance[j].length; k++)
+                    for (int j = 0; j < structuredAbundance.length; j++)
+                        for (int k = 0; k < structuredAbundance[j].length; k++)
                             structuredAbundance[j][k] *= proportionKept;
                     //next species
                 }
-                return new Catch(abundances,modelBiology);
+                return new Catch(abundances, globalBiology);
             }
         }
+    }
+
+    @Override
+    public Catch fish(
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
+        Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
+        return limitToHoldCapacity(original, fisher.getHold(), modelBiology);
     }
 
     /**

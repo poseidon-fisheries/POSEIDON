@@ -18,6 +18,11 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private Map<String, Double> carryingCapacities = new HashMap<>();
     private Map<String, FixedDoubleParameter> attractionRates = new HashMap<>();
+    private DoubleParameter dudProbability = new FixedDoubleParameter(0d);
+
+    public DoubleParameter getDudProbability() { return dudProbability; }
+
+    public void setDudProbability(DoubleParameter dudProbability) { this.dudProbability = dudProbability; }
 
     @SuppressWarnings("unused") public Map<String, FixedDoubleParameter> getAttractionRates() {
         return attractionRates;
@@ -58,7 +63,9 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                 entry -> fishState.getBiology().getSpecie(entry.getKey()),
                 entry -> entry.getValue().getFixedValue()
             )),
-            fishReleaseProbabilityInPercent.apply(random) / 100d
+            fishState.getRandom(),
+            fishReleaseProbabilityInPercent.apply(random) / 100d,
+            dudProbability.apply(random)
         );
     }
 }

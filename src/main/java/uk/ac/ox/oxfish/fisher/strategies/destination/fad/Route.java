@@ -26,7 +26,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 
 public class Route implements Iterator<SeaTile> {
@@ -38,18 +37,6 @@ public class Route implements Iterator<SeaTile> {
     public Route(Deque<SeaTile> route, Fisher fisher) {
         this.route = route;
         this.fisher = fisher;
-    }
-
-    @Override public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Route that = (Route) o;
-        return Objects.equals(route, that.route) &&
-            Objects.equals(fisher, that.fisher);
-    }
-
-    @Override public int hashCode() {
-        return Objects.hash(route, fisher);
     }
 
     @Override public SeaTile next() {
@@ -67,5 +54,7 @@ public class Route implements Iterator<SeaTile> {
     @Override public boolean hasNext() {
         return nextDestination().isPresent();
     }
+
+    public boolean isSameAs(Route that) { return this.route.equals(that.route); }
 
 }

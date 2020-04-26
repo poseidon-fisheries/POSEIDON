@@ -22,23 +22,32 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
+import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 
 public class ActiveActionRegulations {
-    private ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations;
+
+    private ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
+        actionSpecificRegulations;
 
     public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
 
-    public ActiveActionRegulations(
-        ImmutableSetMultimap<Class<? extends FadAction>, ActionSpecificRegulation> actionSpecificRegulations
+    private ActiveActionRegulations(
+        ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this.actionSpecificRegulations = actionSpecificRegulations;
+    }
+
+    public ActiveActionRegulations(
+        Iterable<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
+        this(stream(actionSpecificRegulations));
     }
 
     public ActiveActionRegulations(
@@ -49,31 +58,32 @@ public class ActiveActionRegulations {
             .inverse());
     }
 
-    public boolean isAllowed(FadAction fadAction) {
-        return regulationStream(fadAction).allMatch(reg -> reg.isAllowed(fadAction));
+    public boolean isForbidden(PurseSeinerAction purseSeinerAction) {
+        return regulationStream(purseSeinerAction).anyMatch(reg -> reg.isForbidden(purseSeinerAction));
     }
 
-    public Stream<ActionSpecificRegulation> regulationStream(FadAction fadAction) {
-        return regulationStream(fadAction.getClass());
+    private Stream<ActionSpecificRegulation> regulationStream(PurseSeinerAction purseSeinerAction) {
+        return regulationStream(purseSeinerAction.getClass());
     }
 
-    public Stream<ActionSpecificRegulation> regulationStream(Class<? extends FadAction> fadActionClass) {
-        return actionSpecificRegulations.get(fadActionClass).stream();
+    public Stream<ActionSpecificRegulation> regulationStream(Class<? extends PurseSeinerAction> actionClass) {
+        return actionSpecificRegulations.get(actionClass).stream();
     }
 
-    public void reactToAction(FadAction fadAction) {
-        regulationStream(fadAction).forEach(reg -> reg.reactToAction(fadAction));
+    public void reactToAction(PurseSeinerAction purseSeinerAction) {
+        regulationStream(purseSeinerAction).forEach(reg -> reg.reactToAction(purseSeinerAction));
     }
 
     public boolean anyYearlyLimitedActionRemaining(Fisher fisher) {
-        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations = getYearlyActionLimitRegulations();
+        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations =
+            getYearlyActionLimitRegulations();
         return yearlyActionLimitRegulations.isEmpty() ||
             yearlyActionLimitRegulations.stream().anyMatch(reg ->
                 reg.getNumRemainingActions(fisher) > 0
             );
     }
 
-    public ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
+    private ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
         return actionSpecificRegulations
             .values()
             .stream()

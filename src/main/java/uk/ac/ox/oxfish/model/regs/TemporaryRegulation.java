@@ -31,9 +31,9 @@ public class TemporaryRegulation implements Regulation {
 
     public boolean isActive(int dayOfTheYear) {
         assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
-        return startDay <= endDay ?
-            dayOfTheYear >= startDay && dayOfTheYear <= endDay :
-            dayOfTheYear >= startDay || dayOfTheYear <= endDay;
+        return startDay <= endDay
+            ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
+            : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
     }
 
     @NotNull public Regulation delegateAtStep(FishState model, int timeStep) {

@@ -21,27 +21,14 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class PurseSeineDepartingStrategyFactory implements AlgorithmFactory<CompositeDepartingStrategy> {
 
-    // source: https://github.com/poseidon-fisheries/tuna/commit/d1d0fce68ec9dc49aa353ec63a5d9a1fd7eee481
-    private DoubleParameter hoursBetweenEachDeparture = new FixedDoubleParameter(340.3333);
-
     @Override public CompositeDepartingStrategy apply(FishState state) {
         return new CompositeDepartingStrategy(
-            new FixedRestTimeDepartingStrategy(hoursBetweenEachDeparture.apply(state.getRandom())),
+            new FixedRestTimeDepartingStrategy(0), // rest times assigned in TunaScenario.populateModel
             new YearlyActionLimitsDepartingStrategy()
         );
-    }
-
-    @SuppressWarnings("unused") public DoubleParameter
-    getHoursBetweenEachDeparture() { return hoursBetweenEachDeparture; }
-
-    @SuppressWarnings("unused") public void
-    setHoursBetweenEachDeparture(DoubleParameter hoursBetweenEachDeparture) {
-        this.hoursBetweenEachDeparture = hoursBetweenEachDeparture;
     }
 
 }

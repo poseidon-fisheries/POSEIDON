@@ -46,11 +46,11 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Map.Entry;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -63,7 +63,7 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeRoute;
 
 public class FadDeploymentRouteSelectorTest {
-    @SuppressWarnings("UnstableApiUsage") @Test
+    @SuppressWarnings({"UnstableApiUsage"}) @Test
     public void test() {
 
         final FadManager fadManager = mock(FadManager.class);
@@ -71,6 +71,7 @@ public class FadDeploymentRouteSelectorTest {
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         final Regulation regulation = mock(Regulation.class);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
 
         final NauticalMap map = makeCornerPortMap(3, 3);
         final Port port = map.getPorts().getFirst();
@@ -95,6 +96,7 @@ public class FadDeploymentRouteSelectorTest {
         final Set<SeaTile> emptyDestinationSet = routeSelector.getPossibleDestinations(fisher, 0);
         assertTrue(emptyDestinationSet.isEmpty());
         assertTrue(routeSelector.getPossibleRoutes(fisher, emptyDestinationSet, 0).isEmpty());
+        assertFalse(routeSelector.selectRoute(fisher, 0, rng).isPresent());
 
         final ImmutableSet<SeaTile> deploymentLocations = ImmutableSet.of(
             map.getSeaTile(0, 1),
@@ -119,10 +121,10 @@ public class FadDeploymentRouteSelectorTest {
         final Route shortRoute = new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}}), fisher);
         final Route longRoute = new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}}), fisher);
         // the route going to 2,2 should be excluded because travel time > 2.0h
-        assertEquals(
-            ImmutableSet.of(shortRoute, longRoute),
-            possibleRoutes.stream().map(possibleRoute -> possibleRoute.makeRoute(fisher)).collect(toImmutableSet())
-        );
+        final ImmutableSet<Route> routes =
+            possibleRoutes.stream().map(possibleRoute -> possibleRoute.makeRoute(fisher)).collect(toImmutableSet());
+        assertEquals(1, routes.stream().filter(r -> r.isSameAs(shortRoute)).count());
+        assertEquals(1, routes.stream().filter(r -> r.isSameAs(longRoute)).count());
 
         // same as previous test, but with strings
         assertEquals(
@@ -137,36 +139,42 @@ public class FadDeploymentRouteSelectorTest {
         final ImmutableMap<Route, Double> routeValues =
             routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
                 .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-        assertEquals(ImmutableMap.of(shortRoute, 3.0, longRoute, 4.0), routeValues);
 
-        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        assertEquals(1, routeValues.entrySet().stream().filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 3.0).count());
+        assertEquals(1, routeValues.entrySet().stream().filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 4.0).count());
 
-        final Map<Route, Long> routeSelectionCounts = Stream
+        final Map<Boolean, Long> routeSelectionCounts = Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
             .flatMap(Streams::stream)
-            .limit(100)
-            .collect(groupingBy(identity(), counting()));
+            .limit(500)
+            .collect(groupingBy(r -> r.isSameAs(shortRoute), counting()));
 
         // with no travel costs the shortest route should be picked roughly 43% of the time
+        final double shortRouteValue =
+            routeValues.entrySet().stream()
+                .filter(entry -> entry.getKey().isSameAs(shortRoute))
+                .findFirst().map(Entry::getValue).get();
+        final long shortRouteSelectionCount = routeSelectionCounts.get(true);
+
         assertEquals(
-            routeValues.get(shortRoute) / routeValues.values().stream().mapToDouble(Double::doubleValue).sum(),
-            routeSelectionCounts.get(shortRoute).doubleValue() / routeSelectionCounts.get(longRoute),
-            5
+            shortRouteValue / routeValues.values().stream().mapToDouble(Double::doubleValue).sum(),
+            shortRouteSelectionCount / routeSelectionCounts.values().stream().mapToDouble(Long::doubleValue).sum(),
+            0.1
         );
 
         // never pick longer route when adding costs
         final LinkedList<Cost> costs = Stream.of(new HourlyCost(2)).collect(toCollection(LinkedList::new));
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
-        assertEquals(
-            ImmutableMap.of(shortRoute, 1.0, longRoute, 0.0),
-            routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
-                .collect(toImmutableMap(Entry::getKey, Entry::getValue))
-        );
+        final ImmutableMap<Route, Double> routeValuesWhenCosts = routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
+        assertEquals(1, routeValuesWhenCosts.entrySet().stream().filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 1.0).count());
+        assertEquals(1, routeValuesWhenCosts.entrySet().stream().filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 0.0).count());
+
         Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
             .flatMap(Streams::stream)
             .limit(10)
-            .forEach(route -> assertEquals(shortRoute, route));
+            .forEach(route -> assertTrue(shortRoute.isSameAs(route)));
 
         // when FAD deployment is not permitted at 0, 1
         // the selector should pick the longer route despite costs
@@ -176,7 +184,7 @@ public class FadDeploymentRouteSelectorTest {
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
             .flatMap(Streams::stream)
             .limit(10)
-            .forEach(route -> assertEquals(longRoute, route));
+            .forEach(route -> assertTrue(longRoute.isSameAs(route)));
     }
 
 }

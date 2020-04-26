@@ -22,15 +22,15 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 
 import java.util.AbstractMap;
 import java.util.function.Predicate;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
-    private final ImmutableSet<Class<? extends FadAction>> applicableActions = ImmutableSet.of(DeployFad.class);
+    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(DeployFad.class);
     private final FisherRelativeLimits limits;
 
     public ActiveFadLimits(ImmutableList<AbstractMap.SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits) {
@@ -41,11 +41,11 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
         this.limits = limits;
     }
 
-    @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }
+    @Override public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 
-    public boolean isAllowed(FadAction action) {
+    @Override public boolean isForbidden(PurseSeinerAction action) {
         assert applicableActions.contains(action.getClass());
-        return action.getFadManager().getNumDeployedFads() < limits.getLimit(action.getFisher());
+        return action.getFadManager().getNumDeployedFads() >= limits.getLimit(action.getFisher());
     }
 
 }

@@ -35,6 +35,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.Math.min;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
@@ -44,12 +46,11 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 public class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
-    final private HoldLimitingDecoratorGear delegate;
-    private double minimumSetDurationInHours;
-    private double averageSetDurationInHours;
-    private double stdDevOfSetDurationInHours;
-    private double successfulSetProbability;
-    private double[][] unassociatedSetSamples;
+    private final double minimumSetDurationInHours;
+    private final double averageSetDurationInHours;
+    private final double stdDevOfSetDurationInHours;
+    private final double successfulSetProbability;
+    private final double[][] unassociatedSetSamples;
 
     public PurseSeineGear(
         FadManager fadManager,
@@ -57,52 +58,23 @@ public class PurseSeineGear implements Gear {
         double averageSetDurationInHours,
         double stdDevOfSetDurationInHours,
         double successfulSetProbability,
-        double[][] unassociatedSetSamples) {
+        double[][] unassociatedSetSamples
+    ) {
         this.fadManager = fadManager;
         this.minimumSetDurationInHours = minimumSetDurationInHours;
         this.averageSetDurationInHours = averageSetDurationInHours;
         this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
         this.successfulSetProbability = successfulSetProbability;
         this.unassociatedSetSamples = unassociatedSetSamples;
-        this.delegate = new HoldLimitingDecoratorGear(
-            new PurseSeineGearActuator()
-        );
     }
 
-    @Override
-    public Catch fish(
-        Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing,
-        GlobalBiology modelBiology) {
-        return delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
-    }
+    public double getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
-    /**
-     * get how much gas is consumed by fishing a spot with this gear
-     *
-     * @param fisher the dude fishing
-     * @param boat
-     * @param where  the location being fished  @return liters of gas consumed for every hour spent fishing
-     */
-    @Override
-    public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
-        return delegate.getFuelConsumptionPerHourOfFishing(fisher, boat, where);
-    }
+    public double getAverageSetDurationInHours() { return averageSetDurationInHours; }
 
-    @Override
-    public double[] expectedHourlyCatch(
-        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        return delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
-    }
+    public double getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
 
-    @Override
-    public Gear makeCopy() {
-        return delegate.makeCopy();
-    }
-
-    @Override
-    public boolean isSame(Gear o) {
-        return delegate.isSame(o);
-    }
+    public double[][] getUnassociatedSetSamples() { return unassociatedSetSamples; }
 
     public double getSuccessfulSetProbability() {
         return successfulSetProbability;
@@ -140,39 +112,54 @@ public class PurseSeineGear implements Gear {
         return unassociatedSetBiology;
     }
 
-    private static class PurseSeineGearActuator implements Gear {
+    @Override public Catch fish(
+        Fisher fisher,
+        LocalBiology localBiology,
+        SeaTile context,
+        int hoursSpentFishing,
+        GlobalBiology globalBiology
+    ) {
+        // Assume we catch *all* the biomass from the FAD
+        final double[] catches = globalBiology.getSpecies().stream()
+            .mapToDouble(localBiology::getBiomass).toArray();
+        return HoldLimitingDecoratorGear.limitToHoldCapacity(new Catch(catches), fisher.getHold(), globalBiology);
+    }
 
-        @Override public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology
-        ) {
-            // For now, just assume we catch *all* the biomass from the FAD
-            // TODO: should we revise this assumption?
-            final double[] catches = modelBiology.getSpecies().stream()
-                .mapToDouble(localBiology::getBiomass).toArray();
-            return new Catch(catches);
-        }
+    @Override
+    public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
+        // TODO: see if making a set should consume fuel
+        return 0;
+    }
 
-        @Override
-        public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
-            // TODO: see if making a set should consume fuel
-            return 0;
-        }
+    @Override
+    public double[] expectedHourlyCatch(
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
+        throw new UnsupportedOperationException();
+    }
 
-        @Override
-        public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
-        ) {
-            throw new UnsupportedOperationException();
-        }
+    @Override
+    public Gear makeCopy() {
+        return new PurseSeineGear(
+            fadManager,
+            minimumSetDurationInHours,
+            averageSetDurationInHours,
+            stdDevOfSetDurationInHours,
+            successfulSetProbability,
+            unassociatedSetSamples
+        );
+    }
 
-        @Override
-        public Gear makeCopy() {
-            return new PurseSeineGearActuator();
-        }
-
-        @Override
-        public boolean isSame(Gear o) { return o != null; }
+    @Override public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PurseSeineGear that = (PurseSeineGear) o;
+        return Double.compare(that.minimumSetDurationInHours, minimumSetDurationInHours) == 0 &&
+            Double.compare(that.averageSetDurationInHours, averageSetDurationInHours) == 0 &&
+            Double.compare(that.stdDevOfSetDurationInHours, stdDevOfSetDurationInHours) == 0 &&
+            Double.compare(that.successfulSetProbability, successfulSetProbability) == 0 &&
+            Objects.equals(fadManager, that.fadManager) &&
+            Arrays.equals(unassociatedSetSamples, that.unassociatedSetSamples);
     }
 
 }

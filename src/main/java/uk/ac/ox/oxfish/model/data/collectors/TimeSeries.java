@@ -57,7 +57,7 @@ public class TimeSeries<T> implements Steppable
      */
     public DataColumn registerGatherer(String title, Gatherer<T> gatherer, double defaultValue)
     {
-        Preconditions.checkArgument(!data.containsKey(title), "Column already exists");
+        Preconditions.checkArgument(!data.containsKey(title), "Column already exists: " + title);
         int size =noGatherers() ? 0 : numberOfObservations();
         DataColumn column = new DataColumn(title);
         //fill if needed
@@ -171,8 +171,9 @@ public class TimeSeries<T> implements Steppable
      */
     public DataColumn getColumn(String name){
         ColumnGatherer<T> current = data.get(name);
-        if(current==null)
+        if(current==null) {
             return null;
+        }
         return current.getColumn();
     }
 
