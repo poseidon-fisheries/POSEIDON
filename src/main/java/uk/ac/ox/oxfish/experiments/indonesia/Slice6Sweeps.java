@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.GiveUpAfterSomeLossesThisYearFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -43,7 +45,7 @@ public class Slice6Sweeps {
 
 
     private static final String SCENARIO_NAME = //"tropfishR_tl_2yr_8h";
-     "lime_monthly2yr_8h";
+            "lime_monthly2yr_8h";
 
 
     // "new_cmsy_tropfishR_8h";
@@ -205,9 +207,16 @@ public class Slice6Sweeps {
         //     fleetReduction("fleetreduction10", SCENARIO_NAME, 1,"population1","population2","population3" );
 
 
-        priceShock("price_shock2",SCENARIO_NAME,18*30,SHOCK_YEAR);
-        priceAndCostShock("price_and_cost2_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR);
-        priceAndCostShock("price_and_cost2_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR);
+        //  priceShock("price_shock3",SCENARIO_NAME,18*30,SHOCK_YEAR);
+//        priceAndCostShock("price_and_cost3_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR, false, Double.NaN, true);
+//        priceAndCostShock("price_and_cost3_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR, false, Double.NaN, true);
+
+        priceAndCostShock("price_and_cost_18mo_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, Double.NaN, true);
+        priceAndCostShock("price_and_cost_32mo_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, Double.NaN, true);
+
+        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, .5, false);
+        priceAndCostShock("price_and_cost_sticky30_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, .3, false);
+
 ////        //delays
 //        delays("delay_all",
 //                new String[]{"population0","population1","population2","population3"},
@@ -435,6 +444,38 @@ public class Slice6Sweeps {
         }
         fileWriter.close();
     }
+
+
+
+    private static Consumer<Scenario> giveUpWithinAYearConsumer = new Consumer<Scenario>() {
+        @Override
+        public void accept(Scenario scenario) {
+
+
+            for (int pop = 0; pop < ((FlexibleScenario) scenario).getFisherDefinitions().size(); pop++) {
+                if(pop==2)
+                    continue;
+
+                final FisherDefinition definition = ((FlexibleScenario) scenario).getFisherDefinitions().get(pop);
+                final AlgorithmFactory<? extends DepartingStrategy> original = definition.getDepartingStrategy();
+                final GiveUpAfterSomeLossesThisYearFactory newDepartingStrategy = new GiveUpAfterSomeLossesThisYearFactory();
+                newDepartingStrategy.setDelegate(original);
+                newDepartingStrategy.setHowManyBadTripsBeforeGivingUp(new FixedDoubleParameter(3));
+                newDepartingStrategy.setMinimumProfitPerTripRequired(new FixedDoubleParameter(0));
+                definition.setDepartingStrategy(newDepartingStrategy);
+            }
+
+
+
+        }
+    };
+
+
+
+
+
+
+
 
 
     @NotNull
@@ -1013,9 +1054,110 @@ public class Slice6Sweeps {
 
 
     @NotNull
+    public static Consumer<Scenario> setupPriceShockSticky(int stepDuration,
+                                                           int yearStart,
+                                                           double percentageRecoveryPerStep,
+                                                           double initialPriceDrop) {
+        return scenario -> {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+            Map<ThreePricesMarket,double[]> originalPrices = new HashMap<>();
+
+            ((FlexibleScenario) scenario).getPlugins().add(
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState state) {
+
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    state.scheduleOnceAtTheBeginningOfYear(
+                                            new Steppable() {
+                                                @Override
+                                                public void step(SimState simState) {
+
+                                                    //shock the prices
+                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+
+
+                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+
+                                                            originalPrices.put(
+                                                                    thisMarket,
+                                                                    new double[]{
+                                                                            thisMarket.getPriceBelowThreshold(),
+                                                                            thisMarket.getPriceBetweenThresholds(),
+                                                                            thisMarket.getPriceAboveThresholds()
+                                                                    }
+                                                            );
+
+
+                                                            thisMarket.setPriceAboveThresholds(
+                                                                    thisMarket.getPriceAboveThresholds() * initialPriceDrop
+                                                            );
+                                                            thisMarket.setPriceBetweenThresholds(
+                                                                    thisMarket.getPriceBetweenThresholds() * initialPriceDrop
+                                                            );
+                                                            thisMarket.setPriceBelowThreshold(
+                                                                    thisMarket.getPriceBelowThreshold() * initialPriceDrop
+                                                            );
+                                                            System.out.println(thisMarket.getPriceAboveThresholds());
+
+                                                        }
+                                                    }
+
+                                                    //restore prices
+                                                    ((FishState) simState).scheduleEveryXDay(
+                                                            new Steppable() {
+                                                                @Override
+                                                                public void step(SimState simState) {
+                                                                    for (Port port : ((FishState) simState).getPorts()) {
+                                                                        for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+
+                                                                            thisMarket.setPriceAboveThresholds(
+                                                                                    thisMarket.getPriceAboveThresholds()  * (1d-percentageRecoveryPerStep) +
+                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[2]
+                                                                            );
+                                                                            thisMarket.setPriceBetweenThresholds(
+                                                                                    thisMarket.getPriceBetweenThresholds()  * (1d-percentageRecoveryPerStep) +
+                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[1]
+                                                                            );
+                                                                            thisMarket.setPriceBelowThreshold(
+                                                                                    thisMarket.getPriceBelowThreshold()  * (1d-percentageRecoveryPerStep) +
+                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[0]
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            , StepOrder.DAWN, stepDuration
+                                                    );
+
+                                                }
+                                            },
+                                            StepOrder.DAWN,
+                                            yearStart
+                                    );
+
+                                }
+                            };
+
+                        }
+                    }
+
+            );
+
+
+
+        };
+    }
+
+    @NotNull
     public static Consumer<Scenario> setupVariableCostShock(int durationInDays,
-                                                     int yearStart,
-                                                     double percentageOfTotalCost) {
+                                                            int yearStart,
+                                                            double percentageOfTotalCost) {
         return scenario -> {
 
             FlexibleScenario flexible = (FlexibleScenario) scenario;
@@ -1136,30 +1278,32 @@ public class Slice6Sweeps {
     }
 
 
+
+    private static final double[] COST_SHOCKS_TO_TRY = new double[]{1,1.3};
+    private static final double[]  priceShocksToTry = new double[]{1,0.9,0.8,0.7,0.6,0.5,0};
     /**
      * lowers the price of fish caught below the maturity value
      * @param name
      * @param filename
+     * @param giveUpWithinAYear
+     * @param smoothPriceAdjustments
+     * @param immediatePriceRestoration
      * @throws IOException
      */
     private static void priceAndCostShock(
             String name,
             final String filename,
             final int durationInDays,
-            int yearStart
-    )throws IOException {
+            int yearStart, boolean giveUpWithinAYear,
+            double smoothPriceAdjustments, boolean immediatePriceRestoration)throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,sale_price_percentage,cost_percentage,duration,variable,value\n");
         fileWriter.flush();
 
-        for(double percentageOfTotalSalePrice=1;
-            percentageOfTotalSalePrice>=0;
-            percentageOfTotalSalePrice=FishStateUtilities.round(percentageOfTotalSalePrice-.1)) {
+        for(double percentageOfTotalSalePrice : priceShocksToTry) {
 
-            for (double percentageOfTotalCosts = 1;
-                 percentageOfTotalCosts <= 1.5;
-                 percentageOfTotalCosts = FishStateUtilities.round(percentageOfTotalCosts + .1)) {
+            for (double percentageOfTotalCosts  : COST_SHOCKS_TO_TRY) {
 
 
                 BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
@@ -1170,16 +1314,35 @@ public class Slice6Sweeps {
                 final double finalPercentageOfTotalCosts = percentageOfTotalCosts;
 
                 //add both change in price and costs
-                runner.setScenarioSetup(
-                        setupPriceShock(durationInDays,
-                                yearStart,
-                                percentageOfTotalSalePrice).andThen(
+                Consumer<Scenario> basicSetup =
+                        immediatePriceRestoration ?
+                                setupPriceShock(durationInDays,
+                                        yearStart,
+                                        percentageOfTotalSalePrice).andThen(
                                         setupVariableCostShock(
                                                 durationInDays,
                                                 yearStart,
                                                 percentageOfTotalCosts
                                         )
-                        )
+                                ) :
+                                setupPriceShockSticky(120,
+                                        yearStart,smoothPriceAdjustments,
+                                        percentageOfTotalSalePrice).andThen(
+                                        setupVariableCostShock(
+                                                durationInDays,
+                                                yearStart,
+                                                percentageOfTotalCosts
+                                        )
+                                )
+
+                        ;
+                if(giveUpWithinAYear)
+                    basicSetup = basicSetup.andThen(
+                            giveUpWithinAYearConsumer
+                    );
+
+                runner.setScenarioSetup(
+                        basicSetup
                 );
 
 
