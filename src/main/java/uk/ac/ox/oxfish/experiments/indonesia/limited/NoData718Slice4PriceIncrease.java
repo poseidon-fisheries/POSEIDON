@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -250,12 +251,21 @@ public class NoData718Slice4PriceIncrease {
 
             String[] row = strings.get(i);
             System.out.println(Arrays.toString(row));
-            sensitivity(
-                    Paths.get(row[0]),
-                    Integer.parseInt(row[1]),
-                    OUTPUT_FOLDER,
-                    priceIncreasePolicies
-            );
+
+            final Path scenarioPath = Paths.get(row[0]);
+            if(Files.exists(scenarioPath))
+            {
+
+                sensitivity(
+                        scenarioPath,
+                        Integer.parseInt(row[1]),
+                        OUTPUT_FOLDER,
+                        priceIncreasePolicies
+                );
+            }
+            else {
+                System.err.println("Couldn't find scenario " + scenarioPath);
+            }
         }
 
 
