@@ -19,21 +19,17 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.model.Startable;
 
-import java.util.AbstractMap;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class SetLimits extends YearlyActionLimitRegulation {
 
-    private final ImmutableSet<Class<? extends FadAction>> applicableActions = ImmutableSet.of(
+    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(
         MakeFadSet.class, MakeUnassociatedSet.class
     );
 
@@ -44,5 +40,5 @@ public class SetLimits extends YearlyActionLimitRegulation {
         super(startableConsumer, limits);
     }
 
-    @Override public ImmutableSet<Class<? extends FadAction>> getApplicableActions() { return applicableActions; }
+    @Override public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 }

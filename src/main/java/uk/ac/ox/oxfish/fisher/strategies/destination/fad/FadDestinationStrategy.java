@@ -34,7 +34,7 @@ public class FadDestinationStrategy implements DestinationStrategy {
 
     private final FadDeploymentRouteSelector fadDeploymentRouteSelector;
     private final FadSettingRouteSelector fadSettingRouteSelector;
-    private final LoopingIterator<RouteSelector> routeSelectors;
+    private final LoopingIterator<RouteSelector> routeSelectors; // TODO: replace with Guava cycle?
 
     private Route currentRoute = Route.EMPTY;
 

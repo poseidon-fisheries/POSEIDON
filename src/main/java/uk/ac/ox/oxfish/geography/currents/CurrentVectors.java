@@ -18,11 +18,12 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectors {
 
-    private final TreeMap<Integer, Map<SeaTile, Double2D>> vectorCache = new TreeMap<>();
+    private final Map<Integer, HashMap<SeaTile, Double2D>> vectorCache = new HashMap<>();
     private final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
 
     private final int stepsPerDay;
+    private final int initialHashMapsCapacity;
 
     public CurrentVectors(
         TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
@@ -36,12 +37,34 @@ public class CurrentVectors {
         Function<Integer, CurrentPattern> currentPatternAtStep,
         int stepsPerDay
     ) {
+        this.initialHashMapsCapacity = initialHashMapsCapacity(vectorMaps);
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
         this.stepsPerDay = stepsPerDay;
     }
 
-    int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
+    @NotNull public static Double2D getInterpolatedVector(
+        Double2D vectorBefore, int offsetBefore,
+        Double2D vectorAfter, int offsetAfter
+    ) {
+        final double totalOffset = (double) offsetBefore + offsetAfter;
+        final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
+        final Double2D v2 = vectorAfter.multiply((totalOffset - offsetAfter) / totalOffset);
+        return v1.add(v2);
+    }
+
+    private int initialHashMapsCapacity(Map<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps) {
+        // use half the size of the largest vector map (though they should all be the same size) as initial capacity.
+        // This should lead to *at most* two rehashings (given the default load factor of .75), but avoids all
+        // rehashings most of the time, as the cached vectors rarely exceed one quarter of the map.
+        return vectorMaps.values().stream()
+            .flatMap(map -> map.values().stream()).mapToInt(Map::size)
+            .max()
+            .orElse(0)
+            / 2;
+    }
+
+    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
 
     int positiveDaysOffset(int sourceDay, int targetDay) {
         checkArgument(sourceDay >= 1 && sourceDay <= 365);
@@ -57,7 +80,7 @@ public class CurrentVectors {
 
     Double2D getVector(int step, SeaTile seaTile) {
         return vectorCache
-            .computeIfAbsent(step, __ -> new HashMap<>())
+            .computeIfAbsent(step, __ -> new HashMap<>(initialHashMapsCapacity))
             .computeIfAbsent(seaTile, __ -> computeVector(step, seaTile));
     }
 
@@ -95,7 +118,7 @@ public class CurrentVectors {
             lookupVectorMap(newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
     }
 
-    VectorMapAtStep getVectorMapBefore(int step) {
+    private VectorMapAtStep getVectorMapBefore(int step) {
         return lookupVectorMap(
             step,
             vectorMaps::floorKey,
@@ -105,7 +128,7 @@ public class CurrentVectors {
         );
     }
 
-    VectorMapAtStep getVectorMapAfter(int step) {
+    private VectorMapAtStep getVectorMapAfter(int step) {
         return lookupVectorMap(
             step,
             vectorMaps::ceilingKey,
@@ -119,7 +142,7 @@ public class CurrentVectors {
      * Return the interpolated vector between the currents we have before and after step.
      * Returns null if we don't have currents for the desired sea tile.
      */
-    Double2D getInterpolatedVector(SeaTile seaTile, int step) {
+    private Double2D getInterpolatedVector(SeaTile seaTile, int step) {
         final VectorMapAtStep vectorMapBefore = getVectorMapBefore(step - 1);
         final Double2D vectorBefore = vectorMapBefore.vectorMap.get(seaTile);
         if (vectorBefore == null) return null;
@@ -131,19 +154,10 @@ public class CurrentVectors {
         return getInterpolatedVector(vectorBefore, offsetBefore, vectorAfter, offsetAfter);
     }
 
-    @NotNull public static Double2D getInterpolatedVector(
-        Double2D vectorBefore, int offsetBefore,
-        Double2D vectorAfter, int offsetAfter
-    ) {
-        final double totalOffset = (double) offsetBefore + offsetAfter;
-        final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
-        final Double2D v2 = vectorAfter.multiply((totalOffset - offsetAfter) / totalOffset);
-        return v1.add(v2);
-    }
-
     public void removeCachedVectors(int timeStep) { vectorCache.remove(timeStep); }
 
     static class VectorMapAtStep {
+
         final int step;
         final Map<SeaTile, Double2D> vectorMap;
 
@@ -151,5 +165,7 @@ public class CurrentVectors {
             this.step = step;
             this.vectorMap = vectorMap;
         }
+
     }
+
 }

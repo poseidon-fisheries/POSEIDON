@@ -24,13 +24,14 @@ import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.Fad.biomassLostCounterName;
 
 /**
  * This is a SchaeferLogisticGrower that:
@@ -39,6 +40,7 @@ import static uk.ac.ox.oxfish.fisher.equipment.fads.Fad.biomassLostCounterName;
  * tiles back into the current biomass as part of the recruitment function.
  */
 public class FadAwareCommonLogisticGrower extends SchaeferLogisticGrower {
+
     private final ImmutableList<BiomassLocalBiology> seaTileBiologies;
     private FishState model;
 
@@ -56,9 +58,15 @@ public class FadAwareCommonLogisticGrower extends SchaeferLogisticGrower {
     /**
      * Calls the normal recruitment function, but add the biomass lost by FADs to the total biomass recruited.
      */
+    @SuppressWarnings("UnstableApiUsage")
     @Override protected double recruit(double current, double capacity, double malthusianParameter) {
-        final double biomassLost = model.getFishers().stream()
-            .mapToDouble(fisher -> fisher.getYearlyCounter().getColumn(biomassLostCounterName(species)))
+        final double biomassLost = model.getFishers()
+            .stream()
+            .map(FadManagerUtils::getFadManager)
+            .flatMap(fadManager -> stream(
+                fadManager.getBiomassLostMonitor().flatMap(monitor -> monitor.getSubMonitor(species))
+            ))
+            .mapToDouble(monitor -> monitor.getAccumulator().get())
             .sum();
         return biomassLost + super.recruit(current, capacity, malthusianParameter);
     }
@@ -71,4 +79,5 @@ public class FadAwareCommonLogisticGrower extends SchaeferLogisticGrower {
         ).collect(toList());
         grow(model, biologies, seaTileBiologies);
     }
+
 }

@@ -11,15 +11,13 @@ import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactor
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
-import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
-import uk.ac.ox.oxfish.model.regs.OnOffSwitchRegulator;
+import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
-
 
 public class AdditionalStartables {
 
@@ -41,7 +39,7 @@ public class AdditionalStartables {
         NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class, "Full-time Seasonal Retired Data Collectors");
         NAMES.put(BiomassDepletionGathererFactory.class, "Biomass Depletion Data Collectors");
         NAMES.put(TowLongLoggerFactory.class, "Tow Long Logger");
-        NAMES.put(JsonManagerFactory.class, "Json Manager");
+        NAMES.put(JsonOutputManagerFactory.class, "Json Output Manager");
         NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
         NAMES.put(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors");
         NAMES.put(CatchAtBinFactory.class, "Catch at bin Collectors");
@@ -50,4 +48,5 @@ public class AdditionalStartables {
     }
 
     private AdditionalStartables() {}
+
 }

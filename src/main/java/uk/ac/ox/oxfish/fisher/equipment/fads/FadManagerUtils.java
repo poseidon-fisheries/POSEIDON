@@ -39,13 +39,6 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
  */
 public interface FadManagerUtils {
 
-    static Optional<Fad> oneOfDeployedFads(Fisher fisher) {
-        final ListOrderedSet<Fad> deployedFads = getFadManager(fisher).getDeployedFads();
-        return deployedFads.isEmpty() ?
-            Optional.empty() :
-            Optional.of(oneOf(deployedFads, fisher.grabRandomizer()));
-    }
-
     static FadManager getFadManager(Fisher fisher) {
         if (fisher.getGear() instanceof PurseSeineGear)
             return ((PurseSeineGear) fisher.getGear()).getFadManager();

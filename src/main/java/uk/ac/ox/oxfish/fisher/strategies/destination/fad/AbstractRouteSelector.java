@@ -28,7 +28,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -37,6 +39,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.IntStream.rangeClosed;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 public abstract class AbstractRouteSelector implements RouteSelector {
@@ -46,7 +49,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     private final double travelSpeedMultiplier;
     private double maxTravelTimeInHours;
 
-    protected AbstractRouteSelector(
+    AbstractRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
         double travelSpeedMultiplier
@@ -57,38 +60,53 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         this.travelSpeedMultiplier = travelSpeedMultiplier;
     }
 
-    static ImmutableList<Integer> getTimeStepRange(int startingStep, ImmutableList<PossibleRoute> possibleRoutes) {
+    static ImmutableList<Integer> getTimeStepRange(int startingStep, Collection<PossibleRoute> possibleRoutes) {
         final int maxTimeStep = possibleRoutes.stream().mapToInt(PossibleRoute::getLastTimeStep).max().orElse(0);
         return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
     }
 
-    public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
+    @SuppressWarnings("WeakerAccess") public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
 
-    public void setMaxTravelTimeInHours(double maxTravelTimeInHours) { this.maxTravelTimeInHours = maxTravelTimeInHours; }
+    public void setMaxTravelTimeInHours(double maxTravelTimeInHours) {
+        this.maxTravelTimeInHours = maxTravelTimeInHours;
+    }
 
     boolean canFishAtStep(Fisher fisher, SeaTile seaTile, int timeStep) {
         return fisher.getRegulation().canFishHere(fisher, seaTile, fishState, timeStep);
     }
 
     @Override public Optional<Route> selectRoute(Fisher fisher, int timeStep, MersenneTwisterFast rng) {
+
         if (shouldGoToPort(fisher)) return Optional.empty();
-        final ImmutableList<PossibleRoute> possibleRoutes = getPossibleRoutes(
-            fisher, getPossibleDestinations(fisher, timeStep), timeStep
-        );
-        if (possibleRoutes.isEmpty())
-            return Optional.empty();
-        else {
-            final ImmutableList<Entry<Route, Double>> candidateRoutes =
-                evaluateRoutes(fisher, possibleRoutes, timeStep)
-                    .filter(entry -> entry.getValue() > 0)
-                    .collect(toImmutableList());
-            if (candidateRoutes.isEmpty())
-                return Optional.empty();
-            else
-                return Optional
-                    .of(weightedOneOf(candidateRoutes, Entry::getValue, rng))
-                    .map(Entry::getKey);
-        }
+
+        final ImmutableList<PossibleRoute> possibleRoutes =
+            getPossibleRoutes(fisher, getPossibleDestinations(fisher, timeStep), timeStep);
+
+        final List<Entry<Route, Double>> candidateRoutes =
+            evaluateRoutes(fisher, possibleRoutes, timeStep)
+                .collect(toImmutableList());
+
+        if (candidateRoutes.isEmpty()) return Optional.empty();
+
+        final Stream<Entry<Route, Double>> routeWeights;
+
+        if (candidateRoutes.stream().anyMatch(entry -> entry.getValue() > 0))
+            // we have at least one positive, so we can get rid of the negatives
+            routeWeights = candidateRoutes.stream()
+                .filter(entry -> entry.getValue() > 0);
+        else if (candidateRoutes.stream().anyMatch(entry -> entry.getValue() == 0))
+            // we have no positives, but at least one zero: keep only the zeros and weight them to one
+            routeWeights = candidateRoutes.stream()
+                .filter(entry -> entry.getValue() == 0)
+                .map(entry -> entry(entry.getKey(), 1.0));
+        else
+            // if we're left with only negatives, just minimize the cost by weighting them to 1/-value
+            routeWeights = candidateRoutes.stream()
+                .map(entry -> entry(entry.getKey(), 1.0 / -entry.getValue()));
+
+        return Optional
+            .of(weightedOneOf(routeWeights.collect(toImmutableList()), Entry::getValue, rng))
+            .map(Entry::getKey);
     }
 
     abstract boolean shouldGoToPort(Fisher fisher);
@@ -96,7 +114,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     @SuppressWarnings("UnstableApiUsage")
     ImmutableList<PossibleRoute> getPossibleRoutes(
         Fisher fisher,
-        Set<SeaTile> possibleDestinations,
+        Collection<SeaTile> possibleDestinations,
         int startingTimeStep
     ) {
         return possibleDestinations
@@ -107,7 +125,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
                 fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier,
                 this::cumulativeTravelTimeAlongRouteInHours
             ))
-            .filter(route -> route.getTotalTravelTimeInHours() <= maxTravelTimeInHours)
+            .filter(route -> route.getTotalTravelTimeInHours() <= getMaxTravelTimeInHours())
             .collect(toImmutableList());
     }
 
@@ -122,7 +140,10 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         return Optional.ofNullable(map.getRoute(startingTile, destination));
     }
 
-    private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, Double speedInKph) {
+    private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+        Deque<SeaTile> route,
+        Double speedInKph
+    ) {
         NauticalMap map = fishState.getMap();
         return map.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
     }

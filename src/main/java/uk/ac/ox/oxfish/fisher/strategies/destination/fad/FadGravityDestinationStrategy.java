@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -70,7 +69,7 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         }
 
         if (fisher.isAtPort()) {
-            currentFadDeploymentRoute = fadDeploymentRouteSelector
+            currentFadDeploymentRoute = getFadDeploymentRouteSelector()
                 .selectRoute(fisher, model.getStep(), random)
                 .orElse(Route.EMPTY);
         }
@@ -87,13 +86,14 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
         HashMap<SeaTile, Double> valueMap = new HashMap<>();
 
         //get the map (you need to link back FADs to where they are)
-        final FadMap fadMap = FadManagerUtils.getFadManager(fisher).getFadMap();
+        final FadManager fadManager = FadManagerUtils.getFadManager(fisher);
+        final FadMap fadMap = fadManager.getFadMap();
 
         //grab about 20 deployed fads
         for (int i = 0; i < 20; i++) {
             //find where they are, see which are is more valuable
-            FadManagerUtils
-                .oneOfDeployedFads(fisher)
+            fadManager
+                .oneOfDeployedFads()
                 .flatMap(fadMap::getFadTile)
                 .ifPresent(there ->
                     valueMap.putIfAbsent(there, computeValueOfFad(fisher, map, here, there))
@@ -109,7 +109,6 @@ public class FadGravityDestinationStrategy implements DestinationStrategy {
 
     private double computeValueOfFad(Fisher fisher, NauticalMap map, SeaTile here, SeaTile newTile) {
         double distance = map.distance(here, newTile) + 1;
-        Preconditions.checkArgument(distance > 0);
         FadManager fadManager = FadManagerUtils.getFadManager(fisher);
         double biomassValue = FadManagerUtils
             .fadsAt(fisher, newTile)

@@ -174,8 +174,7 @@ public class BiomassResetterTest {
         final ImmutableMap<Species, Double> fadAttractionRates =
             species.stream().collect(toImmutableMap(identity(), __ -> fadAttractionRate));
         final FadInitializer fadInitializer = new FadInitializer(
-            globalBiology, carryingCapacities, fadAttractionRates, 0
-        );
+            globalBiology, carryingCapacities, fadAttractionRates, rng, 0, 0);
         seaTiles.forEach(seaTile -> fadMap.deployFad(fadInitializer.apply(mock(FadManager.class)), 0, seaTile));
 
         // record total biomass

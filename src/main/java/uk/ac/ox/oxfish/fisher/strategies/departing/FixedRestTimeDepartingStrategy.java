@@ -20,23 +20,28 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * The fisher must spend x hours at port before going back out
  * Created by carrknight on 8/11/15.
  */
-public class FixedRestTimeDepartingStrategy implements DepartingStrategy
-{
+public class FixedRestTimeDepartingStrategy implements DepartingStrategy {
 
-
-    private final double minimumHoursToWait;
+    private double minimumHoursToWait;
 
     public FixedRestTimeDepartingStrategy(double minimumHoursToWait) {
-        Preconditions.checkArgument(minimumHoursToWait >= 0);
+        setMinimumHoursToWait(minimumHoursToWait);
+    }
+
+    @SuppressWarnings("unused") public double getMinimumHoursToWait() { return minimumHoursToWait; }
+
+    public void setMinimumHoursToWait(double minimumHoursToWait) {
+        checkArgument(minimumHoursToWait >= 0);
         this.minimumHoursToWait = minimumHoursToWait;
     }
 
@@ -47,22 +52,9 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
      */
     @Override
     public boolean shouldFisherLeavePort(
-            Fisher fisher, FishState model, MersenneTwisterFast random) {
+        Fisher fisher, FishState model, MersenneTwisterFast random
+    ) {
         return fisher.getHoursAtPort() >= minimumHoursToWait;
     }
 
-    /**
-     */
-    @Override
-    public void start(FishState model,Fisher fisher) {
-
-    }
-
-    /**
-     * @param fisher
-     */
-    @Override
-    public void turnOff(Fisher fisher) {
-//nothing
-    }
 }

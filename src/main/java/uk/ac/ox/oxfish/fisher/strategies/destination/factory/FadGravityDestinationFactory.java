@@ -35,7 +35,7 @@ public class FadGravityDestinationFactory implements AlgorithmFactory<FadGravity
     public FadGravityDestinationStrategy apply(FishState state) {
         return new FadGravityDestinationStrategy(
             gravitationalConstraint.apply(state.getRandom()),
-            new FadDeploymentRouteSelector(state, FadDestinationStrategyFactory.MAX_HOURS_AT_SEA, 1)
+            new FadDeploymentRouteSelector(state, 0, 1) // max travel time has to be set in scenario
         );
     }
 
