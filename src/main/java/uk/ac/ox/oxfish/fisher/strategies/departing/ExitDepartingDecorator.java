@@ -119,7 +119,4 @@ public class ExitDepartingDecorator implements DepartingStrategy {
         }
     }
 
-    public boolean isHasQuit() {
-        return hasQuit;
-    }
 }
