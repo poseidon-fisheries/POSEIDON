@@ -310,7 +310,7 @@ public class NoDataSlice2Policy {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
                                                                             final FixedPriceMarket delegate = (FixedPriceMarket) market;
                                                                             delegate.setPrice(
-                                                                                    delegate.getPrice() * percentageOfTotalPrice
+                                                                                    delegate.getPrice() / percentageOfTotalPrice
                                                                             );
                                                                         }
                                                                     }
