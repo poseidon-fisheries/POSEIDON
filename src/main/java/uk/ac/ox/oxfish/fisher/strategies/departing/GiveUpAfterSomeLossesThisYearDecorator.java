@@ -63,6 +63,7 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
                 },
                 StepOrder.DAWN
         );
+        delegate.start(model, fisher);
     }
 
     @Override
@@ -71,6 +72,7 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
         this.fisherIAmConnectedTo = null;
         if(this.receipt!=null)
             receipt.stop();
+        delegate.turnOff(fisher);
     }
 
     @Override
@@ -96,8 +98,8 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
      * stops giving up!
      */
     public void reset(){
-        if(givenUp==true)
-            this.fisherIAmConnectedTo.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME,null);
+//        if(givenUp==true)
+//            this.fisherIAmConnectedTo.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME,null);
 
         givenUp = false;
         badTrips = 0;
