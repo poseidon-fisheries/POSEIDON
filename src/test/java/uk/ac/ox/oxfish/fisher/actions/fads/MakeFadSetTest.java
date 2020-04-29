@@ -70,7 +70,7 @@ public class MakeFadSetTest {
         final double carryingCapacity = 0.0;
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
-        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0);
+        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0, 0);
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...

@@ -47,7 +47,15 @@ public class FadManagerTest {
         nauticalMap = makeMap(1, 1, -1);
         final CurrentVectors currentVectors = makeUniformCurrentVectors(nauticalMap, new Double2D(0, 0), 1);
         fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
-        fadInitializer = new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        fadInitializer = new FadInitializer(
+            globalBiology,
+            ImmutableMap.of(),
+            ImmutableMap.of(),
+            rng,
+            0,
+            0,
+            () -> 0
+        );
     }
 
     @Test

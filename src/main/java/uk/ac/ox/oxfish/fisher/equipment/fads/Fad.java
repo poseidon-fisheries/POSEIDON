@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -48,18 +47,21 @@ public class Fad implements Locatable {
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
-    final private double[] attractionRates; // proportion of underlying biomass attracted per day
-    final private double fishReleaseProbability; // daily probability of releasing fish from the FAD
+    private final double[] attractionRates; // proportion of underlying biomass attracted per day
+    private final double fishReleaseProbability; // daily probability of releasing fish from the FAD
+    private final int stepDeployed;
 
     public Fad(
         FadManager owner,
         BiomassLocalBiology biology,
-        ImmutableMap<Species, Double> attractionRates,
-        double fishReleaseProbability
+        Map<Species, Double> attractionRates,
+        double fishReleaseProbability,
+        final int stepDeployed
     ) {
         this.owner = owner;
         this.biology = biology;
         this.attractionRates = new double[biology.getCurrentBiomass().length];
+        this.stepDeployed = stepDeployed;
         attractionRates.forEach((species, rate) ->
             this.attractionRates[species.getIndex()] = rate
         );
@@ -106,7 +108,7 @@ public class Fad implements Locatable {
      * Remove biomass from the FAD and send the biomass down to the sea tile's biology.
      * In the unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
      */
-    public void releaseFish(Iterable<Species> allSpecies, VariableBiomassBasedBiology seaTileBiology) {
+    private void releaseFish(Iterable<Species> allSpecies, VariableBiomassBasedBiology seaTileBiology) {
         allSpecies.forEach(species -> {
             final double seaTileBiomass = seaTileBiology.getBiomass(species);
             final double fadBiomass = biology.getBiomass(species);
@@ -146,5 +148,7 @@ public class Fad implements Locatable {
     @Override public SeaTile getLocation() {
         return owner.getFadMap().getFadTile(this).orElseThrow(() -> new RuntimeException(this + " not on map!"));
     }
+
+    public int getStepDeployed() { return stepDeployed; }
 
 }

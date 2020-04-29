@@ -76,8 +76,15 @@ public class FadGravityDestinationStrategyTest {
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0, 1), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final FadInitializer fadInitializer =
-            new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadInitializer fadInitializer = new FadInitializer(
+            globalBiology,
+            ImmutableMap.of(),
+            ImmutableMap.of(),
+            rng,
+            0,
+            0,
+            () -> 0
+        );
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE);
         fadManager.setFisher(fisher);
 
@@ -126,7 +133,7 @@ public class FadGravityDestinationStrategyTest {
         // but at least the coverage report tells us that the filter is exercised and the FAD excluded.
         final BiomassLocalBiology biomassLocalBiology = mock(BiomassLocalBiology.class);
         when(biomassLocalBiology.getCurrentBiomass()).thenReturn(new double[0]);
-        final Fad fad = new Fad(mock(FadManager.class), biomassLocalBiology, ImmutableMap.of(), 0);
+        final Fad fad = new Fad(mock(FadManager.class), biomassLocalBiology, ImmutableMap.of(), 0, 0);
         fadMap.deployFad(fad, 1, map.getSeaTile(1, 2));
         final SeaTile dest12b = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
         assertEquals(map.getSeaTile(1, 2), dest12b);

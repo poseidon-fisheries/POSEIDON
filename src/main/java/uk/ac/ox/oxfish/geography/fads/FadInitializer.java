@@ -32,6 +32,7 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -44,18 +45,22 @@ public class FadInitializer implements Function<FadManager, Fad> {
     private final ImmutableMap<Species, Double> attractionRates;
     private final MersenneTwisterFast rng;
     private final double dudProbability;
+    private final IntSupplier timeStepSupplier;
 
     public FadInitializer(
         GlobalBiology globalBiology,
         Map<Species, Quantity<Mass>> carryingCapacities,
         Map<Species, Double> attractionRates,
-        MersenneTwisterFast rng, double fishReleaseProbability,
-        double dudProbability
+        MersenneTwisterFast rng,
+        double fishReleaseProbability,
+        double dudProbability,
+        IntSupplier timeStepSupplier
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
         this.carryingCapacities = new double[globalBiology.getSize()];
         this.rng = rng;
         this.dudProbability = dudProbability;
+        this.timeStepSupplier = timeStepSupplier;
         carryingCapacities.forEach((species, qty) ->
             this.carryingCapacities[species.getIndex()] = asDouble(qty, KILOGRAM)
         );
@@ -68,7 +73,8 @@ public class FadInitializer implements Function<FadManager, Fad> {
             fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
             rng.nextBoolean(dudProbability) ? ImmutableMap.of() : this.attractionRates,
-            fishReleaseProbability
+            fishReleaseProbability,
+            timeStepSupplier.getAsInt()
         );
     }
 

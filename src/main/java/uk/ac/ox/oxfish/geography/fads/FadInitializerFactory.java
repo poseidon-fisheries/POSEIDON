@@ -65,7 +65,8 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
             )),
             fishState.getRandom(),
             fishReleaseProbabilityInPercent.apply(random) / 100d,
-            dudProbability.apply(random)
+            dudProbability.apply(random),
+            fishState::getStep
         );
     }
 }

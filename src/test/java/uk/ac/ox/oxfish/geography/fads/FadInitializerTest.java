@@ -30,8 +30,15 @@ public class FadInitializerTest {
             speciesB, getQuantity(2d, TONNE)
         );
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final FadInitializer fadInitializer =
-            new FadInitializer(globalBiology, carryingCapacities, ImmutableMap.of(), rng, 0, 0);
+        final FadInitializer fadInitializer = new FadInitializer(
+            globalBiology,
+            carryingCapacities,
+            ImmutableMap.of(),
+            rng,
+            0,
+            0,
+            () -> 0
+        );
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);

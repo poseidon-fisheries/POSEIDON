@@ -62,12 +62,8 @@ import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 public class BiomassResetterTest {
 
-
-
-
     @Test
     public void snapshot() {
-
 
         FishState fishState = MovingTest.generateSimple4x4Map();
         //zero them all
@@ -75,33 +71,36 @@ public class BiomassResetterTest {
             seaTile.setBiology(new EmptyLocalBiology());
         }
 
-        Species species = new Species("test",
-                                      new FromListMeristics(new double[]{1,10},2));
+        Species species = new Species(
+            "test",
+            new FromListMeristics(new double[]{1, 10}, 2)
+        );
         GlobalBiology biology = new GlobalBiology(species);
-
 
         //fill 1x1 at top
         BiomassLocalBiology zerozero = new BiomassLocalBiology(
-                1000000,biology.getSize(),new MersenneTwisterFast()
+            1000000, biology.getSize(), new MersenneTwisterFast()
         );
-        zerozero.setCurrentBiomass(species,100);
+        zerozero.setCurrentBiomass(species, 100);
         BiomassLocalBiology oneone = new BiomassLocalBiology(
-                1000000,biology.getSize(),new MersenneTwisterFast()
+            1000000, biology.getSize(), new MersenneTwisterFast()
         );
-        oneone.setCurrentBiomass(species,100);
+        oneone.setCurrentBiomass(species, 100);
 
-
-
-        fishState.getMap().getSeaTile(0,0).setBiology(zerozero);
-        fishState.getMap().getSeaTile(0,1).setBiology(new BiomassLocalBiology(1000000,biology.getSize(),new MersenneTwisterFast(),0,0));
-        fishState.getMap().getSeaTile(1,0).setBiology(new BiomassLocalBiology(1000000,biology.getSize(),new MersenneTwisterFast(),0,0));
-        fishState.getMap().getSeaTile(1,1).setBiology(oneone);
+        fishState.getMap().getSeaTile(0, 0).setBiology(zerozero);
+        fishState.getMap()
+            .getSeaTile(0, 1)
+            .setBiology(new BiomassLocalBiology(1000000, biology.getSize(), new MersenneTwisterFast(), 0, 0));
+        fishState.getMap()
+            .getSeaTile(1, 0)
+            .setBiology(new BiomassLocalBiology(1000000, biology.getSize(), new MersenneTwisterFast(), 0, 0));
+        fishState.getMap().getSeaTile(1, 1).setBiology(oneone);
 
         //biomass allocator wants to reallocate everythin to 0,1 (and triple it too)
         BiomassAllocator biomassAllocator = new BiomassAllocator() {
             @Override
             public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-                if(tile==fishState.getMap().getSeaTile(0,1))
+                if (tile == fishState.getMap().getSeaTile(0, 1))
                     return 3d;
                 else
                     return 0;
@@ -110,39 +109,32 @@ public class BiomassResetterTest {
         };
 
         //record the abundance as it is
-        BiomassResetter resetter = new BiomassResetter(biomassAllocator,species);
+        BiomassResetter resetter = new BiomassResetter(biomassAllocator, species);
         resetter.recordHowMuchBiomassThereIs(fishState);
 
-
         //reallocate!
-        resetter.resetAbundance(fishState.getMap(),new MersenneTwisterFast());
+        resetter.resetAbundance(fishState.getMap(), new MersenneTwisterFast());
 
-
-        for(int x=0; x<4;x++) {
+        for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 4; y++) {
 
-                if(x==0 && y==1)
-                {
+                if (x == 0 && y == 1) {
                     assertEquals(
-                            fishState.getMap().getSeaTile(x,y).getBiomass(species),
-                            600d,
-                            .0001d
+                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
+                        600d,
+                        .0001d
                     );
 
-                }
-                else{
+                } else {
                     assertEquals(
-                            fishState.getMap().getSeaTile(x,y).getBiomass(species),
-                            0d,
-                            .0001d
+                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
+                        0d,
+                        .0001d
                     );
                 }
 
             }
         }
-
-
-
 
     }
 
@@ -174,7 +166,14 @@ public class BiomassResetterTest {
         final ImmutableMap<Species, Double> fadAttractionRates =
             species.stream().collect(toImmutableMap(identity(), __ -> fadAttractionRate));
         final FadInitializer fadInitializer = new FadInitializer(
-            globalBiology, carryingCapacities, fadAttractionRates, rng, 0, 0);
+            globalBiology,
+            carryingCapacities,
+            fadAttractionRates,
+            rng,
+            0,
+            0,
+            () -> 0
+        );
         seaTiles.forEach(seaTile -> fadMap.deployFad(fadInitializer.apply(mock(FadManager.class)), 0, seaTile));
 
         // record total biomass
@@ -231,7 +230,10 @@ public class BiomassResetterTest {
 
     }
 
-    private ImmutableMap<Species, Double> totalBiomasses(GlobalBiology globalBiology, Collection<LocalBiology> localBiologies) {
+    private ImmutableMap<Species, Double> totalBiomasses(
+        GlobalBiology globalBiology,
+        Collection<LocalBiology> localBiologies
+    ) {
         return globalBiology.getSpecies().stream().collect(toImmutableMap(
             identity(),
             species -> localBiologies.stream().mapToDouble(localBiology -> localBiology.getBiomass(species)).sum()

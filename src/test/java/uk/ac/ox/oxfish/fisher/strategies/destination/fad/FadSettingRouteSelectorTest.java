@@ -78,9 +78,15 @@ public class FadSettingRouteSelectorTest {
 
         final CurrentVectors currentVectors = makeUniformCurrentVectors(map, new Double2D(0.75, 0), 1);
         final FadMap fadMap = new FadMap(map, currentVectors, globalBiology);
-
-        final FadInitializer fadInitializer =
-            new FadInitializer(globalBiology, ImmutableMap.of(), ImmutableMap.of(), rng, 0, 0);
+        final FadInitializer fadInitializer = new FadInitializer(
+            globalBiology,
+            ImmutableMap.of(),
+            ImmutableMap.of(),
+            rng,
+            0,
+            0,
+            () -> 0
+        );
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, Integer.MAX_VALUE);
         fadManager.setFisher(fisher);
 

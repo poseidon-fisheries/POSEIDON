@@ -84,6 +84,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.BasicMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.ObservingAtIntervalMonitor;
@@ -739,6 +740,12 @@ public class TunaScenario implements Scenario {
                     regionalDivision,
                     IncrementingAccumulator::new,
                     makeProportionOfSetsOnOwnFadsMonitor
+                ),
+                new BasicMonitor<>(
+                    "FAD soak time",
+                    EVERY_YEAR,
+                    IterativeAveragingAccumulator::new,
+                    fadSet -> fadSet.getStep() - fadSet.getTargetFad().getStepDeployed()
                 )
             );
 

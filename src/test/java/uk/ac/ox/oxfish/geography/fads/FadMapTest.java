@@ -59,8 +59,15 @@ public class FadMapTest {
         final MersenneTwisterFast rng = new MersenneTwisterFast();
         final CurrentVectors currentVectors =
             TestUtilities.makeUniformCurrentVectors(nauticalMap, new Double2D(-0.3, 0), 1);
-        final FadInitializer fadInitializer =
-            new FadInitializer(globalBiology, fadCarryingCapacities, ImmutableMap.of(), rng, 0, 0);
+        final FadInitializer fadInitializer = new FadInitializer(
+            globalBiology,
+            fadCarryingCapacities,
+            ImmutableMap.of(),
+            rng,
+            0,
+            0,
+            () -> 0
+        );
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
 
         final Schedule schedule = mock(Schedule.class);

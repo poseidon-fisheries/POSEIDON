@@ -47,7 +47,7 @@ public class FadTest {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, 0.75);
         fillBiology(fadBiology);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0.5);
+        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0.5, 0);
 
         // ...and an empty tile biology, with a carrying capacity of 1.0:
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);
