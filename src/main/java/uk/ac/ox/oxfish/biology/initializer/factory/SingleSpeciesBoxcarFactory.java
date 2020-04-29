@@ -509,4 +509,13 @@ public class SingleSpeciesBoxcarFactory implements AlgorithmFactory<SingleSpecie
             AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator) {
         this.habitabilityAllocator = habitabilityAllocator;
     }
+
+
+    public BoxCarSimulator getAbundanceSimulator() {
+        return abundanceSimulator;
+    }
+
+    public void setAbundanceSimulator(BoxCarSimulator abundanceSimulator) {
+        this.abundanceSimulator = abundanceSimulator;
+    }
 }

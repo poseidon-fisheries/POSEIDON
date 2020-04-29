@@ -52,10 +52,8 @@ public class NoData718Slice2PriceIncrease {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
                 "Actual Average Cash-Flow",
                 "Actual Average Hours Out",
-
                 "Full-time fishers",
                 "Seasonal fishers",
-
                 "Retired fishers"
 
 

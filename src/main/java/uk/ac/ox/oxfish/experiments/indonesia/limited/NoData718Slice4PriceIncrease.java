@@ -4,13 +4,10 @@ import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -88,77 +85,17 @@ public class NoData718Slice4PriceIncrease {
 
         priceIncreasePolicies.put(
                 "Price Shock plus seeding",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-
-                        return new Consumer<Scenario>() {
-                            @Override
-                            public void accept(Scenario scenario) {
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        NoData718Slice3PriceIncrease.priceIncreaseEvent(shockYear,
-                                                newCroakerPriceDobo,
-                                                newCroakerPriceProbolinggo)
-                                );
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        farOffPortsSeedingEvent(shockYear,10)
-                                );
-                            }
-                        };
-
-
-                    }
-                }
+                priceShockAndSeedingGenerator(0)
 
         );
         priceIncreasePolicies.put(
                 "Price Shock lag 2 plus seeding",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-
-                        return new Consumer<Scenario>() {
-                            @Override
-                            public void accept(Scenario scenario) {
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        NoData718Slice3PriceIncrease.priceIncreaseEvent(shockYear-2,
-                                                newCroakerPriceDobo,
-                                                newCroakerPriceProbolinggo)
-                                );
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        farOffPortsSeedingEvent(shockYear-2,10)
-                                );
-                            }
-                        };
-
-
-                    }
-                }
+                priceShockAndSeedingGenerator(2)
 
         );
         priceIncreasePolicies.put(
                 "Price Shock lag 5 plus seeding",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-
-                        return new Consumer<Scenario>() {
-                            @Override
-                            public void accept(Scenario scenario) {
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        NoData718Slice3PriceIncrease.priceIncreaseEvent(shockYear-5,
-                                                newCroakerPriceDobo,
-                                                newCroakerPriceProbolinggo)
-                                );
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        farOffPortsSeedingEvent(shockYear-5,10)
-                                );
-                            }
-                        };
-
-
-                    }
-                }
+                priceShockAndSeedingGenerator(5)
 
         );
 
@@ -172,6 +109,30 @@ public class NoData718Slice4PriceIncrease {
 
     }
 
+    @NotNull
+    public static Function<Integer, Consumer<Scenario>> priceShockAndSeedingGenerator(final int lead) {
+        return new Function<Integer, Consumer<Scenario>>() {
+            @Override
+            public Consumer<Scenario> apply(Integer shockYear) {
+
+                return new Consumer<Scenario>() {
+                    @Override
+                    public void accept(Scenario scenario) {
+                        ((FlexibleScenario) scenario).getPlugins().add(
+                                NoData718Slice3PriceIncrease.priceIncreaseEvent(shockYear- lead,
+                                        newCroakerPriceDobo,
+                                        newCroakerPriceProbolinggo)
+                        );
+                        ((FlexibleScenario) scenario).getPlugins().add(
+                                farOffPortsSeedingEvent(shockYear- lead,10)
+                        );
+                    }
+                };
+
+
+            }
+        };
+    }
 
 
     public static void sensitivity(Path scenarioFile, int shockYear,
