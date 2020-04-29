@@ -17,30 +17,11 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.monitors.observers;
 
-import com.google.common.collect.ImmutableList;
+@FunctionalInterface
+public interface Observer<O> {
 
-import java.util.Collection;
-
-import static java.lang.Double.NEGATIVE_INFINITY;
-
-abstract class AbstractTimestepBuilder implements TimestepsBuilder {
-
-    private final ImmutableList.Builder<Timestep> builder = new ImmutableList.Builder<>();
-    private double maxValueSeen = NEGATIVE_INFINITY;
-
-    @Override public void add(Timestep timestep) {
-        timestep.getCellValues().max().ifPresent(value -> {
-            if (value > maxValueSeen) maxValueSeen = value;
-        });
-        builder.add(timestep);
-    }
-
-    public double getMaxValueSeen() { return maxValueSeen; }
-
-    @Override public Collection<Timestep> build() {
-        return builder.build();
-    }
+    void observe(O observable);
 
 }

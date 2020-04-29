@@ -36,6 +36,8 @@ import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+import static java.lang.Double.NaN;
+
 public class HeatmapGatherer implements AdditionalStartable, Steppable {
 
     private final String name;
@@ -81,6 +83,10 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable {
     public String getUnit() { return unit; }
 
     public Map<Integer, DoubleGrid2D> getGrids() { return Collections.unmodifiableMap(grids); }
+
+    public double maxValueSeen() {
+        return grids.values().stream().mapToDouble(DoubleGrid2D::max).max().orElse(NaN);
+    }
 
     @Override public void step(final SimState simState) {
 

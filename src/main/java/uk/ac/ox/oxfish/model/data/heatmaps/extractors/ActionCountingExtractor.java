@@ -23,12 +23,12 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.data.heatmaps.observers.ActionObserver;
+import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.util.function.ToDoubleFunction;
 
 public abstract class ActionCountingExtractor<A extends PurseSeinerAction>
-    implements ActionObserver<A>, ToDoubleFunction<SeaTile> {
+    implements PurseSeinerActionObserver<A>, ToDoubleFunction<SeaTile> {
 
     private final Multiset<SeaTile> actionsPerTile = HashMultiset.create();
 

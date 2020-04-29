@@ -23,8 +23,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
-
-import java.util.Optional;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
 public interface Monitor<O, V> extends Observer<O>, Startable {
 

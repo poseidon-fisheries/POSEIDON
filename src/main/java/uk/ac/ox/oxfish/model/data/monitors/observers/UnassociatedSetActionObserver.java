@@ -17,14 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
+package uk.ac.ox.oxfish.model.data.monitors.observers;
 
-import java.util.Collection;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 
-interface TimestepsBuilder {
+@FunctionalInterface
+public interface UnassociatedSetActionObserver extends PurseSeinerActionObserver<MakeUnassociatedSet> {
 
-    void add(Timestep timestep);
-    double getMaxValueSeen();
-    Collection<Timestep> build();
+    @Override default void registerWith(final FadManager fadManager) {
+        fadManager.getUnassociatedSetObservers().add(this);
+    }
 
 }

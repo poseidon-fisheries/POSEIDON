@@ -19,12 +19,16 @@
 
 package uk.ac.ox.oxfish.model.data.webviz;
 
+import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+@FunctionalInterface
 public interface SteppableJsonBuilder<T> extends Startable, Steppable, JsonBuilder<T> {
+
+    @Override default void step(SimState simState) { }
 
     @Override default void start(final FishState fishState) {
         fishState.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);

@@ -19,8 +19,13 @@
 
 package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDensityExtractor;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.IterativeAverageMerger;
+
+import java.util.function.ToDoubleFunction;
 
 public class FadDensityHeatmapGatherer extends HeatmapGatherer {
 
@@ -31,9 +36,23 @@ public class FadDensityHeatmapGatherer extends HeatmapGatherer {
             "FAD density",
             "Average number of FADs",
             interval,
-            new FadDensityExtractor(),
+            new Extractor(),
             heatmapGatherer -> new IterativeAverageMerger(heatmapGatherer::getNumObservations)
         );
+    }
+
+    private static class Extractor implements ToDoubleFunction<SeaTile>, Startable {
+
+        private FadMap fadMap = null;
+
+        @Override public void start(final FishState fishState) {
+            fadMap = fishState.getFadMap();
+        }
+
+        @Override public double applyAsDouble(final SeaTile seaTile) {
+            return fadMap.fadsAt(seaTile).numObjs;
+        }
+
     }
 
 }

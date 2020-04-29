@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.CatchFromSetExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
-import uk.ac.ox.oxfish.model.data.heatmaps.observers.UnassociatedSetActionObserver;
+import uk.ac.ox.oxfish.model.data.monitors.observers.UnassociatedSetActionObserver;
 
 public class CatchFromUnassociatedSetsHeatmapGatherer extends HeatmapGatherer {
 

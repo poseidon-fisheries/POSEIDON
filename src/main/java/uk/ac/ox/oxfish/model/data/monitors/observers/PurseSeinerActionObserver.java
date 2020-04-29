@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.heatmaps.observers;
+package uk.ac.ox.oxfish.model.data.monitors.observers;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
@@ -25,9 +25,8 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.monitors.Observer;
 
-public interface ActionObserver<A extends PurseSeinerAction> extends Startable, Observer<A> {
+public interface PurseSeinerActionObserver<A extends PurseSeinerAction> extends Startable, Observer<A> {
 
     @Override default void start(final FishState fishState) {
         fishState.getFishers().stream()

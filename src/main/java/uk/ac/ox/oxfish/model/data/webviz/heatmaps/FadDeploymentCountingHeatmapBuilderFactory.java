@@ -19,15 +19,19 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.FadDeploymentHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 
 public class FadDeploymentCountingHeatmapBuilderFactory
-    extends ActionCountingHeatmapBuilderFactory<DeployFad> {
+    extends HeatmapBuilderFactory {
 
-    @Override ActionCountingExtractor<DeployFad> makeExtractor() { return new FadDeploymentCountingExtractor(); }
+    @Override public String getTitle() {
+        return "Number of FAD deployments over " + getInterval() + " day intervals";
+    }
 
-    @Override public String getTitle() { return "Number of FAD deployments over " + getInterval() + " day intervals"; }
+    @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
+        return new FadDeploymentHeatmapGatherer(getInterval());
+    }
 
 }

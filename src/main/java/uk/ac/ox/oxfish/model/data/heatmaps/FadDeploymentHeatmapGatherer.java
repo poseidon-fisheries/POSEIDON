@@ -19,8 +19,10 @@
 
 package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.model.data.heatmaps.extractors.FadDeploymentCountingExtractor;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
+import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
+import uk.ac.ox.oxfish.model.data.monitors.observers.FadDeploymentActionObserver;
 
 public class FadDeploymentHeatmapGatherer extends HeatmapGatherer {
 
@@ -31,9 +33,13 @@ public class FadDeploymentHeatmapGatherer extends HeatmapGatherer {
             "FAD deployments",
             "Number of deployments",
             interval,
-            new FadDeploymentCountingExtractor(),
+            new Extractor(),
             SummingMerger.INSTANCE
         );
     }
+
+    private static class Extractor
+        extends ActionCountingExtractor<DeployFad>
+        implements FadDeploymentActionObserver { }
 
 }

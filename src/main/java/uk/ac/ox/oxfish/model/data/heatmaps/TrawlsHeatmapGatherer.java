@@ -17,25 +17,40 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
+package uk.ac.ox.oxfish.model.data.heatmaps;
 
+import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
 import java.util.function.ToDoubleFunction;
 
-public class FadDensityExtractor implements ToDoubleFunction<SeaTile>, Startable {
+public class TrawlsHeatmapGatherer extends HeatmapGatherer {
 
-    private FadMap fadMap = null;
-
-    @Override public void start(final FishState fishState) {
-        fadMap = fishState.getFadMap();
+    public TrawlsHeatmapGatherer(final int interval) {
+        super(
+            "Trawls",
+            "Number of trawls",
+            interval,
+            new Extractor(),
+            SummingMerger.INSTANCE
+        );
     }
 
-    @Override public double applyAsDouble(final SeaTile seaTile) {
-        return fadMap.fadsAt(seaTile).numObjs;
+    private static class Extractor implements ToDoubleFunction<SeaTile>, Startable {
+
+        private IntGrid2D trawlsMap;
+
+        @Override public void start(final FishState fishState) {
+            trawlsMap = fishState.getDailyTrawlsMap();
+        }
+
+        @Override public double applyAsDouble(final SeaTile seaTile) {
+            return trawlsMap.get(seaTile.getGridX(), seaTile.getGridY());
+        }
+
     }
 
 }

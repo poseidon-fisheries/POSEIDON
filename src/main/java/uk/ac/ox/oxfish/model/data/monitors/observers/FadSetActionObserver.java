@@ -17,11 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.monitors;
+package uk.ac.ox.oxfish.model.data.monitors.observers;
+
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 
 @FunctionalInterface
-public interface Observer<O> {
+public interface FadSetActionObserver extends PurseSeinerActionObserver<MakeFadSet> {
 
-    void observe(O observable);
+    @Override default void registerWith(FadManager fadManager) {
+        fadManager.getFadSetObservers().add(this);
+    }
 
 }

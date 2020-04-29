@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.CatchFromSetExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
-import uk.ac.ox.oxfish.model.data.heatmaps.observers.FadSetActionObserver;
+import uk.ac.ox.oxfish.model.data.monitors.observers.FadSetActionObserver;
 
 public class CatchFromFadSetsHeatmapGatherer extends HeatmapGatherer {
 

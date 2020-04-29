@@ -17,11 +17,16 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
+package uk.ac.ox.oxfish.model.data.monitors.observers;
 
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.model.data.heatmaps.observers.FadDeploymentActionObserver;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 
-public class FadDeploymentCountingExtractor
-    extends ActionCountingExtractor<DeployFad>
-    implements FadDeploymentActionObserver { }
+@FunctionalInterface
+public interface FadDeploymentActionObserver extends PurseSeinerActionObserver<DeployFad> {
+
+    @Override default void registerWith(FadManager fadManager) {
+        fadManager.getFadDeploymentObservers().add(this);
+    }
+
+}
