@@ -399,7 +399,7 @@ public class NoDataSlice2Policy {
             );
 
 
-            BatchRunner runner = setupRunner(scenarioFile, shockYear+20, OUTPUT_FOLDER);
+            BatchRunner runner = setupRunner(scenarioFile, shockYear+20, null);
 
             //give it the scenario
             runner.setScenarioSetup(policy);
