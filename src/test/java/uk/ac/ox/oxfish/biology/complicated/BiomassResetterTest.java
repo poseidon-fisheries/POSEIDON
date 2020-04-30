@@ -52,6 +52,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
@@ -174,7 +175,9 @@ public class BiomassResetterTest {
             0,
             () -> 0
         );
-        seaTiles.forEach(seaTile -> fadMap.deployFad(fadInitializer.apply(mock(FadManager.class)), 0, seaTile));
+        seaTiles.forEach(seaTile ->
+            fadMap.deployFad(fadInitializer.apply(mock(FadManager.class, RETURNS_DEEP_STUBS)), 0, seaTile)
+        );
 
         // record total biomass
         final ImmutableList<LocalBiology> seaTileBiologies =

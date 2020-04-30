@@ -59,7 +59,7 @@ public class MakeFadSetTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         SeaTile seaTile = mock(SeaTile.class);
         FadMap fadMap = mock(FadMap.class);
-        FadManager fadManager = mock(FadManager.class);
+        FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
         PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         Fisher fisher = mock(Fisher.class);
         when(fisher.getGear()).thenReturn(purseSeineGear);

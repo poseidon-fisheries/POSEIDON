@@ -133,7 +133,13 @@ public class FadGravityDestinationStrategyTest {
         // but at least the coverage report tells us that the filter is exercised and the FAD excluded.
         final BiomassLocalBiology biomassLocalBiology = mock(BiomassLocalBiology.class);
         when(biomassLocalBiology.getCurrentBiomass()).thenReturn(new double[0]);
-        final Fad fad = new Fad(mock(FadManager.class), biomassLocalBiology, ImmutableMap.of(), 0, 0);
+        final Fad fad = new Fad(
+            mock(FadManager.class, RETURNS_DEEP_STUBS),
+            biomassLocalBiology,
+            ImmutableMap.of(),
+            0,
+            0
+        );
         fadMap.deployFad(fad, 1, map.getSeaTile(1, 2));
         final SeaTile dest12b = fadGravityDestinationStrategy.chooseDestination(fisher, rng, fishState, null);
         assertEquals(map.getSeaTile(1, 2), dest12b);
