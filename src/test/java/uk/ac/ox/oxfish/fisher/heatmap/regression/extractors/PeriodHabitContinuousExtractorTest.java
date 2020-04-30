@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**

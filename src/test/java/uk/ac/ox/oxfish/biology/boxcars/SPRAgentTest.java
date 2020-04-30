@@ -32,8 +32,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class SPRAgentTest {
