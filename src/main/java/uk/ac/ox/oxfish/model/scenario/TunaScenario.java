@@ -464,8 +464,15 @@ public class TunaScenario implements Scenario {
             fisher -> scheduleClosurePeriodChoice(model, fisher),
             fisher -> fisher.getYearlyData().registerGatherer(
                 "Profits",
-                __ -> fisher.getYearlyCounterColumn(EARNINGS) - fisher.getYearlyCounterColumn(VARIABLE_COSTS),
+                fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS) - fisher1.getYearlyCounterColumn(VARIABLE_COSTS),
                 Double.NaN
+            ),
+            fisher -> fisher.getYearlyCounter().addColumn("Distance travelled"),
+            fisher -> fisher.getYearlyData().registerGatherer("Distance travelled", fisher1 ->
+                fisher1.getYearlyCounterColumn("Distance travelled"), Double.NaN
+            ),
+            fisher -> fisher.addTripListener((tripRecord, fisher1) ->
+                fisher1.getYearlyCounter().count("Distance travelled", tripRecord.getDistanceTravelled())
             )
         ));
         final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
