@@ -153,6 +153,8 @@ import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicGroupingMonitor;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerRegionMonitor;
@@ -277,12 +279,12 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setDepartingStrategy(new PurseSeineDepartingStrategyFactory());
     }
 
-    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
-
     private int dayOfYear(Month month, int dayOfMonth) {
         return LocalDate.of(targetYear, month, dayOfMonth)
             .getDayOfYear();
     }
+
+    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
     @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
 
@@ -748,11 +750,12 @@ public class TunaScenario implements Scenario {
                     IterativeAveragingAccumulator::new,
                     fadSet -> fadSet.getStep() - fadSet.getTargetFad().getStepDeployed()
                 ),
-                new BasicMonitor<>(
+                basicPerRegionMonitor(
                     "sets on FADs deployed during current trip",
                     EVERY_YEAR,
-                    ProportionAccumulator::new,
-                    fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getTargetFad().getTripDeployed()
+                    regionalDivision,
+                    region -> fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getTargetFad().getTripDeployed(),
+                    ProportionAccumulator::new
                 )
             );
 
@@ -802,15 +805,16 @@ public class TunaScenario implements Scenario {
 
         }
 
-        Iterable<Monitor<?, ?>> getMonitors() {
-            return concat(
-                fadDeploymentMonitors,
-                setMonitors,
-                fadSetMonitors,
-                unassociatedSetMonitors,
-                ImmutableList.of(biomassLostMonitor),
-                otherMonitors
-            );
+        private <E extends PurseSeinerAction> ProportionalGatherer<Region, E, E> makeActionCounter(
+            String actionName
+        ) {
+            return new ProportionalGatherer<>(basicPerRegionMonitor(
+                actionName,
+                EVERY_YEAR,
+                regionalDivision,
+                region -> identity(),
+                IncrementingAccumulator::new
+            ));
         }
 
         private <A extends SetAction> GroupingMonitor<Species, A, Double> makeCatchFromSetAccumulator(
@@ -828,16 +832,15 @@ public class TunaScenario implements Scenario {
             );
         }
 
-        private <E extends PurseSeinerAction> ProportionalGatherer<Region, E, E> makeActionCounter(
-            String actionName
-        ) {
-            return new ProportionalGatherer<>(basicPerRegionMonitor(
-                actionName,
-                EVERY_YEAR,
-                regionalDivision,
-                region -> identity(),
-                IncrementingAccumulator::new
-            ));
+        Iterable<Monitor<?, ?>> getMonitors() {
+            return concat(
+                fadDeploymentMonitors,
+                setMonitors,
+                fadSetMonitors,
+                unassociatedSetMonitors,
+                ImmutableList.of(biomassLostMonitor),
+                otherMonitors
+            );
         }
 
     }
