@@ -25,14 +25,14 @@ import java.util.function.Function;
 
 public class NoData718Slice4PriceIncrease {
 
-    public static final String CANDIDATES_CSV_FILE = "price_shock_candidates_max.csv";
+    private static final String CANDIDATES_CSV_FILE = "price_shock_candidates_max.csv";
     private static Path OUTPUT_FOLDER =
             NoData718Slice4.MAIN_DIRECTORY.resolve("price_shock_max");
 
 
-    static final private double newCroakerPriceDobo = 80000; //glaudy's report
+    static final public double newCroakerPriceDobo = 80000; //glaudy's report
 
-    static final private double newCroakerPriceProbolinggo = 350000; //glaudy's report
+    static final public double newCroakerPriceProbolinggo = 350000; //glaudy's report
 
     static private LinkedHashMap<String,
             Function<Integer, Consumer<Scenario>>> priceIncreasePolicies = new LinkedHashMap();
@@ -135,9 +135,9 @@ public class NoData718Slice4PriceIncrease {
     }
 
 
-    public static void sensitivity(Path scenarioFile, int shockYear,
-                                   Path outputFolder,
-                                   LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap) throws IOException {
+    public static void priceIncreaseOneRun(Path scenarioFile, int shockYear,
+                                           Path outputFolder,
+                                           LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -217,7 +217,7 @@ public class NoData718Slice4PriceIncrease {
             if(Files.exists(scenarioPath))
             {
 
-                sensitivity(
+                priceIncreaseOneRun(
                         scenarioPath,
                         Integer.parseInt(row[1]),
                         OUTPUT_FOLDER,
