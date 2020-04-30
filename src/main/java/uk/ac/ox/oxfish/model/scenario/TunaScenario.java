@@ -461,7 +461,12 @@ public class TunaScenario implements Scenario {
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
             addHourlyCosts(),
             fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> scheduleClosurePeriodChoice(model, fisher)
+            fisher -> scheduleClosurePeriodChoice(model, fisher),
+            fisher -> fisher.getYearlyData().registerGatherer(
+                "Profits",
+                __ -> fisher.getYearlyCounterColumn(EARNINGS) - fisher.getYearlyCounterColumn(VARIABLE_COSTS),
+                Double.NaN
+            )
         ));
         final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
             .filter(record -> record.getInt("year") == targetYear)
