@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
@@ -46,11 +47,11 @@ public class Fad implements Locatable {
     private static final double BUOY_VALUE = 1000.0; // Buoy value in dollars, TODO: should be a parameter
 
     private final FadManager owner;
+    private final TripRecord tripDeployed;
     private final BiomassLocalBiology biology;
     private final double[] attractionRates; // proportion of underlying biomass attracted per day
     private final double fishReleaseProbability; // daily probability of releasing fish from the FAD
     private final int stepDeployed;
-
     public Fad(
         FadManager owner,
         BiomassLocalBiology biology,
@@ -59,6 +60,7 @@ public class Fad implements Locatable {
         final int stepDeployed
     ) {
         this.owner = owner;
+        this.tripDeployed = owner.getFisher().getCurrentTrip();
         this.biology = biology;
         this.attractionRates = new double[biology.getCurrentBiomass().length];
         this.stepDeployed = stepDeployed;
@@ -67,6 +69,8 @@ public class Fad implements Locatable {
         );
         this.fishReleaseProbability = fishReleaseProbability;
     }
+
+    public TripRecord getTripDeployed() { return tripDeployed; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start

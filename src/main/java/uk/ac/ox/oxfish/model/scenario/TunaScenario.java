@@ -92,6 +92,7 @@ import uk.ac.ox.oxfish.model.data.monitors.ProportionalGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.IncrementingAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.IterativeAveragingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.ProportionAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.SummingAccumulator;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision.Region;
@@ -746,6 +747,12 @@ public class TunaScenario implements Scenario {
                     EVERY_YEAR,
                     IterativeAveragingAccumulator::new,
                     fadSet -> fadSet.getStep() - fadSet.getTargetFad().getStepDeployed()
+                ),
+                new BasicMonitor<>(
+                    "sets on FADs deployed during current trip",
+                    EVERY_YEAR,
+                    ProportionAccumulator::new,
+                    fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getTargetFad().getTripDeployed()
                 )
             );
 
