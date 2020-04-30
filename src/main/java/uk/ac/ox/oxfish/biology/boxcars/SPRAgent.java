@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -321,5 +322,10 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     @Override
     public void turnOff() {
         sampler.resetObservedFishers();
+    }
+
+
+    public List<Fisher> monitorObservedFishers() {
+        return sampler.monitorObservedFishers();
     }
 }

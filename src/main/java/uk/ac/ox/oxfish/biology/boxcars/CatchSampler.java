@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -268,5 +269,14 @@ public class CatchSampler implements ListChangeListener<Fisher> {
             }
         }
 
+    }
+
+
+    /**
+     * returns unmodifiable list showing fishers
+     * @return
+     */
+    public List<Fisher> monitorObservedFishers() {
+        return Collections.unmodifiableList(observedFishers);
     }
 }
