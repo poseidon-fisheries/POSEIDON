@@ -34,8 +34,6 @@ import uk.ac.ox.oxfish.model.data.heatmaps.UnassociatedSetHeatmapGatherer;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class SampleTunaRun {
 
@@ -78,12 +76,7 @@ public class SampleTunaRun {
         );
 
         final CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
-
-        CsvWriter fisherDataWriter = new CsvWriter(fisherDataOutputFile, csvWriterSettings);
-        fisherDataWriter.writeHeaders("boat_id", "year", "variable", "value");
-        final Stream<List<?>> rows = tunaRunner.getFisherYearlyData(fisher -> fisher.getTags().get(0));
-        fisherDataWriter.writeRowsAndClose(rows::iterator);
-
+        tunaRunner.writeFisherYearlyData(new CsvWriter(fisherDataOutputFile, csvWriterSettings));
         tunaRunner.writeHeatmapData(new CsvWriter(heatmapDataOutputFile, csvWriterSettings));
 
     }

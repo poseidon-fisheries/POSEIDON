@@ -19,6 +19,9 @@
 
 package uk.ac.ox.oxfish.model.data.heatmaps;
 
+import com.google.common.collect.ImmutableList;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.DoubleGrid2D;
@@ -28,18 +31,23 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowsProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.Double.NaN;
+import static java.util.stream.IntStream.range;
 
-public class HeatmapGatherer implements AdditionalStartable, Steppable {
+public class HeatmapGatherer implements AdditionalStartable, Steppable, RowsProvider {
 
+    private static final String[] HEADERS = {"name", "step", "lon", "lat", "value", "unit"};
     private final String name;
     private final String unit;
     private final int interval;
@@ -49,6 +57,7 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable {
     private int numObservations = 0;
     private int intervalStartDay = 0;
     private DoubleGrid2D currentGrid;
+    private FishState fishState;
 
     HeatmapGatherer(
         final String name,
@@ -80,17 +89,12 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable {
 
     int getNumObservations() { return numObservations; }
 
-    public String getUnit() { return unit; }
-
-    public Map<Integer, DoubleGrid2D> getGrids() { return Collections.unmodifiableMap(grids); }
-
     public double maxValueSeen() {
         return grids.values().stream().mapToDouble(DoubleGrid2D::max).max().orElse(NaN);
     }
 
     @Override public void step(final SimState simState) {
 
-        final FishState fishState = ((FishState) simState);
         final NauticalMap map = fishState.getMap();
 
         numObservations++;
@@ -134,11 +138,45 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable {
     }
 
     @Override public void start(final FishState fishState) {
+        this.fishState = fishState;
         if (numericExtractor instanceof Startable)
             ((Startable) numericExtractor).start(fishState);
         fishState.scheduleEveryStep(this, StepOrder.DAILY_DATA_GATHERING);
     }
 
+    @Override public String[] getHeaders() { return HEADERS; }
+
+    @Override public Iterable<List<?>> getRows() {
+        return getGrids().entrySet().stream().flatMap(entry -> {
+            final Integer step = entry.getKey();
+            final DoubleGrid2D grid = entry.getValue();
+            return range(0, grid.getWidth()).boxed().flatMap(x ->
+                range(0, grid.getHeight()).mapToObj(y ->
+                    makeRow(step, grid, x, y)
+                )
+            );
+        }).collect(toImmutableList());
+    }
+
+    public Map<Integer, DoubleGrid2D> getGrids() { return Collections.unmodifiableMap(grids); }
+
+    @NotNull private List<?> makeRow(final int step, final DoubleGrid2D grid, final int x, final int y) {
+        final Coordinate coordinates = fishState.getMap().getCoordinates(x, y);
+        final double value = grid.get(x, y);
+        return value == 0
+            ? ImmutableList.of()
+            : ImmutableList.of(
+                getName(),
+                step,
+                coordinates.x,
+                coordinates.y,
+                value,
+                getUnit()
+            );
+    }
+
     public String getName() { return name; }
+
+    public String getUnit() { return unit; }
 
 }

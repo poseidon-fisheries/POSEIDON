@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 public class MakeFadSet extends SetAction {
 
-    private Fad targetFad;
+    private final Fad targetFad;
 
     public MakeFadSet(FishState model, Fisher fisher, Fad targetFad) {
         super(model, fisher);
