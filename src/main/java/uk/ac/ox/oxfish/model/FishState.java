@@ -886,6 +886,9 @@ public class FishState  extends SimState{
             fishers.clear();
 
         }
+        for (Startable startable : toStart) {
+            startable.turnOff();
+        }
         toStart.clear();
         yearlyDataSet.turnOff();
         yearlyCounter.turnOff();
@@ -902,7 +905,7 @@ public class FishState  extends SimState{
 
     public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
 
-    public Iterable<Startable> viewStartables(){
+    public List<Startable> viewStartables(){
         return ImmutableList.copyOf(toStart);
     }
 }
