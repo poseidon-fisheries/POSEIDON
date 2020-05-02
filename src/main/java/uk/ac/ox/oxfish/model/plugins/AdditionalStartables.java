@@ -30,6 +30,7 @@ public class AdditionalStartables {
         NAMES.put(AbundanceGathererBuilder.class, "Abundance Gatherers");
         NAMES.put(SPRAgentBuilder.class, "SPR Agent");
         NAMES.put(SPRAgentBuilderSelectiveSampling.class, "SPR Selective Agent");
+        NAMES.put(SPRAgentBuilderFixedSample.class, "SPR Fixed Sample Agent");
         NAMES.put(SprOracleBuilder.class, "SPR Oracle");
         NAMES.put(FishingMortalityAgentFactory.class, "Fishing Mortality Agent");
         NAMES.put(FisherEntryByProfitFactory.class, "Fish Entry By Profit");
