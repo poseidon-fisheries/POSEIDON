@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.LinkedList;
 
-import static org.mockito.Matchers.anyList;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 public class OnOffSwitchRegulatorTest {

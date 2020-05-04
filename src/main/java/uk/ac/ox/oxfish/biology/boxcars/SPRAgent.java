@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -40,11 +41,6 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
 
     private final String surveyTag;
-
-    /**
-     * object that returns true whenever the fisher is to be sampled for this SPR computation
-     */
-    private final Predicate<Fisher> samplingSelector;
 
     private final Species species;
 
@@ -72,7 +68,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     /**
      * object sampling fishers to keep track of their landings
      */
-    private CatchSampler sampler;
+    final protected CatchSampler sampler;
 
 
     public SPRAgent(
@@ -83,7 +79,33 @@ public class SPRAgent implements AdditionalStartable, Steppable {
             int assumedMaxAge,
             double assumedVirginRecruits,
             double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity) {
-        this.samplingSelector = samplingSelector;
+
+        this(
+                surveyTag,
+                species,
+                new StochasticCatchSampler(samplingSelector,species,surveyTag),
+        assumedLinf,
+        assumedKParameter, assumedNaturalMortality,
+        assumedMaxAge,
+        assumedVirginRecruits,
+        assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity
+        );
+
+
+
+    }
+
+    public SPRAgent(
+            String surveyTag, Species species,
+            CatchSampler sampler,
+            double assumedLinf,
+            double assumedKParameter, double assumedNaturalMortality,
+            int assumedMaxAge,
+            double assumedVirginRecruits,
+            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity) {
+        /**
+         * object that returns true whenever the fisher is to be sampled for this SPR computation
+         */
         this.surveyTag = surveyTag;
         this.species = species;
         this.assumedLinf = assumedLinf;
@@ -103,6 +125,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                         subBinPair.getSecond()), assumedVarB);
             }
         };
+        this.sampler = sampler;
+
     }
 
 
@@ -216,7 +240,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     @VisibleForTesting
     @Override
     public void step(SimState simState) {
-        sampler.observe(
+        sampler.observeDaily(
 
 
         );
@@ -231,9 +255,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     @Override
     public void start(FishState model) {
 
-        Preconditions.checkArgument(sampler==null, "SPR Agent already Started!!");
-        sampler = new CatchSampler(samplingSelector,species,surveyTag);
-        sampler.checkWhichFisherToObserve(model);
+        //Preconditions.checkArgument(sampler==null, "SPR Agent already Started!!");
+        sampler.start(model);
 
         //every day, collect information
         model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
@@ -242,13 +265,12 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        sampler.resetLandings();
+                        sampler.resetCatchObservations();
                     }
                 },
                 StepOrder.DATA_RESET
         );
 
-        model.getFishers().addListener(sampler);
 
         model.getYearlyDataSet().registerGatherer("SPR " + species + " " + surveyTag,
                                                   new Gatherer<FishState>() {
@@ -320,6 +342,11 @@ public class SPRAgent implements AdditionalStartable, Steppable {
      */
     @Override
     public void turnOff() {
-        sampler.resetObservedFishers();
+        sampler.turnOff();
+    }
+
+
+    public List<Fisher> monitorObservedFishers() {
+        return sampler.viewObservedFishers();
     }
 }

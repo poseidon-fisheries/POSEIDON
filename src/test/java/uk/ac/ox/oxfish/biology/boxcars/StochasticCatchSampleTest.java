@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class CatchSamplerTest {
+public class StochasticCatchSampleTest {
 
 
     @Test
@@ -46,21 +46,21 @@ public class CatchSamplerTest {
         when(wrong.getDailyCounter().getSpecificLandings(species,0,0)).thenReturn(100d);
         when(wrong.getDailyCounter().getSpecificLandings(species,0,1)).thenReturn(200d);
 
-        CatchSampler sampler = new CatchSampler(new Predicate<Fisher>() {
+        StochasticCatchSampler sampler = new StochasticCatchSampler(new Predicate<Fisher>() {
             @Override
             public boolean test(Fisher fisher) {
                 return fisher!=wrong;
             }
         },species,null);
 
-        sampler.checkWhichFisherToObserve(model);
-        sampler.observe();
+        sampler.start( model);
+        sampler.observeDaily();
         double[][] sampledAbundance = sampler.getAbundance();
         assertEquals(sampledAbundance[0][0],10,.01);
         assertEquals(sampledAbundance[0][1],5,.01);
 
         //doesn't reset automatically
-        sampler.observe();
+        sampler.observeDaily();
         sampledAbundance = sampler.getAbundance();
         assertEquals(sampledAbundance[0][0],20,.01);
         assertEquals(sampledAbundance[0][1],10,.01);
@@ -76,7 +76,7 @@ public class CatchSamplerTest {
         assertEquals(sampledAbundance[0][1],20,.01);
 
         //reset works
-        sampler.resetLandings();
+        sampler.resetCatchObservations();
         sampledAbundance = sampler.getAbundance();
         assertEquals(sampledAbundance[0][0],0,.01);
         assertEquals(sampledAbundance[0][1],0,.01);

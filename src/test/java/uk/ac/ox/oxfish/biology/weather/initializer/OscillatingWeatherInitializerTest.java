@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;

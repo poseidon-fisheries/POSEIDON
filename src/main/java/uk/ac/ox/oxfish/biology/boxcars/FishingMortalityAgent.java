@@ -46,7 +46,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
     private final Species species;
 
-    private CatchSampler dailyCatchSampler;
+    private StochasticCatchSampler dailyCatchSampler;
 
     private double lastDailyMortality;
 
@@ -77,7 +77,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         {
             dailyStoppable.stop();
             yearlyStoppable.stop();
-            dailyCatchSampler.resetObservedFishers();
+            dailyCatchSampler.turnOff();
         }
     }
 
@@ -100,10 +100,10 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         //let's look at abundance now
         lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
 
-        dailyCatchSampler = new CatchSampler((Predicate<Fisher>) input -> true,
+        dailyCatchSampler = new StochasticCatchSampler((Predicate<Fisher>) input -> true,
                                              species,
                                              null);
-        dailyCatchSampler.checkWhichFisherToObserve(model);
+        dailyCatchSampler.start(model);
         yearlyCatchesInWeight = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         dailyStoppable =
                 model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
@@ -159,8 +159,8 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     public void step(SimState simState) {
 
 
-        dailyCatchSampler.resetLandings();
-        dailyCatchSampler.observe();
+        dailyCatchSampler.resetCatchObservations();
+        dailyCatchSampler.observeDaily();
         if(computeDailyFishingMortality)
             lastDailyMortality =  computeDailyMortality((FishState)simState);
         final double[][] abundance = dailyCatchSampler.getLandings();
@@ -198,7 +198,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
 
         return computeMortality(
-                CatchSampler.convertLandingsToAbundance(species,
+                CatchSample.convertLandingsToAbundance(species,
                         yearlyCatchesInWeight),
                 lastMeasuredYearlyAbundance
         );

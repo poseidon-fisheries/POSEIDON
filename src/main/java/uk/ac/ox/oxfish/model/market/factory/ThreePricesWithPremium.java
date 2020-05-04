@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.ConditionalMarket;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -29,28 +29,26 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
 
     @Override
     public ConditionalMarket apply(FishState fishState) {
-        final ThreePricesMarket nonPremium = nonPremiumMarket.apply(fishState);
-        final ThreePricesMarket premium = nonPremiumMarket.apply(fishState);
+        final NThresholdsMarket nonPremium = nonPremiumMarket.apply(fishState);
+        final NThresholdsMarket premium = nonPremiumMarket.apply(fishState);
         final double v = premiumInPercentage.apply(fishState.getRandom());
 
         //save prices to restore later
         if(premiumFirstBin) {
-            premium.setPriceBelowThreshold(
-                    premium.getPriceBelowThreshold() * v
-
-            );
+            premium.getPricePerSegment()[0] =
+                    premium.getPricePerSegment()[0] * v;
         }
         if(premiumSecondBin) {
-            premium.setPriceBetweenThresholds(
-                    premium.getPriceBetweenThresholds() * v
 
-            );
+            premium.getPricePerSegment()[1] =
+                    premium.getPricePerSegment()[1] * v;
+
         }
         if(premiumThirdBin) {
-            premium.setPriceAboveThresholds(
-                    premium.getPriceAboveThresholds() * v
 
-            );
+            premium.getPricePerSegment()[2] =
+                    premium.getPricePerSegment()[2] * v;
+
         }
 
 
@@ -98,7 +96,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         this.premiumInPercentage = premiumInPercentage;
     }
 
-    public AlgorithmFactory<ThreePricesMarket> getNonPremiumMarket() {
+    public AlgorithmFactory<NThresholdsMarket> getNonPremiumMarket() {
         return nonPremiumMarket;
     }
 

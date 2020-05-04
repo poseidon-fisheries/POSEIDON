@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 

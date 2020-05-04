@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.biology.Species;
  */
 public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
 
-    private static final int SPAWNING_DAY = 364;
+    public static final int YEARLY_RECRUITMENT_SPAWNING_DAY = 364;
 
     private final boolean recruitEveryday;
 
@@ -52,7 +52,7 @@ public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
 
         //recruits yearly only?
         if(!recruitEveryday) {
-            if (daysSimulated == 1 && dayOfTheYear != SPAWNING_DAY)
+            if (daysSimulated == 1 && dayOfTheYear != YEARLY_RECRUITMENT_SPAWNING_DAY)
             {
                 return 0d;
             }
@@ -70,5 +70,7 @@ public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
     protected abstract double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance);
 
 
-
+    public boolean isRecruitEveryday() {
+        return recruitEveryday;
+    }
 }

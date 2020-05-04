@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketProxy;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
@@ -211,11 +211,23 @@ public class Slice6Sweeps {
 //        priceAndCostShock("price_and_cost3_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR, false, Double.NaN, true);
 //        priceAndCostShock("price_and_cost3_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR, false, Double.NaN, true);
 
-        priceAndCostShock("price_and_cost_18mo_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, Double.NaN, true);
-        priceAndCostShock("price_and_cost_32mo_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, Double.NaN, true);
+        //      priceAndCostShock("price_and_cost_18mo_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, Double.NaN, true);
+//        priceAndCostShock("price_and_cost_32mo_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, Double.NaN, true);
+        //     priceAndCostShock("price_and_cost_1000mo_giveup",SCENARIO_NAME,1000*30,SHOCK_YEAR, true, Double.NaN, true);
 
-        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, .5, false);
-        priceAndCostShock("price_and_cost_sticky30_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, .3, false);
+//        priceAndCostShock("price_and_cost_sticky80_giveup_new",SCENARIO_NAME,80,SHOCK_YEAR, true,
+//                          .8, false,false);
+////        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,50,SHOCK_YEAR, true, .5, false);
+//        priceAndCostShock("price_and_cost_sticky30_giveup_new",SCENARIO_NAME,360,SHOCK_YEAR,
+//                          true, .3, false,false);
+////        priceAndCostShock("price_and_cost_sticky10_giveup",SCENARIO_NAME,10,SHOCK_YEAR, true, .1, false);
+
+
+        priceAndCostShock("price_and_cost_sticky80_giveup_entry",SCENARIO_NAME,80,SHOCK_YEAR, true,
+                .8, false,true);
+//        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,50,SHOCK_YEAR, true, .5, false);
+        priceAndCostShock("price_and_cost_sticky30_giveup_entry",SCENARIO_NAME,360,SHOCK_YEAR,
+                true, .3, false,true);
 
 ////        //delays
 //        delays("delay_all",
@@ -371,6 +383,36 @@ public class Slice6Sweeps {
 
 
 
+    private static Consumer<Scenario> setupEntry = new Consumer<Scenario>() {
+        @Override
+        public void accept(Scenario scenario) {
+
+                FlexibleScenario current = (FlexibleScenario) scenario;
+                FisherEntryConstantRateFactory pop0 = new FisherEntryConstantRateFactory();
+                pop0.setPopulationName("population0");
+                pop0.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                pop0.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                current.getPlugins().add(
+                        pop0
+                );
+
+                FisherEntryConstantRateFactory pop1 = new FisherEntryConstantRateFactory();
+                pop1.setPopulationName("population1");
+                pop1.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                pop1.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                current.getPlugins().add(
+                        pop1
+                );
+                FisherEntryConstantRateFactory pop2 = new FisherEntryConstantRateFactory();
+                pop2.setPopulationName("population3");
+                pop2.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+                pop2.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+                current.getPlugins().add(
+                        pop2
+                );
+
+        }
+    };
 
     private static void businessAsUsual(
             String name,
@@ -391,38 +433,9 @@ public class Slice6Sweeps {
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
             int finalEntry = entry;
+            if(finalEntry==1)
             runner.setScenarioSetup(
-                    new Consumer<Scenario>() {
-                        @Override
-                        public void accept(Scenario scenario) {
-
-                            if (finalEntry == 1) {
-                                FlexibleScenario current = (FlexibleScenario) scenario;
-                                FisherEntryConstantRateFactory pop0 = new FisherEntryConstantRateFactory();
-                                pop0.setPopulationName("population0");
-                                pop0.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                                pop0.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                                current.getPlugins().add(
-                                        pop0
-                                );
-
-                                FisherEntryConstantRateFactory pop1 = new FisherEntryConstantRateFactory();
-                                pop1.setPopulationName("population1");
-                                pop1.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                                pop1.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                                current.getPlugins().add(
-                                        pop1
-                                );
-                                FisherEntryConstantRateFactory pop2 = new FisherEntryConstantRateFactory();
-                                pop2.setPopulationName("population3");
-                                pop2.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                                pop2.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                                current.getPlugins().add(
-                                        pop2
-                                );
-                            }
-                        }
-                    }
+                    setupEntry
             );
 
 
@@ -444,7 +457,6 @@ public class Slice6Sweeps {
         }
         fileWriter.close();
     }
-
 
 
     private static Consumer<Scenario> giveUpWithinAYearConsumer = new Consumer<Scenario>() {
@@ -993,17 +1005,14 @@ public class Slice6Sweeps {
                                                     //shock the prices
                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
-                                                            thisMarket.setPriceAboveThresholds(
-                                                                    thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
-                                                            );
-                                                            thisMarket.setPriceBetweenThresholds(
-                                                                    thisMarket.getPriceBetweenThresholds() * percentageOfTotalPrice
-                                                            );
-                                                            thisMarket.setPriceBelowThreshold(
-                                                                    thisMarket.getPriceBelowThreshold() * percentageOfTotalPrice
-                                                            );
-                                                            System.out.println(thisMarket.getPriceAboveThresholds());
+                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
+
+                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                            {
+                                                            thisMarket.getPricePerSegment()[i] =
+                                                                    thisMarket.getPricePerSegment()[i] *percentageOfTotalPrice;
+                                                            }
+                                                            System.out.println(thisMarket.getPricePerSegment()[2]);
 
                                                         }
                                                     }
@@ -1015,17 +1024,15 @@ public class Slice6Sweeps {
                                                                 public void step(SimState simState) {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
-                                                                            thisMarket.setPriceAboveThresholds(
-                                                                                    thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBetweenThresholds(
-                                                                                    thisMarket.getPriceBetweenThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBelowThreshold(
-                                                                                    thisMarket.getPriceBelowThreshold() / percentageOfTotalPrice
-                                                                            );
+                                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                                            {
+                                                                                thisMarket.getPricePerSegment()[i] =
+                                                                                        thisMarket.getPricePerSegment()[i] /percentageOfTotalPrice;
+                                                                            }
+
+
                                                                         }
                                                                     }
                                                                 }
@@ -1061,7 +1068,7 @@ public class Slice6Sweeps {
         return scenario -> {
 
             FlexibleScenario flexible = (FlexibleScenario) scenario;
-            Map<ThreePricesMarket,double[]> originalPrices = new HashMap<>();
+            Map<NThresholdsMarket,double[]> originalPrices = new HashMap<>();
 
             ((FlexibleScenario) scenario).getPlugins().add(
                     new AlgorithmFactory<AdditionalStartable>() {
@@ -1081,28 +1088,23 @@ public class Slice6Sweeps {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
 
 
-                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
                                                             originalPrices.put(
                                                                     thisMarket,
-                                                                    new double[]{
-                                                                            thisMarket.getPriceBelowThreshold(),
-                                                                            thisMarket.getPriceBetweenThresholds(),
-                                                                            thisMarket.getPriceAboveThresholds()
-                                                                    }
+                                                                    Arrays.copyOf(
+                                                                            thisMarket.getPricePerSegment(),
+                                                                            thisMarket.getPricePerSegment().length
+                                                                    )
+
                                                             );
 
+                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                            {
+                                                                thisMarket.getPricePerSegment()[i] =
+                                                                        thisMarket.getPricePerSegment()[i] *initialPriceDrop;
+                                                            }
 
-                                                            thisMarket.setPriceAboveThresholds(
-                                                                    thisMarket.getPriceAboveThresholds() * initialPriceDrop
-                                                            );
-                                                            thisMarket.setPriceBetweenThresholds(
-                                                                    thisMarket.getPriceBetweenThresholds() * initialPriceDrop
-                                                            );
-                                                            thisMarket.setPriceBelowThreshold(
-                                                                    thisMarket.getPriceBelowThreshold() * initialPriceDrop
-                                                            );
-                                                            System.out.println(thisMarket.getPriceAboveThresholds());
 
                                                         }
                                                     }
@@ -1114,20 +1116,15 @@ public class Slice6Sweeps {
                                                                 public void step(SimState simState) {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
-                                                                            thisMarket.setPriceAboveThresholds(
-                                                                                    thisMarket.getPriceAboveThresholds()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[2]
-                                                                            );
-                                                                            thisMarket.setPriceBetweenThresholds(
-                                                                                    thisMarket.getPriceBetweenThresholds()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[1]
-                                                                            );
-                                                                            thisMarket.setPriceBelowThreshold(
-                                                                                    thisMarket.getPriceBelowThreshold()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[0]
-                                                                            );
+
+                                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                                            {
+                                                                                thisMarket.getPricePerSegment()[i] =
+                                                                                        thisMarket.getPricePerSegment()[i] *initialPriceDrop;
+                                                                            }
+
                                                                         }
                                                                     }
                                                                 }
@@ -1280,7 +1277,7 @@ public class Slice6Sweeps {
 
 
     private static final double[] COST_SHOCKS_TO_TRY = new double[]{1,1.3};
-    private static final double[]  priceShocksToTry = new double[]{1,0.9,0.8,0.7,0.6,0.5,0};
+    private static final double[]  priceShocksToTry = new double[]{0,0.75,0.5,0.25};
     /**
      * lowers the price of fish caught below the maturity value
      * @param name
@@ -1295,7 +1292,8 @@ public class Slice6Sweeps {
             final String filename,
             final int durationInDays,
             int yearStart, boolean giveUpWithinAYear,
-            double smoothPriceAdjustments, boolean immediatePriceRestoration)throws IOException {
+            double smoothPriceAdjustments, boolean immediatePriceRestoration,
+            boolean entry)throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,sale_price_percentage,cost_percentage,duration,variable,value\n");
@@ -1325,11 +1323,11 @@ public class Slice6Sweeps {
                                                 percentageOfTotalCosts
                                         )
                                 ) :
-                                setupPriceShockSticky(120,
+                                setupPriceShockSticky(360,
                                         yearStart,smoothPriceAdjustments,
                                         percentageOfTotalSalePrice).andThen(
                                         setupVariableCostShock(
-                                                durationInDays,
+                                                360,
                                                 yearStart,
                                                 percentageOfTotalCosts
                                         )
@@ -1340,6 +1338,9 @@ public class Slice6Sweeps {
                     basicSetup = basicSetup.andThen(
                             giveUpWithinAYearConsumer
                     );
+
+                if(entry)
+                    basicSetup = basicSetup.andThen(setupEntry);
 
                 runner.setScenarioSetup(
                         basicSetup

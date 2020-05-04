@@ -2,10 +2,7 @@ package uk.ac.ox.oxfish.model.plugins;
 
 import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
-import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
-import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgentFactory;
-import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
-import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
+import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -32,6 +29,8 @@ public class AdditionalStartables {
         NAMES.put(SnapshotBiomassResetterFactory.class, "Biomass Snapshot Resetter");
         NAMES.put(AbundanceGathererBuilder.class, "Abundance Gatherers");
         NAMES.put(SPRAgentBuilder.class, "SPR Agent");
+        NAMES.put(SPRAgentBuilderSelectiveSampling.class, "SPR Selective Agent");
+        NAMES.put(SPRAgentBuilderFixedSample.class, "SPR Fixed Sample Agent");
         NAMES.put(SprOracleBuilder.class, "SPR Oracle");
         NAMES.put(FishingMortalityAgentFactory.class, "Fishing Mortality Agent");
         NAMES.put(FisherEntryByProfitFactory.class, "Fish Entry By Profit");

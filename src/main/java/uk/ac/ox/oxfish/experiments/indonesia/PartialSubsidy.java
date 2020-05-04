@@ -7,11 +7,10 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionHomogeneousGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
@@ -25,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Predicate;
 
 public class PartialSubsidy {
 
@@ -166,8 +164,8 @@ public class PartialSubsidy {
                 Species species = state.getSpecies().get(0);
                 Port benoa = state.getPorts().stream().filter(port -> port.getName().
                         equalsIgnoreCase("Benoa")).findFirst().get();
-                ((ThreePricesMarket) benoa.getDefaultMarketMap().getMarket(species)).setPriceBetweenThresholds(subsidy);
-                ((ThreePricesMarket) benoa.getDefaultMarketMap().getMarket(species)).setPriceAboveThresholds(subsidy);
+                ((NThresholdsMarket) benoa.getDefaultMarketMap().getMarket(species)).getPricePerSegment()[1] = (subsidy);
+                ((NThresholdsMarket) benoa.getDefaultMarketMap().getMarket(species)).getPricePerSegment()[2] =(subsidy);
 
 
                 for (Fisher fisher : state.getFishers()) {
@@ -208,8 +206,8 @@ public class PartialSubsidy {
 
                 Species species = state.getSpecies().get(0);
                 for(Port benoa : state.getPorts()) {
-                    ((ThreePricesMarket) benoa.getDefaultMarketMap().getMarket(species)).setPriceBetweenThresholds(subsidy);
-                    ((ThreePricesMarket) benoa.getDefaultMarketMap().getMarket(species)).setPriceAboveThresholds(subsidy);
+                    ((NThresholdsMarket) benoa.getDefaultMarketMap().getMarket(species)).getPricePerSegment()[1] =(subsidy);
+                    ((NThresholdsMarket) benoa.getDefaultMarketMap().getMarket(species)).getPricePerSegment()[2] =(subsidy);
                 }
 
                 for (Fisher fisher : state.getFishers()) {
@@ -251,7 +249,7 @@ public class PartialSubsidy {
                 Species species = state.getSpecies().get(0);
                 Port kupang = state.getPorts().stream().filter(port -> port.getName().
                         equalsIgnoreCase("Kupang")).findFirst().get();
-                ((ThreePricesMarket) kupang.getDefaultMarketMap().getMarket(species)).setPriceBelowThreshold(fine);
+                ((NThresholdsMarket) kupang.getDefaultMarketMap().getMarket(species)).getPricePerSegment()[0] = fine;
 
 
                 for (Fisher fisher : state.getFishers()) {

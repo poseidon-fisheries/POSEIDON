@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -70,7 +70,7 @@ public class ThreePricesMarketTest {
         );
 
 
-        ThreePricesMarket market = new ThreePricesMarket(
+        NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
                 0,1,
                 10,
                 20,
@@ -201,7 +201,7 @@ public class ThreePricesMarketTest {
         );
 
 
-        ThreePricesMarket market = new ThreePricesMarket(
+        NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
                 0,1,
                 10,
                 20,

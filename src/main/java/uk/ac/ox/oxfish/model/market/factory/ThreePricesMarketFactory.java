@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/12/17.
  */
-public class ThreePricesMarketFactory implements AlgorithmFactory<ThreePricesMarket>{
+public class ThreePricesMarketFactory implements AlgorithmFactory<NThresholdsMarket>{
 
 
     private DoubleParameter lowAgeThreshold = new FixedDoubleParameter(1);
@@ -64,10 +64,10 @@ public class ThreePricesMarketFactory implements AlgorithmFactory<ThreePricesMar
      * @return the function result
      */
     @Override
-    public ThreePricesMarket apply(FishState state) {
+    public NThresholdsMarket apply(FishState state) {
 
 
-        return new ThreePricesMarket(
+        return NThresholdsMarket.ThreePricesMarket(
                 lowAgeThreshold.apply(state.getRandom()).intValue(),
                 highAgeThreshold.apply(state.getRandom()).intValue(),
                 priceBelowThreshold.apply(state.getRandom()),

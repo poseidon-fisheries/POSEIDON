@@ -352,4 +352,57 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     public SingleSpeciesNaturalProcesses getProcesses() {
         return processes;
     }
+
+
+    public InitialAbundance getInitialAbundance() {
+        return initialAbundance;
+    }
+
+    public BiomassAllocator getIntialAbundanceAllocator() {
+        return intialAbundanceAllocator;
+    }
+
+    public AgingProcess getAging() {
+        return aging;
+    }
+
+    public Meristics getMeristics() {
+        return meristics;
+    }
+
+    public String getSpeciesName() {
+        return speciesName;
+    }
+
+    public double getScaling() {
+        return scaling;
+    }
+
+    public RecruitmentProcess getRecruitmentProcess() {
+        return recruitmentProcess;
+    }
+
+    public AbundanceDiffuser getDiffuser() {
+        return diffuser;
+    }
+
+    public BiomassAllocator getHabitabilityAllocator() {
+        return habitabilityAllocator;
+    }
+
+    public BiomassAllocator getRecruitmentAllocator() {
+        return recruitmentAllocator;
+    }
+
+    public boolean isDaily() {
+        return daily;
+    }
+
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    public Map<SeaTile, Double> getInitialWeights() {
+        return initialWeights;
+    }
 }
