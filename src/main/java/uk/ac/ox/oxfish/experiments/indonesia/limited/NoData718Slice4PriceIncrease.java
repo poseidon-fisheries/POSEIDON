@@ -88,16 +88,16 @@ public class NoData718Slice4PriceIncrease {
                 priceShockAndSeedingGenerator(0)
 
         );
-        priceIncreasePolicies.put(
-                "Price Shock lag 2 plus seeding",
-                priceShockAndSeedingGenerator(2)
-
-        );
-        priceIncreasePolicies.put(
-                "Price Shock lag 5 plus seeding",
-                priceShockAndSeedingGenerator(5)
-
-        );
+//        priceIncreasePolicies.put(
+//                "Price Shock lag 2 plus seeding",
+//                priceShockAndSeedingGenerator(2)
+//
+//        );
+//        priceIncreasePolicies.put(
+//                "Price Shock lag 5 plus seeding",
+//                priceShockAndSeedingGenerator(5)
+//
+//        );
 
 
         priceIncreasePolicies.put(
