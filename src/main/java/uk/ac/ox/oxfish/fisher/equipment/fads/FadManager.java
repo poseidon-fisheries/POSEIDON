@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
@@ -38,13 +37,12 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -56,12 +54,9 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 public class FadManager {
 
     private final FadMap fadMap;
-    private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
-    private final Set<Observer<DeployFad>> fadDeploymentObservers;
-    private final Set<Observer<SetAction>> setObservers;
-    private final Set<Observer<MakeFadSet>> fadSetObservers;
-    private final Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers;
+    private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor;
+    private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
@@ -79,7 +74,6 @@ public class FadManager {
             new HashSet<>(),
             new HashSet<>(),
             new HashSet<>(),
-            new HashSet<>(),
             Optional.empty(),
             new ActiveActionRegulations()
         );
@@ -89,10 +83,9 @@ public class FadManager {
         FadMap fadMap,
         FadInitializer fadInitializer,
         int numFadsInStock,
-        Collection<Observer<DeployFad>> fadDeploymentObservers,
-        Collection<Observer<SetAction>> setObservers,
-        Collection<Observer<MakeFadSet>> fadSetObservers,
-        Collection<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
+        Iterable<Observer<DeployFad>> fadDeploymentObservers,
+        Iterable<Observer<MakeFadSet>> fadSetObservers,
+        Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
         Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor,
         ActiveActionRegulations actionSpecificRegulations
     ) {
@@ -100,29 +93,23 @@ public class FadManager {
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
         this.numFadsInStock = numFadsInStock;
-        this.fadDeploymentObservers = new HashSet<>(fadDeploymentObservers);
-        this.setObservers = new HashSet<>(setObservers);
-        this.fadSetObservers = new HashSet<>(fadSetObservers);
-        this.unassociatedSetObservers = new HashSet<>(unassociatedSetObservers);
         this.biomassLostMonitor = biomassLostMonitor;
         this.actionSpecificRegulations = actionSpecificRegulations;
 
-        this.fadDeploymentObservers.add(actionSpecificRegulations::reactToAction);
-        this.setObservers.add(actionSpecificRegulations::reactToAction);
-        this.fadSetObservers.add(actionSpecificRegulations::reactToAction);
-        this.unassociatedSetObservers.add(actionSpecificRegulations::reactToAction);
+        fadDeploymentObservers.forEach(observer -> registerObserver(DeployFad.class, observer));
+        fadSetObservers.forEach(observer -> registerObserver(MakeFadSet.class, observer));
+        unassociatedSetObservers.forEach(observer -> registerObserver(MakeUnassociatedSet.class, observer));
+        biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
+
+        registerObserver(DeployFad.class, actionSpecificRegulations::reactToAction);
+        registerObserver(MakeUnassociatedSet.class, actionSpecificRegulations::reactToAction);
+        registerObserver(MakeFadSet.class, actionSpecificRegulations::reactToAction);
 
     }
 
-    public Set<Observer<DeployFad>> getFadDeploymentObservers() { return fadDeploymentObservers; }
-
-    public Set<Observer<SetAction>> getSetObservers() { return setObservers; }
-
-    public Set<Observer<MakeFadSet>> getFadSetObservers() { return fadSetObservers; }
-
-    public Set<Observer<MakeUnassociatedSet>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
-
-    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public <T> void registerObserver(Class<T> observedClass, Observer<T> observer) {
+        observers.register(observedClass, observer);
+    }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
@@ -230,22 +217,10 @@ public class FadManager {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
-    public void reactTo(DeployFad action) {
-        fadDeploymentObservers.forEach(observer -> observer.observe(action));
+    public <O> void reactTo(final O observable) {
+        this.observers.reactTo(observable);
     }
 
-    public void reactTo(MakeFadSet action) {
-        setObservers.forEach(observer -> observer.observe(action));
-        fadSetObservers.forEach(observer -> observer.observe(action));
-    }
-
-    public void reactTo(MakeUnassociatedSet action) {
-        setObservers.forEach(observer -> observer.observe(action));
-        unassociatedSetObservers.forEach(observer -> observer.observe(action));
-    }
-
-    void reactTo(BiomassLostEvent event) {
-        biomassLostMonitor.ifPresent(monitor -> monitor.observe(event));
-    }
+    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
 
 }

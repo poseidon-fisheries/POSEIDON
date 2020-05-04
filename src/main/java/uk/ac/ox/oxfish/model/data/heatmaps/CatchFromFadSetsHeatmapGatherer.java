@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.CatchFromSetExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
-import uk.ac.ox.oxfish.model.data.monitors.observers.FadSetActionObserver;
 
 public class CatchFromFadSetsHeatmapGatherer extends HeatmapGatherer {
 
@@ -35,17 +34,9 @@ public class CatchFromFadSetsHeatmapGatherer extends HeatmapGatherer {
             species.getName() + " catch from FAD sets",
             "Catch (t)",
             interval,
-            new Extractor(species),
+            new CatchFromSetExtractor<>(MakeFadSet.class, species),
             SummingMerger.INSTANCE
         );
-    }
-
-    private static class Extractor
-        extends CatchFromSetExtractor<MakeFadSet>
-        implements FadSetActionObserver {
-
-        Extractor(final Species species) { super(species); }
-
     }
 
 }

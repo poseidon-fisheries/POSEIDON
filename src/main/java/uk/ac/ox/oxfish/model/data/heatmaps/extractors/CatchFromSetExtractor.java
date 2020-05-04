@@ -29,13 +29,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
-public abstract class CatchFromSetExtractor<A extends SetAction>
+public final class CatchFromSetExtractor<A extends SetAction>
     implements ToDoubleFunction<SeaTile>, PurseSeinerActionObserver<A> {
 
+    private final Class<A> observedClass;
     private final Species species;
     private final Map<SeaTile, Double> catches = new HashMap<>();
 
-    protected CatchFromSetExtractor(final Species species) {
+    public CatchFromSetExtractor(final Class<A> observedClass, final Species species) {
+        this.observedClass = observedClass;
         this.species = species;
     }
 
@@ -48,5 +50,7 @@ public abstract class CatchFromSetExtractor<A extends SetAction>
             catches.put(setAction.getLocation(), catchesKept.getWeightCaught(this.species))
         );
     }
+
+    @Override public Class<A> getObservedClass() { return observedClass; }
 
 }

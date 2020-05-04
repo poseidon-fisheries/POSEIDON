@@ -19,14 +19,22 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.observers;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
-@FunctionalInterface
-public interface FadSetActionObserver extends PurseSeinerActionObserver<MakeFadSet> {
+public class Observers {
 
-    @Override default void registerWith(FadManager fadManager) {
-        fadManager.getFadSetObservers().add(this);
+    private final Multimap<Class<?>, Observer<?>> observers = HashMultimap.create();
+
+    public <T> void register(Class<T> observedClass, Observer<T> observer) {
+        this.observers.put(observedClass, observer);
+    }
+
+    public <O> void reactTo(O observable) {
+        //noinspection unchecked
+        this.observers
+            .get(observable.getClass())
+            .forEach(observer -> ((Observer<O>) observer).observe(observable));
     }
 
 }

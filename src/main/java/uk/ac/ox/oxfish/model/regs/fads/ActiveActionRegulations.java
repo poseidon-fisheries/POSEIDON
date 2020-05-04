@@ -33,7 +33,7 @@ import static java.util.function.Function.identity;
 
 public class ActiveActionRegulations {
 
-    private ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
+    private final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
         actionSpecificRegulations;
 
     public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }

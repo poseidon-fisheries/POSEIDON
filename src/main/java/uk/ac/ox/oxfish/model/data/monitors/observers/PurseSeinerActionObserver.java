@@ -36,6 +36,10 @@ public interface PurseSeinerActionObserver<A extends PurseSeinerAction> extends 
             .forEach(this::registerWith);
     }
 
-    void registerWith(FadManager fadManager);
+    default void registerWith(FadManager fadManager) {
+        fadManager.registerObserver(getObservedClass(), this);
+    }
+
+    Class<A> getObservedClass();
 
 }

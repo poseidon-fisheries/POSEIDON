@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
 import uk.ac.ox.oxfish.fisher.equipment.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -22,7 +21,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +33,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private Set<Observer<DeployFad>> fadDeploymentObservers = new HashSet<>();
-    private Set<Observer<SetAction>> setObservers = new HashSet<>();
     private Set<Observer<MakeFadSet>> fadSetObservers = new HashSet<>();
     private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new HashSet<>();
     private GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
@@ -50,12 +47,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path unassociatedCatchSampleFile;
-
-    public Collection<Observer<SetAction>> getSetObservers() { return setObservers; }
-
-    @SuppressWarnings("unused") public void setSetObservers(Set<Observer<SetAction>> setObservers) {
-        this.setObservers = setObservers;
-    }
 
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
@@ -153,7 +144,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
             fadDeploymentObservers,
-            setObservers,
             fadSetObservers,
             unassociatedSetObservers,
             Optional.of(biomassLostMonitor),

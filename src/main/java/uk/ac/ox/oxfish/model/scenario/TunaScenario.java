@@ -450,7 +450,6 @@ public class TunaScenario implements Scenario {
         monitors.getMonitors().forEach(model::registerStartable);
 
         purseSeineGearFactory.getFadDeploymentObservers().addAll(monitors.fadDeploymentMonitors);
-        purseSeineGearFactory.getSetObservers().addAll(monitors.setMonitors);
         purseSeineGearFactory.getFadSetObservers().addAll(monitors.fadSetMonitors);
         purseSeineGearFactory.getUnassociatedSetObservers().addAll(monitors.unassociatedSetMonitors);
         purseSeineGearFactory.setBiomassLostMonitor(monitors.biomassLostMonitor);
@@ -707,7 +706,6 @@ public class TunaScenario implements Scenario {
 
         private final RegionalDivision regionalDivision;
         private final Collection<Monitor<DeployFad, ?>> fadDeploymentMonitors;
-        private final Collection<Monitor<SetAction, ?>> setMonitors;
         private final Collection<Monitor<MakeFadSet, ?>> fadSetMonitors;
         private final Collection<Monitor<MakeUnassociatedSet, ?>> unassociatedSetMonitors;
         private final GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
@@ -720,11 +718,6 @@ public class TunaScenario implements Scenario {
 
             fadDeploymentMonitors = ImmutableList.of(
                 makeActionCounter("FAD deployments")
-            );
-
-            setMonitors = ImmutableList.of(
-                makeCatchFromSetAccumulator(
-                    fishState, "catches by set", IterativeAveragingAccumulator::new)
             );
 
             final Function<Region, ProportionalGatherer<Boolean, MakeFadSet, MakeFadSet>>
@@ -847,7 +840,6 @@ public class TunaScenario implements Scenario {
         Iterable<Monitor<?, ?>> getMonitors() {
             return concat(
                 fadDeploymentMonitors,
-                setMonitors,
                 fadSetMonitors,
                 unassociatedSetMonitors,
                 ImmutableList.of(biomassLostMonitor),

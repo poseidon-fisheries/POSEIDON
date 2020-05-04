@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.data.heatmaps;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
-import uk.ac.ox.oxfish.model.data.monitors.observers.UnassociatedSetActionObserver;
 
 public class UnassociatedSetHeatmapGatherer extends HeatmapGatherer {
 
@@ -33,12 +32,9 @@ public class UnassociatedSetHeatmapGatherer extends HeatmapGatherer {
             "Unassociated sets",
             "Number of sets",
             interval,
-            new Extractor(),
+            new ActionCountingExtractor<>(MakeUnassociatedSet.class),
             SummingMerger.INSTANCE
         );
     }
 
-    private static class Extractor
-        extends ActionCountingExtractor<MakeUnassociatedSet>
-        implements UnassociatedSetActionObserver { }
 }

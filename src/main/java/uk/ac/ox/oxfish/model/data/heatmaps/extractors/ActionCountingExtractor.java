@@ -27,10 +27,16 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.util.function.ToDoubleFunction;
 
-public abstract class ActionCountingExtractor<A extends PurseSeinerAction>
+public final class ActionCountingExtractor<A extends PurseSeinerAction>
     implements PurseSeinerActionObserver<A>, ToDoubleFunction<SeaTile> {
 
+    private final Class<A> observedClass;
+
     private final Multiset<SeaTile> actionsPerTile = HashMultiset.create();
+
+    public ActionCountingExtractor(final Class<A> observedClass) {
+        this.observedClass = observedClass;
+    }
 
     /**
      * Returns the number of times an action was observed for the tile and resets the count to zero for that tile.
@@ -42,5 +48,7 @@ public abstract class ActionCountingExtractor<A extends PurseSeinerAction>
     @Override public void observe(final A action) {
         actionsPerTile.add(action.getLocation());
     }
+
+    @Override public Class<A> getObservedClass() { return observedClass; }
 
 }
