@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology.boxcars;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
@@ -63,12 +64,17 @@ public class SprAgentBuilderSelectiveSampling {
 
 
         }
-      Assert.assertEquals(lames,5);
-      Assert.assertEquals(cools,10);
+        final Fisher firstMonitored = agent.monitorObservedFishers().get(0);
+        final Fisher secondMonitored = agent.monitorObservedFishers().get(1);
+        //force the first fisher to quit
+        firstMonitored.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0,true));
 
-      //run for a year
-      for(int i =0; i<400; i++)
-          state.schedule.step(state);
+        Assert.assertEquals(lames,5);
+        Assert.assertEquals(cools,10);
+
+        //run for a year
+        for(int i =0; i<400; i++)
+            state.schedule.step(state);
 
 
         cools = 0;
@@ -85,7 +91,19 @@ public class SprAgentBuilderSelectiveSampling {
         Assert.assertEquals(lames,5);
         Assert.assertEquals(cools,10);
 
+        //second fisher hasn't quit: should still be in
+        Assert.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
+        //first fisher was active ON THE FIRST DAY: should still be in!
+        Assert.assertTrue(agent.monitorObservedFishers().contains(firstMonitored));
 
+        //run it one more year
+        for(int i =0; i<365; i++)
+            state.schedule.step(state);
+
+        //second fisher hasn't quit: should still be in
+        Assert.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
+        //first fisher wasn't active: should be out!
+        Assert.assertFalse(agent.monitorObservedFishers().contains(firstMonitored));
 
     }
 

@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.collections.list.UnmodifiableList;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -11,12 +9,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 /**
@@ -34,12 +29,12 @@ public class CatchSamplerFixedSample implements CatchSampler, Steppable {
     private Stoppable receipt;
 
     public CatchSamplerFixedSample(
-            LinkedHashMap<String,Integer> numberOfSamplesPerTag,
+            LinkedHashMap<String, Integer> numberOfSamplesPerTag,
             Species species) {
         this.delegate = new CatchSample(species,
                 new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]);
 
-            numberOfSamplesPerTag.forEach(
+        numberOfSamplesPerTag.forEach(
                     CatchSamplerFixedSample.this.numberOfSamplesPerTag::put);
     }
 
@@ -98,12 +93,24 @@ public class CatchSamplerFixedSample implements CatchSampler, Steppable {
      */
     private void checkWhichFisherToObserve(FishState model){
 
+        //remove fishers who do not go out anymore from the list of observations
+        final List<Fisher> stillValidFishersToObserve = observedFishers.stream().filter(
+                fisher -> model.getYear() == 0 || fisher.hasBeenActiveThisYear()
+        ).collect(Collectors.toList());
+
         observedFishers.clear();
+        observedFishers.addAll(stillValidFishersToObserve);
+
 
         for (Map.Entry<String, Integer> tagToSample : numberOfSamplesPerTag.entrySet()) {
 
-
-
+            //how many are you already monitoring?
+            long currentlyContained = observedFishers.stream().filter(
+                    fisher -> fisher.getTags().contains(tagToSample.getKey())
+            ).count();
+            //how many do you need to add to the sample?
+            long shortfall = Math.max(tagToSample.getValue() - currentlyContained,0); //could go negative if the tag is shared among many populations
+            if(shortfall>0)
             model.getFishers().stream().
                     //ignore fishers that quit
 
@@ -119,7 +126,7 @@ public class CatchSamplerFixedSample implements CatchSampler, Steppable {
                     //shuffle them
                     sorted((fisher, t1) -> model.getRandom().nextInt(3)-1).
                     //pick only first x
-                    limit(tagToSample.getValue()).
+                    limit(shortfall).
                     //add them list of fishers
                     forEach(
                     fisher -> observedFishers.add(fisher)
