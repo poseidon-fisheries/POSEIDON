@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -124,7 +125,7 @@ public class CatchSamplerFixedSample implements CatchSampler, Steppable {
                             fisher -> fisher.getTags().contains(tagToSample.getKey())
                     ).
                     //shuffle them
-                    sorted((fisher, t1) -> model.getRandom().nextInt(3)-1).
+                    sorted(new RandomComparator<>(model.getRandom())).
                     //pick only first x
                     limit(shortfall).
                     //add them list of fishers
@@ -153,5 +154,29 @@ public class CatchSamplerFixedSample implements CatchSampler, Steppable {
     public void turnOff() {
         if(receipt!=null)
             receipt.stop();
+    }
+
+
+    private static final class RandomComparator<T> implements Comparator<T> {
+
+        private final Map<T, Integer> map = new IdentityHashMap<>();
+        private final MersenneTwisterFast random;
+
+
+        public RandomComparator(MersenneTwisterFast random) {
+            this.random = random;
+        }
+
+        @Override
+        public int compare(T t1, T t2) {
+            return Integer.compare(valueFor(t1), valueFor(t2));
+        }
+
+        private int valueFor(T t) {
+            synchronized (map) {
+                return map.computeIfAbsent(t, ignore -> random.nextInt());
+            }
+        }
+
     }
 }
