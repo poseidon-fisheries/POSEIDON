@@ -20,7 +20,7 @@ import java.util.Optional;
  * to be just outputting to file and then using R to filter runs. If that's the case we don't really need predicates
  * anymore, just a list of variables to output to file.
  */
-public class Nodata718Slice6 {
+public class NoData718Slice6 {
 
     final static public Path MAIN_DIRECTORY =
             Paths.get("docs", "indonesia_hub",
@@ -39,7 +39,7 @@ public class Nodata718Slice6 {
                 MAIN_DIRECTORY.resolve("parameters.yaml"),
                 MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
                 MAIN_DIRECTORY,
-                0l,
+                0L,
                 MAX_YEARS_TO_RUN
 
 

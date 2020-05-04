@@ -27,7 +27,7 @@ public class NoData718Slice5 {
     final static public int MAX_YEARS_TO_RUN = 40;
 
 
-    public static void main(String[] args){
+    public static void main2(String[] args){
 
         FishYAML yaml = new FishYAML();
 
@@ -36,7 +36,7 @@ public class NoData718Slice5 {
     }
 
 
-    public static void  main2(String[] args) throws IOException {
+    public static void  main(String[] args) throws IOException {
 
         FishYAML yaml = new FishYAML();
         final List<AcceptableRangePredicate> predicates =
