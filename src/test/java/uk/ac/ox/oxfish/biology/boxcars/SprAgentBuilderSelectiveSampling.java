@@ -18,7 +18,6 @@ public class SprAgentBuilderSelectiveSampling {
     @Test
     public void makeSureTheRightPopulationIsSampled() {
 
-        //I can tell what is sampled because a tag is added!
         FlexibleScenario scenario = new FlexibleScenario();
         scenario.getFisherDefinitions().clear();
 
