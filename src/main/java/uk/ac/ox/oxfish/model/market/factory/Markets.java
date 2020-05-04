@@ -46,6 +46,7 @@ public class Markets {
         NAMES.put(CongestedMarketFactory.class, "Congested Market");
         NAMES.put(MACongestedMarketFactory.class, "Moving Average Congested Market");
         NAMES.put(ThreePricesMarketFactory.class, "Three Prices Market");
+        NAMES.put(NPricesMarketFactory.class, "Many Prices Market");
         NAMES.put(SpeciesMarketMappedFactory.class, "Multiple Three Prices Markets");
         NAMES.put(ThreePricesWithPremium.class, "Three Prices Market with premium");
         CONSTRUCTORS = Constructors.fromNames(NAMES);

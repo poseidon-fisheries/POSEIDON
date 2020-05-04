@@ -70,7 +70,7 @@ public class ThreePricesMarketTest {
         );
 
 
-        ThreePricesMarket market = new ThreePricesMarket(
+        NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
                 0,1,
                 10,
                 20,
@@ -201,7 +201,7 @@ public class ThreePricesMarketTest {
         );
 
 
-        ThreePricesMarket market = new ThreePricesMarket(
+        NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
                 0,1,
                 10,
                 20,

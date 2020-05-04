@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.model.data;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,7 +55,7 @@ public class CatchesHistogrammer implements OutputPlugin {
 
                 Stream<Double> stream = state.getDailyDataSet().getColumn(
                         species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME +
-                                ThreePricesMarket.AGE_BIN_PREFIX + bin).stream();
+                                NThresholdsMarket.AGE_BIN_PREFIX + bin).stream();
                 double catches = stream.collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
                 //now catches are in KG, but we want frequency, so re-divide
                 catches = catches/weight;

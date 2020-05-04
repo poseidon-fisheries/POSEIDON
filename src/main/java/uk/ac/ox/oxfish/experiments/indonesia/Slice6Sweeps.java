@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketProxy;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
+import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.model.market.factory.SpeciesMarketMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
@@ -993,17 +993,14 @@ public class Slice6Sweeps {
                                                     //shock the prices
                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
-                                                            thisMarket.setPriceAboveThresholds(
-                                                                    thisMarket.getPriceAboveThresholds() * percentageOfTotalPrice
-                                                            );
-                                                            thisMarket.setPriceBetweenThresholds(
-                                                                    thisMarket.getPriceBetweenThresholds() * percentageOfTotalPrice
-                                                            );
-                                                            thisMarket.setPriceBelowThreshold(
-                                                                    thisMarket.getPriceBelowThreshold() * percentageOfTotalPrice
-                                                            );
-                                                            System.out.println(thisMarket.getPriceAboveThresholds());
+                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
+
+                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                            {
+                                                            thisMarket.getPricePerSegment()[i] =
+                                                                    thisMarket.getPricePerSegment()[i] *percentageOfTotalPrice;
+                                                            }
+                                                            System.out.println(thisMarket.getPricePerSegment()[2]);
 
                                                         }
                                                     }
@@ -1015,17 +1012,15 @@ public class Slice6Sweeps {
                                                                 public void step(SimState simState) {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
-                                                                            thisMarket.setPriceAboveThresholds(
-                                                                                    thisMarket.getPriceAboveThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBetweenThresholds(
-                                                                                    thisMarket.getPriceBetweenThresholds() / percentageOfTotalPrice
-                                                                            );
-                                                                            thisMarket.setPriceBelowThreshold(
-                                                                                    thisMarket.getPriceBelowThreshold() / percentageOfTotalPrice
-                                                                            );
+                                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                                            {
+                                                                                thisMarket.getPricePerSegment()[i] =
+                                                                                        thisMarket.getPricePerSegment()[i] /percentageOfTotalPrice;
+                                                                            }
+
+
                                                                         }
                                                                     }
                                                                 }
@@ -1061,7 +1056,7 @@ public class Slice6Sweeps {
         return scenario -> {
 
             FlexibleScenario flexible = (FlexibleScenario) scenario;
-            Map<ThreePricesMarket,double[]> originalPrices = new HashMap<>();
+            Map<NThresholdsMarket,double[]> originalPrices = new HashMap<>();
 
             ((FlexibleScenario) scenario).getPlugins().add(
                     new AlgorithmFactory<AdditionalStartable>() {
@@ -1081,28 +1076,23 @@ public class Slice6Sweeps {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
 
 
-                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
                                                             originalPrices.put(
                                                                     thisMarket,
-                                                                    new double[]{
-                                                                            thisMarket.getPriceBelowThreshold(),
-                                                                            thisMarket.getPriceBetweenThresholds(),
-                                                                            thisMarket.getPriceAboveThresholds()
-                                                                    }
+                                                                    Arrays.copyOf(
+                                                                            thisMarket.getPricePerSegment(),
+                                                                            thisMarket.getPricePerSegment().length
+                                                                    )
+
                                                             );
 
+                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                            {
+                                                                thisMarket.getPricePerSegment()[i] =
+                                                                        thisMarket.getPricePerSegment()[i] *initialPriceDrop;
+                                                            }
 
-                                                            thisMarket.setPriceAboveThresholds(
-                                                                    thisMarket.getPriceAboveThresholds() * initialPriceDrop
-                                                            );
-                                                            thisMarket.setPriceBetweenThresholds(
-                                                                    thisMarket.getPriceBetweenThresholds() * initialPriceDrop
-                                                            );
-                                                            thisMarket.setPriceBelowThreshold(
-                                                                    thisMarket.getPriceBelowThreshold() * initialPriceDrop
-                                                            );
-                                                            System.out.println(thisMarket.getPriceAboveThresholds());
 
                                                         }
                                                     }
@@ -1114,20 +1104,15 @@ public class Slice6Sweeps {
                                                                 public void step(SimState simState) {
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                                                            ThreePricesMarket thisMarket = ((ThreePricesMarket) ((MarketProxy) market).getDelegate());
+                                                                            NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
 
-                                                                            thisMarket.setPriceAboveThresholds(
-                                                                                    thisMarket.getPriceAboveThresholds()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[2]
-                                                                            );
-                                                                            thisMarket.setPriceBetweenThresholds(
-                                                                                    thisMarket.getPriceBetweenThresholds()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[1]
-                                                                            );
-                                                                            thisMarket.setPriceBelowThreshold(
-                                                                                    thisMarket.getPriceBelowThreshold()  * (1d-percentageRecoveryPerStep) +
-                                                                                            percentageRecoveryPerStep *  originalPrices.get(thisMarket)[0]
-                                                                            );
+
+                                                                            for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
+                                                                            {
+                                                                                thisMarket.getPricePerSegment()[i] =
+                                                                                        thisMarket.getPricePerSegment()[i] *initialPriceDrop;
+                                                                            }
+
                                                                         }
                                                                     }
                                                                 }
