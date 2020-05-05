@@ -215,17 +215,16 @@ public class Slice6Sweeps {
 //        priceAndCostShock("price_and_cost_32mo_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, Double.NaN, true);
         //     priceAndCostShock("price_and_cost_1000mo_giveup",SCENARIO_NAME,1000*30,SHOCK_YEAR, true, Double.NaN, true);
 
-//        priceAndCostShock("price_and_cost_sticky80_giveup_new",SCENARIO_NAME,80,SHOCK_YEAR, true,
+//        priceAndCostShock("price_and_cost_sticky80_giveup_new2",SCENARIO_NAME,80,SHOCK_YEAR, true,
 //                          .8, false,false);
 ////        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,50,SHOCK_YEAR, true, .5, false);
-//        priceAndCostShock("price_and_cost_sticky30_giveup_new",SCENARIO_NAME,360,SHOCK_YEAR,
+//        priceAndCostShock("price_and_cost_sticky30_giveup_new2",SCENARIO_NAME,360,SHOCK_YEAR,
 //                          true, .3, false,false);
-////        priceAndCostShock("price_and_cost_sticky10_giveup",SCENARIO_NAME,10,SHOCK_YEAR, true, .1, false);
+//        priceAndCostShock("price_and_cost_sticky10_giveup",SCENARIO_NAME,10,SHOCK_YEAR, true, .1, false);
 
 
         priceAndCostShock("price_and_cost_sticky80_giveup_entry",SCENARIO_NAME,80,SHOCK_YEAR, true,
                 .8, false,true);
-//        priceAndCostShock("price_and_cost_sticky50_giveup",SCENARIO_NAME,50,SHOCK_YEAR, true, .5, false);
         priceAndCostShock("price_and_cost_sticky30_giveup_entry",SCENARIO_NAME,360,SHOCK_YEAR,
                 true, .3, false,true);
 
@@ -1122,7 +1121,8 @@ public class Slice6Sweeps {
                                                                             for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
                                                                             {
                                                                                 thisMarket.getPricePerSegment()[i] =
-                                                                                        thisMarket.getPricePerSegment()[i] *initialPriceDrop;
+                                                                                        thisMarket.getPricePerSegment()[i] * (1d-percentageRecoveryPerStep) +
+                                                                                                percentageRecoveryPerStep *  originalPrices.get(thisMarket)[i];
                                                                             }
 
                                                                         }
@@ -1277,7 +1277,7 @@ public class Slice6Sweeps {
 
 
     private static final double[] COST_SHOCKS_TO_TRY = new double[]{1,1.3};
-    private static final double[]  priceShocksToTry = new double[]{0,0.75,0.5,0.25};
+    private static final double[]  priceShocksToTry = new double[]{0,0.75,0.5,0.25,1};
     /**
      * lowers the price of fish caught below the maturity value
      * @param name
