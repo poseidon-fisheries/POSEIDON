@@ -33,10 +33,10 @@ public class ObserversTest {
         final A a = new A(observers);
         final B b = new B(observers);
         AtomicInteger count = new AtomicInteger();
-        observers.register(A.class, __ -> count.incrementAndGet());
-        observers.register(A.class, __ -> count.incrementAndGet());
-        observers.register(B.class, __ -> count.incrementAndGet());
-        observers.register(O.class, __ -> count.incrementAndGet());
+        observers.register(A.class, (A __) -> count.incrementAndGet());
+        observers.register(A.class, (O __) -> count.incrementAndGet());
+        observers.register(B.class, (B __) -> count.incrementAndGet());
+        observers.register(O.class, (O __) -> count.incrementAndGet());
         a.act();
         assertEquals(2, count.get());
         b.act();

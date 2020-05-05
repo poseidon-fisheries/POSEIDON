@@ -30,14 +30,14 @@ import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
 public final class CatchFromSetExtractor<A extends SetAction>
-    implements ToDoubleFunction<SeaTile>, PurseSeinerActionObserver<A> {
+    extends PurseSeinerActionObserver<A>
+    implements ToDoubleFunction<SeaTile> {
 
-    private final Class<A> observedClass;
     private final Species species;
     private final Map<SeaTile, Double> catches = new HashMap<>();
 
     public CatchFromSetExtractor(final Class<A> observedClass, final Species species) {
-        this.observedClass = observedClass;
+        super(observedClass);
         this.species = species;
     }
 
@@ -50,7 +50,5 @@ public final class CatchFromSetExtractor<A extends SetAction>
             catches.put(setAction.getLocation(), catchesKept.getWeightCaught(this.species))
         );
     }
-
-    @Override public Class<A> getObservedClass() { return observedClass; }
 
 }

@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
+import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.csv.CsvWriter;
 
 import java.util.Arrays;
@@ -28,6 +29,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
 
 public interface RowsProvider {
+
+    default void writeRows(CsvWriter csvWriter) {
+        writeRows(csvWriter, ImmutableList.of(this));
+    }
 
     static void writeRows(CsvWriter csvWriter, Collection<? extends RowsProvider> rowsProviders) {
         checkArgument(!rowsProviders.isEmpty());

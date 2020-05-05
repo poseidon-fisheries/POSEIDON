@@ -26,7 +26,7 @@ public class Observers {
 
     private final Multimap<Class<?>, Observer<?>> observers = HashMultimap.create();
 
-    public <T> void register(Class<T> observedClass, Observer<T> observer) {
+    public <T> void register(Class<T> observedClass, Observer<? super T> observer) {
         this.observers.put(observedClass, observer);
     }
 

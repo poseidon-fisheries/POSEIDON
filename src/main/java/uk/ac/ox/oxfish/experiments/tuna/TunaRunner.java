@@ -19,8 +19,10 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.csv.CsvWriter;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
@@ -76,17 +78,31 @@ public final class TunaRunner {
     public TunaScenario getScenario() { return scenario; }
 
     void registerHeatmapGatherers(
-        Function<FishState, Iterable<? extends HeatmapGatherer>> heatmapsProducer
+        Function<FishState, Iterable<HeatmapGatherer>> heatmapGathererProducer
+    ) {
+        registerStartables(heatmapGathererProducer, heatmapGatherers::add);
+    }
+
+    private <T extends Startable> void registerStartables(
+        Function<FishState, Iterable<T>> startableProducer,
+        Consumer<T> postStartConsumer
     ) {
         getModel().registerStartable(fishState ->
-            heatmapsProducer.apply(fishState).forEach(heatmapGatherer -> {
-                heatmapGatherers.add(heatmapGatherer);
-                heatmapGatherer.start(fishState);
+            startableProducer.apply(fishState).forEach(startable -> {
+                startable.start(fishState);
+                postStartConsumer.accept(startable);
             })
         );
     }
 
     public FishState getModel() { return model; }
+
+    <T extends Startable> void registerStartable(
+        Function<FishState, T> startableProducer,
+        Consumer<T> postStartConsumer
+    ) {
+        registerStartables(startableProducer.andThen(ImmutableList::of), postStartConsumer);
+    }
 
     void writeHeatmapData(final CsvWriter csvWriter) {
         writeRows(csvWriter, heatmapGatherers);

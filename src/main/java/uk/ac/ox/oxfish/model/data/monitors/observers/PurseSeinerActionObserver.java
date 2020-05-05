@@ -19,27 +19,23 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.observers;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
-public interface PurseSeinerActionObserver<A extends PurseSeinerAction> extends Startable, Observer<A> {
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
-    @Override default void start(final FishState fishState) {
-        fishState.getFishers().stream()
-            .map(Fisher::getGear)
-            .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> ((PurseSeineGear) gear).getFadManager())
-            .forEach(this::registerWith);
+public abstract class PurseSeinerActionObserver<A> implements Startable, Observer<A> {
+
+    private final Class<A> observedClass;
+
+    protected PurseSeinerActionObserver(final Class<A> observedClass) {
+        this.observedClass = observedClass;
     }
 
-    default void registerWith(FadManager fadManager) {
-        fadManager.registerObserver(getObservedClass(), this);
+    @Override public void start(final FishState fishState) {
+        fishState.getFishers().forEach(fisher ->
+            getFadManager(fisher).registerObserver(observedClass, this)
+        );
     }
-
-    Class<A> getObservedClass();
 
 }

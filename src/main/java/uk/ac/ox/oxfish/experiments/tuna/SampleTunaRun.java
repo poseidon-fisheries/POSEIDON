@@ -30,10 +30,12 @@ import uk.ac.ox.oxfish.model.data.heatmaps.FadDeploymentHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.FadSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.UnassociatedSetHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SampleTunaRun {
 
@@ -45,6 +47,8 @@ public class SampleTunaRun {
         basePath.resolve(Paths.get("tuna", "np", "runs", "webviz_test", "tuna.yaml"));
     private static final Path outputPath =
         basePath.resolve(Paths.get("tuna", "np", "runs", "gatherers_test"));
+    private static final File actionLogOutputFile =
+        outputPath.resolve("action_log.csv").toFile();
     private static final File fisherDataOutputFile =
         outputPath.resolve("fisher_data.csv").toFile();
     private static final File heatmapDataOutputFile =
@@ -71,11 +75,15 @@ public class SampleTunaRun {
             return gatherers.build();
         });
 
+        final AtomicReference<PurseSeineActionsLogger> purseSeineActionLogger = new AtomicReference<>();
+        tunaRunner.registerStartable(PurseSeineActionsLogger::new, purseSeineActionLogger::set);
+
         tunaRunner.runUntilYear(NUM_YEARS_TO_RUN, model ->
             System.out.printf("%5d (year %d, day %3d)\n", model.getStep(), model.getYear(), model.getDayOfTheYear())
         );
 
         final CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
+        purseSeineActionLogger.get().writeRows(new CsvWriter(actionLogOutputFile, csvWriterSettings));
         tunaRunner.writeFisherYearlyData(new CsvWriter(fisherDataOutputFile, csvWriterSettings));
         tunaRunner.writeHeatmapData(new CsvWriter(heatmapDataOutputFile, csvWriterSettings));
 

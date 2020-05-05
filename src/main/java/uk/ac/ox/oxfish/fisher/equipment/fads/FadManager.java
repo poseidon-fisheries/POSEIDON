@@ -107,7 +107,7 @@ public class FadManager {
 
     }
 
-    public <T> void registerObserver(Class<T> observedClass, Observer<T> observer) {
+    public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
         observers.register(observedClass, observer);
     }
 
