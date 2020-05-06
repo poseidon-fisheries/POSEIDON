@@ -37,9 +37,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.unmodifiableList;
 
-public class PurseSeineActionsLogger implements AdditionalStartable, RowsProvider {
+public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider {
 
-    private static final String[] HEADERS = new String[]{
+    private static final List<String> HEADERS = ImmutableList.of(
         "boat_id",
         "action_type",
         "lon",
@@ -47,7 +47,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowsProvide
         "step",
         "trip_start",
         "trip_end"
-    };
+    );
     private final Collection<ActionObserver<? extends PurseSeinerAction>> observers = ImmutableList.of(
         new ActionObserver<>(DeployFad.class),
         new ActionObserver<>(MakeFadSet.class),
@@ -66,7 +66,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowsProvide
         this.nauticalMap = fishState.getMap();
     }
 
-    @Override public String[] getHeaders() { return HEADERS; }
+    @Override public List<String> getHeaders() { return HEADERS; }
 
     @Override public Iterable<? extends Collection<?>> getRows() {
         return actionRecords.build().stream().map(ActionRecord::asRow).collect(toImmutableList());
@@ -95,7 +95,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowsProvide
             this.actionStep = action.getStep();
             this.tripStartStep = (int) (action.getFisher().getCurrentTrip().getTripDate() * stepsPerDay);
             action.getFisher().addTripListener((record, fisher) ->
-                this.tripEndStep = tripStartStep + (int) (record.getDurationInHours() * hoursPerStep)
+                this.tripEndStep = tripStartStep + (int) (record.getDurationInHours() / hoursPerStep)
             );
         }
 

@@ -19,38 +19,49 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.csv.CsvWriter;
+import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Iterables.elementsEqual;
+import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Streams.stream;
 
-public interface RowsProvider {
+public interface RowProvider {
 
-    default void writeRows(CsvWriter csvWriter) {
-        writeRows(csvWriter, ImmutableList.of(this));
+    static void writeRows(
+        CsvWriter csvWriter,
+        Collection<? extends RowProvider> rowProviders
+    ) {
+        writeRows(csvWriter, rowProviders, 0);
     }
 
-    static void writeRows(CsvWriter csvWriter, Collection<? extends RowsProvider> rowsProviders) {
-        checkArgument(!rowsProviders.isEmpty());
-        rowsProviders.stream().findFirst().ifPresent(first -> {
-            final String[] headers = first.getHeaders();
-            checkArgument(rowsProviders.stream().allMatch(provider ->
-                Arrays.equals(provider.getHeaders(), headers))
+    static void writeRows(
+        CsvWriter csvWriter,
+        Collection<? extends RowProvider> rowProviders,
+        int runNumber
+    ) {
+        checkArgument(!rowProviders.isEmpty());
+        rowProviders.stream().findFirst().ifPresent(first -> {
+            final List<String> headers = first.getHeaders();
+            checkArgument(rowProviders.stream().allMatch(provider ->
+                elementsEqual(provider.getHeaders(), headers))
             );
-            csvWriter.writeHeaders(headers);
+            csvWriter.writeHeaders(asList("run", headers.toArray()));
             csvWriter.writeRowsAndClose(
-                rowsProviders.stream()
+                rowProviders.stream()
                     .flatMap(rowsProvider -> stream(rowsProvider.getRows()))
+                    .map(values -> asList(runNumber, values.toArray()))
                     ::iterator
             );
         });
     }
 
-    String[] getHeaders();
+    List<String> getHeaders();
     Iterable<? extends Collection<?>> getRows();
+    default void reactToEndOfSimulation(final FishState fishState) {}
 
 }

@@ -23,15 +23,15 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.mapWithIndex;
 import static java.lang.Math.toIntExact;
 
-public class TidyFisherYearlyData implements RowsProvider {
+public class TidyFisherYearlyData implements RowProvider {
 
-    private static final String[] HEADERS = new String[]{"boat_id", "year", "variable", "value"};
-
+    private static final List<String> HEADERS = ImmutableList.of("boat_id", "year", "variable", "value");
     private final Fisher fisher;
     private final String boatId;
 
@@ -40,7 +40,7 @@ public class TidyFisherYearlyData implements RowsProvider {
         this.boatId = boatId;
     }
 
-    @Override public String[] getHeaders() { return HEADERS; }
+    @Override public List<String> getHeaders() { return HEADERS; }
 
     @SuppressWarnings("UnstableApiUsage")
     @Override public Iterable<? extends Collection<?>> getRows() {

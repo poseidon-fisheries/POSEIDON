@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
@@ -34,7 +35,6 @@ import uk.ac.ox.oxfish.model.data.webviz.heatmaps.UnassociatedSetCountingHeatmap
 import uk.ac.ox.oxfish.model.data.webviz.regions.SpecificRegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -59,13 +59,11 @@ public final class WebVizExporter {
     private static final Path outputPath =
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
-    public static void main(final String[] args) throws IOException {
-        final TunaRunner tunaRunner = new TunaRunner(scenarioPath);
+    public static void main(final String[] args) {
+        final TunaRunner tunaRunner = new TunaRunner(scenarioPath, outputPath, new CsvWriterSettings())
+            .setAfterRunConsumer(fishState -> JsonOutputPlugin.writeOutputsToFolder(fishState, outputPath));
         tunaRunner.getScenario().getPlugins().add(makeJsonOutputManagerFactory());
-        tunaRunner.runUntilYear(NUM_YEARS_TO_RUN, model ->
-            System.out.printf("%5d (year %d, day %3d)\n", model.getStep(), model.getYear(), model.getDayOfTheYear())
-        );
-        JsonOutputPlugin.writeOutputsToFolder(tunaRunner.getModel(), outputPath);
+        tunaRunner.runUntilYear(NUM_YEARS_TO_RUN);
     }
 
     @NotNull private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {

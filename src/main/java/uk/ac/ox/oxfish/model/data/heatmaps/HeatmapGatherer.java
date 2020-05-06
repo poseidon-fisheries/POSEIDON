@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.RowsProvider;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,9 +45,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.Double.NaN;
 import static java.util.stream.IntStream.range;
 
-public class HeatmapGatherer implements AdditionalStartable, Steppable, RowsProvider {
+public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvider {
 
-    private static final String[] HEADERS = {"name", "step", "lon", "lat", "value", "unit"};
+    private static final List<String> HEADERS = ImmutableList.of("name", "step", "lon", "lat", "value", "unit");
     private final String name;
     private final String unit;
     private final int interval;
@@ -144,7 +144,7 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowsProv
         fishState.scheduleEveryStep(this, StepOrder.DAILY_DATA_GATHERING);
     }
 
-    @Override public String[] getHeaders() { return HEADERS; }
+    @Override public List<String> getHeaders() { return HEADERS; }
 
     @Override public Iterable<List<?>> getRows() {
         return getGrids().entrySet().stream().flatMap(entry -> {

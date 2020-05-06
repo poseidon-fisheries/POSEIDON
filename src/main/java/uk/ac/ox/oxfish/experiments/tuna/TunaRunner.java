@@ -19,42 +19,67 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowsProvider.writeRows;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider.writeRows;
 
 public final class TunaRunner {
 
     private final TunaScenario scenario;
-    private final FishState model;
-    private final Collection<HeatmapGatherer> heatmapGatherers = new ArrayList<>();
+    private final Path outputPath;
+    private final CsvWriterSettings csvWriterSettings;
+    private final List<Startable> startables = newArrayList();
+    private final Multimap<Path, RowProvider> registeredRowProviders = HashMultimap.create();
+    private int runNumber;
+    private Consumer<FishState> beforeStartConsumer = __ -> System.out.printf("===\nRun %d\n===\n", runNumber);
+    private Consumer<FishState> afterStepConsumer = TunaRunner::printStep;
+    private Consumer<FishState> afterRunConsumer = __ -> {};
 
-    TunaRunner(final Path scenarioPath) {
-        this(readScenario(scenarioPath));
+    TunaRunner(
+        final Path scenarioPath,
+        final Path outputPath,
+        final CsvWriterSettings csvWriterSettings
+    ) {
+        this(
+            readScenario(scenarioPath),
+            outputPath,
+            csvWriterSettings
+        );
     }
 
-    private TunaRunner(final TunaScenario scenario) {
+    private TunaRunner(
+        final TunaScenario scenario,
+        final Path outputPath,
+        final CsvWriterSettings csvWriterSettings
+    ) {
         this.scenario = scenario;
-        this.model = new FishState();
-        this.model.setScenario(scenario);
+        this.outputPath = outputPath;
+        this.csvWriterSettings = csvWriterSettings;
     }
 
     private static TunaScenario readScenario(final Path scenarioPath) {
@@ -67,53 +92,91 @@ public final class TunaRunner {
         }
     }
 
-    void runUntilYear(int year, Consumer<FishState> modelConsumer) {
-        model.start();
-        do {
-            model.schedule.step(model);
-            modelConsumer.accept(model);
-        } while (model.getYear() < year);
+    @SuppressWarnings("WeakerAccess")
+    static void printStep(FishState fishState) {
+        System.out.printf(
+            "%5d (year %d, day %3d)\n",
+            fishState.getStep(),
+            fishState.getYear(),
+            fishState.getDayOfTheYear()
+        );
+    }
+
+    public TunaRunner setAfterStepConsumer(final Consumer<FishState> afterStepConsumer) {
+        this.afterStepConsumer = checkNotNull(afterStepConsumer);
+        return this;
+    }
+
+    public TunaRunner setAfterRunConsumer(final Consumer<FishState> afterRunConsumer) {
+        this.afterRunConsumer = checkNotNull(afterRunConsumer);
+        return this;
+    }
+
+    void runUntilYear(int year) { runUntilYear(year, 1); }
+
+    void runUntilYear(int year, int numberOfRuns) {
+        range(0, numberOfRuns).forEach(runNumber -> {
+            this.runNumber = runNumber;
+            FishState fishState = new FishState();
+            fishState.setScenario(scenario);
+            startables.forEach(fishState::registerStartable);
+            beforeStartConsumer.accept(fishState);
+            fishState.start();
+            do {
+                fishState.schedule.step(fishState);
+                afterStepConsumer.accept(fishState);
+            } while (fishState.getYear() < year);
+            afterRunConsumer.accept(fishState);
+
+            // write outputs
+            registeredRowProviders.asMap().forEach((outputPath, rowProviders) -> {
+                rowProviders.forEach(rowProvider -> rowProvider.reactToEndOfSimulation(fishState));
+                try (Writer fileWriter = new FileWriter(outputPath.toFile(), runNumber > 0)) {
+                    final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
+                    writeRows(csvWriter, rowProviders, runNumber);
+                } catch (IOException e) {
+                    throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
+                }
+            });
+        });
     }
 
     public TunaScenario getScenario() { return scenario; }
 
-    void registerHeatmapGatherers(
-        Function<FishState, Iterable<HeatmapGatherer>> heatmapGathererProducer
+    TunaRunner registerFisherYearlyData(
+        @SuppressWarnings("SameParameterValue") String fileName
     ) {
-        registerStartables(heatmapGathererProducer, heatmapGatherers::add);
-    }
-
-    private <T extends Startable> void registerStartables(
-        Function<FishState, Iterable<T>> startableProducer,
-        Consumer<T> postStartConsumer
-    ) {
-        getModel().registerStartable(fishState ->
-            startableProducer.apply(fishState).forEach(startable -> {
-                startable.start(fishState);
-                postStartConsumer.accept(startable);
-            })
+        return registerRowProviders(fileName, fishState ->
+            fishState.getFishers().stream()
+                .map(fisher -> new TidyFisherYearlyData(fisher, fisher.getTags().get(0)))
+                .collect(toImmutableList())
         );
     }
 
-    public FishState getModel() { return model; }
-
-    <T extends Startable> void registerStartable(
-        Function<FishState, T> startableProducer,
-        Consumer<T> postStartConsumer
+    TunaRunner registerRowProviders(
+        String fileName,
+        Function<FishState, Iterable<? extends RowProvider>> makeRowProviders
     ) {
-        registerStartables(startableProducer.andThen(ImmutableList::of), postStartConsumer);
+        final Path path = outputPath.resolve(fileName);
+        startables.add(fishState ->
+            makeRowProviders.apply(fishState).forEach(rowProvider -> {
+                registeredRowProviders.put(path, rowProvider);
+                if (rowProvider instanceof Startable)
+                    ((Startable) rowProvider).start(fishState);
+            })
+        );
+        return this;
     }
 
-    void writeHeatmapData(final CsvWriter csvWriter) {
-        writeRows(csvWriter, heatmapGatherers);
-    }
-
-    void writeFisherYearlyData(final CsvWriter csvWriter) {
-        final List<TidyFisherYearlyData> fisherYearlyData =
-            model.getFishers().stream()
-                .map(fisher -> new TidyFisherYearlyData(fisher, fisher.getTags().get(0)))
-                .collect(toImmutableList());
-        writeRows(csvWriter, fisherYearlyData);
+    TunaRunner registerRowProvider(
+        @SuppressWarnings("SameParameterValue") String fileName,
+        Function<FishState, ? extends RowProvider> makeRowProviders
+    ) {
+        registerRowProviders(
+            fileName,
+            makeRowProviders.andThen(ImmutableList::of)
+        );
+        return this;
     }
 
 }
