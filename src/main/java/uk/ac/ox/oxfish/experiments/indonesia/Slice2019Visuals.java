@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static java.awt.Color.GREEN;
+import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.KG_TO_T_TRANSFORMER;
 import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.PERCENTILE_TRANSFORMER;
 
 public class Slice2019Visuals {
@@ -239,7 +240,6 @@ public class Slice2019Visuals {
             "All areas whose depth is below 75m are closed to fishing. This makes Lutjanus malabaricus " +
                 "impossible to catch which results in the liquidation of the entire small fleet"
         );
-
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -316,35 +316,32 @@ public class Slice2019Visuals {
 
         chartBuilderFactories.add(ChartBuilderFactory.fromColumnNamePattern(
             "Landings",
-            "Landings (kg)",
+            "Landings (t)",
             speciesNames,
             "%s Landings"
-        ));
+        ).setValueTransformer(KG_TO_T_TRANSFORMER));
 
         chartBuilderFactories.add(ChartBuilderFactory.fromColumnNamePattern(
             "Biomass",
-            "Biomass (kg)",
+            "Biomass (t)",
             speciesNames,
             "Biomass %s"
-        ));
+        ).setValueTransformer(KG_TO_T_TRANSFORMER));
 
-        final ChartBuilderFactory sprChartBuilderFactory = ChartBuilderFactory.fromColumnNamePattern(
+        chartBuilderFactories.add(ChartBuilderFactory.fromColumnNamePattern(
             "SPR",
             "SPR (%)",
             speciesNames,
             "SPR Oracle - %s"
-        );
-        sprChartBuilderFactory.setYLines(ImmutableList.of(0.4));
-        sprChartBuilderFactory.setValueTransformer(PERCENTILE_TRANSFORMER);
-        chartBuilderFactories.add(sprChartBuilderFactory);
+        ).setValueTransformer(PERCENTILE_TRANSFORMER).setYLines(ImmutableList.of(0.4)));
 
         for (String speciesName : speciesNames) {
             chartBuilderFactories.add(ChartBuilderFactory.fromVesselClassifier(
                 speciesName + " landings per population",
-                "Landings (kg)",
+                "Landings (t)",
                 vesselClassifier,
                 population -> speciesName + " Landings of " + population
-            ));
+            ).setValueTransformer(KG_TO_T_TRANSFORMER));
         }
 
         chartBuilderFactories.add(ChartBuilderFactory.fromVesselClassifier(

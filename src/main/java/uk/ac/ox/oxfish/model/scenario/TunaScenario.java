@@ -51,7 +51,6 @@ import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -832,7 +831,9 @@ public class TunaScenario implements Scenario {
                 EVERY_YEAR,
                 accumulatorSupplier,
                 fishState.getSpecies(),
-                species -> region -> action -> action.getCatchesKept().map(Catch::getTotalWeight).orElse(0.0),
+                species -> region -> action -> action.getCatchesKept()
+                    .map(catchesKept -> catchesKept.getWeightCaught(species))
+                    .orElse(0.0),
                 regionalDivision
             );
         }

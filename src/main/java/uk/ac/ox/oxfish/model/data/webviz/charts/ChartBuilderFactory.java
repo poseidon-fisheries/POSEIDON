@@ -50,6 +50,7 @@ public final class ChartBuilderFactory implements
     JsonDefinitionBuilderFactory<ChartDefinition> {
 
     public static final DoubleUnaryOperator PERCENTILE_TRANSFORMER = value -> round(value * 100d);
+    public static final DoubleUnaryOperator KG_TO_T_TRANSFORMER = value -> value / 1000;
 
     private String title = "Chart title";
     private String xLabel = "Year";
@@ -146,34 +147,42 @@ public final class ChartBuilderFactory implements
 
     @SuppressWarnings("unused") public DoubleUnaryOperator getValueTransformer() { return valueTransformer; }
 
-    public void setValueTransformer(DoubleUnaryOperator valueTransformer) {
+    public ChartBuilderFactory setValueTransformer(DoubleUnaryOperator valueTransformer) {
         this.valueTransformer = valueTransformer;
+        return this;
     }
 
     @SuppressWarnings("unused")
     public Collection<String> getSeriesColours() { return seriesColours; }
 
-    @SuppressWarnings("unused")
-    public void setSeriesColours(final Iterable<String> seriesColours) {
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    public ChartBuilderFactory setSeriesColours(final Iterable<String> seriesColours) {
         this.seriesColours = ImmutableList.copyOf(seriesColours);
+        return this;
     }
 
     @SuppressWarnings("unused") public boolean isXAxisIsSimulationTimeInYears() { return xAxisIsSimulationTimeInYears; }
 
     @SuppressWarnings("unused")
-    public void setXAxisIsSimulationTimeInYears(final boolean xAxisIsSimulationTimeInYears) {
+    public ChartBuilderFactory setXAxisIsSimulationTimeInYears(final boolean xAxisIsSimulationTimeInYears) {
         this.xAxisIsSimulationTimeInYears = xAxisIsSimulationTimeInYears;
+        return this;
     }
 
     @SuppressWarnings("unused") public Collection<Double> getYLines() { return yLines; }
 
-    @SuppressWarnings("unused") public void setYLines(final Collection<Double> yLines) { this.yLines = yLines; }
+    public ChartBuilderFactory setYLines(final Collection<Double> yLines) {
+        this.yLines = yLines;
+        return this;
+    }
 
     @SuppressWarnings("unused")
     public Map<String, String> getDataColumnNamesAndLegends() { return dataColumnNamesAndLegends; }
 
-    public void setDataColumnNamesAndLegends(final Map<String, String> dataColumnNamesAndLegends) {
+    @SuppressWarnings("UnusedReturnValue")
+    public ChartBuilderFactory setDataColumnNamesAndLegends(final Map<String, String> dataColumnNamesAndLegends) {
         this.dataColumnNamesAndLegends = dataColumnNamesAndLegends;
+        return this;
     }
 
     @Override public JsonBuilder<Chart> makeDataBuilder(FishState ignored) {
@@ -202,15 +211,25 @@ public final class ChartBuilderFactory implements
 
     public String getTitle() { return title; }
 
-    public void setTitle(final String title) { this.title = title; }
+    public ChartBuilderFactory setTitle(final String title) {
+        this.title = title;
+        return this;
+    }
 
     public String getXLabel() { return xLabel; }
 
-    @SuppressWarnings("unused") public void setXLabel(final String xLabel) { this.xLabel = xLabel; }
+    @SuppressWarnings("unused") public ChartBuilderFactory setXLabel(final String xLabel) {
+        this.xLabel = xLabel;
+        return this;
+    }
 
     public String getYLabel() { return yLabel; }
 
-    @SuppressWarnings("unused") public void setYLabel(final String yLabel) { this.yLabel = yLabel; }
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    public ChartBuilderFactory setYLabel(final String yLabel) {
+        this.yLabel = yLabel;
+        return this;
+    }
 
     @Override public String getBaseName() { return "Chart of " + getTitle(); }
 

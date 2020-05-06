@@ -45,6 +45,7 @@ import static java.awt.Color.WHITE;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision.REGION_NAMES;
+import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.KG_TO_T_TRANSFORMER;
 import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
 
 public final class WebVizExporter {
@@ -107,52 +108,40 @@ public final class WebVizExporter {
         jsonOutputManagerFactory.setChartBuilderFactories(ImmutableList.of(
             ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass per species",
-                "Biomass (kg)",
+                "Biomass (t)",
                 speciesNames,
                 "Biomass %s"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Landings per species",
-                "Landings (kg)",
+                "Landings (t)",
                 speciesNames,
                 "%s Landings"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Recruitment per species",
-                "Recruitment (kg)",
+                "Recruitment (t)",
                 speciesNames,
                 "%s Recruitment"
-            ),
-            ChartBuilderFactory.fromColumnNamePattern(
-                "Average catch per set per species",
-                "Average catch (kg)",
-                speciesNames,
-                "Average %s catches by set"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from FAD sets per species",
-                "Catch (kg)",
+                "Catch (t)",
                 speciesNames,
                 "Sum of %s catches from FAD sets"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from unassociated sets per species",
-                "Catch (kg)",
+                "Catch (t)",
                 speciesNames,
                 "Sum of %s catches from unassociated sets"
-            ),
-            ChartBuilderFactory.fromColumnNamePattern(
-                "Catch from unassociated sets (kg)",
-                "Catch (kg)",
-                speciesNames,
-                "Sum of %s catches from unassociated sets"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass under FADs per species",
-                "Biomass (kg)",
+                "Biomass (t)",
                 speciesNames,
                 "Sum of %s biomass under FADs"
-            ),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER),
             ChartBuilderFactory.fromColumnNamePattern(
                 "FAD deployments per region",
                 "Number of FAD deployments",
