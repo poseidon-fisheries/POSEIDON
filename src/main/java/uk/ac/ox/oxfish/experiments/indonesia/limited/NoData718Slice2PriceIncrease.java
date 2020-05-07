@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -48,7 +49,9 @@ public class NoData718Slice2PriceIncrease {
     public static BatchRunner setupRunner(
             Path scenarioFile,
             final int yearsToRun,
-            Path outputFolder, long seed) {
+            Path outputFolder, long seed,
+            @Nullable
+            List<String> additionalColumnsToPrint) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
                 "Actual Average Cash-Flow",
                 "Actual Average Hours Out",
@@ -90,6 +93,9 @@ public class NoData718Slice2PriceIncrease {
             }
         }
 
+
+        if(additionalColumnsToPrint != null)
+            columnsToPrint.addAll(additionalColumnsToPrint);
 
         return new BatchRunner(
                 scenarioFile,
@@ -287,7 +293,7 @@ public class NoData718Slice2PriceIncrease {
             );
 
 
-            BatchRunner runner = setupRunner(scenarioFile, shockYear+5, outputFolder, SEED);
+            BatchRunner runner = setupRunner(scenarioFile, shockYear+5, outputFolder, SEED, null);
 
             //give it the scenario
             runner.setScenarioSetup(policy);

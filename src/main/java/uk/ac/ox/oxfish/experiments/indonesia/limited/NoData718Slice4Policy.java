@@ -209,7 +209,7 @@ public class NoData718Slice4Policy {
             );;
 
             BatchRunner runner =  NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
-                    yearOfPolicyShock+15, null, SEED);
+                    yearOfPolicyShock+15, null, SEED, null);
 
             //give it the scenario
             runner.setScenarioSetup(totalConsumer);

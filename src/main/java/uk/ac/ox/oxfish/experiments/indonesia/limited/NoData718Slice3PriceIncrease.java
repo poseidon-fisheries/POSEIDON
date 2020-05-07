@@ -333,7 +333,7 @@ public class NoData718Slice3PriceIncrease {
             );
 
 
-            BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, null,SEED);
+            BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, null,SEED, null);
 
             //give it the scenario
             runner.setScenarioSetup(policy);
