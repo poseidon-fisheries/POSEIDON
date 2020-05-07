@@ -62,6 +62,5 @@ public interface RowProvider {
 
     List<String> getHeaders();
     Iterable<? extends Collection<?>> getRows();
-    default void reactToEndOfSimulation(final FishState fishState) {}
 
 }

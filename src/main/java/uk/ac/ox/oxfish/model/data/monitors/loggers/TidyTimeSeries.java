@@ -19,34 +19,27 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
+import java.util.Collection;
 import java.util.List;
 
-import static java.lang.Math.toIntExact;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
 
-public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
+public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProvider {
 
-    private static final List<String> HEADERS = ImmutableList.of("boat_id", "year", "variable", "value");
-    private final String boatId;
+    private final T timeSeries;
 
-    public TidyFisherYearlyData(final TimeSeries<Fisher> fisherYearlyData, final String boatId) {
-        super(fisherYearlyData);
-        this.boatId = boatId;
+    TidyTimeSeries(final T timeSeries) { this.timeSeries = timeSeries; }
+
+    @Override public Iterable<? extends Collection<?>> getRows() {
+        return timeSeries.getColumns().stream().flatMap(column ->
+            range(0, column.size()).mapToObj(index -> makeRow(column, index))
+        ).collect(toImmutableList());
     }
 
-    @Override public List<String> getHeaders() { return HEADERS; }
-
-    @Override List<Object> makeRow(final DataColumn column, final int index) {
-        return ImmutableList.of(
-            boatId, // boat_id
-            index + 1, // year
-            column.getName(), // variable
-            column.get(toIntExact(index)) // value
-        );
-    }
+    abstract List<Object> makeRow(DataColumn column, int index);
 
 }

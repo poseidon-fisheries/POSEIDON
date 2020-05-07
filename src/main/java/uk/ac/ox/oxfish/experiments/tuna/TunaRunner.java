@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyYearlyData;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -102,6 +103,11 @@ public final class TunaRunner {
         );
     }
 
+    public TunaRunner setBeforeStartConsumer(final Consumer<FishState> beforeStartConsumer) {
+        this.beforeStartConsumer = beforeStartConsumer;
+        return this;
+    }
+
     public TunaRunner setAfterStepConsumer(final Consumer<FishState> afterStepConsumer) {
         this.afterStepConsumer = checkNotNull(afterStepConsumer);
         return this;
@@ -130,7 +136,6 @@ public final class TunaRunner {
 
             // write outputs
             registeredRowProviders.asMap().forEach((outputPath, rowProviders) -> {
-                rowProviders.forEach(rowProvider -> rowProvider.reactToEndOfSimulation(fishState));
                 try (Writer fileWriter = new FileWriter(outputPath.toFile(), runNumber > 0)) {
                     final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
                     writeRows(csvWriter, rowProviders, runNumber);
@@ -148,7 +153,7 @@ public final class TunaRunner {
     ) {
         return registerRowProviders(fileName, fishState ->
             fishState.getFishers().stream()
-                .map(fisher -> new TidyFisherYearlyData(fisher, fisher.getTags().get(0)))
+                .map(fisher -> new TidyFisherYearlyData(fisher.getYearlyData(), fisher.getTags().get(0)))
                 .collect(toImmutableList())
         );
     }
@@ -166,6 +171,14 @@ public final class TunaRunner {
             })
         );
         return this;
+    }
+
+    TunaRunner registerYearlyData(
+        @SuppressWarnings("SameParameterValue") String fileName
+    ) {
+        return registerRowProvider(fileName, fishState ->
+            new TidyYearlyData(fishState.getYearlyDataSet())
+        );
     }
 
     TunaRunner registerRowProvider(

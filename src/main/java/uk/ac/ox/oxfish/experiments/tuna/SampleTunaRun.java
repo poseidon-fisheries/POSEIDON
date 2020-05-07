@@ -49,7 +49,8 @@ public class SampleTunaRun {
     public static void main(final String[] args) {
 
         new TunaRunner(scenarioPath, outputPath, new CsvWriterSettings())
-            .registerFisherYearlyData("fisher_data.csv")
+            .registerYearlyData("yearly_data.csv")
+            .registerFisherYearlyData("fisher_yearly_data.csv")
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
             .registerRowProviders("heatmap_data.csv", fishState -> {
                 final int interval = 30;
@@ -68,7 +69,6 @@ public class SampleTunaRun {
                 return gatherers.build();
             })
             .runUntilYear(NUM_YEARS_TO_RUN, 2);
-
     }
 
 }

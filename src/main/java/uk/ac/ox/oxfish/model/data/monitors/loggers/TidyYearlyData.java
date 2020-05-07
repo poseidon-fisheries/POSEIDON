@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
@@ -28,21 +27,18 @@ import java.util.List;
 
 import static java.lang.Math.toIntExact;
 
-public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
+public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
 
-    private static final List<String> HEADERS = ImmutableList.of("boat_id", "year", "variable", "value");
-    private final String boatId;
+    private static final List<String> HEADERS = ImmutableList.of("year", "variable", "value");
 
-    public TidyFisherYearlyData(final TimeSeries<Fisher> fisherYearlyData, final String boatId) {
-        super(fisherYearlyData);
-        this.boatId = boatId;
+    public TidyYearlyData(final TimeSeries<?> timeSeries) {
+        super(timeSeries);
     }
 
     @Override public List<String> getHeaders() { return HEADERS; }
 
     @Override List<Object> makeRow(final DataColumn column, final int index) {
         return ImmutableList.of(
-            boatId, // boat_id
             index + 1, // year
             column.getName(), // variable
             column.get(toIntExact(index)) // value

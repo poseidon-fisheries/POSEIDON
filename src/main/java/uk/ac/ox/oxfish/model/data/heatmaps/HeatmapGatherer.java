@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.Double.NaN;
@@ -151,7 +152,7 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
             final Integer step = entry.getKey();
             final DoubleGrid2D grid = entry.getValue();
             return range(0, grid.getWidth()).boxed().flatMap(x ->
-                range(0, grid.getHeight()).mapToObj(y ->
+                range(0, grid.getHeight()).boxed().flatMap(y ->
                     makeRow(step, grid, x, y)
                 )
             );
@@ -160,19 +161,19 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
 
     public Map<Integer, DoubleGrid2D> getGrids() { return Collections.unmodifiableMap(grids); }
 
-    @NotNull private List<?> makeRow(final int step, final DoubleGrid2D grid, final int x, final int y) {
+    @NotNull private Stream<List<?>> makeRow(final int step, final DoubleGrid2D grid, final int x, final int y) {
         final Coordinate coordinates = fishState.getMap().getCoordinates(x, y);
         final double value = grid.get(x, y);
         return value == 0
-            ? ImmutableList.of()
-            : ImmutableList.of(
+            ? Stream.empty()
+            : Stream.of(ImmutableList.of(
                 getName(),
                 step,
                 coordinates.x,
                 coordinates.y,
                 value,
                 getUnit()
-            );
+            ));
     }
 
     public String getName() { return name; }
