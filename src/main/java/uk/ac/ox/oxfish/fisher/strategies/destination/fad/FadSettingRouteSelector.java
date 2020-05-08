@@ -56,18 +56,6 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         this.numberOfStepsToLookAheadForFadPositions = numberOfStepsToLookAheadForFadPositions;
     }
 
-    @Override Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {
-        final SeaTile port = fisher.getHomePort().getLocation();
-        return super.getRoute(fisher, startingTile, destination)
-            .flatMap(route ->
-                super.getRoute(fisher, destination, port).map(routeBackToPort -> {
-                    routeBackToPort.removeFirst();
-                    route.addAll(routeBackToPort);
-                    return route;
-                })
-            );
-    }
-
     @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
         Fisher fisher,
         ImmutableList<PossibleRoute> possibleRoutes,

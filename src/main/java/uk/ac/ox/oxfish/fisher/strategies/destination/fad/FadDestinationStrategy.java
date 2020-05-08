@@ -19,9 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import ec.util.MersenneTwisterFast;
-import org.apache.commons.collections15.iterators.LoopingIterator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
@@ -30,11 +29,13 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Iterator;
+
 public class FadDestinationStrategy implements DestinationStrategy {
 
     private final FadDeploymentRouteSelector fadDeploymentRouteSelector;
     private final FadSettingRouteSelector fadSettingRouteSelector;
-    private final LoopingIterator<RouteSelector> routeSelectors; // TODO: replace with Guava cycle?
+    private final Iterator<RouteSelector> routeSelectors;
 
     private Route currentRoute = Route.EMPTY;
 
@@ -45,11 +46,11 @@ public class FadDestinationStrategy implements DestinationStrategy {
     ) {
         this.fadDeploymentRouteSelector = fadDeploymentRouteSelector;
         this.fadSettingRouteSelector = fadSettingRouteSelector;
-        this.routeSelectors = new LoopingIterator<>(ImmutableList.of(
+        this.routeSelectors = Iterators.cycle(
             fadDeploymentRouteSelector,
             fadSettingRouteSelector,
             new RouteToPortSelector(map)
-        ));
+        );
     }
 
     public FadDeploymentRouteSelector getFadDeploymentRouteSelector() { return fadDeploymentRouteSelector; }

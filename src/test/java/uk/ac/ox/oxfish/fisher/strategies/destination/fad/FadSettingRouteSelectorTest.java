@@ -115,9 +115,9 @@ public class FadSettingRouteSelectorTest {
         // We should not have any possible destinations until FADs are in there
         assertTrue(routeSelector.getPossibleDestinations(fisher, 0).isEmpty());
 
-        // Check that route from port to (2, 2) takes us there and back to port
+        // Check that route from port to (2, 2) takes us there
         assertEquals(
-            Optional.of(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 2}, {1, 1}, {0, 0}})),
+            Optional.of(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 2}})),
             routeSelector.getRoute(fisher, port.getLocation(), map.getSeaTile(2, 2))
         );
 
@@ -152,13 +152,13 @@ public class FadSettingRouteSelectorTest {
         final ImmutableList<PossibleRoute> possibleRoutes =
             routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
 
-        // check that all possible routes go back to port
-        assertTrue(possibleRoutes.stream()
-            .allMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
+        // check that no possible route goes back to port
+        assertFalse(possibleRoutes.stream()
+            .anyMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
 
         // given a route with two FADs and a route with one FAD, prefer the one with two FADs
         assertTrue(
-            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}, {1, 1}, {0, 0}}), fisher)
+            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}}), fisher)
                 .isSameAs(
                     routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
                         .max(comparingDouble(Entry::getValue))
@@ -175,15 +175,11 @@ public class FadSettingRouteSelectorTest {
         // Given travel costs and the 1 set limit, we should now prefer the shorter route, catching just one FAD
         final LinkedList<Cost> costs = Stream.of(new HourlyCost(2)).collect(toCollection(LinkedList::new));
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
-        assertTrue(
-            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {0, 0}}), fisher)
-                .isSameAs(
-                    routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
-                        .max(comparingDouble(Entry::getValue))
-                        .map(Entry::getKey)
-                        .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
-                )
-        );
+        final Route bestRoute = routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+            .max(comparingDouble(Entry::getValue))
+            .map(Entry::getKey)
+            .orElseThrow(() -> new IllegalStateException("No evaluated routes!"));
+        assertTrue(new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}}), fisher).isSameAs(bestRoute));
 
         // test that no route is selected when no sets are left
         fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 0)));

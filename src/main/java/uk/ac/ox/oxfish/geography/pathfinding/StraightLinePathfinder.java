@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Optional;
  */
 public class StraightLinePathfinder implements Pathfinder {
 
-    private PathMemory memory;
+    private final PathMemory memory;
 
     public StraightLinePathfinder() { this(new TableBasedPathMemory()); }
 
@@ -63,7 +64,7 @@ public class StraightLinePathfinder implements Pathfinder {
         final Optional<ImmutableList<SeaTile>> knownPath = memory.getPath(start, end);
         if (knownPath != null) return knownPath.map(LinkedList::new).orElse(null);
 
-        LinkedList<SeaTile> path = new LinkedList<>();
+        final Deque<SeaTile> path = new LinkedList<>();
         path.add(start);
 
         while (x != endX || y != endY) {
@@ -95,12 +96,13 @@ public class StraightLinePathfinder implements Pathfinder {
             }
         }
 
-        assert path.peekLast().equals(end);
-        assert path.peekFirst().equals(start);
+        assert Objects.equals(path.peekLast(), end);
+        assert Objects.equals(path.peekFirst(), start);
 
         memory.putPath(start, end, path);
 
         return path;
 
     }
+
 }

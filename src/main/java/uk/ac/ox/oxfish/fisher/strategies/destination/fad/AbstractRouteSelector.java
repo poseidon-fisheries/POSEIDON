@@ -65,12 +65,6 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         return rangeClosed(startingStep, maxTimeStep).boxed().collect(toImmutableList());
     }
 
-    @SuppressWarnings("WeakerAccess") public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
-
-    public void setMaxTravelTimeInHours(double maxTravelTimeInHours) {
-        this.maxTravelTimeInHours = maxTravelTimeInHours;
-    }
-
     boolean canFishAtStep(Fisher fisher, SeaTile seaTile, int timeStep) {
         return fisher.getRegulation().canFishHere(fisher, seaTile, fishState, timeStep);
     }
@@ -136,8 +130,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     );
 
     Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {
-        NauticalMap map = fishState.getMap();
-        return Optional.ofNullable(map.getRoute(startingTile, destination));
+        return getSimpleRoute(startingTile, destination);
     }
 
     private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
@@ -146,6 +139,28 @@ public abstract class AbstractRouteSelector implements RouteSelector {
     ) {
         NauticalMap map = fishState.getMap();
         return map.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
+    }
+
+    @SuppressWarnings("WeakerAccess") public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
+
+    public void setMaxTravelTimeInHours(double maxTravelTimeInHours) {
+        this.maxTravelTimeInHours = maxTravelTimeInHours;
+    }
+
+    Optional<Deque<SeaTile>> getSimpleRoute(SeaTile startingTile, SeaTile destination) {
+        return Optional.ofNullable(fishState.getMap().getRoute(startingTile, destination));
+    }
+
+    Optional<Deque<SeaTile>> getRouteAndBackToPort(Fisher fisher, SeaTile startingTile, SeaTile destination) {
+        final SeaTile port = fisher.getHomePort().getLocation();
+        return getSimpleRoute(startingTile, destination)
+            .flatMap(route ->
+                getSimpleRoute(destination, port).map(routeBackToPort -> {
+                    routeBackToPort.removeFirst();
+                    route.addAll(routeBackToPort);
+                    return route;
+                })
+            );
     }
 
 }

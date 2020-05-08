@@ -63,6 +63,7 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeRoute;
 
 public class FadDeploymentRouteSelectorTest {
+
     @SuppressWarnings({"UnstableApiUsage"}) @Test
     public void test() {
 
@@ -83,6 +84,8 @@ public class FadDeploymentRouteSelectorTest {
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fisher.getBoat().getSpeedInKph()).thenReturn(1.0);
+        when(fisher.getHomePort()).thenReturn(port);
+        when(fisher.isAtPort()).thenReturn(true);
         when(fisher.getLocation()).thenReturn(port.getLocation());
         when(fisher.getRegulation()).thenReturn(regulation);
 
@@ -103,7 +106,7 @@ public class FadDeploymentRouteSelectorTest {
             map.getSeaTile(0, 2),
             map.getSeaTile(2, 2)
         );
-        final HashMap<SeaTile, Double> deploymentLocationValues = new HashMap<>(ImmutableMap.of(
+        final Map<SeaTile, Double> deploymentLocationValues = new HashMap<>(ImmutableMap.of(
             map.getSeaTile(0, 1), 3.0,
             map.getSeaTile(0, 2), 1.0,
             map.getSeaTile(2, 2), 1.0
@@ -140,8 +143,20 @@ public class FadDeploymentRouteSelectorTest {
             routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
                 .collect(toImmutableMap(Entry::getKey, Entry::getValue));
 
-        assertEquals(1, routeValues.entrySet().stream().filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 3.0).count());
-        assertEquals(1, routeValues.entrySet().stream().filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 4.0).count());
+        assertEquals(
+            1,
+            routeValues.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 3.0)
+                .count()
+        );
+        assertEquals(
+            1,
+            routeValues.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 4.0)
+                .count()
+        );
 
         final Map<Boolean, Long> routeSelectionCounts = Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))
@@ -167,8 +182,20 @@ public class FadDeploymentRouteSelectorTest {
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
         final ImmutableMap<Route, Double> routeValuesWhenCosts = routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
             .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-        assertEquals(1, routeValuesWhenCosts.entrySet().stream().filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 1.0).count());
-        assertEquals(1, routeValuesWhenCosts.entrySet().stream().filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 0.0).count());
+        assertEquals(
+            1,
+            routeValuesWhenCosts.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().isSameAs(shortRoute) && entry.getValue() == 1.0)
+                .count()
+        );
+        assertEquals(
+            1,
+            routeValuesWhenCosts.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().isSameAs(longRoute) && entry.getValue() == 0.0)
+                .count()
+        );
 
         Stream
             .generate(() -> routeSelector.selectRoute(fisher, 0, rng))

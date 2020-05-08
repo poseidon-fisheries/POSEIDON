@@ -30,8 +30,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
@@ -43,10 +45,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public class FadDeploymentRouteSelector extends AbstractRouteSelector {
 
     private final static Locker<NauticalMap, ImmutableList<SeaTile>> possibleRouteTilesLocker = new Locker<>();
-
     private final ImmutableList<SeaTile> possibleRouteTiles; // will serve as row keys for our ArrayTable of values
     private Map<SeaTile, Double> deploymentLocationValues;
-
     public FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
@@ -55,7 +55,7 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         this(fishState, maxTravelTimeInHours, travelSpeedMultiplier, new HashMap<>());
     }
 
-    public FadDeploymentRouteSelector(
+    private FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
         double travelSpeedMultiplier,
@@ -69,6 +69,8 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
                 fishState.getMap().getAllSeaTilesExcludingLandAsList().stream()
             ).collect(toImmutableList()));
     }
+
+    @Override boolean shouldGoToPort(Fisher fisher) { return false; }
 
     @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
         return getDeploymentLocationValues().keySet();
@@ -111,5 +113,12 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         ));
     }
 
-    @Override boolean shouldGoToPort(Fisher fisher) { return false; }
+    @Override Optional<Deque<SeaTile>> getRoute(
+        final Fisher fisher, final SeaTile startingTile, final SeaTile destination
+    ) {
+        return fisher.isAtPort()
+            ? getSimpleRoute(startingTile, destination)
+            : getRouteAndBackToPort(fisher, startingTile, destination);
+    }
+
 }
