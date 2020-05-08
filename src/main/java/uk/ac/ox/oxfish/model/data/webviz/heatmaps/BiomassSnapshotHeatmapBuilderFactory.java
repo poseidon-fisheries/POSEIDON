@@ -69,6 +69,6 @@ public final class BiomassSnapshotHeatmapBuilderFactory extends HeatmapBuilderFa
 
     @Override public String getTitle() { return speciesName + " biomass"; }
 
-    @Override public String getLegend() { return getTitle() + " (kg)"; }
+    @Override public String getLegend() { return getTitle() + " (t)"; }
 
 }
