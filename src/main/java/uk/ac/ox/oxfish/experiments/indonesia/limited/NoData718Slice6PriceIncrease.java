@@ -22,8 +22,8 @@ public class NoData718Slice6PriceIncrease {
             NoData718Slice6.MAIN_DIRECTORY.resolve("price_shock_max");
 
 
-    static private LinkedHashMap<String,
-            Function<Integer, Consumer<Scenario>>> slice5PriceJump = new LinkedHashMap();
+    static public LinkedHashMap<String,
+            Function<Integer, Consumer<Scenario>>> slice6PriceJump = new LinkedHashMap();
 
 
 
@@ -32,14 +32,14 @@ public class NoData718Slice6PriceIncrease {
     static {
 
 
-        slice5PriceJump.put(
+        slice6PriceJump.put(
                 "Price Shock plus seeding",
                 priceShockAndSeedingGenerator(0)
 
         );
 
 
-        slice5PriceJump.put(
+        slice6PriceJump.put(
                 "BAU",
                 shockYear -> scenario -> {
                 }
@@ -59,7 +59,7 @@ public class NoData718Slice6PriceIncrease {
         otherColumnsToPrint.add("SPR Lethrinus laticaudis spr_agent1_small");
 
         runDirectoryPriceIncrease(OUTPUT_FOLDER,
-                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE), slice5PriceJump,
+                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE), slice6PriceJump,
                 otherColumnsToPrint);
 
 

@@ -137,7 +137,8 @@ public class NoData718Slice4PriceIncrease {
 
     public static void priceIncreaseOneRun(Path scenarioFile, int shockYear,
                                            Path outputFolder,
-                                           LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap, List<String> additionalColumnsToPrint) throws IOException {
+                                           LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap,
+                                           List<String> additionalColumnsToPrint) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
