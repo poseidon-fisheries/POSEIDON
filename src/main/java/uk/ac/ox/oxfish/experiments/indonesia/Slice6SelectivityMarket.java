@@ -32,8 +32,7 @@ import java.util.function.Consumer;
 
 public class Slice6SelectivityMarket {
 
-    private static final String SCENARIO_NAME = "cmsy_tropfishR_8h";
-  //  private static final String SCENARIO_NAME = "lime_cmsy_3yr_8h";
+    private static final String SCENARIO_NAME =  "lime_monthly2yr_8h";
     private static final int YEARS_TO_RUN = 12;
     private static final int RUNS_PER_POLICY = 1;
     public static final int MAX_SELECTIVITY_SHIFT = 15;
@@ -46,40 +45,50 @@ public class Slice6SelectivityMarket {
 
     public static void main(String[] args) throws IOException {
 
-
-        selectivitySubsidy("selectivity_flat", SCENARIO_NAME,
-                           MAX_SELECTIVITY_SHIFT,
-                           500*MILLION,
-                           "Lutjanus malabaricus", new int[]{0, 3});
-
-
-        //THIS APPLIES EFFORT TO POP 1-2-3 (not 0)
-        //APPLIES SUBSIDY TO POP0 only (not 3)
 //
-//        selectivitySubsidyPlusEffortControl("selectivity_flat_season", SCENARIO_NAME,
+//        selectivitySubsidy("selectivity_flat", SCENARIO_NAME,
 //                           MAX_SELECTIVITY_SHIFT,
 //                           500*MILLION,
-//                           "Lutjanus malabaricus",
-//                           new int[]{0},
-//                                            3);
+//                           "Lutjanus malabaricus", new int[]{0, 3});
+//
+//
+//        //THIS APPLIES EFFORT TO POP 1-2-3 (not 0)
+//        //APPLIES SUBSIDY TO POP0 only (not 3)
+////
+////        selectivitySubsidyPlusEffortControl("selectivity_flat_season", SCENARIO_NAME,
+////                           MAX_SELECTIVITY_SHIFT,
+////                           500*MILLION,
+////                           "Lutjanus malabaricus",
+////                           new int[]{0},
+////                                            3);
+//
+//
+//
+//       selectivityIncentive("selectivity_incentive2", SCENARIO_NAME,
+//                MAX_SELECTIVITY_SHIFT,
+//                3,
+//                "Lutjanus malabaricus",
+//                10);
+//
+//
+//        selectivitySubsidyPlusPenalty("selectivity_subsidyandpenalty",
+//                                      SCENARIO_NAME,
+//                                      MAX_SELECTIVITY_SHIFT,
+//                                      500*MILLION,
+//                                      "Lutjanus malabaricus",
+//                                      new int[]{0, 3},
+//                                      3,
+//                                      10);
 
-
-
-       selectivityIncentive("selectivity_incentive2", SCENARIO_NAME,
-                MAX_SELECTIVITY_SHIFT,
-                3,
+        selectivityPremiumPlusPenalty("selectivity_premiumandpenalty",
+                SCENARIO_NAME,
+                10,
+                2,
                 "Lutjanus malabaricus",
-                10);
-
-
-        selectivitySubsidyPlusPenalty("selectivity_subsidyandpenalty",
-                                      SCENARIO_NAME,
-                                      MAX_SELECTIVITY_SHIFT,
-                                      500*MILLION,
-                                      "Lutjanus malabaricus",
-                                      new int[]{0, 3},
-                                      3,
-                                      10);
+                new int[]{0, 3},
+                3,
+                10
+                );
 
     }
 
@@ -544,6 +553,76 @@ public class Slice6SelectivityMarket {
                                     append(currentShiftSelectivity).append(",").
                                     append(finalSubsidy).append(",").
                                     append(finalMaxDaysOut).append(",");
+                        }
+                    });
+
+
+                    //while (runner.getRunsDone() < 1) {
+                    for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                        StringBuffer tidy = new StringBuffer();
+                        runner.run(tidy);
+                        fileWriter.write(tidy.toString());
+                        fileWriter.flush();
+                    }
+                }
+            }
+        }
+
+        fileWriter.close();
+    }
+
+
+
+
+    private static void selectivityPremiumPlusPenalty(
+            String name,
+            final String filename,
+            final int maxSelectivityShift,
+            final int maxPremium,
+            String species, final int[] populationsSubsidized,
+            int shockYear, final int maturityBin) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
+        fileWriter.write("run,year,selectivity,premium,penalty,variable,value\n");
+        fileWriter.flush();
+
+        for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
+            for (double premium = 1; premium < maxPremium; premium += .5) {
+                for (double penalty = 0; penalty<=.5; penalty = FishStateUtilities.round(penalty+.25)) {
+
+
+                    BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
+
+
+                    int currentShiftSelectivity = selectivityIncrease;
+                    double finalPremium = premium;
+                    double finalPenalty = penalty;
+
+
+                    runner.setScenarioSetup(
+                            addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
+                                    Slice6SelectivityMarket.addPenaltyForImmatureFish(
+                                            species,
+                                            maturityBin,
+                                            finalPenalty
+
+                                    )
+                            ).andThen(
+                                    addConditionalMarket(finalPremium, species, maturityBin,
+                                            false,false,true)
+                            )
+                    );
+
+                    System.out.println(" selectivity: " + selectivityIncrease + "; premium " + premium +
+                            "; penalty: " + finalPenalty);
+
+                    runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                        @Override
+                        public void consume(StringBuffer writer, FishState model, Integer year) {
+                            writer.
+                                    append(currentShiftSelectivity).append(",").
+                                    append(finalPremium).append(",").
+                                    append(finalPenalty).append(",");
                         }
                     });
 
