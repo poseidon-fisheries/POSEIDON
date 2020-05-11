@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.collect.Lists;
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -21,6 +22,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -88,7 +90,7 @@ public class Slice6SelectivityMarket {
                 new int[]{0, 3},
                 3,
                 10
-                );
+        );
 
     }
 
@@ -149,8 +151,8 @@ public class Slice6SelectivityMarket {
 
 
     private static Consumer<Scenario> addConditionalMarket(double premium, String species,
-                                                    double maturityBin, boolean premiumFirst,
-                                                    boolean premiumSecond, boolean premiumThird) {
+                                                           double maturityBin, boolean premiumFirst,
+                                                           boolean premiumSecond, boolean premiumThird) {
 
 
         return new Consumer<Scenario>() {
@@ -168,6 +170,50 @@ public class Slice6SelectivityMarket {
                 newMarket.setPremiumFirstBin(premiumFirst);
                 newMarket.setPremiumSecondBin(premiumSecond);
                 newMarket.setPremiumThirdBin(premiumThird);
+                ((SpeciesMarketMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().put(species,
+                        newMarket);
+
+            }
+
+
+        };
+
+    }
+
+    private static Consumer<Scenario> addSubsidyPremiumAndPenaltyMarket(double premium, String species,
+                                                                        double maturityBin, double penalty,
+                                                                        MersenneTwisterFast random,
+                                                                        boolean premiumToAll) {
+
+
+        return new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario flexible) {
+                ThreePricesMarketFactory nonPremium =
+                        (ThreePricesMarketFactory) ((SpeciesMarketMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().get(
+                                species
+                        );
+
+                nonPremium.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
+                if(nonPremium.getLowAgeThreshold()==nonPremium.getHighAgeThreshold())
+                    nonPremium.setLowAgeThreshold(
+                            new FixedDoubleParameter(
+                                    nonPremium.getHighAgeThreshold().apply(random)-1d));
+                nonPremium.setPriceBelowThreshold(
+                        new FixedDoubleParameter(nonPremium.getPriceBelowThreshold().apply(random)*penalty)
+                );
+                nonPremium.setPriceBetweenThresholds(
+                        new FixedDoubleParameter(nonPremium.getPriceBetweenThresholds().apply(random)*penalty)
+                );
+
+                ThreePricesWithPremium newMarket = new ThreePricesWithPremium();
+
+                newMarket.setTagNeededToAccessToPremium(PeriodicUpdateGearStrategy.tag + "_1");
+                newMarket.setNonPremiumMarket(nonPremium);
+                newMarket.setPremiumInPercentage(new FixedDoubleParameter(premium));
+                newMarket.setPremiumFirstBin(premiumToAll);
+                newMarket.setPremiumSecondBin(premiumToAll);
+                newMarket.setPremiumThirdBin(true);
                 ((SpeciesMarketMappedFactory) ((FlexibleScenario) flexible).getMarket()).getMarkets().put(species,
                         newMarket);
 
@@ -225,7 +271,7 @@ public class Slice6SelectivityMarket {
                         new AlgorithmFactory<AdditionalStartable>() {
                             @Override
                             public AdditionalStartable apply(FishState state) {
-                               return new AdditionalStartable(){
+                                return new AdditionalStartable(){
 
 
                                     @Override
@@ -476,7 +522,7 @@ public class Slice6SelectivityMarket {
                     );
 
                     System.out.println(" selectivity: " + selectivityIncrease +"; subsidy "+ subsidy +
-                                               "; allSubsidized: " + isAllSubsidized);
+                            "; allSubsidized: " + isAllSubsidized);
 
                     runner.setColumnModifier(new BatchRunner.ColumnModifier() {
                         @Override
@@ -544,7 +590,7 @@ public class Slice6SelectivityMarket {
                     );
 
                     System.out.println(" selectivity: " + selectivityIncrease + "; subsidy " + subsidy +
-                                               "; maxDaysOut: " + maxDaysOut);
+                            "; maxDaysOut: " + maxDaysOut);
 
                     runner.setColumnModifier(new BatchRunner.ColumnModifier() {
                         @Override
@@ -583,60 +629,62 @@ public class Slice6SelectivityMarket {
             int shockYear, final int maturityBin) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
-        fileWriter.write("run,year,selectivity,premium,penalty,variable,value\n");
+        fileWriter.write("run,year,selectivity,premium,penalty,allSubsidized,variable,value\n");
         fileWriter.flush();
+        //people who switch... do they get premium from catch small fish as well?
+        final boolean[] allSubsidized = {false, true};
 
-        for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
-            for (double premium = 1; premium < maxPremium; premium += .5) {
-                for (double penalty = 0; penalty<=.5; penalty = FishStateUtilities.round(penalty+.25)) {
-
-
-                    BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
-
-
-                    int currentShiftSelectivity = selectivityIncrease;
-                    double finalPremium = premium;
-                    double finalPenalty = penalty;
+        for (boolean fullySubsidized : allSubsidized) {
+            for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
+                for (double premium = 1; premium < maxPremium; premium += .5) {
+                    for (double penalty = 0; penalty<=.5; penalty = FishStateUtilities.round(penalty+.25)) {
 
 
-                    runner.setScenarioSetup(
-                            addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
-                                    Slice6SelectivityMarket.addPenaltyForImmatureFish(
-                                            species,
-                                            maturityBin,
-                                            finalPenalty
+                        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN);
 
-                                    )
-                            ).andThen(
-                                    addConditionalMarket(finalPremium, species, maturityBin,
-                                            false,false,true)
-                            )
-                    );
 
-                    System.out.println(" selectivity: " + selectivityIncrease + "; premium " + premium +
-                            "; penalty: " + finalPenalty);
+                        int currentShiftSelectivity = selectivityIncrease;
+                        double finalPremium = premium;
+                        double finalPenalty = penalty;
 
-                    runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                        @Override
-                        public void consume(StringBuffer writer, FishState model, Integer year) {
-                            writer.
-                                    append(currentShiftSelectivity).append(",").
-                                    append(finalPremium).append(",").
-                                    append(finalPenalty).append(",");
+
+                        runner.setScenarioSetup(
+                                addGearUpdate(species, currentShiftSelectivity, populationsSubsidized).andThen(
+                                        addSubsidyPremiumAndPenaltyMarket(premium,
+                                                species,
+                                                maturityBin,
+                                                penalty,
+                                                new MersenneTwisterFast(),
+                                                true)
+                                )
+                        );
+
+                        System.out.println(" selectivity: " + selectivityIncrease + "; premium " + premium +
+                                "; penalty: " + finalPenalty);
+
+                        runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                            @Override
+                            public void consume(StringBuffer writer, FishState model, Integer year) {
+                                writer.
+                                        append(currentShiftSelectivity).append(",").
+                                        append(finalPremium).append(",").
+                                        append(finalPenalty).append(",");
+                            }
+                        });
+
+
+                        //while (runner.getRunsDone() < 1) {
+                        for (int i = 0; i < RUNS_PER_POLICY; i++) {
+                            StringBuffer tidy = new StringBuffer();
+                            runner.run(tidy);
+                            fileWriter.write(tidy.toString());
+                            fileWriter.flush();
                         }
-                    });
-
-
-                    //while (runner.getRunsDone() < 1) {
-                    for (int i = 0; i < RUNS_PER_POLICY; i++) {
-                        StringBuffer tidy = new StringBuffer();
-                        runner.run(tidy);
-                        fileWriter.write(tidy.toString());
-                        fileWriter.flush();
                     }
                 }
             }
         }
+
 
         fileWriter.close();
     }
@@ -683,7 +731,7 @@ public class Slice6SelectivityMarket {
                     );
 
                     System.out.println(" selectivity: " + selectivityIncrease + "; subsidy " + subsidy +
-                                               "; penalty: " + finalPenalty);
+                            "; penalty: " + finalPenalty);
 
                     runner.setColumnModifier(new BatchRunner.ColumnModifier() {
                         @Override
