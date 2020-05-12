@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
-import com.univocity.parsers.csv.CsvWriterSettings;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
@@ -60,10 +59,10 @@ public final class WebVizExporter {
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
     public static void main(final String[] args) {
-        final TunaRunner tunaRunner = new TunaRunner(scenarioPath, outputPath, new CsvWriterSettings())
+        final Runner<TunaScenario> runner = new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+            .setBeforeStartConsumer(fishState -> fishState.registerStartable(makeJsonOutputManagerFactory().apply(fishState)))
             .setAfterRunConsumer(fishState -> JsonOutputPlugin.writeOutputsToFolder(fishState, outputPath));
-        tunaRunner.getScenario().getPlugins().add(makeJsonOutputManagerFactory());
-        tunaRunner.runUntilYear(NUM_YEARS_TO_RUN);
+        runner.run(NUM_YEARS_TO_RUN);
     }
 
     @NotNull private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {

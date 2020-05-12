@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutab
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 
-public class ActiveActionRegulations {
+public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
 
     private final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
         actionSpecificRegulations;
@@ -70,8 +71,8 @@ public class ActiveActionRegulations {
         return actionSpecificRegulations.get(actionClass).stream();
     }
 
-    public void reactToAction(PurseSeinerAction purseSeinerAction) {
-        regulationStream(purseSeinerAction).forEach(reg -> reg.reactToAction(purseSeinerAction));
+    public void observe(PurseSeinerAction purseSeinerAction) {
+        regulationStream(purseSeinerAction).forEach(reg -> reg.observe(purseSeinerAction));
     }
 
     public boolean anyYearlyLimitedActionRemaining(Fisher fisher) {

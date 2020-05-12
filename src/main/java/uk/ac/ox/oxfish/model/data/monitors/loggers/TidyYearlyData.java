@@ -25,8 +25,6 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import java.util.List;
 
-import static java.lang.Math.toIntExact;
-
 public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
 
     private static final List<String> HEADERS = ImmutableList.of("year", "variable", "value");
@@ -41,7 +39,7 @@ public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
         return ImmutableList.of(
             index + 1, // year
             column.getName(), // variable
-            column.get(toIntExact(index)) // value
+            column.get(index) // value
         );
     }
 

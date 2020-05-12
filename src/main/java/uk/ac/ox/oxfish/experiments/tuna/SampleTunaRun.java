@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
-import com.univocity.parsers.csv.CsvWriterSettings;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.CatchFromFadSetsHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.CatchFromUnassociatedSetsHeatmapGatherer;
@@ -30,45 +30,49 @@ import uk.ac.ox.oxfish.model.data.heatmaps.FadSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.UnassociatedSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SampleTunaRun {
 
-    private static final int NUM_YEARS_TO_RUN = 3;
+    private static final int NUM_YEARS_TO_RUN = 4;
 
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
+
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("runs", "webviz_test", "tuna.yaml"));
-    //basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets", "tuna_calibrated.yaml"));
+        basePath.resolve(Paths.get("runs", "slice1_2020-05-13_policy_shock", "tuna_calibrated.yaml"));
+
     private static final Path outputPath =
         basePath.resolve(Paths.get("runs", "gatherers_test"));
 
     public static void main(final String[] args) {
-
-        new TunaRunner(scenarioPath, outputPath, new CsvWriterSettings())
-            .registerYearlyData("yearly_data.csv")
-            .registerFisherYearlyData("fisher_yearly_data.csv")
+        new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+            .requestYearlyData()
+            .requestFisherYearlyData()
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
-            .registerRowProviders("heatmap_data.csv", fishState -> {
-                final int interval = 30;
-                ImmutableList.Builder<HeatmapGatherer> gatherers = new ImmutableList.Builder<>();
-                gatherers.add(
-                    new FadDeploymentHeatmapGatherer(interval),
-                    new FadSetHeatmapGatherer(interval),
-                    new UnassociatedSetHeatmapGatherer(interval),
-                    new FadDensityHeatmapGatherer(interval)
-                );
-                fishState.getSpecies().forEach(species -> {
-                    gatherers.add(new BiomassHeatmapGatherer(interval, species));
-                    gatherers.add(new CatchFromFadSetsHeatmapGatherer(interval, species));
-                    gatherers.add(new CatchFromUnassociatedSetsHeatmapGatherer(interval, species));
-                });
-                return gatherers.build();
-            })
-            .runUntilYear(NUM_YEARS_TO_RUN, 2);
+//            .registerRowProviders("heatmap_data.csv", SampleTunaRun::makeHeatmapProviders)
+            .run(NUM_YEARS_TO_RUN, 1);
+    }
+
+    private static Iterable<? extends RowProvider> makeHeatmapProviders(final FishState fishState) {
+        final int interval = 30;
+        ImmutableList.Builder<HeatmapGatherer> gatherers = new ImmutableList.Builder<>();
+        gatherers.add(
+            new FadDeploymentHeatmapGatherer(interval),
+            new FadSetHeatmapGatherer(interval),
+            new UnassociatedSetHeatmapGatherer(interval),
+            new FadDensityHeatmapGatherer(interval)
+        );
+        fishState.getSpecies().forEach(species -> {
+            gatherers.add(new BiomassHeatmapGatherer(interval, species));
+            gatherers.add(new CatchFromFadSetsHeatmapGatherer(interval, species));
+            gatherers.add(new CatchFromUnassociatedSetsHeatmapGatherer(interval, species));
+        });
+        return gatherers.build();
     }
 
 }

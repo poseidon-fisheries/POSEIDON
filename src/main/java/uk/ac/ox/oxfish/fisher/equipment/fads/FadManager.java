@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import ec.util.MersenneTwisterFast;
@@ -30,6 +31,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
@@ -42,6 +44,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -52,6 +55,10 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadManager {
+
+    private static List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
+        DeployFad.class, MakeFadSet.class, MakeUnassociatedSet.class
+    );
 
     private final FadMap fadMap;
     private final Observers observers = new Observers();
@@ -100,11 +107,7 @@ public class FadManager {
         fadSetObservers.forEach(observer -> registerObserver(MakeFadSet.class, observer));
         unassociatedSetObservers.forEach(observer -> registerObserver(MakeUnassociatedSet.class, observer));
         biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
-
-        registerObserver(DeployFad.class, actionSpecificRegulations::reactToAction);
-        registerObserver(MakeUnassociatedSet.class, actionSpecificRegulations::reactToAction);
-        registerObserver(MakeFadSet.class, actionSpecificRegulations::reactToAction);
-
+        setActionSpecificRegulations(actionSpecificRegulations);
     }
 
     public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
@@ -214,7 +217,9 @@ public class FadManager {
     }
 
     private void setActionSpecificRegulations(ActiveActionRegulations actionSpecificRegulations) {
+        observers.unregister(this.actionSpecificRegulations);
         this.actionSpecificRegulations = actionSpecificRegulations;
+        POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(actionClass, actionSpecificRegulations));
     }
 
     public <O> void reactTo(final O observable) {

@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import com.univocity.parsers.csv.CsvWriter;
-import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,13 +35,14 @@ public interface RowProvider {
         CsvWriter csvWriter,
         Collection<? extends RowProvider> rowProviders
     ) {
-        writeRows(csvWriter, rowProviders, 0);
+        writeRows(csvWriter, rowProviders, 1, true);
     }
 
     static void writeRows(
         CsvWriter csvWriter,
         Collection<? extends RowProvider> rowProviders,
-        int runNumber
+        int runNumber,
+        boolean writeHeaders
     ) {
         checkArgument(!rowProviders.isEmpty());
         rowProviders.stream().findFirst().ifPresent(first -> {
@@ -50,7 +50,8 @@ public interface RowProvider {
             checkArgument(rowProviders.stream().allMatch(provider ->
                 elementsEqual(provider.getHeaders(), headers))
             );
-            csvWriter.writeHeaders(asList("run", headers.toArray()));
+            if (writeHeaders)
+                csvWriter.writeHeaders(asList("run", headers.toArray()));
             csvWriter.writeRowsAndClose(
                 rowProviders.stream()
                     .flatMap(rowsProvider -> stream(rowsProvider.getRows()))

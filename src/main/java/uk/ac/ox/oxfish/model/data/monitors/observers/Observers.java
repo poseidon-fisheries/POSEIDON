@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors.observers;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 public class Observers {
@@ -28,6 +29,16 @@ public class Observers {
 
     public <T> void register(Class<T> observedClass, Observer<? super T> observer) {
         this.observers.put(observedClass, observer);
+    }
+
+    public void unregister(Observer<?> observer) {
+        // copy the keys to avoid ConcurrentModificationException
+        final ImmutableList<Class<?>> observedClasses = ImmutableList.copyOf(observers.keySet());
+        observedClasses.forEach(observedClass -> unregister(observedClass, observer));
+    }
+
+    public void unregister(Class<?> observedClass, Observer<?> observer) {
+        this.observers.remove(observedClass, observer);
     }
 
     public <O> void reactTo(O observable) {

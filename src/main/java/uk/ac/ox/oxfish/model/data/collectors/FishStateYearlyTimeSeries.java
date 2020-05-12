@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
@@ -144,6 +143,12 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState state1) {
+                                     System.out.printf(
+                                         "Gathering %s biomass at day %d: %,f.0\n",
+                                         species.getName(),
+                                         state1.getDay(),
+                                         state1.getTotalBiomass(species)
+                                     );
                                      return state1.getTotalBiomass(species);
                                  }
                              }

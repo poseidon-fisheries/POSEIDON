@@ -21,13 +21,17 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.util.Collection;
@@ -57,6 +61,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     private final double hoursPerStep;
     private final double stepsPerDay;
     private final NauticalMap nauticalMap;
+    private FishState fishState;
 
     public PurseSeineActionsLogger(
         final FishState fishState
@@ -73,6 +78,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     }
 
     @Override public void start(final FishState fishState) {
+        this.fishState = fishState;
         observers.forEach(observer -> observer.start(fishState));
     }
 
@@ -93,10 +99,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.lon = coordinates.x;
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
-            this.tripStartStep = (int) (action.getFisher().getCurrentTrip().getTripDate() * stepsPerDay);
-            action.getFisher().addTripListener((record, fisher) ->
-                this.tripEndStep = tripStartStep + (int) (record.getDurationInHours() / hoursPerStep)
-            );
+            final TripRecord currentTrip = action.getFisher().getCurrentTrip();
+            this.tripStartStep = (int) (currentTrip.getTripDate() * stepsPerDay);
+            action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
         }
 
         private String actionType(PurseSeinerAction action) {
@@ -116,6 +121,23 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 tripStartStep,
                 tripEndStep
             ));
+        }
+
+        private class TripEndRecorder implements TripListener {
+
+            private final TripRecord currentTrip;
+
+            private TripEndRecorder(final TripRecord currentTrip) {
+                this.currentTrip = currentTrip;
+            }
+
+            @Override public void reactToFinishedTrip(final TripRecord trip, final Fisher fisher) {
+                if (trip == currentTrip) {
+                    tripEndStep = tripStartStep + (int) (trip.getDurationInHours() / hoursPerStep);
+                    fishState.scheduleOnce(__ -> fisher.removeTripListener(this), StepOrder.DAWN);
+                }
+            }
+
         }
 
     }

@@ -71,19 +71,19 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.reactToAction(new DeployFad(fishState, fisher));
+        actionSpecificRegulations.observe(new DeployFad(fishState, fisher));
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.reactToAction(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.observe(new MakeFadSet(fishState, fisher, null));
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.reactToAction(new MakeUnassociatedSet(fishState, fisher));
+        actionSpecificRegulations.observe(new MakeUnassociatedSet(fishState, fisher));
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.reactToAction(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.observe(new MakeFadSet(fishState, fisher, null));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
