@@ -36,17 +36,7 @@ public class NoData718Slice6 {
 
     public static void main(String[] args) throws IOException {
 
-//        runSlice(
-//                MAIN_DIRECTORY.resolve("base.yaml"),
-//                MAIN_DIRECTORY.resolve("parameters.yaml"),
-//                MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
-//                MAIN_DIRECTORY,
-//                0L,
-//                MAX_YEARS_TO_RUN
-//
-//
-//        );
-        runSliceIntegrated(
+        runSlice(
                 MAIN_DIRECTORY.resolve("base.yaml"),
                 MAIN_DIRECTORY.resolve("parameters.yaml"),
                 MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
@@ -56,6 +46,16 @@ public class NoData718Slice6 {
 
 
         );
+//        runSliceIntegrated(
+//                MAIN_DIRECTORY.resolve("base.yaml"),
+//                MAIN_DIRECTORY.resolve("parameters.yaml"),
+//                MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
+//                MAIN_DIRECTORY,
+//                0L,
+//                MAX_YEARS_TO_RUN
+//
+//
+//        );
     }
 
 
@@ -257,6 +257,8 @@ public class NoData718Slice6 {
                                       int maxYearsToRun,
             int shockYear
     ) throws IOException {
+
+        
 
         System.out.println(scenarioFile.toFile().getAbsolutePath() );
 

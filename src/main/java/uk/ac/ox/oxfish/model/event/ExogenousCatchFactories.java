@@ -42,6 +42,7 @@ public class ExogenousCatchFactories {
     static {
         NAMES.put(SimpleExogenousCatchesFactory.class, "Simple Exogenous Catches");
         NAMES.put(AbundanceDrivenGearExogenousCatchesFactory.class, "Abundance Gear Exogenous Catches");
+        NAMES.put(ExogenousInstantaneousMortalityCatchesFactory.class, "Instantaneous Mortality Exogenous Catches");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

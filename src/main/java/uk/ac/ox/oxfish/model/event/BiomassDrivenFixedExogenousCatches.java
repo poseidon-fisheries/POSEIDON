@@ -37,7 +37,7 @@ import java.util.function.Function;
 /**
  * Created by carrknight on 5/25/17.
  */
-public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches {
+public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
 
     private final boolean allowMortalityOnFads;

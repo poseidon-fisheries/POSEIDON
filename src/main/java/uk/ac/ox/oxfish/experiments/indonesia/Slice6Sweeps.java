@@ -7,6 +7,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -45,7 +46,7 @@ public class Slice6Sweeps {
 
 
     private static final String SCENARIO_NAME = //"tropfishR_tl_2yr_8h";
-            "lime_monthly2yr_8h";
+            "lime_monthly2yr_9h";
 
 
     // "new_cmsy_tropfishR_8h";
@@ -170,6 +171,11 @@ public class Slice6Sweeps {
 //
 //
 //// no fishing
+
+                effortControl("calibration",
+                new String[]{"population0","population1","population2","population3"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, 250);
 //        stopFishing("nofishing",
 //                new String[]{"population0","population1","population2","population3"},
 //                SCENARIO_NAME,
@@ -191,6 +197,7 @@ public class Slice6Sweeps {
 ////
 //////        //selectivity test
 //        selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
+  ///      selectivityTest3("selectivity_sweep_all", SCENARIO_NAME,SHOCK_YEAR);
 //////
 //////        //price penalty
 //        pricePenalty("malus_malabaricus",
@@ -222,11 +229,11 @@ public class Slice6Sweeps {
 //                          true, .3, false,false);
 //        priceAndCostShock("price_and_cost_sticky10_giveup",SCENARIO_NAME,10,SHOCK_YEAR, true, .1, false);
 
-
-        priceAndCostShock("price_and_cost_sticky80_giveup_entry",SCENARIO_NAME,80,SHOCK_YEAR, true,
-                .8, false,true);
-        priceAndCostShock("price_and_cost_sticky30_giveup_entry",SCENARIO_NAME,360,SHOCK_YEAR,
-                true, .3, false,true);
+//
+//        priceAndCostShock("price_and_cost_sticky80_giveup_entry",SCENARIO_NAME,80,SHOCK_YEAR, true,
+//                .8, false,true);
+//        priceAndCostShock("price_and_cost_sticky30_giveup_entry",SCENARIO_NAME,360,SHOCK_YEAR,
+//                true, .3, false,true);
 
 ////        //delays
 //        delays("delay_all",
@@ -1727,6 +1734,152 @@ public class Slice6Sweeps {
     }
 
 
+    private static void selectivityTest3(
+            String name,
+            final String filename,
+            int yearsFromStart) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(double increase=0; increase<=30; increase=FishStateUtilities.round5(increase+1)) {
+
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
+
+
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            double finalIncrease = increase;
+            runner.setScenarioSetup(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    FlexibleScenario flexible = (FlexibleScenario) scenario;
+                    Preconditions.checkArgument(flexible.getFisherDefinitions().get(0).getTags().contains("small"));
+                    ;
+                    final DelayGearDecoratorFactory gearPopulation0 = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                            0).getGear();
+                    final DelayGearDecoratorFactory gearPopulation3 = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                            3).getGear();
+
+
+
+                    ((FlexibleScenario) scenario).getPlugins().add(
+
+                            new AlgorithmFactory<AdditionalStartable>() {
+                                @Override
+                                public AdditionalStartable apply(FishState state) {
+
+                                    return new AdditionalStartable(){
+                                        /**
+                                         * this gets called by the fish-state right after the scenario has started.
+                                         * It's useful to set up steppables
+                                         * or just to percolate a reference to the model
+                                         *
+                                         * @param model the model
+                                         */
+                                        @Override
+                                        public void start(FishState model) {
+                                            state.scheduleOnceAtTheBeginningOfYear(
+                                                    new Steppable() {
+                                                        @Override
+                                                        public void step(SimState simState) {
+
+
+
+
+                                                            //modify gear factories
+                                                            HashMap<String, HomogeneousGearFactory> gears = ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                    gearPopulation0.getDelegate()).getDelegate()).getDelegate()).getGears();
+
+                                                            for (Map.Entry<String, HomogeneousGearFactory> gear : gears.entrySet()) {
+
+
+                                                                ((SimpleLogisticGearFactory) gear.getValue()).setSelexParameter1(
+                                                                        new FixedDoubleParameter(
+                                                                                ((FixedDoubleParameter) ((SimpleLogisticGearFactory) gear.getValue()).getSelexParameter1()).getFixedValue()
+                                                                                        + finalIncrease
+                                                                        )
+                                                                );
+                                                            }
+                                                            gears = ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory)
+                                                                    gearPopulation3.getDelegate()).getDelegate()).getDelegate()).getGears();
+
+                                                            for (Map.Entry<String, HomogeneousGearFactory> gear : gears.entrySet()) {
+
+                                                                ((SimpleLogisticGearFactory) gear.getValue()).setSelexParameter1(
+                                                                        new FixedDoubleParameter(
+                                                                                ((FixedDoubleParameter) ((SimpleLogisticGearFactory) gear.getValue()).getSelexParameter1()).getFixedValue()
+                                                                                        + finalIncrease
+                                                                        )
+                                                                );
+                                                            }
+
+
+
+                                                            for (Fisher fisher : state.getFishers()) {
+
+                                                                if(fisher.getTags().contains("population0")) {
+                                                                    fisher.setGear(gearPopulation0.apply(state));
+
+                                                                }else
+                                                                if(fisher.getTags().contains("population3")){
+                                                                    fisher.setGear(gearPopulation3.apply(state));
+
+                                                                }
+
+                                                            }
+
+                                                        }
+                                                    }
+                                                    ,
+                                                    StepOrder.DAWN, yearsFromStart+1);
+                                        }
+
+                                        /**
+                                         * tell the startable to turnoff,
+                                         */
+                                        @Override
+                                        public void turnOff() {
+
+                                        }
+                                    };
+
+                                }
+                            }
+                    );
+
+
+
+
+
+                }
+            });
+
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalIncrease).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
     //sweep selectivity of small boats, see if it makes a difference anyway
     private static void selectivityTest2(
             String name,
@@ -1737,7 +1890,7 @@ public class Slice6Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double increase=0; increase<=30; increase=FishStateUtilities.round5(increase+1)) {
+        for(double increase=0; increase<=15; increase=FishStateUtilities.round5(increase+1)) {
 
             BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, DEFAULT_COLUMNS_TO_PRINT);
 

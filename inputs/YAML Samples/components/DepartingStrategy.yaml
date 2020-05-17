@@ -75,6 +75,5 @@ Full-time Seasonal Retired Decorator:
   targetVariable: '100.0'
   variableName: TRIP_PROFITS_PER_HOUR
 -------
-Purse-Seine Gear Departing Strategy:
-  hoursBetweenEachDeparture: '340.3333'
+Purse-Seine Gear Departing Strategy
 -------

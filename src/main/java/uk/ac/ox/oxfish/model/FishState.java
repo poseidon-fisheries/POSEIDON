@@ -314,6 +314,16 @@ public class FishState  extends SimState{
         return biology.getSpecies();
     }
 
+    /**
+     *
+     * @return an unmodifiable list of all the species available
+     */
+    public Species getSpecies(String speciesName) {
+        return biology.getSpecie(speciesName);
+    }
+
+
+
     public NauticalMap getMap() {
         return map;
     }

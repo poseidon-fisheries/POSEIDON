@@ -124,16 +124,25 @@ Purse Seine Gear:
       - {
         }
   averageSetDurationInHours: '8.0219505805135'
-  dudProbability: '0.0'
+  biomassLostMonitor: null
+  fadDeploymentObservers: !!set {
+    }
   fadInitializerFactory:
     attractionRates: {
       }
     carryingCapacities: {
       }
+    dudProbability: '0.0'
     fishReleaseProbabilityInPercent: '0.0'
+  fadSetObservers: !!set {
+    }
   initialNumberOfFads: 999999
   minimumSetDurationInHours: '3.03333333333333'
+  setObservers: !!set {
+    }
   stdDevOfSetDurationInHours: '2.99113291538723'
   successfulSetProbability: '0.9231701'
   unassociatedCatchSampleFile: null
+  unassociatedSetObservers: !!set {
+    }
 -------

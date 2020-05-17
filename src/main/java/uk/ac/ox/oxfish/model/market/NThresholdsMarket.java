@@ -39,7 +39,8 @@ public class NThresholdsMarket extends AbstractMarket {
         this.binThresholds = binThresholds;
         //all the bins must be in order already!
         for (int i = 1; i < binThresholds.length; i++) {
-            Preconditions.checkArgument( this.binThresholds[i]>this.binThresholds[i-1]);
+            Preconditions.checkArgument( this.binThresholds[i]>this.binThresholds[i-1],
+                    Arrays.toString(binThresholds));
         }
         this.pricePerSegment = pricePerSegment;
         Preconditions.checkArgument(this.pricePerSegment.length==this.binThresholds.length+1);

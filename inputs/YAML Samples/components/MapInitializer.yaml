@@ -3,7 +3,9 @@ Simple Map:
   coastalRoughness: '4.0'
   depthSmoothing: '1000000.0'
   height: '50.0'
+  maxInitialDepth: '5000.0'
   maxLandWidth: '10.0'
+  minInitialDepth: '5000.0'
   width: '50.0'
 -------
 Two Sided Map:
@@ -24,20 +26,15 @@ Map with far-off ports:
   delegate:
     Simple Map:
       cellSizeInKilometers: '10.0'
-      coastalRoughness: '1.0'
-      depthSmoothing: '1.0'
-      height: '20.0'
+      coastalRoughness: '4.0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      maxInitialDepth: '5000.0'
       maxLandWidth: '10.0'
-      width: '20.0'
-  farOffPorts:
-  - distanceFromExitInKm: 100.0
-    exitGridX: 20
-    exitGridY: 20
-    gasPriceAtPort: 0.0
-    marketMaker:
-      Fixed Price Market:
-        marketPrice: '10.0'
-    portName: Ahoy
+      minInitialDepth: '5000.0'
+      width: '50.0'
+  farOffPorts: [
+    ]
 -------
 From File Map:
   gridWidthInCell: '100.0'

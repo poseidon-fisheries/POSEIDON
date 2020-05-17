@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -38,7 +37,7 @@ import java.util.LinkedHashMap;
  * on the "abundance" side of catches
  * Created by carrknight on 3/23/17.
  */
-public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatches {
+public class AbundanceDrivenFixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
 
     public AbundanceDrivenFixedExogenousCatches(

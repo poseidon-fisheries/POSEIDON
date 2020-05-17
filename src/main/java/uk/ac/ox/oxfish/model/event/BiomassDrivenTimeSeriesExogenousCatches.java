@@ -40,7 +40,7 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
 
     private final LinkedHashMap<Species, Queue<Double>> landingsTimeSeries;
 
-    private final AbstractExogenousCatches delegate;
+    private final AbstractYearlyTargetExogenousCatches delegate;
 
     private Stoppable stoppable;
 

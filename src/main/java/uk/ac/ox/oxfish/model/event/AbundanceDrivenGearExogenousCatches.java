@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class AbundanceDrivenGearExogenousCatches extends AbstractExogenousCatches {
+public class AbundanceDrivenGearExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
     private final HashMap<Species, HomogeneousAbundanceGear> gears;
 

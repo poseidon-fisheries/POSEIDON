@@ -60,7 +60,9 @@ Abstract:
       coastalRoughness: '4.0'
       depthSmoothing: '1000000.0'
       height: '50.0'
+      maxInitialDepth: '5000.0'
       maxLandWidth: '10.0'
+      minInitialDepth: '5000.0'
       width: '50.0'
   mapMakerDedicatedRandomSeed: null
   market:

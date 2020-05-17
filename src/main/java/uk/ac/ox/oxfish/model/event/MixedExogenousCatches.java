@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.LinkedHashMap;
 
-public class MixedExogenousCatches extends AbstractExogenousCatches {
+public class MixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
     public MixedExogenousCatches(
             LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");

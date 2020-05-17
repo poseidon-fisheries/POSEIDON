@@ -34,7 +34,7 @@ import java.util.Map;
  * Used to simulate shrimp-related snapper mortality (which is concentrated in 0-1 juveniles)
  * Created by carrknight on 6/2/17.
  */
-public class OsmoseBoundedExogenousCatches extends AbstractExogenousCatches {
+public class OsmoseBoundedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
 
 
