@@ -24,7 +24,6 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
 
     private final HashMap<String,Double> exponentialMortality;
 
-    private final LinkedHashMap<Species,Double> lastExogenousCatches = new LinkedHashMap<>();
 
     private final boolean isAbundanceBased;
 
