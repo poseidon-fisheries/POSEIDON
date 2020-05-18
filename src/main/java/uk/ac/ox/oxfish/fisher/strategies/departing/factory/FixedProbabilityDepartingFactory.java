@@ -30,6 +30,9 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
 {
     private DoubleParameter probabilityToLeavePort= new FixedDoubleParameter(1);
 
+
+    private boolean checkOnlyOnceADay = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -50,4 +53,12 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
         this.probabilityToLeavePort = probabilityToLeavePort;
     }
 
+
+    public boolean isCheckOnlyOnceADay() {
+        return checkOnlyOnceADay;
+    }
+
+    public void setCheckOnlyOnceADay(boolean checkOnlyOnceADay) {
+        this.checkOnlyOnceADay = checkOnlyOnceADay;
+    }
 }

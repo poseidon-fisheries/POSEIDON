@@ -330,6 +330,15 @@ public class TripRecord {
         return tilesFished.entrySet();
     }
 
+
+    /**
+     * alias of getEffort
+     */
+    public int getHoursSpentFishing(){
+        return getEffort();
+
+    }
+
     public SeaTile getMostFishedTileInTrip()
     {
 

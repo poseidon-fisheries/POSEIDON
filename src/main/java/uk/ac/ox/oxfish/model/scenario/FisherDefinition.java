@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -33,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.EffortCost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -46,12 +46,10 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -65,7 +63,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -136,6 +133,11 @@ public class FisherDefinition {
      * negative numbers are ignored!
      */
     private DoubleParameter hourlyVariableCost = new FixedDoubleParameter(0);
+
+    /**
+     * the cost in money for each hour spent actually fishing
+     */
+    private DoubleParameter hourlyEffortCost = new NullParameter();
 
     /**
      * tags to add to each fisher created
@@ -275,6 +277,9 @@ public class FisherDefinition {
                 new Consumer<Fisher>() {
                     @Override
                     public void accept(Fisher fisher) {
+
+                        ///////////////////////////////////////////////////////////////////////
+                        // VARIABLE COSTS
                         //don't bother if we don't have any variable costs
                         if(hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
                             return;
@@ -285,6 +290,16 @@ public class FisherDefinition {
                                     new HourlyCost(vc)
                             );
 
+                        ///////////////////////////////////////////////////////////////////////
+                        // EFFORT COSTS
+                        if(hourlyEffortCost == null || hourlyEffortCost instanceof NullParameter)
+                                return;
+                        double effortCost = hourlyEffortCost.apply(fisher.grabRandomizer());
+                        //don't bother if variable costs are negative!
+                        if(effortCost>0)
+                            fisher.getAdditionalTripCosts().add(
+                                    new EffortCost(effortCost)
+                            );
                     }
                 }
         );
@@ -648,5 +663,13 @@ public class FisherDefinition {
      */
     public List<Consumer<Fisher>> grabAdditionalSetups() {
         return additionalSetups;
+    }
+
+    public DoubleParameter getHourlyEffortCost() {
+        return hourlyEffortCost;
+    }
+
+    public void setHourlyEffortCost(DoubleParameter hourlyEffortCost) {
+        this.hourlyEffortCost = hourlyEffortCost;
     }
 }
