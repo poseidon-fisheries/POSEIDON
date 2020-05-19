@@ -22,18 +22,9 @@ public class ExogenousInstantaneousMortalityCatchesFactory implements
     public ExogenousInstantaneousMortalityCatches apply(FishState fishState) {
 
 
-
-        //useless in almost all cases, but sometimes YAML forces a string in there!
-        final LinkedHashMap<String, Double> copy = new LinkedHashMap<>();
-        for (Map.Entry<String, Double> entry : exogenousMortalities.entrySet()) {
-            copy.put(entry.getKey(), Double.parseDouble(((Object) entry.getValue()).toString()));
-
-        }
-
-
         return new ExogenousInstantaneousMortalityCatches(
-                "Exogenous landings of ",
-                copy,
+                "Exogenous catches of ",
+                new LinkedHashMap<>(exogenousMortalities),
                 isAbundanceBased
         );
 
