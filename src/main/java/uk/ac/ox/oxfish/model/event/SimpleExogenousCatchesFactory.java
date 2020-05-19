@@ -73,6 +73,8 @@ public class SimpleExogenousCatchesFactory  implements AlgorithmFactory<MixedExo
      * @param yearlyBiomassToExtract Value to set for property 'yearlyBiomassToExtract'.
      */
     public void setYearlyBiomassToExtract(HashMap<String, Number> yearlyBiomassToExtract) {
+
+
         this.yearlyBiomassToExtract = yearlyBiomassToExtract;
     }
 }

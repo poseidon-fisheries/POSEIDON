@@ -159,7 +159,7 @@ public class FisherDefinition {
 
         int numberOfInitialFishers =0;
         for (Map.Entry<String, Integer> portNumber : initialFishersPerPort.entrySet()) {
-            numberOfInitialFishers+=portNumber.getValue();
+            numberOfInitialFishers+= portNumber.getValue();
         }
         flatPortArray = new String[numberOfInitialFishers];
         int i=0;
@@ -590,6 +590,7 @@ public class FisherDefinition {
      * @param initialFishersPerPort Value to set for property 'initialFishersPerPort'.
      */
     public void setInitialFishersPerPort(LinkedHashMap<String, Integer> initialFishersPerPort) {
+
         this.initialFishersPerPort = initialFishersPerPort;
     }
 

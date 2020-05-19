@@ -48,6 +48,13 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     private boolean alwaysPositive = false;
 
+    /**
+     * when this is set to true, it means the argument could never be a DoubleParameter. This usually doesn't matter
+     * but unfortunately it seems that YAML struggles with map<String,Number> and turn them into string,string maps
+     */
+    private boolean isRawNumber = false;
+
+
     public SimpleOptimizationParameter() {
     }
 
@@ -85,7 +92,10 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         //i am just going to do this the hackish way. The input could be a DoubleParameter or a straight up number. I will try the first, catch the exception
         // and try the second
 
-        quickParametrize(scenario, realValue, addressToModify);
+        if(!isRawNumber)
+            quickParametrize(scenario, realValue, addressToModify);
+        else
+            quickParametrizeRawNumber(scenario,realValue,addressToModify);
 
         return String.valueOf(realValue);
 
@@ -123,6 +133,19 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
             {
                 throw new RuntimeException(d);
             }
+        }
+    }
+
+    public static void quickParametrizeRawNumber(Scenario scenario, double realValue, String addressToModify) {
+        //try as raw number
+        try{
+            OptimizationParameter.navigateAndSet(
+                    scenario,addressToModify,realValue
+
+            );}
+        catch (Exception d)
+        {
+            throw new RuntimeException(d);
         }
     }
 
@@ -194,5 +217,13 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     @Override
     public String getName() {
         return getAddressToModify();
+    }
+
+    public boolean isRawNumber() {
+        return isRawNumber;
+    }
+
+    public void setRawNumber(boolean rawNumber) {
+        isRawNumber = rawNumber;
     }
 }
