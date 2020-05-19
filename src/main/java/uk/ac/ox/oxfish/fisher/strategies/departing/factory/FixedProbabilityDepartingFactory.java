@@ -41,7 +41,8 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
      */
     @Override
     public FixedProbabilityDepartingStrategy apply(FishState state) {
-        return new FixedProbabilityDepartingStrategy(probabilityToLeavePort.apply(state.random), false);
+        return new FixedProbabilityDepartingStrategy(probabilityToLeavePort.apply(state.random),
+                checkOnlyOnceADay);
     }
 
 
