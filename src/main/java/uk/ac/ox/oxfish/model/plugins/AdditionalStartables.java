@@ -35,6 +35,7 @@ public class AdditionalStartables {
         NAMES.put(FishingMortalityAgentFactory.class, "Fishing Mortality Agent");
         NAMES.put(FisherEntryByProfitFactory.class, "Fish Entry By Profit");
         NAMES.put(FisherEntryConstantRateFactory.class, "Fish Entry Constant Rate");
+        NAMES.put(SpendSaveInvestEntryFactory.class, "Spend Save Invest Entry");
         NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class, "Full-time Seasonal Retired Data Collectors");
         NAMES.put(BiomassDepletionGathererFactory.class, "Biomass Depletion Data Collectors");
         NAMES.put(TowLongLoggerFactory.class, "Tow Long Logger");

@@ -64,6 +64,7 @@ import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -982,7 +983,9 @@ public class FishStateUtilities {
             final String policyScript, final int yearsToRun,
             final boolean saveOnExit, Integer heatmapGathererYear,
             @Nullable Consumer<Scenario> scenarioSetup,
-            @Nullable  Consumer<FishState> preStartSetup) throws IOException {
+            @Nullable  Consumer<FishState> preStartSetup,
+            //if any of returns true, it stops the simulation before it is over!
+            Predicate<FishState>... circuitBreakers) throws IOException {
 
         //create scenario and files
         String fullScenario = String.join("\n", Files.readAllLines(scenarioYaml));
@@ -1044,11 +1047,21 @@ public class FishStateUtilities {
                         yaml.dump(scripts.getScripts()).getBytes());
         }
 
-
+        mainloop:
         while(model.getYear()< yearsToRun) {
             model.schedule.step(model);
-            if(Log.DEBUG && model.getDayOfTheYear()==1)
-                Log.debug("Year " + model.getYear() + " starting");
+            if(model.getDayOfTheYear()==1)
+            {
+                //if you fail any of the 
+                for (Predicate<FishState> circuitBreaker : circuitBreakers) {
+                    if(circuitBreaker.test(model))
+                        break mainloop;
+                }
+                if(Log.DEBUG)
+                    Log.debug("Year " + model.getYear() + " starting");
+            }
+
+
         }
 
         if(outputFolder!=null) {

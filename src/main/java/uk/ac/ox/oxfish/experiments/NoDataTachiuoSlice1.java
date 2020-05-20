@@ -16,12 +16,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class NoDataTachiuoSlice1 {
 
     //docs/20200425 abc_example/
     final static public Path MAIN_DIRECTORY =
-            Paths.get("docs", "20200425 abc_example");
+            Paths.get("docs", "20200425 abc_example","slice2");
 
 
     final static public int MAX_YEARS_TO_RUN = 45;
@@ -38,6 +39,36 @@ public class NoDataTachiuoSlice1 {
                 0L,
                 MAX_YEARS_TO_RUN
         );
+    }
+
+
+    private final static List<Predicate<FishState>> modelInterruptors = new LinkedList<>();
+    static {
+
+        //stop the simulation if there are more than 500 boats (way too many)
+        modelInterruptors.add(
+                new Predicate<FishState>() {
+                    @Override
+                    public boolean test(FishState fishState) {
+                        final Double fishers = fishState.getLatestYearlyObservation("Number Of Active Fishers");
+                        System.out.println("fishers "+ fishers);
+                        return (Double.isFinite(fishers) && fishers >= 500);
+                    }
+                }
+        );
+
+
+        //stop the simulation if the landings of the small fleet alone are above 10,000t
+        modelInterruptors.add(
+                new Predicate<FishState>() {
+                    @Override
+                    public boolean test(FishState fishState) {
+                        final Double usukiLandings = fishState.getLatestYearlyObservation("タチウオ Landings");
+                        return (Double.isFinite(usukiLandings) && usukiLandings >= 10000*1000);
+                    }
+                }
+        );
+
     }
 
 
@@ -137,6 +168,9 @@ public class NoDataTachiuoSlice1 {
                     -1
             );
             StringBuffer tidy = new StringBuffer();
+
+            batchRunner.setModelInterruptors(modelInterruptors);
+
 
             batchRunner.setColumnModifier(new BatchRunner.ColumnModifier() {
                 @Override

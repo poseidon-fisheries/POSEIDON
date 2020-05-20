@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import org.apache.commons.math3.analysis.solvers.BracketingNthOrderBrentSolver;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Created by carrknight on 9/24/16.
@@ -96,6 +98,11 @@ public class BatchRunner
      */
     private ColumnModifier columnModifier;
 
+    /**
+     * this get called once a year and can stop a simulation for running for too long
+     */
+    private List<Predicate<FishState>> modelInterruptors = new LinkedList();
+
     public BatchRunner(
             Path yamlFile, int yearsToRun,@Nullable List<String> columnsToPrint,
             @Nullable Path outputFolder, Path policyFile, long initialSeed,
@@ -131,7 +138,8 @@ public class BatchRunner
                 yearsToRun, false,
                 heatmapGathererStartYear,
                 getScenarioSetup(),
-                beforeStartSetup
+                beforeStartSetup,
+                modelInterruptors.toArray(new Predicate[modelInterruptors.size()])
         );
         System.out.println("Run took: " + (System.currentTimeMillis()-startTime)/1000 + " seconds");
 
@@ -158,9 +166,10 @@ public class BatchRunner
             );
         }
         //print it tidyly if needed
+        int yearsActuallyRan = model.getYearlyDataSet().numberOfObservations();
         if(writer!=null)
             for(DataColumn column : columns)
-                for(int year=0; year<yearsToRun; year++) {
+                for(int year=0; year<yearsActuallyRan; year++) {
                     writer.append(runsDone).append(",").append(year).append(",");
                     if(columnModifier!=null)
                         columnModifier.consume(writer,
@@ -291,5 +300,13 @@ public class BatchRunner
 
     public void setBeforeStartSetup(Consumer<FishState> beforeStartSetup) {
         this.beforeStartSetup = beforeStartSetup;
+    }
+
+    public List<Predicate<FishState>> getModelInterruptors() {
+        return modelInterruptors;
+    }
+
+    public void setModelInterruptors(List<Predicate<FishState>> modelInterruptors) {
+        this.modelInterruptors = modelInterruptors;
     }
 }
