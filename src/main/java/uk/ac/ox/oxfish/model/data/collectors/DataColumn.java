@@ -79,7 +79,7 @@ public class DataColumn implements Iterable<Double>, Serializable{
         return data.get(index);
     }
 
-    public Double getDatumXDaysAgo(int daysAgo)
+    public Double getDatumXStepsAgo(int daysAgo)
     {
         return data.get(data.size()-daysAgo-1);
     }

@@ -57,6 +57,27 @@ public class NoDataTachiuoSlice1 {
                 }
         );
 
+        //stop the simulation if there are 3 consecutive years with no active fishers
+        modelInterruptors.add(
+                new Predicate<FishState>() {
+                    @Override
+                    public boolean test(FishState fishState) {
+                        if(fishState.getYear()>3)
+                        {
+                            if(
+                                    fishState.getYearlyDataSet().getColumn("Number Of Active Fishers").getLatest() == 0 &&
+                                            fishState.getYearlyDataSet().getColumn("Number Of Active Fishers").getDatumXStepsAgo(1) == 0 &&
+                                            fishState.getYearlyDataSet().getColumn("Number Of Active Fishers").getDatumXStepsAgo(2) == 0
+                            )
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }
+        );
+
 
         //stop the simulation if the landings of the small fleet alone are above 10,000t
         modelInterruptors.add(
@@ -68,7 +89,16 @@ public class NoDataTachiuoSlice1 {
                     }
                 }
         );
-
+        //never bother with HUUUUGE exogenous landings
+        modelInterruptors.add(
+                new Predicate<FishState>() {
+                    @Override
+                    public boolean test(FishState fishState) {
+                        final Double exogenousLandings = fishState.getLatestYearlyObservation("Exogenous catches of タチウオ");
+                        return (Double.isFinite(exogenousLandings) && exogenousLandings >= 15000*1000);
+                    }
+                }
+        );
     }
 
 

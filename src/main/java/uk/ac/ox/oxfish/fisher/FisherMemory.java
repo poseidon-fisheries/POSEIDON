@@ -210,7 +210,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     public double balanceXDaysAgo(int daysAgo)
     {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
-        return dailyTimeSeries.getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+        return dailyTimeSeries.getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXStepsAgo(daysAgo);
     }
 
 

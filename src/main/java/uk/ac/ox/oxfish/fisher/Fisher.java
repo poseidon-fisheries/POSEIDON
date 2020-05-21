@@ -1005,7 +1005,7 @@ public class Fisher implements Steppable, Startable{
     public double balanceXDaysAgo(int daysAgo)
     {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
-        return getDailyData().getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+        return getDailyData().getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXStepsAgo(daysAgo);
     }
 
 

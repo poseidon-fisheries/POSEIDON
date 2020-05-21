@@ -82,7 +82,7 @@ public class SingleSpeciesPIDTaxationOnLandingsFactory implements AlgorithmFacto
                             double totalLandings = 0;
                             int toCycle = Math.min(days, landings.size());
                             for (int i = 0; i < toCycle; i++)
-                                totalLandings += landings.getDatumXDaysAgo(i);
+                                totalLandings += landings.getDatumXStepsAgo(i);
 
                             return totalLandings;
                         }

@@ -102,8 +102,14 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     }
 
     public double computeNumericValue(double input) {
+        return computeNumericValueFromEVABounds(input,minimum,maximum,alwaysPositive);
+    }
+
+
+    public static double computeNumericValueFromEVABounds(double input,double minimum, double maximum,
+                                                          boolean forcePositive) {
         double realValue =minimum+((maximum-minimum)/(10-(-10)))*(input - (-10));
-        if(realValue < 0 & alwaysPositive)
+        if(realValue < 0 & forcePositive)
             realValue = 0;
         return realValue;
     }
