@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.function.Predicate;
+
 /**
  * Represents a regulation that is only active for part of the year. This is a more general version
  * of the {@link TemporaryProtectedArea} class, with the following differences:
@@ -18,22 +20,38 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class TemporaryRegulation implements Regulation {
 
-    private final int startDay;
-    private final int endDay;
+  //  private final int startDay;
+   // private final int endDay;
+
+    /**
+     * given the day of the year, it tells me which regulation is active.
+     */
+    private final Predicate<Integer> dayOfTheYearPredicate;
     private final Regulation delegateWhenActive;
     private final Anarchy delegateWhenInactive = new Anarchy();
 
     public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive) {
-        this.startDay = startDay;
-        this.endDay = endDay;
+
+        this.dayOfTheYearPredicate = new Predicate<Integer>() {
+            @Override
+            public boolean test(Integer dayOfTheYear) {
+                assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
+                return startDay <= endDay
+                        ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
+                        : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
+            }
+        };
+        this.delegateWhenActive = delegateWhenActive;
+    }
+
+    public TemporaryRegulation(Predicate<Integer> dayOfTheYearPredicate, Regulation delegateWhenActive) {
+        this.dayOfTheYearPredicate = dayOfTheYearPredicate;
         this.delegateWhenActive = delegateWhenActive;
     }
 
     public boolean isActive(int dayOfTheYear) {
-        assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
-        return startDay <= endDay
-            ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
-            : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
+        return dayOfTheYearPredicate.test(dayOfTheYear);
+
     }
 
     @NotNull public Regulation delegateAtStep(FishState model, int timeStep) {
@@ -73,7 +91,7 @@ public class TemporaryRegulation implements Regulation {
     }
 
     @NotNull @Override public Regulation makeCopy() {
-        return new TemporaryRegulation(startDay, endDay, delegateWhenActive.makeCopy());
+        return new TemporaryRegulation(dayOfTheYearPredicate, delegateWhenActive.makeCopy());
     }
 
     @Override public void start(FishState model, Fisher fisher) {

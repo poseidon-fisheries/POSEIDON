@@ -269,6 +269,31 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
 
 
+        registerGatherer("Actual Average Cash Balance", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().
+                        filter(
+                                new Predicate<Fisher>() {
+                                    @Override
+                                    public boolean test(Fisher fisher) {
+                                        return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
+
+                                    }
+                                }
+                        ).
+
+                        mapToDouble(
+                                new ToDoubleFunction<Fisher>() {
+                                    @Override
+                                    public double applyAsDouble(Fisher value) {
+                                        return value.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN);
+                                    }
+                                }).average().orElse(0d);
+            }
+        }, 0d);
+
+
         registerGatherer("Total Effort",
                          FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")),
                          0d);

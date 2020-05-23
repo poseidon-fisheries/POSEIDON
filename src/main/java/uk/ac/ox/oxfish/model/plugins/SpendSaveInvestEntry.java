@@ -37,6 +37,8 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
 
     private Stoppable stoppable;
 
+    private boolean newEntryAllowed = true;
+
 
 
     /**
@@ -78,7 +80,7 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
                 //spend your daily trip
                 fisher.spendExogenously(yearlyExpenses);
                 //if you have collected enough money, invest it in a new boat
-                if(fisher.getBankBalance()>moneyNeededForANewEntry){
+                if(newEntryAllowed && fisher.getBankBalance()>moneyNeededForANewEntry){
                     fisher.spendExogenously(moneyNeededForANewEntry);
                     assert fisher.getBankBalance()>0;
                     boatsToAdd++;
@@ -99,5 +101,14 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
 
     public double getYearlyExpenses() {
         return yearlyExpenses;
+    }
+
+
+    public boolean isNewEntryAllowed() {
+        return newEntryAllowed;
+    }
+
+    public void setNewEntryAllowed(boolean newEntryAllowed) {
+        this.newEntryAllowed = newEntryAllowed;
     }
 }

@@ -987,6 +987,8 @@ public class FishStateUtilities {
             //if any of returns true, it stops the simulation before it is over!
             Predicate<FishState>... circuitBreakers) throws IOException {
 
+
+        System.out.println("seed " + seed);
         //create scenario and files
         String fullScenario = String.join("\n", Files.readAllLines(scenarioYaml));
 

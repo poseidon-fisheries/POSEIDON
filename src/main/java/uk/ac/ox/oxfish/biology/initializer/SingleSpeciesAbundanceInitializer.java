@@ -36,6 +36,8 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -273,7 +275,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             processes.setRecruitsAllocator(recruitmentAllocator);
 
 
-        model.getDailyDataSet().registerGatherer(
+        final DataColumn recruitmentColumn = model.getDailyDataSet().registerGatherer(
                 speciesName + " Recruits",
                 new Gatherer<FishState>() {
                     @Override
@@ -283,6 +285,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 },
                 0d
         );
+
+        model.getYearlyDataSet().registerGatherer(speciesName + " Recruits",
+                FishStateUtilities.generateYearlySum(recruitmentColumn),
+                0d);
 
 
         /**

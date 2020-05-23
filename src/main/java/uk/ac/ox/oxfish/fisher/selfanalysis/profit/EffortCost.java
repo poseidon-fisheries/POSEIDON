@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class EffortCost implements Cost {
 
 
-    private final double costPerHourSpentFishing;
+    private double costPerHourSpentFishing;
 
     public EffortCost(double costPerHourSpentFishing) {
         this.costPerHourSpentFishing = costPerHourSpentFishing;
@@ -21,6 +21,11 @@ public class EffortCost implements Cost {
         return costPerHourSpentFishing * record.getEffort();
     }
 
+    public double getCostPerHourSpentFishing() {
+        return costPerHourSpentFishing;
+    }
 
-
+    public void setCostPerHourSpentFishing(double costPerHourSpentFishing) {
+        this.costPerHourSpentFishing = costPerHourSpentFishing;
+    }
 }

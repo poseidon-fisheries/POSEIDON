@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.*;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfits;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
+import uk.ac.ox.oxfish.model.plugins.SpendSaveInvestEntry;
 import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
@@ -68,6 +69,14 @@ public class NoDataPolicy {
                     deactivated++;
                 }
 
+
+                if(viewStartable instanceof SpendSaveInvestEntry)
+                {
+                    //don't stop stepping it because you need to keep it going
+                    ((SpendSaveInvestEntry) viewStartable).setNewEntryAllowed(false);
+
+                    deactivated++;
+                }
             }
 
             System.out.println("removed " + deactivated + " entry steppables");
