@@ -111,7 +111,7 @@ public class FullSeasonalRetiredDecoratorTest {
         FullSeasonalRetiredDecorator decorator = new FullSeasonalRetiredDecorator(
                 EffortStatus.FULLTIME,100,10,0,
                 new FixedRestTimeDepartingStrategy(0),
-                "Average Cash-Flow",-1,3);
+                "Average Cash-Flow",-1,3, true);
 
         Fisher fisher = mock(Fisher.class);
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(200d);
@@ -229,6 +229,50 @@ public class FullSeasonalRetiredDecoratorTest {
 
     }
 
+
+    /**
+     * flag prevents you from retiring
+     */
+    @Test
+    public void withFriendsLikeTheseButBlocked() {
+
+
+        FullSeasonalRetiredDecorator decorator = new FullSeasonalRetiredDecorator(
+                EffortStatus.RETIRED,100,10,0,
+                new FixedRestTimeDepartingStrategy(0),
+                "Average Cash-Flow",-1,1,false);
+
+        Fisher fisher = mock(Fisher.class,  RETURNS_DEEP_STUBS);
+
+        Fisher friend1 = mock(Fisher.class,  RETURNS_DEEP_STUBS);
+        Fisher friend2 = mock(Fisher.class,  RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class);
+        when(model.getDay()).thenReturn(1000); //pass the test
+
+
+
+        when(fisher.getDirectedFriends()).thenReturn(Lists.newArrayList(friend1,friend2));
+        //friends make no money; you won't come out of retirement
+        when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
+        when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-2d);
+        decorator.updateEffortLevel(fisher,model);
+        assertEquals(decorator.getStatus(),EffortStatus.RETIRED);
+
+        //both make more than minimumIncome; still not good enough!
+        when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
+        when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(32d);
+        decorator.updateEffortLevel(fisher,model);
+        assertEquals(decorator.getStatus(),EffortStatus.RETIRED);
+
+        //but if one makes more than target; you come back
+        when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-20d);
+        when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(320d);
+        decorator.updateEffortLevel(fisher,model);
+        assertEquals(decorator.getStatus(),EffortStatus.RETIRED);
+
+        verify(fisher,times(3)).getAdditionalVariables();
+
+    }
 
     @Test
     public void itActuallyReducesEffort(){

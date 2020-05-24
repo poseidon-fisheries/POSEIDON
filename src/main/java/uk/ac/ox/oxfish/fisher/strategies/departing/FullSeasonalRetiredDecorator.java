@@ -94,6 +94,9 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
     private final int neverSwitchBeforeThisYear;
 
 
+    private final boolean canReturnFromRetirement;
+
+
 
     public FullSeasonalRetiredDecorator(
             EffortStatus status,
@@ -117,7 +120,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
             int neverSwitchBeforeThisYear
             ) {
         this(status, targetIncome, minimumIncome, maxHoursOutWhenSeasonal, delegate,
-                targetVariable,neverSwitchBeforeThisYear,1);
+                targetVariable,neverSwitchBeforeThisYear,1, true);
 
     }
 
@@ -129,9 +132,10 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
             DepartingStrategy delegate,
             String targetVariable,
             int neverSwitchBeforeThisYear,
-            int inertia
-    ) {
+            int inertia,
+            boolean canReturnFromRetirement) {
         this.targetVariable = targetVariable;
+        this.canReturnFromRetirement = canReturnFromRetirement;
         Preconditions.checkState(maxHoursOutWhenSeasonal>=0);
         this.status = status;
         this.targetIncome = targetIncome;
@@ -276,7 +280,8 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
                 }
                 break;
             case RETIRED:
-
+                if(!canReturnFromRetirement)
+                    break;
                 double maxFriendsProfits = fisher.getDirectedFriends().stream().mapToDouble(new ToDoubleFunction<Fisher>() {
                     @Override
                     public double applyAsDouble(Fisher value) {

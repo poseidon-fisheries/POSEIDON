@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.EffortStatus;
-import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectors;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -30,8 +29,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Supplier;
 
 public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<FullSeasonalRetiredDecorator> {
 
@@ -70,6 +67,8 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     private DoubleParameter inertia = new FixedDoubleParameter(1);
 
 
+    private boolean canReturnFromRetirement = true;
+
     /**
      * makes sure we create only one instance for each data gatherer
      */
@@ -96,11 +95,10 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
                 decorated.apply(state),
                 variableName,
                 firstYearYouCanSwitch.apply(state.getRandom()).intValue(),
-                getInertia().apply(state.getRandom()).intValue()
+                getInertia().apply(state.getRandom()).intValue(),
 
 
-
-        );
+                canReturnFromRetirement);
     }
 
 
@@ -240,5 +238,13 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
 
     public void setInertia(DoubleParameter inertia) {
         this.inertia = inertia;
+    }
+
+    public boolean isCanReturnFromRetirement() {
+        return canReturnFromRetirement;
+    }
+
+    public void setCanReturnFromRetirement(boolean canReturnFromRetirement) {
+        this.canReturnFromRetirement = canReturnFromRetirement;
     }
 }
