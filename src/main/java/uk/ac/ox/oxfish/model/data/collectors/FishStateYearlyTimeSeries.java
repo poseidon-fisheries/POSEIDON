@@ -350,6 +350,19 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             }
         }, 0d);
 
+        registerGatherer("Total Number of Trips", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
+                            }
+                        }).sum();
+            }
+        }, 0d);
+
         registerGatherer("Average Gas Expenditure", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {

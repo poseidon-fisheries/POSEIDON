@@ -331,6 +331,10 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
     public EffortStatus getStatus() {
         return status;
     }
+
+    public boolean isCanReturnFromRetirement() {
+        return canReturnFromRetirement;
+    }
 }
 
 

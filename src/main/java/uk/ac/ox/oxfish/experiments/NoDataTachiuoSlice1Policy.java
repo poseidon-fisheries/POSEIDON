@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import ec.util.MersenneTwisterFast;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
@@ -44,11 +45,11 @@ import java.util.function.Predicate;
 
 public class NoDataTachiuoSlice1Policy {
 
-    public static final String CANDIDATES_CSV_FILE = "success_slice2.csv";
+    public static final String CANDIDATES_CSV_FILE = "success_slice3.csv";
     public static final int SEED = 0;
     public static final int YEARS_FROM_POLICY_TO_RUN = 15;
     private static Path OUTPUT_FOLDER =
-            Paths.get("docs", "20200425 abc_example","slice2").resolve("outputs_again");
+            Paths.get("docs", "20200425 abc_example","slice3").resolve("outputs");
 
 
 
@@ -57,6 +58,26 @@ public class NoDataTachiuoSlice1Policy {
 
 
     static {
+
+
+
+
+
+        policies.put(
+                "BAU",
+                integer -> scenario -> {
+                }
+
+
+        );
+
+        policies.put(
+                "noentry",
+                shockYear -> NoDataPolicy.removeEntry(shockYear)
+
+
+        );
+
 
         policies.put(
                 "hard_seasonal_closure",
@@ -122,14 +143,6 @@ public class NoDataTachiuoSlice1Policy {
                 )
 
         );
-
-        policies.put(
-                "BAU",
-                shockYear -> NoDataPolicy.removeEntry(shockYear)
-
-
-        );
-
 
         policies.put(
                 "seasonal_closure",
@@ -377,7 +390,8 @@ public class NoDataTachiuoSlice1Policy {
                 //"Average Hours Out",
                 "Actual Average Hours Out",
                 "Total Effort",
-                "Actual Median Trip Profits"
+                "Actual Median Trip Profits",
+                "Total Number of Trips"
 
 
 
