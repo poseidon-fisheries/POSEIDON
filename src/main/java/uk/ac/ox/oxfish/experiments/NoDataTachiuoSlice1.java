@@ -22,7 +22,7 @@ public class NoDataTachiuoSlice1 {
 
     //docs/20200425 abc_example/
     final static public Path MAIN_DIRECTORY =
-            Paths.get("docs", "20200425 abc_example","slice3");
+            Paths.get("docs", "20200425 abc_example","slice4");
 
 
     final static public int MAX_YEARS_TO_RUN = 45;

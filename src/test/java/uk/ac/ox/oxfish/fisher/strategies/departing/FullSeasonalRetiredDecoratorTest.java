@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class FullSeasonalRetiredDecoratorTest {
@@ -236,6 +235,10 @@ public class FullSeasonalRetiredDecoratorTest {
     @Test
     public void withFriendsLikeTheseButBlocked() {
 
+        FullSeasonalRetiredDecoratorFactory factory = new FullSeasonalRetiredDecoratorFactory();
+        factory.setCanReturnFromRetirement(false);
+        final FullSeasonalRetiredDecorator apply = factory.apply(new FishState());
+        assertFalse(apply.isCanReturnFromRetirement());
 
         FullSeasonalRetiredDecorator decorator = new FullSeasonalRetiredDecorator(
                 EffortStatus.RETIRED,100,10,0,
