@@ -27,10 +27,14 @@ import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.javaColorToHtmlCode;
 
 public final class BiomassSnapshotHeatmapBuilderFactory extends HeatmapBuilderFactory {
@@ -42,11 +46,22 @@ public final class BiomassSnapshotHeatmapBuilderFactory extends HeatmapBuilderFa
         Color javaColor,
         int interval
     ) {
-        return stream(speciesNames)
-            .map(speciesName -> {
+        return forSpecies(
+            stream(speciesNames).collect(toImmutableMap(identity(), __ -> javaColor)),
+            interval
+        );
+    }
+
+    public static Collection<BiomassSnapshotHeatmapBuilderFactory> forSpecies(
+        Map<String, Color> speciesNamesAndColors,
+        int interval
+    ) {
+        return speciesNamesAndColors.entrySet()
+            .stream()
+            .map(entry -> {
                 final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
-                instance.speciesName = speciesName;
-                instance.setColour(javaColorToHtmlCode(javaColor));
+                instance.speciesName = entry.getKey();
+                instance.setColour(javaColorToHtmlCode(entry.getValue()));
                 instance.setInterval(interval);
                 return instance;
             })

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.colours.ColourSeries;
 import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.AverageNumberOfActiveFadsHeatmapBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.heatmaps.BiomassSnapshotHeatmapBuilderFactory;
@@ -40,12 +41,15 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.awt.Color.GREEN;
+import static java.awt.Color.ORANGE;
+import static java.awt.Color.RED;
 import static java.awt.Color.WHITE;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision.REGION_NAMES;
 import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.KG_TO_T_TRANSFORMER;
 import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.zipToMap;
 
 public final class WebVizExporter {
 
@@ -59,13 +63,19 @@ public final class WebVizExporter {
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
 
     public static void main(final String[] args) {
-        final Runner<TunaScenario> runner = new Runner<>(TunaScenario.class, scenarioPath, outputPath)
-            .setBeforeStartConsumer(fishState -> fishState.registerStartable(makeJsonOutputManagerFactory().apply(fishState)))
-            .setAfterRunConsumer(fishState -> JsonOutputPlugin.writeOutputsToFolder(fishState, outputPath));
+        final Runner<TunaScenario> runner =
+            new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+                .setAfterStartConsumer(fishState ->
+                    fishState.registerStartable(makeJsonOutputManagerFactory().apply(fishState))
+                )
+                .setAfterRunConsumer(fishState ->
+                    JsonOutputPlugin.writeOutputsToFolder(fishState, outputPath)
+                );
         runner.run(NUM_YEARS_TO_RUN);
     }
 
-    @NotNull private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {
+    @NotNull
+    private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {
 
         final Set<String> speciesNames = TunaScenario.speciesNames.values();
 
@@ -73,9 +83,9 @@ public final class WebVizExporter {
         jsonOutputManagerFactory.setScenarioTitle("Tuna - Baseline Scenario");
         jsonOutputManagerFactory.setScenarioDescription(
             "This is sample output from the current tuna simulation, " +
-                "over a period of three years after one year of 'spin up'.");
+                "over a period of five years.");
         jsonOutputManagerFactory.setStartDate("2017-01-01");
-        jsonOutputManagerFactory.setNumYearsToSkip(1);
+        jsonOutputManagerFactory.setNumYearsToSkip(0);
         jsonOutputManagerFactory.setPrettyPrinting(true);
         jsonOutputManagerFactory.setRegionsBuilderFactory(new SpecificRegionsBuilderFactory());
         jsonOutputManagerFactory.getVesselsBuilderFactory().setVesselClassifier(
@@ -102,43 +112,45 @@ public final class WebVizExporter {
             )).collect(toList())
         );
 
+        final ColourSeries speciesColours = new ColourSeries(GREEN.darker(), RED, ORANGE);
+
         jsonOutputManagerFactory.setChartBuilderFactories(ImmutableList.of(
             ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass per species",
                 "Biomass (t)",
                 speciesNames,
                 "Biomass %s"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Landings per species",
                 "Landings (t)",
                 speciesNames,
                 "%s Landings"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Recruitment per species",
                 "Recruitment (t)",
                 speciesNames,
                 "%s Recruitment"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from FAD sets per species",
                 "Catch (t)",
                 speciesNames,
                 "Sum of %s catches from FAD sets"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Catch from unassociated sets per species",
                 "Catch (t)",
                 speciesNames,
                 "Sum of %s catches from unassociated sets"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "Biomass under FADs per species",
                 "Biomass (t)",
                 speciesNames,
                 "Sum of %s biomass under FADs"
-            ).setValueTransformer(KG_TO_T_TRANSFORMER),
+            ).setValueTransformer(KG_TO_T_TRANSFORMER).setSeriesColours(speciesColours),
             ChartBuilderFactory.fromColumnNamePattern(
                 "FAD deployments per region",
                 "Number of FAD deployments",
@@ -167,7 +179,10 @@ public final class WebVizExporter {
 
         jsonOutputManagerFactory.setHeatmapBuilderFactories(
             new ImmutableList.Builder<HeatmapBuilderFactory>()
-                .addAll(BiomassSnapshotHeatmapBuilderFactory.forSpecies(speciesNames, GREEN, 30))
+                .addAll(BiomassSnapshotHeatmapBuilderFactory.forSpecies(
+                    zipToMap(speciesNames, speciesColours.getJavaColors()),
+                    30
+                ))
                 .add(new AverageNumberOfActiveFadsHeatmapBuilderFactory())
                 .add(new FadDeploymentCountingHeatmapBuilderFactory())
                 .add(new FadSetCountingHeatmapBuilderFactory())

@@ -38,13 +38,13 @@ import java.nio.file.Paths;
 
 public class SampleTunaRun {
 
-    private static final int NUM_YEARS_TO_RUN = 4;
+    private static final int NUM_YEARS_TO_RUN = 5;
 
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
 
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("runs", "slice1_2020-05-13_policy_shock", "tuna_calibrated.yaml"));
+        basePath.resolve(Paths.get("runs", "gatherers_test", "tuna_calibrated.yaml"));
 
     private static final Path outputPath =
         basePath.resolve(Paths.get("runs", "gatherers_test"));

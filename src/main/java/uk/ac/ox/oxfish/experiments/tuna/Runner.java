@@ -71,8 +71,9 @@ public final class Runner<S extends Scenario> {
         HashMultimap.create();
 
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
-    private Map<String, Consumer<S>> policies = ImmutableMap.of("Business as usual", __ -> {});
+    private Map<String, Consumer<S>> policies = ImmutableMap.of("Current FAD limits / No set limit", __ -> {});
     private Consumer<FishState> beforeStartConsumer = __ -> {};
+    private Consumer<FishState> afterStartConsumer = __ -> {};
     private Consumer<FishState> afterStepConsumer = __ -> {};
     private Consumer<FishState> afterRunConsumer = __ -> {};
 
@@ -99,6 +100,11 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
+    public Runner<S> setAfterStartConsumer(final Consumer<FishState> afterStartConsumer) {
+        this.afterStartConsumer = afterStartConsumer;
+        return this;
+    }
+
     @SuppressWarnings("unused")
     public Runner<S> setAfterStepConsumer(final Consumer<FishState> afterStepConsumer) {
         this.afterStepConsumer = checkNotNull(afterStepConsumer);
@@ -118,24 +124,23 @@ public final class Runner<S extends Scenario> {
         int numRuns = policies.size() * numberOfRunsPerPolicy;
         final AtomicInteger runNumber = new AtomicInteger(1);
         range(0, numberOfRunsPerPolicy).forEach(i ->
-            policies.forEach((policyName, policy) -> {
-                System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
-                CurrentRun.INSTANCE.start(policyName);
-                FishState fishState = makeFishState(policy);
-                beforeStartConsumer.accept(fishState);
-                fishState.start();
-                final Multimap<Path, RowProvider> rowProviders = makeRowProviders(fishState);
-                do {
-                    System.out.println("---");
-                    fishState.schedule.step(fishState);
-                    System.out.printf("Bigeye biomass:    %,8.2f\n", fishState.getTotalBiomass(fishState.getBiology().getSpecie("Bigeye tuna")) / 1000);
-                    System.out.printf("Yellowfin biomass: %,8.2f\n", fishState.getTotalBiomass(fishState.getBiology().getSpecie("Yellowfin tuna")) / 1000);
-                    printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policyName);
-                    afterStepConsumer.accept(fishState);
-                } while (fishState.getYear() < numYearsToRun);
-                afterRunConsumer.accept(fishState);
-                writeOutputs(runNumber.getAndIncrement(), rowProviders);
-            })
+                policies.forEach((policyName, policy) -> {
+                    System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
+                    CurrentRun.INSTANCE.start(policyName);
+                    FishState fishState = makeFishState(policy);
+                    beforeStartConsumer.accept(fishState);
+                    fishState.start();
+                    afterStartConsumer.accept(fishState);
+                    final Multimap<Path, RowProvider> rowProviders = makeRowProviders(fishState);
+                    do {
+                        System.out.println("---");
+                        printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policyName);
+                        fishState.schedule.step(fishState);
+                        afterStepConsumer.accept(fishState);
+                    } while (fishState.getYear() < numYearsToRun);
+                    afterRunConsumer.accept(fishState);
+                    writeOutputs(runNumber.getAndIncrement(), rowProviders);
+                })
         );
     }
 

@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.colours.ColourSeries;
 import uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ChartDefinition;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.SeriesDefinition;
@@ -154,6 +155,13 @@ public final class ChartBuilderFactory implements
 
     @SuppressWarnings("unused")
     public Collection<String> getSeriesColours() { return seriesColours; }
+
+
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    public ChartBuilderFactory setSeriesColours(final ColourSeries seriesColours) {
+        this.seriesColours = ImmutableList.copyOf(seriesColours.getHtmlColours());
+        return this;
+    }
 
     @SuppressWarnings({"unused", "UnusedReturnValue"})
     public ChartBuilderFactory setSeriesColours(final Iterable<String> seriesColours) {
