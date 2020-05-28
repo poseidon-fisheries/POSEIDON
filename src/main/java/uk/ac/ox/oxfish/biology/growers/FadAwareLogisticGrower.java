@@ -121,7 +121,8 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
             allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum();
 
         // if we are in "Schaefer mode", the biomass we'll feed to the logistic growth
-        // function is the memorized biomass, otherwise it's just the current biomass.
+        // function is the biomass that was memorized at the beginning of the year,
+        // otherwise it's just the current biomass.
         final double biomassToUse = memorizer.map(m -> m.memorizedBiomass).orElse(currentBiomass);
 
         // we call the logistic function (r  * biomassToUse * (1 - biomassToUse / K))
@@ -131,8 +132,7 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         // we calculate how much space we have left in the ocean to put new biomass
         final double availableCapacity = totalCapacity - currentBiomass;
 
-        // the new biomass to allocate is the difference between the "biomass after growth"
-        // and the current biomass, to which we add back the biomass lost by FADs drifting out,
+        // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs drifting out,
         // while making sure we won't be exceeding the total carrying capacity of the ocean tiles
         final double biomassLostByFads = biomassLostAccumulator.map(Accumulator::get).orElse(0.0);
         final double biomassToAllocate = Math.min(newBiomass + biomassLostByFads, availableCapacity);
