@@ -14,15 +14,11 @@ public class CommonLogisticGrowerInitializer implements LogisticGrowerInitialize
 
     private final DoubleParameter steepness;
     private final double distributionalWeight;
-    private final boolean schaefer;
 
 
-
-    public CommonLogisticGrowerInitializer(DoubleParameter steepness, double distributeProportionally,
-                                           boolean schaefer) {
+    public CommonLogisticGrowerInitializer(DoubleParameter steepness, double distributeProportionally) {
         this.steepness = steepness;
         this.distributionalWeight = distributeProportionally;
-        this.schaefer = schaefer;
     }
 
     @Override
@@ -35,15 +31,11 @@ public class CommonLogisticGrowerInitializer implements LogisticGrowerInitialize
             return;
         //initialize the malthusian parameter
 
-        CommonLogisticGrower grower;
-        if(schaefer)
-            grower = new SchaeferLogisticGrower(
-                    steepness.apply(random),
-                    species, distributionalWeight);
-        else
-            grower = new CommonLogisticGrower(
-                    steepness.apply(random),
-                    species, distributionalWeight);
+        CommonLogisticGrower grower = new CommonLogisticGrower(
+            steepness.apply(random),
+            species,
+            distributionalWeight
+        );
 
         //add all the biologies
         for(BiomassLocalBiology biology : biologies)

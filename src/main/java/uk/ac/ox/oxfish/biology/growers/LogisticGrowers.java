@@ -45,7 +45,7 @@ public class LogisticGrowers {
     static {
         NAMES.put(SimpleLogisticGrowerFactory.class, "Independent Logistic Grower");
         NAMES.put(CommonLogisticGrowerFactory.class, "Common Logistic Grower");
-        NAMES.put(FadAwareCommonLogisticGrowerInitializerFactory.class, "FAD-Aware Common Logistic Grower");
+        NAMES.put(FadAwareLogisticGrowerFactory.class, "FAD-Aware Logistic Grower");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.utility;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
@@ -55,17 +56,36 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static com.google.common.collect.Streams.zip;
 
 /**
  * Just a collector of all the utilities function i need
@@ -1332,6 +1352,16 @@ public class FishStateUtilities {
         return new AbstractMap.SimpleImmutableEntry<K, V>(k, v);
     }
 
+
+    /**
+     *  Builds an immutable map where each element of {@code keys}
+     *  is associated with the corresponding element of {@code values}.
+     */
+    public static <K, V> ImmutableMap<K, V> zipToMap(Iterable<K> keys, Iterable<V> values) {
+        //noinspection UnstableApiUsage
+        return zip(stream(keys), stream(values), AbstractMap.SimpleImmutableEntry::new)
+            .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
 }
 

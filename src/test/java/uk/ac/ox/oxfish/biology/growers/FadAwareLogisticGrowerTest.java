@@ -19,18 +19,20 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
-import com.google.common.base.Supplier;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertTrue;
 
-public class FadAwareCommonLogisticGrowerTest {
+public class FadAwareLogisticGrowerTest {
 
     @Test
     public void jonLandings() {
@@ -40,16 +42,27 @@ public class FadAwareCommonLogisticGrowerTest {
         scenario.setDeploymentValuesFile(TunaScenario.input("dummy_deployment_values.csv"));
         scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
         scenario.getFisherDefinition().setRegulation(new NoFishingFactory());
+        ((MultipleIndependentSpeciesBiomassFactory) scenario.getBiologyInitializers())
+            .getFactories()
+            .forEach(factory -> {
+                final AlgorithmFactory<? extends LogisticGrowerInitializer> growerFactory =
+                    ((SingleSpeciesBiomassNormalizedFactory) factory).getGrower();
+                ((FadAwareLogisticGrowerFactory) growerFactory).setUseLastYearBiomass(true);
+            });
 
         FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
 
-        final Supplier<Double> yellowfinBiomass = () -> state.getTotalBiomass(state.getBiology().getSpecie("Yellowfin tuna"));
-        final Species yellowfinSpecies = state.getBiology().getSpecie("Yellowfin tuna");
+        final Supplier<Double> yellowfinBiomass =
+            () -> state.getTotalBiomass(state.getBiology().getSpecie("Yellowfin tuna"));
         while (state.getYear() < 5) {
             state.schedule.step(state);
-            System.out.printf("Yellowfin biomass at step %d: %.2f%n", state.schedule.getSteps(), yellowfinBiomass.get());
+            System.out.printf(
+                "Yellowfin biomass at step %d: %.2f%n",
+                state.schedule.getSteps(),
+                yellowfinBiomass.get()
+            );
         }
         state.schedule.step(state);
         System.out.printf("Yellowfin biomass at step %d: %.2f%n", state.schedule.getSteps(), yellowfinBiomass.get());
@@ -59,4 +72,5 @@ public class FadAwareCommonLogisticGrowerTest {
         assertTrue(diff < 10);
 
     }
+
 }

@@ -15,9 +15,6 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      */
     private DoubleParameter distributionalWeight = new FixedDoubleParameter(-1);
 
-    private boolean usesBeginningOfYearBiomassToGrow = false;
-
-
     public CommonLogisticGrowerFactory() {
     }
 
@@ -40,8 +37,7 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
     @Override
     public CommonLogisticGrowerInitializer apply(FishState state) {
         return new CommonLogisticGrowerInitializer(steepness.makeCopy(),
-                                                   distributionalWeight.apply(state.getRandom()),
-                                                   usesBeginningOfYearBiomassToGrow);
+                                                   distributionalWeight.apply(state.getRandom()));
     }
 
     /**
@@ -81,21 +77,4 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
         this.distributionalWeight = distributionalWeight;
     }
 
-    /**
-     * Getter for property 'usesBeginningOfYearBiomassToGrow'.
-     *
-     * @return Value for property 'usesBeginningOfYearBiomassToGrow'.
-     */
-    public boolean isUsesBeginningOfYearBiomassToGrow() {
-        return usesBeginningOfYearBiomassToGrow;
-    }
-
-    /**
-     * Setter for property 'usesBeginningOfYearBiomassToGrow'.
-     *
-     * @param usesBeginningOfYearBiomassToGrow Value to set for property 'usesBeginningOfYearBiomassToGrow'.
-     */
-    public void setUsesBeginningOfYearBiomassToGrow(boolean usesBeginningOfYearBiomassToGrow) {
-        this.usesBeginningOfYearBiomassToGrow = usesBeginningOfYearBiomassToGrow;
-    }
 }

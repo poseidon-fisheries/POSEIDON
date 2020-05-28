@@ -33,7 +33,7 @@ import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
-import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
+import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
@@ -660,7 +660,7 @@ public class TunaScenario implements Scenario {
     ) {
         final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
         factory.setSpeciesName(speciesNames.get(speciesCode));
-        factory.setGrower(new FadAwareCommonLogisticGrowerInitializerFactory(logisticGrowthRate));
+        factory.setGrower(new FadAwareLogisticGrowerFactory(logisticGrowthRate));
         factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
         factory.setBiomassSuppliedPerCell(false);
 

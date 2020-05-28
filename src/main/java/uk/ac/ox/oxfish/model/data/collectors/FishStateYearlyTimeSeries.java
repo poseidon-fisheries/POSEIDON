@@ -143,12 +143,6 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState state1) {
-                                     System.out.printf(
-                                         "Gathering %s biomass at day %d: %,f.0\n",
-                                         species.getName(),
-                                         state1.getDay(),
-                                         state1.getTotalBiomass(species)
-                                     );
                                      return state1.getTotalBiomass(species);
                                  }
                              }

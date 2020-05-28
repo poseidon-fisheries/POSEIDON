@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import org.apache.commons.collections15.set.ListOrderedSet;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 /**
  * This provides convenience implementations for the various classes that need to access the
@@ -39,15 +37,21 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
  */
 public interface FadManagerUtils {
 
+    static Stream<Fad> fadsHere(Fisher fisher) { return bagToStream(getFadManager(fisher).getFadsHere()); }
+
     static FadManager getFadManager(Fisher fisher) {
-        if (fisher.getGear() instanceof PurseSeineGear)
-            return ((PurseSeineGear) fisher.getGear()).getFadManager();
-        else throw new IllegalArgumentException(
+        return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear required to get FadManager instance. Fisher " +
                 fisher + " is using " + fisher.getGear().getClass() + "."
-        );
+        ));
     }
-    static Stream<Fad> fadsHere(Fisher fisher) { return bagToStream(getFadManager(fisher).getFadsHere()); }
+
+    static Optional<FadManager> maybeGetFadManager(Fisher fisher) {
+        return Optional
+            .of(fisher.getGear())
+            .filter(gear -> gear instanceof PurseSeineGear)
+            .map(gear -> ((PurseSeineGear) fisher.getGear()).getFadManager());
+    }
 
     static Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
         return bagToStream(getFadManager(fisher).getFadMap().fadsAt(seaTile));

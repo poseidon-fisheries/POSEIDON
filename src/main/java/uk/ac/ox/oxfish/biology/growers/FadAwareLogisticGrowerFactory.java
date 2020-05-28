@@ -4,33 +4,37 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-public class FadAwareCommonLogisticGrowerInitializerFactory implements AlgorithmFactory<FadAwareCommonLogisticGrowerInitializer> {
+public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareLogisticGrowerInitializer> {
 
     private DoubleParameter steepness = new FixedDoubleParameter(0.7);
+
     /**
      * when this is set to anything above 0, growth will be distributed with higher proportion to the area with higher
      * unfilled carrying capacity
      */
     private DoubleParameter distributionalWeight = new FixedDoubleParameter(-1);
 
-    public FadAwareCommonLogisticGrowerInitializerFactory() {
-    }
+    private boolean useLastYearBiomass = true;
 
-    public FadAwareCommonLogisticGrowerInitializerFactory(double steepness) {
+    @SuppressWarnings("unused") public FadAwareLogisticGrowerFactory() { }
+
+    public FadAwareLogisticGrowerFactory(double steepness) {
         this.steepness = new FixedDoubleParameter(steepness);
     }
 
-    public FadAwareCommonLogisticGrowerInitializerFactory(double low, double high) {
-        this.steepness = new UniformDoubleParameter(low, high);
+    @SuppressWarnings("unused") public boolean getUseLastYearBiomass() { return useLastYearBiomass; }
+
+    @SuppressWarnings("unused") public void setUseLastYearBiomass(final boolean useLastYearBiomass) {
+        this.useLastYearBiomass = useLastYearBiomass;
     }
 
     @Override
-    public FadAwareCommonLogisticGrowerInitializer apply(FishState state) {
-        return new FadAwareCommonLogisticGrowerInitializer(
+    public FadAwareLogisticGrowerInitializer apply(FishState state) {
+        return new FadAwareLogisticGrowerInitializer(
             steepness.makeCopy(),
-            distributionalWeight.apply(state.getRandom())
+            distributionalWeight.makeCopy(),
+            useLastYearBiomass
         );
     }
 
@@ -42,11 +46,12 @@ public class FadAwareCommonLogisticGrowerInitializerFactory implements Algorithm
         this.steepness = steepness;
     }
 
-    public DoubleParameter getDistributionalWeight() {
+    @SuppressWarnings("unused") public DoubleParameter getDistributionalWeight() {
         return distributionalWeight;
     }
 
-    public void setDistributionalWeight(DoubleParameter distributionalWeight) {
+    @SuppressWarnings("unused") public void setDistributionalWeight(DoubleParameter distributionalWeight) {
         this.distributionalWeight = distributionalWeight;
     }
+
 }
