@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -58,17 +57,10 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         new ActionObserver<>(MakeUnassociatedSet.class)
     );
     private final ImmutableList.Builder<ActionRecord> actionRecords = new ImmutableList.Builder<>();
-    private final double hoursPerStep;
-    private final double stepsPerDay;
-    private final NauticalMap nauticalMap;
-    private FishState fishState;
+    private final FishState fishState;
 
-    public PurseSeineActionsLogger(
-        final FishState fishState
-    ) {
-        this.hoursPerStep = fishState.getHoursPerStep();
-        this.stepsPerDay = fishState.getStepsPerDay();
-        this.nauticalMap = fishState.getMap();
+    public PurseSeineActionsLogger(final FishState fishState) {
+        this.fishState = fishState;
     }
 
     @Override public List<String> getHeaders() { return HEADERS; }
@@ -78,7 +70,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     }
 
     @Override public void start(final FishState fishState) {
-        this.fishState = fishState;
+        assert this.fishState == fishState;
         observers.forEach(observer -> observer.start(fishState));
     }
 
@@ -95,12 +87,12 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private ActionRecord(PurseSeinerAction action) {
             this.boatId = action.getFisher().getTags().get(0);
             this.actionType = actionType(action);
-            final Coordinate coordinates = nauticalMap.getCoordinates(action.getLocation());
+            final Coordinate coordinates = fishState.getMap().getCoordinates(action.getLocation());
             this.lon = coordinates.x;
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
-            this.tripStartStep = (int) (currentTrip.getTripDate() * stepsPerDay);
+            this.tripStartStep = currentTrip.getTripDate() * fishState.getStepsPerDay();
             action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
         }
 
@@ -133,7 +125,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
 
             @Override public void reactToFinishedTrip(final TripRecord trip, final Fisher fisher) {
                 if (trip == currentTrip) {
-                    tripEndStep = tripStartStep + (int) (trip.getDurationInHours() / hoursPerStep);
+                    tripEndStep = fishState.getStep();
+                    // removal needs to be scheduled to avoid ConcurrentModificationException
                     fishState.scheduleOnce(__ -> fisher.removeTripListener(this), StepOrder.DAWN);
                 }
             }

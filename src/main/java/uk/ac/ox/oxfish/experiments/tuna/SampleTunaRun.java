@@ -55,7 +55,7 @@ public class SampleTunaRun {
             .requestFisherYearlyData()
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
 //            .registerRowProviders("heatmap_data.csv", SampleTunaRun::makeHeatmapProviders)
-            .run(NUM_YEARS_TO_RUN, 1);
+            .run(NUM_YEARS_TO_RUN, 10);
     }
 
     private static Iterable<? extends RowProvider> makeHeatmapProviders(final FishState fishState) {
