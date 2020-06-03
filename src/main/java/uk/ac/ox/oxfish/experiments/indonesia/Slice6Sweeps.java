@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.GiveUpAfterSomeLossesThisYearDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.GiveUpAfterSomeLossesThisYearFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -46,7 +47,7 @@ public class Slice6Sweeps {
 
 
     private static final String SCENARIO_NAME = //"tropfishR_tl_2yr_8h";
-            "lime_monthly2yr_9h";
+            "lime_monthly2yr_8h";
 
 
     // "new_cmsy_tropfishR_8h";
@@ -172,10 +173,10 @@ public class Slice6Sweeps {
 //
 //// no fishing
 
-                effortControl("calibration",
-                new String[]{"population0","population1","population2","population3"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, 250);
+//                effortControl("calibration",
+//                new String[]{"population0","population1","population2","population3"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, 250);
 //        stopFishing("nofishing",
 //                new String[]{"population0","population1","population2","population3"},
 //                SCENARIO_NAME,
@@ -197,7 +198,7 @@ public class Slice6Sweeps {
 ////
 //////        //selectivity test
 //        selectivityTest2("selectivity_sweep3", SCENARIO_NAME,SHOCK_YEAR);
-  ///      selectivityTest3("selectivity_sweep_all", SCENARIO_NAME,SHOCK_YEAR);
+        ///      selectivityTest3("selectivity_sweep_all", SCENARIO_NAME,SHOCK_YEAR);
 //////
 //////        //price penalty
 //        pricePenalty("malus_malabaricus",
@@ -215,8 +216,14 @@ public class Slice6Sweeps {
 
 
         //  priceShock("price_shock3",SCENARIO_NAME,18*30,SHOCK_YEAR);
-//        priceAndCostShock("price_and_cost3_18mo",SCENARIO_NAME,18*30,SHOCK_YEAR, false, Double.NaN, true);
-//        priceAndCostShock("price_and_cost3_32mo",SCENARIO_NAME,32*30,SHOCK_YEAR, false, Double.NaN, true);
+        priceAndCostShock("price_and_cost3_3mo_10runs",SCENARIO_NAME,
+                4*30,SHOCK_YEAR, true, Double.NaN, true,
+                false);
+
+//
+//        priceAndCostShock("price_and_cost3_6mo_10runs",SCENARIO_NAME,
+//                6*30,SHOCK_YEAR, true, Double.NaN, true,
+//                false);
 
         //      priceAndCostShock("price_and_cost_18mo_giveup",SCENARIO_NAME,18*30,SHOCK_YEAR, true, Double.NaN, true);
 //        priceAndCostShock("price_and_cost_32mo_giveup",SCENARIO_NAME,32*30,SHOCK_YEAR, true, Double.NaN, true);
@@ -393,29 +400,29 @@ public class Slice6Sweeps {
         @Override
         public void accept(Scenario scenario) {
 
-                FlexibleScenario current = (FlexibleScenario) scenario;
-                FisherEntryConstantRateFactory pop0 = new FisherEntryConstantRateFactory();
-                pop0.setPopulationName("population0");
-                pop0.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                pop0.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                current.getPlugins().add(
-                        pop0
-                );
+            FlexibleScenario current = (FlexibleScenario) scenario;
+            FisherEntryConstantRateFactory pop0 = new FisherEntryConstantRateFactory();
+            pop0.setPopulationName("population0");
+            pop0.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+            pop0.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+            current.getPlugins().add(
+                    pop0
+            );
 
-                FisherEntryConstantRateFactory pop1 = new FisherEntryConstantRateFactory();
-                pop1.setPopulationName("population1");
-                pop1.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                pop1.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                current.getPlugins().add(
-                        pop1
-                );
-                FisherEntryConstantRateFactory pop2 = new FisherEntryConstantRateFactory();
-                pop2.setPopulationName("population3");
-                pop2.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
-                pop2.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
-                current.getPlugins().add(
-                        pop2
-                );
+            FisherEntryConstantRateFactory pop1 = new FisherEntryConstantRateFactory();
+            pop1.setPopulationName("population1");
+            pop1.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+            pop1.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+            current.getPlugins().add(
+                    pop1
+            );
+            FisherEntryConstantRateFactory pop2 = new FisherEntryConstantRateFactory();
+            pop2.setPopulationName("population3");
+            pop2.setGrowthRateInPercentage(new FixedDoubleParameter(0.029));
+            pop2.setFirstYearEntryOccurs(new FixedDoubleParameter(1));
+            current.getPlugins().add(
+                    pop2
+            );
 
         }
     };
@@ -440,9 +447,9 @@ public class Slice6Sweeps {
             //to get it done right
             int finalEntry = entry;
             if(finalEntry==1)
-            runner.setScenarioSetup(
-                    setupEntry
-            );
+                runner.setScenarioSetup(
+                        setupEntry
+                );
 
 
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {
@@ -478,7 +485,7 @@ public class Slice6Sweeps {
                 final AlgorithmFactory<? extends DepartingStrategy> original = definition.getDepartingStrategy();
                 final GiveUpAfterSomeLossesThisYearFactory newDepartingStrategy = new GiveUpAfterSomeLossesThisYearFactory();
                 newDepartingStrategy.setDelegate(original);
-                newDepartingStrategy.setHowManyBadTripsBeforeGivingUp(new FixedDoubleParameter(3));
+                newDepartingStrategy.setHowManyBadTripsBeforeGivingUp(new FixedDoubleParameter(1));
                 newDepartingStrategy.setMinimumProfitPerTripRequired(new FixedDoubleParameter(0));
                 definition.setDepartingStrategy(newDepartingStrategy);
             }
@@ -488,13 +495,59 @@ public class Slice6Sweeps {
         }
     };
 
+    private static Consumer<Scenario> disableGivingWithinAYear(int shockYear, int dayOfTheYear){
+        return new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario scenario) {
+                ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
+                    @Override
+                    public AdditionalStartable apply(FishState fishState) {
+                        return new AdditionalStartable() {
+                            @Override
+                            public void start(FishState model) {
 
 
+                                model.scheduleOnceAtTheBeginningOfYear(
+                                        new Steppable() {
+                                            @Override
+                                            public void step(SimState simState) {
+
+                                                model.scheduleOnceInXDays(new Steppable() {
+                                                                              @Override
+                                                                              public void step(SimState simState) {
+                                                                                  System.out.println("disabling shocks at " + ((FishState) simState).getDay());
+
+                                                                                  final FishState state = (FishState) simState;
+                                                                                  int deactivated = 0;
+                                                                                  int hadGivenUp = 0;
+                                                                                  for (Fisher fisher : state.getFishers()) {
+                                                                                      if(fisher.getDepartingStrategy() instanceof GiveUpAfterSomeLossesThisYearDecorator) {
+                                                                                          if(((GiveUpAfterSomeLossesThisYearDecorator) fisher.getDepartingStrategy()).isGivenUp())
+                                                                                              hadGivenUp++;
+                                                                                          ((GiveUpAfterSomeLossesThisYearDecorator) fisher.getDepartingStrategy()).disable();
+                                                                                          deactivated++;
+                                                                                      }
+                                                                                  }
+                                                                                  System.out.println("deactivated " + deactivated);
+                                                                                  System.out.println("givenup " + hadGivenUp);
+                                                                              }
+                                                                          },
+                                                        StepOrder.DAWN,
+                                                        dayOfTheYear);
+
+                                            }
+                                        }, StepOrder.DAWN,
+                                        shockYear);
 
 
+                            }
+                        };
+                    }
+                });
 
-
-
+            }
+        };
+    }
 
     @NotNull
     public static Consumer<Scenario> setupEffortControlConsumer(
@@ -1008,6 +1061,7 @@ public class Slice6Sweeps {
                                                 @Override
                                                 public void step(SimState simState) {
 
+                                                    System.out.println("shocking prices at " + ((FishState) simState).getDay());
                                                     //shock the prices
                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
@@ -1015,8 +1069,8 @@ public class Slice6Sweeps {
 
                                                             for(int i=0; i<thisMarket.getPricePerSegment().length; i++)
                                                             {
-                                                            thisMarket.getPricePerSegment()[i] =
-                                                                    thisMarket.getPricePerSegment()[i] *percentageOfTotalPrice;
+                                                                thisMarket.getPricePerSegment()[i] =
+                                                                        thisMarket.getPricePerSegment()[i] *percentageOfTotalPrice;
                                                             }
                                                             System.out.println(thisMarket.getPricePerSegment()[2]);
 
@@ -1028,6 +1082,8 @@ public class Slice6Sweeps {
                                                             new Steppable() {
                                                                 @Override
                                                                 public void step(SimState simState) {
+                                                                    System.out.println("restoring prices at " + ((FishState) simState).getDay());
+
                                                                     for (Port port : ((FishState) simState).getPorts()) {
                                                                         for (Market market : port.getDefaultMarketMap().getMarkets()) {
                                                                             NThresholdsMarket thisMarket = ((NThresholdsMarket) ((MarketProxy) market).getDelegate());
@@ -1284,7 +1340,8 @@ public class Slice6Sweeps {
 
 
     private static final double[] COST_SHOCKS_TO_TRY = new double[]{1,1.3};
-    private static final double[]  priceShocksToTry = new double[]{0,0.75,0.5,0.25,1};
+    private static final double[]  priceShocksToTry = new double[]{1,0.5,0.75,0.66,0.25,0};
+    //private static final double[]  priceShocksToTry = new double[]{0,0.75,0.5,0.25,1};
     /**
      * lowers the price of fish caught below the maturity value
      * @param name
@@ -1341,11 +1398,17 @@ public class Slice6Sweeps {
                                 )
 
                         ;
-                if(giveUpWithinAYear)
+                if(giveUpWithinAYear) {
                     basicSetup = basicSetup.andThen(
                             giveUpWithinAYearConsumer
                     );
-
+                    if(immediatePriceRestoration && durationInDays<300)
+                    {
+                        basicSetup = basicSetup.andThen(
+                                disableGivingWithinAYear(yearStart,durationInDays )
+                        );
+                    }
+                }
                 if(entry)
                     basicSetup = basicSetup.andThen(setupEntry);
 

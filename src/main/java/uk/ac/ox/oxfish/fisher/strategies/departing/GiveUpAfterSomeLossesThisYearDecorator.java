@@ -30,6 +30,8 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
 
     private Fisher fisherIAmConnectedTo;
 
+    private boolean disabled = false;
+
     public GiveUpAfterSomeLossesThisYearDecorator(int howManyBadTripsBeforeGivingUp,
                                                   double minimumProfitPerTripRequired,
                                                   DepartingStrategy delegate) {
@@ -42,7 +44,7 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
 
 
-        return !givenUp && delegate.shouldFisherLeavePort(fisher, model, random);
+        return  (disabled || !givenUp) && delegate.shouldFisherLeavePort(fisher, model, random);
     }
 
 
@@ -77,6 +79,9 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
 
     @Override
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+        if(disabled)
+            return;
+
         //if you have given up you should have done no trips, actually.
         //however it is possible that something forced your hand
         assert !givenUp;
@@ -103,6 +108,13 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
 
         givenUp = false;
         badTrips = 0;
+    }
+
+    /**
+     * basically stop stopping the fisher
+     */
+    public void disable(){
+        disabled=true;
     }
 
 

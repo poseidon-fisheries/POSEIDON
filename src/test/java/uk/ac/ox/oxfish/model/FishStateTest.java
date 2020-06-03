@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -41,6 +42,7 @@ import java.util.LinkedList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
+import static uk.ac.ox.oxfish.model.StepOrder.*;
 
 
 public class FishStateTest {
@@ -153,21 +155,21 @@ public class FishStateTest {
             public void step(SimState simState) {
                 stepCounter[0]++;
             }
-        },StepOrder.DAWN,300);
+        }, DAWN,300);
         //increase array after 800 days
         state.scheduleOnceInXDays(new Steppable() {
             @Override
             public void step(SimState simState) {
                 stepCounter[0]++;
             }
-        },StepOrder.DAWN,800);
+        }, DAWN,800);
         //increase array at the end of year 1
         state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
             @Override
             public void step(SimState simState) {
                 stepCounter[1]++;
             }
-        },StepOrder.DAWN,1);
+        }, DAWN,1);
 
         for(int day=0;day<350; day++)
         {
@@ -187,5 +189,35 @@ public class FishStateTest {
         }
         assertEquals(stepCounter[0],2);
         assertEquals(stepCounter[1],1);
+    }
+
+    @Test
+    public void testScheduleEveryYearStepOrders() {
+        final FishState fishState = new FishState();
+        fishState.start();
+        new ImmutableMap.Builder<StepOrder, String>()
+                .put(DAWN, "DAWN(false)")
+                .put(FISHER_PHASE, "FISHER_PHASE(true)")
+                .put(BIOLOGY_PHASE, "BIOLOGY_PHASE(true)")
+                .put(POLICY_UPDATE, "POLICY_UPDATE(true)")
+                .put(DAILY_DATA_GATHERING, "DAILY_DATA_GATHERING(false)")
+                .put(YEARLY_DATA_GATHERING, "YEARLY_DATA_GATHERING(false)")
+                .put(AGGREGATE_DATA_GATHERING, "AGGREGATE_DATA_GATHERING(false)")
+                .put(DATA_RESET, "DATA_RESET(false)")
+                .put(AFTER_DATA, "AFTER_DATA(true)")
+                .build()
+                .forEach((order, name) -> {
+                    fishState.scheduleOnce(
+                            simState -> {
+                                System.out.printf("day %d: %s\n", fishState.getDay(), name);
+                                fishState.scheduleEveryYear(
+                                        simState1 -> System.out.printf("day %d: %s\n", fishState.getDay(), name),
+                                        order
+                                );
+                            },
+                            order
+                    );
+                });
+        do fishState.schedule.step(fishState); while (fishState.getDay() <= 900);
     }
 }
