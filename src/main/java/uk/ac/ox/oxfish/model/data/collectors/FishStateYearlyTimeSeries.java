@@ -95,10 +95,40 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
 
             //catches (includes discards)
-            String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+            final String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
             registerGatherer(catchesColumn,
                              FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
                                      catchesColumn)), 0d);
+
+
+            //CPUE
+            registerGatherer(species + " CPUE",
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(FishState fishState) {
+                            final String catches =  catchesColumn;
+                            final String effort = "Total Effort";
+
+                            DataColumn numerator = originalGatherer.getColumn(catches);
+                            DataColumn denominator = originalGatherer.getColumn(effort);
+                            final Iterator<Double> numeratorIterator = numerator.descendingIterator();
+                            final Iterator<Double>  denominatorIterator = denominator.descendingIterator();
+                            if(!numeratorIterator.hasNext()) //not ready/year 1
+                                return Double.NaN;
+                            double sumNumerator = 0;
+                            double sumDenominator = 0;
+                            for(int i=0; i<365; i++) {
+                                //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                                //and only has a partially filled collection
+                                if(numeratorIterator.hasNext()) {
+                                    sumNumerator += numeratorIterator.next();
+                                    sumDenominator += denominatorIterator.next();
+                                }
+                            }
+                            return  sumNumerator/sumDenominator;
+
+                        }
+                    },Double.NaN);
 
 
 

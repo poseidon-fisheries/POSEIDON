@@ -231,6 +231,7 @@ public class FishState  extends SimState{
         dailyCounter.start(this);
 
         //schedule aggregate steppables
+
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateYearlySteppables.entrySet()  )
             schedule.scheduleRepeating(steppable.getValue(),steppable.getKey().ordinal(), stepsPerDay*365);
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateDailySteppables.entrySet()  )
