@@ -21,7 +21,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,10 +32,10 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private Set<Observer<DeployFad>> fadDeploymentObservers = new HashSet<>();
-    private Set<Observer<MakeFadSet>> fadSetObservers = new HashSet<>();
-    private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new HashSet<>();
     private GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
+    private Set<Observer<DeployFad>> fadDeploymentObservers = new LinkedHashSet<>();
+    private Set<Observer<MakeFadSet>> fadSetObservers = new LinkedHashSet<>();
+    private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new LinkedHashSet<>();
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill

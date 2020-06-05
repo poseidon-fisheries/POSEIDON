@@ -78,9 +78,9 @@ public class FadManager {
             fadMap,
             fadInitializer,
             numFadsInStock,
-            new HashSet<>(),
-            new HashSet<>(),
-            new HashSet<>(),
+            ImmutableSet.of(),
+            ImmutableSet.of(),
+            ImmutableSet.of(),
             Optional.empty(),
             new ActiveActionRegulations()
         );
