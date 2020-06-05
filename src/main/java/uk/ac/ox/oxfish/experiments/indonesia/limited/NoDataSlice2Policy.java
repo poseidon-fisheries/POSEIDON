@@ -124,7 +124,7 @@ public class NoDataSlice2Policy {
 
     private static Path OUTPUT_FOLDER =
             //Paths.get("docs/20191025 limited_poseidon/slice2/easier/output");
-            Paths.get("docs/20191025 limited_poseidon/slice2/output");
+            Paths.get("docs/20191025 limited_poseidon/slice2/output_priceshock");
 
 
     /**
@@ -168,95 +168,231 @@ public class NoDataSlice2Policy {
 //        );
 
 
+
+        //////////////////////////////////////////////////////////////////
+
+        //OLD PRICE SHOCKS
         policies.put("price_shock_33_18mo",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
                     public Consumer<Scenario> apply(Integer shockYear) {
+
                         return setupPriceShock(18*30,shockYear,.33);
                     }
                 }
 
         );
 
-        policies.put("price_shock_33_32mo",
+//        policies.put("price_shock_33_32mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(32*30,shockYear,.33);
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("price_shock_50_18mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(18*30,shockYear,.50);
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("price_shock_50_32mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(32*30,shockYear,.50);
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("cost_shock_33_price_shock_33_18mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(18*30,shockYear,.33).andThen(
+//                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33)
+//                        );
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("cost_shock_33_price_shock_33_32mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(32*30,shockYear,.33).andThen(
+//                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("cost_shock_33_price_shock_50_18mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(18*30,shockYear,.50).andThen(
+//                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+//                    }
+//                }
+//
+//        );
+//
+//        policies.put("cost_shock_33_price_shock_50_32mo",
+//                new Function<Integer, Consumer<Scenario>>() {
+//                    @Override
+//                    public Consumer<Scenario> apply(Integer shockYear) {
+//                        return setupPriceShock(32*30,shockYear,.50).andThen(
+//                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+//                    }
+//                }
+//
+//        );
+
+
+        ///////////////////////////////////////////////////////////////////
+        //NEW PRICE SHOCKS
+
+        //3mo
+        policies.put("cost_shock_33_price_shock_50_3mo",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
                     public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(32*30,shockYear,.33);
+                        return setupPriceShock(6*30,shockYear,.5).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
+                    }
+                }
+
+        );
+        policies.put("cost_shock_33_price_shock_33_3mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
                     }
                 }
 
         );
 
-        policies.put("price_shock_50_18mo",
+        policies.put("cost_shock_33_price_shock_25_3mo",
                 new Function<Integer, Consumer<Scenario>>() {
                     @Override
                     public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(18*30,shockYear,.50);
-                    }
-                }
-
-        );
-
-        policies.put("price_shock_50_32mo",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(32*30,shockYear,.50);
-                    }
-                }
-
-        );
-
-        ///////////////////////////////////////////////////////////////////////////////
-
-
-        policies.put("cost_shock_33_price_shock_33_18mo",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(18*30,shockYear,.33).andThen(
-                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33)
-                        );
-                    }
-                }
-
-        );
-
-        policies.put("cost_shock_33_price_shock_33_32mo",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(32*30,shockYear,.33).andThen(
-                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
-                    }
-                }
-
-        );
-
-        policies.put("cost_shock_33_price_shock_50_18mo",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(18*30,shockYear,.50).andThen(
-                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
-                    }
-                }
-
-        );
-
-        policies.put("cost_shock_33_price_shock_50_32mo",
-                new Function<Integer, Consumer<Scenario>>() {
-                    @Override
-                    public Consumer<Scenario> apply(Integer shockYear) {
-                        return setupPriceShock(32*30,shockYear,.50).andThen(
-                                Slice6Sweeps.setupVariableCostShock(18*30,shockYear,.33));
+                        return setupPriceShock(6*30,shockYear,1d-.25).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
                     }
                 }
 
         );
 
 
+        policies.put("cost_shock_0_price_shock_50_3mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,.5).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
+        policies.put("cost_shock_0_price_shock_33_3mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_0_price_shock_25_3mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.25).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
+
+        //6mo
+        policies.put("cost_shock_33_price_shock_50_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,.5).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
+                    }
+                }
+
+        );
+        policies.put("cost_shock_33_price_shock_33_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_33_price_shock_25_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.25).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1.33));
+                    }
+                }
+
+        );
+
+
+        policies.put("cost_shock_0_price_shock_50_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,.5).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
+        policies.put("cost_shock_0_price_shock_33_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.33).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
+
+        policies.put("cost_shock_0_price_shock_25_6mo",
+                new Function<Integer, Consumer<Scenario>>() {
+                    @Override
+                    public Consumer<Scenario> apply(Integer shockYear) {
+                        return setupPriceShock(6*30,shockYear,1d-.25).andThen(
+                                Slice6Sweeps.setupVariableCostShock(6*30,shockYear,1));
+                    }
+                }
+
+        );
 
     }
 
