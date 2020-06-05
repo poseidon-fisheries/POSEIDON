@@ -51,7 +51,7 @@ import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
- * The SchaeferLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
+ * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
  * memorized biomass from the previous year instead of using the current biomass.
  * This grower takes FAD biomass into account as part of the total memorized biomass, but only
  * redistributes new biomass in ocean cells. When the growth function is called, it also adds back

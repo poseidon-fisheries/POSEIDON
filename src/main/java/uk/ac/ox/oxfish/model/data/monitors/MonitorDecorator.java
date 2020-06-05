@@ -23,17 +23,22 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
-public abstract class MonitorDecorator<O, V> implements Monitor<O, V> {
+import javax.measure.Quantity;
+import javax.measure.Unit;
 
-    private final Monitor<O, V> delegate;
+public abstract class MonitorDecorator<O, V, Q extends Quantity<Q>> implements Monitor<O, V, Q> {
 
-    MonitorDecorator(Monitor<O, V> delegate) { this.delegate = delegate; }
+    private final Monitor<O, V, Q> delegate;
 
-    @Override public Accumulator<V> getAccumulator() { return delegate.getAccumulator(); }
+    MonitorDecorator(Monitor<O, V, Q> delegate) { this.delegate = delegate; }
 
     @Override public String getBaseName() { return delegate.getBaseName(); }
 
+    @Override public Unit<Q> getUnit() { return delegate.getUnit(); }
+
     @Override public Iterable<V> extractValues(O observable) { return delegate.extractValues(observable); }
+
+    @Override public Accumulator<V> getAccumulator() { return delegate.getAccumulator(); }
 
     @Override public void registerWith(TimeSeries<FishState> timeSeries) {
         delegate.registerWith(timeSeries);

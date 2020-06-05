@@ -124,23 +124,23 @@ public final class Runner<S extends Scenario> {
         int numRuns = policies.size() * numberOfRunsPerPolicy;
         final AtomicInteger runNumber = new AtomicInteger(1);
         range(0, numberOfRunsPerPolicy).forEach(i ->
-                policies.forEach((policyName, policy) -> {
-                    System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
-                    CurrentRun.INSTANCE.start(policyName);
-                    FishState fishState = makeFishState(policy);
-                    beforeStartConsumer.accept(fishState);
-                    fishState.start();
-                    afterStartConsumer.accept(fishState);
-                    final Multimap<Path, RowProvider> rowProviders = makeRowProviders(fishState);
-                    do {
-                        System.out.println("---");
-                        printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policyName);
-                        fishState.schedule.step(fishState);
-                        afterStepConsumer.accept(fishState);
-                    } while (fishState.getYear() < numYearsToRun);
-                    afterRunConsumer.accept(fishState);
-                    writeOutputs(runNumber.getAndIncrement(), rowProviders);
-                })
+            policies.forEach((policyName, policy) -> {
+                System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
+                CurrentRun.INSTANCE.start(policyName);
+                FishState fishState = makeFishState(policy);
+                beforeStartConsumer.accept(fishState);
+                fishState.start();
+                afterStartConsumer.accept(fishState);
+                final Multimap<Path, RowProvider> rowProviders = makeRowProviders(fishState);
+                do {
+                    System.out.println("---");
+                    printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policyName);
+                    fishState.schedule.step(fishState);
+                    afterStepConsumer.accept(fishState);
+                } while (fishState.getYear() < numYearsToRun);
+                afterRunConsumer.accept(fishState);
+                writeOutputs(runNumber.getAndIncrement(), rowProviders);
+            })
         );
     }
 

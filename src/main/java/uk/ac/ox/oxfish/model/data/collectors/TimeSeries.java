@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -28,7 +29,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 
-import java.util.*;
+import javax.measure.Quantity;
+import javax.measure.Unit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Basically a map<String,Double> to collect data about an object of type T
@@ -50,16 +56,32 @@ public class TimeSeries<T> implements Steppable
 
     /**
      * Create a new data column
-     * @param title the title of the column
-     * @param gatherer the function to call in order to fill the rows when the datagatherer is stepped
+     *
+     * @param title        the title of the column
+     * @param gatherer     the function to call in order to fill the rows when the datagatherer is stepped
      * @param defaultValue the value to fill the rows with if this gatherer is added after other columns already have
      *                     some rows filled
      */
-    public DataColumn registerGatherer(String title, Gatherer<T> gatherer, double defaultValue)
-    {
+    public DataColumn registerGatherer(String title, Gatherer<T> gatherer, double defaultValue) {
+        return registerGatherer(title, gatherer, defaultValue, null, "");
+    }
+
+    /**
+     * Create a new data column
+     *
+     * @param title        the title of the column
+     * @param gatherer     the function to call in order to fill the rows when the datagatherer is stepped
+     * @param defaultValue the value to fill the rows with if this gatherer is added after other columns already have
+     *                     some rows filled
+     * @param unit         the unit of measure that the data is stored in. If this is not null, the new DataColumn will be
+     *                     an instance of MeasuredDataColumn and store the unit so it can be used for display or conversion.
+     */
+    public <Q extends Quantity<Q>> DataColumn registerGatherer(
+        String title, Gatherer<T> gatherer, double defaultValue, @Nullable Unit<Q> unit, String yLabel
+    ) {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists: " + title);
         int size =noGatherers() ? 0 : numberOfObservations();
-        DataColumn column = new DataColumn(title);
+        DataColumn column = unit == null ? new DataColumn(title) : new MeasuredDataColumn<>(title, unit, yLabel);
         //fill if needed
         for(int i=0; i<size; i++)
             column.add(defaultValue);

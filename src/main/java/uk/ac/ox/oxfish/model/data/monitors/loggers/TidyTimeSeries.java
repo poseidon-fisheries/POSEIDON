@@ -20,13 +20,16 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.MeasuredDataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
+import javax.measure.Unit;
 import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
+import static tech.units.indriya.AbstractUnit.ONE;
 
 public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProvider {
 
@@ -41,5 +44,17 @@ public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProv
     }
 
     abstract List<Object> makeRow(DataColumn column, int index);
+
+    Unit<?> getUnit(DataColumn column) {
+        return column instanceof MeasuredDataColumn
+            ? ((MeasuredDataColumn<?>) column).getUnit()
+            : ONE;
+    }
+
+    String getYLabel(DataColumn column) {
+        return column instanceof MeasuredDataColumn
+            ? ((MeasuredDataColumn<?>) column).getYLabel()
+            : "";
+    }
 
 }

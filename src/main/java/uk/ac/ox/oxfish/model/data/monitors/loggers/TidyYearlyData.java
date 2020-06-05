@@ -21,13 +21,17 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.MeasuredDataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
+import javax.measure.Unit;
 import java.util.List;
+
+import static tech.units.indriya.AbstractUnit.ONE;
 
 public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
 
-    private static final List<String> HEADERS = ImmutableList.of("year", "variable", "value");
+    private static final List<String> HEADERS = ImmutableList.of("year", "variable", "value", "unit", "y_label");
 
     public TidyYearlyData(final TimeSeries<?> timeSeries) {
         super(timeSeries);
@@ -39,7 +43,9 @@ public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
         return ImmutableList.of(
             index + 1, // year
             column.getName(), // variable
-            column.get(index) // value
+            column.get(index), // value
+            getUnit(column).getSymbol(), // unit of measure ("" if unit is dimensionless, i.e., ONE)
+            getYLabel(column)
         );
     }
 

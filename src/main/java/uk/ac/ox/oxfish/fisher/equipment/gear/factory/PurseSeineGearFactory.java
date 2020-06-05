@@ -20,6 +20,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import javax.measure.quantity.Mass;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,10 +33,10 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
     private Set<Observer<DeployFad>> fadDeploymentObservers = new LinkedHashSet<>();
     private Set<Observer<MakeFadSet>> fadSetObservers = new LinkedHashSet<>();
     private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new LinkedHashSet<>();
+    private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
@@ -49,9 +50,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private Path unassociatedCatchSampleFile;
 
     @SuppressWarnings("unused")
-    public GroupingMonitor<Species, BiomassLostEvent, Double> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
 
-    public void setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor) {
+    public void setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor) {
         this.biomassLostMonitor = biomassLostMonitor;
     }
 

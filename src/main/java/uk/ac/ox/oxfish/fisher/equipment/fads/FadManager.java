@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
+import javax.measure.quantity.Mass;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -56,13 +57,13 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadManager {
 
-    private static List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
+    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
         DeployFad.class, MakeFadSet.class, MakeUnassociatedSet.class
     );
 
     private final FadMap fadMap;
     private final Observers observers = new Observers();
-    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor;
+    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
@@ -93,7 +94,7 @@ public class FadManager {
         Iterable<Observer<DeployFad>> fadDeploymentObservers,
         Iterable<Observer<MakeFadSet>> fadSetObservers,
         Iterable<Observer<MakeUnassociatedSet>> unassociatedSetObservers,
-        Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> biomassLostMonitor,
+        Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
         ActiveActionRegulations actionSpecificRegulations
     ) {
         checkArgument(numFadsInStock >= 0);
@@ -226,6 +227,6 @@ public class FadManager {
         this.observers.reactTo(observable);
     }
 
-    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double>> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> getBiomassLostMonitor() { return biomassLostMonitor; }
 
 }

@@ -22,11 +22,13 @@ package uk.ac.ox.oxfish.model.data.monitors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-public class ProportionalGatherer<G, O, V> extends MonitorDecorator<O, V> {
+import javax.measure.Quantity;
 
-    private final GroupingMonitor<G, O, V> delegate;
+public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends MonitorDecorator<O, V, Q> {
 
-    public ProportionalGatherer(GroupingMonitor<G, O, V> delegate) {
+    private final GroupingMonitor<G, O, V, Q> delegate;
+
+    public ProportionalGatherer(GroupingMonitor<G, O, V, Q> delegate) {
         super(delegate);
         this.delegate = delegate;
     }
@@ -37,7 +39,9 @@ public class ProportionalGatherer<G, O, V> extends MonitorDecorator<O, V> {
                 timeSeries.registerGatherer(
                     "Proportion of " + subMonitor.getBaseName(),
                     __ -> subMonitor.getAccumulator().get() / getAccumulator().get(),
-                    0.0
+                    0.0,
+                    delegate.getUnit(),
+                    delegate.getYLabel()
                 );
         });
         super.registerWith(timeSeries);

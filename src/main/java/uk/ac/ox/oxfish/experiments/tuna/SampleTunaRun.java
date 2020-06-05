@@ -38,7 +38,8 @@ import java.nio.file.Paths;
 
 public class SampleTunaRun {
 
-    private static final int NUM_YEARS_TO_RUN = 5;
+    private static final int NUM_YEARS_TO_RUN = 10;
+    private static final int NUM_RUNS_PER_POLICY = 2;
 
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
@@ -55,7 +56,7 @@ public class SampleTunaRun {
             .requestFisherYearlyData()
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
 //            .registerRowProviders("heatmap_data.csv", SampleTunaRun::makeHeatmapProviders)
-            .run(NUM_YEARS_TO_RUN, 10);
+            .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
     private static Iterable<? extends RowProvider> makeHeatmapProviders(final FishState fishState) {

@@ -118,6 +118,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.Quantity;
+import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
@@ -147,8 +148,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.AbstractUnit.ONE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
+import static tech.units.indriya.unit.Units.DAY;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
@@ -704,11 +707,11 @@ public class TunaScenario implements Scenario {
     private static class Monitors {
 
         private final RegionalDivision regionalDivision;
-        private final Collection<Monitor<DeployFad, ?>> fadDeploymentMonitors;
-        private final Collection<Monitor<MakeFadSet, ?>> fadSetMonitors;
-        private final Collection<Monitor<MakeUnassociatedSet, ?>> unassociatedSetMonitors;
-        private final GroupingMonitor<Species, BiomassLostEvent, Double> biomassLostMonitor;
-        private final Collection<Monitor<?, ?>> otherMonitors;
+        private final Collection<Monitor<DeployFad, ?, ?>> fadDeploymentMonitors;
+        private final Collection<Monitor<MakeFadSet, ?, ?>> fadSetMonitors;
+        private final Collection<Monitor<MakeUnassociatedSet, ?, ?>> unassociatedSetMonitors;
+        private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
+        private final Collection<Monitor<?, ?, ?>> otherMonitors;
 
         Monitors(FishState fishState) {
 
@@ -719,12 +722,14 @@ public class TunaScenario implements Scenario {
                 makeActionCounter("FAD deployments")
             );
 
-            final Function<Region, ProportionalGatherer<Boolean, MakeFadSet, MakeFadSet>>
+            final Function<Region, ProportionalGatherer<Boolean, MakeFadSet, MakeFadSet, Dimensionless>>
                 makeProportionOfSetsOnOwnFadsMonitor =
                 region -> new ProportionalGatherer<>(basicGroupingMonitor(
                     null, // we already have the total number of sets and don't want to gather it from here
                     EVERY_YEAR,
                     IncrementingAccumulator::new,
+                    ONE,
+                    "Proportion of sets",
                     ImmutableList.of(true, false),
                     isOnOwnFad -> String.format(
                         "sets on %s FADs%s",
@@ -746,12 +751,16 @@ public class TunaScenario implements Scenario {
                     EVERY_YEAR,
                     regionalDivision,
                     IncrementingAccumulator::new,
+                    ONE,
+                    "Proportion of sets",
                     makeProportionOfSetsOnOwnFadsMonitor
                 ),
                 new BasicMonitor<>(
                     "FAD soak time",
                     EVERY_YEAR,
                     IterativeAveragingAccumulator::new,
+                    DAY,
+                    "Soak time",
                     fadSet -> fadSet.getStep() - fadSet.getTargetFad().getStepDeployed()
                 ),
                 basicPerRegionMonitor(
@@ -759,7 +768,9 @@ public class TunaScenario implements Scenario {
                     EVERY_YEAR,
                     regionalDivision,
                     region -> fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getTargetFad().getTripDeployed(),
-                    ProportionAccumulator::new
+                    ProportionAccumulator::new,
+                    ONE,
+                    "Proportion of sets"
                 )
             );
 
@@ -775,6 +786,8 @@ public class TunaScenario implements Scenario {
                 "biomass lost",
                 EVERY_YEAR,
                 SummingAccumulator::new,
+                KILOGRAM,
+                "Biomass",
                 fishState.getSpecies(),
                 species -> event -> event.getBiomassLost().get(species)
             );
@@ -788,7 +801,9 @@ public class TunaScenario implements Scenario {
                         EVERY_YEAR,
                         regionalDivision,
                         region -> identity(),
-                        IncrementingAccumulator::new
+                        IncrementingAccumulator::new,
+                        ONE,
+                        "Number of FADs"
                     )
                 ),
                 new ObservingAtIntervalMonitor<>(
@@ -798,6 +813,8 @@ public class TunaScenario implements Scenario {
                         "biomass under FADs",
                         EVERY_YEAR,
                         SummingAccumulator::new,
+                        KILOGRAM,
+                        "Biomass",
                         fishState.getSpecies(),
                         species -> region -> fad -> fad.getBiology().getBiomass(species),
                         regionalDivision
@@ -809,7 +826,7 @@ public class TunaScenario implements Scenario {
 
         }
 
-        private <E extends PurseSeinerAction> ProportionalGatherer<Region, E, E> makeActionCounter(
+        private <E extends PurseSeinerAction> ProportionalGatherer<Region, E, E, Dimensionless> makeActionCounter(
             String actionName
         ) {
             return new ProportionalGatherer<>(basicPerRegionMonitor(
@@ -817,11 +834,13 @@ public class TunaScenario implements Scenario {
                 EVERY_YEAR,
                 regionalDivision,
                 region -> identity(),
-                IncrementingAccumulator::new
+                IncrementingAccumulator::new,
+                ONE,
+                "Number of " + actionName
             ));
         }
 
-        private <A extends SetAction> GroupingMonitor<Species, A, Double> makeCatchFromSetAccumulator(
+        private <A extends SetAction> GroupingMonitor<Species, A, Double, Mass> makeCatchFromSetAccumulator(
             FishState fishState,
             String baseName,
             Supplier<Accumulator<Double>> accumulatorSupplier
@@ -830,6 +849,8 @@ public class TunaScenario implements Scenario {
                 baseName,
                 EVERY_YEAR,
                 accumulatorSupplier,
+                KILOGRAM,
+                "Biomass",
                 fishState.getSpecies(),
                 species -> region -> action -> action.getCatchesKept()
                     .map(catchesKept -> catchesKept.getWeightCaught(species))
@@ -838,7 +859,7 @@ public class TunaScenario implements Scenario {
             );
         }
 
-        Iterable<Monitor<?, ?>> getMonitors() {
+        Iterable<Monitor<?, ?, ?>> getMonitors() {
             return concat(
                 fadDeploymentMonitors,
                 fadSetMonitors,

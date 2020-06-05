@@ -27,49 +27,62 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 import uk.ac.ox.oxfish.utility.FishStateSteppable;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 
-abstract public class AbstractMonitor<O, V> implements Monitor<O, V> {
+abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Monitor<O, V, Q> {
 
     private final IntervalPolicy resetInterval;
     private final String baseName;
     private final Supplier<Accumulator<V>> accumulatorSupplier;
+    private final Unit<Q> unit;
+    private final String yLabel;
     private final FishStateSteppable resetter;
     private Stoppable stoppable = null;
     private Accumulator<V> accumulator;
-
-    protected AbstractMonitor(
+    AbstractMonitor(
         @Nullable String baseName,
         IntervalPolicy resetInterval,
-        Supplier<Accumulator<V>> accumulatorSupplier
+        Supplier<Accumulator<V>> accumulatorSupplier,
+        final Unit<Q> unit,
+        final String yLabel
     ) {
         this.resetInterval = checkNotNull(resetInterval);
         this.baseName = baseName;
         this.accumulatorSupplier = checkNotNull(accumulatorSupplier);
+        this.unit = checkNotNull(unit);
+        this.yLabel = yLabel;
         this.accumulator = this.accumulatorSupplier.get();
         this.resetter = __ -> this.accumulator = this.accumulatorSupplier.get();
     }
 
-    public Accumulator<V> getAccumulator() { return accumulator; }
+    public String getYLabel() { return yLabel; }
 
     public String getBaseName() { return baseName; }
 
-    @Override public void start(FishState fishState) {
-        checkState(stoppable == null, "Already started!");
-        stoppable = fishState.schedulePerPolicy(resetter, DATA_RESET, resetInterval);
-    }
+    @Override public Unit<Q> getUnit() { return unit; }
+
+    public Accumulator<V> getAccumulator() { return accumulator; }
 
     @Override public void registerWith(TimeSeries<FishState> timeSeries) {
         if (baseName != null) // a null baseName indicates we don't want to register the accumulator
             timeSeries.registerGatherer(
                 accumulator.makeName(baseName),
                 __ -> accumulator.get(),
-                0.0
+                0.0,
+                unit,
+                yLabel
             );
+    }
+
+    @Override public void start(FishState fishState) {
+        checkState(stoppable == null, "Already started!");
+        stoppable = fishState.schedulePerPolicy(resetter, DATA_RESET, resetInterval);
     }
 
     @Override public void observe(O observable) {
