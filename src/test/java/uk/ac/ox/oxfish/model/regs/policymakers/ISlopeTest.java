@@ -15,7 +15,7 @@ public class ISlopeTest {
     @Test
     public void usingNumbersFromDLMToolkitToTestISlopeImplementation() {
 
-        //these number come from the DLMTookkit, SimulatedData, row 1
+        //these number come from the DLMTookkit, SimulatedData, row 1   
         //SimulatedData@MPrec<-c(NA,NA) needs to be called in DLMToolkit to actually compute it!
         final double[] indicators = {0.727146523713908, 1.00488900317951, 1.05670327078653, 1.1620629858966,
                 0.701410061340196, 0.914689667756402, 0.85874709669169, 1.20816538836671, 0.754876423014956};

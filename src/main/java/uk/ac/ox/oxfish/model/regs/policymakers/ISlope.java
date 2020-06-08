@@ -67,6 +67,12 @@ public class ISlope implements Sensor<FishState, Double> {
         this.maxTimeLag = maxTimeLag;
     }
 
+    /**
+     * this gets initialized the first time we have enough data and is in fact the policy suggested before
+     */
+    private double lastTacGiven = Double.NaN;
+
+
     @Override
     public Double scan(FishState system) {
 
@@ -107,9 +113,23 @@ public class ISlope implements Sensor<FishState, Double> {
         );
         double indicatorSlope = regression.slope();
 
-        //scaling*TAC∗(1+λI)
-        return catches.getAverage() * precautionaryScaling *
-                (1+indicatorSlope*gainParameterLambda);
+        //the first time we are supposed to use precautionary adjustment on average catch
+        //but later on we just adjust from the previous TAC
+        double baseline = Double.isFinite(lastTacGiven) ?
+                lastTacGiven :
+                catches.getAverage() * precautionaryScaling;
+
+        //TAC∗(1+λI)
+        double newTAC =  baseline * (1+indicatorSlope*gainParameterLambda);
+        if(Double.isFinite(newTAC))
+        {
+            lastTacGiven = newTAC;
+            return lastTacGiven;
+        }
+        else
+            return Double.NaN;
+
+
 
     }
 
