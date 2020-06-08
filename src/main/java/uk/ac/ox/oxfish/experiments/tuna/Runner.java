@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
@@ -47,7 +46,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -71,7 +69,7 @@ public final class Runner<S extends Scenario> {
         HashMultimap.create();
 
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
-    private Map<String, Consumer<S>> policies = ImmutableMap.of("Current FAD limits / No set limit", __ -> {});
+    private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
     private Consumer<FishState> beforeStartConsumer = __ -> {};
     private Consumer<FishState> afterStartConsumer = __ -> {};
     private Consumer<FishState> afterStepConsumer = __ -> {};
@@ -94,7 +92,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    @SuppressWarnings({"unused"})
     public Runner<S> setBeforeStartConsumer(final Consumer<FishState> beforeStartConsumer) {
         this.beforeStartConsumer = beforeStartConsumer;
         return this;
@@ -124,17 +122,17 @@ public final class Runner<S extends Scenario> {
         int numRuns = policies.size() * numberOfRunsPerPolicy;
         final AtomicInteger runNumber = new AtomicInteger(1);
         range(0, numberOfRunsPerPolicy).forEach(i ->
-            policies.forEach((policyName, policy) -> {
+            policies.forEach(policy -> {
                 System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
-                CurrentRun.INSTANCE.start(policyName);
-                FishState fishState = makeFishState(policy);
+                CurrentRun.INSTANCE.start(policy.getName());
+                FishState fishState = makeFishState(policy.getScenarioConsumer());
                 beforeStartConsumer.accept(fishState);
                 fishState.start();
                 afterStartConsumer.accept(fishState);
                 final Multimap<Path, RowProvider> rowProviders = makeRowProviders(fishState);
                 do {
                     System.out.println("---");
-                    printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policyName);
+                    printStep(fishState, runNumber.get(), numRuns, numYearsToRun, policy.getName());
                     fishState.schedule.step(fishState);
                     afterStepConsumer.accept(fishState);
                 } while (fishState.getYear() < numYearsToRun);
@@ -144,7 +142,7 @@ public final class Runner<S extends Scenario> {
         );
     }
 
-    @NotNull private FishState makeFishState(final Consumer<S> policy) {
+    @NotNull private FishState makeFishState(final Consumer<? super S> policy) {
         final S scenario = readScenario(scenarioPath, scenarioClass);
         policy.accept(scenario);
         FishState fishState = new FishState();
@@ -256,8 +254,8 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    public Runner<S> setPolicies(final Map<String, Consumer<S>> policies) {
-        this.policies = policies;
+    public Runner<S> setPolicies(final Iterable<Policy<S>> policies) {
+        this.policies = ImmutableList.copyOf(policies);
         return this;
     }
 

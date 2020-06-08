@@ -66,7 +66,11 @@ public final class WebVizExporter {
         final Runner<TunaScenario> runner =
             new Runner<>(TunaScenario.class, scenarioPath, outputPath)
                 .setAfterStartConsumer(fishState ->
-                    fishState.registerStartable(makeJsonOutputManagerFactory().apply(fishState))
+                    fishState.registerStartable(makeJsonOutputManagerFactory(
+                        "Tuna - Baseline Scenario",
+                        "This is sample output from the current tuna simulation, " +
+                            "over a period of five years."
+                    ).apply(fishState))
                 )
                 .setAfterRunConsumer(fishState ->
                     JsonOutputPlugin.writeOutputsToFolder(fishState, outputPath)
@@ -75,15 +79,15 @@ public final class WebVizExporter {
     }
 
     @NotNull
-    private static JsonOutputManagerFactory makeJsonOutputManagerFactory() {
+    private static JsonOutputManagerFactory makeJsonOutputManagerFactory(
+        final String scenarioTitle, final String scenarioDescription
+    ) {
 
         final Set<String> speciesNames = TunaScenario.speciesNames.values();
 
         final JsonOutputManagerFactory jsonOutputManagerFactory = new JsonOutputManagerFactory();
-        jsonOutputManagerFactory.setScenarioTitle("Tuna - Baseline Scenario");
-        jsonOutputManagerFactory.setScenarioDescription(
-            "This is sample output from the current tuna simulation, " +
-                "over a period of five years.");
+        jsonOutputManagerFactory.setScenarioTitle(scenarioTitle);
+        jsonOutputManagerFactory.setScenarioDescription(scenarioDescription);
         jsonOutputManagerFactory.setStartDate("2017-01-01");
         jsonOutputManagerFactory.setNumYearsToSkip(0);
         jsonOutputManagerFactory.setPrettyPrinting(true);

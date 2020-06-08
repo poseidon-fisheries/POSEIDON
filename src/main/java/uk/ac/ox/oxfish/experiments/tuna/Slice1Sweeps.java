@@ -38,9 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -49,7 +47,6 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Stream.concat;
 import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
 import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.makeLimit;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1Sweeps {
@@ -94,10 +91,10 @@ public class Slice1Sweeps {
         final ImmutableList<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual =
             ImmutableList.of(__ -> currentFadLimits);
 
-        ImmutableMap.Builder<String, Consumer<TunaScenario>> policies = ImmutableMap.builder();
+        ImmutableList.Builder<Policy<TunaScenario>> policies = ImmutableList.builder();
         fadLimits.forEach((activeFadLimits, fadLimitsName) ->
             setLimits.forEach((generalSetLimits, setLimitsName) ->
-                policies.put(makePolicy(
+                policies.add(makePolicy(
                     businessAsUsual,
                     concat(Stream.of(activeFadLimits), stream(generalSetLimits)).collect(toImmutableList()),
                     fadLimitsName + " / " + setLimitsName
@@ -129,7 +126,7 @@ public class Slice1Sweeps {
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private static Map.Entry<String, Consumer<TunaScenario>> makePolicy(
+    private static Policy<TunaScenario> makePolicy(
         List<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
         String policyName
@@ -143,7 +140,7 @@ public class Slice1Sweeps {
                 )
             );
         };
-        return entry(policyName, scenario -> {
+        return new Policy<>(policyName, "", scenario -> {
             PurseSeineGearFactory purseSeineGearFactory =
                 (PurseSeineGearFactory) scenario.getFisherDefinition().getGear();
             purseSeineGearFactory.setActionSpecificRegulations(businessAsUsual);
