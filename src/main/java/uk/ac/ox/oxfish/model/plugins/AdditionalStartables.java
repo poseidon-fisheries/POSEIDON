@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsF
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -47,6 +48,7 @@ public class AdditionalStartables {
 
 
         NAMES.put(ISlopeTACController.class, "ISlope-TAC Controller");
+        NAMES.put(PIDControllerIndicatorTarget.class, "PID-TAC Controller");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.regs.policymakers;
+package uk.ac.ox.oxfish.model.regs.policymakers.sensors;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;

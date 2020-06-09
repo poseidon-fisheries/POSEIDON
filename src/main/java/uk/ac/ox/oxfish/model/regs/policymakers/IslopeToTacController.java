@@ -1,20 +1,11 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import sim.display.Console;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.gui.FishGUI;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
-import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.IntermittentSensorDecorator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 public class IslopeToTacController extends Controller {

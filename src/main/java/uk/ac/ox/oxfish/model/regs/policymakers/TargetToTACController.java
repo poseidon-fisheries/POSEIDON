@@ -4,6 +4,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -12,27 +14,30 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  * then translates literally into a monoTAC
  */
 public class TargetToTACController extends Controller {
+
+    public static final Actuator<FishState, Double> POLICY_TO_TAC_ACTUATOR = new Actuator<FishState, Double>() {
+        @Override
+        public void apply(FishState subject, Double tac, FishState model) {
+            if (!Double.isFinite(tac))
+                return;
+
+            final MonoQuotaRegulation quotaRegulation =
+                    new MonoQuotaRegulation(
+                            tac
+                    );
+            for (Fisher fisher : model.getFishers()) {
+                fisher.setRegulation(quotaRegulation);
+            }
+        }
+    };
+
     public TargetToTACController(
                                  Sensor<FishState, Double> target,
                                  int intervalInDays) {
         super(
                 (Sensor<FishState, Double>) system -> -1d,
                 target,
-                new Actuator<FishState, Double>() {
-                    @Override
-                    public void apply(FishState subject, Double tac, FishState model) {
-                        if(!Double.isFinite(tac))
-                            return;
-
-                        final MonoQuotaRegulation quotaRegulation =
-                                new MonoQuotaRegulation(
-                                tac
-                        );
-                        for (Fisher fisher : model.getFishers()) {
-                            fisher.setRegulation(quotaRegulation);
-                        }
-                    }
-                } , intervalInDays);
+                POLICY_TO_TAC_ACTUATOR, intervalInDays);
     }
 
 

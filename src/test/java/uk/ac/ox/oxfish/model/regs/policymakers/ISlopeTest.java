@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 

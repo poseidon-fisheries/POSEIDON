@@ -571,12 +571,12 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         registerGatherer("Average Trip Income", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
-                double hoursOut = observed.getFishers().stream().mapToDouble(
+                double earnings = observed.getFishers().stream().mapToDouble(
                         new ToDoubleFunction<Fisher>() {
                             @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.EARNINGS) -
-                                        value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
+                            public double applyAsDouble(Fisher fisher) {
+                                return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.EARNINGS) -
+                                        fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
                             }
                         }).filter(new DoublePredicate() { //skip boats that made no trips
                     @Override
@@ -597,7 +597,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                     }
                 }).sum();
 
-                return trips > 0 ? hoursOut/trips : 0d;
+                return trips > 0 ? earnings/trips : 0d;
             }
         }, 0d);
 

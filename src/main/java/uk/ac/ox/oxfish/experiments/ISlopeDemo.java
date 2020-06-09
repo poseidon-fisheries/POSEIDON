@@ -1,27 +1,28 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.google.common.collect.Lists;
-import sim.display.Console;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.policymakers.ISlope;
-import uk.ac.ox.oxfish.model.regs.policymakers.ITarget;
-import uk.ac.ox.oxfish.model.regs.policymakers.IslopeToTacController;
+import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ISlopeDemo {
@@ -35,8 +36,20 @@ public class ISlopeDemo {
             "Species 0 CPUE",
             "Average Trip Income",
             "Number Of Active Fishers",
-            "Biomass Species 0"
+            "Biomass Species 0",
+            "Average Trip Duration"
     };
+
+    private static LinkedHashMap<String,Double> pidMultipliers =
+            new LinkedHashMap<>();
+    static  {
+        pidMultipliers.put("Species 0 CPHO",1.5);
+        pidMultipliers.put("Species 0 CPUE",1.5);
+        pidMultipliers.put("Biomass Species 0",1.5);
+        pidMultipliers.put("Average Trip Income",1.5);
+        pidMultipliers.put("Average Trip Duration",0.8);
+        pidMultipliers.put("Number Of Active Fishers",1d);
+    }
 
     private static List<String> columnsToPrint = Lists.newArrayList(
             "Species 0 CPHO",
@@ -51,8 +64,10 @@ public class ISlopeDemo {
 
 
     public static void main(String[] args) throws IOException {
-        mainIslope(args);
-        mainITarget(args);
+//        mainIslope(args);
+//        mainITarget(args);
+      //  mainPID(false);
+        mainPID(true);
     }
 
     public static void  mainITarget(String[] args) throws IOException {
@@ -209,6 +224,84 @@ public class ISlopeDemo {
                             }
 
 
+                    );
+
+                }
+            });
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.
+                            append(indicator).append(",");
+                }
+            });
+
+            for (int run = 0; run < RUNS_TO_RUN; run++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+
+
+            }
+
+
+        }
+
+    }
+
+
+
+    public static void  mainPID(boolean integrated) throws IOException {
+
+        columnsToPrint.remove("TAC from TARGET-TAC Controller");
+        columnsToPrint.add("Policy from PID Controller");
+
+
+        FileWriter fileWriter = new FileWriter(
+                DIRECTORY.resolve("indicators_PI.csv").toFile());
+        fileWriter.write("run,year,indicator,variable,value\n");
+        fileWriter.flush();
+
+
+
+        for (String indicator : indicatorsToUse) {
+
+            System.out.println(indicator);
+
+            BatchRunner runner = new BatchRunner(
+                    DIRECTORY.resolve(
+                            "base_islope_2.yaml"),
+                    30,
+                    columnsToPrint,
+                    null,
+                    null,
+                    0,
+                    -1
+            );
+            runner.setScenarioSetup(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                    prototype.setFishers(200);
+                    final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
+                    pid.setIndicatorColumnName(indicator);
+                    double multiplier = pidMultipliers.get(indicator);
+                    pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
+                    if(multiplier<1)
+                        pid.setNegative(false);
+                    else
+                        pid.setNegative(true);
+
+                    pid.setIntegrated(integrated);
+
+                    //never turn it fully off
+                    pid.setMinimumTAC(10000);
+
+                    prototype.getPlugins().add(
+                            pid
                     );
 
                 }

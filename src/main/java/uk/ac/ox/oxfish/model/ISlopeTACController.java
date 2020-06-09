@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.model.regs.policymakers.ISlope;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;

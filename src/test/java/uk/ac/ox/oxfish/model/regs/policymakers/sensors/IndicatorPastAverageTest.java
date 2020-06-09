@@ -1,17 +1,17 @@
-package uk.ac.ox.oxfish.model.regs.policymakers;
+package uk.ac.ox.oxfish.model.regs.policymakers.sensors;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class FixedTargetAsMultipleOfOriginalObservationTest {
+public class IndicatorPastAverageTest {
+
 
     @Test
-    public void targetIsSetCorrectly() {
+    public void correctlyUpdates() {
 
         //these number come from the DLMTookkit, SimulatedData, row 1
         final double[] indicators = {0.727146523713908, 1.00488900317951, 1.05670327078653, 1.1620629858966,
@@ -29,18 +29,17 @@ public class FixedTargetAsMultipleOfOriginalObservationTest {
         FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(state.getYearlyDataSet().getColumn("indicator")).thenReturn(indicatorColumn);
 
-        FixedTargetAsMultipleOfOriginalObservation target =
-                new FixedTargetAsMultipleOfOriginalObservation("indicator",
-                        1.5,3);
+        IndicatorPastAverage target =
+                new IndicatorPastAverage("indicator",
+                        2);
         assertEquals(target.scan(state),
-                1.4,.0001d);
+                0.975,.0001d);
 
-
-
-        //make sure it doesn't update
+        //make sure it updates
         indicatorColumn.add(1d);
         indicatorColumn.add(2d);
         assertEquals(target.scan(state),
-                1.4,.0001d);
+                1.5d,.0001d);
+
     }
 }
