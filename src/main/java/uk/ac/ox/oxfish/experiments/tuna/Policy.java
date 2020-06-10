@@ -25,8 +25,6 @@ import java.util.function.Consumer;
 
 public class Policy<S extends Scenario> {
 
-    public static final Policy<Scenario> DEFAULT = new Policy<>("Default", "", __ -> {});
-
     private final String name;
     private final String description;
     private final Consumer<S> scenarioConsumer;

@@ -34,6 +34,8 @@ import java.util.DoubleSummaryStatistics;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 /**
  * the data gatherer for a fisher that steps every year. It gathers:
  * <ul>
@@ -159,13 +161,11 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
         {
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
             registerGatherer(landings,
-                             FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
-                                     landings))
-                    , Double.NaN);
-
-
-
-
+                FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(landings)),
+                Double.NaN,
+                KILOGRAM,
+                "Biomass"
+            );
 
         }
 

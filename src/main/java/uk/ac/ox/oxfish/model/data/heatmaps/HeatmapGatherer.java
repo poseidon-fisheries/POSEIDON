@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleBinaryOperator;
@@ -54,7 +55,7 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
     private final int interval;
     private final ToDoubleFunction<SeaTile> numericExtractor;
     private final DoubleBinaryOperator merger;
-    private final Map<Integer, DoubleGrid2D> grids = new HashMap<>();
+    private final Map<Integer, DoubleGrid2D> grids = new LinkedHashMap<>();
     private int numObservations = 0;
     private int intervalStartDay = 0;
     private DoubleGrid2D currentGrid;

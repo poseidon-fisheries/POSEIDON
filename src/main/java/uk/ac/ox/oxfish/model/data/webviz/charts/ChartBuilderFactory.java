@@ -115,6 +115,14 @@ public final class ChartBuilderFactory implements
         return chartBuilderFactory;
     }
 
+    @NotNull public static ChartBuilderFactory fromColumnName(
+        final String title,
+        final String yLabel,
+        final String columnName
+    ) {
+        return fromColumnNamePattern(title, yLabel, ImmutableList.of(columnName), "%s");
+    }
+
     @NotNull public static ChartBuilderFactory fromColumnNamePattern(
         final String title,
         final String yLabel,
@@ -155,7 +163,6 @@ public final class ChartBuilderFactory implements
 
     @SuppressWarnings("unused")
     public Collection<String> getSeriesColours() { return seriesColours; }
-
 
     @SuppressWarnings({"unused", "UnusedReturnValue"})
     public ChartBuilderFactory setSeriesColours(final ColourSeries seriesColours) {

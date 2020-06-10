@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import java.util.Collection;
 import java.util.function.DoubleUnaryOperator;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
@@ -54,17 +55,20 @@ public final class ChartBuilder implements JsonBuilder<Chart>, Startable {
     @Override public Chart buildJsonObject(final FishState fishState) {
 
         final Collection<Integer> xData =
-            range(numYearsToSkip, fishState.getYear())
+            range(numYearsToSkip, fishState.getYear() + 1) // TODO: the `+ 1` is a temporary hack around https://github.com/poseidon-fisheries/poseidon-webviz/issues/52; remove when fixed
                 .boxed()
                 .collect(toList());
 
         final Collection<Series> series =
             columns.stream()
-                .map(fishState.getYearlyDataSet()::getColumn)
-                .map(col -> col.stream()
-                    .skip(numYearsToSkip)
-                    .map(valueTransformer::applyAsDouble)
-                    .collect(toList())
+                .map(colName -> requireNonNull(
+                    fishState.getYearlyDataSet().getColumn(colName), () -> colName + "not found!"
+                ))
+                .map(col ->
+                    col.stream()
+                        .skip(numYearsToSkip - 1) // TODO: the `- 1` is a temporary hack around https://github.com/poseidon-fisheries/poseidon-webviz/issues/52; remove when fixed
+                        .map(valueTransformer::applyAsDouble)
+                        .collect(toList())
                 )
                 .map(Series::new)
                 .collect(toList());

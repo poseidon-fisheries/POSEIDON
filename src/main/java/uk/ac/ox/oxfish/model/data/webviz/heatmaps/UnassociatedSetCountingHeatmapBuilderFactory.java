@@ -22,11 +22,22 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.UnassociatedSetHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
+
+import java.util.Collection;
 
 public class UnassociatedSetCountingHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
     @Override public String getTitle() {
-        return "Number of unassociated sets over " + getInterval() + " day intervals";
+        return "Unassociated sets (" + getInterval() + " days)";
+    }
+
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
+        );
     }
 
     @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {

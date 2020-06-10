@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;

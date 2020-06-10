@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -37,7 +36,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -88,14 +86,10 @@ public class Slice1Sweeps {
                 opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
             ));
 
-        final ImmutableList<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual =
-            ImmutableList.of(__ -> currentFadLimits);
-
         ImmutableList.Builder<Policy<TunaScenario>> policies = ImmutableList.builder();
         fadLimits.forEach((activeFadLimits, fadLimitsName) ->
             setLimits.forEach((generalSetLimits, setLimitsName) ->
                 policies.add(makePolicy(
-                    businessAsUsual,
                     concat(Stream.of(activeFadLimits), stream(generalSetLimits)).collect(toImmutableList()),
                     fadLimitsName + " / " + setLimitsName
                 ))
@@ -127,7 +121,6 @@ public class Slice1Sweeps {
     }
 
     private static Policy<TunaScenario> makePolicy(
-        List<AlgorithmFactory<? extends ActionSpecificRegulation>> businessAsUsual,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
         String policyName
     ) {
@@ -141,9 +134,6 @@ public class Slice1Sweeps {
             );
         };
         return new Policy<>(policyName, "", scenario -> {
-            PurseSeineGearFactory purseSeineGearFactory =
-                (PurseSeineGearFactory) scenario.getFisherDefinition().getGear();
-            purseSeineGearFactory.setActionSpecificRegulations(businessAsUsual);
             scenario.getPlugins().add(fishState ->
                 __ -> fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, 1)
             );

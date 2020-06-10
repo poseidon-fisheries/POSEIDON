@@ -22,10 +22,21 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.heatmaps.FadDensityHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
+
+import java.util.Collection;
 
 public class AverageNumberOfActiveFadsHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
-    @Override public String getTitle() { return "Average daily number of active FADs"; }
+    @Override public String getTitle() { return "Number of active FADs"; }
+
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
+        );
+    }
 
     @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
         return new FadDensityHeatmapGatherer(getInterval());

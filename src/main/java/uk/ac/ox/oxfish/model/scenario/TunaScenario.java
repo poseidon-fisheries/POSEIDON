@@ -165,6 +165,7 @@ import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perRegionMonit
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesPerRegionMonitor;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.Measures.convert;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
@@ -195,16 +196,30 @@ public class TunaScenario implements Scenario {
     );
     private static final Path schaeferParamsFile = input("schaefer_params.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(input("ports.csv"));
+    private int targetYear = 2017;
+    public final AlgorithmFactory<TemporaryRegulation> closureAReg = new TemporaryRegulationFactory(
+        dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
+        new NoFishingFactory()
+    );
+    public final AlgorithmFactory<TemporaryRegulation> closureBReg = new TemporaryRegulationFactory(
+        dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
+        new NoFishingFactory()
+    );
+    public final AlgorithmFactory<TemporaryRegulation> elCorralitoReg = new TemporaryRegulationFactory(
+        dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
+        new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
+    );
     private Path mapFile = input("depth.csv");
     private Path deploymentValuesFile = input("deployment_values.csv");
     private Path iattcShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
     private Path galapagosEezShapeFile = input("galapagos_eez").resolve("eez.shp");
+    public final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
+        new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile);
     private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
     private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
     private Path unassociatedCatchSampleFile = input("unassociated_catch_sample.csv");
     private Path costsFile = input("costs.csv");
-    private int targetYear = 2017;
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -236,22 +251,7 @@ public class TunaScenario implements Scenario {
         snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
         plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
 
-        final AlgorithmFactory<TemporaryRegulation> elCorralitoReg = new TemporaryRegulationFactory(
-            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
-            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
-        );
-        final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
-            new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile);
-        final AlgorithmFactory<TemporaryRegulation> closureAReg = new TemporaryRegulationFactory(
-            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
-            new NoFishingFactory()
-        );
-        final AlgorithmFactory<TemporaryRegulation> closureBReg = new TemporaryRegulationFactory(
-            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
-            new NoFishingFactory()
-        );
-
-        AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
+        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
             galapagosEezReg, TAG_FOR_ALL,
             elCorralitoReg, TAG_FOR_ALL,
             closureAReg, "closure A",
@@ -274,19 +274,19 @@ public class TunaScenario implements Scenario {
         ));
         purseSeineGearFactory.setUnassociatedCatchSampleFile(unassociatedCatchSampleFile);
 
-        fisherDefinition.setRegulation(regulations);
+        fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
         fisherDefinition.setDepartingStrategy(new PurseSeineDepartingStrategyFactory());
     }
 
-    private int dayOfYear(Month month, int dayOfMonth) {
+    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+
+    public int dayOfYear(Month month, int dayOfMonth) {
         return LocalDate.of(targetYear, month, dayOfMonth)
             .getDayOfYear();
     }
-
-    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
     @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
 
@@ -476,6 +476,18 @@ public class TunaScenario implements Scenario {
                 fisher1.getYearlyCounter().count("Distance travelled", tripRecord.getDistanceTravelled())
             )
         ));
+
+        model.getYearlyDataSet().registerGatherer(
+            "Total profits",
+            fishState -> fishState.getFishers()
+                .stream()
+                .mapToDouble(fisher -> fisher.getLatestYearlyObservation("Profits"))
+                .sum(),
+            Double.NaN,
+            DOLLAR,
+            "Profits"
+        );
+
         final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
             .filter(record -> record.getInt("year") == targetYear)
             .collect(toMap(

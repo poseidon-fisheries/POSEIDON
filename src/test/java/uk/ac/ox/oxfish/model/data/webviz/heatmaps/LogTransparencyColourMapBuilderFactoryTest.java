@@ -17,25 +17,17 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.webviz.scenarios;
+package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import java.util.Collection;
+import org.junit.Test;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-public final class VesselsDefinition {
+import static org.junit.Assert.*;
 
-    private final String path;
-    private final double size;
-    private final Collection<VesselTypeDefinition> vesselTypes;
+public class LogTransparencyColourMapBuilderFactoryTest {
 
-    public VesselsDefinition(
-        final String path,
-        final double size,
-        final Collection<VesselTypeDefinition> vesselTypeDefinitions
-    ) {
-        this.path = path;
-        this.size = size;
-        this.vesselTypes = vesselTypeDefinitions;
+    @Test
+    public void testGradations() {
+        System.out.println(LogTransparencyColourMapBuilderFactory.gradations);
     }
 
 }

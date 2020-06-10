@@ -24,7 +24,10 @@ import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.HeatmapDefinition;
+
+import java.util.Collection;
 
 abstract public class HeatmapBuilderFactory
     implements JsonDataBuilderFactory<Heatmap>,
@@ -34,12 +37,14 @@ abstract public class HeatmapBuilderFactory
     private String colour;
     private HeatmapGatherer heatmapGatherer;
 
-    HeatmapBuilderFactory() { this(30, "green"); }
+    HeatmapBuilderFactory() { this(30, "yellow"); }
 
     HeatmapBuilderFactory(final int interval, final String colour) {
         this.interval = interval;
         this.colour = colour;
     }
+
+    HeatmapGatherer getHeatmapGatherer() { return heatmapGatherer; }
 
     @Override public String getBaseName() { return "Heatmap of " + getTitle(); }
 
@@ -56,7 +61,7 @@ abstract public class HeatmapBuilderFactory
 
     public String getLegend() { return getTitle(); }
 
-    private MonochromeGradientColourMapBuilderFactory getColourMapBuilderFactory() {
+    JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
         return new MonochromeGradientColourMapBuilderFactory(
             getColour(),
             heatmapGatherer::maxValueSeen

@@ -28,18 +28,15 @@ public class TemporaryRegulation implements Regulation {
      */
     private final Predicate<Integer> dayOfTheYearPredicate;
     private final Regulation delegateWhenActive;
-    private final Anarchy delegateWhenInactive = new Anarchy();
+    private final Regulation delegateWhenInactive = new Anarchy();
 
     public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive) {
 
-        this.dayOfTheYearPredicate = new Predicate<Integer>() {
-            @Override
-            public boolean test(Integer dayOfTheYear) {
-                assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
-                return startDay <= endDay
-                        ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
-                        : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
-            }
+        this.dayOfTheYearPredicate = dayOfTheYear -> {
+            assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
+            return startDay <= endDay
+                    ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
+                    : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
         };
         this.delegateWhenActive = delegateWhenActive;
     }

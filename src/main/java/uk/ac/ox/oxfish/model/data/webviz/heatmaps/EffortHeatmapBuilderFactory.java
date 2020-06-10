@@ -22,6 +22,10 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.TrawlsHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
+
+import java.util.Collection;
 
 public class EffortHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
@@ -35,6 +39,13 @@ public class EffortHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
     @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
         return new TrawlsHeatmapGatherer(getInterval());
+    }
+
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
+        );
     }
 
 }

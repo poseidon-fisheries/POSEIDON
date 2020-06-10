@@ -49,6 +49,7 @@ public final class VesselsBuilderFactory implements
     @Override public JsonBuilder<VesselsDefinition> makeDefinitionBuilder(final String scenarioTitle) {
         return __ -> new VesselsDefinition(
             makeFileName(scenarioTitle),
+            2.0, // TODO: make this configurable
             vesselClassifier.getTypeIds().stream()
                 .map(typeId -> new VesselTypeDefinition(
                     typeId,
