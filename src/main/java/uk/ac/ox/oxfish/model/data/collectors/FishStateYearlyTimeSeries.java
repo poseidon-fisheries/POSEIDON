@@ -602,6 +602,40 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         }, 0d);
 
 
+
+        registerGatherer("Average Income per Hour Out", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                double earnings = observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher fisher) {
+                                return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.EARNINGS) -
+                                        fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
+                            }
+                        }).filter(new DoublePredicate() { //skip boats that made no trips
+                    @Override
+                    public boolean test(double value) {
+                        return Double.isFinite(value);
+                    }
+                }).sum();
+                double hours = observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
+                            }
+                        }).filter(new DoublePredicate() { //skip boats that made no trips
+                    @Override
+                    public boolean test(double value) {
+                        return Double.isFinite(value);
+                    }
+                }).sum();
+
+                return hours > 0 ? earnings/hours : 0d;
+            }
+        }, 0d);
+
         //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
         registerGatherer("Average Trip Duration", new Gatherer<FishState>() {
             @Override

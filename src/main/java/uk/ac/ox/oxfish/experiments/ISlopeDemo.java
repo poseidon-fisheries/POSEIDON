@@ -3,14 +3,15 @@ package uk.ac.ox.oxfish.experiments;
 import com.google.common.collect.Lists;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.BatchRunner;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.model.*;
+import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -24,6 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.DoublePredicate;
+import java.util.function.ToDoubleFunction;
 
 public class ISlopeDemo {
 
@@ -67,7 +70,10 @@ public class ISlopeDemo {
 //        mainIslope(args);
 //        mainITarget(args);
       //  mainPID(false);
-        mainPID(true);
+      //  mainPID(true);
+       // mainPID(false);
+        mainStockAssessmentFormula(false);
+    //    mainStockAssessmentFormula(true);
     }
 
     public static void  mainITarget(String[] args) throws IOException {
@@ -261,7 +267,10 @@ public class ISlopeDemo {
 
 
         FileWriter fileWriter = new FileWriter(
-                DIRECTORY.resolve("indicators_PI.csv").toFile());
+                DIRECTORY.resolve(
+                        integrated ?
+                        "indicators_PI.csv" :
+                        "indicators_P").toFile());
         fileWriter.write("run,year,indicator,variable,value\n");
         fileWriter.flush();
 
@@ -330,5 +339,185 @@ public class ISlopeDemo {
 
     }
 
+
+
+    private static String[] indicatorsToUseForStockAssessment = new String[]{
+            "Biomass Species 0 dividedAMillion",
+            "Inverse Trip Variable Costs",
+            "Inverse Trip Duration",
+            "Average Income per Hour Out",
+            "Species 0 CPHO",
+            "Species 0 CPUE" //ADD:
+    };
+
+
+
+    public static void  mainStockAssessmentFormula(boolean nomovement) throws IOException {
+
+        columnsToPrint.remove("Policy from PID Controller");
+        columnsToPrint.add("TAC from TARGET-TAC Controller");
+
+
+        FileWriter fileWriter = new FileWriter(
+                DIRECTORY.resolve( nomovement? "indicators_SBA_formula_nomovement.csv" :
+                                "indicators_SBA_formula.csv").toFile());
+        fileWriter.write("run,year,indicator,variable,value\n");
+        fileWriter.flush();
+
+
+
+        for (String indicator : indicatorsToUseForStockAssessment) {
+
+            System.out.println(indicator);
+
+            BatchRunner runner = new BatchRunner(
+                    DIRECTORY.resolve(
+                            nomovement ? "base_islope_2_nomo.yaml"
+            :"base_islope_2.yaml"),
+                    30,
+                    columnsToPrint,
+                    null,
+                    null,
+                    0,
+                    -1
+            );
+            runner.setScenarioSetup(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                    prototype.setFishers(200);
+                    final SurplusProductionDepletionFormulaController sps =
+                            new SurplusProductionDepletionFormulaController();
+                    sps.setIndicatorColumnName(indicator);
+
+
+
+
+                    //never turn it fully off
+                    sps.setMinimumTAC(new FixedDoubleParameter(10000));
+
+                    prototype.getPlugins().add(
+                            sps
+                    );
+
+                }
+            });
+            //add a scaled version of the biomass (should have used transformers but for now let's just do it through here
+            runner.setBeforeStartSetup(new Consumer<FishState>() {
+                @Override
+                public void accept(FishState fishState) {
+                    fishState.registerStartable(new Startable() {
+                        @Override
+                        public void start(FishState model) {
+                            model.getYearlyDataSet().registerGatherer(
+                                    "Inverse Trip Variable Costs",
+                                    new Gatherer<FishState>() {
+                                        @Override
+                                        public Double apply(FishState ignored) {
+                                            double variableCosts = ignored.getFishers().stream().mapToDouble(
+                                                    new ToDoubleFunction<Fisher>() {
+                                                        @Override
+                                                        public double applyAsDouble(Fisher value) {
+                                                            return value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
+                                                        }
+                                                    }).filter(new DoublePredicate() { //skip boats that made no trips
+                                                @Override
+                                                public boolean test(double value) {
+                                                    return Double.isFinite(value);
+                                                }
+                                            }).sum();
+                                            double trips = ignored.getFishers().stream().mapToDouble(
+                                                    new ToDoubleFunction<Fisher>() {
+                                                        @Override
+                                                        public double applyAsDouble(Fisher value) {
+                                                            return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
+                                                        }
+                                                    }).filter(new DoublePredicate() { //skip boats that made no trips
+                                                @Override
+                                                public boolean test(double value) {
+                                                    return Double.isFinite(value);
+                                                }
+                                            }).sum();
+
+                                            return trips > 0 ? trips/variableCosts : 0d;
+                                        }
+                                    },
+                                    0d
+                            );
+
+
+                            model.getYearlyDataSet().registerGatherer(
+                                    "Inverse Trip Duration",
+                                    new Gatherer<FishState>() {
+                                        @Override
+                                        public Double apply(FishState ignored) {
+                                            double hoursOut = ignored.getFishers().stream().mapToDouble(
+                                                    new ToDoubleFunction<Fisher>() {
+                                                        @Override
+                                                        public double applyAsDouble(Fisher value) {
+                                                            return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
+                                                        }
+                                                    }).filter(new DoublePredicate() { //skip boats that made no trips
+                                                @Override
+                                                public boolean test(double value) {
+                                                    return Double.isFinite(value);
+                                                }
+                                            }).sum();
+                                            double trips = ignored.getFishers().stream().mapToDouble(
+                                                    new ToDoubleFunction<Fisher>() {
+                                                        @Override
+                                                        public double applyAsDouble(Fisher value) {
+                                                            return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
+                                                        }
+                                                    }).filter(new DoublePredicate() { //skip boats that made no trips
+                                                @Override
+                                                public boolean test(double value) {
+                                                    return Double.isFinite(value);
+                                                }
+                                            }).sum();
+
+                                            return trips > 0 ? trips/hoursOut : 0d;
+                                        }
+                                    },
+                                    0d
+                            );
+
+                            model.getYearlyDataSet().registerGatherer(
+                                    "Biomass Species 0 dividedAMillion",
+                                    new Gatherer<FishState>() {
+                                        @Override
+                                        public Double apply(FishState fishState) {
+                                            return fishState.getTotalBiomass(fishState.getSpecies("Species 0"))/1000000;
+                                        }
+                                    },
+                                    0d
+                            );
+                        }
+                    });
+                }
+            });
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.
+                            append(indicator).append(",");
+                }
+            });
+
+            for (int run = 0; run < RUNS_TO_RUN; run++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+
+
+            }
+
+
+        }
+
+    }
 
 }
