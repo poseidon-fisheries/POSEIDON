@@ -196,6 +196,9 @@ public class TimeSeries<T> implements Steppable
 
 
     protected void reset(){
+        for (ColumnGatherer<T> value : data.values()) {
+            value.getColumn().clear();
+        }
         data.clear();
     }
 }

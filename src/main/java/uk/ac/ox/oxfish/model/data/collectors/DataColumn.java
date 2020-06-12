@@ -161,4 +161,8 @@ public class DataColumn implements Iterable<Double>, Serializable{
         sb.append('}');
         return sb.toString();
     }
+
+    public void clear(){
+        data.clear();
+    }
 }

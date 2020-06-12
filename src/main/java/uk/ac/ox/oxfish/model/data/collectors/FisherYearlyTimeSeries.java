@@ -163,6 +163,13 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
                                      landings))
                     , Double.NaN);
 
+            final String catches = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+
+
+            registerGatherer(catches,
+                    FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
+                            catches))
+                    , Double.NaN);
 
 
 

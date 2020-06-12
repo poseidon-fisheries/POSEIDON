@@ -342,6 +342,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
      */
     @Override
     public void turnOff() {
+
         sampler.turnOff();
     }
 

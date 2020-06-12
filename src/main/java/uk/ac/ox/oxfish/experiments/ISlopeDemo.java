@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -69,11 +70,13 @@ public class ISlopeDemo {
     public static void main(String[] args) throws IOException {
 //        mainIslope(args);
 //        mainITarget(args);
-      //  mainPID(false);
-      //  mainPID(true);
-       // mainPID(false);
-        mainStockAssessmentFormula(false);
-    //    mainStockAssessmentFormula(true);
+        //  mainPID(false);
+        //  mainPID(true);
+        // mainPID(false);
+        //    mainStockAssessmentFormula(false);
+        //    mainStockAssessmentFormula(true);
+
+        mainSampling();
     }
 
     public static void  mainITarget(String[] args) throws IOException {
@@ -269,8 +272,8 @@ public class ISlopeDemo {
         FileWriter fileWriter = new FileWriter(
                 DIRECTORY.resolve(
                         integrated ?
-                        "indicators_PI.csv" :
-                        "indicators_P").toFile());
+                                "indicators_PI.csv" :
+                                "indicators_P").toFile());
         fileWriter.write("run,year,indicator,variable,value\n");
         fileWriter.flush();
 
@@ -360,7 +363,7 @@ public class ISlopeDemo {
 
         FileWriter fileWriter = new FileWriter(
                 DIRECTORY.resolve( nomovement? "indicators_SBA_formula_nomovement.csv" :
-                                "indicators_SBA_formula.csv").toFile());
+                        "indicators_SBA_formula.csv").toFile());
         fileWriter.write("run,year,indicator,variable,value\n");
         fileWriter.flush();
 
@@ -373,7 +376,7 @@ public class ISlopeDemo {
             BatchRunner runner = new BatchRunner(
                     DIRECTORY.resolve(
                             nomovement ? "base_islope_2_nomo.yaml"
-            :"base_islope_2.yaml"),
+                                    :"base_islope_2.yaml"),
                     30,
                     columnsToPrint,
                     null,
@@ -519,5 +522,92 @@ public class ISlopeDemo {
         }
 
     }
+
+
+    private static final double[] probabilityToSample = new double[]{.01,.025,
+            .05,.1,.25,.5};
+
+
+
+    public static void  mainSampling() throws IOException {
+
+        columnsToPrint.remove("TAC from TARGET-TAC Controller");
+        columnsToPrint.add("Policy from PID Controller");
+
+
+        FileWriter fileWriter = new FileWriter(
+                DIRECTORY.resolve(
+                        "indicators_sampling").toFile());
+        fileWriter.write("run,year,probability,variable,value\n");
+        fileWriter.flush();
+
+
+
+        for (double probability : probabilityToSample) {
+
+            System.out.println(probability);
+
+            BatchRunner runner = new BatchRunner(
+                    DIRECTORY.resolve(
+                            "base_islope_2.yaml"),
+                    30,
+                    columnsToPrint,
+                    null,
+                    null,
+                    0,
+                    -1
+            );
+            runner.setScenarioSetup(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                    prototype.setFishers(200);
+                    final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
+                    pid.setIndicatorColumnName("Species 0 CPHO Scaled Sample" );
+                    pid.setOffsetColumnName("Species 0 Landings Scaled Sample");
+                    double multiplier = 1.5;
+                    pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
+                    pid.setNegative(true);
+                    //never turn it fully off
+                    pid.setMinimumTAC(10000);
+
+                    prototype.getPlugins().add(
+                            pid
+                    );
+
+                    SimpleFishSamplerFactory samplerFactory = new SimpleFishSamplerFactory();
+                    samplerFactory.setPercentageSampled(new FixedDoubleParameter(probability));
+                    prototype.getPlugins().add(
+                            samplerFactory
+                    );
+
+
+                }
+            });
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.
+                            append(probability).append(",");
+                }
+            });
+
+            for (int run = 0; run < RUNS_TO_RUN; run++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+
+
+            }
+
+
+        }
+
+    }
+
+
 
 }

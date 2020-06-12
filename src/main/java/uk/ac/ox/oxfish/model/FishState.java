@@ -75,6 +75,7 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
  */
 public class FishState  extends SimState{
 
+    private final String hopefullyUniqueID;
 
     public static final String DEFAULT_POPULATION_NAME = "default_population";
     /**
@@ -202,6 +203,8 @@ public class FishState  extends SimState{
     {
         super(seed);
         this.stepsPerDay = stepsPerDay;
+        this.hopefullyUniqueID = seed + "_" + System.nanoTime() +"_" + FishStateUtilities.getComputerName();
+
         toStart = new LinkedList<>();
 
         for(StepOrder order : StepOrder.values())
@@ -918,5 +921,9 @@ public class FishState  extends SimState{
 
     public List<Startable> viewStartables(){
         return ImmutableList.copyOf(toStart);
+    }
+
+    public String getHopefullyUniqueID() {
+        return hopefullyUniqueID;
     }
 }

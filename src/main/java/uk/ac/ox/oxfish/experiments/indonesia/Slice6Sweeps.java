@@ -1241,8 +1241,11 @@ public class Slice6Sweeps {
                                                         Preconditions.checkState(fisher.getAdditionalTripCosts().size()==1);
                                                         assert fisher.getAdditionalTripCosts().getFirst() instanceof HourlyCost;
                                                         final HourlyCost first = (HourlyCost) fisher.getAdditionalTripCosts().removeFirst();
+                                                        System.out.println("old costs" + first.getHourlyCost());
+
                                                         HourlyCost replacement = new HourlyCost(first.getHourlyCost() * percentageOfTotalCost);
                                                         fisher.getAdditionalTripCosts().add(replacement);
+                                                        System.out.println("new costs" + replacement.getHourlyCost());
                                                     }
 
                                                     //restore prices
@@ -1259,6 +1262,8 @@ public class Slice6Sweeps {
                                                                         final HourlyCost first = (HourlyCost) fisher.getAdditionalTripCosts().removeFirst();
                                                                         HourlyCost replacement = new HourlyCost(first.getHourlyCost() / percentageOfTotalCost);
                                                                         fisher.getAdditionalTripCosts().add(replacement);
+                                                                        System.out.println("restored costs" + replacement.getHourlyCost());
+
                                                                     }
                                                                 }
                                                             }

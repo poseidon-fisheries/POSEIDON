@@ -787,13 +787,15 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                           Double.NaN);
 
 
-                state.getYearlyDataSet().registerGatherer("Total Hours Out",
-                        fishState ->
-                                fishState.getFishers().stream().
-                                        mapToDouble(value -> value.getLatestYearlyObservation(
-                                                FisherYearlyTimeSeries.HOURS_OUT)).sum(),
-                        0 );
-
+                //some scenarios collect it automatically
+                if(state.getYearlyDataSet().getColumn("Total Hours Out")==null) {
+                    state.getYearlyDataSet().registerGatherer("Total Hours Out",
+                            fishState ->
+                                    fishState.getFishers().stream().
+                                            mapToDouble(value -> value.getLatestYearlyObservation(
+                                                    FisherYearlyTimeSeries.HOURS_OUT)).sum(),
+                            0);
+                }
                 state.getYearlyDataSet().registerGatherer("Average Cash-Flow at " + port.getName(),
                                                           new Gatherer<FishState>() {
                                                               @Override
