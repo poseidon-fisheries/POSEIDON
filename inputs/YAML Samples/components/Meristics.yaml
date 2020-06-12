@@ -1,0 +1,17 @@
+Weight List Meristics:
+  maturityPerBin: 0,0.5,1
+  mortalityRate: '0.08'
+  weightsPerBin: .1,1,5
+-------
+Stock Assessment Meristics From File:
+  pathToMeristicFile: inputs/california/biology/Sablefish/meristics.yaml
+-------
+Equally Spaced Von bertalanffy:
+  allometricAlpha: '0.015'
+  allometricBeta: '2.961'
+  cmPerBin: null
+  kYearlyParameter: '0.364'
+  maxLengthInCm: '113.0'
+  numberOfBins: 100
+  recruitLengthInCm: '10.0'
+-------

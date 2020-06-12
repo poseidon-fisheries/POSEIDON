@@ -1,0 +1,281 @@
+Indonesia:
+  biologyInitializer:
+    Multiple Species Biomass:
+      constantBiomass: false
+      factories:
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: 60791500.0
+          differentialPercentageToMove: '0.02'
+          grower:
+            Independent Logistic Grower:
+              steepness: 0.3
+          initialBiomass: 10942470.0
+          initialBiomassAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '7000.0'
+                  absoluteMinimum: '2000.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '350.0'
+              minDepth: '125.0'
+          initialCapacityAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '7000.0'
+                  absoluteMinimum: '2000.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '350.0'
+              minDepth: '125.0'
+          percentageLimitOnDailyMovement: '0.02'
+          speciesName: Pristipomoides multidens
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: 27541500.0
+          differentialPercentageToMove: '0.02'
+          grower:
+            Independent Logistic Grower:
+              steepness: 0.301
+          initialBiomass: 2754150.0
+          initialBiomassAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '700.0'
+                  absoluteMinimum: '200.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '100.0'
+              minDepth: '12.0'
+          initialCapacityAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '700.0'
+                  absoluteMinimum: '200.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '100.0'
+              minDepth: '12.0'
+          percentageLimitOnDailyMovement: '0.1'
+          speciesName: Lutjanus malabaricus
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: 25582500.0
+          differentialPercentageToMove: '0'
+          grower:
+            Independent Logistic Grower:
+              steepness: 0.3
+          initialBiomass: 2558250.0
+          initialBiomassAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '700.0'
+                  absoluteMinimum: '200.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '120.0'
+              minDepth: '40.0'
+          initialCapacityAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '700.0'
+                  absoluteMinimum: '200.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '120.0'
+              minDepth: '40.0'
+          percentageLimitOnDailyMovement: '0'
+          speciesName: Pristipomoides typus
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: 4408000.0
+          differentialPercentageToMove: '0'
+          grower:
+            Independent Logistic Grower:
+              steepness: 0.3
+          initialBiomass: 2115840.0
+          initialBiomassAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '200.0'
+                  absoluteMinimum: '6.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '100.0'
+              minDepth: '12.0'
+          initialCapacityAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '200.0'
+                  absoluteMinimum: '6.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '120.0'
+              minDepth: '40.0'
+          percentageLimitOnDailyMovement: '0'
+          speciesName: Epinephelus areolatus
+      - Single Species Biomass Normalized:
+          biomassSuppliedPerCell: false
+          carryingCapacity: 505000.0
+          differentialPercentageToMove: '0'
+          grower:
+            Independent Logistic Grower:
+              steepness: 0.299
+          initialBiomass: 80800.0
+          initialBiomassAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '80.0'
+                  absoluteMinimum: '6.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '100.0'
+              minDepth: '12.0'
+          initialCapacityAllocator:
+            Depth Allocator:
+              delegate:
+                Random Smoothed Allocator:
+                  absoluteMaximum: '80.0'
+                  absoluteMinimum: '6.0'
+                  aggressivness: '0.4'
+                  smoothingRuns: '40000.0'
+              maxDepth: '120.0'
+              minDepth: '40.0'
+          percentageLimitOnDailyMovement: '0'
+          speciesName: Lutjanus johnii
+  cheaters: false
+  fisherDefinitions:
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: false
+        automaticallyIgnoreMPAs: false
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 200
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '15.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Garbage Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Random Catchability By List:
+                catchabilityMap: 0:3.91867896683e-05,1:0.0025921021547,2:1.18860595462e-05,3:0.000331353073857,4:0.00726213643547
+                standardDeviationMap: ''
+                trawlSpeed: '0.0'
+        garbageSpeciesName: Others
+        proportionSimulatedToGarbage: 1.1908967616947
+        rounding: false
+    gearStrategy: Never Change Gear
+    holdSize: '2300'
+    initialFishersPerPort:
+      Balikpapan: 8
+      Brondong: 115
+      Galesong: 9
+      Karangsong: 7
+      Pati: 5
+      Sangatta: 12
+    literPerKilometer: '1.89'
+    regulation:
+      Fishing Season:
+        respectMPA: true
+        seasonLength: '150.0'
+    speedInKmh: '5.0'
+    tags: small,canoe,yellow
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Perfect RPUE Logit:
+        automaticallyAvoidMPA: true
+        automaticallyAvoidWastelands: true
+        discretizer:
+          Squared Discretization:
+            horizontalSplits: '15.0'
+            verticalSplits: '15.0'
+        hoursOut: '720'
+        profitBeta: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '30.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Garbage Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Random Catchability By List:
+                catchabilityMap: 0:0.00012543579672866096,1:0.0031090115406987623,2:0.0004724515514646307,3:1.6013164555885778e-05,4:5e-07
+                standardDeviationMap: ''
+                trawlSpeed: '0.0'
+        garbageSpeciesName: Others
+        proportionSimulatedToGarbage: 0.6207556076200336
+        rounding: false
+    gearStrategy: Never Change Gear
+    holdSize: '15000'
+    initialFishersPerPort:
+      Pati: 24
+      Probolinggo: 28
+    literPerKilometer: '1.89'
+    regulation:
+      Fishing Season:
+        respectMPA: true
+        seasonLength: '150.0'
+    speedInKmh: '14.0'
+    tags: big,ship,black
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '10000'
+  habitatInitializer: All Sand
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '60.0'
+      header: true
+      latLong: true
+      mapFile: /home/carrknight/code/oxfish/inputs/indonesia/wpp7127132_latlong.csv
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '40000.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  portFilePath: /home/carrknight/code/oxfish/docs/20180516 medium_713/complete_ports.csv
+  portSwitching: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

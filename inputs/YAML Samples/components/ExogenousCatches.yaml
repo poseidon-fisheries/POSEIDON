@@ -1,0 +1,17 @@
+Simple Exogenous Catches:
+  yearlyBiomassToExtract: {
+    }
+-------
+Abundance Gear Exogenous Catches:
+  gears: [
+    ]
+  species: [
+    ]
+  yearlyBiomassToExtract: [
+    ]
+-------
+Instantaneous Mortality Exogenous Catches:
+  abundanceBased: true
+  exogenousMortalities: {
+    }
+-------

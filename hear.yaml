@@ -1,0 +1,1001 @@
+Flexible:
+  allowFriendshipsAcrossPorts: true
+  biologyInitializer:
+    Multiple Species Abundance:
+      addGarbageSpecies: true
+      factories:
+      - Single Species Abundance:
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '86.0'
+              k: '0.4438437'
+          daily: true
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 352732.0966626
+              - 355999.1442025
+              - 359514.7758353
+              - 363316.9011504
+              - 366966.076317
+              - 368049.5532101
+              - 363534.0280966
+              - 349890.942252
+              - 323377.04312
+              - 287354.4405417
+              - 243941.1882811
+              - 193705.8265192
+              - 142144.5776144
+              - 96519.4617702
+              - 58985.7447453
+              - 29231.5452121
+              - 7521.8867682
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.02'
+              allometricBeta: '2.944'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.4438437'
+              maxLengthInCm: '86.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          mortalityProcess:
+            Exponential Mortality:
+              mortalityPerSubdivision:
+              - 0.3775984
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '7.8075686'
+              halfFemalePopulation: false
+              lengthAtMaturity: 50.0
+              recruitsDaily: false
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '2125000.0'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Pristipomoides multidens
+      - Single Species Abundance:
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '86.0'
+              k: '0.4438437'
+          daily: true
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 1148709.5811639
+              - 1159349.0688848
+              - 1170798.0971376
+              - 1182704.9281406
+              - 1188813.3490875
+              - 1168778.8721695
+              - 1090697.3099583
+              - 928738.9893086
+              - 701306.1405562
+              - 489173.3195915
+              - 345612.9849074
+              - 264144.4709062
+              - 219585.7157338
+              - 181595.11941
+              - 137402.7109527
+              - 82144.7352292
+              - 19028.0960972
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.00853'
+              allometricBeta: '3.137'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.4438437'
+              maxLengthInCm: '86.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          mortalityProcess:
+            Exponential Mortality:
+              mortalityPerSubdivision:
+              - 0.3775984
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '7.6303043'
+              halfFemalePopulation: false
+              lengthAtMaturity: 50.0
+              recruitsDaily: false
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '7093750.0'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Lutjanus malabaricus
+      - Single Species Abundance:
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '45.0'
+              k: '0.3300512'
+          daily: true
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 1.1368463E7
+              - 1.0257472E7
+              - 9119523.3
+              - 7946831.7
+              - 6665848.3
+              - 5043014.5
+              - 3090465.8
+              - 1390222.8
+              - 300413.02
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.01142'
+              allometricBeta: '3.048'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.3300512'
+              maxLengthInCm: '45.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          mortalityProcess:
+            Exponential Mortality:
+              mortalityPerSubdivision:
+              - 0.6011646
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '0.2896371'
+              halfFemalePopulation: false
+              lengthAtMaturity: 21.0
+              recruitsDaily: false
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '4.525E7'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Epinephelus areolatus
+      - Single Species Abundance:
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '63.0'
+              k: '0.5508334'
+          daily: true
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 325338.7449441
+              - 329375.5527495
+              - 333851.8014535
+              - 338530.714496
+              - 338208.0028519
+              - 307578.1797528
+              - 221443.1751865
+              - 114711.5254719
+              - 44925.2967911
+              - 17172.0608459
+              - 7915.801791
+              - 1435.2961761
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.0244'
+              allometricBeta: '2.87'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.5508334'
+              maxLengthInCm: '63.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          mortalityProcess:
+            Exponential Mortality:
+              mortalityPerSubdivision:
+              - 0.4721429
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: ./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePolygon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '2.3354381'
+              halfFemalePopulation: false
+              lengthAtMaturity: 37.0
+              recruitsDaily: false
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '6625000.0'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Lutjanus erythropterus
+  cheaters: false
+  exogenousCatches:
+    Abundance Gear Exogenous Catches:
+      gears:
+      - Simple Logistic Selectivity Gear:
+          averageCatchability: '6.6569679E-4'
+          litersOfGasConsumedPerHour: '0.0'
+          rounding: false
+          selexParameter1: '14.0072538'
+          selexParameter2: '0.4799149'
+      species:
+      - Lutjanus malabaricus
+      yearlyBiomassToExtract:
+      - 19000
+  fisherDefinitions:
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '4920.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+        firstYearYouCanSwitch: '2.0'
+        inertia: '1.0'
+        maxHoursOutWhenSeasonal: '2460.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '0.568'
+        targetVariable: '123632.9'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 378.0
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '12.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Garbage Gear:
+                delegate:
+                  Heterogeneous Selectivity Gear:
+                    gears:
+                      Epinephelus areolatus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '1.3602667592404802E-5'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '23.8186057'
+                          selexParameter2: '0.9938362'
+                      Lutjanus malabaricus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.0101215878387'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '14.0072538'
+                          selexParameter2: '0.4799149'
+                      Pristipomoides multidens:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.0040300488116420405'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.8541259'
+                          selexParameter2: '0.275035'
+                      Lutjanus erythropterus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00649642951299308'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.1905043'
+                          selexParameter2: '0.6721798'
+                    hourlyGasPriceOverride: nullparameter
+                garbageSpeciesName: Others
+                proportionSimulatedToGarbage: '0.4070028096'
+                rounding: false
+        hoursItTake: '12.0'
+    gearStrategy:
+      Periodic Gear Update from List:
+        availableGears: 
+        - Hour Delay Gear:
+            delegate:
+              Hold Upper Limit:
+                delegate:
+                  Garbage Gear:
+                    delegate:
+                      Heterogeneous Selectivity Gear:
+                        gears:
+                          Epinephelus areolatus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '1.3602667592404802E-5'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '23.8186057'
+                              selexParameter2: '0.9938362'
+                          Lutjanus malabaricus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.0101215878387'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '14.0072538'
+                              selexParameter2: '0.4799149'
+                          Pristipomoides multidens:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.0040300488116420405'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '10.8541259'
+                              selexParameter2: '0.275035'
+                          Lutjanus erythropterus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.00649642951299308'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '10.1905043'
+                              selexParameter2: '0.6721798'
+                        hourlyGasPriceOverride: nullparameter
+                    garbageSpeciesName: Others
+                    proportionSimulatedToGarbage: '0.4070028096'
+                    rounding: false
+            hoursItTake: '12.0'     
+        - Hour Delay Gear:
+            delegate:
+              Hold Upper Limit:
+                delegate:
+                  Garbage Gear:
+                    delegate:
+                      Heterogeneous Selectivity Gear:
+                        gears:
+                          Epinephelus areolatus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '1.3602667592404802E-5'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '23.8186057'
+                              selexParameter2: '0.9938362'
+                          Lutjanus malabaricus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.0101215878387'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '20.0072538'
+                              selexParameter2: '0.4799149'
+                          Pristipomoides multidens:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.0040300488116420405'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '10.8541259'
+                              selexParameter2: '0.275035'
+                          Lutjanus erythropterus:
+                            Simple Logistic Selectivity Gear:
+                              averageCatchability: '0.00649642951299308'
+                              litersOfGasConsumedPerHour: '0.0'
+                              rounding: false
+                              selexParameter1: '10.1905043'
+                              selexParameter2: '0.6721798'
+                        hourlyGasPriceOverride: nullparameter
+                    garbageSpeciesName: Others
+                    proportionSimulatedToGarbage: '0.4070028096'
+                    rounding: false
+            hoursItTake: '12.0'             
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.05'
+            imitationProbability: '0.9'
+        yearly: true    
+    holdSize: '1940.0'
+    hourlyVariableCost: '46381.0'
+    initialFishersPerPort:
+      Desa Masalima: 12
+      Gili Iyang: 7
+      Pagatan: 2
+      Asem Doyong: 24
+      Brondong: 120
+      Karimunjawa: 68
+      Tanjung Pandan: 12
+      Sumenep: 449
+    literPerKilometer: '1.2669'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: small,dropline,yellow,canoe
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '5040.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+        firstYearYouCanSwitch: '2.0'
+        inertia: '1.0'
+        maxHoursOutWhenSeasonal: '2520.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '1.0'
+        targetVariable: '53571.0'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 551.0
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '15.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Garbage Gear:
+                delegate:
+                  Heterogeneous Selectivity Gear:
+                    gears:
+                      Epinephelus areolatus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.0032761907607870002'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '23.8186057'
+                          selexParameter2: '0.9938362'
+                      Lutjanus malabaricus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '9.751680000000001E-5'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '14.0072538'
+                          selexParameter2: '0.4799149'
+                      Pristipomoides multidens:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00281745801618278'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.8541259'
+                          selexParameter2: '0.275035'
+                      Lutjanus erythropterus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '7.2925810122115E-5'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.1905043'
+                          selexParameter2: '0.6721798'
+                    hourlyGasPriceOverride: nullparameter
+                garbageSpeciesName: Others
+                proportionSimulatedToGarbage: '0.5201693712000001'
+                rounding: false
+        hoursItTake: '12.0'
+    gearStrategy: Never Change Gear
+    holdSize: '6900.0'
+    hourlyVariableCost: '41667.0'
+    initialFishersPerPort:
+      Bajomulyo: 57
+      Karangsong: 11
+      Probolinggo: 7
+    literPerKilometer: '1.553'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: blue,longline,boat,medium
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Exit Decorator:
+        consecutiveLossYearsBeforeQuitting: '50.0'
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '5856.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+    destinationStrategy:
+      Perfect RPUE Logit:
+        automaticallyAvoidMPA: true
+        automaticallyAvoidWastelands: true
+        discretizer:
+          Squared Discretization:
+            horizontalSplits: '10.0'
+            verticalSplits: '10.0'
+        hoursOut: '1440.0'
+        profitBeta: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '60.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Garbage Gear:
+                delegate:
+                  Heterogeneous Selectivity Gear:
+                    gears:
+                      Epinephelus areolatus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '5.3372856240384804E-5'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '23.8186057'
+                          selexParameter2: '0.9938362'
+                      Lutjanus malabaricus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00339743862360288'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '14.0072538'
+                          selexParameter2: '0.4799149'
+                      Pristipomoides multidens:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00195958322370625'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.8541259'
+                          selexParameter2: '0.275035'
+                      Lutjanus erythropterus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.007749231477565851'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.1905043'
+                          selexParameter2: '0.6721798'
+                    hourlyGasPriceOverride: nullparameter
+                garbageSpeciesName: Others
+                proportionSimulatedToGarbage: '0.696484824'
+                rounding: false
+        hoursItTake: '12.0'
+    gearStrategy: Never Change Gear
+    holdSize: '13500.0'
+    hourlyVariableCost: '162288.0'
+    initialFishersPerPort:
+      Bajomulyo: 21
+      Probolinggo: 2
+    literPerKilometer: '6.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: black,longline,ship,big
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '4728.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+        firstYearYouCanSwitch: '2.0'
+        inertia: '1.0'
+        maxHoursOutWhenSeasonal: '2364.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '1.0'
+        targetVariable: '128977.1'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 378.0
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '12.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Hold Upper Limit:
+            delegate:
+              Garbage Gear:
+                delegate:
+                  Heterogeneous Selectivity Gear:
+                    gears:
+                      Epinephelus areolatus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '7.244923611976002E-6'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '23.8186057'
+                          selexParameter2: '0.9938362'
+                      Lutjanus malabaricus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.004783647559813238'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '14.0072538'
+                          selexParameter2: '0.4799149'
+                      Pristipomoides multidens:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00951748'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.8541259'
+                          selexParameter2: '0.275035'
+                      Lutjanus erythropterus:
+                        Simple Logistic Selectivity Gear:
+                          averageCatchability: '0.00543941773266144'
+                          litersOfGasConsumedPerHour: '0.0'
+                          rounding: false
+                          selexParameter1: '10.1905043'
+                          selexParameter2: '0.6721798'
+                    hourlyGasPriceOverride: nullparameter
+                garbageSpeciesName: Others
+                proportionSimulatedToGarbage: '0.8979680000000001'
+                rounding: false
+        hoursItTake: '12.0'
+    gearStrategy: Never Change Gear
+    holdSize: '3465.0'
+    hourlyVariableCost: '60417.0'
+    initialFishersPerPort:
+      Sumenep: 2
+      Brondong: 84
+      Karimunjawa: 28
+      Gili Iyang: 1
+    literPerKilometer: '1.689'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: small10,dropline,pink,canoe
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '10000.0'
+  habitatInitializer: All Sand
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '100.0'
+      header: true
+      latLong: true
+      mapFile: ./docs/indonesia_hub/runs/712/712_map.csv
+      mapPaddingInDegrees: '1.0E-6'
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Multiple Three Prices Markets:
+      markets:
+        Lutjanus malabaricus:
+          Three Prices Market:
+            highAgeThreshold: '9.0'
+            lowAgeThreshold: '7.0'
+            priceAboveThresholds: '52800.0'
+            priceBelowThreshold: '42900.0'
+            priceBetweenThresholds: '66000.0'
+        Pristipomoides multidens:
+          Three Prices Market:
+            highAgeThreshold: '7.0'
+            lowAgeThreshold: '6.0'
+            priceAboveThresholds: '42500.0'
+            priceBelowThreshold: '26325.0'
+            priceBetweenThresholds: '40500.0'
+        Lutjanus erythropterus:
+          Three Prices Market:
+            highAgeThreshold: '9.0'
+            lowAgeThreshold: '6.0'
+            priceAboveThresholds: '52800.0'
+            priceBelowThreshold: '42900.0'
+            priceBetweenThresholds: '66000.0'
+        Epinephelus areolatus:
+          Three Prices Market:
+            highAgeThreshold: '20.0'
+            lowAgeThreshold: '8.0'
+            priceAboveThresholds: '43200.0'
+            priceBelowThreshold: '35100.0'
+            priceBetweenThresholds: '54000.0'
+        Others:
+          Three Prices Market:
+            highAgeThreshold: '2.0'
+            lowAgeThreshold: '1.0'
+            priceAboveThresholds: '40000.0'
+            priceBelowThreshold: '40000.0'
+            priceBetweenThresholds: '40000.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+      predicates: [
+        ]
+  plugins:
+  - Abundance Gatherers:
+      observationDay: 365
+  - Full-time Seasonal Retired Data Collectors
+  - Catch at bin Collectors
+  - SPR Oracle:
+      dayOfMeasurement: 365
+      lengthAtMaturity: '50.0'
+      speciesName: Lutjanus malabaricus
+      virginSSB: '5.1971823E7'
+  - Fishing Mortality Agent:
+      computeDailyFishingMortality: false
+      selectivityRounding: false
+      selexParameter1: '28.4833678576524'
+      selexParameter2: '5.9742458342377'
+      speciesName: Lutjanus malabaricus
+  - Fishing Mortality Agent:
+      computeDailyFishingMortality: false
+      selectivityRounding: false
+      selexParameter1: '28.4833678576524'
+      selexParameter2: '5.9742458342377'
+      speciesName: Pristipomoides multidens
+  - Fishing Mortality Agent:
+      computeDailyFishingMortality: false
+      selectivityRounding: false
+      selexParameter1: '28.4833678576524'
+      selexParameter2: '5.9742458342377'
+      speciesName: Lutjanus erythropterus
+  - SPR Oracle:
+      dayOfMeasurement: 365
+      lengthAtMaturity: '50.0'
+      speciesName: Pristipomoides multidens
+      virginSSB: '1.1723809E7'
+  - SPR Oracle:
+      dayOfMeasurement: 365
+      lengthAtMaturity: '37.0'
+      speciesName: Lutjanus erythropterus
+      virginSSB: '4514590.7658387'
+  - SPR Oracle:
+      dayOfMeasurement: 365
+      lengthAtMaturity: '21.0'
+      speciesName: Epinephelus areolatus
+      virginSSB: '9846038.8771707'
+  - SPR Agent:
+      assumedKParameter: '0.4438437'
+      assumedLengthAtMaturity: '50.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '86.0'
+      assumedNaturalMortality: '0.3775984'
+      assumedVarA: '0.00853'
+      assumedVarB: '3.137'
+      probabilityOfSamplingEachBoat: '1.0'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lutjanus malabaricus
+      surveyTag: 100_malabaricus
+  - SPR Agent:
+      assumedKParameter: '0.5508334'
+      assumedLengthAtMaturity: '37.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '63.0'
+      assumedNaturalMortality: '0.4721429'
+      assumedVarA: '0.0244'
+      assumedVarB: '2.87'
+      probabilityOfSamplingEachBoat: '1.0'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lutjanus erythropterus
+      surveyTag: 100_erythropterus
+  - SPR Agent:
+      assumedKParameter: '0.4438437'
+      assumedLengthAtMaturity: '50.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '86.0'
+      assumedNaturalMortality: '0.3775984'
+      assumedVarA: '0.02'
+      assumedVarB: '2.944'
+      probabilityOfSamplingEachBoat: '1.0'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Pristipomoides multidens
+      surveyTag: 100_multidens
+  - SPR Agent:
+      assumedKParameter: '0.3300512'
+      assumedLengthAtMaturity: '21.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '45.0'
+      assumedNaturalMortality: '0.6011646'
+      assumedVarA: '0.01142'
+      assumedVarB: '3.048'
+      probabilityOfSamplingEachBoat: '1.0'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Epinephelus areolatus
+      surveyTag: 100_areolatus
+  portInitializer:
+    List of Ports:
+      ports:
+        Sumenep: 113.972926,-7.05225
+        Gili Iyang: 114.190362,-6.974766
+        Bajomulyo: 111.186606,-6.658267
+        Brondong: 112.267658,-6.867022
+        Karangsong: 108.372488,-6.30807
+        Tanjung Pandan: 107.62312,-2.733054
+        Probolinggo: 113.20387,-7.728979
+        Karimunjawa: 110.453507,-5.870655
+        Desa Masalima: 114.409736,-5.571817
+        Asem Doyong: 109.425567,-6.845671
+        Pagatan: 115.80881, -3.613657
+      usingGridCoordinates: false
+  portSwitching: false
+  tagsToTrackSeparately: 'PERIODIC_UPDATE_GEAR_0,PERIODIC_UPDATE_GEAR_1'
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

@@ -1,0 +1,1077 @@
+#####
+# WPP 712 - scenario - with optimistic stock-assessment
+####
+Flexible:
+  allowFriendshipsAcrossPorts: true
+  #############################
+  # Biology starts here
+  ############################
+  biologyInitializer:
+    Multiple Species Abundance:
+      #garbage species is the "Others" species, it accounts for all the species we are not simulated but these boats are landing    
+      addGarbageSpecies: true
+      factories:
+      - Single Species Abundance:
+          # These are the VB/growth parameters      
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '86.0'
+              k: '0.4438437'
+          # growth happens every day              
+          daily: true
+          diffuser: No Diffusion
+          #habitability defines which areas are allowed for fish to live in
+          #what we do is simply read the WPP boundary and allow fish only in these areas          
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          # this defines where the initial abundance is allocated. We just read the csv file
+          # that describes abundance from the statistical map Steve produced
+          # the absolute values in the inputs do not matter as this gets normalized          
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          # here we define the initial population in terms of how many are in each bin at the very beginning of the simulation              
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 1198377.58131983
+              - 3962.26294999924
+              - 17753.4273418499
+              - 49534.3639866194
+              - 96711.8416570251
+              - 141568.217281449
+              - 164764.392370608
+              - 163346.177884347
+              - 150271.288379044
+              - 138299.435183916
+              - 128923.229617387
+              - 115437.907811033
+              - 92957.1846987871
+              - 64366.0087930105
+              - 37437.5192439503
+              - 17888.0492640125
+              - 6409.26062462342
+              - 1094.91513740255
+              - 18.0894311302603
+              - 7.63909248887978
+              - 3.22595758754691
+              - 1.3623087449458
+              - 0.575297434034667
+              - 0.242945763266186
+              - 0.102595006351283
+          # growth and length parameters are here              
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.02'
+              allometricBeta: '2.944'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.4438437'
+              maxLengthInCm: '86.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          # yearly mortality rate              
+          mortalityProcess:
+            Proportional Mortality:
+              yearlyMortality: '0.3775984'
+          # this defines where new recruits end up
+          # it's the same exact map as the initial allocation              
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          #this defines the recruitment function! 
+          #in this case it follows the BH formula where every fish longer than lengthAtMaturity 
+          #will be counted for the spawning stock biomass
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '7.47089504960781'
+              lengthAtMaturity: 50.0
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '1755813.57315668'
+          rounding: false
+          #this multiples all initial numbers for the same numberl to quickly test changes in abundance              
+          scaling: '1.0'
+          speciesName: Pristipomoides multidens
+      ###############################################################################
+      # Malabaricus:          
+      - Single Species Abundance:
+          # These are the VB/growth parameters            
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '86.0'
+              k: '0.4438437'
+          # growth happens every day                                          
+          daily: true
+          diffuser: No Diffusion
+          #habitability defines which areas are allowed for fish to live in
+          #what we do is simply read the WPP boundary and allow fish only in these areas                    
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          # this defines where the initial abundance is allocated. We just read the csv file
+          # that describes abundance from the statistical map Steve produced
+          # the absolute values in the inputs do not matter as this gets normalized                    
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          # here we define the initial population in terms of how many are in each bin at the very beginning of the simulation                                          
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 3128881.60848543
+              - 16534.283823304
+              - 74189.7835811196
+              - 207755.88904834
+              - 408609.776254743
+              - 599150.333904274
+              - 678833.312192487
+              - 616996.871722337
+              - 477191.936333185
+              - 343216.039981083
+              - 248864.984437443
+              - 181249.513176825
+              - 122466.674867078
+              - 71374.4251140949
+              - 34905.2408404388
+              - 14440.5533317032
+              - 4849.12593272083
+              - 860.551854364174
+              - 23.2934261429787
+              - 10.7883153686839
+              - 4.99659207622718
+              - 2.31416412322234
+              - 1.07180164150065
+              - 0.496403322130798
+              - 0.229908453841779
+          # growth and length parameters are here                                          
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.00853'
+              allometricBeta: '3.137'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.4438437'
+              maxLengthInCm: '86.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          # yearly mortality rate                                          
+          mortalityProcess:
+            Proportional Mortality:
+              yearlyMortality: '0.3775984'
+          # this defines where new recruits end up
+          # it's the same exact map as the initial allocation               
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          #this defines the recruitment function! 
+          #in this case it follows the BH formula where every fish longer than lengthAtMaturity 
+          #will be counted for the spawning stock biomass              
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '7.2665742'
+              lengthAtMaturity: 50.0
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '8342549.0'
+          rounding: false
+          #this multiples all initial numbers for the same numberl to quickly test changes in abundance                                  
+          scaling: '1.0'
+          speciesName: Lutjanus malabaricus
+      ###############################################################################
+      # Areolatus:            
+      - Single Species Abundance:
+          # These are the VB/growth parameters            
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '45.0'
+              k: '0.3300512'
+          # growth happens every day                                                                      
+          daily: true
+          diffuser: No Diffusion
+          #habitability defines which areas are allowed for fish to live in
+          #what we do is simply read the WPP boundary and allow fish only in these areas                              
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          # this defines where the initial abundance is allocated. We just read the csv file
+          # that describes abundance from the statistical map Steve produced
+          # the absolute values in the inputs do not matter as this gets normalized                                                
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          # here we define the initial population in terms of how many are in each bin at the very beginning of the simulation                                                                      
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 3.37841122552154E7
+              - 2556029.09120097
+              - 4027430.75553883
+              - 4044460.91021035
+              - 3115708.95721223
+              - 1952693.93535146
+              - 930611.317588206
+              - 305461.677669557
+              - 58471.851554892
+              - 3451.22110956137
+              - 0.258494168324185
+              - 0.058346094110876
+              - 0.013170402024774
+              - 0.002972964909399
+              - 6.71090365313E-4
+              - 1.51485926438E-4
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          # growth and length parameters are here                                                                      
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.01142'
+              allometricBeta: '3.048'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.3300512'
+              maxLengthInCm: '45.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          # yearly mortality rate                                                                      
+          mortalityProcess:
+            Proportional Mortality:
+              yearlyMortality: '0.6011646'
+          # this defines where new recruits end up
+          # it's the same exact map as the initial allocation                             
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          #this defines the recruitment function! 
+          #in this case it follows the BH formula where every fish longer than lengthAtMaturity 
+          #will be counted for the spawning stock biomass               
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '0.220975865151625'
+              lengthAtMaturity: 21.0
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '4.3122686E7'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Epinephelus areolatus
+      ###############################################################################
+      # Erythropterus:                 
+      - Single Species Abundance:
+          aging:
+            Fixed Boxcar VB Aging:
+              LInfinity: '63.0'
+              k: '0.5508334'
+          # growth happens every day                                                                                    
+          daily: true
+          diffuser: No Diffusion
+          #habitability defines which areas are allowed for fish to live in
+          #what we do is simply read the WPP boundary and allow fish only in these areas                                        
+          habitabilityAllocator:
+            Shape File Allocator:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          histogrammerOutput: false
+          # this defines where the initial abundance is allocated. We just read the csv file
+          # that describes abundance from the statistical map Steve produced
+          # the absolute values in the inputs do not matter as this gets normalized                                                          
+          initialAbundanceAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          # here we define the initial population in terms of how many are in each bin at the very beginning of the simulation                                                                                    
+          initialAbundanceFactory:
+            Abundance From List:
+              fishPerBinPerSex:
+              - 1138422.56245127
+              - 9638.70897918442
+              - 40356.6135101607
+              - 103628.354004377
+              - 185318.718673231
+              - 240138.895424038
+              - 227387.024410665
+              - 159953.993366934
+              - 86841.9142003799
+              - 38590.2449732339
+              - 14527.179611493
+              - 4237.19403348566
+              - 701.613970604257
+              - 9.67243751166371
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+              - 0.0
+          # growth and length parameters are here                                                                                    
+          meristics:
+            Equally Spaced Von bertalanffy:
+              allometricAlpha: '0.0244'
+              allometricBeta: '2.87'
+              cmPerBin: 5.0
+              kYearlyParameter: '0.5508334'
+              maxLengthInCm: '63.0'
+              numberOfBins: 25
+              recruitLengthInCm: '0.0'
+          # yearly mortality rate                                                                                    
+          mortalityProcess:
+            Proportional Mortality:
+              yearlyMortality: '0.4721429'
+          # this defines where new recruits end up
+          # it's the same exact map as the initial allocation                                           
+          recruitAllocator:
+            Shape File Allocator:
+              delegate:
+                From File Allocator:
+                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  inputFileHasHeader: true
+              insidePoligon: true
+              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+          #this defines the recruitment function! 
+          #in this case it is fixed!             
+          recruitment:
+            Beverton-Holt Knife-Edge Maturity:
+              cumulativePhi: '2.0867469745321'
+              lengthAtMaturity: 37.0
+              steepness: '0.8'
+              subdivisionThatSpawns: 0
+              virginRecruits: '1953522.0'
+          rounding: false
+          scaling: '1.0'
+          speciesName: Lutjanus erythropterus
+  #rules are followed
+  cheaters: false
+  # this determines the catches that are simulated exogenously from the fishery
+  # that is, it accounts for medium dropliners and nano boats
+  exogenousCatches:
+    Abundance Gear Exogenous Catches:
+    # this is the list of selectivity curves for each species for the EXOGENOUS
+    # catches; 
+      gears:
+      - Logistic Selectivity Gear:
+          averageCatchability: '2.0115486500000003E-4'
+          litersOfGasConsumedPerHour: '0.0'
+          logBaseTen: false
+          retentionAsymptote: nullparameter
+          retentionInflection: nullparameter
+          retentionSlope: nullparameter
+          rounding: false
+          selectivityAParameter: '27.6928506911035'
+          selectivityBParameter: '5.65042828459421'
+      - Logistic Selectivity Gear:
+          averageCatchability: '6.6569679E-4'
+          litersOfGasConsumedPerHour: '0.0'
+          logBaseTen: false
+          retentionAsymptote: nullparameter
+          retentionInflection: nullparameter
+          retentionSlope: nullparameter
+          rounding: false
+          selectivityAParameter: '28.4833678576524'
+          selectivityBParameter: '5.9742458342377'
+      - Logistic Selectivity Gear:
+          averageCatchability: '1.00047505E-4'
+          litersOfGasConsumedPerHour: '0.0'
+          logBaseTen: false
+          retentionAsymptote: nullparameter
+          retentionInflection: nullparameter
+          retentionSlope: nullparameter
+          rounding: false
+          selectivityAParameter: '35.8219623420782'
+          selectivityBParameter: '9.95047637567899'
+      - Logistic Selectivity Gear:
+          averageCatchability: '2.9634296500000005E-4'
+          litersOfGasConsumedPerHour: '0.0'
+          logBaseTen: false
+          retentionAsymptote: nullparameter
+          retentionInflection: nullparameter
+          retentionSlope: nullparameter
+          rounding: false
+          selectivityAParameter: '27.7849584072828'
+          selectivityBParameter: '7.39722463325152'
+      # which species are affected by the exogenous catches and their order
+      # this is the same order in which we specified the selectivity
+      species:
+      - Lutjanus erythropterus
+      - Lutjanus malabaricus
+      - Pristipomoides multidens
+      - Epinephelus areolatus
+      # how much biomass, in kg, is taken for each species (in the order above)
+      # at the end of the year in this simulated exogenous catches
+      yearlyBiomassToExtract:
+      - 56430
+      - 360750
+      - 11040
+      - 32830
+#######################################################################
+# HERE START THE FISHER DEFINITIONS!
+#######################################################################
+  fisherDefinitions:
+  # each - element is a new population; there are 4
+  # population 0 : 5-9 GT boats; dropliners
+  # population 1: 15-30 GT boats; longliners
+  # population 2: 30+ GT boats; longliners
+  # population 3: 10-14 GT boats; dropliners  
+  #######################################################################
+  #  5-9 GT boats
+  #######################################################################  
+  # Departing strategy; 
+  - departingStrategy:
+      Exit Decorator:
+        # years of consecutive losses before quitting; the years of consecutivty losses are actually 4; this takes years+1
+        consecutiveLossYearsBeforeQuitting: '5.0'
+        # stop going out at sea this year if you have been out more than maxHoursOut
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '4704.0'
+            # list of months where you stay at port 
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+    # this determines how do people choose where to go fishing next trip
+    # it's the explore-exploit-imitate algorithm which basically
+    # explores with fixed percentage, otherwise goes back to the last best spot
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 378.0
+        # if a trip is cut short, if you are looking at somebody else's trip
+        # copy only if it made sense given the hours you want to go out
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            # exploration probability; from surveys
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        # "exploration rage"            
+        stepSize: uniform 1.0 10.0
+    # do they discard something?
+    discardingStrategy: No Discarding
+    # this decides the maximum number of trips
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '12.0'
+    # not really used
+    fuelTankSize: '100000.0'
+    #this determines selectivity + catchability for each species
+    gear:
+      Hold Upper Limit:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+              # list of gears, per species, with catchability and selectivity
+                gears:
+                  Epinephelus areolatus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '1.632370425E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.7849584072828'
+                      selectivityBParameter: '7.32036124169827'
+                  Lutjanus malabaricus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.365587734999999E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '28.4833678576524'
+                      selectivityBParameter: '5.9742458342377'
+                  Pristipomoides multidens:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '2.45261771E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+                  Lutjanus erythropterus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.301943764999999E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+            garbageSpeciesName: Others
+            # this determines, for every KG of caught, what additional % of 
+            # "other" species is retrieved
+            proportionSimulatedToGarbage: '0.49036'
+            rounding: false
+    gearStrategy: Never Change Gear
+    # maximum size of the hold after which the boat is full and you need to go back
+    holdSize: '1940.0'
+    # how much does it cost PER HOUR OUT to maintain the ship
+    hourlyVariableCost: '46381.0'
+    # how many fishers there are and where are they
+    initialFishersPerPort:
+      Sumenep: 452
+      Gili Iyang: 2
+      Brondong: 124
+      Tanjung Pandan: 16
+    # gas consumption per km out      
+    literPerKilometer: '1.2669'
+    logbook: No Logbook
+    # here you can add more regulations; starting condition is that there are no real rules
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: small,dropline,yellow,canoe
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  #######################################################################
+  #  15 - 30 GT longliners
+  #######################################################################      
+  - departingStrategy:
+      Exit Decorator:
+        consecutiveLossYearsBeforeQuitting: '50.0'
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '5808.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 551.0
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '12.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hold Upper Limit:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Epinephelus areolatus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '1.01540388E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.7849584072828'
+                      selectivityBParameter: '7.32036124169827'
+                  Lutjanus malabaricus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '2.051280735E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '28.4833678576524'
+                      selectivityBParameter: '5.9742458342377'
+                  Pristipomoides multidens:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.364637825E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+                  Lutjanus erythropterus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '1.4476129300000003E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.39308'
+            rounding: false
+    gearStrategy: Never Change Gear
+    holdSize: '6900.0'
+    hourlyVariableCost: '41667.0'
+    initialFishersPerPort:
+      Bajomulyo: 0
+      Karangsong: 0
+      Probolinggo: 0
+    literPerKilometer: '1.44'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: blue,longline,boat,medium
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  #######################################################################
+  #  30+ GT longliners
+  #######################################################################      
+  - departingStrategy:
+      Exit Decorator:
+        consecutiveLossYearsBeforeQuitting: '50.0'
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '5856.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+    destinationStrategy:
+      Perfect RPUE Logit:
+        automaticallyAvoidMPA: true
+        automaticallyAvoidWastelands: true
+        discretizer:
+          Squared Discretization:
+            horizontalSplits: '10.0'
+            verticalSplits: '10.0'
+        hoursOut: '1440.0'
+        profitBeta: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '60.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hold Upper Limit:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Epinephelus areolatus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '2.967969649999997E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.7849584072828'
+                      selectivityBParameter: '7.32036124169827'
+                  Lutjanus malabaricus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.821570299999999E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '28.4833678576524'
+                      selectivityBParameter: '5.9742458342377'
+                  Pristipomoides multidens:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '6.888222455000001E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+                  Lutjanus erythropterus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '2.83638135E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.1632'
+            rounding: false
+    gearStrategy: Never Change Gear
+    holdSize: '13500.0'
+    hourlyVariableCost: '162288.0'
+    initialFishersPerPort:
+      Bajomulyo: 21
+      Probolinggo: 3
+    literPerKilometer: '6.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: black,longline,ship,big
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  #######################################################################
+  #  10-14GT dropliners
+  #######################################################################          
+  - departingStrategy:
+      Exit Decorator:
+        consecutiveLossYearsBeforeQuitting: '5.0'
+        decorated:
+          Monthly Departing:
+            delegate:
+              Max Hours Per Year:
+                maxHoursOut: '4704.0'
+            monthsNotGoingOut:
+            - 1
+            - 12
+            - 6
+            - 7
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: false
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: 378.0
+        objectiveFunction:
+          Simulated Profit Objective:
+            tripLength: '288.0'
+        probability:
+          Fixed Probability:
+            explorationProbability: uniform 0.05 0.5
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 10.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '12.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Hold Upper Limit:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Epinephelus areolatus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '1.632370425E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.7849584072828'
+                      selectivityBParameter: '7.32036124169827'
+                  Lutjanus malabaricus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.365587734999999E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '28.4833678576524'
+                      selectivityBParameter: '5.9742458342377'
+                  Pristipomoides multidens:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '2.45261771E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+                  Lutjanus erythropterus:
+                    Logistic Selectivity Gear:
+                      averageCatchability: '9.301943764999999E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      logBaseTen: false
+                      retentionAsymptote: nullparameter
+                      retentionInflection: nullparameter
+                      retentionSlope: nullparameter
+                      rounding: false
+                      selectivityAParameter: '27.6928506911035'
+                      selectivityBParameter: '5.65042828459421'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.49036'
+            rounding: false
+    gearStrategy: Never Change Gear
+    holdSize: '2760.0'
+    hourlyVariableCost: '58575.0'
+    initialFishersPerPort:
+      Sumenep: 2
+      Brondong: 39
+    literPerKilometer: '1.689'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: small10,dropline,pink,canoe
+    usePredictors: false
+    weatherStrategy: Ignore Weather    
+  # price in rupiae for each liter of fish    
+  gasPricePerLiter: '10000.0'
+  habitatInitializer: All Sand
+  # map file with lat long coordinates --> depth
+  # and the grid width which describes how many cells will be in poseidon (on the x axis)
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '100.0'
+      header: true
+      latLong: true
+      #this address contains the map of 712      
+      mapFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/712_map.csv
+  mapMakerDedicatedRandomSeed: null
+  # market data. all are three prices, one below the lowAgeThreshold, one above highAgeThreshold and the last in between
+  # the "age" thresholds are actually bin numbers
+  # so lowthreshold of 7 means that all the catches of bin 7 or below (35cm or less)  will command "priceBelowThreshold
+  market:
+    Multiple Three Prices Markets:
+      markets:
+        Lutjanus malabaricus:
+          Three Prices Market:
+            highAgeThreshold: '9.0'
+            lowAgeThreshold: '7.0'
+            priceAboveThresholds: '52800.0'
+            priceBelowThreshold: '42900.0'
+            priceBetweenThresholds: '66000.0'
+        Pristipomoides multidens:
+          Three Prices Market:
+            highAgeThreshold: '7.0'
+            lowAgeThreshold: '6.0'
+            priceAboveThresholds: '42500.0'
+            priceBelowThreshold: '26325.0'
+            priceBetweenThresholds: '40500.0'
+        Lutjanus erythropterus:
+          Three Prices Market:
+            highAgeThreshold: '9.0'
+            lowAgeThreshold: '6.0'
+            priceAboveThresholds: '52800.0'
+            priceBelowThreshold: '42900.0'
+            priceBetweenThresholds: '66000.0'
+        Epinephelus areolatus:
+          Three Prices Market:
+            highAgeThreshold: '20.0'
+            lowAgeThreshold: '8.0'
+            priceAboveThresholds: '43200.0'
+            priceBelowThreshold: '35100.0'
+            priceBetweenThresholds: '54000.0'
+        Others:
+          Three Prices Market:
+            highAgeThreshold: '2.0'
+            lowAgeThreshold: '1.0'
+            priceAboveThresholds: '40000.0'
+            priceBelowThreshold: '40000.0'
+            priceBetweenThresholds: '40000.0'   
+  # network structure of the fishery. Basically how many boats each
+  # boat is connected to. The higher the number the stronger the imitation
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  #plugins is a list of additional objects, mostly thoe that collect data
+  plugins: 
+    # abundance gatherer collects raw numbers of abundance at the end of the year
+    - Abundance Gatherers:
+        observationDay: 365
+    # SPR oracle counts SPR with no measurement error
+    - SPR Oracle: 
+        dayOfMeasurement: 365
+        lengthAtMaturity: 50.0
+        virginSSB: 60931870.6850951
+        speciesName: Lutjanus malabaricus
+    - SPR Agent:
+        assumedKParameter: '0.4438437'
+        assumedLengthAtMaturity: '50.0'
+        assumedLengthBinCm: '5.0'
+        assumedLinf: '86.0'
+        assumedNaturalMortality: '0.3775984'
+        assumedVarA: '0.00853'
+        assumedVarB: '3.137'
+        probabilityOfSamplingEachBoat: '1'
+        simulatedMaxAge: '100.0'
+        simulatedVirginRecruits: '1000.0'
+        speciesName: Lutjanus malabaricus
+        surveyTag: 100_malabaricus
+    - SPR Oracle: 
+        dayOfMeasurement: 365
+        lengthAtMaturity: 50.0
+        virginSSB: 12350398
+        speciesName: Pristipomoides multidens        
+    - SPR Agent:
+        assumedKParameter: '0.4438437'
+        assumedLengthAtMaturity: '50.0'
+        assumedLengthBinCm: '5.0'
+        assumedLinf: '86.0'
+        assumedNaturalMortality: '0.3775984'
+        assumedVarA: '0.02'
+        assumedVarB: '2.944'
+        probabilityOfSamplingEachBoat: '1'
+        simulatedMaxAge: '100.0'
+        simulatedVirginRecruits: '1000.0'
+        speciesName: Pristipomoides multidens
+        surveyTag: 100_multidens      
+    - SPR Oracle: 
+        dayOfMeasurement: 365
+        lengthAtMaturity: 37.0
+        virginSSB: 4000653
+        speciesName: Lutjanus erythropterus           
+    - SPR Agent:
+        assumedKParameter: '0.5508334'
+        assumedLengthAtMaturity: '37.0'
+        assumedLengthBinCm: '5.0'
+        assumedLinf: '63.0'
+        assumedNaturalMortality: '0.4721429'
+        assumedVarA: '0.0244'
+        assumedVarB: '2.87'
+        probabilityOfSamplingEachBoat: '1'
+        simulatedMaxAge: '100.0'
+        simulatedVirginRecruits: '1000.0'
+        speciesName: Lutjanus erythropterus
+        surveyTag: 100_erythropterus   
+    - SPR Oracle: 
+        dayOfMeasurement: 365
+        lengthAtMaturity: 21.0
+        virginSSB: 9295439
+        speciesName: Epinephelus areolatus         
+    - SPR Agent:
+        assumedKParameter: '0.3300512'
+        assumedLengthAtMaturity: '21.0'
+        assumedLengthBinCm: '5.0'
+        assumedLinf: '45.0'
+        assumedNaturalMortality: '0.6011646'
+        assumedVarA: '0.01142'
+        assumedVarB: '3.048'
+        probabilityOfSamplingEachBoat: '1'
+        simulatedMaxAge: '100.0'
+        simulatedVirginRecruits: '1000.0'
+        speciesName: Epinephelus areolatus
+        surveyTag: 100_areolatus  
+  # ports together with their location in lat-long        
+  portInitializer:
+    List of Ports:
+      ports:
+        Sumenep: 113.972926,-7.05225
+        Gili Iyang: 114.190362,-6.974766
+        Bajomulyo: 111.186606,-6.658267
+        Brondong: 112.267658,-6.867022
+        Karangsong: 108.372488,-6.30807
+        Tanjung Pandan: 107.62312,-2.733054
+        Probolinggo: 113.20387,-7.728979
+      usingGridCoordinates: false
+  # are fishers allowed to change port over the years?
+  portSwitching: false
+  tagsToTrackSeparately: ''
+  # weather, not used for anything
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

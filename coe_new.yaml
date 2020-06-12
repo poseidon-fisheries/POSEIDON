@@ -1,0 +1,102 @@
+Flexible:
+  biologyInitializer:
+    Single Species Biomass Normalized:
+      biomassSuppliedPerCell: false
+      carryingCapacity: '1.25E8'
+      differentialPercentageToMove: '0.001'
+      grower:
+        Common Logistic Grower:
+          steepness: '0.33'
+      initialBiomassAllocator:
+        Random Allocator:
+          maximum: '0.8'
+          minimum: '0.7'
+      initialCapacityAllocator:
+        Depth Allocator:
+          delegate:
+            Equal Allocation:
+              constantValue: '1.0'
+          maxDepth: '800.0'
+          minDepth: '30.0'
+      percentageLimitOnDailyMovement: '0.01'
+      speciesName: Peter Snapper
+      unfishable: false
+  cheaters: false
+  fisherDefinitions:
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: false
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 100.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '10.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Random Catchability:
+        gasPerHourFished: '72.0'
+        meanCatchabilityFirstSpecies: '6.2E-4'
+        meanCatchabilityOtherSpecies: '0.0'
+        standardDeviationCatchabilityFirstSpecies: '0.0'
+        standardDeviationCatchabilityOtherSpecies: '0.0'
+    gearStrategy: Never Change Gear
+    holdSize: '15000.0'
+    hourlyVariableCost: '0.0'
+    initialFishersPerPort:
+      Benoa: 25
+      Kupang: 50
+    literPerKilometer: '3.5'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '16.0'
+    tags: ''
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '10000.0'
+  habitatInitializer: All Sand
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '70.0'
+      header: true
+      latLong: true
+      mapFile: /home/carrknight/code/POSEIDON/inputs/indonesia/indonesia_latlong.csv
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '40000.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  plugins: [
+    ]
+  portInitializer:
+    List of Ports:
+      ports:
+        Benoa: 115.238843,-8.799605
+        Kupang: 123.586249,-10.148044
+      usingGridCoordinates: false
+  portSwitching: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

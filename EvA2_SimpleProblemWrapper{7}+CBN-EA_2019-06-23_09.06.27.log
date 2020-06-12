@@ -1,0 +1,168 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.ClusterBasedNichingEA
+    clusterDiffDist: 0.05
+    differentiationCA: !!eva2.optimization.operator.cluster.ClusteringDensityBased
+        clustDistParam: 0.1
+        metric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        minimumGroupSize: 3
+    epsilonBound: 1.0E-10
+    haltingWindow: 15
+    maxSpeciesSize: 15
+    mergingCA: !!eva2.optimization.operator.cluster.ClusteringDensityBased
+        clustDistParam: 0.1
+        metric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        minimumGroupSize: 3
+    optimizer: !!eva2.optimization.strategies.GeneticAlgorithm
+        elitism: true
+        numberOfPartners: 1
+        parentSelection: !!eva2.optimization.operator.selection.SelectXProbRouletteWheel
+            obeyDebsConstViolationPrinciple: true
+            selProbCalculator: !!eva2.optimization.operator.selection.probability.SelProbStandard {}
+        partnerSelection: !!eva2.optimization.operator.selection.SelectRandom {obeyDebsConstViolationPrinciple: false}
+        population: !population
+            initAround: 0.1
+            initMethod: individualDefault
+            initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+            seedCardinality: {head: 5, tail: 1}
+            targetSize: 50
+    parameterControl: []
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 50
+    populationSize: 50
+    reduceSizeComparator: {fitCriterion: -1, indyDataKey: '', preferFeasible: true}
+    showCycle: 0
+    sleepTime: 0
+    speciesCycle: 1
+    useMerging: true
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 5
+    problemDimension: 7
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaDistance,
+            alwaysPositive: false, maximum: -0.001, minimum: -0.01}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.intercept,
+            alwaysPositive: false, maximum: 100.0, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaHabit,
+            alwaysPositive: false, maximum: 3.0, minimum: -3.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaRevenue,
+            alwaysPositive: false, maximum: 1.0, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Dover Sole,
+            alwaysPositive: false, maximum: 1.0, minimum: -1.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Sablefish,
+            alwaysPositive: false, maximum: 1.0, minimum: -1.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Yelloweye Rockfish,
+            alwaysPositive: false, maximum: 1.0, minimum: -1.0}
+        runsPerSetting: 1
+        scenarioFile: temp/calibration/nofleetwide.yaml
+        seed: 0
+        summaryDirectory: temp/calibration
+        yearsToIgnore: 1
+        yearsToRun: 5
+randomSeed: 0
+terminator: !!eva2.optimization.operator.terminators.EvaluationTerminator {fitnessCalls: 50000}
+
+```
+
+## Multirun 1
+| FunctionCalls | currentBest | meanFit | solution | 
+| --- | --- | --- | --- | 
+| 100 | 9.669217485045454 | 26.900781022481997 | { 2.192,-10.000, 3.756, 7.331,-3.373, 7.558, 0.526} | 
+| 150 | 9.269435045806297 | 22.469359751192542 | { 4.331,-8.963, 1.930, 3.769, 1.964,-3.560,-2.358} | 
+| 200 | 8.157119267666673 | 20.839442038572088 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 250 | 8.157119267666673 | 21.346573726291002 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 300 | 8.157119267666673 | 18.651281441198876 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 350 | 8.157119267666673 | 21.79813057578174 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 400 | 8.157119267666673 | 19.204316672228273 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 450 | 8.157119267666673 | 18.719890998703217 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 500 | 8.157119267666673 | 20.993098437624873 | { 0.911,-7.984, 3.711, 10.000,-3.166, 7.149,-0.434} | 
+| 550 | 7.306848152419279 | 18.209582144642486 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 600 | 7.306848152419279 | 16.51433311916778 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 650 | 7.306848152419279 | 14.747341775230623 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 700 | 7.306848152419279 | 19.897420192801054 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 750 | 7.306848152419279 | 17.641245280052374 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 800 | 7.306848152419279 | 14.969437268684343 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 850 | 7.306848152419279 | 17.738258631147723 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 900 | 7.306848152419279 | 16.423878961858996 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 950 | 7.306848152419279 | 16.06221228890924 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 1000 | 7.306848152419279 | 16.290211207033714 | { 2.358,-7.536, 2.566, 10.000,-6.869, 9.940, 3.856} | 
+| 1050 | 7.091394293009564 | 15.358738544848151 | { 1.779,-8.288, 3.846, 10.000,-5.320, 10.000, 4.607} | 
+| 1100 | 7.091394293009564 | 15.410030143460292 | { 1.779,-8.288, 3.846, 10.000,-5.320, 10.000, 4.607} | 
+| 1150 | 7.085050204592704 | 17.338602883252335 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1200 | 7.085050204592704 | 17.655935823518075 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1250 | 7.085050204592704 | 15.972736809049854 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1300 | 7.085050204592704 | 17.125241433801495 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1350 | 7.085050204592704 | 17.371669412527826 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1400 | 7.085050204592704 | 15.87738262713508 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1450 | 7.085050204592704 | 15.285170593347791 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1500 | 7.085050204592704 | 17.154003575488858 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1550 | 7.085050204592704 | 16.896087705521484 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1600 | 7.085050204592704 | 14.603480932607061 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1650 | 7.085050204592704 | 16.46520573028728 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1700 | 7.085050204592704 | 14.115404548653595 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1750 | 7.085050204592704 | 17.221258401005468 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1800 | 7.085050204592704 | 15.603591040011871 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1850 | 7.085050204592704 | 19.63179987234293 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1900 | 7.085050204592704 | 17.088165691823864 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 1950 | 7.085050204592704 | 17.677167981460357 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2000 | 7.085050204592704 | 14.849398315481485 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2050 | 7.085050204592704 | 15.77854714672658 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2100 | 7.085050204592704 | 15.186078152543198 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2150 | 7.085050204592704 | 15.682394585760285 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2200 | 7.085050204592704 | 15.875493297498386 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2250 | 7.085050204592704 | 17.066469932360338 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2300 | 7.085050204592704 | 13.513399659024703 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2350 | 7.085050204592704 | 15.664643764228387 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2400 | 7.085050204592704 | 13.584983593549572 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2450 | 7.085050204592704 | 16.622897121024643 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2500 | 7.085050204592704 | 15.415744088444837 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2550 | 7.085050204592704 | 17.039077173756592 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2600 | 7.085050204592704 | 16.906480197690243 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2650 | 7.085050204592704 | 16.081950459876463 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2700 | 7.085050204592704 | 16.35326230399888 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2750 | 7.085050204592704 | 14.99954681603847 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2800 | 7.085050204592704 | 17.069572478909745 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2850 | 7.085050204592704 | 14.946441850420465 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2900 | 7.085050204592704 | 15.649138838642145 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 2950 | 7.085050204592704 | 14.433164313296718 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3000 | 7.085050204592704 | 14.048249226677756 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3050 | 7.085050204592704 | 14.165946301329733 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3100 | 7.085050204592704 | 16.368465284190286 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3150 | 7.085050204592704 | 14.564975626785644 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3200 | 7.085050204592704 | 16.172551045793412 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3250 | 7.085050204592704 | 14.82308210184367 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3300 | 7.085050204592704 | 15.096637561425668 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3350 | 7.085050204592704 | 14.511013518249188 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 
+| 3400 | 7.085050204592704 | 13.757294680638996 | { 2.692,-9.947, 1.806, 10.000,-6.748, 8.185, 6.595} | 

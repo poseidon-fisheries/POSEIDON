@@ -1,0 +1,72 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.NelderMeadSimplex
+    checkRange: false
+    critIndex: 0
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.EuclideanMetric {normedByDblRange: false}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 50
+    populationSize: 50
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 4
+    problemDimension: 7
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Dover Sole.averageCatchability,
+            alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Longspine Thornyhead.averageCatchability,
+            alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Sablefish.averageCatchability,
+            alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Shortspine Thornyhead.averageCatchability,
+            alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Yelloweye Rockfish.averageCatchability,
+            alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.proportionSimulatedToGarbage,
+            alwaysPositive: true, maximum: 0.5, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
+            alwaysPositive: true, maximum: 15000.0, minimum: 1500.0}
+        runsPerSetting: 1
+        scenarioFile: docs/groundfish/calibration/step1_catchability/clamped.yaml
+        seed: 0
+        summaryDirectory: docs/groundfish/calibration/step1_catchability
+        yearsToIgnore: 1
+        yearsToRun: 5
+randomSeed: 0
+terminator: !!eva2.optimization.operator.terminators.EvaluationTerminator {fitnessCalls: 50000}
+
+```
+
+## Multirun 1
+| FunctionCalls | currentBest | meanFit | solution | 
+| --- | --- | --- | --- | 
+| 50 | 15.980303220090047 | 36.58689186720815 | { 1.566, 8.515, 4.982,-5.374, 1.604,-2.131,-0.906} | 

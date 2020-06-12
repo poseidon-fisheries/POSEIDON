@@ -1,0 +1,137 @@
+Flexible:
+  biologyInitializer:
+    Single Species Biomass Normalized:
+      biomassSuppliedPerCell: false
+      carryingCapacity: '500000000'
+      differentialPercentageToMove: '0.001'
+      grower:
+        Common Logistic Grower:
+          steepness: '0.5'
+      initialBiomassAllocator:
+        Random Allocator:
+          maximum: '1'
+          minimum: '0'
+      initialCapacityAllocator:
+        Equal Allocation:
+          constantValue: '1.0'
+      percentageLimitOnDailyMovement: '0.01'
+      speciesName: Peter Snapper
+      unfishable: false
+  cheaters: false
+  fisherDefinitions:
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: false
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 100.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '5.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Random Catchability:
+        gasPerHourFished: '5.0'
+        meanCatchabilityFirstSpecies: '0.01'
+        meanCatchabilityOtherSpecies: '0.01'
+        standardDeviationCatchabilityFirstSpecies: '0.0'
+        standardDeviationCatchabilityOtherSpecies: '0.0'
+    gearStrategy: Never Change Gear
+    holdSize: '100.0'
+    hourlyVariableCost: '0.0'
+    initialFishersPerPort:
+      Port 0 : 100
+    literPerKilometer: '10.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '5.0'
+    tags: ''
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Fixed Rest:
+        hoursBetweenEachDeparture: '12.0'
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: false
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: uniform 1.0 100.0
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '5.0'
+    fuelTankSize: '100000.0'
+    gear:
+      Random Catchability:
+        gasPerHourFished: '5.0'
+        meanCatchabilityFirstSpecies: '0.01'
+        meanCatchabilityOtherSpecies: '0.01'
+        standardDeviationCatchabilityFirstSpecies: '0.0'
+        standardDeviationCatchabilityOtherSpecies: '0.0'
+    gearStrategy: Never Change Gear
+    holdSize: '500000.0'
+    hourlyVariableCost: '0.0'
+    initialFishersPerPort:
+      Port 0 : 50
+    literPerKilometer: '10.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '5.0'
+    tags: 'canoe'
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '0'
+  habitatInitializer: All Sand
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '70.0'
+      header: true
+      latLong: true
+      mapFile: /home/carrknight/code/POSEIDON/inputs/indonesia/indonesia_latlong.csv
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '100.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  plugins: [
+    ]
+  portInitializer: Random Ports
+  portSwitching: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

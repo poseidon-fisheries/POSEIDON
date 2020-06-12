@@ -1,0 +1,233 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.NelderMeadSimplex
+    checkRange: true
+    critIndex: 0
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 50
+    populationSize: 50
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 5
+    problemDimension: 20
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.GenericOptimization
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 0.095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        runsPerSetting: 1
+        scenarioFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/baseline_popweight.yaml
+        simulatedYears: 1
+        targets:
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_Others.csv,
+            yearlyDataColumnName: Others Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_total.csv,
+            yearlyDataColumnName: Total Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_Others.csv,
+            yearlyDataColumnName: Others Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_total.csv,
+            yearlyDataColumnName: Total Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_Others.csv,
+            yearlyDataColumnName: Others Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_total.csv,
+            yearlyDataColumnName: Total Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_Others.csv,
+            yearlyDataColumnName: Others Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_total.csv,
+            yearlyDataColumnName: Total Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings}
+randomSeed: 0
+terminator: !!eva2.optimization.operator.terminators.EvaluationTerminator {fitnessCalls: 50000}
+
+```
+
+## Multirun 1
+| FunctionCalls | currentBest | meanFit | solution | 
+| --- | --- | --- | --- | 
+| 50 | 1.6825435432372686E7 | 2.141789343149314E7 | {-6.973,-6.505,-8.769,-7.361,-4.513, 4.418,-9.406,-9.048, 6.896, 5.056, 4.201,-5.456, 2.047,-7.702, 0.969,-0.897,-3.218,-2.325, 1.403, 8.704} | 
+| 100 | 1.6825435432372686E7 | 1.8561999792332187E7 | {-6.973,-6.505,-8.769,-7.361,-4.513, 4.418,-9.406,-9.048, 6.896, 5.056, 4.201,-5.456, 2.047,-7.702, 0.969,-0.897,-3.218,-2.325, 1.403, 8.704} | 
+| 150 | 1.2847644266345298E7 | 1.751788289323125E7 | { 2.556, 10.000,-10.000,-2.310,-0.328,-10.000, 10.000,-10.000,-10.000, 9.773,-9.836,-10.000,-5.435,-10.000,-6.217,-7.246,-1.529,-8.727, 9.324, 0.218} | 
+| 200 | 1.1898720522073735E7 | 1.6407185697317574E7 | { 2.556, 10.000,-10.000,-2.310,-0.328,-10.000, 10.000,-10.000,-10.000, 9.773,-9.836,-10.000,-5.435,-10.000,-6.217,-7.246,-1.529,-8.727, 9.324, 0.218} | 
+| 250 | 1.1898720522073735E7 | 1.5147752634481842E7 | { 2.556, 10.000,-10.000,-2.310,-0.328,-10.000, 10.000,-10.000,-10.000, 9.773,-9.836,-10.000,-5.435,-10.000,-6.217,-7.246,-1.529,-8.727, 9.324, 0.218} | 
+| 300 | 1.2324585725822438E7 | 1.4117268008208336E7 | { 1.288, 8.075,-9.823,-1.055,-1.728,-6.929, 8.311,-9.891,-8.093, 9.121,-7.397,-7.982,-5.377,-7.171,-6.822,-4.933, 0.895,-7.331, 6.966, 1.605} | 
+| 350 | 1.2120864059925785E7 | 1.320648700433997E7 | { 2.119, 8.931,-9.556,-0.853,-1.793,-7.967, 7.314,-9.716,-6.731, 9.043,-5.580,-7.739,-5.541,-7.747,-5.690,-5.762, 0.001,-7.704, 7.228, 1.729} | 
+| 400 | 1.1679088456869729E7 | 1.2714795464958543E7 | { 2.437, 9.454,-9.722,-1.964,-0.873,-9.606, 8.498,-9.987,-8.350, 9.389,-7.731,-8.292,-5.964,-8.806,-5.909,-7.049,-0.793,-9.357, 9.326, 1.551} | 
+| 450 | 1.1679088456869729E7 | 1.2215198160303311E7 | { 2.437, 9.454,-9.722,-1.964,-0.873,-9.606, 8.498,-9.987,-8.350, 9.389,-7.731,-8.292,-5.964,-8.806,-5.909,-7.049,-0.793,-9.357, 9.326, 1.551} | 
+| 500 | 1.1604504576488769E7 | 1.2067328891171938E7 | { 1.993, 8.847,-9.726,-1.813,-1.212,-9.183, 7.618,-9.949,-7.853, 9.106,-6.991,-7.843,-6.094,-8.795,-5.818,-6.481,-0.325,-9.098, 8.877, 1.932} | 
+| 550 | 1.1421769729826055E7 | 1.1985722927113047E7 | { 2.111, 8.945,-9.726,-1.790,-1.201,-9.113, 7.717,-9.927,-7.851, 9.102,-7.039,-7.852,-5.968,-8.568,-5.897,-6.664,-0.371,-9.100, 8.725, 1.942} | 
+| 600 | 1.1421769729826055E7 | 1.2067483162845694E7 | { 2.111, 8.945,-9.726,-1.790,-1.201,-9.113, 7.717,-9.927,-7.851, 9.102,-7.039,-7.852,-5.968,-8.568,-5.897,-6.664,-0.371,-9.100, 8.725, 1.942} | 
+| 650 | 1.1296354088673038E7 | 1.1938897243878065E7 | { 2.112, 8.952,-9.722,-1.730,-1.212,-9.062, 7.780,-9.951,-7.854, 9.153,-7.030,-7.818,-5.984,-8.475,-5.912,-6.577,-0.304,-9.082, 8.768, 1.927} | 
+| 700 | 1.123556415725357E7 | 1.2088961493685044E7 | { 2.186, 8.974,-9.716,-1.804,-1.218,-9.085, 7.795,-9.934,-7.843, 9.150,-7.089,-7.888,-6.014,-8.519,-5.887,-6.591,-0.316,-9.109, 8.837, 1.958} | 
+| 750 | 1.0963422923386302E7 | 1.19547284730651E7 | { 2.092, 9.012,-9.722,-1.730,-1.185,-9.087, 7.761,-9.936,-7.866, 9.174,-7.028,-7.883,-5.952,-8.536,-5.858,-6.616,-0.383,-9.109, 8.729, 1.877} | 
+| 800 | 1.1432600363560013E7 | 1.1978551291975899E7 | { 2.111, 8.957,-9.725,-1.729,-1.176,-9.082, 7.790,-9.939,-7.901, 9.184,-7.046,-7.918,-5.966,-8.530,-5.876,-6.607,-0.316,-9.137, 8.767, 1.925} | 
+| 850 | 1.1432600363560013E7 | 1.1981846026486712E7 | { 2.111, 8.957,-9.725,-1.729,-1.176,-9.082, 7.790,-9.939,-7.901, 9.184,-7.046,-7.918,-5.966,-8.530,-5.876,-6.607,-0.316,-9.137, 8.767, 1.925} | 
+| 900 | 1.1267753262582807E7 | 1.196033756660403E7 | { 2.106, 8.961,-9.718,-1.741,-1.179,-9.097, 7.779,-9.937,-7.890, 9.181,-7.030,-7.897,-5.975,-8.538,-5.858,-6.616,-0.331,-9.102, 8.747, 1.913} | 
+| 950 | 1.159249394345384E7 | 1.201259188710677E7 | { 2.113, 8.968,-9.719,-1.736,-1.182,-9.091, 7.780,-9.937,-7.891, 9.174,-7.037,-7.897,-5.975,-8.533,-5.865,-6.610,-0.333,-9.111, 8.754, 1.913} | 
+| 1000 | 1.1151946753231943E7 | 1.1911643761274315E7 | { 2.103, 8.973,-9.720,-1.736,-1.180,-9.094, 7.768,-9.937,-7.889, 9.181,-7.038,-7.891,-5.973,-8.531,-5.871,-6.616,-0.334,-9.108, 8.753, 1.914} | 
+| 1050 | 1.1151946753231943E7 | 1.1862955729390882E7 | { 2.103, 8.973,-9.720,-1.736,-1.180,-9.094, 7.768,-9.937,-7.889, 9.181,-7.038,-7.891,-5.973,-8.531,-5.871,-6.616,-0.334,-9.108, 8.753, 1.914} | 
+| 1100 | 1.141455954584321E7 | 1.2108693756792212E7 | { 2.106, 8.970,-9.720,-1.735,-1.181,-9.091, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.973,-8.532,-5.870,-6.613,-0.332,-9.108, 8.751, 1.917} | 
+| 1150 | 1.1334095074292928E7 | 1.1973682609688766E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1200 | 1.1334095074292928E7 | 1.188859063646883E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1250 | 1.1450848135750996E7 | 1.2097184995553365E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1300 | 1.1450848135750996E7 | 1.1957028468016474E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1350 | 1.1109350695140235E7 | 1.1869632003805486E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.038,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1400 | 1.1164274705645598E7 | 1.2044564176410362E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1450 | 1.1371479276022332E7 | 1.1876154237240562E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1500 | 1.1535838342187144E7 | 1.2039083750976518E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1550 | 1.1345715238998864E7 | 1.1936597038038773E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1600 | 1.1423905793272426E7 | 1.1995959078265388E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1650 | 1.1480600318782574E7 | 1.1943876937947229E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1700 | 1.1520974238477167E7 | 1.2079397860427832E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1750 | 1.1400348940520782E7 | 1.2041054407178732E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1800 | 1.1369159612049453E7 | 1.1885988940281449E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1850 | 1.1232036743273895E7 | 1.2098208661792373E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1900 | 1.1232036743273895E7 | 1.200167943870508E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 1950 | 1.1196867735056717E7 | 1.1846515176999018E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2000 | 1.143575274466598E7 | 1.1967773246511253E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2050 | 1.1081383580875777E7 | 1.1995071631983291E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2100 | 1.143080628842955E7 | 1.1938355139301011E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2150 | 1.163032471301756E7 | 1.208162665347043E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2200 | 1.1299444814353855E7 | 1.1936201190082174E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2250 | 1.1299444814353855E7 | 1.1966741308508325E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2300 | 1.1454061797821099E7 | 1.2041596565821964E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2350 | 1.1402860034144677E7 | 1.1890226250861421E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2400 | 1.1492673203799918E7 | 1.1987261122184781E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2450 | 1.1309415661961894E7 | 1.2030875636914052E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2500 | 1.1498736965582706E7 | 1.1993367891128628E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2550 | 1.1498736965582706E7 | 1.195908985484152E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2600 | 1.1336708901574776E7 | 1.193130066255381E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2650 | 1.1428693398109924E7 | 1.2019218581663294E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 
+| 2700 | 1.1396067123999862E7 | 1.1869761683762936E7 | { 2.105, 8.970,-9.720,-1.735,-1.181,-9.092, 7.770,-9.937,-7.888, 9.179,-7.037,-7.891,-5.972,-8.532,-5.870,-6.613,-0.332,-9.109, 8.752, 1.916} | 

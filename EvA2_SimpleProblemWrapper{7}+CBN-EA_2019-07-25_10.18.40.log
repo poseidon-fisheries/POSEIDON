@@ -1,0 +1,113 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.ClusterBasedNichingEA
+    clusterDiffDist: 0.05
+    differentiationCA: !!eva2.optimization.operator.cluster.ClusteringDensityBased
+        clustDistParam: 0.1
+        metric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        minimumGroupSize: 3
+    epsilonBound: 1.0E-10
+    haltingWindow: 15
+    maxSpeciesSize: 15
+    mergingCA: !!eva2.optimization.operator.cluster.ClusteringDensityBased
+        clustDistParam: 0.1
+        metric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        minimumGroupSize: 3
+    optimizer: !!eva2.optimization.strategies.GeneticAlgorithm
+        elitism: true
+        numberOfPartners: 1
+        parentSelection: !!eva2.optimization.operator.selection.SelectXProbRouletteWheel
+            obeyDebsConstViolationPrinciple: true
+            selProbCalculator: !!eva2.optimization.operator.selection.probability.SelProbStandard {}
+        partnerSelection: !!eva2.optimization.operator.selection.SelectRandom {obeyDebsConstViolationPrinciple: false}
+        population: !population
+            initAround: 0.1
+            initMethod: individualDefault
+            initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+            seedCardinality: {head: 5, tail: 1}
+            targetSize: 50
+    parameterControl: []
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 50
+    populationSize: 100
+    reduceSizeComparator: {fitCriterion: -1, indyDataKey: '', preferFeasible: true}
+    showCycle: 0
+    sleepTime: 0
+    speciesCycle: 1
+    useMerging: true
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 4
+    problemDimension: 7
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.GenericOptimization
+        maximization: false
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: true, maximum: 0.095, minimum: 9.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: true, maximum: 9.5E-5, minimum: 9.0E-9}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: true, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: true, maximum: 9.0E-6, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: true, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: true, maximum: 0.095, minimum: 9.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: true, maximum: 9.0E-6, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: true, maximum: 9.5E-5, minimum: 9.0E-9}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: true, maximum: 0.095, minimum: 9.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: true, maximum: 0.0095, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDe

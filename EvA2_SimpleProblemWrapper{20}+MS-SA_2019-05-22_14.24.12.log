@@ -1,0 +1,225 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.SimulatedAnnealing
+    alpha: 0.9
+    currentTemperature: 0.0
+    initialTemperature: 2.0
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.PhenotypeMetric {}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 10
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 5
+    problemDimension: 20
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.GenericOptimization
+        maximization: false
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$0.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$1.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$2.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Pristipomoides multidens.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Epinephelus areolatus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability,
+            alwaysPositive: false, maximum: 9.5E-4, minimum: 9.0E-8}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: fisherDefinitions$3.gear.delegate.delegate.proportionSimulatedToGarbage,
+            alwaysPositive: false, maximum: 0.8, minimum: 0.0}
+        runsPerSetting: 1
+        scenarioFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/better_baseline.yaml
+        simulatedYears: 1
+        targets:
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_Others.csv,
+            yearlyDataColumnName: Others Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Big_total.csv,
+            yearlyDataColumnName: Total Landings of population2}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_Others.csv,
+            yearlyDataColumnName: Others Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (5-9)_total.csv,
+            yearlyDataColumnName: Total Landings of population0}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_Others.csv,
+            yearlyDataColumnName: Others Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Medium_total.csv,
+            yearlyDataColumnName: Total Landings of population1}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_Others.csv,
+            yearlyDataColumnName: Others Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/Small (10-14)_total.csv,
+            yearlyDataColumnName: Total Landings of population3}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LL021 Lutjanus malabaricus.csv,
+            yearlyDataColumnName: Lutjanus malabaricus Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LP012 Pristipomoides multidens.csv,
+            yearlyDataColumnName: Pristipomoides multidens Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_SE002 Epinephelus areolatus.csv,
+            yearlyDataColumnName: Epinephelus areolatus Landings}
+        - !!uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget {coefficientOfVariation: -1.0,
+            cumulative: false, exponent: 1.0, hasHeader: true, pathToCsvFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/targets_oneyear/all_landings_LL017 Lutjanus erythropterus.csv,
+            yearlyDataColumnName: Lutjanus erythropterus Landings}
+randomSeed: 0
+terminator: !!eva2.optimization.operator.terminators.EvaluationTerminator {fitnessCalls: 50000}
+
+```
+
+## Multirun 1
+| FunctionCalls | currentBest | meanFit | solution | 
+| --- | --- | --- | --- | 
+| 10 | 2.0515529743267506E7 | 2.2599463780948795E7 | { 2.708, 2.148, 5.484, 9.990, 8.043, 2.915, 4.867,-9.678,-0.219,-6.988,-6.760,-4.452, 1.485, 8.720,-9.262, 1.403, 4.590, 6.172, 4.805, 0.784} | 
+| 20 | 1.9954354165699918E7 | 2.22971655707608E7 | { 3.760, 3.927, 6.671, 10.000, 10.000, 2.174, 2.536,-8.797,-2.832,-8.496,-5.413,-5.127, 3.786, 8.635,-10.000, 0.977, 7.598,-0.189, 8.949,-1.483} | 
+| 30 | 1.9954354165699918E7 | 2.212708701227074E7 | { 3.760, 3.927, 6.671, 10.000, 10.000, 2.174, 2.536,-8.797,-2.832,-8.496,-5.413,-5.127, 3.786, 8.635,-10.000, 0.977, 7.598,-0.189, 8.949,-1.483} | 
+| 40 | 1.9844256542798664E7 | 2.1981965246169318E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+| 50 | 1.9844256542798664E7 | 2.1711677941516347E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+| 60 | 1.9844256542798664E7 | 2.1531982417916678E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+| 70 | 1.9844256542798664E7 | 2.1417106259549074E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+| 80 | 1.9844256542798664E7 | 2.1417106259549074E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+| 90 | 1.9844256542798664E7 | 2.1345115389292337E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227} | 
+ Termination message: Not terminated.
+ Function calls run: 90, sum: 90
+* Last best ind.: eva2.optimization.individuals.ESIndividualDoubleData{DGenotype=[ 4.493523715615508 3.2772667522247296 2.481080307442938 10.0 10.0 2.664078052138865 4.859895400425036 -10.0 -3.2773772387311997 -6.18944965106451 -2.811587179419854 -5.710461453541594 3.1312840229022947 4.736450885867379 -9.579693750401676 5.678696940521938 10.0 -2.1072511326200165 10.0 5.227135689800241 ]; age=8; crossoverOperator=eva2.optimization.operator.crossover.CrossoverESDefault{}; crossoverProbability=0.5; doubleRange=[ [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] ]; fitness=[ 1.9844256542798664E7 ]; individualIndex=-1; initOperator=eva2.optimization.operator.initialization.DefaultInitialization{}; marked=false; mutationOperator=eva2.optimization.operator.mutation.MutateESGlobal{crossoverType=intermediate; lowerLimitStepSize=5.0E-7; mutationStepSize=0.29794752140464204; tau1=0.15; }; mutationProbability=1.0; selectionProbability=[ 0.0 ]; }
+         solution data	: { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227}
+         solution fit	: [ 1.9844256542798664E7 ]
+* Run best ind.: eva2.optimization.individuals.ESIndividualDoubleData{DGenotype=[ 4.493523715615508 3.2772667522247296 2.481080307442938 10.0 10.0 2.664078052138865 4.859895400425036 -10.0 -3.2773772387311997 -6.18944965106451 -2.811587179419854 -5.710461453541594 3.1312840229022947 4.736450885867379 -9.579693750401676 5.678696940521938 10.0 -2.1072511326200165 10.0 5.227135689800241 ]; age=8; crossoverOperator=eva2.optimization.operator.crossover.CrossoverESDefault{}; crossoverProbability=0.5; doubleRange=[ [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] ]; fitness=[ 1.9844256542798664E7 ]; individualIndex=-1; initOperator=eva2.optimization.operator.initialization.DefaultInitialization{}; marked=false; mutationOperator=eva2.optimization.operator.mutation.MutateESGlobal{crossoverType=intermediate; lowerLimitStepSize=5.0E-7; mutationStepSize=0.29794752140464204; tau1=0.15; }; mutationProbability=1.0; selectionProbability=[ 0.0 ]; }
+         solution data	: { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227}
+         solution fit	: [ 1.9844256542798664E7 ]
+ Feasible ind. found after 10 evaluations.
+ Solution correlations (min,max,avg,med,var): [ -0.5566962039972452 0.5275676078205672 0.035247303650149046 0.051387090429007014 0.06537730701879882 ]
+* Run best feasible individual equals best individual.
+### Resulting population 
+Fit.:	[ 2.239030241391749E7 ], ID: 184,	{-0.982, 5.280,-6.130, 7.718,-5.295, 3.484,-5.662,-0.310, 3.903,-9.613, 3.813,-5.519, 8.567, 1.386, 4.546, 10.000,-3.792, 1.805, 4.523, 0.873}  
+Fit.:	[ 2.0831167907034308E7 ], ID: 185,	{-0.209,-1.108, 10.000, 1.808, 10.000, 9.087, 1.994, 2.592, 0.057,-4.352,-4.413,-5.766,-1.727,-4.941,-0.313, 8.099, 0.261,-5.910,-2.093,-1.091}  
+Fit.:	[ 2.229560952036917E7 ], ID: 164,	{-5.054,-5.078, 4.265, 5.046, 3.249, 9.712, 9.233, 7.673,-10.000, 0.135,-4.405, 9.674,-6.459,-7.918, 7.773,-1.242,-10.000,-6.248,-0.539,-4.115}  
+Fit.:	[ 2.1215306029738057E7 ], ID: 187,	{-4.606, 1.749,-0.744,-1.323, 10.000, 0.974, 2.577,-5.959,-10.000,-1.730,-10.000, 0.714, 10.000,-10.000, 1.931,-7.534, 1.890, 10.000, 10.000,-3.820}  
+Fit.:	[ 2.0820782486816213E7 ], ID: 188,	{ 5.689, 1.694,-5.877, 2.242, 6.587,-9.254, 9.795, 6.992,-0.950, 6.019,-5.684, 9.347,-6.573, 0.959,-0.762, 3.098,-1.615, 3.561,-3.969, 5.037}  
+Fit.:	[ 2.1496326578739844E7 ], ID: 189,	{-8.370, 10.000,-3.748, 10.000,-3.348, 5.403, 1.842,-10.000,-2.242,-9.093,-0.598,-8.097,-2.952, 7.141, 9.823, 9.529, 0.660,-9.282,-6.540, 5.843}  
+Fit.:	[ 2.2167559857020464E7 ], ID: 190,	{-4.606, 4.121, 0.194,-10.000, 5.360,-6.658,-1.805, 2.384,-8.147,-9.171,-1.397,-0.065, 2.030,-1.183,-3.271, 9.421,-10.000,-0.743, 2.241,-4.548}  
+Fit.:	[ 2.1207265489947762E7 ], ID: 191,	{-1.004, 3.047, 6.751, 5.832, 2.958,-1.854, 5.969,-8.410, 9.222,-5.133, 9.784,-6.755,-1.288,-1.038, 2.709, 8.488, 7.509,-3.606,-2.881,-0.686}  
+Fit.:	[ 2.1182577066541374E7 ], ID: 170,	{ 7.633,-0.887, 10.000,-1.234, 4.115,-0.991, 10.000, 1.864,-8.747, 9.457, 10.000, 8.533,-8.397, 10.000,-10.000,-0.316,-3.658, 4.750, 4.875,-7.572}  
+Fit.:	[ 1.9844256542798664E7 ], ID: 193,	{ 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227}  
+*******
+ Runs performed: 1, reached target 0 times with threshold 0.001, rate 0.0
+ Average function calls: 90
+     Feasible solution found in 1 of 1 runs 
+     Average evaluations until feasible ind. was found in 1 runs: 10.0 evaluations
+     Averaged sum of run statistical data: (1 runs): | 450.0 | 1.7948977733145934E8 | 1.9642866987797317E8
+     Averaged last statistical data (1 runs): | 90.0 | 1.9844256542798664E7 | 2.1345115389292337E7
+* Overall best ind.: eva2.optimization.individuals.ESIndividualDoubleData{DGenotype=[ 4.493523715615508 3.2772667522247296 2.481080307442938 10.0 10.0 2.664078052138865 4.859895400425036 -10.0 -3.2773772387311997 -6.18944965106451 -2.811587179419854 -5.710461453541594 3.1312840229022947 4.736450885867379 -9.579693750401676 5.678696940521938 10.0 -2.1072511326200165 10.0 5.227135689800241 ]; age=8; crossoverOperator=eva2.optimization.operator.crossover.CrossoverESDefault{}; crossoverProbability=0.5; doubleRange=[ [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] [ -10.0 10.0 ] ]; fitness=[ 1.9844256542798664E7 ]; individualIndex=-1; initOperator=eva2.optimization.operator.initialization.DefaultInitialization{}; marked=false; mutationOperator=eva2.optimization.operator.mutation.MutateESGlobal{crossoverType=intermediate; lowerLimitStepSize=5.0E-7; mutationStepSize=0.29794752140464204; tau1=0.15; }; mutationProbability=1.0; selectionProbability=[ 0.0 ]; }
+         solution data	: { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227}
+         solution fit	: [ 1.9844256542798664E7 ]
+Overall best statistical data: 
+FunctionCalls | currentBest | meanFit | solution
+90 | 1.9844256542798664E7 | 2.1345115389292337E7 | { 4.494, 3.277, 2.481, 10.000, 10.000, 2.664, 4.860,-10.000,-3.277,-6.189,-2.812,-5.710, 3.131, 4.736,-9.580, 5.679, 10.000,-2.107, 10.000, 5.227}
+StopDate:2019-05-22_14.38.58

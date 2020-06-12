@@ -1,0 +1,11 @@
+Epsilon Greedy Bandit:
+  explorationRate: '0.2'
+-------
+Softmax Bandit:
+  initialTemperature: '5.0'
+  temperatureDecay: '0.98'
+-------
+UCB1 Bandit:
+  maximumReward: '20.0'
+  minimumReward: '-20.0'
+-------

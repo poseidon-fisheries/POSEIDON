@@ -1,0 +1,106 @@
+
+### Optimization parameters 
+```
+!!eva2.optimization.OptimizationParameters
+optimizer: !!eva2.optimization.strategies.NelderMeadSimplex
+    checkRange: true
+    critIndex: 0
+    population: !population
+        initAround: 0.1
+        initMethod: individualDefault
+        initPos: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        popMetric: !!eva2.optimization.operator.distancemetric.EuclideanMetric {normedByDblRange: false}
+        seedCardinality: {head: 5, tail: 1}
+        targetSize: 50
+    populationSize: 50
+postProcessParams: !!eva2.optimization.operator.postprocess.PostProcessParams
+    PPMethod: nelderMead
+    accAssumeConv: 1.0E-8
+    accMaxEval: -1
+    accuracies: [0.01]
+    doPostProcessing: false
+    postProcessClusterSigma: 0.05
+    postProcessSteps: 5000
+    printNBest: 10
+    withPlot: false
+problem: !!eva2.problems.SimpleProblemWrapper
+    defaultAccuracy: 0.001
+    defaultRange: 10.0
+    individualTemplate: !!eva2.optimization.individuals.ESIndividualDoubleData
+        areaConst4ParallelViolated: false
+        crossoverOperator: !!eva2.optimization.operator.crossover.CrossoverESDefault {}
+        crossoverProbability: 0.5
+        initOperator: !!eva2.optimization.operator.initialization.DefaultInitialization {}
+        isMarked: false
+        isPenalized: false
+        mutationOperator: !!eva2.optimization.operator.mutation.MutateESGlobal {crossoverType: intermediate,
+            lowerLimitStepSize: 5.0E-7, mutationStepSize: 0.2, tau1: 0.15}
+        mutationProbability: 1.0
+    noise: 0.0
+    parallelThreads: 4
+    problemDimension: 7
+    simpleProblem: !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
+        parameters:
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Dover Sole.averageCatchability,
+            maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Longspine Thornyhead.averageCatchability,
+            maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Sablefish.averageCatchability,
+            maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Shortspine Thornyhead.averageCatchability,
+            maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Yelloweye Rockfish.averageCatchability,
+            maximum: 0.001, minimum: 1.0E-5}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.proportionSimulatedToGarbage,
+            maximum: 0.5, minimum: 0.0}
+        - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
+            maximum: 15000.0, minimum: 1500.0}
+        runsPerSetting: 1
+        scenarioFile: docs/groundfish/calibration/step1_catchability/clamped.yaml
+        seed: 0
+        summaryDirectory: docs/groundfish/calibration/step1_catchability
+        yearsToIgnore: 1
+        yearsToRun: 5
+randomSeed: 0
+terminator: !!eva2.optimization.operator.terminators.EvaluationTerminator {fitnessCalls: 50000}
+
+```
+
+## Multirun 1
+| FunctionCalls | currentBest | meanFit | solution | 
+| --- | --- | --- | --- | 
+| 50 | 20.473993635775756 | 34.37304099802295 | {-0.243,-1.370,-0.229,-5.175, 3.578, 6.013, 6.305} | 
+| 100 | 19.008681296185717 | 25.588086233640503 | { 3.934, 2.741, 6.164,-7.088, 0.592, 3.453, 0.642} | 
+| 150 | 18.823669192849 | 22.75126715415389 | {-0.936,-1.110,-1.850,-5.025, 6.330,-1.276, 5.716} | 
+| 200 | 16.721861128107303 | 21.100384735268143 | {-0.589,-1.240,-1.039,-5.100, 4.954, 2.369, 6.011} | 
+| 250 | 15.146639952161498 | 19.696554014832348 | {-1.565,-0.158,-1.776,-5.818, 7.214, 3.306, 6.512} | 
+| 300 | 15.146639952161498 | 18.26420951994081 | {-1.565,-0.158,-1.776,-5.818, 7.214, 3.306, 6.512} | 
+| 350 | 15.260572439429227 | 17.11054924092474 | {-1.259,-0.429,-1.828,-5.979, 7.559, 2.054, 4.773} | 
+| 400 | 14.26224295106475 | 16.27573059323602 | {-0.184,-0.606,-1.637,-5.743, 7.630,-0.211, 4.959} | 
+| 450 | 13.224546150714827 | 16.06847183005492 | {-0.717,-0.682,-1.685,-5.677, 6.573, 0.540, 5.222} | 
+| 500 | 14.275751259676653 | 16.003511761331676 | {-0.708,-0.690,-1.697,-5.671, 6.678, 0.183, 5.041} | 
+| 550 | 13.963110674600355 | 15.571199089597433 | {-0.385,-0.426,-1.763,-5.692, 6.976, 0.350, 5.230} | 
+| 600 | 14.328889456036027 | 15.705720003441925 | {-0.527,-0.469,-1.828,-5.755, 6.960, 0.357, 5.272} | 
+| 650 | 14.598144123485023 | 15.80045550719992 | {-0.585,-0.518,-1.826,-5.785, 6.998, 0.370, 5.217} | 
+| 700 | 13.794055853803933 | 15.776305697483647 | {-0.589,-0.526,-1.824,-5.789, 7.013, 0.367, 5.219} | 
+| 750 | 13.794055853803933 | 15.773381857486063 | {-0.589,-0.526,-1.824,-5.789, 7.013, 0.367, 5.219} | 
+| 800 | 13.853695664212252 | 15.753233326734145 | {-0.597,-0.524,-1.832,-5.791, 6.995, 0.382, 5.229} | 
+| 850 | 14.327569428188342 | 16.010813635621005 | {-0.602,-0.539,-1.829,-5.791, 7.020, 0.375, 5.235} | 
+| 900 | 13.566443552649636 | 15.508717448334346 | {-0.594,-0.527,-1.828,-5.793, 6.996, 0.386, 5.228} | 
+| 950 | 14.554951785483201 | 15.776247090714728 | {-0.597,-0.522,-1.833,-5.794, 6.999, 0.386, 5.232} | 
+| 1000 | 13.548826234555465 | 15.734847514752898 | {-0.597,-0.530,-1.829,-5.793, 7.005, 0.380, 5.230} | 
+| 1050 | 13.846070445411007 | 15.787940217551615 | {-0.596,-0.529,-1.830,-5.794, 7.004, 0.379, 5.229} | 
+| 1100 | 13.846070445411007 | 15.496017604294739 | {-0.596,-0.529,-1.830,-5.794, 7.004, 0.379, 5.229} | 
+| 1150 | 14.517621969350177 | 15.97174201170583 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1200 | 14.517621969350177 | 15.640538536679642 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1250 | 14.43116861393261 | 15.859442581714626 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1300 | 14.13626908934356 | 15.584914173170722 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1350 | 14.161098935724759 | 15.758410622761621 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1400 | 13.816929926006328 | 15.620349725466658 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1450 | 14.170940383490313 | 15.569310537674724 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1500 | 14.826246821117866 | 16.13268772108619 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1550 | 14.396554746238607 | 16.12199064370729 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1600 | 14.349619183776031 | 15.973092218373232 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1650 | 14.300682522821038 | 15.788753912689149 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1700 | 14.33506072868918 | 15.761800368838596 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 
+| 1750 | 14.724668653388802 | 16.000634640561152 | {-0.596,-0.529,-1.830,-5.793, 7.003, 0.380, 5.229} | 

@@ -182,6 +182,7 @@ public class BatchRunner
                 }
         //new run
         runsDone++;
+        model.finish();
         return writer;
 
     }

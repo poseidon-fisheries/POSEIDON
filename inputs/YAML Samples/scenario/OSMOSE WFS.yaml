@@ -1,0 +1,135 @@
+OSMOSE WFS:
+  biologyInitializer:
+    Osmose Biology:
+      discardMortalityRate:
+        2: 0.374
+        3: 0.5
+        4: 0.82875
+      indexOfSpeciesToBeManagedByThisModel: 2,3,4
+      numberOfOsmoseStepsToPulseBeforeSimulationStart: 1368
+      osmoseConfigurationFile: /home/carrknight/code/POSEIDON/temp_wfs/wfs/osm_all-parameters.csv
+      preInitializedConfiguration: true
+      preInitializedConfigurationDirectory: /home/carrknight/code/POSEIDON/temp_wfs/wfs/randomStarts
+      recruitmentAges:
+        2: 2
+        3: 2
+        4: 1
+      scalingFactor: '1000.0'
+  exogenousCatches:
+    RedSnapper: '935084.25'
+    GagGrouper: '1607978.75'
+    RedGrouper: '887488.0'
+  gagGrouperPrice: '4.414031175'
+  handlineLogbook: No Logbook
+  handlinerDepartingStrategy:
+    WFS Handline:
+      intercept: '-2.075184'
+      priceGagGrouper: '0.29466086127701985'
+      priceRedGrouper: '-0.16347469028508835'
+      realDieselPrice: '-2.341569186447353'
+      spring: '0.725026'
+      summer: '0.624472'
+      weekend: '-0.097619'
+      windSpeedInKnots: '-0.046672'
+      winter: '0.266862'
+  handlinerDestinationStrategy:
+    Boolean Bare Bones:
+      automaticallyAvoidMPA: true
+      automaticallyAvoidWastelands: true
+      discretizer:
+        Centroid File Discretization:
+          automaticallyIgnoreWastelands: false
+          filePath: temp_wfs/areas.txt
+          xColumnName: eastings
+          yColumnName: northings
+      distanceInKm: '-0.00759009'
+      habitIntercept: '2.53163185'
+      habitPeriodInDays: '90.0'
+  handlinerDiscardingStrategy: Discarding All Unsellable
+  handlinerFishingStrategy:
+    WFS Logit Return:
+      intercept: '-3.47701'
+      priceGagGrouper: '-0.29538842343911'
+      priceRedGrouper: '0.4190966706129506'
+      ratioCatchToFishHold: '4.37828'
+      weekendDummy: '-0.24437'
+  handlinerGear:
+    Random Catchability By List:
+      catchabilityMap: 2:0.001,3:0.001,4:0.001
+      standardDeviationMap: ''
+      trawlSpeed: '5.0'
+  handlinerGearStrategy: Never Change Gear
+  handlinerHoldSize: '2200.0'
+  handlinerSpeedKph: '16.0661'
+  handlinerTravellingCosts: '0.0'
+  handlinerWeatherStrategy: Ignore Weather
+  longlineLogbook:
+    Logit-like Logbook:
+      dayOfTheYear: false
+      discretization:
+        Centroid File Discretization:
+          automaticallyIgnoreWastelands: false
+          filePath: temp_wfs/areas.txt
+          xColumnName: eastings
+          yColumnName: northings
+      gasPrice: true
+      gridX: false
+      gridY: false
+      habitat: false
+      histogrammerStartYear: -1
+      identifier: longline_
+      intercept: true
+      periodHabit: 90
+      periodHabitContinuous: -1
+      portDistance: true
+      simulatedCost: false
+      simulatedProfits: false
+      simulatedRevenue: false
+      timeOfObservation: false
+      windSpeed: true
+  longlinerDepartingStrategy:
+    WFS Handline:
+      intercept: '-2.959116'
+      priceGagGrouper: nullparameter
+      priceRedGrouper: nullparameter
+      realDieselPrice: '-0.572412067751844'
+      spring: '0.770212'
+      summer: '0.933939'
+      weekend: nullparameter
+      windSpeedInKnots: '0.004265'
+      winter: '0.706415'
+  longlinerDestinationStrategy:
+    Florida Longliner:
+      automaticallyAvoidMPA: true
+      automaticallyAvoidWastelands: true
+      centroidFile: temp_wfs/areas.txt
+      coefficientsFile: temp_wfs/longline.csv
+      coefficientsStandardDeviationFile: temp_wfs/longline_dummy.csv
+  longlinerDiscardingStrategy: Discarding All Unsellable
+  longlinerFishingStrategy:
+    WFS Logit Return:
+      intercept: '-2.74969'
+      priceGagGrouper: '-0.1280581980057884'
+      priceRedGrouper: '-0.056590184128656'
+      ratioCatchToFishHold: '4.53092'
+      weekendDummy: '-0.15556'
+  longlinerGear:
+    Random Catchability By List:
+      catchabilityMap: 2:0.001,3:0.001,4:0.001
+      standardDeviationMap: ''
+      trawlSpeed: '5.0'
+  longlinerGearStrategy: Never Change Gear
+  longlinerHoldSize: '6500.0'
+  longlinerSpeedKph: '16.0661'
+  longlinerTravellingCosts: '0.0'
+  longlinerWeatherStrategy: Ignore Weather
+  redGrouperPrice: '5.616258398'
+  redSnapperMortalityFromShrimpBycatchInKg: '124650.0'
+  redSnapperPrice: '5.424372922'
+  regulations:
+    Multiple Regulations:
+      factories:
+      - Weak Multi-TAC by List:
+          yearlyQuotaMaps: 2:2408575.485,3:3991612.856,4:337000
+      tags:
+      - all

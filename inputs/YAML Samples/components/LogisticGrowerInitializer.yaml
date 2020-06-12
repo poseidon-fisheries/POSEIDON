@@ -1,0 +1,12 @@
+Independent Logistic Grower:
+  steepness: '0.7'
+-------
+Common Logistic Grower:
+  distributionalWeight: '-1.0'
+  steepness: '0.7'
+  usesBeginningOfYearBiomassToGrow: false
+-------
+FAD-Aware Common Logistic Grower:
+  distributionalWeight: '-1.0'
+  steepness: '0.7'
+-------

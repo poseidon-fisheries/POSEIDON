@@ -1,0 +1,3 @@
+Year: 0 day: 0 hour: 0,4,null,Canary Rockfish does not have a spatial.txt file and so cannot be distributed on the map. It will be ignored
+Year: 0 day: 365 hour: 0,3,null,Resetting all rules
+Year: 1 day: 1 hour: 0,3,null,Resetting all local biologies

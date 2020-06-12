@@ -1,0 +1,8 @@
+Average
+-------
+Moving Average:
+  window: '20.0'
+-------
+Exponential Moving Average:
+  alpha: '0.2'
+-------
