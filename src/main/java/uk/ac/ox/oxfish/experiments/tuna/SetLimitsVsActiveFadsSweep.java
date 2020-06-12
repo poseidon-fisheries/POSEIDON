@@ -38,17 +38,17 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.time.Month.FEBRUARY;
+import static java.time.Month.JANUARY;
 import static java.time.Month.JULY;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
-import static java.util.stream.Stream.concat;
+import static java.util.stream.IntStream.rangeClosed;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
 
@@ -61,69 +61,67 @@ public class SetLimitsVsActiveFadsSweep {
         basePath.resolve(Paths.get("runs", "gatherers_test", "tuna_calibrated.yaml"));
 
     private static final Path outputPath =
-        basePath.resolve(Paths.get("runs", "set_limits_vs_closures_sweeps"));
+        basePath.resolve(Paths.get("runs", "set_limits_vs_closures_sweeps_5_rpp"));
 
-    private static final int NUM_RUNS_PER_POLICY = 2;
-    private static final int NUM_YEARS_TO_RUN = 6;
-    private static final int POLICY_KICK_IN_YEAR = 1;
 
-    private static final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
-        new ActiveFadLimitsFactory(iattcLimits);
+    private static final int NUM_RUNS_PER_POLICY = 5;
+    private static final int NUM_YEARS_TO_RUN = 5;
+    private static final int POLICY_KICK_IN_YEAR = 3;
 
     public static void main(final String[] args) {
-        new SetLimitsVsActiveFadsSweep().makeRunner().run(NUM_YEARS_TO_RUN);
+        new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+            .setPolicies(new SetLimitsVsActiveFadsSweep().makePolicies())
+            .requestYearlyData()
+            .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private Runner<TunaScenario> makeRunner() {
+    private ImmutableList<Policy<TunaScenario>> makePolicies() {
 
-        final ImmutableMap<Optional<AlgorithmFactory<? extends ActionSpecificRegulation>>, String> setLimits =
-            concat(
-                Stream.of(0, 25, 50, 75).map(Optional::of),
-                Stream.of(Optional.<Integer>empty())
-            ).collect(toImmutableMap(
-                opt -> opt.map(SetLimitsFactory::new),
-                opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
+        final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
+            new ActiveFadLimitsFactory(iattcLimits);
+
+        final Map<Integer, SetLimitsFactory> setLimitsFactories =
+            rangeClosed(1, 5).boxed().collect(toImmutableMap(
+                i -> i * 25,
+                i -> new SetLimitsFactory(i * 25)
             ));
 
-        Policy<TunaScenario> p =
-            makePolicy(
-                "Tuna - Longer seasonal closures",
-                "Length of closure periods A and B increased by 40% (100 days instead of 72).",
-                ImmutableList.of(currentFadLimits),
-                scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
+        final Map<Integer, Function<TunaScenario, AlgorithmFactory<? extends Regulation>>> closureFactories =
+            rangeClosed(0, 4).boxed().collect(toImmutableMap(
+                i -> i * 14,
+                i -> scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
                     scenario.galapagosEezReg, TAG_FOR_ALL,
                     scenario.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
-                        scenario.dayOfYear(JULY, 1),
+                        scenario.dayOfYear(JULY, 29) - (i * 14),
                         scenario.dayOfYear(OCTOBER, 8),
                         new NoFishingFactory()
                     ), "closure A",
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(NOVEMBER, 9),
-                        scenario.dayOfYear(FEBRUARY, 16),
+                        scenario.dayOfYear(JANUARY, 19) + (i * 14),
                         new NoFishingFactory()
                     ), "closure B"
                 ))
-            );
+            ));
 
-        ImmutableList.Builder<Policy<TunaScenario>> policies = ImmutableList.builder();
-//        fadLimits.forEach((activeFadLimits, fadLimitsName) ->
-//            setLimits.forEach((generalSetLimits, setLimitsName) ->
-//                policies.add(makePolicy(
-//                    concat(Stream.of(activeFadLimits), stream(generalSetLimits)).collect(toImmutableList()),
-//                    fadLimitsName + " / " + setLimitsName
-//                ))
-//            )
-//        );
+        final ImmutableList.Builder<Policy<TunaScenario>> builder = ImmutableList.builder();
 
-        return new Runner<>(TunaScenario.class, scenarioPath, outputPath)
-            .requestYearlyData()
-            .setPolicies(policies.build());
+        setLimitsFactories.forEach((i, setLimitsFactory) ->
+            closureFactories.forEach((j, closureFactory) ->
+                builder.add(makePolicy(
+                    i + "," + j,
+                    ImmutableList.of(currentFadLimits, setLimitsFactory),
+                    closureFactory
+                ))
+            )
+        );
+
+        return builder.build();
     }
 
     private Policy<TunaScenario> makePolicy(
         String policyName,
-        String policyDescription,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
         Function<TunaScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
@@ -145,7 +143,7 @@ public class SetLimitsVsActiveFadsSweep {
                 fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, POLICY_KICK_IN_YEAR)
             );
         };
-        return new Policy<>(policyName, policyDescription, scenarioConsumer);
+        return new Policy<>(policyName, policyName, scenarioConsumer);
     }
 
 }
