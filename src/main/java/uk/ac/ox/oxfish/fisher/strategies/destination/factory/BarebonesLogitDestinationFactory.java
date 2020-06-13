@@ -46,7 +46,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
     /**
      * everybody shares the parent same destination logit strategy
      */
-    private final Locker<FishState,MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
     protected AlgorithmFactory<? extends MapDiscretizer> discretizer =
             new CentroidMapFileFactory();
     /**
@@ -69,7 +69,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
     public LogitDestinationStrategy apply(FishState state) {
         //create the discretization
         MapDiscretization discretization = discretizationLocker.presentKey(
-                state, new Supplier<MapDiscretization>() {
+                state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
                     @Override
                     public MapDiscretization get() {
                         MapDiscretizer mapDiscretizer = discretizer.apply(state);

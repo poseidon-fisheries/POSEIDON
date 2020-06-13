@@ -69,10 +69,6 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
 
     private boolean canReturnFromRetirement = true;
 
-    /**
-     * makes sure we create only one instance for each data gatherer
-     */
-    private final Locker<FishState, Startable> dataGatherer = new Locker<>();
 
     /**
      * Applies this function to the given argument.

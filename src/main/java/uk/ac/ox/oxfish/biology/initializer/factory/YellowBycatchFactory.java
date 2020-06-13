@@ -99,7 +99,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter diffusingRate = new FixedDoubleParameter(.0001);
 
-    private Locker<FishState,YellowBycatchInitializer> instance = new Locker<>();
+    private Locker<String,YellowBycatchInitializer> instance = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -110,7 +110,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     @Override
     public YellowBycatchInitializer apply(FishState state) {
         int northSouthSeparator = this.northSouthSeparator.apply(state.getRandom()).intValue();
-        return instance.presentKey(state,
+        return instance.presentKey(state.getHopefullyUniqueID(),
                             new Supplier<YellowBycatchInitializer>() {
                                 @Override
                                 public YellowBycatchInitializer get() {

@@ -48,7 +48,7 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
     }
 
 
-    private Locker<FishState,StrategyReplicator> replicator = new Locker<>();
+    private Locker<String,StrategyReplicator> replicator = new Locker<>();
 
     private DoubleParameter inertia = new FixedDoubleParameter(.8);
 
@@ -63,7 +63,7 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
     public ReplicatorDrivenDestinationStrategy apply(FishState state) {
 
         StrategyReplicator replicator =
-                this.replicator.presentKey(state,
+                this.replicator.presentKey(state.getHopefullyUniqueID(),
                                            new Supplier<StrategyReplicator>() {
                                                @Override
 

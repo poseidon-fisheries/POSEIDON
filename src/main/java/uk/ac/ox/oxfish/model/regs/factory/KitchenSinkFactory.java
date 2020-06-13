@@ -80,7 +80,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         if(individualTradeableQuotas) {
             //initializes
             itqFactory.apply(fishState);
-            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().presentKey(fishState,
+            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().presentKey(fishState.getHopefullyUniqueID(),
                                                                                         () -> {
                                                                                             throw new RuntimeException("Should be initialized already!!!");
                                                                                         }))

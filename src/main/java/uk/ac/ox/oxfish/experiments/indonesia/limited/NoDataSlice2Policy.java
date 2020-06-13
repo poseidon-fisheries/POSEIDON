@@ -494,10 +494,13 @@ public class NoDataSlice2Policy {
         for (int i = 1; i < strings.size(); i++) {
 
             String[] row = strings.get(i);
+            System.out.println(Integer.parseInt(row[1]));
+            if(Integer.parseInt(row[1])<30)
             sensitivity(
                     Paths.get(row[0]),
                     Integer.parseInt(row[1])
             );
+            System.gc();
         }
 
 
@@ -560,6 +563,7 @@ public class NoDataSlice2Policy {
             runner=null;
             fileWriter.write(tidy.toString());
             fileWriter.flush();
+            System.gc();
 
         }
         fileWriter.close();

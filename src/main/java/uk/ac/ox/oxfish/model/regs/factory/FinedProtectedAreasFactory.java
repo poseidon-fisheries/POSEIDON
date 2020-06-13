@@ -51,7 +51,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
     /**
      * makes sure you only schedule yourself to build the MPAs once
      */
-    private final Locker<FishState,FinedProtectedAreas> mpaBuilder = new Locker<>();
+    private final Locker<String,FinedProtectedAreas> mpaBuilder = new Locker<>();
 
     private List<StartingMPA> mpas = new LinkedList<>();
     {
@@ -72,7 +72,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
 
 
         return mpaBuilder.presentKey(
-                state,
+                state.getHopefullyUniqueID(),
                 new Supplier<FinedProtectedAreas>() {
                     @Override
                     public FinedProtectedAreas get() {

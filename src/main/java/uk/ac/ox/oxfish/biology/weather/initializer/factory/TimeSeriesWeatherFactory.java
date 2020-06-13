@@ -54,7 +54,7 @@ public class TimeSeriesWeatherFactory implements AlgorithmFactory<CSVWeatherInit
     /**
      * locker holding the weather object
      */
-    private Locker<FishState,CSVWeatherInitializer> weatherLocker = new Locker<>();
+    private Locker<String,CSVWeatherInitializer> weatherLocker = new Locker<>();
 
 
     private CsvColumnToList reader = new CsvColumnToList(Paths.get("inputs","test","weather.csv").toAbsolutePath().toString(),
@@ -85,7 +85,7 @@ public class TimeSeriesWeatherFactory implements AlgorithmFactory<CSVWeatherInit
     public CSVWeatherInitializer apply(FishState state)
     {
 
-        return weatherLocker.presentKey(state,
+        return weatherLocker.presentKey(state.getHopefullyUniqueID(),
 
                                  new Supplier<CSVWeatherInitializer>() {
                                      @Override

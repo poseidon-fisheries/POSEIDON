@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  */
 public class RandomOpenCloseController implements AlgorithmFactory<ExternalOpenCloseSeason>{
 
-    private final Locker<FishState,ExternalOpenCloseSeason> locker = new Locker<>();
+    private final Locker<String,ExternalOpenCloseSeason> locker = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -47,7 +47,7 @@ public class RandomOpenCloseController implements AlgorithmFactory<ExternalOpenC
     @Override
     public ExternalOpenCloseSeason apply(FishState fishState) {
         return locker.presentKey
-                (fishState,
+                (fishState.getHopefullyUniqueID(),
                  new Supplier<ExternalOpenCloseSeason>() {
                      @Override
                      public ExternalOpenCloseSeason get() {

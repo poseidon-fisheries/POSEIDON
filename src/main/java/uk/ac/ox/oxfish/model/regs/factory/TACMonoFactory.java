@@ -44,7 +44,7 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<FishState,MonoQuotaRegulation> modelQuota = new Locker<>();
+    private final Locker<String,MonoQuotaRegulation> modelQuota = new Locker<>();
 
 
     /**
@@ -66,7 +66,8 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 
         final Double yearlyQuota = quota.apply(state.random);
         final MonoQuotaRegulation quotaRegulation =
-                modelQuota.presentKey(state, () -> new MonoQuotaRegulation(yearlyQuota));
+                modelQuota.presentKey(state.getHopefullyUniqueID(),
+                        () -> new MonoQuotaRegulation(yearlyQuota));
 
         //if it has not been consumed (probably because the model still has to start) then:
         if(quotaRegulation.getQuotaRemaining(0) > 0 &&

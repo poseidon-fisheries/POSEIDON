@@ -57,12 +57,12 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
     /**
      * an array of order books for each "model" lspiRun
      */
-    private final Locker<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
+    private final Locker<String,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
 
     /**
      * an array of order book makers for each model lspiRun
      */
-    private final Locker<FishState,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
+    private final Locker<String,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
 
     /**
      * The ITQ yearly quota to give the fisher to fish the first species
@@ -105,13 +105,13 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
 
         //grab the markets and its builders
         HashMap<Integer,ITQOrderBook> markets =
-                orderBooks.presentKey(state,
+                orderBooks.presentKey(state.getHopefullyUniqueID(),
                                       HashMap::new
                 );
 
 
         ITQMarketBuilder[] builders = orderBooksBuilder.
-                presentKey(state,
+                presentKey(state.getHopefullyUniqueID(),
                            () -> new ITQMarketBuilder[numberOfSpecies]);
 
 

@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.Locker;
 
 abstract public class SpecificProtectedAreaFactory implements AlgorithmFactory<SpecificProtectedArea> {
 
-    private final Locker<FishState, SpecificProtectedArea> specificProtectedAreaLocker = new Locker<>();
+    private final Locker<String, SpecificProtectedArea> specificProtectedAreaLocker = new Locker<>();
 
     abstract ImmutableSet<MasonGeometry> buildGeometries(FishState fishState);
 
@@ -26,6 +26,6 @@ abstract public class SpecificProtectedAreaFactory implements AlgorithmFactory<S
 
     @Override
     public SpecificProtectedArea apply(FishState fishState) {
-        return specificProtectedAreaLocker.presentKey(fishState, () -> buildSpecificProtectedArea(fishState));
+        return specificProtectedAreaLocker.presentKey(fishState.getHopefullyUniqueID(), () -> buildSpecificProtectedArea(fishState));
     }
 }

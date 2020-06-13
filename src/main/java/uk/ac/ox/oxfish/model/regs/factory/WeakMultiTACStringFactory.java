@@ -50,7 +50,7 @@ public class WeakMultiTACStringFactory implements AlgorithmFactory<WeakMultiQuot
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<FishState,WeakMultiQuotaRegulation> modelQuota = new Locker<>();
+    private final Locker<String,WeakMultiQuotaRegulation> modelQuota = new Locker<>();
 
 
 
@@ -59,7 +59,7 @@ public class WeakMultiTACStringFactory implements AlgorithmFactory<WeakMultiQuot
     {
 
 
-        return modelQuota.presentKey(state,
+        return modelQuota.presentKey(state.getHopefullyUniqueID(),
                                      new Supplier<WeakMultiQuotaRegulation>() {
                                          @Override
                                          public WeakMultiQuotaRegulation get() {

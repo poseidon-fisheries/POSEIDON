@@ -39,7 +39,7 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
     /**
      * share the same discretization
      */
-    private final Locker<FishState,MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
     private AlgorithmFactory<? extends MapDiscretizer> discretizer =
             new CentroidMapFileFactory();
 
@@ -71,7 +71,7 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
 
         //create the discretization
         MapDiscretization discretization = discretizationLocker.presentKey(
-                state, new Supplier<MapDiscretization>() {
+                state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
                     @Override
                     public MapDiscretization get() {
                         MapDiscretizer mapDiscretizer = discretizer.apply(state);

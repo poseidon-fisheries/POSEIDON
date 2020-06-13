@@ -44,7 +44,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     /**
      * one market only for each fish-state
      */
-    private final Locker<FishState,ITQMarketBuilder> marketBuilders = new Locker<>();
+    private final Locker<String,ITQMarketBuilder> marketBuilders = new Locker<>();
 
     /**
      * quota available to each guy
@@ -71,7 +71,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 
 
         ITQMarketBuilder marketBuilder =
-                marketBuilders.presentKey(state,
+                marketBuilders.presentKey(state.getHopefullyUniqueID(),
                                           new Supplier<ITQMarketBuilder>() {
                                               @Override
                                               public ITQMarketBuilder get() {

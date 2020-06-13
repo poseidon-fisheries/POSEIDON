@@ -43,12 +43,12 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
     /**
      * an array of order books for each "model" lspiRun
      */
-    private final Locker<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
+    private final Locker<String,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
 
     /**
      * an array of order book makers for each model lspiRun
      */
-    private final Locker<FishState,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
+    private final Locker<String,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
 
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
@@ -139,13 +139,13 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
 
         //grab the markets and its builders
         HashMap<Integer,ITQOrderBook> markets =
-                orderBooks.presentKey(state,
+                orderBooks.presentKey(state.getHopefullyUniqueID(),
                                       HashMap::new
                 );
 
 
         ITQMarketBuilder[] builders = orderBooksBuilder.
-                presentKey(state,
+                presentKey(state.getHopefullyUniqueID(),
                            () -> new ITQMarketBuilder[numberOfSpecies]);
 
 
@@ -217,7 +217,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      *
      * @return Value for property 'orderBooksBuilder'.
      */
-    public Locker<FishState, ITQMarketBuilder[]> getOrderBooksBuilder() {
+    public Locker<String, ITQMarketBuilder[]> getOrderBooksBuilder() {
         return orderBooksBuilder;
     }
 }

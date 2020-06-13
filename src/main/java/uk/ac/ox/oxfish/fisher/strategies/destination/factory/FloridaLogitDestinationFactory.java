@@ -67,7 +67,7 @@ public class FloridaLogitDestinationFactory implements
     /**
      * everybody shares the parent same destination logit strategy
      */
-    private Locker<FishState,MapDiscretization> discretizationLocker = new Locker<>();
+    private Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
 
     private boolean automaticallyAvoidMPA = true;
 
@@ -85,7 +85,7 @@ public class FloridaLogitDestinationFactory implements
     public LogitDestinationStrategy apply(FishState state) {
 
         MapDiscretization discretization = discretizationLocker.
-                presentKey(state, () -> OsmoseWFSScenario.createDiscretization(state, centroidFile)
+                presentKey(state.getHopefullyUniqueID(), () -> OsmoseWFSScenario.createDiscretization(state, centroidFile)
                 );
 
         CsvColumnsToLists reader = new CsvColumnsToLists(
