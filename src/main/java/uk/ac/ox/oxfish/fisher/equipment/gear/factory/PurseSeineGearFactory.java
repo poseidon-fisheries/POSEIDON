@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -36,6 +37,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private Set<Observer<DeployFad>> fadDeploymentObservers = new LinkedHashSet<>();
     private Set<Observer<MakeFadSet>> fadSetObservers = new LinkedHashSet<>();
     private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new LinkedHashSet<>();
+
+    private final WeakHashMap<FishState, Set<Observer<DeployFad>>> fadDeploymentObserversCache = new WeakHashMap<>();
+    private final WeakHashMap<FishState, Set<Observer<MakeFadSet>>> fadSetObserversCache = new WeakHashMap<>();
+    private final WeakHashMap<FishState, Set<Observer<MakeUnassociatedSet>>> unassociatedSetObserversCache = new WeakHashMap<>();
+
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
@@ -144,9 +150,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads,
-            fadDeploymentObservers,
-            fadSetObservers,
-            unassociatedSetObservers,
+            fadDeploymentObserversCache.computeIfAbsent(fishState, __ -> new LinkedHashSet<>(fadDeploymentObservers)),
+            fadSetObserversCache.computeIfAbsent(fishState, __ -> new LinkedHashSet<>(fadSetObservers)),
+            unassociatedSetObserversCache.computeIfAbsent(fishState, __ -> new LinkedHashSet<>(unassociatedSetObservers)),
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations
         );
