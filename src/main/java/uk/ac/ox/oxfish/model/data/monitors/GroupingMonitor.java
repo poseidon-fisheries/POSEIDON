@@ -131,7 +131,8 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
                     intervalPolicy,
                     accumulatorSupplier,
                     unit,
-                    yLabel, valueExtractorBuilder.apply(group)
+                    yLabel,
+                    valueExtractorBuilder.apply(group)
                 )
             ))
         );

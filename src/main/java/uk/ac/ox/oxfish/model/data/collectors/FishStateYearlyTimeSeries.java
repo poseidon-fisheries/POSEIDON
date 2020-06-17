@@ -38,11 +38,9 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import static javax.measure.MetricPrefix.KILO;
 import static tech.units.indriya.AbstractUnit.ONE;
 import static tech.units.indriya.unit.Units.HOUR;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.METRE;
 import static uk.ac.ox.oxfish.model.FishStateDailyTimeSeries.getAllMarketColumns;
 import static uk.ac.ox.oxfish.utility.Measures.KILOMETRE;
 
@@ -89,24 +87,13 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         for(Species species : observed.getSpecies())
         {
 
-
-            List<String> allPossibleColumns = getAllMarketColumns(observed.getAllMarketsForThisSpecie(species));
-            for(String column : allPossibleColumns)
-                registerGatherer(species + " " + column,
-                                 FishStateUtilities.generateYearlySum(
-                                         originalGatherer.getColumn(species + " " + column)),0d);
-
-
-
+            List<String> allMarketColumns = getAllMarketColumns(observed.getAllMarketsForThisSpecie(species));
+            for (String marketColumn : allMarketColumns) {
+                registerYearlySumGatherer(species + " " + marketColumn);
+            }
 
             //catches (includes discards)
-            String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
-            registerGatherer(catchesColumn,
-                             FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
-                                     catchesColumn)), 0d);
-
-
-
+            registerYearlySumGatherer(species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME);
 
             final String price = species + " Average Sale Price";
             registerGatherer(price,
@@ -135,7 +122,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                      return  sumNumerator/sumDenominator;
 
                                  }
-                             },Double.NaN);
+                             },Double.NaN, currency, "Price");
 
 
 
@@ -165,7 +152,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         }).sum() /
                         observed.getFishers().size();
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
         registerGatherer("Median Cash-Flow", new Gatherer<FishState>() {
             @Override
@@ -184,7 +171,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
 
         registerGatherer("Actual Median Cash-Flow", new Gatherer<FishState>() {
@@ -213,7 +200,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
         registerGatherer("Actual Median Trip Profits", new Gatherer<FishState>() {
             @Override
@@ -242,7 +229,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Profits");
 
 
 
@@ -268,7 +255,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                     }
                                 }).average().orElse(0d);
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
 
 
@@ -294,12 +281,10 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                     }
                                 }).average().orElse(0d);
             }
-        }, 0d);
+        }, 0d, currency, "Balance");
 
 
-        registerGatherer("Total Effort",
-                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")),
-                         0d);
+        registerYearlySumGatherer("Total Effort");
 
         registerGatherer(
             "Average Distance From Port",
@@ -375,7 +360,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         }).sum() /
                         observed.getFishers().size();
             }
-        }, 0d);
+        }, 0d, currency, "Expenditure");
 
 
         registerGatherer("Average Variable Costs", new Gatherer<FishState>() {
@@ -392,7 +377,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return costs.getAverage();
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         registerGatherer("Total Variable Costs", new Gatherer<FishState>() {
             @Override
@@ -408,7 +393,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return costs.getSum();
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         registerGatherer("Total Earnings", new Gatherer<FishState>() {
             @Override
@@ -424,7 +409,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return earnings.getSum();
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Earnings", new Gatherer<FishState>() {
             @Override
@@ -440,7 +425,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return earnings.getAverage();
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Trip Earnings", new Gatherer<FishState>() {
             @Override
@@ -472,7 +457,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return trips > 0 ? hoursOut/trips : 0d;
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Trip Variable Costs", new Gatherer<FishState>() {
             @Override
@@ -504,7 +489,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return trips > 0 ? hoursOut/trips : 0d;
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
         registerGatherer(
@@ -568,17 +553,20 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             {
 
                 String portname = port.getName();
-                for(Species species : state.getBiology().getSpecies())
-                {
 
+                for (Species species : state.getBiology().getSpecies()) {
+                    final String columnName = species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
                     state.getYearlyDataSet().registerGatherer(
-                            portname + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                            fishState -> fishState.getFishers().stream().
-                                    filter(fisher -> fisher.getHomePort().equals(port)).
-                                    mapToDouble(value -> value.getLatestYearlyObservation(
-                                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+                        portname + " " + columnName,
+                        fishState -> fishState.getFishers().stream()
+                            .filter(fisher -> fisher.getHomePort().equals(port))
+                            .mapToDouble(value -> value.getLatestYearlyObservation(columnName))
+                            .sum(),
+                        Double.NaN,
+                        KILOGRAM,
+                        "Biomass"
+                    );
                 }
-
 
                 state.getYearlyDataSet().registerGatherer(portname + " Total Income",
                                                           fishState ->
@@ -586,6 +574,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                           filter(fisher -> fisher.getHomePort().equals(port)).
                                                                           mapToDouble(value -> value.getLatestYearlyObservation(
                                                                                   FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
 
                 state.getYearlyDataSet().registerGatherer(portname + " Average Distance From Port",
                                                           fishState ->
@@ -653,13 +642,22 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                                   }).sum() /
                                                                           fishers.size();
                                                               }
-                                                          }, Double.NaN);
+                                                          }, Double.NaN, currency, "Cash flow");
             }
         }
 
 
     }
 
-
+    private void registerYearlySumGatherer(final String columnName) {
+        final DataColumn column = originalGatherer.getColumn(columnName);
+        registerGatherer(
+            columnName,
+            FishStateUtilities.generateYearlySum(column),
+            0d,
+            column.getUnit(),
+            column.getYLabel()
+        );
+    }
 
 }

@@ -43,6 +43,6 @@ public class Measures {
         return asDouble(getQuantity(sourceValue, sourceUnit), targetUnit);
     }
 
-    interface Money extends Quantity<Money> { }
+    public interface Money extends Quantity<Money> { }
 
 }

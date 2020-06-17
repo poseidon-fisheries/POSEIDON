@@ -36,6 +36,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static uk.ac.ox.oxfish.utility.Measures.*;
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
+
 /**
  * Basically a map<String,Double> to collect data about an object of type T
  * Created by carrknight on 5/2/15.
@@ -53,6 +56,9 @@ public class TimeSeries<T> implements Steppable
     private final StepOrder stepOrder;
 
     private T observed;
+
+    // The currency to use to set the unit of money related columns.
+    Unit<Money> currency = DOLLAR;
 
     /**
      * Create a new data column
@@ -81,7 +87,7 @@ public class TimeSeries<T> implements Steppable
     ) {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists: " + title);
         int size =noGatherers() ? 0 : numberOfObservations();
-        DataColumn column = unit == null ? new DataColumn(title) : new MeasuredDataColumn<>(title, unit, yLabel);
+        DataColumn column = new DataColumn(title, unit, yLabel);
         //fill if needed
         for(int i=0; i<size; i++)
             column.add(defaultValue);
@@ -220,6 +226,11 @@ public class TimeSeries<T> implements Steppable
     protected void reset(){
         data.clear();
     }
+
+    public Unit<Money> getCurrency() { return currency; }
+
+    public void setCurrency(final Unit<Money> currency) { this.currency = currency; }
+
 }
 
 
@@ -246,4 +257,5 @@ final class ColumnGatherer<T>{
     public Gatherer<T> getGatherer() {
         return gatherer;
     }
+
 }

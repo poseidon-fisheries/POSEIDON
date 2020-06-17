@@ -22,14 +22,11 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.MeasuredDataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-import javax.measure.Unit;
 import java.util.List;
 
 import static java.lang.Math.toIntExact;
-import static tech.units.indriya.AbstractUnit.ONE;
 
 public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
 
@@ -49,7 +46,7 @@ public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
             index + 1, // year
             column.getName(), // variable
             column.get(toIntExact(index)), // value
-            getUnit(column).getSymbol() // unit of measure ("" if unit is dimensionless, i.e., ONE)
+            column.getUnit().getSymbol() // unit of measure ("" if unit is dimensionless, i.e., ONE)
         );
     }
 

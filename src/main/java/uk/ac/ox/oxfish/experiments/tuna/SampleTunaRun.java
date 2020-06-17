@@ -38,8 +38,8 @@ import java.nio.file.Paths;
 
 public class SampleTunaRun {
 
-    private static final int NUM_YEARS_TO_RUN = 10;
-    private static final int NUM_RUNS_PER_POLICY = 2;
+    private static final int NUM_YEARS_TO_RUN = 2;
+    private static final int NUM_RUNS_PER_POLICY = 1;
 
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");

@@ -12,6 +12,8 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 /**
  * an abstract class that deals with data gatherrs and other basic utilities of the exogenous catch
  * but doesn't actually do any "catching" except scheduling itself every year
@@ -70,7 +72,9 @@ public abstract class AbstractExogenousCatches implements  ExogenousCatches {
                             return lastExogenousCatchesMade.get(species);
                         }
                     },
-                    0
+                    0,
+                    KILOGRAM,
+                    "Biomass"
             );
         }
     }

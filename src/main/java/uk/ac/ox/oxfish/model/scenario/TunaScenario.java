@@ -741,7 +741,7 @@ public class TunaScenario implements Scenario {
                     EVERY_YEAR,
                     IncrementingAccumulator::new,
                     ONE,
-                    "Proportion of sets",
+                    "Number of sets",
                     ImmutableList.of(true, false),
                     isOnOwnFad -> String.format(
                         "sets on %s FADs%s",

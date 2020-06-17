@@ -499,27 +499,22 @@ public class FishStateUtilities {
         final DataColumn column,
         final SerializableFunction<Double, Double> sumTransformer
     ) {
-        return new Gatherer<T>() {
-            @Override
-            public Double apply(T state) {
-                //get the iterator
-                final Iterator<Double> iterator = column.descendingIterator();
-                if(!iterator.hasNext()) //not ready/year 1
-                    return Double.NaN;
-                double sum = 0;
-                for(int i=0; i<365; i++) {
-                    //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                    //and only has a partially filled collection
-                    if(iterator.hasNext())
-                        sum += iterator.next();
-                }
-
-                return sumTransformer.apply(sum);
+        return state -> {
+            //get the iterator
+            final Iterator<Double> iterator = column.descendingIterator();
+            if (!iterator.hasNext()) //not ready/year 1
+                return Double.NaN;
+            double sum = 0;
+            for (int i = 0; i < 365; i++) {
+                //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                //and only has a partially filled collection
+                if (iterator.hasNext())
+                    sum += iterator.next();
             }
+
+            return sumTransformer.apply(sum);
         };
     }
-
-
 
     /**
      * takes a column of daily observations and sum them up to generate a yearly observation

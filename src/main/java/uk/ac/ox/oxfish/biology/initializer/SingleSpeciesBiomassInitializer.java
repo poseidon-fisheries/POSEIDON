@@ -24,7 +24,14 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.util.Log;
-import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassMovementRule;
+import uk.ac.ox.oxfish.biology.ConstantBiomassDecorator;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.AllocatorManager;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -32,12 +39,13 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
 
@@ -353,18 +361,14 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         );
 
         final String columnName = species + " Recruitment";
-        modelBeingInitialized.getYearlyCounter().addColumn(
-                columnName);
+        modelBeingInitialized.getYearlyCounter().addColumn(columnName);
         modelBeingInitialized.getYearlyDataSet().registerGatherer(
-                columnName,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(
-                            FishState state) {
-                        return modelBeingInitialized.getYearlyCounter().getColumn(
-                                columnName);
-                    }
-                }, 0d);
+            columnName,
+            state -> modelBeingInitialized.getYearlyCounter().getColumn(columnName),
+            0d,
+            KILOGRAM,
+            "Biomass"
+        );
 
         return independentGlobalBiology;
 

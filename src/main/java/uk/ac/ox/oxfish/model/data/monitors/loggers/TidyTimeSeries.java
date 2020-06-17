@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.MeasuredDataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import javax.measure.Unit;
@@ -44,17 +43,5 @@ public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProv
     }
 
     abstract List<Object> makeRow(DataColumn column, int index);
-
-    Unit<?> getUnit(DataColumn column) {
-        return column instanceof MeasuredDataColumn
-            ? ((MeasuredDataColumn<?>) column).getUnit()
-            : ONE;
-    }
-
-    String getYLabel(DataColumn column) {
-        return column instanceof MeasuredDataColumn
-            ? ((MeasuredDataColumn<?>) column).getYLabel()
-            : "";
-    }
 
 }

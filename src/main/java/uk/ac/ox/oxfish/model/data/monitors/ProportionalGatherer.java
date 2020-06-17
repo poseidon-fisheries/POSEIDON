@@ -24,6 +24,9 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import javax.measure.Quantity;
 
+import static tech.units.indriya.AbstractUnit.ONE;
+import static tech.units.indriya.unit.Units.PERCENT;
+
 public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends MonitorDecorator<O, V, Q> {
 
     private final GroupingMonitor<G, O, V, Q> delegate;
@@ -40,8 +43,8 @@ public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends Monito
                     "Proportion of " + subMonitor.getBaseName(),
                     __ -> subMonitor.getAccumulator().get() / getAccumulator().get(),
                     0.0,
-                    delegate.getUnit(),
-                    delegate.getYLabel()
+                    ONE,
+                    "Proportion"
                 );
         });
         super.registerWith(timeSeries);
