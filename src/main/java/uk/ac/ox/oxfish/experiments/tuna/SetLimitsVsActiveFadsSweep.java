@@ -64,7 +64,7 @@ public class SetLimitsVsActiveFadsSweep {
         basePath.resolve(Paths.get("runs", "set_limits_vs_closures_sweeps_5_rpp"));
 
 
-    private static final int NUM_RUNS_PER_POLICY = 5;
+    private static final int NUM_RUNS_PER_POLICY = 25;
     private static final int NUM_YEARS_TO_RUN = 5;
     private static final int POLICY_KICK_IN_YEAR = 3;
 

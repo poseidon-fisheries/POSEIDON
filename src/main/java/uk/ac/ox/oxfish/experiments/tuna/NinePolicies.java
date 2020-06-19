@@ -62,7 +62,7 @@ public class NinePolicies {
     private static final Path outputPath =
         basePath.resolve(Paths.get("runs", "nine_policies"));
 
-    private static final int NUM_RUNS_PER_POLICY = 10;
+    private static final int NUM_RUNS_PER_POLICY = 25;
     private static final int NUM_YEARS_TO_RUN = 5;
     private static final int POLICY_KICK_IN_YEAR = 3;
 
@@ -86,22 +86,22 @@ public class NinePolicies {
 
         return ImmutableList.of(
             makePolicy(
-                "Strict FAD limits / 25-set limit",
+                "25-set limit / Strict FAD limits",
                 ImmutableList.of(strictFadLimits, new SetLimitsFactory(25)),
                 null
             ),
             makePolicy(
-                "Current FAD limit / 25-set limit",
+                "25-set limit / Current FAD limit",
                 ImmutableList.of(currentFadLimits, new SetLimitsFactory(25)),
                 null
             ),
             makePolicy(
-                "Strict FAD limits / 50-set limit",
+                "50-set limit / Strict FAD limits",
                 ImmutableList.of(strictFadLimits, new SetLimitsFactory(50)),
                 null
             ),
             makePolicy(
-                "Current FAD limit / 50-set limit",
+                "50-set limit / Current FAD limit",
                 ImmutableList.of(currentFadLimits, new SetLimitsFactory(50)),
                 null
             ),
