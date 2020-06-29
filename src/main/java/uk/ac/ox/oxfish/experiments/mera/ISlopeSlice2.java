@@ -25,7 +25,7 @@ public class ISlopeSlice2 {
 
     final static public Path MAIN_DIRECTORY =
             Paths.get("docs", "20200604 islope",
-                    "slice2");
+                    "last_catch_tac");
 
 
     final static public int MAX_YEARS_TO_RUN = 40;
@@ -35,8 +35,8 @@ public class ISlopeSlice2 {
     public static void main(String[] args) throws IOException {
 
         runSlice(
-                MAIN_DIRECTORY.resolve("base_islope_slice2.yaml"),
-                MAIN_DIRECTORY.resolve("parameters_nomovement.yaml"),
+                MAIN_DIRECTORY.resolve("base.yaml"),
+                MAIN_DIRECTORY.resolve("parameters.yaml"),
                 MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
                 MAIN_DIRECTORY,
                 0L,

@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.IndicatorPastAverage;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -48,7 +48,7 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
                 numberOfYearsToLookBackForTarget);
 
 
-        IndicatorPastAverage current = new IndicatorPastAverage(
+        PastAverageSensor current = new PastAverageSensor(
                 indicatorColumnName,
                 numberOfYearsToAverageForCurrent
         );
@@ -80,15 +80,15 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
 //                        controller.setP(
 //                                - 0.1 *
 //                        );
-                        final Double meanIndicator = new IndicatorPastAverage(
+                        final Double meanIndicator = new PastAverageSensor(
                                 indicatorColumnName,
-                                numberOfYearsToAverageForCurrent
+                                numberOfYearsToLookBackForTarget
                         ).scan(((FishState) simState));
                         System.out.println("mean_index:" +
                                 meanIndicator);
-                        final Double meanOffset = new IndicatorPastAverage(
+                        final Double meanOffset = new PastAverageSensor(
                                 offsetColumnName,
-                                numberOfYearsToAverageForCurrent
+                                numberOfYearsToLookBackForTarget
                         ).scan(((FishState) simState));
                         System.out.println("mean_offset:" +
                                 meanOffset);

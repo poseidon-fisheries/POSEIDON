@@ -8,13 +8,13 @@ import java.util.function.Function;
 /**
  * reads column name, returns the average of its last X observations
  */
-public class IndicatorPastAverage implements Sensor<FishState,Double> {
+public class PastAverageSensor implements Sensor<FishState,Double> {
 
 
     private final  FixedTargetAsMultipleOfOriginalObservation delegate;
 
 
-    public IndicatorPastAverage(String indicatorColumnName, int yearsToLookBack) {
+    public PastAverageSensor(String indicatorColumnName, int yearsToLookBack) {
 
         delegate = new FixedTargetAsMultipleOfOriginalObservation(
                 indicatorColumnName,

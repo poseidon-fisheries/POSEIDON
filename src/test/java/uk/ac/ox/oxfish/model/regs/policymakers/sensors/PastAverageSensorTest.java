@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class IndicatorPastAverageTest {
+public class PastAverageSensorTest {
 
 
     @Test
@@ -29,8 +29,8 @@ public class IndicatorPastAverageTest {
         FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(state.getYearlyDataSet().getColumn("indicator")).thenReturn(indicatorColumn);
 
-        IndicatorPastAverage target =
-                new IndicatorPastAverage("indicator",
+        PastAverageSensor target =
+                new PastAverageSensor("indicator",
                         2);
         assertEquals(target.scan(state),
                 0.975,.0001d);

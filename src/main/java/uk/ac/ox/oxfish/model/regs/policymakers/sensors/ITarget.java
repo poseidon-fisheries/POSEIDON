@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.regs.policymakers.sensors;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.utility.LinearRegression;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.DoubleSummaryStatistics;
@@ -26,6 +25,7 @@ public class ITarget implements Sensor<FishState,Double> {
 
 
     private final String catchColumnName;
+    private final int yearsToLookBackToTarget;
 
 
     /**
@@ -62,14 +62,19 @@ public class ITarget implements Sensor<FishState,Double> {
     /**
      * this is TAC* and is unchanged through the years
      */
-    private double tacStar = Double.NaN;
+    private double lastPolicy = Double.NaN;
 
-    public ITarget(String catchColumnName, String indicatorColumnName, double precautionaryScaling, double indicatorMultiplier, int timeInterval) {
+
+
+    public ITarget(String catchColumnName, String indicatorColumnName,
+                   double precautionaryScaling, double indicatorMultiplier,
+                   int timeInterval, int yearsToLookBackToTarget) {
         this.catchColumnName = catchColumnName;
         this.indicatorColumnName = indicatorColumnName;
         this.precautionaryScaling = precautionaryScaling;
         this.indicatorMultiplier = indicatorMultiplier;
         this.timeInterval = timeInterval;
+        this.yearsToLookBackToTarget = yearsToLookBackToTarget;
     }
 
     @Override
@@ -78,7 +83,7 @@ public class ITarget implements Sensor<FishState,Double> {
         final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
         final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
         //you need to have at least timeInterval*2 observations
-        if(catchColumn.size()<timeInterval*2) //need a long enough time series!
+        if(catchColumn.size()< yearsToLookBackToTarget) //need a long enough time series!
             return Double.NaN;
         assert indicatorColumn.size() == catchColumn.size();
 
@@ -124,16 +129,16 @@ public class ITarget implements Sensor<FishState,Double> {
         double catches = catchesThisInterval.getAverage();
 
         //create baseline if it's not there!
-        if(!Double.isFinite(tacStar))
-             tacStar = catches * (1-precautionaryScaling);
+        if(!Double.isFinite(lastPolicy))
+             lastPolicy = catches * (1-precautionaryScaling);
 
         if(indicatorRecent<=indicatorZero) {
             //0.5 * TACstar * (Irecent/I0)^2
-            return  0.5*tacStar* Math.pow(indicatorRecent/indicatorZero,2);
+            return  0.5* lastPolicy * Math.pow(indicatorRecent/indicatorZero,2);
         }
         else
             //TAC=0.5TAC∗[1+(Irecent−I0)/(Itarget−I0)]
-            return 0.5*tacStar * (1d+ (indicatorRecent-indicatorZero)/
+            return 0.5* lastPolicy * (1d+ (indicatorRecent-indicatorZero)/
                     (indicatorTarget-indicatorZero));
     }
 

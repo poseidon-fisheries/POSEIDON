@@ -49,7 +49,7 @@ public class ITargetTest {
         ITarget target = new ITarget("catches","indicator",
                 0.2,
                 1.7,
-                5);
+                5, 5 * 2);
 
         Assert.assertEquals(target.scan(state),
                 661.2503
