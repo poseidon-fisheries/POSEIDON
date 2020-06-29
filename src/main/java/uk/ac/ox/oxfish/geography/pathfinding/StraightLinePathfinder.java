@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The default pathfinder: quick and stupid as it runs over land and everything else
  * Created by carrknight on 11/4/15.
@@ -54,6 +56,9 @@ public class StraightLinePathfinder implements Pathfinder {
 
         assert start != null : "start " + start + ", end: " + end;
         assert end != null : "start " + start + ", end: " + end;
+
+        checkArgument(start.isWater() || start.isPortHere());
+        checkArgument(end.isWater() || end.isPortHere());
 
         int x = start.getGridX();
         int endX = end.getGridX();

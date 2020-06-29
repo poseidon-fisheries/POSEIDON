@@ -35,6 +35,8 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.PriorityQueue;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The A* pathfinder, as implemented here:
  * http://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -76,13 +78,13 @@ public class AStarPathfinder implements Pathfinder {
     public Deque<SeaTile> getRoute(
             NauticalMap map, SeaTile start, SeaTile end)
     {
-
-
-
         //preconditions
         Preconditions.checkNotNull(start);
         Preconditions.checkNotNull(end);
         Preconditions.checkNotNull(map);
+
+        checkArgument(start.isWater() || start.isPortHere());
+        checkArgument(end.isWater() || end.isPortHere());
 
         // If we already have this path in our memory, return a mutable copy of it
         final Optional<ImmutableList<SeaTile>> knownPath = memory.getPath(start, end);
