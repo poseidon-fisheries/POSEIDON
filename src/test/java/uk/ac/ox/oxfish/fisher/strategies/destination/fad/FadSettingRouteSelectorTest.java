@@ -118,7 +118,7 @@ public class FadSettingRouteSelectorTest {
         // Check that route from port to (2, 2) takes us there
         assertEquals(
             Optional.of(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 2}})),
-            routeSelector.getRoute(fisher, port.getLocation(), map.getSeaTile(2, 2))
+            routeSelector.getRoute(port.getLocation(), map.getSeaTile(2, 2))
         );
 
         final Set<SeaTile> initialFadTiles = Stream.of(
@@ -150,7 +150,7 @@ public class FadSettingRouteSelectorTest {
         );
 
         final ImmutableList<PossibleRoute> possibleRoutes =
-            routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
+            routeSelector.getPossibleRoutes(fisher, map, possibleDestinations, 0);
 
         // check that no possible route goes back to port
         assertFalse(possibleRoutes.stream()

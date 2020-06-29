@@ -21,12 +21,12 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.fad;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.geography.ports.Port;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.function.BiFunction;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.getLast;
@@ -38,16 +38,18 @@ public class PossibleRoute {
     private final ImmutableList<Step> steps;
     private final double totalTravelTimeInHours;
     private final int lastTimeStep;
+    private final double totalTravelTimeAndBackToPortInHours;
 
     public PossibleRoute(
         Deque<SeaTile> route,
         int startingTimeStep,
         double hoursPerStep,
         double speedInKph,
-        BiFunction<Deque<SeaTile>, Double, ImmutableList<Pair<SeaTile, Double>>> getCumulativeTravelTimeAlongRoute
+        NauticalMap map,
+        Port homePort
     ) {
         this.steps =
-            getCumulativeTravelTimeAlongRoute.apply(route, speedInKph)
+            map.cumulativeTravelTimeAlongRouteInHours(route, speedInKph)
                 .stream()
                 .map(pair -> new Step(
                     pair.getFirst(),
@@ -57,6 +59,13 @@ public class PossibleRoute {
                 .collect(toImmutableList());
         final Step lastStep = getLast(steps);
         this.totalTravelTimeInHours = lastStep.getCumulativeHours();
+
+        this.totalTravelTimeAndBackToPortInHours =
+            getLast(map.cumulativeTravelTimeAlongRouteInHours(
+                map.getRoute(getLast(steps).seaTile, homePort.getLocation()),
+                speedInKph
+            )).getSecond();
+
         this.lastTimeStep = lastStep.getTimeStep();
     }
 
@@ -70,12 +79,19 @@ public class PossibleRoute {
     public int getLastTimeStep() { return lastTimeStep; }
 
     public double getCost(Fisher fisher) {
+        // We include the travel time back to port in the cost of the route since,
+        // even if it's not the last leg of the trip, this cost will have to be paid
+        // eventually and fishers have to take it into account when making decisions
         return fisher
             .getAdditionalTripCosts()
             .stream()
-            .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, getTotalTravelTimeInHours()))
+            .mapToDouble(cost ->
+                cost.cost(fisher, null, null, 0.0, getTotalTravelTimeAndBackToPortInHours())
+            )
             .sum();
     }
+
+    double getTotalTravelTimeAndBackToPortInHours() { return totalTravelTimeAndBackToPortInHours; }
 
     public double getTotalTravelTimeInHours() { return totalTravelTimeInHours; }
 
@@ -89,7 +105,7 @@ public class PossibleRoute {
         private final double cumulativeHours;
         private final int timeStep;
 
-        public Step(SeaTile seaTile, double cumulativeHours, int timeStep) {
+        Step(SeaTile seaTile, double cumulativeHours, int timeStep) {
             this.seaTile = seaTile;
             this.cumulativeHours = cumulativeHours;
             this.timeStep = timeStep;
@@ -110,5 +126,7 @@ public class PossibleRoute {
                 cumulativeHours
             );
         }
+
     }
+
 }

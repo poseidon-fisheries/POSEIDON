@@ -48,7 +48,7 @@ public class DriftingPath {
         final Optional<Double2D> vector = Optional.ofNullable(currentVectors.getVector(timeStep, tile));
         final Optional<Double2D> newPosition = vector.map(position::add);
         final Optional<SeaTile> newTile = newPosition.flatMap(p ->
-            Optional.ofNullable(getSeaTile.apply((int) p.x, (int) p.y))
+            Optional.ofNullable(getSeaTile.apply((int) p.x, (int) p.y)).filter(SeaTile::isWater)
         );
         // only return the new position if it's on a tile
         return newTile.flatMap(__ -> newPosition);

@@ -24,25 +24,28 @@ import com.google.common.collect.Streams;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.toCollection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class PossibleRouteTest {
 
-    @SuppressWarnings("UnstableApiUsage") @Test
+    @SuppressWarnings({"UnstableApiUsage", "unchecked"}) @Test
     public void test() {
 
         final LinkedList<SeaTile> tileDeque = Stream
@@ -50,23 +53,36 @@ public class PossibleRouteTest {
             .limit(5)
             .collect(toCollection(LinkedList::new));
 
-        BiFunction<Deque<SeaTile>, Double, ImmutableList<Pair<SeaTile, Double>>> travelTimes =
-            (tiles, __) -> Streams
-                .mapWithIndex(tiles.stream(), (tile, i) -> new Pair<>(tile, (double) i))
-                .collect(toImmutableList());
+        final NauticalMap map = mock(NauticalMap.class);
+        final Port port = mock(Port.class);
 
-        PossibleRoute route = new PossibleRoute(tileDeque, 0, 1, 1, travelTimes);
+        final ImmutableList<Pair<SeaTile, Double>> steps = Streams
+            .mapWithIndex(tileDeque.stream(), (tile, i) -> new Pair<>(tile, (double) i))
+            .collect(toImmutableList());
+        when(map.cumulativeTravelTimeAlongRouteInHours(any(), anyDouble())).thenReturn(steps);
 
-        assertEquals(tileDeque, route.getSteps().stream().map(PossibleRoute.Step::getSeaTile).collect(toCollection(LinkedList::new)));
+        PossibleRoute route = new PossibleRoute(tileDeque, 0, 1, 1, map, port);
+
+        assertEquals(
+            tileDeque,
+            route.getSteps().stream().map(PossibleRoute.Step::getSeaTile).collect(toCollection(LinkedList::new))
+        );
         assertTrue(new Route(tileDeque, null).isSameAs(route.makeRoute(null)));
         assertEquals(4, route.getLastTimeStep());
         assertEquals(4.0, route.getTotalTravelTimeInHours(), EPSILON);
-        assertEquals(ImmutableList.of(0, 1, 2, 3, 4), route.getSteps().stream().map(PossibleRoute.Step::getTimeStep).collect(toImmutableList()));
-        assertEquals(ImmutableList.of(0d, 1d, 2d, 3d, 4d), route.getSteps().stream().map(PossibleRoute.Step::getCumulativeHours).collect(toImmutableList()));
+        assertEquals(
+            ImmutableList.of(0, 1, 2, 3, 4),
+            route.getSteps().stream().map(PossibleRoute.Step::getTimeStep).collect(toImmutableList())
+        );
+        assertEquals(
+            ImmutableList.of(0d, 1d, 2d, 3d, 4d),
+            route.getSteps().stream().map(PossibleRoute.Step::getCumulativeHours).collect(toImmutableList())
+        );
 
         Fisher fisher = mock(Fisher.class);
         when(fisher.getAdditionalTripCosts()).thenReturn(new LinkedList<>(ImmutableList.of(new HourlyCost(2))));
         assertEquals(8.0, route.getCost(fisher), EPSILON);
 
     }
+
 }

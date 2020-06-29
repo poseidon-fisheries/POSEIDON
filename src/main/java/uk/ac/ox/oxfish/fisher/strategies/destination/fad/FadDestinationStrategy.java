@@ -49,6 +49,7 @@ public class FadDestinationStrategy implements DestinationStrategy {
         this.routeSelectors = Iterators.cycle(
             fadDeploymentRouteSelector,
             fadSettingRouteSelector,
+            fadDeploymentRouteSelector,
             new RouteToPortSelector(map)
         );
     }

@@ -30,15 +30,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Map.Entry;
+import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -47,6 +48,7 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
     private final static Locker<NauticalMap, ImmutableList<SeaTile>> possibleRouteTilesLocker = new Locker<>();
     private final ImmutableList<SeaTile> possibleRouteTiles; // will serve as row keys for our ArrayTable of values
     private Map<SeaTile, Double> deploymentLocationValues;
+
     public FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
@@ -76,10 +78,13 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         return getDeploymentLocationValues().keySet();
     }
 
-    public Map<SeaTile, Double> getDeploymentLocationValues() { return deploymentLocationValues; }
+    public Map<SeaTile, Double> getDeploymentLocationValues() { return unmodifiableMap(deploymentLocationValues); }
 
     public void setDeploymentLocationValues(Map<SeaTile, Double> deploymentLocationValues) {
-        this.deploymentLocationValues = deploymentLocationValues;
+        this.deploymentLocationValues = deploymentLocationValues
+            .entrySet().stream()
+            .filter(entry -> entry.getKey().isWater())
+            .collect(toMap(Entry::getKey, Entry::getValue));
     }
 
     @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
@@ -111,14 +116,6 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
                 )
                 .sum() - possibleRoute.getCost(fisher)
         ));
-    }
-
-    @Override Optional<Deque<SeaTile>> getRoute(
-        final Fisher fisher, final SeaTile startingTile, final SeaTile destination
-    ) {
-        return fisher.isAtPort()
-            ? getSimpleRoute(startingTile, destination)
-            : getRouteAndBackToPort(fisher, startingTile, destination);
     }
 
 }

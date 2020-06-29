@@ -98,7 +98,7 @@ public class FadDeploymentRouteSelectorTest {
         // make sure no possible destinations are returned as long as max travel time is 0
         final Set<SeaTile> emptyDestinationSet = routeSelector.getPossibleDestinations(fisher, 0);
         assertTrue(emptyDestinationSet.isEmpty());
-        assertTrue(routeSelector.getPossibleRoutes(fisher, emptyDestinationSet, 0).isEmpty());
+        assertTrue(routeSelector.getPossibleRoutes(fisher, map, emptyDestinationSet, 0).isEmpty());
         assertFalse(routeSelector.selectRoute(fisher, 0, rng).isPresent());
 
         final ImmutableSet<SeaTile> deploymentLocations = ImmutableSet.of(
@@ -118,7 +118,7 @@ public class FadDeploymentRouteSelectorTest {
         assertEquals(deploymentLocations, possibleDestinations);
 
         final ImmutableList<PossibleRoute> possibleRoutes =
-            routeSelector.getPossibleRoutes(fisher, possibleDestinations, 0);
+            routeSelector.getPossibleRoutes(fisher, map, possibleDestinations, 0);
         assertEquals(ImmutableList.of(0, 1, 2), getTimeStepRange(0, possibleRoutes));
 
         final Route shortRoute = new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}}), fisher);

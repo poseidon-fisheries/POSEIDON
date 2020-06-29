@@ -495,8 +495,8 @@ public Coordinate getCoordinates(int gridX, int gridY) {
     }
 
 
-    public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, NauticalMap map, double speedInKph) {
-        return distance.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
+    public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, double speedInKph) {
+        return distance.cumulativeTravelTimeAlongRouteInHours(route, this, speedInKph);
     }
 
 

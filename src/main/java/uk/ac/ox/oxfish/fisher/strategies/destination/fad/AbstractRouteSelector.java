@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
@@ -74,7 +73,7 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         if (shouldGoToPort(fisher)) return Optional.empty();
 
         final ImmutableList<PossibleRoute> possibleRoutes =
-            getPossibleRoutes(fisher, getPossibleDestinations(fisher, timeStep), timeStep);
+            getPossibleRoutes(fisher, fishState.getMap(), getPossibleDestinations(fisher, timeStep), timeStep);
 
         final List<Entry<Route, Double>> candidateRoutes =
             evaluateRoutes(fisher, possibleRoutes, timeStep)
@@ -107,19 +106,23 @@ public abstract class AbstractRouteSelector implements RouteSelector {
 
     @SuppressWarnings("UnstableApiUsage")
     ImmutableList<PossibleRoute> getPossibleRoutes(
-        Fisher fisher,
-        Collection<SeaTile> possibleDestinations,
-        int startingTimeStep
+        final Fisher fisher,
+        final NauticalMap map,
+        final Collection<SeaTile> possibleDestinations,
+        final int startingTimeStep
     ) {
         return possibleDestinations
             .stream()
-            .flatMap(destinationTile -> stream(getRoute(fisher, fisher.getLocation(), destinationTile)))
+            .flatMap(destinationTile -> stream(getRoute(fisher.getLocation(), destinationTile)))
             .map(routeDeque -> new PossibleRoute(
-                routeDeque, startingTimeStep, hoursPerStep,
+                routeDeque,
+                startingTimeStep,
+                hoursPerStep,
                 fisher.getBoat().getSpeedInKph() * travelSpeedMultiplier,
-                this::cumulativeTravelTimeAlongRouteInHours
+                map,
+                fisher.getHomePort()
             ))
-            .filter(route -> route.getTotalTravelTimeInHours() <= getMaxTravelTimeInHours())
+            .filter(route -> route.getTotalTravelTimeAndBackToPortInHours() <= getMaxTravelTimeInHours())
             .collect(toImmutableList());
     }
 
@@ -129,38 +132,14 @@ public abstract class AbstractRouteSelector implements RouteSelector {
         Fisher fisher, ImmutableList<PossibleRoute> possibleRoutes, int timeStep
     );
 
-    Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile startingTile, SeaTile destination) {
-        return getSimpleRoute(startingTile, destination);
-    }
-
-    private ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
-        Deque<SeaTile> route,
-        Double speedInKph
-    ) {
-        NauticalMap map = fishState.getMap();
-        return map.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
-    }
-
     @SuppressWarnings("WeakerAccess") public double getMaxTravelTimeInHours() { return maxTravelTimeInHours; }
 
     public void setMaxTravelTimeInHours(double maxTravelTimeInHours) {
         this.maxTravelTimeInHours = maxTravelTimeInHours;
     }
 
-    Optional<Deque<SeaTile>> getSimpleRoute(SeaTile startingTile, SeaTile destination) {
+    Optional<Deque<SeaTile>> getRoute(SeaTile startingTile, SeaTile destination) {
         return Optional.ofNullable(fishState.getMap().getRoute(startingTile, destination));
-    }
-
-    Optional<Deque<SeaTile>> getRouteAndBackToPort(Fisher fisher, SeaTile startingTile, SeaTile destination) {
-        final SeaTile port = fisher.getHomePort().getLocation();
-        return getSimpleRoute(startingTile, destination)
-            .flatMap(route ->
-                getSimpleRoute(destination, port).map(routeBackToPort -> {
-                    routeBackToPort.removeFirst();
-                    route.addAll(routeBackToPort);
-                    return route;
-                })
-            );
     }
 
 }
