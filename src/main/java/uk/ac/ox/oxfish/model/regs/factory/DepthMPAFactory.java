@@ -42,7 +42,7 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
     private DoubleParameter maxDepth = new FixedDoubleParameter(200);
 
 
-    private Locker<FishState,ProtectedAreasOnly> locker = new Locker<>();
+    private Locker<String,ProtectedAreasOnly> locker = new Locker<>();
 
 
     /**
@@ -54,7 +54,8 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
     @Override
     public ProtectedAreasOnly apply(FishState state) {
 
-        return locker.presentKey(state, new Supplier<ProtectedAreasOnly>() {
+        return locker.presentKey(state.getHopefullyUniqueID(),
+                new Supplier<ProtectedAreasOnly>() {
             @Override
             public ProtectedAreasOnly get() {
 

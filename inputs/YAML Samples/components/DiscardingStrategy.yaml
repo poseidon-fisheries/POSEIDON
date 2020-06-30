@@ -1,0 +1,10 @@
+No Discarding
+-------
+Discarding All Unsellable
+-------
+Specific Discarding:
+  indices: ''
+-------
+Age Discarding:
+  minAgeRetained: '1.0'
+-------

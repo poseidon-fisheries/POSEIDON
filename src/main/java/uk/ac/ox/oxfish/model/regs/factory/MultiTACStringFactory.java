@@ -47,7 +47,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<FishState,MultiQuotaRegulation> modelQuota = new Locker<>();
+    private final Locker<String,MultiQuotaRegulation> modelQuota = new Locker<>();
 
 
     /**
@@ -61,7 +61,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     {
 
 
-        return modelQuota.presentKey(state,
+        return modelQuota.presentKey(state.getHopefullyUniqueID(),
                                      new Supplier<MultiQuotaRegulation>() {
                                          @Override
                                          public MultiQuotaRegulation get() {

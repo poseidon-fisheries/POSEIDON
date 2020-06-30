@@ -1,0 +1,10 @@
+Inverse:
+  exponent: '1.0'
+-------
+Exponential:
+  exponent: '1.0'
+-------
+Sigmoidal:
+  a: '1.0'
+  b: '1.0'
+-------

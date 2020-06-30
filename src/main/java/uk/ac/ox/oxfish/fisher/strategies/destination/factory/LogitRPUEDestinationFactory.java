@@ -49,7 +49,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     /**
      * everybody shares the parent same destination logit strategy
      */
-    private Locker<FishState,MapDiscretization> discretizationLocker = new Locker<>();
+    private Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
 
 
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new IdentityDiscretizerFactory();
@@ -72,7 +72,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
         MapDiscretization discretization = discretizationLocker.
                 presentKey(
-                        state,
+                        state.getHopefullyUniqueID(),
                         new Supplier<MapDiscretization>()
                         {
                             @Override

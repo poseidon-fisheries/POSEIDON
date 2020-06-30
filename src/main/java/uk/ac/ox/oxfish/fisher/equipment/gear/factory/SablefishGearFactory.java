@@ -81,7 +81,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
     private DoubleParameter litersOfGasConsumedPerHour = new FixedDoubleParameter(0);
 
 
-    private Locker<FishState,ArrayFilter> selectivity = new Locker<>();
+    private Locker<String,ArrayFilter> selectivity = new Locker<>();
 
 
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
@@ -118,7 +118,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
         return new HomogeneousAbundanceGear(
                 litersOfGasConsumedPerHour.apply(random),
                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                selectivity.presentKey(state,
+                selectivity.presentKey(state.getHopefullyUniqueID(),
                                        () -> new ArrayFilter(
                                                true, Arrays.copyOf(MALE, MALE.length),
                                                Arrays.copyOf(FEMALE,FEMALE.length)

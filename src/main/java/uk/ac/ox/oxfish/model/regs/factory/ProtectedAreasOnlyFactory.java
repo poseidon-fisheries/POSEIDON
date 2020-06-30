@@ -52,7 +52,7 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
      * for each model I need to create starting mpas from scratch. Here I store
      * the stoppable as a receipt to make sure I create the MPAs only once
      */
-    private final Locker<FishState,Startable> startReceipt = new Locker<>();
+    private final Locker<String,Startable> startReceipt = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -65,7 +65,7 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
         //if there are mpas to build and I haven't already done it, schedule yourself
         //at the start of the model to create the MPA
         //this makes sure both that the map is properly set up AND that it's only done once
-        startReceipt.presentKey(state, new Supplier<Startable>() {
+        startReceipt.presentKey(state.getHopefullyUniqueID(), new Supplier<Startable>() {
             @Override
             public Startable get() {
                 Startable startable = new Startable() {

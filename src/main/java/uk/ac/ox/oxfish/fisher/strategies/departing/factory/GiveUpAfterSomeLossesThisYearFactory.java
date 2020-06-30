@@ -15,7 +15,7 @@ public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<Gi
 
     private DoubleParameter minimumProfitPerTripRequired = new FixedDoubleParameter(0);
 
-    private AlgorithmFactory<? extends DepartingStrategy> delegate = new MaxHoursPerYearDepartingFactory();
+    private AlgorithmFactory<? extends DepartingStrategy> delegate = new MaxHoursPerYearDepartingFactory(9999999);
 
 
     @Override

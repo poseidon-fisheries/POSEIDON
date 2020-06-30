@@ -6,10 +6,17 @@ import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.ISlopeTACController;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
+import uk.ac.ox.oxfish.model.data.collectors.HerfindalIndexCollector;
+import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
+import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -43,6 +50,15 @@ public class AdditionalStartables {
         NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
         NAMES.put(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors");
         NAMES.put(CatchAtBinFactory.class, "Catch at bin Collectors");
+        NAMES.put(HerfindalndexCollectorFactory.class, "Herfindal Index");
+
+
+        NAMES.put(ISlopeTACController.class, "ISlope-TAC Controller");
+        NAMES.put(LastCatchToTACController.class, "Last catch as TAC Controller");
+        NAMES.put(PIDControllerIndicatorTarget.class, "PID-TAC Controller");
+        NAMES.put(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller");
+        NAMES.put(SimpleFishSamplerFactory.class,
+                "Simple Fisher Sampler");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

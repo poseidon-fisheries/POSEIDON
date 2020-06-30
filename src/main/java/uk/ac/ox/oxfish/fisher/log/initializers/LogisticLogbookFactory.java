@@ -77,7 +77,7 @@ public class LogisticLogbookFactory
             = new IdentityDiscretizerFactory();
 
 
-    private Locker<FishState, MapDiscretization> locker = new Locker<>() ;
+    private Locker<String, MapDiscretization> locker = new Locker<>() ;
 
     /**
      * if this is positive, that's when the histogrammer starts
@@ -97,7 +97,7 @@ public class LogisticLogbookFactory
         ArrayList<String> names = new ArrayList<>();
 
         MapDiscretization discretized =
-                locker.presentKey(state,
+                locker.presentKey(state.getHopefullyUniqueID(),
                                   new Supplier<MapDiscretization>() {
                                       @Override
                                       public MapDiscretization get() {

@@ -167,6 +167,14 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
                 "Biomass"
             );
 
+            final String catches = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+
+
+            registerGatherer(catches,
+                    FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
+                            catches))
+                    , Double.NaN);
+
         }
 
 

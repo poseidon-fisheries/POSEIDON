@@ -44,7 +44,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
 
 
-    private static Locker<FishState,MapDiscretization> locker = new Locker();
+    private static Locker<String,MapDiscretization> locker = new Locker();
 
     private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
 
@@ -76,7 +76,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     {
 
         MapDiscretization map =  locker.
-                presentKey(state,
+                presentKey(state.getHopefullyUniqueID(),
                            () -> {
                                MapDiscretization discretization =
                                        new MapDiscretization(

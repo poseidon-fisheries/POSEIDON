@@ -47,7 +47,7 @@ public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenClose
     /**
      * locker where we keep a single controller per state
      */
-    private final Locker<FishState,ShodanController> locker = new Locker<>();
+    private final Locker<String,ShodanController> locker = new Locker<>();
 
 
     /**
@@ -61,7 +61,7 @@ public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenClose
 
 
         ShodanController controller = locker.presentKey(
-                fishState,
+                fishState.getHopefullyUniqueID(),
                 new Supplier<ShodanController>() {
                     @Override
                     public ShodanController get() {

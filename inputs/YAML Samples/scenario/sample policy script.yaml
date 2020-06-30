@@ -1,0 +1,35 @@
+scripts:
+  1:
+    PolicyScript:
+      changeInNumberOfFishers: 100
+      departingStrategy: null
+      destinationStrategy: null
+      discardingStrategy: null
+      fishingStrategy: null
+      gasPricePerLiter: null
+      gear:
+        Fixed Proportion:
+          catchabilityPerHour: '0.01'
+      hourlyTravellingCosts: null
+      nameOfPopulation: default_population
+      regulation: null
+      removeAllMPAs: false
+      weatherStrategy: null
+  10:
+    PolicyScript:
+      changeInNumberOfFishers: null
+      departingStrategy:
+        Fixed Rest:
+          hoursBetweenEachDeparture: '12.0'
+      destinationStrategy: null
+      discardingStrategy: null
+      fishingStrategy: null
+      gasPricePerLiter: null
+      gear: null
+      hourlyTravellingCosts: null
+      nameOfPopulation: default_population
+      regulation:
+        Mono-ITQ:
+          individualQuota: '5000.0'
+      removeAllMPAs: false
+      weatherStrategy: null

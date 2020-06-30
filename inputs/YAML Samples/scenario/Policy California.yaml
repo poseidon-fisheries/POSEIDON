@@ -1,0 +1,369 @@
+Policy California:
+  allowFriendshipsBetweenPorts: false
+  allowTwoPopulationFriendships: true
+  biologyInitializer:
+    Yellow Bycatch Factory with History:
+      bycatchInitialRecruits: '111139.5982902'
+      bycatchNaturalSurvivalRate: '0.95504'
+      bycatchRecruitmentLag: '14.0'
+      bycatchRecruitmentSteepness: '0.44056'
+      bycatchRho: '0.981194230283006'
+      bycatchSpeciesName: Yelloweye Rockfish
+      bycatchVirginBiomass: '8883000.0'
+      bycatchWeightAtRecruitment: '1.1191'
+      bycatchWeightAtRecruitmentMinus1: '1.01604'
+      diffusingRate: '1.0E-4'
+      historicalBycatchBiomass:
+      - 8883000.0
+      - 8879174.0
+      - 8873953.0
+      - 8868155.0
+      - 8864445.0
+      - 8860530.0
+      - 8856710.0
+      - 8853086.0
+      - 8849360.0
+      - 8845047.0
+      - 8838688.0
+      - 8831406.0
+      - 8823224.0
+      - 8813870.0
+      - 8800921.0
+      - 8787570.0
+      - 8776476.0
+      - 8765928.0
+      - 8757796.0
+      - 8747619.0
+      - 8735145.0
+      - 8718657.0
+      - 8702657.0
+      - 8687139.0
+      - 8676014.0
+      - 8657811.0
+      - 8635120.0
+      - 8606655.0
+      - 8534448.0
+      - 8463244.0
+      - 8344813.0
+      - 8248938.0
+      - 8216305.0
+      - 8177412.0
+      - 8154640.0
+      - 8129782.0
+      - 8097658.0
+      - 8071355.0
+      - 8053628.0
+      - 8028939.0
+      - 7995605.0
+      - 7953450.0
+      - 7903732.0
+      - 7849827.0
+      - 7802497.0
+      - 7760358.0
+      - 7727444.0
+      - 7686846.0
+      - 7657372.0
+      - 7639984.0
+      - 7543438.0
+      - 7510307.0
+      - 7470365.0
+      - 7428501.0
+      - 7320928.0
+      - 7252466.0
+      - 7156663.0
+      - 7031742.0
+      - 6914782.0
+      - 6781853.0
+      - 6661574.0
+      - 6517739.0
+      - 6371633.0
+      - 6108281.0
+      - 5850281.0
+      - 5652339.0
+      - 5359377.0
+      - 4978877.0
+      - 4735490.0
+      - 4550998.0
+      - 4318958.0
+      - 4199800.0
+      - 4051556.0
+      - 3878241.0
+      - 3641386.0
+      - 3516316.0
+      - 3264065.0
+      - 3009226.0
+      - 2809955.0
+      - 2706916.0
+      - 2572423.0
+      - 2472791.0
+      - 2345994.0
+      - 2355185.0
+      - 2313621.0
+      - 2385708.0
+      historicalBycatchSurvival:
+      - 0.932582202042579
+      - 0.938156881691037
+      historicalTargetBiomass:
+      - 5.27154E8
+      - 5.27105779E8
+      - 5.27033675E8
+      - 5.26937145E8
+      - 5.26819309E8
+      - 5.26679414E8
+      - 5.26563028E8
+      - 5.26467416E8
+      - 5.2639256E8
+      - 5.26337557E8
+      - 5.26243592E8
+      - 5.26110372E8
+      - 5.2594182E8
+      - 5.25738694E8
+      - 5.25502749E8
+      - 5.25235725E8
+      - 5.24940279E8
+      - 5.23750897E8
+      - 5.21807115E8
+      - 5.19028892E8
+      - 5.18183379E8
+      - 5.17707156E8
+      - 5.1680938E8
+      - 5.16662376E8
+      - 5.15626553E8
+      - 5.14582427E8
+      - 5.13397054E8
+      - 5.12674141E8
+      - 5.11423759E8
+      - 5.10525199E8
+      - 5.09507192E8
+      - 5.08278705E8
+      - 5.08102873E8
+      - 5.07775981E8
+      - 5.07491398E8
+      - 5.0656966E8
+      - 5.05125433E8
+      - 5.04494266E8
+      - 5.03975133E8
+      - 5.03628931E8
+      - 5.02963312E8
+      - 5.02927457E8
+      - 5.02782061E8
+      - 5.01560771E8
+      - 4.9972477E8
+      - 4.97712445E8
+      - 4.95422136E8
+      - 4.93526237E8
+      - 4.93495066E8
+      - 4.92918991E8
+      - 4.92646142E8
+      - 4.92560761E8
+      - 4.91204268E8
+      - 4.91212648E8
+      - 4.91585614E8
+      - 4.91276018E8
+      - 4.91098354E8
+      - 4.89641827E8
+      - 4.89181485E8
+      - 4.89750949E8
+      - 4.8961577E8
+      - 4.88813834E8
+      - 4.89120929E8
+      - 4.88538202E8
+      - 4.88842424E8
+      - 4.88890144E8
+      - 4.89039154E8
+      - 4.89251476E8
+      - 4.87090459E8
+      - 4.8656254E8
+      - 4.83366313E8
+      - 4.81078276E8
+      - 4.79618827E8
+      - 4.75399328E8
+      - 4.72254781E8
+      - 4.66454189E8
+      - 4.55081889E8
+      - 4.33774184E8
+      - 4.29505494E8
+      - 4.21974007E8
+      - 4.0297136E8
+      - 3.99900476E8
+      - 3.94650983E8
+      - 3.81593314E8
+      - 3.73460329E8
+      - 3.66503129E8
+      - 3.59845028E8
+      - 3.54395185E8
+      - 3.4971149E8
+      - 3.47253956E8
+      - 3.45399509E8
+      - 3.44891059E8
+      - 3.43993698E8
+      - 3.43317882E8
+      - 3.44025143E8
+      - 3.45403773E8
+      - 3.46390724E8
+      - 3.46833531E8
+      - 3.47657176E8
+      - 3.52224351E8
+      - 3.54280712E8
+      - 3.56442219E8
+      historicalTargetSurvival:
+      - 0.906926410977892
+      - 0.90533206481522
+      northSouthSeparator: '50.0'
+      proportionOfBycatchNorth: '1.0'
+      separateBycatchStock: false
+      targetInitialRecruits: '1.6713267E7'
+      targetNaturalSurvivalRate: '0.92311'
+      targetRecruitmentLag: '3.0'
+      targetRecruitmentSteepness: '0.6'
+      targetRho: '0.813181970802262'
+      targetSpeciesName: Sablefish
+      targetVirginBiomass: '5.27154E8'
+      targetWeightAtRecruitment: '1.03313'
+      targetWeightAtRecruitmentMinus1: '0.63456'
+      verticalSeparator: '5.0'
+  departingStrategyLarge:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  departingStrategySmall:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  destinationStrategyLarge:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      ignoreFailedTrips: false
+      maxInitialDistance: -1.0
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.2'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  destinationStrategySmall:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      ignoreFailedTrips: false
+      maxInitialDistance: -1.0
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.2'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  discardingStrategyLarge:
+    Specific Discarding:
+      indices: '1'
+  discardingStrategySmall:
+    Specific Discarding:
+      indices: '1'
+  enginePower: normal 5000.0 100.0
+  exogenousSablefishCatches: 4187000.0
+  exogenousYelloweyeCatches: 10317.0
+  fishingStrategyLarge:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fishingStrategySmall:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  gasPricePerLiter: '0.3689'
+  gearLarge:
+    Hold Upper Limit:
+      delegate:
+        Random Catchability By List:
+          catchabilityMap: 0:0.001,1:0.001
+          standardDeviationMap: ''
+          trawlSpeed: '57.0'
+  gearSmall:
+    Hold Upper Limit:
+      delegate:
+        Random Catchability By List:
+          catchabilityMap: 0:0.001,1:0.001
+          standardDeviationMap: ''
+          trawlSpeed: '57.0'
+  gearStrategy: Never Change Gear
+  habitatInitializer: All Sand
+  hourlyTravellingCostLarge: '93.69'
+  hourlyTravellingCostSmall: '93.69'
+  largeFishers: 64
+  largeFuelTankSize: '1.0E8'
+  largeHoldSize: '6500.0'
+  largeLitersPerKilometer: '3.418019'
+  largeSpeed: '16.0661'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '15.47'
+      coastalRoughness: '4.0'
+      depthSmoothing: '1000000.0'
+      height: '100.0'
+      maxLandWidth: '1.0'
+      width: '11.0'
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market Array:
+      prices: 3.35102639,0
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  ports:
+    List of Ports:
+      ports:
+        Washington: 10,0
+        Oregon: 10,49
+        California: 10,99
+      usingGridCoordinates: true
+  regulationLarge: Anarchy
+  regulationSmall: Anarchy
+  regulationsToImposeAtStartYear:
+    Multiple Regulations:
+      factories:
+      - Fishing Season:
+          respectMPA: false
+          seasonLength: '213.0'
+      - Mono-IQ:
+          individualQuota: '22222.0'
+      - MPA Only:
+          startingMPAs:
+          - height: 100
+            topLeftX: 6
+            topLeftY: 0
+            width: 3
+      tags:
+      - all
+      - all
+      - all
+  separatePorts: false
+  separateRegulations: false
+  smallFishers: 26
+  smallFuelTankSize: '1.0E8'
+  smallHoldSize: '6500.0'
+  smallLitersPerKilometer: '3.418019'
+  smallSpeed: '16.0661'
+  startingMPAs: [
+    ]
+  usePredictors: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather

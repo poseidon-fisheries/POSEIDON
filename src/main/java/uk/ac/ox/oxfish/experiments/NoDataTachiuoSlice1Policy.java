@@ -45,11 +45,11 @@ import java.util.function.Predicate;
 
 public class NoDataTachiuoSlice1Policy {
 
-    public static final String CANDIDATES_CSV_FILE = "success_slice3.csv";
+    public static final String CANDIDATES_CSV_FILE = "slice3_spr_opt.csv";
     public static final int SEED = 0;
     public static final int YEARS_FROM_POLICY_TO_RUN = 15;
     private static Path OUTPUT_FOLDER =
-            Paths.get("docs", "20200425 abc_example","slice3").resolve("outputs");
+            Paths.get("docs", "20200425 abc_example","slice4").resolve("outputs_opt");
 
 
 
@@ -70,112 +70,112 @@ public class NoDataTachiuoSlice1Policy {
 
 
         );
-
-        policies.put(
-                "noentry",
-                shockYear -> NoDataPolicy.removeEntry(shockYear)
-
-
-        );
-
-
-        policies.put(
-                "hard_seasonal_closure",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        seasonalClosure(shockYear, 200)
-                )
-
-        );
-
-        policies.put(
-                "spawning_protection",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        new Consumer<Scenario>() {
-                            @Override
-                            public void accept(Scenario scenario) {
-
-                                TemporaryRegulation spawningClosure =
-                                        new TemporaryRegulation(
-                                                new Predicate<Integer>() {
-                                                    @Override
-                                                    public boolean test(Integer dayOfYear) {
-                                                        return (Season.getMonth(dayOfYear) == 5 ||
-                                                                Season.getMonth(dayOfYear) == 10
-                                                        );
-                                                    }
-                                                },
-                                                new FishingSeason(true,0)
-                                        );
-
-                                ((FlexibleScenario) scenario).getPlugins().add(
-                                        new AlgorithmFactory<AdditionalStartable>() {
-                                            @Override
-                                            public AdditionalStartable apply(FishState fishState) {
-
-                                                return new AdditionalStartable() {
-                                                    @Override
-                                                    public void start(FishState model) {
-                                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                                new Steppable() {
-                                                                    @Override
-                                                                    public void step(SimState simState) {
-
-                                                                        for (Fisher fisher : ((FishState) simState).getFishers()) {
-
-                                                                            fisher.setRegulation(spawningClosure);
-                                                                        }
-
-
-                                                                    }
-                                                                },
-                                                                StepOrder.DAWN,
-                                                                shockYear
-                                                        );
-
-
-                                                    }
-                                                };
-                                            }
-                                        }
-                                );
-                            }
-                        }
-                )
-
-        );
-
-        policies.put(
-                "seasonal_closure",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        seasonalClosure(shockYear, 300)
-                )
-
-        );
-
-
-
-
-        policies.put(
-                "selectivity_one",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        gearGeneration(shockYear, 1, 0.9)
-                )
-
-        );
-
-        policies.put(
-                "selectivity_two",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        gearGeneration(shockYear, 1.1, 0.9)
-                )
-
-        );
-        policies.put(
-                "selectivity_three",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        gearGeneration(shockYear, 1.2, 0.8)
-                )
-        );
+//
+//        policies.put(
+//                "noentry",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear)
+//
+//
+//        );
+//
+//
+//        policies.put(
+//                "hard_seasonal_closure",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        seasonalClosure(shockYear, 200)
+//                )
+//
+//        );
+//
+//        policies.put(
+//                "spawning_protection",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        new Consumer<Scenario>() {
+//                            @Override
+//                            public void accept(Scenario scenario) {
+//
+//                                TemporaryRegulation spawningClosure =
+//                                        new TemporaryRegulation(
+//                                                new Predicate<Integer>() {
+//                                                    @Override
+//                                                    public boolean test(Integer dayOfYear) {
+//                                                        return (Season.getMonth(dayOfYear) == 5 ||
+//                                                                Season.getMonth(dayOfYear) == 10
+//                                                        );
+//                                                    }
+//                                                },
+//                                                new FishingSeason(true,0)
+//                                        );
+//
+//                                ((FlexibleScenario) scenario).getPlugins().add(
+//                                        new AlgorithmFactory<AdditionalStartable>() {
+//                                            @Override
+//                                            public AdditionalStartable apply(FishState fishState) {
+//
+//                                                return new AdditionalStartable() {
+//                                                    @Override
+//                                                    public void start(FishState model) {
+//                                                        model.scheduleOnceAtTheBeginningOfYear(
+//                                                                new Steppable() {
+//                                                                    @Override
+//                                                                    public void step(SimState simState) {
+//
+//                                                                        for (Fisher fisher : ((FishState) simState).getFishers()) {
+//
+//                                                                            fisher.setRegulation(spawningClosure);
+//                                                                        }
+//
+//
+//                                                                    }
+//                                                                },
+//                                                                StepOrder.DAWN,
+//                                                                shockYear
+//                                                        );
+//
+//
+//                                                    }
+//                                                };
+//                                            }
+//                                        }
+//                                );
+//                            }
+//                        }
+//                )
+//
+//        );
+//
+//        policies.put(
+//                "seasonal_closure",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        seasonalClosure(shockYear, 300)
+//                )
+//
+//        );
+//
+//
+//
+//
+//        policies.put(
+//                "selectivity_one",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        gearGeneration(shockYear, 1, 0.9)
+//                )
+//
+//        );
+//
+//        policies.put(
+//                "selectivity_two",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        gearGeneration(shockYear, 1.1, 0.9)
+//                )
+//
+//        );
+//        policies.put(
+//                "selectivity_three",
+//                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                        gearGeneration(shockYear, 1.2, 0.8)
+//                )
+//        );
 
     }
 

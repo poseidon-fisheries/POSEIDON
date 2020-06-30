@@ -115,6 +115,9 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
             }
         }, 0d, HOUR, "Effort");
 
+
+
+
         registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {

@@ -83,7 +83,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
-    private final Locker<FishState,String> locker = new Locker<>();
+    private final Locker<String,String> locker = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -97,7 +97,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
         //add data gathering if necessary
         if(!state.equals(locker.getCurrentKey()))
         {
-            locker.presentKey(state, () -> null);
+            locker.presentKey(state.getHopefullyUniqueID(), () -> null);
             addDataGatherers(state);
             assert locker.getCurrentKey().equals(state);
         }

@@ -57,7 +57,7 @@ public abstract class Controller implements Steppable,Startable {
     /**
      * how often do we act? (in days)
      */
-    private final int interval;
+    private final int intervalInDays;
 
     /**
      * the last number fed to the actuator
@@ -71,11 +71,11 @@ public abstract class Controller implements Steppable,Startable {
             Sensor<FishState, Double> observed,
             Sensor<FishState, Double> target,
             Actuator<FishState, Double> actuator,
-            int interval) {
+            int intervalInDays) {
         this.observed = observed;
         this.target = target;
         this.actuator = actuator;
-        this.interval = interval;
+        this.intervalInDays = intervalInDays;
     }
 
     @Override
@@ -105,7 +105,7 @@ public abstract class Controller implements Steppable,Startable {
     @Override
     public void start(FishState model) {
         Preconditions.checkArgument(receipt==null);
-        receipt = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, interval);
+        receipt = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, intervalInDays);
     }
 
     /**
@@ -154,7 +154,7 @@ public abstract class Controller implements Steppable,Startable {
      *
      * @return Value for property 'interval'.
      */
-    public int getInterval() {
-        return interval;
+    public int getIntervalInDays() {
+        return intervalInDays;
     }
 }

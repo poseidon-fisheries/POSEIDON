@@ -39,7 +39,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
     /**
      * locker to make sure data collectors are done only once
      */
-    private final Locker<FishState,Startable> locker = new Locker<>();
+    private final Locker<String,Startable> locker = new Locker<>();
 
     private double maxPercentageChangeA = .1;
 
@@ -51,7 +51,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
     public PeriodicUpdateGearStrategy apply(FishState model) {
 
         locker.presentKey(
-                model,
+                model.getHopefullyUniqueID(),
                 new Supplier<Startable>() {
                     @Override
                     public Startable get() {

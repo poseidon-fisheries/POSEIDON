@@ -102,7 +102,7 @@ public class ExogenousInstantaneousMortalityCatchesTest {
                 state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Red Fish")),
                 2266886,1);
 
-        catches.start(state);
+    //    catches.start(state);
         catches.step(state);
         Assert.assertEquals(
                 state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Red Fish")),

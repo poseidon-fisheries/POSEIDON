@@ -37,12 +37,12 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
     /**
      * everybody shares the same discretization
      */
-    private final Locker<FishState, MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String, MapDiscretization> discretizationLocker = new Locker<>();
 
     /**
      *
      */
-    private Locker<FishState,List<TripLaggedExtractor>> fleetWideLocker = new Locker<>();
+    private Locker<String,List<TripLaggedExtractor>> fleetWideLocker = new Locker<>();
 
     protected AlgorithmFactory<? extends MapDiscretizer> discretizer =
             new SquaresMapDiscretizerFactory();
@@ -77,7 +77,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
     private boolean logToFile = false;
 
 
-    private Locker<FishState, LogisticLogs> logLocker = new Locker<>();
+    private Locker<String, LogisticLogs> logLocker = new Locker<>();
 
 
     public AlgorithmFactory<? extends MapDiscretizer> getDiscretizer() {
@@ -96,7 +96,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
         //create the discretization
         MapDiscretization discretization = discretizationLocker.presentKey(
-                state, new Supplier<MapDiscretization>() {
+                state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
                     @Override
                     public MapDiscretization get() {
                         MapDiscretizer mapDiscretizer = discretizer.apply(state);
@@ -140,7 +140,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
         if(logToFile)
         {
-            LogisticLogs logs = logLocker.presentKey(state,
+            LogisticLogs logs = logLocker.presentKey(state.getHopefullyUniqueID(),
                     new Supplier<LogisticLogs>() {
                         @Override
                         public LogisticLogs get() {
@@ -231,7 +231,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
         if(!fleetWide)
             return buildTripLaggedExtractors(discretization,state);
         else
-            return fleetWideLocker.presentKey(state,
+            return fleetWideLocker.presentKey(state.getHopefullyUniqueID(),
                     new Supplier<List<TripLaggedExtractor>>() {
                         @Override
                         public List<TripLaggedExtractor> get() {

@@ -46,7 +46,7 @@ public class Locker<K,I>
      * @return old item if the key is unchanged, new item otherwise
      */
     public I presentKey(K key, Supplier<I> constructor){
-        if(key.equals(this.key))
+        if(this.key!= null && key.equals(this.key))
         {
             assert itemHeld != null;
             return itemHeld;

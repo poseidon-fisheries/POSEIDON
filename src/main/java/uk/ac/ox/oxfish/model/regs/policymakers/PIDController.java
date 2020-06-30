@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -59,6 +60,13 @@ public class PIDController extends Controller {
 
     private double sumOfErrors = 0;
 
+    private Sensor<FishState,Double> offsetSetter;
+
+
+    private boolean zeroOverflowProtection = false;
+
+
+    private double minimumPolicy = Double.NEGATIVE_INFINITY;
 
     public PIDController(
             Sensor<FishState, Double> observed,
@@ -74,12 +82,34 @@ public class PIDController extends Controller {
         this.offset = offset;
     }
 
+
+    @Override
+    public void start(FishState model) {
+        super.start(model);
+
+        model.getYearlyDataSet().registerGatherer(
+
+                "Policy from PID Controller",
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        return getPolicy();
+                    }
+                },
+                Double.NaN);
+    }
+
     @Override
     public double computePolicy(double currentVariable,
                                 double target,
                                 FishState model,
                                 double oldPolicy)
     {
+        if(offsetSetter != null)
+        {
+            offset = offsetSetter.scan(model);
+            offsetSetter = null;
+        }
 
         //pid magic here
         double error = target - currentVariable;
@@ -87,9 +117,24 @@ public class PIDController extends Controller {
         double derivative =  error - previousError;
         previousError = error;
 
-        double policy = p * error + i * sumOfErrors + d * derivative;
+        double pidPolicy = p * error + i * sumOfErrors + d * derivative;
 
-        return  offset + policy;
+
+        //do not accumulate error past zero?
+        final double policyToOutput = offset + pidPolicy;
+        if(zeroOverflowProtection && i!=0){
+            if(policyToOutput < 0)
+            {
+                sumOfErrors =  (- offset - d * derivative - p * error)/i;
+            }
+        }
+
+        System.out.println("PID Target: " + target);
+        System.out.println("PID Error: " + error);
+        System.out.println("PID MV: " + policyToOutput);
+
+
+        return Math.max(policyToOutput, minimumPolicy);
     }
 
     /**
@@ -163,4 +208,39 @@ public class PIDController extends Controller {
     public void setOffset(double offset) {
         this.offset = offset;
     }
+
+    public Sensor<FishState, Double> getOffsetSetter() {
+        return offsetSetter;
+    }
+
+    public void setOffsetSetter(Sensor<FishState, Double> offsetSetter) {
+        this.offsetSetter = offsetSetter;
+    }
+
+    public double getPreviousError() {
+        return previousError;
+    }
+
+    public double getSumOfErrors() {
+        return sumOfErrors;
+    }
+
+
+    public boolean isZeroOverflowProtection() {
+        return zeroOverflowProtection;
+    }
+
+    public void setZeroOverflowProtection(boolean zeroOverflowProtection) {
+        this.zeroOverflowProtection = zeroOverflowProtection;
+    }
+
+    public double getMinimumPolicy() {
+        return minimumPolicy;
+    }
+
+    public void setMinimumPolicy(double minimumPolicy) {
+        this.minimumPolicy = minimumPolicy;
+    }
+
+
 }

@@ -1,0 +1,147 @@
+Tow Heatmapper:
+  histogrammerStartYear: 0
+  identifier: ''
+  tagSusbset: ''
+-------
+Biomass Location Resetter:
+  algorithmFactory:
+    Random Kernel Allocator:
+      bandwidth: '5.0'
+      fixedPoints: '10.0'
+      maximum: '1.0'
+      minimum: '0.0'
+  speciesName: Species 0
+-------
+Biomass Total Resetter:
+  allocator:
+    Random Kernel Allocator:
+      bandwidth: '5.0'
+      fixedPoints: '10.0'
+      maximum: '1.0'
+      minimum: '0.0'
+  speciesName: Species 0
+  yearlyBiomass: '5000000.0'
+-------
+Abundance Snapshot Resetter:
+  restoreOriginalLengthDistribution: true
+  restoreOriginalLocations: false
+  yearsToReset: 1
+-------
+Biomass Snapshot Resetter:
+  restoreOriginalLocations: false
+  yearsToReset: 1
+-------
+Abundance Gatherers:
+  observationDay: 365
+-------
+SPR Agent:
+  assumedKParameter: '0.4438437'
+  assumedLengthAtMaturity: '50.0'
+  assumedLengthBinCm: '5.0'
+  assumedLinf: '86.0'
+  assumedNaturalMortality: '0.3775984'
+  assumedVarA: '0.00853'
+  assumedVarB: '3.137'
+  probabilityOfSamplingEachBoat: '0.33'
+  simulatedMaxAge: '100.0'
+  simulatedVirginRecruits: '1000.0'
+  speciesName: Species 0
+  surveyTag: spr_agent
+-------
+SPR Selective Agent:
+  assumedKParameter: '0.4438437'
+  assumedLengthAtMaturity: '50.0'
+  assumedLengthBinCm: '5.0'
+  assumedLinf: '86.0'
+  assumedNaturalMortality: '0.3775984'
+  assumedVarA: '0.00853'
+  assumedVarB: '3.137'
+  probabilityOfSamplingEachTag: {
+    }
+  simulatedMaxAge: '100.0'
+  simulatedVirginRecruits: '1000.0'
+  speciesName: Species 0
+  surveyTag: spr_agent
+-------
+SPR Fixed Sample Agent:
+  assumedKParameter: '0.4438437'
+  assumedLengthAtMaturity: '50.0'
+  assumedLengthBinCm: '5.0'
+  assumedLinf: '86.0'
+  assumedNaturalMortality: '0.3775984'
+  assumedVarA: '0.00853'
+  assumedVarB: '3.137'
+  simulatedMaxAge: '100.0'
+  simulatedVirginRecruits: '1000.0'
+  speciesName: Species 0
+  surveyTag: spr_agent
+  tagsToSample:
+    population9: 100
+-------
+SPR Oracle:
+  dayOfMeasurement: 365
+  lengthAtMaturity: '50.0'
+  speciesName: Species 0
+  virginSSB: '2.01231231E8'
+-------
+Fishing Mortality Agent:
+  computeDailyFishingMortality: false
+  selectivityRounding: false
+  selexParameter1: '23.5035'
+  selexParameter2: '9.03702'
+  speciesName: Species 0
+-------
+Fish Entry By Profit:
+  costsFinalColumnName: Average Variable Costs
+  fixedCostsToCover: '0.0'
+  maxEntrantsPerYear: '50.0'
+  populationName: default_population
+  profitDataColumnName: Average Cash-Flow
+  profitRatioToEntrantsMultiplier: '100.0'
+-------
+Fish Entry Constant Rate:
+  firstYearEntryOccurs: '-1.0'
+  growthRateInPercentage: '0.029'
+  populationName: population0
+-------
+Spend Save Invest Entry:
+  moneyNeededForANewEntry: '2.5E7'
+  populationName: population0
+  yearlyExpenses: '5000000.0'
+-------
+Full-time Seasonal Retired Data Collectors
+-------
+Biomass Depletion Data Collectors:
+  msy: {
+    }
+-------
+Tow Long Logger:
+  fileName: tow_log.csv
+-------
+Json Output Manager:
+  chartBuilderFactories: &id001 [
+    ]
+  eventBuilderFactories: *id001
+  fadsBuilderFactory:
+    fadsColour: yellow
+  heatmapBuilderFactories: *id001
+  numYearsToSkip: 0
+  prettyPrinting: false
+  regionsBuilderFactory: !!uk.ac.ox.oxfish.model.data.webviz.regions.UnifiedRegionBuilderFactory
+    colour: gray
+    typeId: 0
+  scenarioDescription: Scenario description
+  scenarioTitle: Scenario title
+  startDate: '2020-05-20'
+  vesselsBuilderFactory:
+    vesselClassifier: {
+      }
+-------
+Effort Regulator:
+  permitPolicy: No effort limit
+  tagsOfParticipants: population0,population1
+-------
+Additional Daily Collectors
+-------
+Catch at bin Collectors
+-------
