@@ -28,15 +28,16 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Deque;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.lang.Math.min;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
@@ -56,18 +57,32 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         this.numberOfStepsToLookAheadForFadPositions = numberOfStepsToLookAheadForFadPositions;
     }
 
+    @Override boolean shouldGoToPort(Fisher fisher) {
+        double holdFillProportionConsideredFull = 0.99; // TODO: this should be a parameter somewhere
+        boolean holdFull = fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
+        final boolean anyLimitedActionsRemaining =
+            getFadManager(fisher).getActionSpecificRegulations().anyYearlyLimitedActionRemaining(fisher);
+        return holdFull || !anyLimitedActionsRemaining;
+    }
+
+    @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
+        return getFadManager(fisher).fadLocationsInTimeStepRange(
+            timeStep, timeStep + getNumberOfStepsToLookAheadForFadPositions()
+        );
+    }
+
     @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
         Fisher fisher,
         ImmutableList<PossibleRoute> possibleRoutes,
         int timeStep
     ) {
         final FadManager fadManager = getFadManager(fisher);
-        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep = fadsByTileByStep(fadManager, possibleRoutes, timeStep);
+        final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep =
+            fadsByTileByStep(fadManager, possibleRoutes, timeStep);
         final long fadSetsRemaining = getFadSetsRemaining(fadManager);
 
-        return possibleRoutes.stream().map(possibleRoute -> entry(
-            possibleRoute.makeRoute(fisher),
-            possibleRoute.getSteps().stream()
+        return possibleRoutes.stream().map(possibleRoute -> {
+            final double possibleRevenues = possibleRoute.getSteps().stream()
                 .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))
                 .flatMap(routeStep ->
                     fadsByTileByStep
@@ -79,13 +94,17 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
                 .sorted(reverseOrder())
                 .limit(fadSetsRemaining)
                 .mapToDouble(Double::doubleValue)
-                .sum() - possibleRoute.getCost(fisher)
-        ));
+                .sum();
+            return entry(
+                possibleRoute.makeRoute(fisher),
+                min(possibleRevenues, maxPossibleRevenues(fisher)) - possibleRoute.getCost(fisher)
+            );
+        });
     }
 
     private ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep(
         FadManager fadManager,
-        ImmutableList<PossibleRoute> routes,
+        Collection<PossibleRoute> routes,
         int timeStep
     ) {
         return getTimeStepRange(timeStep, routes).stream()
@@ -101,10 +120,16 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
             .orElse(Long.MAX_VALUE);
     }
 
-    @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
-        return getFadManager(fisher).fadLocationsInTimeStepRange(
-            timeStep, timeStep + getNumberOfStepsToLookAheadForFadPositions()
-        );
+    private double maxPossibleRevenues(final Fisher fisher) {
+        // calc max possible value given space in hold, using the highest species price
+        final double highestPrice =
+            fisher.getHomePort().getMarketMap(fisher).getMarkets().stream()
+                .mapToDouble(Market::getMarginalPrice)
+                .max()
+                .orElseThrow(() -> new IllegalStateException("No sellable species for " + fisher));
+        final double availableHoldCapacity =
+            fisher.getMaximumHold() - fisher.getTotalWeightOfCatchInHold();
+        return highestPrice * availableHoldCapacity;
     }
 
     @SuppressWarnings("WeakerAccess") public int getNumberOfStepsToLookAheadForFadPositions() {
@@ -115,11 +140,4 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         this.numberOfStepsToLookAheadForFadPositions = numberOfStepsToLookAheadForFadPositions;
     }
 
-    @Override boolean shouldGoToPort(Fisher fisher) {
-        double holdFillProportionConsideredFull = 0.99; // TODO: this should be a parameter somewhere
-        boolean holdFull = fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
-        final boolean anyLimitedActionsRemaining =
-            getFadManager(fisher).getActionSpecificRegulations().anyYearlyLimitedActionRemaining(fisher);
-        return holdFull || !anyLimitedActionsRemaining;
-    }
 }
