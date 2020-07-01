@@ -52,6 +52,7 @@ public class SampleTunaRun {
 
     public static void main(final String[] args) {
         new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+            .setAfterStartConsumer(state -> System.out.println(state.getModel().getMap().asASCII()))
             .requestYearlyData()
             .requestFisherYearlyData()
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)

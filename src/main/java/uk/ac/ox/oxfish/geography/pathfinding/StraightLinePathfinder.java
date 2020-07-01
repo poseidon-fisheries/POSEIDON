@@ -57,9 +57,6 @@ public class StraightLinePathfinder implements Pathfinder {
         assert start != null : "start " + start + ", end: " + end;
         assert end != null : "start " + start + ", end: " + end;
 
-        checkArgument(start.isWater() || start.isPortHere());
-        checkArgument(end.isWater() || end.isPortHere());
-
         int x = start.getGridX();
         int endX = end.getGridX();
         int y = start.getGridY();

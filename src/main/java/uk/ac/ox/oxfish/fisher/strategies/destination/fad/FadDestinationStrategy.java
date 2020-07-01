@@ -63,10 +63,12 @@ public class FadDestinationStrategy implements DestinationStrategy {
         // don't change destination while we're moving
         if (currentAction instanceof Moving) return fisher.getDestination();
         // if we don't have a current destination, loop through selectors until we find one
-        while (!currentRoute.hasNext())
-            currentRoute = routeSelectors.next()
+        while (!currentRoute.hasNext()) {
+            final RouteSelector routeSelector = routeSelectors.next();
+            currentRoute = routeSelector
                 .selectRoute(fisher, model.getStep(), rng)
                 .orElse(Route.EMPTY);
+        }
         return currentRoute.next();
     }
 

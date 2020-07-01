@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.Arrays;
@@ -25,7 +26,9 @@ public class TestUtilities {
         for (int[] row : altitudes) Arrays.fill(row, -1);
         altitudes[0][0] = 1;
         NauticalMap map = makeMap(altitudes);
-        map.addPort(new Port("", map.getSeaTile(0, 0), new MarketMap(globalBiology), 0));
+        final MarketMap marketMap = new MarketMap(globalBiology);
+        globalBiology.getSpecies().forEach(species -> marketMap.addMarket(species, new FixedPriceMarket(0)));
+        map.addPort(new Port("", map.getSeaTile(0, 0), marketMap, 0));
         return map;
     }
 

@@ -78,7 +78,7 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
         return getDeploymentLocationValues().keySet();
     }
 
-    public Map<SeaTile, Double> getDeploymentLocationValues() { return unmodifiableMap(deploymentLocationValues); }
+    public Map<SeaTile, Double> getDeploymentLocationValues() { return deploymentLocationValues; }
 
     public void setDeploymentLocationValues(Map<SeaTile, Double> deploymentLocationValues) {
         this.deploymentLocationValues = deploymentLocationValues

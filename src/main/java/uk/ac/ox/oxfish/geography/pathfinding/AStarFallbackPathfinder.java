@@ -9,6 +9,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * This class first tries to find a straight line path, checks if it goes over land
  * and falls back on A* when that is the case. It uses a memory-less {@link StraightLinePathfinder}
@@ -31,6 +33,9 @@ public class AStarFallbackPathfinder implements Pathfinder {
 
     @SuppressWarnings("OptionalAssignedToNull")
     @Override public Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end) {
+
+        checkArgument(start.isWater() || start.isPortHere());
+        checkArgument(end.isWater() || end.isPortHere());
 
         // If we already have this path in our memory, return a mutable copy of it
         final Optional<ImmutableList<SeaTile>> knownPath = memory.getPath(start, end);

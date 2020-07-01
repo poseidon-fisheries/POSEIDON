@@ -50,7 +50,12 @@ public class FadDestinationStrategyTest {
 
         final FadDeploymentRouteSelector fadDeploymentRouteSelector = mock(FadDeploymentRouteSelector.class);
         when(fadDeploymentRouteSelector.selectRoute(any(), anyInt(), any()))
-            .thenAnswer(__ -> Optional.of(new Route(makeRoute(map, new int[][]{{0, 0}, {0, 1}, {0, 2}}), fisher)));
+            .thenAnswer(__ -> {
+                final int[][] points = fisher.getLocation() == port.getLocation()
+                    ? new int[][]{{0, 0}, {0, 1}, {0, 2}}
+                    : new int[][]{{2, 2}, {1, 1}, {0, 0}};
+                return Optional.of(new Route(makeRoute(map, points), fisher));
+            });
 
         final FadSettingRouteSelector fadSettingRouteSelector = mock(FadSettingRouteSelector.class);
         when(fadSettingRouteSelector.selectRoute(any(), anyInt(), any()))
@@ -69,13 +74,15 @@ public class FadDestinationStrategyTest {
             {1, 2}, {2, 2}, // FAD setting destination
             {1, 1}, {0, 0} //  ... and back to port
         });
-        expectedRoute.addAll(ImmutableList.copyOf(expectedRoute)); // double our route
 
-        for (SeaTile expectedDestination : expectedRoute) {
-            final SeaTile actualDestination =
-                fadDestinationStrategy.chooseDestination(fisher, null, fishState, null);
-            assertEquals(expectedDestination, actualDestination);
-            when(fisher.getLocation()).thenReturn(actualDestination);
-        }
+        final ImmutableList.Builder<SeaTile> actualRoute = ImmutableList.builder();
+        do {
+            final SeaTile destination = fadDestinationStrategy.chooseDestination(fisher, null, fishState, null);
+            when(fisher.getLocation()).thenReturn(destination);
+            actualRoute.add(fisher.getLocation());
+        } while (fisher.getLocation() != port.getLocation());
+        assertEquals(expectedRoute, actualRoute.build());
+
     }
+
 }

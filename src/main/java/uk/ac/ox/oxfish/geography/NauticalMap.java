@@ -59,6 +59,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.IntStream.range;
+
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
  * It ought to be initialized as follows:
@@ -592,13 +595,23 @@ public Coordinate getCoordinates(int gridX, int gridY) {
             }
         }
 
-            return lineTiles;
-
+        return lineTiles;
 
     }
-
 
     public Pathfinder getPathfinder() {
         return pathfinder;
     }
+
+    public String asASCII() {
+        return range(0, getRasterBathymetry().getGridHeight())
+            .mapToObj(y ->
+                range(0, getRasterBathymetry().getGridWidth())
+                    .mapToObj(x -> getSeaTile(x, y))
+                    .map(tile -> tile.isWater() ? "~" : (tile.isPortHere() ? "@" : "*"))
+                    .collect(joining())
+            )
+            .collect(joining("\n"));
+    }
+
 }

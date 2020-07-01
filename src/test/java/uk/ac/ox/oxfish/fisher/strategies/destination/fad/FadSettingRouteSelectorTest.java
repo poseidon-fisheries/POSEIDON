@@ -25,6 +25,7 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -72,7 +73,7 @@ public class FadSettingRouteSelectorTest {
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final GlobalBiology globalBiology = new GlobalBiology();
+        final GlobalBiology globalBiology = new GlobalBiology(new Species("dummy"));
         final NauticalMap map = makeCornerPortMap(3, 3, globalBiology);
         final Port port = map.getPorts().getFirst();
 
@@ -157,15 +158,12 @@ public class FadSettingRouteSelectorTest {
             .anyMatch(route -> getLast(route.getSteps()).getSeaTile() == port.getLocation()));
 
         // given a route with two FADs and a route with one FAD, prefer the one with two FADs
-        assertTrue(
-            new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}}), fisher)
-                .isSameAs(
-                    routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
-                        .max(comparingDouble(Entry::getValue))
-                        .map(Entry::getKey)
-                        .orElseThrow(() -> new IllegalStateException("No evaluated routes!"))
-                )
-        );
+        final Route bestRoute1 = routeSelector
+            .evaluateRoutes(fisher, possibleRoutes, 0)
+            .max(comparingDouble(Entry::getValue))
+            .map(Entry::getKey)
+            .orElseThrow(() -> new IllegalStateException("No evaluated routes!"));
+        assertTrue(new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}, {2, 1}}), fisher).isSameAs(bestRoute1));
 
         // No put a limit of just one FAD set
         fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 1)));
@@ -175,11 +173,12 @@ public class FadSettingRouteSelectorTest {
         // Given travel costs and the 1 set limit, we should now prefer the shorter route, catching just one FAD
         final LinkedList<Cost> costs = Stream.of(new HourlyCost(2)).collect(toCollection(LinkedList::new));
         when(fisher.getAdditionalTripCosts()).thenReturn(costs);
-        final Route bestRoute = routeSelector.evaluateRoutes(fisher, possibleRoutes, 0)
+        final Route bestRoute2 = routeSelector
+            .evaluateRoutes(fisher, possibleRoutes, 0)
             .max(comparingDouble(Entry::getValue))
             .map(Entry::getKey)
             .orElseThrow(() -> new IllegalStateException("No evaluated routes!"));
-        assertTrue(new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}}), fisher).isSameAs(bestRoute));
+        assertTrue(new Route(makeRoute(map, new int[][]{{0, 0}, {1, 1}}), fisher).isSameAs(bestRoute2));
 
         // test that no route is selected when no sets are left
         fadManager.setActionSpecificRegulations(Stream.of(new SetLimits(__ -> {}, __ -> 0)));
