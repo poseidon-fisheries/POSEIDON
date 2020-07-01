@@ -33,12 +33,15 @@ import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.lang.Math.min;
-import static java.util.Comparator.reverseOrder;
+import static java.util.Comparator.comparingDouble;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -66,9 +69,11 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
     }
 
     @Override public Set<SeaTile> getPossibleDestinations(Fisher fisher, int timeStep) {
-        return getFadManager(fisher).fadLocationsInTimeStepRange(
-            timeStep, timeStep + getNumberOfStepsToLookAheadForFadPositions()
-        );
+        return getFadManager(fisher)
+            .fadLocationsInTimeStepRange(timeStep, timeStep + getNumberOfStepsToLookAheadForFadPositions())
+            .stream()
+            .filter(SeaTile::isWater)
+            .collect(toImmutableSet());
     }
 
     @Override public Stream<SimpleImmutableEntry<Route, Double>> evaluateRoutes(
@@ -80,26 +85,10 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
         final ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep =
             fadsByTileByStep(fadManager, possibleRoutes, timeStep);
         final long fadSetsRemaining = getFadSetsRemaining(fadManager);
-
-        return possibleRoutes.stream().map(possibleRoute -> {
-            final double possibleRevenues = possibleRoute.getSteps().stream()
-                .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))
-                .flatMap(routeStep ->
-                    fadsByTileByStep
-                        .get(routeStep.getTimeStep())
-                        .get(routeStep.getSeaTile())
-                        .stream()
-                        .map(fad -> fad.valueOfSet(fisher))
-                )
-                .sorted(reverseOrder())
-                .limit(fadSetsRemaining)
-                .mapToDouble(Double::doubleValue)
-                .sum();
-            return entry(
-                possibleRoute.makeRoute(fisher),
-                min(possibleRevenues, maxPossibleRevenues(fisher)) - possibleRoute.getCost(fisher)
-            );
-        });
+        return possibleRoutes.stream().map(possibleRoute -> entry(
+            possibleRoute.makeRoute(fisher),
+            possibleRouteValue(possibleRoute, fisher, fadSetsRemaining, fadsByTileByStep)
+        ));
     }
 
     private ImmutableMap<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep(
@@ -120,8 +109,33 @@ public class FadSettingRouteSelector extends AbstractRouteSelector {
             .orElse(Long.MAX_VALUE);
     }
 
-    private double maxPossibleRevenues(final Fisher fisher) {
-        // calc max possible value given space in hold, using the highest species price
+    private double possibleRouteValue(
+        final PossibleRoute possibleRoute,
+        final Fisher fisher,
+        final long fadSetsRemaining,
+        final Map<Integer, ImmutableSetMultimap<SeaTile, Fad>> fadsByTileByStep
+    ) {
+        final Collection<Fad> fads = possibleRoute.getSteps().stream()
+            .filter(routeStep -> canFishAtStep(fisher, routeStep.getSeaTile(), routeStep.getTimeStep()))
+            .flatMap(routeStep ->
+                fadsByTileByStep
+                    .get(routeStep.getTimeStep())
+                    .get(routeStep.getSeaTile())
+                    .stream()
+            )
+            .sorted(comparingDouble(fad -> fad.valueOfSet(fisher)))
+            .limit(fadSetsRemaining)
+            .collect(toImmutableList());
+        final double totalFishValue = fads.stream().mapToDouble(fad -> fad.valueOfFishFor(fisher)).sum();
+        final double totalBuoyValue = fads.stream().mapToDouble(fad -> fad.valueOfBuoyFor(fisher)).sum();
+        final double possibleRevenues = min(totalFishValue, maxPossibleRevenuesFromFish(fisher)) + totalBuoyValue;
+        return possibleRevenues - possibleRoute.getCost(fisher);
+    }
+
+    /**
+     * calc max possible value given space in hold, using the highest species price
+     */
+    private double maxPossibleRevenuesFromFish(final Fisher fisher) {
         final double highestPrice =
             fisher.getHomePort().getMarketMap(fisher).getMarkets().stream()
                 .mapToDouble(Market::getMarginalPrice)

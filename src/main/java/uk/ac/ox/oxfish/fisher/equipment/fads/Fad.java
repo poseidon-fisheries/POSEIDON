@@ -142,9 +142,18 @@ public class Fad implements Locatable {
 
     public FadManager getOwner() { return owner; }
 
+    public double valueOfFishFor(Fisher fisher) {
+        return priceOfFishHere(getBiology(), getMarkets(fisher));
+    }
+
+    public double valueOfBuoyFor(Fisher fisher) {
+        // Because fishers return buoys to their rightful owners,
+        // picking up a buoy that is not their own doesn't pay for them
+        return getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
+    }
+
     public double valueOfSet(Fisher fisher) {
-        double buoyValue = getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
-        return buoyValue + priceOfFishHere(getBiology(), getMarkets(fisher));
+        return valueOfFishFor(fisher) + valueOfBuoyFor(fisher);
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
