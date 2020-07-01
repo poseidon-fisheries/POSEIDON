@@ -26,10 +26,12 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegressio
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Goes through all the possible seatiles and picks the highest one
@@ -67,8 +69,11 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
             FishState state, Fisher fisher, SeaTile current) {
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
-        Collections.shuffle(seaTiles);
+
         MersenneTwisterFast random = state.getRandom();
+        Collections.shuffle(seaTiles,new Random(random.nextLong()));
+
+
 
         Pair<SeaTile,Double> best;
         if(current!=null)

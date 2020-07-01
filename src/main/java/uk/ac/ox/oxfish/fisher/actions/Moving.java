@@ -69,7 +69,8 @@ public class Moving implements Action
     public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
 
         //it would be very weird to accumulate a full day!
-        assert accruedHours < 24;
+        //it's not actually that weird with far-off ports!
+        //assert accruedHours <= 24 : "we accrued " + accruedHours;
 
         //adapt if needed
         SeaTile oldDestination = agent.getDestination();

@@ -141,7 +141,8 @@ public class NoData718Slice4PriceIncrease {
     public static void priceIncreaseOneRun(Path scenarioFile, int shockYear,
                                            Path outputFolder,
                                            LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap,
-                                           List<String> additionalColumnsToPrint) throws IOException {
+                                           List<String> additionalColumnsToPrint,
+                                           Consumer<Scenario>... additionalPolicies) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -171,6 +172,10 @@ public class NoData718Slice4PriceIncrease {
                         }
                     }
             );
+
+            for (Consumer<Scenario> additionalPolicy : additionalPolicies) {
+                policy = policy.andThen(additionalPolicy);
+            }
 
 
             BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile, shockYear+5, null,SEED, additionalColumnsToPrint);
