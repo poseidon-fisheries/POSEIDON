@@ -83,7 +83,7 @@ public class NoData718Slice6PriceIncrease {
             System.out.println(Arrays.toString(row));
 
             final Path scenarioPath = Paths.get(row[0]);
-            if(Files.exists(scenarioPath))
+            if(Files.exists(scenarioPath) && Files.size(scenarioPath)>0)
             {
 
                 priceIncreaseOneRun(

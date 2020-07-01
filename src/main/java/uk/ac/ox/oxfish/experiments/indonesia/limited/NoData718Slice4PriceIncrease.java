@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
+import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -118,6 +119,8 @@ public class NoData718Slice4PriceIncrease {
                 return new Consumer<Scenario>() {
                     @Override
                     public void accept(Scenario scenario) {
+                        Preconditions.checkNotNull(scenario);
+                        Preconditions.checkNotNull(((FlexibleScenario) scenario).getPlugins());
                         ((FlexibleScenario) scenario).getPlugins().add(
                                 NoData718Slice3PriceIncrease.priceIncreaseEvent(shockYear- lead,
                                         newCroakerPriceDobo,
