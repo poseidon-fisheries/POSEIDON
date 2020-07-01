@@ -17,12 +17,14 @@ import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -37,7 +39,7 @@ public class NoData718Slice6Policy {
 
 
 
-    static private LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
+    static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
 
 
     private static Function<Integer,Consumer<Scenario>> decreasePricesForAllSpeciesByAPercentage(double taxRate) {
@@ -153,8 +155,19 @@ public class NoData718Slice6Policy {
 
     public static void main(String[] args) throws IOException {
 
+        runPolicyDirectory(
+                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile(),
+                OUTPUT_FOLDER,
+                policies);
+
+
+    }
+
+    public static void runPolicyDirectory(File candidateFile,
+                                          Path outputFolder,
+                                          LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(
-                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile()
+                candidateFile
         ));
 
         List<String[]> strings = reader.readAll();
@@ -164,74 +177,30 @@ public class NoData718Slice6Policy {
             runOnePolicySimulation(
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
-                    Integer.parseInt(row[2])
+                    Integer.parseInt(row[2]), outputFolder, policies
             );
         }
-
-
     }
 
 
     private static void runOnePolicySimulation(Path scenarioFile,
                                                int yearOfPriceShock,
-                                               int yearOfPolicyShock) throws IOException {
+                                               int yearOfPolicyShock,
+                                               Path outputFolder,
+                                               LinkedHashMap<String, Function<Integer,
+                                                       Consumer<Scenario>>> policies) throws IOException {
 
 
-        Preconditions.checkArgument(yearOfPolicyShock>yearOfPriceShock);
+        NoData718Slice4PriceIncrease.priceIncreaseOneRun(
+                scenarioFile,
+                yearOfPolicyShock,
+                outputFolder,
+                policies,
+                null,
+                NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
+                        apply(yearOfPriceShock)
 
-        String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
-
-        System.out.println(filename);
-        if(OUTPUT_FOLDER.resolve(filename + ".csv").toFile().exists())
-        {
-            System.out.println(filename + " already exists!");
-            return;
-
-        }
-
-
-        FileWriter fileWriter = new FileWriter(OUTPUT_FOLDER.resolve(filename + ".csv").toFile());
-        fileWriter.write("run,year,policy,variable,value\n");
-        fileWriter.flush();
-
-        for (Map.Entry<String, Function<Integer, Consumer<Scenario>>> policyRun : policies.entrySet()) {
-            String policyName = policyRun.getKey();
-
-            //add the price shock
-            final Consumer<Scenario> priceShockConsumer =
-                    NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).apply(yearOfPriceShock);
-
-            //add policy!
-            final Consumer<Scenario> totalConsumer = priceShockConsumer.andThen(
-                    policyRun.getValue().apply(yearOfPolicyShock)
-            ).andThen(
-                    //collect full-time vs part-time stuff
-                    scenario -> ((FlexibleScenario) scenario).getPlugins().add(
-                            new FullSeasonalRetiredDataCollectorsFactory()
-                    )
-            );;
-
-            BatchRunner runner =  NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
-                    yearOfPolicyShock+15, null, SEED, null);
-
-            //give it the scenario
-            runner.setScenarioSetup(totalConsumer);
-
-            //remember to output the policy tag
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(StringBuffer writer, FishState model, Integer year) {
-                    writer.append(policyName).append(",");
-                }
-            });
-
-            StringBuffer tidy = new StringBuffer();
-            runner.run(tidy);
-            fileWriter.write(tidy.toString());
-            fileWriter.flush();
-
-        }
-        fileWriter.close();
+        );
 
 
     }

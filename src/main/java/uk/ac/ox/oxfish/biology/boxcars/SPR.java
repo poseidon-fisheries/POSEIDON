@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.boxcars;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.function.Function;
 
@@ -127,6 +128,9 @@ public class SPR {
         double instantaneousMortality = (kParameter * (lengthInfinity - meanLengthCaughtAboveThreshold))/
                 (meanLengthCaughtAboveThreshold - mostFrequentLength);
         instantaneousMortality= instantaneousMortality - naturalMortality;
+        //round it to 0 if the instantaneous mortality goes below
+        if(instantaneousMortality<0)
+            instantaneousMortality = 0;
 
         assert mostFrequentLength>minimumLengthCaught;
         double mortalityAtAge[] = new double[maxSimulatedAge];
@@ -140,8 +144,8 @@ public class SPR {
                     Math.min(1,(lengthAtAge-minimumLengthCaught)/
                             (mostFrequentLength-minimumLengthCaught))*instantaneousMortality;
 
-            assert  mortalityAtAge[age] >=0;
-            assert  mortalityAtAge[age] <= instantaneousMortality;
+            assert  mortalityAtAge[age] >= -FishStateUtilities.EPSILON : mortalityAtAge[age];
+            assert  mortalityAtAge[age] <= instantaneousMortality + FishStateUtilities.EPSILON;
 
         }
 

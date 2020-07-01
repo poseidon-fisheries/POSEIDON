@@ -1049,11 +1049,16 @@ public class FishStateUtilities {
                         yaml.dump(scripts.getScripts()).getBytes());
         }
 
+   //     System.out.println("random " + model.random.nextDouble());
+
         mainloop:
         while(model.getYear()< yearsToRun) {
             model.schedule.step(model);
+ //           System.out.println("random_day" + model.getDay() +"  ---- " + model.random.nextDouble());
+
             if(model.getDayOfTheYear()==1)
             {
+
                 //if you fail any of the 
                 for (Predicate<FishState> circuitBreaker : circuitBreakers) {
                     if(circuitBreaker.test(model))
@@ -1062,6 +1067,8 @@ public class FishStateUtilities {
                 if(Log.DEBUG)
                     Log.debug("Year " + model.getYear() + " starting");
             }
+
+
 
 
         }
