@@ -51,10 +51,10 @@ public class PossibleRoute {
         this.steps =
             map.cumulativeTravelTimeAlongRouteInHours(route, speedInKph)
                 .stream()
-                .map(pair -> new Step(
-                    pair.getFirst(),
-                    pair.getSecond(),
-                    (int) (startingTimeStep + (pair.getSecond() / hoursPerStep))
+                .map(entry -> new Step(
+                    entry.getKey(),
+                    entry.getValue(),
+                    (int) (startingTimeStep + (entry.getValue() / hoursPerStep))
                 ))
                 .collect(toImmutableList());
         final Step lastStep = getLast(steps);
@@ -64,7 +64,7 @@ public class PossibleRoute {
             getLast(map.cumulativeTravelTimeAlongRouteInHours(
                 map.getRoute(getLast(steps).seaTile, homePort.getLocation()),
                 speedInKph
-            )).getSecond();
+            )).getValue();
 
         this.lastTimeStep = lastStep.getTimeStep();
     }

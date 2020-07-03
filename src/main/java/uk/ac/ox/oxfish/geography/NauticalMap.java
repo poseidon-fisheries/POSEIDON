@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import static java.util.stream.Collectors.joining;
@@ -498,7 +499,7 @@ public Coordinate getCoordinates(int gridX, int gridY) {
     }
 
 
-    public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, double speedInKph) {
+    public List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, double speedInKph) {
         return distance.cumulativeTravelTimeAlongRouteInHours(route, this, speedInKph);
     }
 

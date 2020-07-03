@@ -21,13 +21,15 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Common interface for all distance measures over a nautical chart
@@ -35,29 +37,29 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
  */
 public interface Distance {
 
-    default ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+    default List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
         Deque<SeaTile> route,
         NauticalMap map,
         double speedInKph
     ) {
         return cumulativeDistanceAlongRouteInKm(route, map).stream()
-            .map(pair -> pair.mapSecond(dist -> dist / speedInKph))
+            .map(pair -> entry(pair.getKey(), pair.getValue() / speedInKph))
             .collect(toImmutableList());
     }
 
-    default ImmutableList<Pair<SeaTile, Double>> cumulativeDistanceAlongRouteInKm(
+    default List<Entry<SeaTile, Double>> cumulativeDistanceAlongRouteInKm(
         Deque<SeaTile> route,
         NauticalMap map
     ) {
         checkArgument(!route.isEmpty());
         double cumulativeDistance = 0.0;
-        final ImmutableList.Builder<Pair<SeaTile, Double>> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Entry<SeaTile, Double>> builder = ImmutableList.builder();
         SeaTile start = route.peek();
         final Iterator<SeaTile> iterator = route.iterator();
         do {
             SeaTile end = iterator.next();
             cumulativeDistance += distance(start, end, map);
-            builder.add(new Pair<>(end, cumulativeDistance));
+            builder.add(entry(end, cumulativeDistance));
             start = end;
         } while (iterator.hasNext());
         return builder.build();

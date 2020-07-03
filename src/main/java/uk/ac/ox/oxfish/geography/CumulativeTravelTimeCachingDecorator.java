@@ -1,37 +1,40 @@
 package uk.ac.ox.oxfish.geography;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Table;
-import uk.ac.ox.oxfish.utility.Pair;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class CumulativeTravelTimeCachingDecorator implements Distance {
 
+    private static final long CACHE_SIZE = 500;
+
     private final Distance delegate;
-    private Map<Double, Table<SeaTile, SeaTile, ImmutableList<Pair<SeaTile, Double>>>> memory = new HashMap<>();
+
+    // A cache from endpoints to a map from speed to cumulative distances along route
+    private final LoadingCache<Entry<SeaTile, SeaTile>, Map<Double, List<Entry<SeaTile, Double>>>> cache =
+        CacheBuilder.newBuilder()
+            .maximumSize(CACHE_SIZE)
+            .build(CacheLoader.from(__ -> new HashMap<>()));
 
     public CumulativeTravelTimeCachingDecorator(Distance delegate) { this.delegate = delegate; }
 
-    @Override public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+    @Override public List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
         Deque<SeaTile> route,
         NauticalMap map,
         double speedInKph
     ) {
-        final SeaTile startTile = route.getFirst();
-        final SeaTile endTile = route.getLast();
-        final Table<SeaTile, SeaTile, ImmutableList<Pair<SeaTile, Double>>> cache =
-            memory.computeIfAbsent(speedInKph, __ -> HashBasedTable.create());
-        final ImmutableList<Pair<SeaTile, Double>> cachedResult =
-            cache.get(startTile, endTile);
-        if (cachedResult != null) return cachedResult;
-        final ImmutableList<Pair<SeaTile, Double>> result =
-            Distance.super.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
-        cache.put(startTile, endTile, result);
-        return result;
+        return cache.getUnchecked(entry(route.getFirst(), route.getLast())).computeIfAbsent(
+            speedInKph,
+            __ -> Distance.super.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph)
+        );
     }
 
     @Override public double distance(SeaTile start, SeaTile end, NauticalMap map) {

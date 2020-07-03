@@ -31,6 +31,8 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -42,6 +44,7 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class PossibleRouteTest {
 
@@ -56,8 +59,8 @@ public class PossibleRouteTest {
         final NauticalMap map = mock(NauticalMap.class);
         final Port port = mock(Port.class);
 
-        final ImmutableList<Pair<SeaTile, Double>> steps = Streams
-            .mapWithIndex(tileDeque.stream(), (tile, i) -> new Pair<>(tile, (double) i))
+        final ImmutableList<Entry<SeaTile, Double>> steps = Streams
+            .mapWithIndex(tileDeque.stream(), (tile, i) -> entry(tile, (double) i))
             .collect(toImmutableList());
         when(map.cumulativeTravelTimeAlongRouteInHours(any(), anyDouble())).thenReturn(steps);
 
