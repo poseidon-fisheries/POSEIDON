@@ -139,7 +139,7 @@ public class NoData718Slice4PriceIncrease {
                                            Path outputFolder,
                                            LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap,
                                            List<String> additionalColumnsToPrint,
-                                           Consumer<Scenario>... additionalPolicies) throws IOException {
+                                           boolean printYAMLScenario, Consumer<Scenario>... additionalPolicies) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -150,6 +150,8 @@ public class NoData718Slice4PriceIncrease {
             return;
 
         }
+        if(printYAMLScenario && !outputFolder.resolve(filename).toFile().exists())
+            Files.copy(scenarioFile,outputFolder.resolve(filename));
 
 
         FileWriter fileWriter = new FileWriter(outputFolder.resolve(filename + ".csv").toFile());
@@ -227,8 +229,8 @@ public class NoData718Slice4PriceIncrease {
                         scenarioPath,
                         Integer.parseInt(row[1]),
                         OUTPUT_FOLDER,
-                        priceIncreasePolicies, null
-                );
+                        priceIncreasePolicies, null,
+                        false);
             }
             else {
                 System.err.println("Couldn't find scenario " + scenarioPath);
