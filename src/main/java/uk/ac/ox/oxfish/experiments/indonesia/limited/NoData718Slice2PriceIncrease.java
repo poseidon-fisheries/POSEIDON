@@ -32,7 +32,7 @@ public class NoData718Slice2PriceIncrease {
 
     private static final int POPULATIONS = 3;
 
-    private static Map<String,String> speciesToSprAgent =
+    public static Map<String,String> speciesToSprAgent =
             new HashMap<>(3);
     static {
         speciesToSprAgent.put("Atrobucca brevis","spr_agent3");
@@ -89,8 +89,13 @@ public class NoData718Slice2PriceIncrease {
             columnsToPrint.add("Average Trip Duration of population"+i);
             for (String species : NoData718Slice1.validSpecies) {
                 columnsToPrint.add(species+ " Landings of population" + i);
-                columnsToPrint.add(species+" Landings of population" + i);
             }
+            columnsToPrint.add("Others Landings of population" + i);
+
+            columnsToPrint.add("Actual Average Distance From Port of population"+i);
+            columnsToPrint.add("Actual Average Variable Costs of population"+i);
+            columnsToPrint.add("Total Variable Costs of population"+i);
+            columnsToPrint.add("Total Hours Out of population"+i);
         }
 
 

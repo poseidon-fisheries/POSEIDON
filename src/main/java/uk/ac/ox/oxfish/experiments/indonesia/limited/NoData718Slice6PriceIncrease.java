@@ -91,8 +91,8 @@ public class NoData718Slice6PriceIncrease {
                         scenarioPath,
                         Integer.parseInt(row[1]),
                         outputFolder,
-                        policies, additionalColumnsToPrint
-                );
+                        policies, additionalColumnsToPrint,
+                        false);
             }
             else {
                 System.err.println("Couldn't find scenario " + scenarioPath);

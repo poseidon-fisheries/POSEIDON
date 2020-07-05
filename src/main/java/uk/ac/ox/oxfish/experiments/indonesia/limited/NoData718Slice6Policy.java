@@ -4,29 +4,27 @@ import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketProxy;
-import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -111,6 +109,21 @@ public class NoData718Slice6Policy {
 
     static {
 
+
+        for(double yearlyReduction = .01; yearlyReduction<=.05; yearlyReduction= FishStateUtilities.round5(yearlyReduction+.005)) {
+            double finalYearlyReduction = yearlyReduction;
+            policies.put(
+                    yearlyReduction+"_yearlyReduction_noentry",
+                    shockYear -> Slice6Sweeps.setupFleetReductionConsumer(
+                            shockYear,
+                            finalYearlyReduction
+                    ).andThen(
+                            NoDataPolicy.removeEntry(shockYear)
+                    )
+
+            );
+        }
+
         policies.put(
                 "BAU",
                 shockYear -> scenario -> {
@@ -126,7 +139,7 @@ public class NoData718Slice6Policy {
         );
 
 
-        for(int days = 250; days>100; days-=10) {
+        for(int days = 250; days>=100; days-=10) {
             int finalDays = days;
             policies.put(
                     days+"_days_noentry",
@@ -138,6 +151,8 @@ public class NoData718Slice6Policy {
 
             );
         }
+
+
 
         policies.put(
                 "tax_20",
@@ -191,12 +206,20 @@ public class NoData718Slice6Policy {
                                                        Consumer<Scenario>>> policies) throws IOException {
 
 
+
+        List<String> additionalColumns = new LinkedList<>();
+        for (String species : NoData718Slice1.validSpecies) {
+            final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
+            Preconditions.checkNotNull(agent, "species has no agent!");
+            additionalColumns.add("SPR " + species + " " + agent + "_small");
+        }
         NoData718Slice4PriceIncrease.priceIncreaseOneRun(
                 scenarioFile,
                 yearOfPolicyShock,
                 outputFolder,
                 policies,
                 null,
+                true,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock)
 
