@@ -1,0 +1,560 @@
+Flexible:
+  allowFriendshipsAcrossPorts: false
+  biologyInitializer:
+    Multiple Species Abundance:
+      addGarbageSpecies: true
+      factories:
+      - Boxcar Biology:
+          LInfinity: '61.85870998996987'
+          abundanceSimulator: null
+          allometricAlpha: '0.0197'
+          allometricBeta: '2.986'
+          cmPerBin: 5.0
+          cumulativePhi: '1.0473709340880382'
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Equal Allocation:
+              constantValue: '1.0'
+          initialAbundanceAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: false
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          initialBtOverK: '0.9843308882768513'
+          k: '0.14081392995893774'
+          lengthAtMaturity: '29.796292123356576'
+          numberOfBins: 25
+          recruitAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: false
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          speciesName: Lethrinus laticaudis
+          steepness: '0.6288444333483529'
+          virginRecruits: '8265149.128406507'
+          yearlyMortality: '0.2615033770749143'
+      - Boxcar Biology:
+          LInfinity: '85.561555502256'
+          abundanceSimulator: null
+          allometricAlpha: '0.01894'
+          allometricBeta: '2.916'
+          cmPerBin: 5.0
+          cumulativePhi: '7.515746094429746'
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Equal Allocation:
+              constantValue: '1.0'
+          initialAbundanceAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: false
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          initialBtOverK: '0.9842886357068137'
+          k: '0.16658738640297205'
+          lengthAtMaturity: '44.840328451710306'
+          numberOfBins: 25
+          recruitAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: false
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          speciesName: Lutjanus malabaricus
+          steepness: '0.6154808117841734'
+          virginRecruits: '6232491.537460939'
+          yearlyMortality: '0.17251026510060105'
+      - Boxcar Biology:
+          LInfinity: '65.97415964409058'
+          abundanceSimulator: null
+          allometricAlpha: '0.0128'
+          allometricBeta: '2.94'
+          cmPerBin: 5.0
+          cumulativePhi: '1.2075934020472139'
+          diffuser: No Diffusion
+          habitabilityAllocator:
+            Equal Allocation:
+              constantValue: '1.0'
+          initialAbundanceAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: true
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          initialBtOverK: '0.7620625772849596'
+          k: '0.20699314017120007'
+          lengthAtMaturity: '39.71848295773902'
+          numberOfBins: 25
+          recruitAllocator:
+            Bounded Allocation:
+              delegate:
+                Equal Allocation:
+                  constantValue: '1.0'
+              highestX: '3.916934106241936'
+              highestY: '3.1761187135703093'
+              insideTheBox: true
+              lowestX: '0.23177555162912553'
+              lowestY: '1.7246543125192624'
+          speciesName: Atrobucca brevis
+          steepness: '0.7466096873072885'
+          virginRecruits: '7580052.209490627'
+          yearlyMortality: '0.3539506040551526'
+  cheaters: false
+  exogenousCatches:
+    Simple Exogenous Catches:
+      yearlyBiomassToExtract:
+        Lutjanus malabaricus: 421490
+        Lethrinus laticaudis: 453317
+  fisherDefinitions:
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Max Hours Per Year:
+            maxHoursOut: '4709.497844003305'
+        firstYearYouCanSwitch: '1.0'
+        inertia: '4.670116019713456'
+        maxHoursOutWhenSeasonal: '2352.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '1.0'
+        targetVariable: '264541.46147595666'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '51.13267465755343'
+    fuelTankSize: '9.9999999999E10'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Lethrinus laticaudis:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '3.6700970748853736E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '22.4439411815167'
+                      selexParameter2: '0.5282748835189799'
+                  Lutjanus malabaricus:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '5.209910330123578E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '19.863935619859024'
+                      selexParameter2: '0.5085016732606742'
+                  Atrobucca brevis:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '4.776875878448889E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '23.253363340414914'
+                      selexParameter2: '0.5897696314851046'
+                hourlyGasPriceOverride: '0.0'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.3480505048421594'
+            rounding: false
+        hoursItTake: '24.0'
+    gearStrategy: Never Change Gear
+    holdSize: '21324.873940399913'
+    hourlyVariableCost: '211013.90187512152'
+    initialFishersPerPort:
+      Far-off: 10
+    literPerKilometer: '0.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: red
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Max Hours Per Year:
+            maxHoursOut: '5047.033861338443'
+        firstYearYouCanSwitch: '1.0'
+        inertia: '4.711292844761207'
+        maxHoursOutWhenSeasonal: '2352.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '1.0'
+        targetVariable: '263907.43401082646'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '51.70164672508835'
+    fuelTankSize: '9.9999999999E10'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Lethrinus laticaudis:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '5.190430718573784E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '24.242225880398564'
+                      selexParameter2: '0.6052270431707465'
+                  Lutjanus malabaricus:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '4.8108861044138E-5'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '18.97896478453321'
+                      selexParameter2: '0.4388558739743037'
+                  Atrobucca brevis:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '8.046503471471024E-4'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '20.19660740777975'
+                      selexParameter2: '0.7644176946605189'
+                hourlyGasPriceOverride: '0.0'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.208713716255121'
+            rounding: false
+        hoursItTake: '24.0'
+    gearStrategy: Never Change Gear
+    holdSize: '24084.525135907097'
+    hourlyVariableCost: '244208.87476298958'
+    initialFishersPerPort:
+      Port 0: 10
+    literPerKilometer: '0.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: orange
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  - departingStrategy:
+      Full-time Seasonal Retired Decorator:
+        decorated:
+          Max Hours Per Year:
+            maxHoursOut: '5078.33879388824'
+        firstYearYouCanSwitch: '1.0'
+        inertia: '4.46193432780892'
+        maxHoursOutWhenSeasonal: '2352.0'
+        minimumVariable: '0.0'
+        probabilityStartingFullTime: '1.0'
+        targetVariable: '255238.4281925495'
+        variableName: TRIP_PROFITS_PER_HOUR
+    destinationStrategy:
+      Imitator-Explorator:
+        alwaysCopyBest: true
+        automaticallyIgnoreAreasWhereFishNeverGrows: true
+        automaticallyIgnoreMPAs: true
+        backtracksOnBadExploration: true
+        dropInUtilityNeededForUnfriend: '-1.0'
+        ignoreEdgeDirection: true
+        ignoreFailedTrips: false
+        maxInitialDistance: -1.0
+        objectiveFunction:
+          Hourly Profit Objective:
+            opportunityCosts: true
+        probability:
+          Fixed Probability:
+            explorationProbability: '0.2'
+            imitationProbability: '1.0'
+        stepSize: '1.0'
+    discardingStrategy: No Discarding
+    fishingStrategy:
+      Until Full With Day Limit:
+        daysAtSea: '53.51219566471875'
+    fuelTankSize: '9.9999999999E10'
+    gear:
+      Hour Delay Gear:
+        delegate:
+          Garbage Gear:
+            delegate:
+              Heterogeneous Selectivity Gear:
+                gears:
+                  Lethrinus laticaudis:
+                    Simple Dome Shaped Selectivity Gear:
+                      averageCatchability: '0.00448472469158039'
+                      lengthFullSelectivity: '38.72539832312853'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      slopeLeft: '1.7945447744943732'
+                      slopeRight: '4.376768072880926'
+                  Lutjanus malabaricus:
+                    Simple Dome Shaped Selectivity Gear:
+                      averageCatchability: '9.626546821006973E-4'
+                      lengthFullSelectivity: '25.498976055362377'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      slopeLeft: '7.5727099061142775'
+                      slopeRight: '5.478276857538758'
+                  Atrobucca brevis:
+                    Simple Logistic Selectivity Gear:
+                      averageCatchability: '0.0'
+                      litersOfGasConsumedPerHour: '0.0'
+                      rounding: false
+                      selexParameter1: '9999.0'
+                      selexParameter2: '1.0'
+                hourlyGasPriceOverride: '0.0'
+            garbageSpeciesName: Others
+            proportionSimulatedToGarbage: '0.225891807348696'
+            rounding: false
+        hoursItTake: '24.0'
+    gearStrategy: Never Change Gear
+    holdSize: '21513.809634888315'
+    hourlyVariableCost: '227409.67381163503'
+    initialFishersPerPort:
+      Port 0: 10
+    literPerKilometer: '0.0'
+    logbook: No Logbook
+    regulation: Anarchy
+    speedInKmh: '13.0'
+    tags: black,gillnet
+    usePredictors: false
+    weatherStrategy: Ignore Weather
+  gasPricePerLiter: '0.0'
+  habitatInitializer: All Sand
+  mapInitializer:
+    Map with far-off ports:
+      delegate:
+        Simple Map:
+          cellSizeInKilometers: '100.0'
+          coastalRoughness: '0.0'
+          depthSmoothing: '1000000.0'
+          height: '5.0'
+          maxInitialDepth: '5000.0'
+          maxLandWidth: '1.0'
+          minInitialDepth: '5000.0'
+          width: '6.0'
+      farOffPorts:
+      - distanceFromExitInKm: 1500.0
+        exitGridX: 0
+        exitGridY: 4
+        gasPriceAtPort: 0.0
+        marketMaker:
+          Multiple Three Prices Markets:
+            markets:
+              Atrobucca brevis:
+                Fixed Price Market:
+                  marketPrice: '0.0'
+              Lethrinus laticaudis:
+                Fixed Price Market:
+                  marketPrice: '48314.3144334316'
+              Lutjanus malabaricus:
+                Fixed Price Market:
+                  marketPrice: '48314.3144334316'
+              Others:
+                Fixed Price Market:
+                  marketPrice: '48314.3144334316'
+        portName: Far-off
+  mapMakerDedicatedRandomSeed: 0
+  market:
+    Multiple Three Prices Markets:
+      markets:
+        Atrobucca brevis:
+          Fixed Price Market:
+            marketPrice: '0.0'
+        Lethrinus laticaudis:
+          Fixed Price Market:
+            marketPrice: '48314.3144334316'
+        Lutjanus malabaricus:
+          Fixed Price Market:
+            marketPrice: '48314.3144334316'
+        Others:
+          Fixed Price Market:
+            marketPrice: '48314.3144334316'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+      predicates:
+      - Must share port
+      - Must share a tag:
+          mustShareOneOfThese: population0,population1,population2
+  plugins:
+  - Full-time Seasonal Retired Data Collectors
+  - Fish Entry By Profit:
+      costsFinalColumnName: Average Variable Costs of population0
+      fixedCostsToCover: '0.0'
+      maxEntrantsPerYear: '20.0'
+      populationName: population0
+      profitDataColumnName: Average Cash-Flow of population0
+      profitRatioToEntrantsMultiplier: '15.846043440041061'
+  - Fish Entry By Profit:
+      costsFinalColumnName: Average Variable Costs of population1
+      fixedCostsToCover: '0.0'
+      maxEntrantsPerYear: '20.0'
+      populationName: population1
+      profitDataColumnName: Average Cash-Flow of population1
+      profitRatioToEntrantsMultiplier: '9.354452778341464'
+  - Fish Entry By Profit:
+      costsFinalColumnName: Average Variable Costs of population2
+      fixedCostsToCover: '0.0'
+      maxEntrantsPerYear: '20.0'
+      populationName: population2
+      profitDataColumnName: Average Cash-Flow of population2
+      profitRatioToEntrantsMultiplier: '3.5195762824410863'
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.322'
+      assumedLengthAtMaturity: '29.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '59.0'
+      assumedNaturalMortality: '0.495'
+      assumedVarA: '0.0197'
+      assumedVarB: '2.99'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lethrinus laticaudis
+      surveyTag: spr_agent1
+      tagsToSample:
+        population0: 18
+        population1: 16
+        population2: 4
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.4438437'
+      assumedLengthAtMaturity: '50.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '86.0'
+      assumedNaturalMortality: '0.3775984'
+      assumedVarA: '0.00853'
+      assumedVarB: '3.137'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lutjanus malabaricus
+      surveyTag: spr_agent2
+      tagsToSample:
+        population0: 18
+        population1: 16
+        population2: 4
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.291'
+      assumedLengthAtMaturity: '34.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '68.0'
+      assumedNaturalMortality: '0.447'
+      assumedVarA: '0.0128'
+      assumedVarB: '2.94'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Atrobucca brevis
+      surveyTag: spr_agent3
+      tagsToSample:
+        population0: 18
+        population1: 16
+        population2: 4
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.322'
+      assumedLengthAtMaturity: '29.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '59.0'
+      assumedNaturalMortality: '0.495'
+      assumedVarA: '0.0197'
+      assumedVarB: '2.99'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lethrinus laticaudis
+      surveyTag: spr_agent1_small
+      tagsToSample:
+        population0: 16
+        population1: 16
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.4438437'
+      assumedLengthAtMaturity: '50.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '86.0'
+      assumedNaturalMortality: '0.3775984'
+      assumedVarA: '0.00853'
+      assumedVarB: '3.137'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Lutjanus malabaricus
+      surveyTag: spr_agent2_small
+      tagsToSample:
+        population0: 16
+        population1: 16
+  - SPR Fixed Sample Agent:
+      assumedKParameter: '0.291'
+      assumedLengthAtMaturity: '34.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '68.0'
+      assumedNaturalMortality: '0.447'
+      assumedVarA: '0.0128'
+      assumedVarB: '2.94'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Atrobucca brevis
+      surveyTag: spr_agent3_small
+      tagsToSample:
+        population0: 16
+        population1: 16
+        population2: 4
+  portInitializer:
+    One Port:
+      portPositionX: '5.0'
+      portPositionY: '0.0'
+  portSwitching: false
+  tagsToTrackSeparately: ''
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
