@@ -21,10 +21,8 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -35,13 +33,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.Arrays;
 import java.util.Objects;
 
-import static java.lang.Math.min;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 public class PurseSeineGear implements Gear {
 
@@ -50,7 +45,8 @@ public class PurseSeineGear implements Gear {
     private final double averageSetDurationInHours;
     private final double stdDevOfSetDurationInHours;
     private final double successfulSetProbability;
-    private final double[][] unassociatedSetSamples;
+
+    private final CatchSampler unassociatedCatchSampler;
 
     public PurseSeineGear(
         FadManager fadManager,
@@ -58,23 +54,23 @@ public class PurseSeineGear implements Gear {
         double averageSetDurationInHours,
         double stdDevOfSetDurationInHours,
         double successfulSetProbability,
-        double[][] unassociatedSetSamples
+        final CatchSampler unassociatedCatchSampler
     ) {
         this.fadManager = fadManager;
         this.minimumSetDurationInHours = minimumSetDurationInHours;
         this.averageSetDurationInHours = averageSetDurationInHours;
         this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
         this.successfulSetProbability = successfulSetProbability;
-        this.unassociatedSetSamples = unassociatedSetSamples;
+        this.unassociatedCatchSampler = unassociatedCatchSampler;
     }
+
+    public CatchSampler getUnassociatedCatchSampler() { return unassociatedCatchSampler; }
 
     public double getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
 
     public double getAverageSetDurationInHours() { return averageSetDurationInHours; }
 
     public double getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
-
-    public double[][] getUnassociatedSetSamples() { return unassociatedSetSamples; }
 
     public double getSuccessfulSetProbability() {
         return successfulSetProbability;
@@ -88,28 +84,6 @@ public class PurseSeineGear implements Gear {
             rng.nextGaussian() * stdDevOfSetDurationInHours + averageSetDurationInHours
         );
         return getQuantity(duration, HOUR);
-    }
-
-    /**
-     * This creates a new biology object that will be the target of an unassociated set.
-     * It's called by the MakeUnassociatedSet action but the code lives here because the
-     * gear knows how much fish it can catch. The fish is taken from the underlying sea tile.
-     */
-    public LocalBiology createUnassociatedSetBiology(
-        GlobalBiology globalBiology,
-        LocalBiology seaTileBiology,
-        MersenneTwisterFast rng
-    ) {
-        final double[] biomasses = oneOf(unassociatedSetSamples, rng).clone();
-        for (int i = 0; i < biomasses.length; i++) {
-            final double biomassInTile = seaTileBiology.getBiomass(globalBiology.getSpecie(i));
-            biomasses[i] = min(biomassInTile, biomasses[i]);
-        }
-        final VariableBiomassBasedBiology unassociatedSetBiology = new BiomassLocalBiology(biomasses, biomasses);
-        // Remove the catches from the underlying biology:
-        final Catch catchObject = new Catch(unassociatedSetBiology.getCurrentBiomass());
-        seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
-        return unassociatedSetBiology;
     }
 
     @Override public Catch fish(
@@ -146,7 +120,7 @@ public class PurseSeineGear implements Gear {
             averageSetDurationInHours,
             stdDevOfSetDurationInHours,
             successfulSetProbability,
-            unassociatedSetSamples
+            unassociatedCatchSampler
         );
     }
 
@@ -159,7 +133,7 @@ public class PurseSeineGear implements Gear {
             Double.compare(that.stdDevOfSetDurationInHours, stdDevOfSetDurationInHours) == 0 &&
             Double.compare(that.successfulSetProbability, successfulSetProbability) == 0 &&
             Objects.equals(fadManager, that.fadManager) &&
-            Arrays.equals(unassociatedSetSamples, that.unassociatedSetSamples);
+            Objects.equals(unassociatedCatchSampler, that.unassociatedCatchSampler);
     }
 
 }

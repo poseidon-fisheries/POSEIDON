@@ -20,21 +20,30 @@
 package uk.ac.ox.oxfish.fisher.actions.purseseiner;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 
+import static java.util.stream.IntStream.range;
+
 public class MakeUnassociatedSet extends SetAction {
 
-    public static String ACTION_NAME = "unassociated sets";
+    private static final String ACTION_NAME = "unassociated sets";
 
     public MakeUnassociatedSet(FishState model, Fisher fisher) {
         super(model, fisher);
     }
+
+    public String getActionName() { return ACTION_NAME; }
+
+    @Override void notifyFadManager() { getFadManager().reactTo(this); }
 
     @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
         // unassociated sets are always successful since we're sampling from an empirical distribution
@@ -42,24 +51,36 @@ public class MakeUnassociatedSet extends SetAction {
         return true;
     }
 
-    public String getActionName() { return ACTION_NAME; }
-
-    @Override void notifyFadManager() { getFadManager().reactTo(this); }
-
-    @Override public Action actionAfterSet() { return new Arriving(); }
-
     /**
-     * The target biology of an unassociated set has to be created on the fly, and this action is delegated to
-     * the purse seine gear, which knows how much fish its likely to catch. Note that, since this is only done
+     * The target biology of an unassociated set has to be created on the fly. Note that, since this is only done
      * in the case of a successful set, there is no need for a separate method to release the fish if it fails.
      */
-    @Override public LocalBiology targetBiology(
+    @SuppressWarnings("UnstableApiUsage") @Override public LocalBiology targetBiology(
         PurseSeineGear purseSeineGear,
         GlobalBiology globalBiology,
         LocalBiology seaTileBiology,
         MersenneTwisterFast rng
     ) {
-        return purseSeineGear.createUnassociatedSetBiology(globalBiology, seaTileBiology, rng);
+        final double[] availableBiomass =
+            range(0, globalBiology.getSize())
+                .mapToDouble(i -> seaTileBiology.getBiomass(globalBiology.getSpecie(i)))
+                .toArray();
+
+        final double[] biomassCaught =
+            purseSeineGear
+                .getUnassociatedCatchSampler()
+                .next(availableBiomass)
+                .toArray();
+
+        final VariableBiomassBasedBiology unassociatedSetBiology =
+            new BiomassLocalBiology(biomassCaught, biomassCaught);
+
+        // Remove the catches from the underlying biology:
+        final Catch catchObject = new Catch(unassociatedSetBiology.getCurrentBiomass());
+        seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
+        return unassociatedSetBiology;
     }
+
+    @Override public Action actionAfterSet() { return new Arriving(); }
 
 }

@@ -1,13 +1,16 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.equipment.gear.fads.CatchSampler;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -16,32 +19,35 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
+    private final WeakHashMap<FishState, Set<Observer<DeployFad>>> fadDeploymentObserversCache = new WeakHashMap<>();
+    private final WeakHashMap<FishState, Set<Observer<MakeFadSet>>> fadSetObserversCache = new WeakHashMap<>();
+    private final WeakHashMap<FishState, Set<Observer<MakeUnassociatedSet>>> unassociatedSetObserversCache =
+        new WeakHashMap<>();
+    private final WeakHashMap<FishState, CatchSampler> unassociatedCatchSamples = new WeakHashMap<>();
     private Set<Observer<DeployFad>> fadDeploymentObservers = new LinkedHashSet<>();
     private Set<Observer<MakeFadSet>> fadSetObservers = new LinkedHashSet<>();
     private Set<Observer<MakeUnassociatedSet>> unassociatedSetObservers = new LinkedHashSet<>();
-
-    private final WeakHashMap<FishState, Set<Observer<DeployFad>>> fadDeploymentObserversCache = new WeakHashMap<>();
-    private final WeakHashMap<FishState, Set<Observer<MakeFadSet>>> fadSetObserversCache = new WeakHashMap<>();
-    private final WeakHashMap<FishState, Set<Observer<MakeUnassociatedSet>>> unassociatedSetObserversCache = new WeakHashMap<>();
-
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
@@ -137,8 +143,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.unassociatedSetObservers = unassociatedSetObservers;
     }
 
-    private final WeakHashMap<Path, double[][]> unassociatedCatchSamples = new WeakHashMap<>();
-
     @Override
     public PurseSeineGear apply(FishState fishState) {
 
@@ -163,14 +167,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         );
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        double[][] unassociatedCatchSample =
+        CatchSampler unassociatedCatchSampler =
             unassociatedCatchSamples.computeIfAbsent(
-                unassociatedCatchSampleFile,
-                path -> parseAllRecords(path).stream().map(r ->
-                    range(0, fishState.getBiology().getSize()).mapToDouble(i ->
-                        r.getDouble(i) * 1000
-                    ).toArray() // convert tonnes to kg
-                ).toArray(double[][]::new)
+                fishState,
+                __ -> new CatchSampler(readUnassociatedCatchSamples(fishState.getBiology()), rng)
             );
 
         return new PurseSeineGear(
@@ -179,8 +179,21 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             averageSetDurationInHours.apply(rng),
             stdDevOfSetDurationInHours.apply(rng),
             successfulSetProbability.apply(rng),
-            unassociatedCatchSample
+            unassociatedCatchSampler
         );
+    }
+
+    private List<Iterable<Double>> readUnassociatedCatchSamples(final GlobalBiology globalBiology) {
+        return parseAllRecords(unassociatedCatchSampleFile).stream()
+            .map(r -> Arrays.stream(r.getMetaData().headers())
+                .collect(toImmutableSortedMap(
+                    Ordering.natural(),
+                    speciesCode -> globalBiology
+                        .getSpecie(TunaScenario.speciesNames.get(speciesCode.toUpperCase()))
+                        .getIndex(),
+                    speciesCode -> r.getDouble(speciesCode) * 1000 // convert tonnes to kg
+                )).values())
+            .collect(toImmutableList());
     }
 
     @SuppressWarnings("unused") public Path getUnassociatedCatchSampleFile() {

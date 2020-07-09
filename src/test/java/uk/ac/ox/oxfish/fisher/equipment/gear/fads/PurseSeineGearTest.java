@@ -19,6 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
 
+import com.google.common.collect.ImmutableList;
+import ec.util.MersenneTwisterFast;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -43,7 +45,7 @@ public class PurseSeineGearTest {
         purseSeineGear = new PurseSeineGear(
             mock(FadManager.class),
             1, 1, 0.1, 1,
-            new double[0][]
+            new CatchSampler(ImmutableList.of(), mock(MersenneTwisterFast.class))
         );
     }
 
@@ -66,7 +68,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             purseSeineGear.getStdDevOfSetDurationInHours(),
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             mock(FadManager.class),
@@ -74,7 +76,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             purseSeineGear.getStdDevOfSetDurationInHours(),
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -82,7 +84,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             purseSeineGear.getStdDevOfSetDurationInHours(),
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -90,7 +92,7 @@ public class PurseSeineGearTest {
             2,
             purseSeineGear.getStdDevOfSetDurationInHours(),
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -98,7 +100,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             0.2,
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -106,7 +108,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             2,
             purseSeineGear.getSuccessfulSetProbability(),
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -114,7 +116,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             purseSeineGear.getStdDevOfSetDurationInHours(),
             0,
-            purseSeineGear.getUnassociatedSetSamples()
+            purseSeineGear.getUnassociatedCatchSampler()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -122,7 +124,7 @@ public class PurseSeineGearTest {
             purseSeineGear.getAverageSetDurationInHours(),
             purseSeineGear.getStdDevOfSetDurationInHours(),
             purseSeineGear.getSuccessfulSetProbability(),
-            new double[][]{{1.0}}
+            new CatchSampler(ImmutableList.of(), mock(MersenneTwisterFast.class))
         )));
     }
 }
