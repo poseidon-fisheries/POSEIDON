@@ -166,7 +166,6 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
                 catchabilityBounds
 
         ));
-        //problem.setDefaultRange(3);
         problem.setParallelThreads(1);
         OptimizationParameters params = OptimizerFactory.makeParams(
                 NelderMeadSimplex.createNelderMeadSimplex(
