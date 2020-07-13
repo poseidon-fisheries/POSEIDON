@@ -45,7 +45,7 @@ public class NoData718Slice6PolicyTest {
         );
     }
 
-    @Test
+  //  @Test
     public void seedStaysTheSame() throws IOException {
 
         final Path scenarioFile = Paths.get("inputs", "tests", "scenario0.yaml");
@@ -67,7 +67,7 @@ public class NoData718Slice6PolicyTest {
 
     }
 
-    @Test
+  //  @Test
     public void sameInputSameOutput() throws IOException {
 
 
@@ -86,7 +86,7 @@ public class NoData718Slice6PolicyTest {
 
     }
 
-    @Test
+  //  @Test
     public void samePolicySameOutput() throws IOException {
 
 
@@ -99,7 +99,7 @@ public class NoData718Slice6PolicyTest {
         NoData718Slice6Policy.runPolicyDirectory(
                 Paths.get("inputs", "tests", "slice718","candidates.csv").toFile(),
                 Paths.get("inputs", "tests", "slice718","output_policy"),
-                testPolicies
+                NoData718Utilities.policies
         );
 
     }
