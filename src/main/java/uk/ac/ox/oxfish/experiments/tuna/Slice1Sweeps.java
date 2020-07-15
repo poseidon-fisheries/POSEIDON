@@ -21,14 +21,13 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimits;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -43,8 +42,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Stream.concat;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.makeLimit;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1Sweeps {
@@ -63,14 +60,11 @@ public class Slice1Sweeps {
 
     public static void main(String[] args) {
 
-        final ActionSpecificRegulation currentFadLimits = new ActiveFadLimits(iattcLimits);
+        final ActionSpecificRegulation currentFadLimits =
+            new ActiveFadLimitsFactory().apply(null);
 
-        final ActionSpecificRegulation smallerFadLimits = new ActiveFadLimits(ImmutableList.of(
-            makeLimit(ImmutableSet.of(6), v -> v >= 1200, 115),
-            makeLimit(ImmutableSet.of(6), v -> v < 1200, 75),
-            makeLimit(ImmutableSet.of(4, 5), __ -> true, 30),
-            makeLimit(ImmutableSet.of(1, 2, 3), __ -> true, 20)
-        ));
+        final ActionSpecificRegulation smallerFadLimits =
+            new ActiveFadLimitsFactory(0, 0, 75, 115).apply(null);
 
         final ImmutableMap<AlgorithmFactory<? extends ActionSpecificRegulation>, String> fadLimits = ImmutableMap.of(
             __ -> currentFadLimits, "Current FAD limits",
@@ -133,11 +127,11 @@ public class Slice1Sweeps {
                 )
             );
         };
-        return new Policy<>(policyName, "", scenario -> {
+        return new Policy<>(policyName, "", scenario ->
             scenario.getPlugins().add(fishState ->
                 __ -> fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, 1)
-            );
-        });
+            )
+        );
     }
 
 }

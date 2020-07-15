@@ -50,7 +50,6 @@ import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static java.util.stream.IntStream.rangeClosed;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
 
 public class SetLimitsVsActiveFadsSweep {
 
@@ -62,7 +61,6 @@ public class SetLimitsVsActiveFadsSweep {
 
     private static final Path outputPath =
         basePath.resolve(Paths.get("runs", "set_limits_vs_closures_sweeps_5_rpp"));
-
 
     private static final int NUM_RUNS_PER_POLICY = 25;
     private static final int NUM_YEARS_TO_RUN = 5;
@@ -78,7 +76,7 @@ public class SetLimitsVsActiveFadsSweep {
     private ImmutableList<Policy<TunaScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
-            new ActiveFadLimitsFactory(iattcLimits);
+            new ActiveFadLimitsFactory();
 
         final Map<Integer, SetLimitsFactory> setLimitsFactories =
             rangeClosed(1, 5).boxed().collect(toImmutableMap(

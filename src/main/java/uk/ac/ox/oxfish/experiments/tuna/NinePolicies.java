@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
@@ -48,8 +47,6 @@ import static java.time.Month.JULY;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.makeLimit;
 
 public class NinePolicies {
 
@@ -76,13 +73,10 @@ public class NinePolicies {
     private ImmutableList<Policy<TunaScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
-            new ActiveFadLimitsFactory(iattcLimits);
+            new ActiveFadLimitsFactory();
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> strictFadLimits =
-            new ActiveFadLimitsFactory(ImmutableList.of(
-                makeLimit(ImmutableSet.of(6), v -> v >= 1200, 115),
-                makeLimit(ImmutableSet.of(6), v -> v < 1200, 75)
-            ));
+            new ActiveFadLimitsFactory(0, 0, 75, 115);
 
         return ImmutableList.of(
             makePolicy(

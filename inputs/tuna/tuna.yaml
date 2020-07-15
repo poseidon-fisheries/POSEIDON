@@ -9,23 +9,19 @@ Tuna:
           carryingCapacity: '1.44094E9'
           differentialPercentageToMove: '0.001'
           grower:
-            FAD-Aware Common Logistic Grower:
+            FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
               steepness: '0.265079184'
+              useLastYearBiomass: true
           initialBiomassAllocator:
             Equal Allocation:
               constantValue: '0.2340305633822366'
           initialCapacityAllocator:
             Shape File Allocator:
               delegate:
-                From File Smoothed Allocator:
+                From File Allocator:
                   biomassPath: inputs/tuna/2017_BET_DIST.csv
                   inputFileHasHeader: true
-                  smoother:
-                    Nearest Neighbor:
-                      neighbors: '1.0'
-                      spaceBandwidth: '5.0'
-                      timeBandwidth: '500.0'
               insidePolygon: true
               shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
           percentageLimitOnDailyMovement: '0.01'
@@ -36,23 +32,19 @@ Tuna:
           carryingCapacity: '4.776E9'
           differentialPercentageToMove: '0.001'
           grower:
-            FAD-Aware Common Logistic Grower:
+            FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
               steepness: '1.1520938023450586'
+              useLastYearBiomass: true
           initialBiomassAllocator:
             Equal Allocation:
               constantValue: '0.7468946817420435'
           initialCapacityAllocator:
             Shape File Allocator:
               delegate:
-                From File Smoothed Allocator:
+                From File Allocator:
                   biomassPath: inputs/tuna/2017_SKJ_DIST.csv
                   inputFileHasHeader: true
-                  smoother:
-                    Nearest Neighbor:
-                      neighbors: '1.0'
-                      spaceBandwidth: '5.0'
-                      timeBandwidth: '500.0'
               insidePolygon: true
               shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
           percentageLimitOnDailyMovement: '0.01'
@@ -63,36 +55,34 @@ Tuna:
           carryingCapacity: '1.20277E9'
           differentialPercentageToMove: '0.001'
           grower:
-            FAD-Aware Common Logistic Grower:
+            FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
               steepness: '0.878915170814038'
+              useLastYearBiomass: true
           initialBiomassAllocator:
             Equal Allocation:
               constantValue: '0.42177224240711025'
           initialCapacityAllocator:
             Shape File Allocator:
               delegate:
-                From File Smoothed Allocator:
+                From File Allocator:
                   biomassPath: inputs/tuna/2017_YFT_DIST.csv
                   inputFileHasHeader: true
-                  smoother:
-                    Nearest Neighbor:
-                      neighbors: '1.0'
-                      spaceBandwidth: '5.0'
-                      timeBandwidth: '500.0'
               insidePolygon: true
               shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
           percentageLimitOnDailyMovement: '0.01'
           speciesName: Yellowfin tuna
           unfishable: false
+  boatsFile: inputs/tuna/boats.csv
   costsFile: inputs/tuna/costs.csv
+  deploymentValuesFile: inputs/tuna/deployment_values.csv
+  fadCarryingCapacitiesFile: inputs/tuna/fad_carrying_capacities.csv
+  fadMortalityIncludedInExogenousCatches: true
   fisherDefinition:
-    departingStrategy:
-      Fixed Rest:
-        hoursBetweenEachDeparture: '340.3333'
+    departingStrategy: Purse-Seine Gear Departing Strategy
     destinationStrategy:
       FAD Destination Strategy:
-        numberOfStepsToLookAheadForFadPositions: '30.0'
+        numberOfStepsToLookAheadForFadPositions: '10.0'
         travelSpeedMultiplier: '1.0'
     discardingStrategy: No Discarding
     fishingStrategy:
@@ -107,7 +97,19 @@ Tuna:
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
+        actionSpecificRegulations:
+        - Active FAD limits:
+            limitClass1: 70
+            limitClass2: 70
+            limitClass3: 70
+            limitClass4: 120
+            limitClass5: 120
+            limitClass6a: 300
+            limitClass6b: 450
         averageSetDurationInHours: '8.0219505805135'
+        biomassLostMonitor: null
+        fadDeploymentObservers: !!set {
+          }
         fadInitializerFactory:
           attractionRates:
             Bigeye tuna: '0.05'
@@ -117,14 +119,20 @@ Tuna:
             Bigeye tuna: 254700.0
             Yellowfin tuna: 278370.0
             Skipjack tuna: 387000.0
+          dudProbability: '0.0'
           fishReleaseProbabilityInPercent: '0.0'
+        fadSetObservers: !!set {
+          }
         initialNumberOfFads: 999999
         minimumSetDurationInHours: '3.03333333333333'
         stdDevOfSetDurationInHours: '2.99113291538723'
         successfulSetProbability: '0.9231701'
         unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
+        unassociatedSetObservers: !!set {
+          }
     gearStrategy: Never Change Gear
     holdSize: '100.0'
+    hourlyEffortCost: nullparameter
     hourlyVariableCost: '0.0'
     initialFishersPerPort: {
       }
@@ -162,6 +170,8 @@ Tuna:
     usePredictors: false
     weatherStrategy: Ignore Weather
   gasPricePerLiter: '0.01'
+  iattcShapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+  mapFile: inputs/tuna/depth.csv
   mapInitializer:
     From File Map:
       gridWidthInCell: '101.0'
@@ -174,7 +184,8 @@ Tuna:
       restoreOriginalLocations: true
       yearsToReset: 1
   portFilePath: inputs/tuna/ports.csv
-  targetYear: 2017
+  pricesFile: inputs/tuna/prices.csv
+  unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
   weatherInitializer:
     Constant Weather:
       temperature: '30.0'

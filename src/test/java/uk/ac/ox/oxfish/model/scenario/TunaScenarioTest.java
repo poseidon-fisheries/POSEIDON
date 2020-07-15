@@ -24,11 +24,23 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class TunaScenarioTest {
+
+    @Test
+    public void canSaveToAndLoadFromYamlWithoutCrashing() {
+        TunaScenario scenario = new TunaScenario();
+        FishYAML yaml = new FishYAML();
+        final String output = yaml.dump(scenario);
+        System.out.println(output);
+        TunaScenario scenario2 = yaml.loadAs(output, TunaScenario.class);
+        assertNotNull(scenario2);
+    }
 
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
@@ -62,4 +74,5 @@ public class TunaScenarioTest {
         while (state.getYear() < 5) state.schedule.step(state);
         state.schedule.step(state);
     }
+
 }

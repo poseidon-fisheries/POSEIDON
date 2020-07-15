@@ -19,29 +19,25 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
-
-import java.util.AbstractMap;
-import java.util.function.Predicate;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
     private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(DeployFad.class);
     private final FisherRelativeLimits limits;
 
-    public ActiveFadLimits(ImmutableList<AbstractMap.SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits) {
+    public ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
         this(new ConditionalFisherRelativeLimits(limits));
     }
 
-    public ActiveFadLimits(FisherRelativeLimits limits) {
+    private ActiveFadLimits(FisherRelativeLimits limits) {
         this.limits = limits;
     }
 
-    @Override public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
+    @Override
+    public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 
     @Override public boolean isForbidden(PurseSeinerAction action) {
         assert applicableActions.contains(action.getClass());

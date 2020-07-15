@@ -19,25 +19,10 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-import java.util.List;
+import java.util.function.Predicate;
 
-public class ConditionalFisherRelativeLimits implements FisherRelativeLimits {
-
-    private final List<ConditionalLimit> limits;
-
-    ConditionalFisherRelativeLimits(Iterable<? extends ConditionalLimit> limits) {
-        this.limits = ImmutableList.copyOf(limits);
-    }
-
-    @Override public int getLimit(Fisher fisher) {
-        return limits.stream()
-            .filter(limit -> limit.test(fisher))
-            .findFirst()
-            .map(ConditionalLimit::getLimit)
-            .orElseThrow(() -> new IllegalArgumentException("No limit applies to fisher " + fisher));
-    }
-
+public interface ConditionalLimit extends Predicate<Fisher> {
+    int getLimit();
 }

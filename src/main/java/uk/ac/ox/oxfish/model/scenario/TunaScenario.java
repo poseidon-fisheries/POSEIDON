@@ -195,26 +195,26 @@ public class TunaScenario implements Scenario {
         "YFT", input("2017_YFT_DIST.csv")
     );
     private static final Path schaeferParamsFile = input("schaefer_params.csv");
-    private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(input("ports.csv"));
-    private int targetYear = 2017;
-    public final AlgorithmFactory<TemporaryRegulation> closureAReg = new TemporaryRegulationFactory(
+    private static final int TARGET_YEAR = 2017;
+    public static final AlgorithmFactory<TemporaryRegulation> closureAReg = new TemporaryRegulationFactory(
         dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
         new NoFishingFactory()
     );
-    public final AlgorithmFactory<TemporaryRegulation> closureBReg = new TemporaryRegulationFactory(
+    public static final AlgorithmFactory<TemporaryRegulation> closureBReg = new TemporaryRegulationFactory(
         dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
         new NoFishingFactory()
     );
-    public final AlgorithmFactory<TemporaryRegulation> elCorralitoReg = new TemporaryRegulationFactory(
+    public static final AlgorithmFactory<TemporaryRegulation> elCorralitoReg = new TemporaryRegulationFactory(
         dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
         new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
     );
+    private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
+    public static final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
+        new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
+    private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(input("ports.csv"));
     private Path mapFile = input("depth.csv");
     private Path deploymentValuesFile = input("deployment_values.csv");
     private Path iattcShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
-    private Path galapagosEezShapeFile = input("galapagos_eez").resolve("eez.shp");
-    public final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
-        new SpecificProtectedAreaFromShapeFileFactory(galapagosEezShapeFile);
     private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
     private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
@@ -224,7 +224,7 @@ public class TunaScenario implements Scenario {
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             input("exogenous_catches.csv"),
-            targetYear,
+            TARGET_YEAR,
             (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode)),
             fadMortalityIncludedInExogenousCatches
         );
@@ -261,7 +261,7 @@ public class TunaScenario implements Scenario {
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
         purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
             parseAllRecords(fadCarryingCapacitiesFile).stream()
-                .filter(r -> r.getInt("year") == targetYear)
+                .filter(r -> r.getInt("year") == TARGET_YEAR)
                 .collect(toMap(
                     r -> speciesNames.get(r.getString("species_code")),
                     r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
@@ -283,8 +283,8 @@ public class TunaScenario implements Scenario {
 
     public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
-    public int dayOfYear(Month month, int dayOfMonth) {
-        return LocalDate.of(targetYear, month, dayOfMonth)
+    public static int dayOfYear(Month month, int dayOfMonth) {
+        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
     }
 
@@ -300,12 +300,6 @@ public class TunaScenario implements Scenario {
 
     @SuppressWarnings("unused") public void setIattcShapeFile(Path iattcShapeFile) {
         this.iattcShapeFile = iattcShapeFile;
-    }
-
-    @SuppressWarnings("unused") public Path getGalapagosEezShapeFile() { return galapagosEezShapeFile; }
-
-    @SuppressWarnings("unused") public void setGalapagosEezShapeFile(Path galapagosEezShapeFile) {
-        this.galapagosEezShapeFile = galapagosEezShapeFile;
     }
 
     @SuppressWarnings("unused") public Path getPricesFile() { return pricesFile; }
@@ -419,7 +413,7 @@ public class TunaScenario implements Scenario {
     private MarketMap makeMarketMap(GlobalBiology globalBiology) {
         Map<String, Double> prices = parseAllRecords(pricesFile).stream()
             .filter(
-                r -> r.getInt("year") == targetYear
+                r -> r.getInt("year") == TARGET_YEAR
             )
             .collect(toMap(
                 r -> r.getString("species_code"),
@@ -489,7 +483,7 @@ public class TunaScenario implements Scenario {
         );
 
         final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
-            .filter(record -> record.getInt("year") == targetYear)
+            .filter(record -> record.getInt("year") == TARGET_YEAR)
             .collect(toMap(
                 record -> record.getString("boat_id"),
                 record -> {
@@ -619,7 +613,7 @@ public class TunaScenario implements Scenario {
     ) {
         final Map<String, Map<SeaTile, Double>> deploymentValuesPerBoatId =
             parseAllRecords(deploymentValuesFile).stream()
-                .filter(record -> record.getInt("year") == targetYear)
+                .filter(record -> record.getInt("year") == TARGET_YEAR)
                 .map(record -> Triple.of( // oh, how I long for case classes...
                     record.getString("boat_id"),
                     nauticalMap.getSeaTile(new Coordinate(record.getDouble("lon"), record.getDouble("lat"))),
@@ -659,12 +653,6 @@ public class TunaScenario implements Scenario {
             }
         });
 
-    }
-
-    @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }
-
-    @SuppressWarnings("unused") public void setTargetYear(int targetYear) {
-        this.targetYear = targetYear;
     }
 
     private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(

@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
@@ -71,8 +70,6 @@ import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.KG_TO_T_TRANSFORMER;
 import static uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier.singleTypeClassifier;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.iattcLimits;
-import static uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory.makeLimit;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.zipToMap;
 
 public final class WebVizExporter {
@@ -91,13 +88,10 @@ public final class WebVizExporter {
         basePath.resolve(Paths.get("tuna", "np", "runs", "webviz"));
 
     private final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
-        new ActiveFadLimitsFactory(iattcLimits);
+        new ActiveFadLimitsFactory();
 
     private final AlgorithmFactory<? extends ActionSpecificRegulation> smallerFadLimits =
-        new ActiveFadLimitsFactory(ImmutableList.of(
-            makeLimit(ImmutableSet.of(6), v -> v >= 1200, 115),
-            makeLimit(ImmutableSet.of(6), v -> v < 1200, 75)
-        ));
+        new ActiveFadLimitsFactory(0, 0, 75, 115);
 
     private final ImmutableList<Policy<TunaScenario>> policies = ImmutableList.of(
         makePolicy(
