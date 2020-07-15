@@ -27,17 +27,16 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Map.Entry;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -45,7 +44,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 @SuppressWarnings("UnstableApiUsage")
 public class FadDeploymentRouteSelector extends AbstractRouteSelector {
 
-    private final static Locker<NauticalMap, ImmutableList<SeaTile>> possibleRouteTilesLocker = new Locker<>();
+    private final static Map<NauticalMap, ImmutableList<SeaTile>> possibleRouteTilesCache = new WeakHashMap<>();
     private final ImmutableList<SeaTile> possibleRouteTiles; // will serve as row keys for our ArrayTable of values
     private Map<SeaTile, Double> deploymentLocationValues;
 
@@ -65,11 +64,13 @@ public class FadDeploymentRouteSelector extends AbstractRouteSelector {
     ) {
         super(fishState, maxTravelTimeInHours, travelSpeedMultiplier);
         this.deploymentLocationValues = deploymentLocationValues;
-        this.possibleRouteTiles =
-            possibleRouteTilesLocker.presentKey(fishState.getMap(), () -> Stream.concat(
-                fishState.getMap().getPorts().stream().map(Port::getLocation),
-                fishState.getMap().getAllSeaTilesExcludingLandAsList().stream()
-            ).collect(toImmutableList()));
+        this.possibleRouteTiles = possibleRouteTilesCache.computeIfAbsent(
+            fishState.getMap(),
+            map -> Stream.concat(
+                map.getPorts().stream().map(Port::getLocation),
+                map.getAllSeaTilesExcludingLandAsList().stream()
+            ).collect(toImmutableList())
+        );
     }
 
     @Override boolean shouldGoToPort(Fisher fisher) { return false; }
