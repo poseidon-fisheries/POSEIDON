@@ -3,10 +3,8 @@ package uk.ac.ox.oxfish.maximization;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
 import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,15 +15,13 @@ public class TunaMaximization {
 
     public static void main(String[] args) {
 
-        final Path scenarioPath =
-            Paths.get(System.getProperty("user.home"), "workspace", "POSEIDON", "inputs", "tuna", "tuna.yaml");
+        final Path basePath =
+            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-07-15");
+        final Path calibrationPath = basePath.resolve("calibration.yaml");
+        ScaledFixedDataLastStepTarget.VERBOSE = true;
 
-        try (FileReader fileReader = new FileReader(scenarioPath.toFile())) {
-            final FishYAML fishYAML = new FishYAML();
-            final TunaScenario scenario = fishYAML.loadAs(fileReader, TunaScenario.class);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        try {
+            OptimizerConsole.main(new String[]{calibrationPath.toString(), "ernesto_default"});
         } catch (IOException e) {
             e.printStackTrace();
         }
