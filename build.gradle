@@ -289,7 +289,7 @@ task appendix(type: JavaExec) {
 task execute(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "package.MyDefaultMain"
-
+    jvmArgs = ["-Xms1024m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
 }
 
 task algorithms(type: JavaExec) {
