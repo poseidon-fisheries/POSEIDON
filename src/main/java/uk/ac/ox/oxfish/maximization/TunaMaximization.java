@@ -24,7 +24,7 @@ public class TunaMaximization {
             OptimizerConsole.main(new String[]{
                 calibrationPath.toString(),
                 "ernesto_default",
-                String.valueOf(8)
+                String.valueOf(4)
             });
         } catch (IOException e) {
             e.printStackTrace();
