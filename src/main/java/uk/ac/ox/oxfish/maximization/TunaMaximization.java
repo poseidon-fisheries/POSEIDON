@@ -21,7 +21,11 @@ public class TunaMaximization {
         ScaledFixedDataLastStepTarget.VERBOSE = true;
 
         try {
-            OptimizerConsole.main(new String[]{calibrationPath.toString(), "ernesto_default"});
+            OptimizerConsole.main(new String[]{
+                calibrationPath.toString(),
+                "ernesto_default",
+                String.valueOf(Runtime.getRuntime().availableProcessors())
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
