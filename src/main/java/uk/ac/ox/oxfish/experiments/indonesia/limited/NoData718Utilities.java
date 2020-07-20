@@ -20,9 +20,13 @@
 
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
+import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
 import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -41,6 +45,7 @@ import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -50,6 +55,41 @@ import java.util.function.Function;
 
 public class NoData718Utilities {
 
+
+    static final Consumer<Scenario> CORRECT_LIFE_HISTORIES_CONSUMER =
+            new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+
+                    final FlexibleScenario flexible = (FlexibleScenario) scenario;
+                    final SingleSpeciesBoxcarFactory malabaricus = (SingleSpeciesBoxcarFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
+                            get(1);
+                    Preconditions.checkArgument(malabaricus.getSpeciesName().equals("Lutjanus malabaricus"));
+                    SPRAgentBuilder builder = new SPRAgentBuilder();
+                    builder.setAssumedKParameter(malabaricus.getK().makeCopy());
+                    builder.setAssumedLengthAtMaturity(malabaricus.getLengthAtMaturity().makeCopy());
+                    builder.setAssumedLinf(malabaricus.getLInfinity().makeCopy());
+                    builder.setAssumedNaturalMortality(malabaricus.getYearlyMortality().makeCopy());
+                    builder.setAssumedVarA(malabaricus.getAllometricAlpha().makeCopy());
+                    builder.setAssumedVarB(malabaricus.getAllometricBeta().makeCopy());
+
+                    builder.setSurveyTag("total_and_correct");
+                    builder.setProbabilityOfSamplingEachBoat(new FixedDoubleParameter(1));
+
+                    ((FlexibleScenario) scenario).getPlugins().add(builder);
+                }
+            };
+    static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> onlyBAU = new LinkedHashMap();
+
+    static {
+
+        onlyBAU.put(
+                "BAU",
+                shockYear -> scenario -> {
+                }
+
+        );
+    }
 
     static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
 

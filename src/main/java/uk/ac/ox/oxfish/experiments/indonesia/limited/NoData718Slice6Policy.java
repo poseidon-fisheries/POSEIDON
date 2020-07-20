@@ -3,31 +3,10 @@ package uk.ac.ox.oxfish.experiments.indonesia.limited;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
-import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
-import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.MarketProxy;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
-import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
@@ -47,20 +26,10 @@ public class NoData718Slice6Policy {
             NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_complete");
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.policies;
+            NoData718Utilities.onlyBAU;
 
 
-    static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> onlyBAU = new LinkedHashMap();
 
-    static {
-
-        onlyBAU.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
-
-        );
-    }
 
 
     public static void main(String[] args) throws IOException {
@@ -191,37 +160,12 @@ public class NoData718Slice6Policy {
                         ((FlexibleScenario) scenario).getPlugins().addAll(plugins);
                     }
                 },
-                CORRECT_LIFE_HISTORIES_CONSUMER
+                NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER
 
         );
 
 
     }
 
-
-
-    private static final Consumer<Scenario> CORRECT_LIFE_HISTORIES_CONSUMER =
-            new Consumer<Scenario>() {
-                @Override
-                public void accept(Scenario scenario) {
-
-                    final FlexibleScenario flexible = (FlexibleScenario) scenario;
-                    final SingleSpeciesBoxcarFactory malabaricus = (SingleSpeciesBoxcarFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
-                            get(1);
-                    Preconditions.checkArgument(malabaricus.getSpeciesName().equals("Lutjanus malabaricus"));
-                    SPRAgentBuilder builder = new SPRAgentBuilder();
-                    builder.setAssumedKParameter(malabaricus.getK().makeCopy());
-                    builder.setAssumedLengthAtMaturity(malabaricus.getLengthAtMaturity().makeCopy());
-                    builder.setAssumedLinf(malabaricus.getLInfinity().makeCopy());
-                    builder.setAssumedNaturalMortality(malabaricus.getYearlyMortality().makeCopy());
-                    builder.setAssumedVarA(malabaricus.getAllometricAlpha().makeCopy());
-                    builder.setAssumedVarB(malabaricus.getAllometricBeta().makeCopy());
-
-                    builder.setSurveyTag("total_and_correct");
-                    builder.setProbabilityOfSamplingEachBoat(new FixedDoubleParameter(1));
-
-                    ((FlexibleScenario) scenario).getPlugins().add(builder);
-                }
-            };
 
 }
