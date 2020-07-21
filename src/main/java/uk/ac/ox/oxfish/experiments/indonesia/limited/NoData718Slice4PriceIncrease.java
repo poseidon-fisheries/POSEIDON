@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.experiments.indonesia.limited;
 import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -13,6 +14,7 @@ import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -144,7 +146,14 @@ public class NoData718Slice4PriceIncrease {
             LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policyMap,
             List<String> additionalColumnsToPrint,
             boolean printYAMLScenario, final int additionalYearsToRun,
-            Consumer<Scenario>... commonPolicies) throws IOException {
+            @Nullable
+            Consumer<Scenario> commonPolicy,
+            //the problem with adding plugins through scenario is that they may screw up the seed as the stack has to randomize it
+            //the solution then is simply not to start anything until the right year arrives. This will make the seed
+            //still inconsistent after the startable... starts, but at least until then it's okay
+            @Nullable
+            LinkedList<Pair<Integer,
+                    AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -177,9 +186,9 @@ public class NoData718Slice4PriceIncrease {
                     }
             );
 
-            for (Consumer<Scenario> additionalPolicy : commonPolicies) {
-                policy = policy.andThen(additionalPolicy);
-            }
+            if(commonPolicy!=null)
+                policy = policy.andThen(commonPolicy);
+
 
 
             BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
@@ -188,6 +197,8 @@ public class NoData718Slice4PriceIncrease {
 
             //give it the scenario
             runner.setScenarioSetup(policy);
+            if(additionalPlugins!=null)
+            runner.setOutsidePlugins(additionalPlugins);
 
             //remember to output the policy tag
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {
@@ -237,7 +248,8 @@ public class NoData718Slice4PriceIncrease {
                         Integer.parseInt(row[1]),
                         OUTPUT_FOLDER,
                         priceIncreasePolicies, null,
-                        false, 5);
+                        false, 5,null,
+                        null);
             }
             else {
                 System.err.println("Couldn't find scenario " + scenarioPath);

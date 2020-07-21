@@ -22,17 +22,16 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import org.apache.commons.math3.analysis.solvers.BracketingNthOrderBrentSolver;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -103,6 +102,12 @@ public class BatchRunner
      */
     private List<Predicate<FishState>> modelInterruptors = new LinkedList();
 
+    //the problem with adding plugins through scenario is that they may screw up the seed as the stack has to randomize it
+    //the solution then is simply not to start anything until the right year arrives. This will make the seed
+    //still inconsistent after the startable... starts, but at least until then it's okay
+    private             LinkedList<Pair<Integer,
+            AlgorithmFactory<? extends AdditionalStartable>>>  outsidePlugins = new LinkedList<>();
+
     public BatchRunner(
             Path yamlFile, int yearsToRun,@Nullable List<String> columnsToPrint,
             @Nullable Path outputFolder, Path policyFile, long initialSeed,
@@ -139,7 +144,8 @@ public class BatchRunner
                 heatmapGathererStartYear,
                 getScenarioSetup(),
                 beforeStartSetup,
-                modelInterruptors.toArray(new Predicate[modelInterruptors.size()])
+                outsidePlugins,
+                modelInterruptors
         );
         System.out.println("Run took: " + (System.currentTimeMillis()-startTime)/1000 + " seconds");
 
@@ -309,5 +315,15 @@ public class BatchRunner
 
     public void setModelInterruptors(List<Predicate<FishState>> modelInterruptors) {
         this.modelInterruptors = modelInterruptors;
+    }
+
+    public             LinkedList<Pair<Integer,
+            AlgorithmFactory<? extends AdditionalStartable>>>  getOutsidePlugins() {
+        return outsidePlugins;
+    }
+
+    public void setOutsidePlugins(            LinkedList<Pair<Integer,
+            AlgorithmFactory<? extends AdditionalStartable>>>  outsidePlugins) {
+        this.outsidePlugins = outsidePlugins;
     }
 }

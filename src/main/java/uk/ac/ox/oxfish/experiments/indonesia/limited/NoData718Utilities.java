@@ -56,275 +56,275 @@ import java.util.function.Function;
 public class NoData718Utilities {
 
 
-    static final Consumer<Scenario> CORRECT_LIFE_HISTORIES_CONSUMER =
-            new Consumer<Scenario>() {
-                @Override
-                public void accept(Scenario scenario) {
+    static final AlgorithmFactory<? extends AdditionalStartable>  CORRECT_LIFE_HISTORIES_CONSUMER(Scenario scenario) {
 
-                    final FlexibleScenario flexible = (FlexibleScenario) scenario;
-                    final SingleSpeciesBoxcarFactory malabaricus = (SingleSpeciesBoxcarFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
-                            get(1);
-                    Preconditions.checkArgument(malabaricus.getSpeciesName().equals("Lutjanus malabaricus"));
-                    SPRAgentBuilder builder = new SPRAgentBuilder();
-                    builder.setAssumedKParameter(malabaricus.getK().makeCopy());
-                    builder.setAssumedLengthAtMaturity(malabaricus.getLengthAtMaturity().makeCopy());
-                    builder.setAssumedLinf(malabaricus.getLInfinity().makeCopy());
-                    builder.setAssumedNaturalMortality(malabaricus.getYearlyMortality().makeCopy());
-                    builder.setAssumedVarA(malabaricus.getAllometricAlpha().makeCopy());
-                    builder.setAssumedVarB(malabaricus.getAllometricBeta().makeCopy());
+        final FlexibleScenario flexible = (FlexibleScenario) scenario;
+        final SingleSpeciesBoxcarFactory malabaricus = (SingleSpeciesBoxcarFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
+                get(1);
+        Preconditions.checkArgument(malabaricus.getSpeciesName().equals("Lutjanus malabaricus"));
+        SPRAgentBuilder builder = new SPRAgentBuilder();
+        builder.setAssumedKParameter(malabaricus.getK().makeCopy());
+        builder.setAssumedLengthAtMaturity(malabaricus.getLengthAtMaturity().makeCopy());
+        builder.setAssumedLinf(malabaricus.getLInfinity().makeCopy());
+        builder.setAssumedNaturalMortality(malabaricus.getYearlyMortality().makeCopy());
+        builder.setAssumedVarA(malabaricus.getAllometricAlpha().makeCopy());
+        builder.setAssumedVarB(malabaricus.getAllometricBeta().makeCopy());
 
-                    builder.setSurveyTag("total_and_correct");
-                    builder.setProbabilityOfSamplingEachBoat(new FixedDoubleParameter(1));
+        builder.setSurveyTag("total_and_correct");
+        builder.setProbabilityOfSamplingEachBoat(new FixedDoubleParameter(1));
 
-                    ((FlexibleScenario) scenario).getPlugins().add(builder);
-                }
-            };
+        ((FlexibleScenario) scenario).getPlugins().add(builder);
+
+
+        return builder;
+    }
+
     static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> onlyBAU = new LinkedHashMap();
 
-    static {
+static {
 
         onlyBAU.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
+        "BAU",
+        shockYear -> scenario -> {
+        }
 
         );
-    }
+        }
 
-    static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
+static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
 
 
-    private static Function<Integer,Consumer<Scenario>> decreasePricesForAllSpeciesByAPercentage(double taxRate) {
+private static Function<Integer,Consumer<Scenario>> decreasePricesForAllSpeciesByAPercentage(double taxRate) {
 
         return new Function<Integer, Consumer<Scenario>>() {
-            public Consumer<Scenario> apply(Integer shockYear) {
+public Consumer<Scenario> apply(Integer shockYear) {
 
 
-                return new Consumer<Scenario>() {
+        return new Consumer<Scenario>() {
 
-                    @Override
-                    public void accept(Scenario scenario) {
+@Override
+public void accept(Scenario scenario) {
 
-                        ((FlexibleScenario) scenario).getPlugins().add(
-                                new AlgorithmFactory<AdditionalStartable>() {
-                                    @Override
-                                    public AdditionalStartable apply(FishState state) {
+        ((FlexibleScenario) scenario).getPlugins().add(
+        new AlgorithmFactory<AdditionalStartable>() {
+@Override
+public AdditionalStartable apply(FishState state) {
 
-                                        return new AdditionalStartable() {
-                                            @Override
-                                            public void start(FishState model) {
+        return new AdditionalStartable() {
+@Override
+public void start(FishState model) {
 
-                                                model.scheduleOnceAtTheBeginningOfYear(
-                                                        new Steppable() {
-                                                            @Override
-                                                            public void step(SimState simState) {
+        model.scheduleOnceAtTheBeginningOfYear(
+        new Steppable() {
+@Override
+public void step(SimState simState) {
 
-                                                                //shock the prices
-                                                                for (Port port : ((FishState) simState).getPorts()) {
-                                                                    for (Market market : port.getDefaultMarketMap().getMarkets()) {
+        //shock the prices
+        for (Port port : ((FishState) simState).getPorts()) {
+        for (Market market : port.getDefaultMarketMap().getMarkets()) {
 
-                                                                        if(port.getName().equals("Port 0")) {
-                                                                            final FixedPriceMarket delegate = (FixedPriceMarket) ((MarketProxy) market).getDelegate();
-                                                                            delegate.setPrice(
-                                                                                    delegate.getPrice() * (1 - taxRate)
-                                                                            );
-                                                                        }
-                                                                        else {
+        if(port.getName().equals("Port 0")) {
+final FixedPriceMarket delegate = (FixedPriceMarket) ((MarketProxy) market).getDelegate();
+        delegate.setPrice(
+        delegate.getPrice() * (1 - taxRate)
+        );
+        }
+        else {
 
-                                                                            final FixedPriceMarket delegate = ((FixedPriceMarket) ((MarketProxy) ((MarketProxy) market).getDelegate()).getDelegate());
-                                                                            delegate.setPrice(
-                                                                                    delegate.getPrice() * (1 - taxRate)
-                                                                            );
-                                                                        }
-                                                                    }
-                                                                }
+final FixedPriceMarket delegate = ((FixedPriceMarket) ((MarketProxy) ((MarketProxy) market).getDelegate()).getDelegate());
+        delegate.setPrice(
+        delegate.getPrice() * (1 - taxRate)
+        );
+        }
+        }
+        }
 
-                                                            }
-                                                        }, StepOrder.DAWN, shockYear);
+        }
+        }, StepOrder.DAWN, shockYear);
 
-                                            }
-                                        };
-
-
-                                    }
-                                });
+        }
+        };
 
 
-                    }
-                };
-            }
+        }
+        });
 
-            ;
+
+        }
+        };
+        }
+
+        ;
 
         };
-    }
+        }
 
 
 
-    static {
+static {
 
 
         for(double yearlyReduction = .01; yearlyReduction<=.05; yearlyReduction= FishStateUtilities.round5(yearlyReduction+.01)) {
-            double finalYearlyReduction = yearlyReduction;
-            policies.put(
-                    yearlyReduction+"_yearlyReduction_noentry",
-                    shockYear -> Slice6Sweeps.setupFleetReductionConsumer(
-                            shockYear,
-                            finalYearlyReduction
-                    ).andThen(
-                            NoDataPolicy.removeEntry(shockYear)
-                    )
+        double finalYearlyReduction = yearlyReduction;
+        policies.put(
+        yearlyReduction+"_yearlyReduction_noentry",
+        shockYear -> Slice6Sweeps.setupFleetReductionConsumer(
+        shockYear,
+        finalYearlyReduction
+        ).andThen(
+        NoDataPolicy.removeEntry(shockYear)
+        )
 
-            );
+        );
         }
 
         policies.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
+        "BAU",
+        shockYear -> scenario -> {
+        }
 
         );
 
 
         policies.put(
-                "noentry",
-                shockYear -> NoDataPolicy.removeEntry(shockYear)
+        "noentry",
+        shockYear -> NoDataPolicy.removeEntry(shockYear)
 
         );
 
 
         for(int days = 250; days>=100; days-=10) {
-            int finalDays = days;
-            policies.put(
-                    days+"_days_noentry",
-                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
-                                                                     new String[]{"population0", "population1", "population2"}
-                            , finalDays).andThen(
-                            NoDataPolicy.removeEntry(shockYear)
-                    )
+        int finalDays = days;
+        policies.put(
+        days+"_days_noentry",
+        shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+        new String[]{"population0", "population1", "population2"}
+        , finalDays).andThen(
+        NoDataPolicy.removeEntry(shockYear)
+        )
 
-            );
+        );
         }
 
 
 
         policies.put(
-                "tax_20",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        decreasePricesForAllSpeciesByAPercentage(.2d).apply(shockYear)
-                )
+        "tax_20",
+        shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+        decreasePricesForAllSpeciesByAPercentage(.2d).apply(shockYear)
+        )
 
         );
 
 
-    }
+        }
 
 
-    private static Consumer<Scenario> protectBestCell(int shockYear){
+private static Consumer<Scenario> protectBestCell(int shockYear){
         return new Consumer<Scenario>() {
-            @Override
-            public void accept(Scenario scenario) {
-                ((FlexibleScenario) scenario).getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(FishState state) {
+@Override
+public void accept(Scenario scenario) {
+        ((FlexibleScenario) scenario).getPlugins().add(
+        new AlgorithmFactory<AdditionalStartable>() {
+@Override
+public AdditionalStartable apply(FishState state) {
 
-                                return new AdditionalStartable() {
-                                    @Override
-                                    public void start(FishState model) {
+        return new AdditionalStartable() {
+@Override
+public void start(FishState model) {
 
-                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                new Steppable() {
-                                                    @Override
-                                                    public void step(SimState simState) {
+        model.scheduleOnceAtTheBeginningOfYear(
+        new Steppable() {
+@Override
+public void step(SimState simState) {
 
-                                                        //go through all possible tiles; find the one that has now the most atrobucca
-                                                        //protected it!
-                                                        final FishState model = (FishState) simState;
-                                                        final Species brevis = model.getSpecies("Atrobucca Brevis");
-                                                        final SeaTile toProtect = model.getMap().getAllSeaTilesExcludingLandAsList().stream().max(
-                                                                new Comparator<SeaTile>() {
-                                                                    @Override
-                                                                    public int compare(SeaTile thisTile,
-                                                                                       SeaTile thatTile) {
-                                                                        return Double.compare(
-                                                                                thisTile.getBiomass(brevis),
-                                                                                thatTile.getBiomass(brevis)
+//go through all possible tiles; find the one that has now the most atrobucca
+//protected it!
+final FishState model = (FishState) simState;
+final Species brevis = model.getSpecies("Atrobucca Brevis");
+final SeaTile toProtect = model.getMap().getAllSeaTilesExcludingLandAsList().stream().max(
+        new Comparator<SeaTile>() {
+@Override
+public int compare(SeaTile thisTile,
+        SeaTile thatTile) {
+        return Double.compare(
+        thisTile.getBiomass(brevis),
+        thatTile.getBiomass(brevis)
 
-                                                                        );
-                                                                    }
-                                                                }
-                                                        ).get();
-                                                        toProtect.assignMpa(NauticalMap.MPA_SINGLETON);
+        );
+        }
+        }
+        ).get();
+        toProtect.assignMpa(NauticalMap.MPA_SINGLETON);
 
-                                                        //now go through all fishers and make them follow MPA
-                                                        for (Fisher fisher : model.getFishers()) {
-                                                            fisher.setRegulation(new ProtectedAreasOnly());
-                                                        }
-                                                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                                                            fisherFactory.getValue().setRegulations(
-                                                                    new ProtectedAreasOnlyFactory()
-                                                            );
-                                                        }
+        //now go through all fishers and make them follow MPA
+        for (Fisher fisher : model.getFishers()) {
+        fisher.setRegulation(new ProtectedAreasOnly());
+        }
+        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+        fisherFactory.getValue().setRegulations(
+        new ProtectedAreasOnlyFactory()
+        );
+        }
 
-                                                    }
-                                                }, StepOrder.DAWN, shockYear);
+        }
+        }, StepOrder.DAWN, shockYear);
 
-                                    }
-                                };
-
-
-                            }
-                        });
-            }
+        }
         };
-    }
 
-    static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policiesMPA = new LinkedHashMap();
 
-    static{
+        }
+        });
+        }
+        };
+        }
+
+static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policiesMPA = new LinkedHashMap();
+
+static{
         policiesMPA.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
+        "BAU",
+        shockYear -> scenario -> {
+        }
 
         );
 
         policiesMPA.put(
-                "MPA_entry",
-                shockYear -> protectBestCell(shockYear)
+        "MPA_entry",
+        shockYear -> protectBestCell(shockYear)
 
 
         );
 
 
         policiesMPA.put(
-                "MPA_noentry",
-                shockYear -> protectBestCell(shockYear).andThen(NoDataPolicy.removeEntry(shockYear))
+        "MPA_noentry",
+        shockYear -> protectBestCell(shockYear).andThen(NoDataPolicy.removeEntry(shockYear))
 
 
         );
 
 
         for(int days = 250; days>=100; days-=10) {
-            int finalDays = days;
-            policiesMPA.put(
-                    days+"_days_MPA_noentry",
-                    //max days regulations include respect protected areas so it works if put in this order
-                    shockYear ->  protectBestCell(shockYear).andThen(NoDataPolicy.buildMaxDaysRegulation(shockYear,
-                                                                                                         new String[]{"population0", "population1", "population2"}
-                            , finalDays).andThen(
-                            NoDataPolicy.removeEntry(shockYear)
-                                                                     )
-                    )
+        int finalDays = days;
+        policiesMPA.put(
+        days+"_days_MPA_noentry",
+        //max days regulations include respect protected areas so it works if put in this order
+        shockYear ->  protectBestCell(shockYear).andThen(NoDataPolicy.buildMaxDaysRegulation(shockYear,
+        new String[]{"population0", "population1", "population2"}
+        , finalDays).andThen(
+        NoDataPolicy.removeEntry(shockYear)
+        )
+        )
 
-            );
+        );
         }
 
 
 
 
 
-    }
+        }
 
-}
+        }
