@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
@@ -983,9 +984,11 @@ public class FishStateUtilities {
             final String policyScript, final int yearsToRun,
             final boolean saveOnExit, Integer heatmapGathererYear,
             @Nullable Consumer<Scenario> scenarioSetup,
-            @Nullable  Consumer<FishState> preStartSetup,
+            @Nullable Consumer<FishState> preStartSetup,
             //if any of returns true, it stops the simulation before it is over!
-            Predicate<FishState>... circuitBreakers) throws IOException {
+            @Nullable             LinkedList<Pair<Integer,
+                    AlgorithmFactory<? extends AdditionalStartable>>>  outsidePlugins,
+            @Nullable List<Predicate<FishState>> circuitBreakers) throws IOException {
 
 
         System.out.println("seed " + seed);
@@ -1064,6 +1067,20 @@ public class FishStateUtilities {
                     if(circuitBreaker.test(model))
                         break mainloop;
                 }
+
+
+
+                for (Pair<Integer,
+                        AlgorithmFactory<? extends AdditionalStartable>> outsidePlugin : outsidePlugins) {
+
+                    if(outsidePlugin.getFirst()==model.getYear())
+                    {
+                        System.out.println("started new plugin");
+                        model.registerStartable(outsidePlugin.getSecond().apply(model));
+                    }
+
+                }
+
                 if(Log.DEBUG)
                     Log.debug("Year " + model.getYear() + " starting");
             }

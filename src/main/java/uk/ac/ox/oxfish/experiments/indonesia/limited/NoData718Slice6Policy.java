@@ -7,11 +7,13 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -136,12 +138,26 @@ public class NoData718Slice6Policy {
 
         FishYAML yaml = new FishYAML();
 
-        final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new LinkedList<>();
+
+        final LinkedList<
+                Pair<Integer,
+                        AlgorithmFactory<? extends AdditionalStartable>>>
+                plugins = new LinkedList<>();
         for (String additionalPlugin : ADDITIONAL_PLUGINS) {
             plugins.add(
-                    yaml.loadAs(additionalPlugin,AlgorithmFactory.class)
+                    new Pair<>(yearOfPolicyShock+1,
+                            yaml.loadAs(additionalPlugin,AlgorithmFactory.class))
             );
+
         }
+        plugins.add(
+                new Pair<>(
+                        yearOfPolicyShock+1,
+                        NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER(
+                                yaml.loadAs(Files.readString(scenarioFile),Scenario.class)
+                        )
+                )
+        );
 
 
 
@@ -154,17 +170,20 @@ public class NoData718Slice6Policy {
                 true, 15,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
-                new Consumer<Scenario>() {
-                    @Override
-                    public void accept(Scenario scenario) {
-                        ((FlexibleScenario) scenario).getPlugins().addAll(plugins);
-                    }
-                },
-                NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER
+                plugins
+
 
         );
 
 
+
+        // new Consumer<Scenario>() {
+        //                    @Override
+        //                    public void accept(Scenario scenario) {
+        //                        ((FlexibleScenario) scenario).getPlugins().addAll(plugins);
+        //                    }
+        //                },
+        //                NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER
     }
 
 
