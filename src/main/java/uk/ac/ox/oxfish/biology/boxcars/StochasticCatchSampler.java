@@ -70,6 +70,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
             Predicate<Fisher> samplingSelector,
             Species species,
             @Nullable String surveyTag) {
+        Preconditions.checkArgument(species!=null);
         this.samplingSelector = samplingSelector;
         this.delegate = new CatchSample(species,
                 new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]);
