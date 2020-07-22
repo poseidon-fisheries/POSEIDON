@@ -90,7 +90,7 @@ public class FadDeploymentRouteSelectorTest {
         when(fisher.getRegulation()).thenReturn(regulation);
 
         final FadDeploymentRouteSelector routeSelector =
-            new FadDeploymentRouteSelector(fishState, 0, 1);
+            new FadDeploymentRouteSelector(fishState, 0, 1, map.getAllSeaTilesAsList());
 
         // just check that deployment location values are empty by default
         assertEquals(ImmutableMap.<SeaTile, Double>of(), routeSelector.getDeploymentLocationValues());

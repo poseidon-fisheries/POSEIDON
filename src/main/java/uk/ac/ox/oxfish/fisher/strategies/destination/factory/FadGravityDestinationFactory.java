@@ -29,13 +29,19 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FadGravityDestinationFactory implements AlgorithmFactory<FadGravityDestinationStrategy> {
 
+    private final PossibleRouteTilesCache possibleRouteTilesCache = new PossibleRouteTilesCache();
     private DoubleParameter gravitationalConstraint = new FixedDoubleParameter(1d);
 
     @Override
     public FadGravityDestinationStrategy apply(FishState state) {
         return new FadGravityDestinationStrategy(
             gravitationalConstraint.apply(state.getRandom()),
-            new FadDeploymentRouteSelector(state, 0, 1) // max travel time has to be set in scenario
+            new FadDeploymentRouteSelector(
+                state,
+                0, // max travel time has to be set in scenario
+                1,
+                possibleRouteTilesCache.get(state.getMap())
+            )
         );
     }
 

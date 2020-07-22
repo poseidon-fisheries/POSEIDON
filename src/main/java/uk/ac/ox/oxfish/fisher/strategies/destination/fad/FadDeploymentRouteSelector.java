@@ -23,20 +23,17 @@ import com.google.common.collect.ArrayTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Map.Entry;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -44,33 +41,28 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 @SuppressWarnings("UnstableApiUsage")
 public class FadDeploymentRouteSelector extends AbstractRouteSelector {
 
-    private final static Map<NauticalMap, ImmutableList<SeaTile>> possibleRouteTilesCache = new WeakHashMap<>();
     private final ImmutableList<SeaTile> possibleRouteTiles; // will serve as row keys for our ArrayTable of values
     private Map<SeaTile, Double> deploymentLocationValues;
 
     public FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
-        double travelSpeedMultiplier
+        double travelSpeedMultiplier,
+        Iterable<SeaTile> possibleRouteTiles
     ) {
-        this(fishState, maxTravelTimeInHours, travelSpeedMultiplier, new HashMap<>());
+        this(fishState, maxTravelTimeInHours, travelSpeedMultiplier, possibleRouteTiles, new HashMap<>());
     }
 
     private FadDeploymentRouteSelector(
         FishState fishState,
         double maxTravelTimeInHours,
         double travelSpeedMultiplier,
+        Iterable<SeaTile> possibleRouteTiles,
         Map<SeaTile, Double> deploymentLocationValues
     ) {
         super(fishState, maxTravelTimeInHours, travelSpeedMultiplier);
         this.deploymentLocationValues = deploymentLocationValues;
-        this.possibleRouteTiles = possibleRouteTilesCache.computeIfAbsent(
-            fishState.getMap(),
-            map -> Stream.concat(
-                map.getPorts().stream().map(Port::getLocation),
-                map.getAllSeaTilesExcludingLandAsList().stream()
-            ).collect(toImmutableList())
-        );
+        this.possibleRouteTiles = ImmutableList.copyOf(checkNotNull(possibleRouteTiles));
     }
 
     @Override boolean shouldGoToPort(Fisher fisher) { return false; }
