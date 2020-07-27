@@ -58,7 +58,6 @@ public final class Runner<S extends Scenario> {
 
     private static final String YEARLY_DATA_FILENAME = "yearly_data.csv";
 
-    ;
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
     private final Class<S> scenarioClass;
