@@ -6,13 +6,13 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
+import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.statistics.InterfaceTextListener;
 import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.problems.SimpleProblemWrapper;
-import uk.ac.ox.oxfish.maximization.generic.FixedDataLastStepTarget;
+import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
-import uk.ac.ox.oxfish.maximization.generic.ScaledFixedDataLastStepTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -25,26 +25,26 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.lang.Runtime.getRuntime;
 import static java.util.stream.IntStream.rangeClosed;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaMaximization {
 
     private static final int GB = 1024 * 1024 * 1024;
+    private static final boolean VERBOSE = false;
     private final Path calibrationFilePath;
 
     public TunaMaximization(final Path calibrationFilePath) {this.calibrationFilePath = calibrationFilePath;}
 
     public static void main(String[] args) {
 
-        ScaledFixedDataLastStepTarget.VERBOSE = true;
-        FixedDataLastStepTarget.VERBOSE = true;
-
         final int minMemoryPerThread = 1 * GB;
-        final int populationSize = 500;
+        final int populationSize = 200;
+        final int maxFitnessCalls = 5000;
+        final int numEvaluationRuns = 30;
+
         final Path basePath =
-            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-07-15");
+            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-07-31");
 
         final Path calibrationFilePath = basePath.resolve("calibration.yaml");
         final Path calibratedScenarioPath = basePath.resolve("tuna_calibrated.yaml");
@@ -52,22 +52,27 @@ public class TunaMaximization {
 
         final TunaMaximization tunaMaximization = new TunaMaximization(calibrationFilePath);
 
-        final double[] solution = tunaMaximization.calibrate(minMemoryPerThread, populationSize);
+        final double[] solution = tunaMaximization.calibrate(minMemoryPerThread, populationSize, maxFitnessCalls);
 
 //        final double[] solution =
 //            {0.086, 3.238, -7.165, -6.770, -0.893, 10.000, -8.301, -4.487, 3.181, -6.490, -8.782, 1.569, 5.822};
 
         tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
         final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
-        tunaMaximization.evaluate(calibrationFilePath, csvWriter, 30, solution);
+        tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
     }
 
     private double[] calibrate(
-        int minMemoryPerThread,
-        int populationSize
+        final int minMemoryPerThread,
+        final int populationSize,
+        final int maxFitnessCalls
     ) {
 
         final GenericOptimization optimizationProblem = makeGenericOptimizationProblem(calibrationFilePath);
+
+        optimizationProblem.getTargets().stream()
+            .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
+            .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(VERBOSE));
 
         final int numThreads = 8; //Math.min(
 //            (int) getRuntime().maxMemory() / minMemoryPerThread,
@@ -84,7 +89,13 @@ public class TunaMaximization {
         optimizer.setPopulationSize(populationSize);
 
         final OptimizationParameters optimizationParameters =
-            OptimizerFactory.makeParams(optimizer, populationSize, problemWrapper);
+            OptimizerFactory.makeParams(
+                optimizer,
+                populationSize,
+                problemWrapper,
+                System.currentTimeMillis(),
+                new EvaluationTerminator(maxFitnessCalls)
+            );
 
         OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
         runnable.setOutputFullStatsToText(true);
