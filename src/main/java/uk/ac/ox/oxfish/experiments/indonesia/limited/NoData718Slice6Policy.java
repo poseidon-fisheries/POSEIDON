@@ -145,16 +145,18 @@ public class NoData718Slice6Policy {
                 plugins = new LinkedList<>();
         for (String additionalPlugin : ADDITIONAL_PLUGINS) {
             plugins.add(
-                    new Pair<>(yearOfPolicyShock+1,
+                    new Pair<>(yearOfPolicyShock-1,
                             yaml.loadAs(additionalPlugin,AlgorithmFactory.class))
             );
 
         }
+
+
         plugins.add(
                 new Pair<>(
-                        yearOfPolicyShock+1,
+                        yearOfPolicyShock-1,
                         NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER(
-                                yaml.loadAs(Files.readString(scenarioFile),Scenario.class)
+                                yaml.loadAs(new FileReader(scenarioFile.toFile()),Scenario.class)
                         )
                 )
         );
