@@ -45,7 +45,7 @@ public class MakeFadSet extends SetAction {
     @Override void notifyFadManager() { getFadManager().reactTo(this); }
 
     @Override boolean isSuccessful(PurseSeineGear purseSeineGear, MersenneTwisterFast rng) {
-        return rng.nextDouble() < purseSeineGear.getSuccessfulSetProbability();
+        return rng.nextDouble() < purseSeineGear.getSuccessfulFadSetProbability();
     }
 
     @Override

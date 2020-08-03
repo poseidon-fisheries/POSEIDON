@@ -44,7 +44,7 @@ public class TunaMaximization {
         final int numEvaluationRuns = 30;
 
         final Path basePath =
-            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-07-31");
+            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-08-03");
 
         final Path calibrationFilePath = basePath.resolve("calibration.yaml");
         final Path calibratedScenarioPath = basePath.resolve("tuna_calibrated.yaml");

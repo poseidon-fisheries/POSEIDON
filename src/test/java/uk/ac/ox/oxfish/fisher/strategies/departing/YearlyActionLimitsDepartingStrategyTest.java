@@ -53,7 +53,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         FishState fishState = mock(FishState.class);
 
         PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
-        when(purseSeineGear.nextSetDuration(any())).thenReturn(getQuantity(1, HOUR));
+        when(purseSeineGear.nextSetDuration(any(), any())).thenReturn(getQuantity(1, HOUR));
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fisher.getHold().getVolume()).thenReturn(Optional.of(getQuantity(1, CUBIC_METRE)));

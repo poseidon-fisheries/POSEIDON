@@ -48,7 +48,7 @@ public abstract class SetAction extends PurseSeinerAction {
 
     SetAction(FishState model, Fisher fisher) {
         super(model, fisher);
-        this.duration = ((PurseSeineGear) fisher.getGear()).nextSetDuration(model.getRandom());
+        this.duration = ((PurseSeineGear) fisher.getGear()).nextSetDuration(this.getClass(), model.getRandom());
     }
 
     public Optional<Catch> getCatchesKept() { return catchesKept; }

@@ -106,7 +106,8 @@ Tuna:
             limitClass5: 120
             limitClass6a: 300
             limitClass6b: 450
-        averageSetDurationInHours: '8.0219505805135'
+        averageFadSetDurationInHours: '2.799212'
+        averageUnassociatedSetDurationInHours: '2.301648'
         biomassLostMonitor: null
         fadDeploymentObservers: !!set {
           }
@@ -124,8 +125,10 @@ Tuna:
         fadSetObservers: !!set {
           }
         initialNumberOfFads: 999999
-        minimumSetDurationInHours: '3.03333333333333'
-        stdDevOfSetDurationInHours: '2.99113291538723'
+        minimumFadSetDurationInHours: '1.066667'
+        minimumUnassociatedSetDurationInHours: '0.9'
+        stdDevOfFadSetDurationInHours: '0.7325816'
+        stdDevOfUnassociatedSetDurationInHours: '1.015816'
         successfulSetProbability: '0.9231701'
         unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
         unassociatedSetObservers: !!set {

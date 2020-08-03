@@ -20,10 +20,14 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
@@ -33,58 +37,67 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
+import java.util.Map;
 import java.util.Objects;
-
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.HOUR;
 
 public class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
-    private final double minimumSetDurationInHours;
-    private final double averageSetDurationInHours;
-    private final double stdDevOfSetDurationInHours;
-    private final double successfulSetProbability;
+    private final double successfulFadSetProbability;
+
+    private final Map<Class<? extends PurseSeinerAction>, DurationSampler> durationSamplers;
 
     private final CatchSampler unassociatedCatchSampler;
 
     public PurseSeineGear(
         FadManager fadManager,
-        double minimumSetDurationInHours,
-        double averageSetDurationInHours,
-        double stdDevOfSetDurationInHours,
-        double successfulSetProbability,
+        double minimumFadSetDurationInHours,
+        double averageFadSetDurationInHours,
+        double stdDevOfFadSetDurationInHours,
+        double minimumUnassociatedSetDurationInHours,
+        double averageUnassociatedSetDurationInHours,
+        double stdDevOfUnassociatedSetDurationInHours,
+        double successfulFadSetProbability,
+        final CatchSampler unassociatedCatchSampler
+    ) {
+        this(
+            fadManager,
+            ImmutableMap.of(
+                MakeFadSet.class, DurationSampler.getInstance(
+                    minimumFadSetDurationInHours,
+                    averageFadSetDurationInHours,
+                    stdDevOfFadSetDurationInHours
+                ),
+                MakeUnassociatedSet.class, DurationSampler.getInstance(
+                    minimumUnassociatedSetDurationInHours,
+                    averageUnassociatedSetDurationInHours,
+                    stdDevOfUnassociatedSetDurationInHours
+                )
+            ),
+            successfulFadSetProbability,
+            unassociatedCatchSampler
+        );
+    }
+
+    private PurseSeineGear(
+        FadManager fadManager,
+        Map<Class<? extends PurseSeinerAction>, DurationSampler> durationSamplers,
+        double successfulFadSetProbability,
         final CatchSampler unassociatedCatchSampler
     ) {
         this.fadManager = fadManager;
-        this.minimumSetDurationInHours = minimumSetDurationInHours;
-        this.averageSetDurationInHours = averageSetDurationInHours;
-        this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
-        this.successfulSetProbability = successfulSetProbability;
+        this.durationSamplers = durationSamplers;
+        this.successfulFadSetProbability = successfulFadSetProbability;
         this.unassociatedCatchSampler = unassociatedCatchSampler;
     }
 
     public CatchSampler getUnassociatedCatchSampler() { return unassociatedCatchSampler; }
 
-    public double getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
-
-    public double getAverageSetDurationInHours() { return averageSetDurationInHours; }
-
-    public double getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
-
-    public double getSuccessfulSetProbability() {
-        return successfulSetProbability;
+    public double getSuccessfulFadSetProbability() {
+        return successfulFadSetProbability;
     }
 
     public FadManager getFadManager() { return fadManager; }
-
-    public Quantity<Time> nextSetDuration(MersenneTwisterFast rng) {
-        final double duration = Math.max(
-            minimumSetDurationInHours,
-            rng.nextGaussian() * stdDevOfSetDurationInHours + averageSetDurationInHours
-        );
-        return getQuantity(duration, HOUR);
-    }
 
     @Override public Catch fish(
         Fisher fisher,
@@ -116,10 +129,8 @@ public class PurseSeineGear implements Gear {
     public Gear makeCopy() {
         return new PurseSeineGear(
             fadManager,
-            minimumSetDurationInHours,
-            averageSetDurationInHours,
-            stdDevOfSetDurationInHours,
-            successfulSetProbability,
+            ImmutableMap.copyOf(durationSamplers),
+            successfulFadSetProbability,
             unassociatedCatchSampler
         );
     }
@@ -128,12 +139,14 @@ public class PurseSeineGear implements Gear {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PurseSeineGear that = (PurseSeineGear) o;
-        return Double.compare(that.minimumSetDurationInHours, minimumSetDurationInHours) == 0 &&
-            Double.compare(that.averageSetDurationInHours, averageSetDurationInHours) == 0 &&
-            Double.compare(that.stdDevOfSetDurationInHours, stdDevOfSetDurationInHours) == 0 &&
-            Double.compare(that.successfulSetProbability, successfulSetProbability) == 0 &&
+        return Objects.equals(durationSamplers, that.durationSamplers) &&
+            Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0 &&
             Objects.equals(fadManager, that.fadManager) &&
             Objects.equals(unassociatedCatchSampler, that.unassociatedCatchSampler);
+    }
+
+    public Quantity<Time> nextSetDuration(Class<? extends PurseSeinerAction> actionClass, MersenneTwisterFast rng) {
+        return durationSamplers.get(actionClass).nextDuration(rng);
     }
 
 }

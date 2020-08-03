@@ -53,13 +53,35 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         ImmutableList.of(new ActiveFadLimitsFactory());
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
-    // see https://github.com/poseidon-fisheries/tuna/issues/7 re: set duration
-    private DoubleParameter minimumSetDurationInHours = new FixedDoubleParameter(3.03333333333333);
-    private DoubleParameter averageSetDurationInHours = new FixedDoubleParameter(8.0219505805135);
-    private DoubleParameter stdDevOfSetDurationInHours = new FixedDoubleParameter(2.99113291538723);
+
+    // see https://github.com/poseidon-fisheries/tuna/issues/114 re: set duration
+    private DoubleParameter minimumFadSetDurationInHours = new FixedDoubleParameter(1.066667);
+    private DoubleParameter averageFadSetDurationInHours = new FixedDoubleParameter(2.799212);
+    private DoubleParameter stdDevOfFadSetDurationInHours = new FixedDoubleParameter(0.7325816);
+    private DoubleParameter minimumUnassociatedSetDurationInHours = new FixedDoubleParameter(0.900000);
+    private DoubleParameter averageUnassociatedSetDurationInHours = new FixedDoubleParameter(2.301648);
+    private DoubleParameter stdDevOfUnassociatedSetDurationInHours = new FixedDoubleParameter(1.0158160);
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path unassociatedCatchSampleFile;
+
+    public DoubleParameter getMinimumUnassociatedSetDurationInHours() { return minimumUnassociatedSetDurationInHours; }
+
+    public void setMinimumUnassociatedSetDurationInHours(final DoubleParameter minimumUnassociatedSetDurationInHours) {
+        this.minimumUnassociatedSetDurationInHours = minimumUnassociatedSetDurationInHours;
+    }
+
+    public DoubleParameter getAverageUnassociatedSetDurationInHours() { return averageUnassociatedSetDurationInHours; }
+
+    public void setAverageUnassociatedSetDurationInHours(final DoubleParameter averageUnassociatedSetDurationInHours) {
+        this.averageUnassociatedSetDurationInHours = averageUnassociatedSetDurationInHours;
+    }
+
+    public DoubleParameter getStdDevOfUnassociatedSetDurationInHours() { return stdDevOfUnassociatedSetDurationInHours; }
+
+    public void setStdDevOfUnassociatedSetDurationInHours(final DoubleParameter stdDevOfUnassociatedSetDurationInHours) {
+        this.stdDevOfUnassociatedSetDurationInHours = stdDevOfUnassociatedSetDurationInHours;
+    }
 
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
@@ -78,24 +100,27 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     @SuppressWarnings("unused")
-    public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
+    public DoubleParameter getMinimumFadSetDurationInHours() { return minimumFadSetDurationInHours; }
 
-    @SuppressWarnings("unused") public void setMinimumSetDurationInHours(DoubleParameter minimumSetDurationInHours) {
-        this.minimumSetDurationInHours = minimumSetDurationInHours;
+    @SuppressWarnings("unused")
+    public void setMinimumFadSetDurationInHours(DoubleParameter minimumFadSetDurationInHours) {
+        this.minimumFadSetDurationInHours = minimumFadSetDurationInHours;
     }
 
     @SuppressWarnings("unused")
-    public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
+    public DoubleParameter getAverageFadSetDurationInHours() { return averageFadSetDurationInHours; }
 
-    @SuppressWarnings("unused") public void setAverageSetDurationInHours(DoubleParameter averageSetDurationInHours) {
-        this.averageSetDurationInHours = averageSetDurationInHours;
+    @SuppressWarnings("unused")
+    public void setAverageFadSetDurationInHours(DoubleParameter averageFadSetDurationInHours) {
+        this.averageFadSetDurationInHours = averageFadSetDurationInHours;
     }
 
     @SuppressWarnings("unused")
-    public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
+    public DoubleParameter getStdDevOfFadSetDurationInHours() { return stdDevOfFadSetDurationInHours; }
 
-    @SuppressWarnings("unused") public void setStdDevOfSetDurationInHours(DoubleParameter stdDevOfSetDurationInHours) {
-        this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
+    @SuppressWarnings("unused")
+    public void setStdDevOfFadSetDurationInHours(DoubleParameter stdDevOfFadSetDurationInHours) {
+        this.stdDevOfFadSetDurationInHours = stdDevOfFadSetDurationInHours;
     }
 
     @SuppressWarnings("unused")
@@ -175,9 +200,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
         return new PurseSeineGear(
             fadManager,
-            minimumSetDurationInHours.apply(rng),
-            averageSetDurationInHours.apply(rng),
-            stdDevOfSetDurationInHours.apply(rng),
+            minimumFadSetDurationInHours.apply(rng),
+            averageFadSetDurationInHours.apply(rng),
+            stdDevOfFadSetDurationInHours.apply(rng),
+            minimumUnassociatedSetDurationInHours.apply(rng),
+            averageUnassociatedSetDurationInHours.apply(rng),
+            stdDevOfUnassociatedSetDurationInHours.apply(rng),
             successfulSetProbability.apply(rng),
             unassociatedCatchSampler
         );
