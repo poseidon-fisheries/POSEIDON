@@ -61,10 +61,18 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
             Preconditions.checkState(inputs.length==1);
             //normalize it 0 to 1
             double input = (inputs[0]+10d)/20d;
+            //the bounds might be broken by some optimizers: bound it again
+            if(input<0)
+                input=0;
+            if(input>1)
+                input=1;
+
             Preconditions.checkState(input>=0);
             Preconditions.checkState(input<=1);
 
             int row = (int) Math.floor(input * csvContent.size());
+            if(row==csvContent.size()) //rounding issue (not considering the header)
+                row=row-1;
 
             final String[] selectedRow = csvContent.get(row).split(",");
             Preconditions.checkState(selectedRow.length == addressForEachColumn.length);

@@ -49,7 +49,7 @@ public class NoData718Slice4PriceIncrease {
      */
     @NotNull
     public static AlgorithmFactory<AdditionalStartable> farOffPortsSeedingEvent(Integer shockYear,
-                                                                           final int minPopulation0Boats) {
+                                                                                final int minPopulation0Boats) {
         return new AlgorithmFactory<AdditionalStartable>() {
             @Override
             public AdditionalStartable apply(FishState fishState) {
@@ -147,13 +147,13 @@ public class NoData718Slice4PriceIncrease {
             List<String> additionalColumnsToPrint,
             boolean printYAMLScenario, final int additionalYearsToRun,
             @Nullable
-            Consumer<Scenario> commonPolicy,
+                    Consumer<Scenario> commonPolicy,
             //the problem with adding plugins through scenario is that they may screw up the seed as the stack has to randomize it
             //the solution then is simply not to start anything until the right year arrives. This will make the seed
             //still inconsistent after the startable... starts, but at least until then it's okay
             @Nullable
-            LinkedList<Pair<Integer,
-                    AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
+                    LinkedList<Pair<Integer,
+                            AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -192,13 +192,13 @@ public class NoData718Slice4PriceIncrease {
 
 
             BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
-                                                                          shockYear+ additionalYearsToRun,
-                                                                          null, SEED, additionalColumnsToPrint);
+                    shockYear+ additionalYearsToRun,
+                    null, SEED, additionalColumnsToPrint);
 
             //give it the scenario
             runner.setScenarioSetup(policy);
             if(additionalPlugins!=null)
-            runner.setOutsidePlugins(additionalPlugins);
+                runner.setOutsidePlugins(additionalPlugins);
 
             //remember to output the policy tag
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {

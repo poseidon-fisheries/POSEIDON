@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
@@ -14,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -185,8 +185,7 @@ public class NoData718Slice6 {
                     columnsToPrint,
                     summaryStatisticsWriter,
                     writtenScenario,
-                    maxYearsToRun,
-                    mainDirectory
+                    maxYearsToRun
             );
         }
 
@@ -198,15 +197,16 @@ public class NoData718Slice6 {
 
 
     @NotNull
-    public static void runOneScenario(long randomSeed,
-                                                   List<String> columns,
-                                                   FileWriter summaryStatisticsWriter,
-                                                   Path scenarioFile,
-                                                   int maxYearsToRun,
-                                      Path mainDirectory
-                                      ) throws IOException {
+    public static StringBuffer runOneScenario(long randomSeed,
+                                              List<String> columns,
+                                              @Nullable
+                                              FileWriter summaryStatisticsWriter,
+                                              Path scenarioFile,
+                                              int maxYearsToRun
+    ) throws IOException {
 
         System.out.println(scenarioFile.toFile().getAbsolutePath() );
+        StringBuffer tidy = new StringBuffer();
 
         try {
             long start = System.currentTimeMillis();
@@ -221,7 +221,6 @@ public class NoData718Slice6 {
                     randomSeed,
                     -1
             );
-            StringBuffer tidy = new StringBuffer();
 
             batchRunner.setColumnModifier(new BatchRunner.ColumnModifier() {
                 @Override
@@ -231,9 +230,11 @@ public class NoData718Slice6 {
             });
 
             batchRunner.run(tidy);
-            summaryStatisticsWriter.write(tidy.toString());
-            summaryStatisticsWriter.flush();
 
+            if(summaryStatisticsWriter!=null) {
+                summaryStatisticsWriter.write(tidy.toString());
+                summaryStatisticsWriter.flush();
+            }
             long end = System.currentTimeMillis();
             System.out.println( "Run lasted: " + (end-start)/1000 + " seconds");
         }
@@ -241,6 +242,7 @@ public class NoData718Slice6 {
         }
         System.out.println(scenarioFile.toFile().getAbsolutePath() );
         System.out.println("--------------------------------------------------------------");
+        return tidy;
     }
 
 
