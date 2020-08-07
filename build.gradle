@@ -265,6 +265,18 @@ task fatJar718NoData(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     }
 }
 
+task fatJar718Iterative(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_nodata718slice6_iterative.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice6Iterative'
+    }
+}
+
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
