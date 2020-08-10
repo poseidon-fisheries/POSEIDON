@@ -24,7 +24,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
+import static java.nio.file.Files.createDirectories;
+import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.rangeClosed;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -43,8 +46,10 @@ public class TunaMaximization {
         final int maxFitnessCalls = 5000;
         final int numEvaluationRuns = 30;
 
+        final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
+
         final Path basePath =
-            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", "2020-08-03");
+            Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", folderName);
 
         final Path calibrationFilePath = basePath.resolve("calibration.yaml");
         final Path calibratedScenarioPath = basePath.resolve("tuna_calibrated.yaml");
