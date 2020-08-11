@@ -317,7 +317,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
 
             for (int i = 0; i < runsPerSetting; i++) {
                 //read in and modify parameters
-                Scenario scenario = buildScenario(x);
+                Scenario scenario = buildScenario(x, Paths.get(scenarioFile).toFile(), parameters);
 
                 //run the model
                 error += computeErrorGivenScenario(scenario, simulatedYears);
@@ -360,11 +360,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         return error;
     }
 
-    public Scenario buildScenario(double[] x) throws FileNotFoundException {
+    public static Scenario buildScenario(double[] x, File scenarioFile,
+                                         List<OptimizationParameter> parameterList)
+            throws FileNotFoundException {
         FishYAML yaml = new FishYAML();
-        Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()),Scenario.class);
+        Scenario scenario = yaml.loadAs(new 
+                FileReader(scenarioFile),Scenario.class);
         int parameter=0;
-       for (OptimizationParameter optimizationParameter : parameters)
+       for (OptimizationParameter optimizationParameter : parameterList)
         {
             optimizationParameter.parametrize(scenario,
                     Arrays.copyOfRange(x,parameter,
@@ -389,8 +392,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
-        Scenario scenario = optimization.buildScenario(new double[]{
-                -8.207,-4.757,-9.443,-1.924,-4.246,-4.158,-9.681,-9.751, 2.864,-0.253, 4.651, 8.520,-6.758,-7.782, 4.285,-5.825,-0.477,-9.664, 1.917,-1.249                   });
+        Scenario scenario = GenericOptimization.buildScenario(new double[]{
+                -8.207,-4.757,-9.443,-1.924,-4.246,-4.158,-9.681,-9.751, 2.864,-0.253, 4.651, 8.520,-6.758,-7.782, 4.285,-5.825,-0.477,-9.664, 1.917,-1.249                   }, Paths.get(optimization.scenarioFile).toFile(), optimization.parameters);
         Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_8h.yaml");
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 

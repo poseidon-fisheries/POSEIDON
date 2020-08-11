@@ -96,7 +96,7 @@ public class AllocatorSlice1 {
                 yaml.loadAs(new FileReader(OPTIMIZATION_YAML_PATH.toFile()),
                             GenericOptimization.class);
 
-        Scenario scenario = optimization.buildScenario(CALIBRATION_BEST);
+        Scenario scenario = GenericOptimization.buildScenario(CALIBRATION_BEST, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
         Path outputFile = MAIN_DIRECTORY.resolve(CALIBRATED_SCENARIO_NAME+".yaml");
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
     }

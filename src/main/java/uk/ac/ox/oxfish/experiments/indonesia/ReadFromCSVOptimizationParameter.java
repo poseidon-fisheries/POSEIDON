@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     private String[] addressForEachColumn;
 
 
-    private Path csvPathFile;
+    private String csvPathFile;
 
     private boolean csvHasHeader;
 
@@ -41,7 +42,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
 
     public ReadFromCSVOptimizationParameter(Path csvPathFile, String[] addressForEachColumn, boolean hasHeader) throws IOException {
         this.addressForEachColumn = addressForEachColumn;
-        this.csvPathFile = csvPathFile;
+        this.csvPathFile = csvPathFile.toString();
         this.csvHasHeader = hasHeader;
 
 
@@ -54,7 +55,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     public String parametrize(Scenario scenario, double[] inputs) {
 
         try {
-            List<String> csvContent  = Files.readAllLines(csvPathFile);
+            List<String> csvContent  = Files.readAllLines(Paths.get(csvPathFile));
             if(csvHasHeader)
                 csvContent.remove(0);
 
@@ -108,11 +109,12 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
         this.addressForEachColumn = addressForEachColumn;
     }
 
-    public Path getCsvPathFile() {
+
+    public String getCsvPathFile() {
         return csvPathFile;
     }
 
-    public void setCsvPathFile(Path csvPathFile) {
+    public void setCsvPathFile(String csvPathFile) {
         this.csvPathFile = csvPathFile;
     }
 

@@ -38,7 +38,7 @@ public class TunaMaximization {
         );
 
 
-        Scenario scenario = optimization.buildScenario(optimalParameters);
+        Scenario scenario = GenericOptimization.buildScenario(optimalParameters, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
         Path outputFile = optimizationFile.getParent().resolve("summer_calibration_grav.yaml");
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
