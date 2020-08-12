@@ -145,7 +145,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
         this.neverSwitchBeforeThisYear = neverSwitchBeforeThisYear;
         this.inertia = inertia;
 
-        Preconditions.checkState(inertia>0);
+        Preconditions.checkState(inertia>=0);
     }
 
 

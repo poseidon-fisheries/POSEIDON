@@ -30,6 +30,11 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
     private double maximum = 5;
 
 
+    /**
+     * when strict, it never goes beyond min and max, even if the EVA optimizer wants it to
+     */
+    private boolean strict = false;
+
     private boolean alwaysPositive = false;
 
     public MultipleOptimizationParameter() {
@@ -50,8 +55,21 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
         double realValue =minimum+((maximum-minimum)/(10-(-10)))*(inputs[0] - (-10));
+
+
+        if(isStrict())
+        {
+            if(realValue<minimum)
+                realValue = minimum;
+            if(realValue>maximum)
+                realValue = maximum;
+        }
+
+
         if(realValue < 0 & alwaysPositive)
             realValue = 0;
+
+
 
         for (String addressToModify : addressesToModify) {
             quickParametrize(scenario, realValue, addressToModify);
@@ -97,5 +115,13 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
 
     public void setAlwaysPositive(boolean alwaysPositive) {
         this.alwaysPositive = alwaysPositive;
+    }
+
+    public boolean isStrict() {
+        return strict;
+    }
+
+    public void setStrict(boolean strict) {
+        this.strict = strict;
     }
 }
