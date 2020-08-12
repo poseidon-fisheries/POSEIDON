@@ -38,9 +38,17 @@ public class IntervalTarget {
         }
 
 
+        //lag is 2
+        //then at time 0 it should be false
+        //at time 1 it should be false
+        //at time 2 it should check the value of the column at time 0
+        //at time 3 ...
+
+
+
         for (int i = lag; i < column.size(); i++)
-            toReturn[i+lag] = (Double.isFinite(column.get(i)) &&
-                    column.get(i)>=minimum && column.get(i)<=maximum);
+            toReturn[i] = (Double.isFinite(column.get(i-lag)) &&
+                    column.get(i-lag)>=minimum && column.get(i-lag)<=maximum);
 
 
         return toReturn;
