@@ -33,6 +33,7 @@ import eva2.optimization.statistics.InterfaceTextListener;
 import eva2.optimization.strategies.*;
 import eva2.problems.F1Problem;
 import eva2.problems.SimpleProblemWrapper;
+import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -51,8 +52,7 @@ public class OptimizerConsole {
 
         Path optimizationFilePath = Paths.get(args[0]);
         FishYAML reader = new FishYAML();
-        GenericOptimization optimization = reader.loadAs(new FileReader(optimizationFilePath.toFile()),
-                                                         GenericOptimization.class);
+        SimpleProblemDouble optimization = (SimpleProblemDouble) reader.load(new FileReader(optimizationFilePath.toFile()));
 
         String type = args[1];
         //  int type = Integer.parseInt();
@@ -67,6 +67,12 @@ public class OptimizerConsole {
         SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(optimization);
         problem.setParallelThreads(parallelThreads);
+
+        if(args.length>4) {
+            problem.setDefaultRange(Integer.parseInt(args[4]));
+            System.out.println("problem range set to : " + problem.getDefaultRange());
+        }
+
 
         OptimizationParameters params;
         if(type.equals("ernesto_nelder_mead"))
@@ -98,6 +104,28 @@ public class OptimizerConsole {
         {
             ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
             opt.setPopulationSize(populationSize == -1 ? 200 : populationSize);
+            params = OptimizerFactory.makeParams(
+
+                    opt,
+                    populationSize == -1 ? 200 : populationSize,
+                    problem
+            );
+        }
+        else if(type.equals("ernesto_evolution"))
+        {
+            EvolutionStrategies opt = new EvolutionStrategies(5,50,false);
+            params = OptimizerFactory.makeParams(
+
+                    opt,
+                    100,
+                    problem
+            );
+        }
+        else if(type.equals("ernesto_ga"))
+        {
+            GeneticAlgorithm opt = new GeneticAlgorithm();
+            opt.setElitism(true);
+            opt.setNumberOfPartners(4);
             params = OptimizerFactory.makeParams(
 
                     opt,

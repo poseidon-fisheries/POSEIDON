@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
+import com.google.common.io.ByteStreams;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.IntervalTarget;
@@ -8,6 +9,8 @@ import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
+import java.io.FileWriter;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -42,6 +45,8 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
     private int minimumYear = 6;
 
     private int maximumYearsToRun = 40;
+
+    private String logName = "total_log_optimization";
 
     private List<IntervalTarget> targets  = new LinkedList<>();
     {
@@ -87,8 +92,8 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
                 //bounds could be broken. Keep them reasonable
                 if(yearOfPriceShock<2)
                     yearOfPriceShock=2;
-                if(yearOfPriceShock>60)
-                    yearOfPriceShock=60;
+                if(yearOfPriceShock>50)
+                    yearOfPriceShock=50;
 
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock).accept(scenario);
@@ -100,13 +105,35 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
             }
 
             //run the model
-            double error = computeErrorGivenScenario(scenario, numberOfYearsToRun, firstValidYear);
+            try {
+                double error = computeErrorGivenScenario(scenario, numberOfYearsToRun, firstValidYear);
 
-            return new double[]{error};
 
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                FileWriter writer = new FileWriter(
+                        Paths.get(baselineScenario).getParent().resolve(logName + ".log").toFile(),
+                        true
+                );
+                synchronized(writer) {
+
+                    writer.write(Arrays.toString(x) + " ---> " + error);
+                    writer.write("\n");
+                    writer.close();
+                }
+                System.out.println(Arrays.toString(x) + " ---> " + error);
+                return new double[]{error};
+
+            }
+            catch (RuntimeException e){
+                System.out.println(e);
+                return new double[]{0};
+
+            }
+
+
+        } catch (Exception | OutOfMemoryError e) {
+            System.out.println(e);
+            return new double[]{0};
         }
 
     }
@@ -121,7 +148,8 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
         model.start();
         System.out.println("starting run");
         while (model.getYear() <= yearsToRun) {
-            model.schedule.step(model);
+                model.schedule.step(model);
+
         }
         model.schedule.step(model);
 
@@ -208,6 +236,17 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
     public void setPriceShock(boolean priceShock) {
         this.priceShock = priceShock;
     }
+
+    public String getLogName() {
+        return logName;
+    }
+
+    public void setLogName(String logName) {
+        this.logName = logName;
+    }
+
+
+
 
 
     //    public static void main(String[] args) throws IOException {
