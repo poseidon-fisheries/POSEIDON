@@ -25,6 +25,7 @@ import java.util.List;
 public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble implements Serializable {
 
 
+    public static final int SEED = 0;
     /**
      * does this simulation include a "price shock" event
      */
@@ -49,6 +50,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
     private String logName = "total_log_optimization";
 
     private List<IntervalTarget> targets  = new LinkedList<>();
+
     {
         //example
         targets.add(
@@ -142,7 +144,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
     public double computeErrorGivenScenario(Scenario scenario,
                                             int yearsToRun, int firstValidYear) {
-        FishState model = new FishState(System.currentTimeMillis());
+        FishState model = new FishState(SEED);
 
         model.setScenario(scenario);
         model.start();
