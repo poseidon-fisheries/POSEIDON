@@ -67,7 +67,6 @@ public class OptimizerConsole {
         SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(optimization);
         problem.setParallelThreads(parallelThreads);
-
         if(args.length>=4) {
             problem.setDefaultRange(Integer.parseInt(args[4]));
             System.out.println("problem range set to : " + problem.getDefaultRange());
