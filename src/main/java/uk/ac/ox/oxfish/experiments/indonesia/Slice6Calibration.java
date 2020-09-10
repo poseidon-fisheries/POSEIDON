@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.collect.Lists;
-import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
-import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
@@ -511,7 +509,7 @@ public class Slice6Calibration {
 
 
 
-        Scenario scenario = optimization.buildScenario(optimalParameters);
+        Scenario scenario = GenericOptimization.buildScenario(optimalParameters, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
         Path outputFile = optimizationFile.getParent().resolve(calibratedScenarioFileName);
         yaml.dump(scenario, new FileWriter(outputFile.toFile()));
 
@@ -545,7 +543,7 @@ public class Slice6Calibration {
         for(double steepness : new double[]{0.6,0.7,0.8}) {
 
             int printName = (int) (steepness * 10);
-            Scenario scenario = optimization.buildScenario(optimalParameters);
+            Scenario scenario = GenericOptimization.buildScenario(optimalParameters, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
             FlexibleScenario modified = (FlexibleScenario) scenario;
             modified.getPlugins().add(new CatchAtBinFactory());
 
@@ -562,7 +560,7 @@ public class Slice6Calibration {
             yaml.dump(modified, new FileWriter(outputFile.toFile()));
         }
         //variants with linear recruitment
-        Scenario scenario = optimization.buildScenario(optimalParameters);
+        Scenario scenario = GenericOptimization.buildScenario(optimalParameters, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
         FlexibleScenario modified = (FlexibleScenario) scenario;
         modified.getPlugins().add(new CatchAtBinFactory());
         for (AlgorithmFactory<? extends AdditionalStartable> plugin : plugins) {

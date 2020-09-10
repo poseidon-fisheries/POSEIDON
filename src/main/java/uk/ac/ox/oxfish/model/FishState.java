@@ -164,9 +164,9 @@ public class FishState  extends SimState{
     /**
      * aggregate steppables for phases where there is no need for randomization
      */
-    private HashMap<StepOrder,AggregateSteppable> aggregateYearlySteppables = new HashMap<>();
+    private LinkedHashMap<StepOrder,AggregateSteppable> aggregateYearlySteppables = new LinkedHashMap<>();
 
-    private HashMap<StepOrder,AggregateSteppable> aggregateDailySteppables = new HashMap<>();
+    private LinkedHashMap<StepOrder,AggregateSteppable> aggregateDailySteppables = new LinkedHashMap<>();
 
     public int getStepsPerDay() {
         return stepsPerDay;

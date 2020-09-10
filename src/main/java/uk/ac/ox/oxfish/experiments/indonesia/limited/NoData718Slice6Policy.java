@@ -1,30 +1,22 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.BatchRunner;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.MarketProxy;
-import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,128 +25,30 @@ public class NoData718Slice6Policy {
     public static final String CANDIDATES_CSV_FILE = "total_successes.csv";
     public static final int SEED = 0;
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs");
+            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_complete");
 
+    private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
+            NoData718Utilities.onlyBAU;
 
-
-    static private LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies = new LinkedHashMap();
-
-
-    private static Function<Integer,Consumer<Scenario>> decreasePricesForAllSpeciesByAPercentage(double taxRate) {
-
-        return new Function<Integer, Consumer<Scenario>>() {
-            public Consumer<Scenario> apply(Integer shockYear) {
-
-
-                return new Consumer<Scenario>() {
-
-                    @Override
-                    public void accept(Scenario scenario) {
-
-                        ((FlexibleScenario) scenario).getPlugins().add(
-                                new AlgorithmFactory<AdditionalStartable>() {
-                                    @Override
-                                    public AdditionalStartable apply(FishState state) {
-
-                                        return new AdditionalStartable() {
-                                            @Override
-                                            public void start(FishState model) {
-
-                                                model.scheduleOnceAtTheBeginningOfYear(
-                                                        new Steppable() {
-                                                            @Override
-                                                            public void step(SimState simState) {
-
-                                                                //shock the prices
-                                                                for (Port port : ((FishState) simState).getPorts()) {
-                                                                    for (Market market : port.getDefaultMarketMap().getMarkets()) {
-
-                                                                        if(port.getName().equals("Port 0")) {
-                                                                            final FixedPriceMarket delegate = (FixedPriceMarket) ((MarketProxy) market).getDelegate();
-                                                                            delegate.setPrice(
-                                                                                    delegate.getPrice() * (1 - taxRate)
-                                                                            );
-                                                                        }
-                                                                        else {
-
-                                                                            final FixedPriceMarket delegate = ((FixedPriceMarket) ((MarketProxy) ((MarketProxy) market).getDelegate()).getDelegate());
-                                                                            delegate.setPrice(
-                                                                                    delegate.getPrice() * (1 - taxRate)
-                                                                            );
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                            }
-                                                        }, StepOrder.DAWN, shockYear);
-
-                                            }
-                                        };
-
-
-                                    }
-                                });
-
-
-                    }
-                };
-            }
-
-            ;
-
-        };
-    }
-
-
-
-    static {
-
-        policies.put(
-                "BAU",
-                shockYear -> scenario -> {
-                }
-
-        );
-
-
-        policies.put(
-                "noentry",
-                shockYear -> NoDataPolicy.removeEntry(shockYear)
-
-        );
-
-
-        for(int days = 250; days>100; days-=10) {
-            int finalDays = days;
-            policies.put(
-                    days+"_days_noentry",
-                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
-                            new String[]{"population0", "population1", "population2"}
-                            , finalDays).andThen(
-                            NoDataPolicy.removeEntry(shockYear)
-                    )
-
-            );
-        }
-
-        policies.put(
-                "tax_20",
-                shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                        decreasePricesForAllSpeciesByAPercentage(.2d).apply(shockYear)
-                )
-
-        );
-
-
-    }
 
 
 
 
     public static void main(String[] args) throws IOException {
 
+        runPolicyDirectory(
+                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile(),
+                OUTPUT_FOLDER,
+                simulatedPolicies);
+
+
+    }
+
+    public static void runPolicyDirectory(File candidateFile,
+                                          Path outputFolder,
+                                          LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(
-                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile()
+                candidateFile
         ));
 
         List<String[]> strings = reader.readAll();
@@ -164,76 +58,135 @@ public class NoData718Slice6Policy {
             runOnePolicySimulation(
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
-                    Integer.parseInt(row[2])
+                    Integer.parseInt(row[2]), outputFolder, policies
             );
         }
-
-
     }
 
+
+    //additional data collectors
+    private static final List<String> ADDITIONAL_PLUGINS =
+            Lists.newArrayList(
+                    "- SPR Fixed Sample Agent:\n" +
+                            "    assumedKParameter: '0.322'\n" +
+                            "    assumedLengthAtMaturity: '29.0'\n" +
+                            "    assumedLengthBinCm: '5.0'\n" +
+                            "    assumedLinf: '59.0'\n" +
+                            "    assumedNaturalMortality: '0.495'\n" +
+                            "    assumedVarA: '0.0197'\n" +
+                            "    assumedVarB: '2.99'\n" +
+                            "    simulatedMaxAge: '100.0'\n" +
+                            "    simulatedVirginRecruits: '1000.0'\n" +
+                            "    speciesName: Lethrinus laticaudis\n" +
+                            "    surveyTag: spr_agent1_total\n" +
+                            "    probabilityOfSamplingEachBoat: 1",
+                    "- SPR Fixed Sample Agent:\n" +
+                            "    assumedKParameter: '0.4438437'\n" +
+                            "    assumedLengthAtMaturity: '50.0'\n" +
+                            "    assumedLengthBinCm: '5.0'\n" +
+                            "    assumedLinf: '86.0'\n" +
+                            "    assumedNaturalMortality: '0.3775984'\n" +
+                            "    assumedVarA: '0.00853'\n" +
+                            "    assumedVarB: '3.137'\n" +
+                            "    simulatedMaxAge: '100.0'\n" +
+                            "    simulatedVirginRecruits: '1000.0'\n" +
+                            "    speciesName: Lutjanus malabaricus\n" +
+                            "    surveyTag: spr_agent2_total\n" +
+                            "    probabilityOfSamplingEachBoat: 1",
+                    "- SPR Fixed Sample Agent:\n" +
+                            "    assumedKParameter: '0.291'\n" +
+                            "    assumedLengthAtMaturity: '34.0'\n" +
+                            "    assumedLengthBinCm: '5.0'\n" +
+                            "    assumedLinf: '68.0'\n" +
+                            "    assumedNaturalMortality: '0.447'\n" +
+                            "    assumedVarA: '0.0128'\n" +
+                            "    assumedVarB: '2.94'\n" +
+                            "    simulatedMaxAge: '100.0'\n" +
+                            "    simulatedVirginRecruits: '1000.0'\n" +
+                            "    speciesName: Atrobucca brevis\n" +
+                            "    surveyTag: spr_agent3_total\n" +
+                            "    probabilityOfSamplingEachBoat: 1"
+
+
+            );
 
     private static void runOnePolicySimulation(Path scenarioFile,
                                                int yearOfPriceShock,
-                                               int yearOfPolicyShock) throws IOException {
+                                               int yearOfPolicyShock,
+                                               Path outputFolder,
+                                               LinkedHashMap<String, Function<Integer,
+                                                       Consumer<Scenario>>> policies) throws IOException {
 
 
-        Preconditions.checkArgument(yearOfPolicyShock>yearOfPriceShock);
 
-        String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
+        List<String> additionalColumns = new LinkedList<>();
+        for (String species : NoData718Slice1.validSpecies) {
+            final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
+            Preconditions.checkNotNull(agent, "species has no agent!");
+            additionalColumns.add("SPR " + species + " " + agent + "_small");
+            additionalColumns.add("Exogenous catches of "+species);
 
-        System.out.println(filename);
-        if(OUTPUT_FOLDER.resolve(filename + ".csv").toFile().exists())
-        {
-            System.out.println(filename + " already exists!");
-            return;
+            additionalColumns.add("SPR " + species + " " + agent + "_total");
+        }
+        additionalColumns.add("Exogenous catches of Lutjanus malabaricus");
+        additionalColumns.add("Exogenous catches of Lethrinus laticaudis");
+        additionalColumns.add("Exogenous catches of Atrobucca brevis");
+        additionalColumns.add("Others Landings");
+        additionalColumns.add("Others Earnings");
+        additionalColumns.add("SPR " + "Lutjanus malabaricus" + " " +"total_and_correct");
+
+
+        FishYAML yaml = new FishYAML();
+
+
+        final LinkedList<
+                Pair<Integer,
+                        AlgorithmFactory<? extends AdditionalStartable>>>
+                plugins = new LinkedList<>();
+        for (String additionalPlugin : ADDITIONAL_PLUGINS) {
+            plugins.add(
+                    new Pair<>(yearOfPolicyShock-1,
+                            yaml.loadAs(additionalPlugin,AlgorithmFactory.class))
+            );
 
         }
 
 
-        FileWriter fileWriter = new FileWriter(OUTPUT_FOLDER.resolve(filename + ".csv").toFile());
-        fileWriter.write("run,year,policy,variable,value\n");
-        fileWriter.flush();
-
-        for (Map.Entry<String, Function<Integer, Consumer<Scenario>>> policyRun : policies.entrySet()) {
-            String policyName = policyRun.getKey();
-
-            //add the price shock
-            final Consumer<Scenario> priceShockConsumer =
-                    NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).apply(yearOfPriceShock);
-
-            //add policy!
-            final Consumer<Scenario> totalConsumer = priceShockConsumer.andThen(
-                    policyRun.getValue().apply(yearOfPolicyShock)
-            ).andThen(
-                    //collect full-time vs part-time stuff
-                    scenario -> ((FlexibleScenario) scenario).getPlugins().add(
-                            new FullSeasonalRetiredDataCollectorsFactory()
-                    )
-            );;
-
-            BatchRunner runner =  NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
-                    yearOfPolicyShock+15, null, SEED, null);
-
-            //give it the scenario
-            runner.setScenarioSetup(totalConsumer);
-
-            //remember to output the policy tag
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(StringBuffer writer, FishState model, Integer year) {
-                    writer.append(policyName).append(",");
-                }
-            });
-
-            StringBuffer tidy = new StringBuffer();
-            runner.run(tidy);
-            fileWriter.write(tidy.toString());
-            fileWriter.flush();
-
-        }
-        fileWriter.close();
+        plugins.add(
+                new Pair<>(
+                        yearOfPolicyShock-1,
+                        NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER(
+                                yaml.loadAs(new FileReader(scenarioFile.toFile()),Scenario.class)
+                        )
+                )
+        );
 
 
+
+        NoData718Slice4PriceIncrease.priceIncreaseOneRun(
+                scenarioFile,
+                yearOfPolicyShock+1, //you want 0 to be still without policy
+                outputFolder,
+                policies,
+                additionalColumns,
+                true, 15,
+                NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
+                        apply(yearOfPriceShock),
+                plugins
+
+
+        );
+
+
+
+        // new Consumer<Scenario>() {
+        //                    @Override
+        //                    public void accept(Scenario scenario) {
+        //                        ((FlexibleScenario) scenario).getPlugins().addAll(plugins);
+        //                    }
+        //                },
+        //                NoData718Utilities.CORRECT_LIFE_HISTORIES_CONSUMER
     }
+
 
 }

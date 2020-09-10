@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     private String[] addressForEachColumn;
 
 
-    private Path csvPathFile;
+    private String csvPathFile;
 
     private boolean csvHasHeader;
 
@@ -41,7 +42,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
 
     public ReadFromCSVOptimizationParameter(Path csvPathFile, String[] addressForEachColumn, boolean hasHeader) throws IOException {
         this.addressForEachColumn = addressForEachColumn;
-        this.csvPathFile = csvPathFile;
+        this.csvPathFile = csvPathFile.toString();
         this.csvHasHeader = hasHeader;
 
 
@@ -54,17 +55,25 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     public String parametrize(Scenario scenario, double[] inputs) {
 
         try {
-            List<String> csvContent  = Files.readAllLines(csvPathFile);
+            List<String> csvContent  = Files.readAllLines(Paths.get(csvPathFile));
             if(csvHasHeader)
                 csvContent.remove(0);
 
             Preconditions.checkState(inputs.length==1);
             //normalize it 0 to 1
             double input = (inputs[0]+10d)/20d;
+            //the bounds might be broken by some optimizers: bound it again
+            if(input<0)
+                input=0;
+            if(input>1)
+                input=1;
+
             Preconditions.checkState(input>=0);
             Preconditions.checkState(input<=1);
 
             int row = (int) Math.floor(input * csvContent.size());
+            if(row==csvContent.size()) //rounding issue (not considering the header)
+                row=row-1;
 
             final String[] selectedRow = csvContent.get(row).split(",");
             Preconditions.checkState(selectedRow.length == addressForEachColumn.length);
@@ -100,11 +109,12 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
         this.addressForEachColumn = addressForEachColumn;
     }
 
-    public Path getCsvPathFile() {
+
+    public String getCsvPathFile() {
         return csvPathFile;
     }
 
-    public void setCsvPathFile(Path csvPathFile) {
+    public void setCsvPathFile(String csvPathFile) {
         this.csvPathFile = csvPathFile;
     }
 

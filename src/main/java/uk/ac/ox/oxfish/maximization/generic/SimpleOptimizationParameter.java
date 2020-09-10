@@ -89,9 +89,6 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         double realValue = computeNumericValue(inputs[0]);
 
 
-        //i am just going to do this the hackish way. The input could be a DoubleParameter or a straight up number. I will try the first, catch the exception
-        // and try the second
-
         if(!isRawNumber)
             quickParametrize(scenario, realValue, addressToModify);
         else

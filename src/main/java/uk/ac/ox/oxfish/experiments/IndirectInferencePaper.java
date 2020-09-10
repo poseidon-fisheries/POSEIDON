@@ -586,7 +586,7 @@ public class IndirectInferencePaper {
                 simulationYears,
                 false,
                 -1,
-                null, null);
+                null, null, null,null);
 
         //at the end I'd like a CSV like this:
         // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....

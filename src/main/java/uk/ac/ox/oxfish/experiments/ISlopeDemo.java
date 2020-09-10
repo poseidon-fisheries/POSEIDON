@@ -35,7 +35,17 @@ public class ISlopeDemo {
 
     public static final Path DIRECTORY = Paths.get("docs",
             "20200604 islope");
-    public static final int RUNS_TO_RUN = 100;
+
+    /*
+    number_of_policies<-6
+    number_of_pairs<- factorial(number_of_policies)/(factorial(2)*factorial(number_of_policies-2))
+    pwr.t.test(sig.level = 0.05/number_of_pairs,
+           power = .8,
+           d=.2,
+           type="two.sample",
+           alternative="two.sided")
+     */
+    public static final int RUNS_TO_RUN = 715;
     public static final int FIRST_CONTROL_YEAR = 10;
     private static String[] indicatorsToUse = new String[]{
             "Average Income per Hour Out",
@@ -77,10 +87,10 @@ public class ISlopeDemo {
 
 
     public static void main(String[] args) throws IOException {
-      //  mainIT1();
+        mainIT1();
 
-    //      mainPID(false);
-        //  mainPID(true);
+      //    mainPID(false);
+          mainPID(true);
         mainStockAssessmentFormula(false);
         //    mainStockAssessmentFormula(true);
 
@@ -484,8 +494,7 @@ public class ISlopeDemo {
             "Species 0 CPUE",
             "Average Trip Income",
             "Average Income per Hour Out",
-            "Species 0 CPHO",
-            "Species 0 CPUE" //ADD:
+            "Species 0 CPHO"
     };
 
 
@@ -895,7 +904,7 @@ public class ISlopeDemo {
                 false,
                 -1,
                 null,
-                null
-        );
+                null,
+                null,null);
     }
 }

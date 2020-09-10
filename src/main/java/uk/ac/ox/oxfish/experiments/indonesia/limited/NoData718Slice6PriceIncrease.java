@@ -17,9 +17,10 @@ import static uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice4Price
 
 public class NoData718Slice6PriceIncrease {
 
-    private static final String CANDIDATES_CSV_FILE = "price_shock_candidates_max.csv";
+    private static final String CANDIDATES_CSV_FILE =
+            "price_shock_candidates_min.csv";
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("price_shock_max");
+            NoData718Slice6.MAIN_DIRECTORY.resolve("price_shock_min");
 
 
     static public LinkedHashMap<String,
@@ -74,8 +75,8 @@ public class NoData718Slice6PriceIncrease {
         ));
 
         List<String[]> strings = reader.readAll();
-        strings.remove(0);
-        Collections.shuffle(strings);
+     //   strings.remove(0);
+      //  Collections.shuffle(strings);
 
         for (int i = 1; i < strings.size(); i++) {
 
@@ -83,15 +84,15 @@ public class NoData718Slice6PriceIncrease {
             System.out.println(Arrays.toString(row));
 
             final Path scenarioPath = Paths.get(row[0]);
-            if(Files.exists(scenarioPath))
+            if(Files.exists(scenarioPath) && Files.size(scenarioPath)>0)
             {
 
                 priceIncreaseOneRun(
                         scenarioPath,
                         Integer.parseInt(row[1]),
                         outputFolder,
-                        policies, additionalColumnsToPrint
-                );
+                        policies, additionalColumnsToPrint,
+                        false, 5,null,null);
             }
             else {
                 System.err.println("Couldn't find scenario " + scenarioPath);

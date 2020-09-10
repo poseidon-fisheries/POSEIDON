@@ -27,6 +27,7 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
@@ -68,7 +69,7 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
     public void start(FishState model) {
         Preconditions.checkArgument(stoppable==null,"already started!");
         stoppable = model.scheduleEveryYear(this,
-                                            StepOrder.AFTER_DATA);
+                                            StepOrder.POLICY_UPDATE);
     }
 
     /**
@@ -92,7 +93,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
         if(profitRate<=0 || !Double.isFinite(profitRate))
             return 0;
         else
-            return (int) (profitRate*rateToEntryMultiplier);
+            return FishStateUtilities.quickRounding(
+                    profitRate*rateToEntryMultiplier);
 
     }
 

@@ -22,7 +22,6 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -88,8 +87,7 @@ public class Slice6SelectivityMarket {
                 2,
                 "Lutjanus malabaricus",
                 new int[]{0, 3},
-                3,
-                10
+                                      10
         );
 
     }
@@ -626,7 +624,7 @@ public class Slice6SelectivityMarket {
             final int maxSelectivityShift,
             final int maxPremium,
             String species, final int[] populationsSubsidized,
-            int shockYear, final int maturityBin) throws IOException {
+            final int maturityBin) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
         fileWriter.write("run,year,selectivity,premium,penalty,allSubsidized,variable,value\n");
@@ -636,7 +634,7 @@ public class Slice6SelectivityMarket {
 
         for (boolean fullySubsidized : allSubsidized) {
             for (int selectivityIncrease = 0; selectivityIncrease <= maxSelectivityShift; selectivityIncrease += 5) {
-                for (double premium = 1; premium < maxPremium; premium += .5) {
+                for (double premium = 1; premium <= maxPremium; premium += .5) {
                     for (double penalty = 0; penalty<=.5; penalty = FishStateUtilities.round(penalty+.25)) {
 
 
@@ -655,7 +653,7 @@ public class Slice6SelectivityMarket {
                                                 maturityBin,
                                                 penalty,
                                                 new MersenneTwisterFast(),
-                                                true)
+                                                                          fullySubsidized)
                                 )
                         );
 
@@ -668,7 +666,8 @@ public class Slice6SelectivityMarket {
                                 writer.
                                         append(currentShiftSelectivity).append(",").
                                         append(finalPremium).append(",").
-                                        append(finalPenalty).append(",");
+                                        append(finalPenalty).append(",").
+                                        append(fullySubsidized).append(",");
                             }
                         });
 
