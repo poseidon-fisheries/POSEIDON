@@ -46,7 +46,9 @@ public class TunaMaximization {
         final int maxFitnessCalls = 5000;
         final int numEvaluationRuns = 30;
 
-        final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
+        //final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
+
+        final String folderName = "2020-08-10B";
 
         final Path basePath =
             Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", folderName);
@@ -57,10 +59,10 @@ public class TunaMaximization {
 
         final TunaMaximization tunaMaximization = new TunaMaximization(calibrationFilePath);
 
-        final double[] solution = tunaMaximization.calibrate(minMemoryPerThread, populationSize, maxFitnessCalls);
+//        final double[] solution = tunaMaximization.calibrate(minMemoryPerThread, populationSize, maxFitnessCalls);
 
-//        final double[] solution =
-//            {0.086, 3.238, -7.165, -6.770, -0.893, 10.000, -8.301, -4.487, 3.181, -6.490, -8.782, 1.569, 5.822};
+        final double[] solution =
+            { 0.403, 5.861, 1.658,-7.726,-0.739, 1.428,-5.191,-8.892,-6.943,-1.381,-7.990, 6.557, 6.021};
 
         tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
         final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());

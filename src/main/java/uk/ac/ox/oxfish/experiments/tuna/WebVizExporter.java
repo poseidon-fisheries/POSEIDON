@@ -75,13 +75,13 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.zipToMap;
 public final class WebVizExporter {
 
     private static final int NUM_YEARS_TO_SKIP = 1;
-    private static final int NUM_YEARS_TO_RUN = 5;
-    private static final int POLICY_KICK_IN_YEAR = 3;
+    private static final int NUM_YEARS_TO_RUN = 4;
+    private static final int POLICY_KICK_IN_YEAR = 2;
 
     private final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace");
     private final Path scenarioPath =
-        basePath.resolve(Paths.get("tuna", "np", "runs", "webviz_test", "tuna.yaml"));
+        basePath.resolve(Paths.get("tuna", "np", "runs", "webviz", "scenario.yaml"));
     private final Path jsonOutputPath =
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
     private final Path csvOutputPath =

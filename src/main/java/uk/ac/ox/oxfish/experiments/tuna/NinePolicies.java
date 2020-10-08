@@ -54,14 +54,14 @@ public class NinePolicies {
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
 
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("runs", "gatherers_test", "tuna_calibrated.yaml"));
+        basePath.resolve(Paths.get("calibrations", "2020-08-10B", "tuna_calibrated.yaml"));
 
     private static final Path outputPath =
-        basePath.resolve(Paths.get("runs", "nine_policies"));
+        basePath.resolve(Paths.get("runs", "nine_policies_2020-09-15"));
 
-    private static final int NUM_RUNS_PER_POLICY = 25;
-    private static final int NUM_YEARS_TO_RUN = 5;
-    private static final int POLICY_KICK_IN_YEAR = 3;
+    private static final int NUM_RUNS_PER_POLICY = 20;
+    private static final int NUM_YEARS_TO_RUN = 3;
+    private static final int POLICY_KICK_IN_YEAR = 2;
 
     public static void main(final String[] args) {
         new Runner<>(TunaScenario.class, scenarioPath, outputPath)
