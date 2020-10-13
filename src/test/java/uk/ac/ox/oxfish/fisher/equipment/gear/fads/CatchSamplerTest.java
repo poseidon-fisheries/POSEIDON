@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 
 import java.util.Map;
 

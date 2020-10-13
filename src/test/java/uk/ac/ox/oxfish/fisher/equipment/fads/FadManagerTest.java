@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;

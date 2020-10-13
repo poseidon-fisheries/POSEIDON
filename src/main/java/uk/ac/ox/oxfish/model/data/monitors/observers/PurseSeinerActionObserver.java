@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.data.monitors.observers;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
 
 public abstract class PurseSeinerActionObserver<A> implements Startable, Observer<A> {
 
@@ -31,6 +31,8 @@ public abstract class PurseSeinerActionObserver<A> implements Startable, Observe
     protected PurseSeinerActionObserver(final Class<A> observedClass) {
         this.observedClass = observedClass;
     }
+
+    public Class<A> getObservedClass() { return observedClass; }
 
     @Override public void start(final FishState fishState) {
         fishState.getFishers().forEach(fisher ->

@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;

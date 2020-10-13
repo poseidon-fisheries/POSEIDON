@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
 
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.SetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
-public final class CatchFromSetExtractor<A extends SetAction>
+public final class CatchFromSetExtractor<A extends AbstractSetAction>
     extends PurseSeinerActionObserver<A>
     implements ToDoubleFunction<SeaTile> {
 

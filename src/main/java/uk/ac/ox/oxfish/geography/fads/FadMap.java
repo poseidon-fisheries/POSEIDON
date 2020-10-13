@@ -11,7 +11,7 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -144,7 +144,12 @@ public class FadMap implements Startable, Steppable {
 
     @NotNull
     public Bag fadsAt(SeaTile seaTile) {
-        Int2D location = new Int2D(seaTile.getGridX(), seaTile.getGridY());
+        return fadsAt(seaTile.getGridX(), seaTile.getGridY());
+    }
+
+    @NotNull
+    public Bag fadsAt(int x, int y) {
+        Int2D location = new Int2D(x, y);
         final Bag bag = driftingObjectsMap.getField().getObjectsAtDiscretizedLocation(location);
         return bag == null ? new Bag() : bag;
     }

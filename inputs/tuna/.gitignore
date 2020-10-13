@@ -1,3 +1,4 @@
 boat_port_frequencies.csv
 boats.csv
-deployment_values.csv
+location_values.csv
+action_weights.csv

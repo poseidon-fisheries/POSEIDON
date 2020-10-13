@@ -113,17 +113,24 @@ public class PortReader {
      * start the GasPriceMaker (the PortInitializer is responsible for doing so)
      */
     public Collection<Port> readSimplePortFile(
-        Path pathToFile, NauticalMap map,
-        Function<SeaTile, MarketMap> marketmap,
-        GasPriceMaker gasPriceMaker, FishState model) {
-        LinkedHashMap<String, Port> ports = new LinkedHashMap<>();
+        int targetYear,
+        Path pathToFile,
+        NauticalMap map,
+        Function<SeaTile, MarketMap> marketMap,
+        GasPriceMaker gasPriceMaker
+    ) {
+        Map<String, Port> ports = new LinkedHashMap<>();
         for (Record record: parseAllRecords(pathToFile)) {
-            ports.computeIfAbsent(record.getString("port_name"), portName -> {
-                SeaTile location = computePortLocation(map, portName,
-                    record.getDouble("lon"),record.getDouble("lat"));
-                return new Port(portName, location, marketmap.apply(location),
-                    gasPriceMaker.supplyInitialPrice(location,portName));
-            });
+            if (record.getInt("year") == targetYear) {
+                ports.computeIfAbsent(record.getString("port_name"), portName -> {
+                    SeaTile location = computePortLocation(map, portName,
+                        record.getDouble("lon"), record.getDouble("lat")
+                    );
+                    return new Port(portName, location, marketMap.apply(location),
+                        gasPriceMaker.supplyInitialPrice(location, portName)
+                    );
+                });
+            }
         }
         return ports.values();
     }

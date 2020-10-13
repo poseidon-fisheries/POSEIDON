@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.UnifiedAmateurishDynamicFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -56,7 +57,7 @@ public class DepartingStrategies {
         NAMES.put(FloridaLogisticDepartingFactory.class, "WFS Handline");
         NAMES.put(ExitDecoratorFactory.class, "Exit Decorator");
         NAMES.put(FullSeasonalRetiredDecoratorFactory.class, "Full-time Seasonal Retired Decorator");
-        NAMES.put(PurseSeineDepartingStrategyFactory.class, "Purse-Seine Gear Departing Strategy");
+        NAMES.put(PurseSeinerDepartingStrategyFactory.class, "Purse-Seine Gear Departing Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

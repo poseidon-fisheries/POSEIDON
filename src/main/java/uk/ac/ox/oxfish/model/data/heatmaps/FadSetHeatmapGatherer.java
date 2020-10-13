@@ -19,7 +19,7 @@
 
 package uk.ac.ox.oxfish.model.data.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.ActionCountingExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
@@ -32,7 +32,7 @@ public class FadSetHeatmapGatherer extends HeatmapGatherer {
             "FAD sets",
             "Number of sets",
             interval,
-            new ActionCountingExtractor<>(MakeFadSet.class),
+            new ActionCountingExtractor<>(AbstractFadSetAction.class),
             SummingMerger.INSTANCE
         );
     }

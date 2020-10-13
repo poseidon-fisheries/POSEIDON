@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
 
 public class FadManagerUtilsTest {
 

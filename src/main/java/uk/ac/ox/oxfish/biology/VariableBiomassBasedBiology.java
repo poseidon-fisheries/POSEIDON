@@ -31,7 +31,11 @@ public interface VariableBiomassBasedBiology extends LocalBiology {
 
     void setCurrentBiomass(Species s, double newCurrentBiomass);
 
-    default double getTotalBiomass() { return stream(getCurrentBiomass()).sum(); }
+    default double getTotalBiomass() {
+        double sum = 0.0;
+        for (double v : getCurrentBiomass()) sum += v;
+        return sum;
+    }
 
     double[] getCurrentBiomass();
 

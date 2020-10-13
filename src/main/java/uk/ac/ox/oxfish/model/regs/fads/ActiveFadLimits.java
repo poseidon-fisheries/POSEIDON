@@ -20,12 +20,16 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
 import com.google.common.collect.ImmutableSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
-    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(DeployFad.class);
+    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions =
+        ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;
 
     public ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
@@ -41,7 +45,9 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
 
     @Override public boolean isForbidden(PurseSeinerAction action) {
         assert applicableActions.contains(action.getClass());
-        return action.getFadManager().getNumDeployedFads() >= limits.getLimit(action.getFisher());
+        return getFadManager(action.getFisher()).getNumDeployedFads() >= getLimit(action.getFisher());
     }
+
+    public int getLimit(final Fisher fisher) { return limits.getLimit(fisher); }
 
 }

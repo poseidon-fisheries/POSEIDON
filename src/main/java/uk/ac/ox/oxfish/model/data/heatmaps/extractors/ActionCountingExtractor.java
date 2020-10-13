@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.model.data.heatmaps.extractors;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 

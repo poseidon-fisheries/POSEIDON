@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.heatmaps;
 
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.model.data.heatmaps.extractors.CatchFromSetExtractor;
 import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
@@ -34,7 +34,7 @@ public class CatchFromUnassociatedSetsHeatmapGatherer extends HeatmapGatherer {
             species.getName() + " catch from unassociated sets",
             "Catch (t)",
             interval,
-            new CatchFromSetExtractor<>(MakeUnassociatedSet.class, species),
+            new CatchFromSetExtractor<>(NonAssociatedSetAction.class, species),
             SummingMerger.INSTANCE
         );
     }

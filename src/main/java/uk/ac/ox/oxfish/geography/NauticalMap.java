@@ -38,6 +38,7 @@ import sim.field.grid.IntGrid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
+import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -350,6 +351,10 @@ public class NauticalMap implements Startable
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
+    public SeaTile getSeaTile(Int2D gridLocation) {
+        return getSeaTile(gridLocation.x, gridLocation.y);
+    }
+
     /**
      * basically getting coordinates is an expensive call; so we store previous calls here
      */
@@ -613,6 +618,10 @@ public Coordinate getCoordinates(int gridX, int gridY) {
                     .collect(joining())
             )
             .collect(joining("\n"));
+    }
+
+    public Int2D getGridXY(Coordinate coordinate) {
+        return getSeaTile(coordinate).getGridLocation();
     }
 
 }

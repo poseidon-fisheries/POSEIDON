@@ -22,10 +22,13 @@ package uk.ac.ox.oxfish.fisher.equipment.fads;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +50,14 @@ public class FadTest {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, 0.75);
         fillBiology(fadBiology);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0.5, 0);
+        final Fad fad = new Fad(
+            fadManager,
+            fadBiology,
+            ImmutableMap.of(),
+            0.5,
+            0,
+            new Int2D()
+        );
 
         // ...and an empty tile biology, with a carrying capacity of 1.0:
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);

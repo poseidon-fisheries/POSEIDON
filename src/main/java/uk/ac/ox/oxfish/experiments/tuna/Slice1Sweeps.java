@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.experiments.tuna;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.equipment.gear.fads.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;

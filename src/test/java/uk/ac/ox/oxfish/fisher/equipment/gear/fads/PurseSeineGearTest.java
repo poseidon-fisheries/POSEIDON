@@ -24,8 +24,10 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;

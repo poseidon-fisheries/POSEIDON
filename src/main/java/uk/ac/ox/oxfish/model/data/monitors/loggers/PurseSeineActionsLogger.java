@@ -22,12 +22,12 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -52,9 +52,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         "trip_end"
     );
     private final Collection<ActionObserver<? extends PurseSeinerAction>> observers = ImmutableList.of(
-        new ActionObserver<>(DeployFad.class),
-        new ActionObserver<>(MakeFadSet.class),
-        new ActionObserver<>(MakeUnassociatedSet.class)
+        new ActionObserver<>(FadDeploymentAction.class),
+        new ActionObserver<>(AbstractFadSetAction.class),
+        new ActionObserver<>(NonAssociatedSetAction.class)
     );
     private final ImmutableList.Builder<ActionRecord> actionRecords = new ImmutableList.Builder<>();
     private final FishState fishState;
@@ -97,9 +97,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         }
 
         private String actionType(PurseSeinerAction action) {
-            if (action instanceof DeployFad) return "DEPLOY";
-            else if (action instanceof MakeFadSet) return "FADSET";
-            else if (action instanceof MakeUnassociatedSet) return "UNASET";
+            if (action instanceof FadDeploymentAction) return "DEPLOY";
+            else if (action instanceof AbstractFadSetAction) return "FADSET";
+            else if (action instanceof NonAssociatedSetAction) return "UNASET";
             else throw new IllegalArgumentException("Unknown action type.");
         }
 

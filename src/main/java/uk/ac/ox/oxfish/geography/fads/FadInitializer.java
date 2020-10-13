@@ -22,11 +22,13 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -69,12 +71,14 @@ public class FadInitializer implements Function<FadManager, Fad> {
     }
 
     @Override public Fad apply(@NotNull FadManager fadManager) {
+        final SeaTile seaTile = fadManager.getFisher().getLocation();
         return new Fad(
             fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
             rng.nextBoolean(dudProbability) ? ImmutableMap.of() : this.attractionRates,
             fishReleaseProbability,
-            timeStepSupplier.getAsInt()
+            timeStepSupplier.getAsInt(),
+            new Int2D(seaTile.getGridX(), seaTile.getGridY())
         );
     }
 

@@ -17,9 +17,13 @@ import java.util.function.Function;
 public class FromSimpleFilePortInitializer implements PortInitializer {
 
     private final PortReader reader = new PortReader();
-    private Path filePath;
+    private final int targetYear;
+    private final Path filePath;
 
-    public FromSimpleFilePortInitializer(Path filePath) { this.filePath = filePath; }
+    public FromSimpleFilePortInitializer(final int targetYear, Path filePath) {
+        this.targetYear = targetYear;
+        this.filePath = filePath;
+    }
 
     @Override public List<Port> buildPorts(
         NauticalMap map,
@@ -29,7 +33,7 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
         GasPriceMaker gasPriceMaker
     ) {
         final Collection<Port> ports =
-            reader.readSimplePortFile(filePath, map, marketFactory, gasPriceMaker, model);
+            reader.readSimplePortFile(targetYear, filePath, map, marketFactory, gasPriceMaker);
         ports.forEach(port -> {
             map.addPort(port);
             gasPriceMaker.start(port, model);
@@ -39,5 +43,4 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
 
     public Path getFilePath() { return filePath; }
 
-    public void setFilePath(Path filePath) { this.filePath = filePath; }
 }

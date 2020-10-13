@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.model.data.heatmaps.FadDensityHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.FadDeploymentHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.FadSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.UnassociatedSetHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.NonAssociatedSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
@@ -66,7 +66,7 @@ public class SampleTunaRun {
         gatherers.add(
             new FadDeploymentHeatmapGatherer(interval),
             new FadSetHeatmapGatherer(interval),
-            new UnassociatedSetHeatmapGatherer(interval),
+            new NonAssociatedSetHeatmapGatherer(interval),
             new FadDensityHeatmapGatherer(interval)
         );
         fishState.getSpecies().forEach(species -> {

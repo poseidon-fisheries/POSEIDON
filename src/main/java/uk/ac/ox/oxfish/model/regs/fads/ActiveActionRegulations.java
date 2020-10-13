@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
 import java.util.stream.Stream;
@@ -84,7 +84,7 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
             );
     }
 
-    private ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
+    public ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
         return actionSpecificRegulations
             .values()
             .stream()
