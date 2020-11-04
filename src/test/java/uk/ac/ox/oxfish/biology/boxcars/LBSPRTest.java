@@ -1,8 +1,22 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 public class LBSPRTest {
 
@@ -10,7 +24,7 @@ public class LBSPRTest {
     @Test
     public void probMatrix() {
 
-        final LBSPR.AgeToLength ageToLength = LBSPR.buildAgeToLengthKey(
+        final LbSprEstimation.AgeToLength ageToLength = LbSprEstimation.buildAgeToLengthKey(
                 new double[]{2.5,7.5,12.5,17.5,22.5,27.5,32.5,37.5,42.5,47.5,52.5,57.5,62.5,67.5,72.5,77.5,82.5,87.5,92.5,97.5,102.5},
                 1.5,
                 100,
@@ -66,4 +80,292 @@ public class LBSPRTest {
 
 
     }
+
+
+    @Test
+    public void formulaTest() {
+
+        final LbSprEstimation.TheoreticalSPR theoreticalSPR = LbSprEstimation.sprFormula(
+                30,
+                50,
+                1.2,
+                100,
+                100,
+                0.1,
+                new double[]{2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 77.5, 80, 82.5, 85, 87.5, 90, 92.5, 95, 97.5, 100, 102.5, 105, 107.5},
+                1.5,
+                new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                .01
+
+
+        );
+        System.out.println(theoreticalSPR.getSpr());
+        assertEquals(theoreticalSPR.getSpr(),0.2692,.0001);
+        System.out.println(Arrays.toString(theoreticalSPR.getCatchesAtLength()));
+        assertArrayEquals(
+                theoreticalSPR.getCatchesAtLength(),
+                new double[]{0.002728,0.003731,0.002341,0.006383,0.009351,0.012567,0.016806,0.02228,0.028641,0.035723,0.042553,0.050446,0.056415,0.060525,0.062533,0.062506,0.060939,0.05794,0.054172,0.049845,0.045279,0.040631,0.035691,0.031429,0.027384,0.023597,0.019933,0.016807,0.013852,0.011375,0.009111,0.007172,0.005542,0.004195,0.003106,0.002242,0.001576,0.001058,0.000687,0.000429,0.000258,0.000145,7.4e-05},
+                .0001);
+
+
+    }
+
+
+    @Test
+    public void lbsprOptTest() {
+
+
+        double[] catchAtLengthObserved =       new double[]{2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20,
+                22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45,
+                47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70,
+                72.5, 75, 77.5, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        double logSelectivityCmAt50PercentAsPercentageOfLinf = .3;
+        double logSelectivitySlope = .1;
+        double logRatioFishingToNaturalMortality = Math.log((1.5/1));
+        int maximumAge = 100;
+        double Linf = 100;
+        double coefficientVariationLinf = .1;
+        double[] binMids =
+                new double[]{2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 77.5, 80, 82.5, 85, 87.5, 90, 92.5, 95, 97.5, 100, 102.5, 105, 107.5};
+
+
+        double mkRatio = 1.5;
+        double[] maturityPerBin  = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        double bVariableLengthToWeightConversion = .01;
+
+
+        final double likelihood = LbSprEstimation.lbsprDistance(catchAtLengthObserved,
+                logSelectivityCmAt50PercentAsPercentageOfLinf,
+                logSelectivitySlope,
+                logRatioFishingToNaturalMortality,
+                maximumAge,
+                Linf,
+                coefficientVariationLinf,
+                binMids,
+                mkRatio,
+                maturityPerBin,
+                bVariableLengthToWeightConversion);
+
+        System.out.println(likelihood);
+        assertEquals(861.6453,likelihood,.0001);
+
+
+        //R script:
+//        catchAtLengthObserved =
+//                c(2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20,
+//                        22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45,
+//                        47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70,
+//                        72.5, 75, 77.5, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+//        logSelectivityCmAt50PercentAsPercentageOfLinf = .3;
+//        logSelectivitySlope = .1;
+//        logRatioFishingToNaturalMortality = log((1.5/1));
+//        nage = 101;
+//        Linf = 100;
+//        coefficientVariationLinf = .1;
+//        binMids =   c(2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 77.5, 80, 82.5, 85, 87.5, 90, 92.5, 95, 97.5, 100, 102.5, 105, 107.5)
+//
+//        mkRatio = 1.5;
+//        maturityPerBin  =c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+//        bVariableLengthToWeightConversion = .01;
+//
+//
+//
+//
+//        nage <- 101
+//        P <- 0.01
+//        xs <- seq(0, to=1, length.out = nage)
+//        rLens <- 1-P^(xs/MK)
+//        EL <- rLens * Linf
+//        SDL <- EL * CVLinf
+//
+//        Prob <- matrix(0, nrow=nage, ncol=length(binMids))
+//        for (aa in 1:nage) {
+//            d1 <- dnorm(binMids, EL[aa], SDL[aa])
+//            t1 <- dnorm(EL[aa] + SDL[aa]*2.5, EL[aa], SDL[aa]) # truncate at 2.5 sd
+//            d1[d1<t1] <- 0
+//            if (!all(d1==0)) Prob[aa,] <- d1/sum(d1)
+//        }
+//
+//
+//
+//
+//
+//        DLMtool:::LBSPRopt(
+//                pars = c(logSelectivityCmAt50PercentAsPercentageOfLinf,
+//                        logSelectivitySlope,
+//                        logRatioFishingToNaturalMortality),
+//                CAL = catchAtLengthObserved,
+//                nage = nage,
+//                nlen = length(binMids),
+//                CVLinf = coefficientVariationLinf,
+//                LenBins = rep.int(-1,times=length(binMids)), ### not used!
+//                L50 =  -1, ### not used!
+//                L95 = -1, ### not used!
+//                LenMids = binMids,
+//                MK = mkRatio,
+//                Linf = Linf,
+//                Ml = maturityPerBin,
+//                Beta = bVariableLengthToWeightConversion,
+//                Prob = Prob,
+//                rLens = rLens
+//)
+
+    }
+
+
+    @Test
+    public void findingLBSPR(){
+
+        double[] catchAtLengthObserved =       new double[]{2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20,
+                22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45,
+                47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70,
+                72.5, 75, 77.5, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        double Linf = 100;
+        double coefficientVariationLinf = .1;
+        double[] binMids =
+                new double[]{2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25,
+                        27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50,
+                        52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75,
+                        77.5, 80, 82.5, 85, 87.5, 90, 92.5, 95, 97.5, 100,
+                        102.5, 105, 107.5};
+
+
+        double mkRatio = 1.5;
+        double[] maturityPerBin  = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        double bVariableLengthToWeightConversion = .01;
+
+        final LbSprEstimation.LBSPREstimate estimate = LbSprEstimation.computeSPR(
+                catchAtLengthObserved,
+                Linf,
+                coefficientVariationLinf,
+                binMids,
+                mkRatio,
+                maturityPerBin,
+                bVariableLengthToWeightConversion
+        );
+        System.out.println(estimate);
+
+
+
+        assertEquals(estimate.getFishingToNaturalMortalityRatio(),
+                2.599041,
+                .01);
+
+        assertEquals(estimate.getLengthAt50PercentSelectivity(),
+                69.7203,
+                .01);
+
+        assertEquals(estimate.getLengthAt95PercentSelectivity(),
+                112.0104,
+                .01);
+
+        assertEquals(estimate.getSpr(),
+                0.4260315,
+                .01);
+        assertEquals(estimate.getLikelihood(),
+                167.1362,
+                .01);
+
+    }
+
+    @Test
+    public void findingLBSPRInTheAgent(){
+
+
+
+
+
+        EquallySpacedBertalanffyFactory factory = new EquallySpacedBertalanffyFactory();
+        factory.setAllometricAlpha(new FixedDoubleParameter(1));
+        factory.setAllometricBeta(new FixedDoubleParameter(3));
+        factory.setMaxLengthInCm(new FixedDoubleParameter(100));
+        factory.setRecruitLengthInCm(new FixedDoubleParameter(0d));
+        factory.setkYearlyParameter(new FixedDoubleParameter(1));
+        factory.setNumberOfBins(101);
+
+
+        GrowthBinByList meristics = factory.apply(mock(FishState.class));
+
+        Species fish = new Species("test",meristics);
+
+
+        SPRAgent agent =
+                new SPRAgent("tag",
+                        fish,
+                        new Predicate<Fisher>() {
+                            @Override
+                            public boolean test(Fisher fisher) {
+                                return fisher.getID()==1;
+                            }
+                        },
+                        100d,
+                        1,1.5,100,1000,5,
+                        1,3,
+                        52,new LbSPRFormula());
+
+
+
+        //there are two fishers, but you should only sample fisher 1
+        int[] lengthsCaught = new int[]{45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,75,81};
+        int[] correctLandings =new int[]{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+
+
+        double reOrderedLandings[] = new double[101];
+        for(int i=0; i<lengthsCaught.length; i++)
+            reOrderedLandings[lengthsCaught[i]] = correctLandings[i];
+
+        for(int i=0; i<reOrderedLandings.length; i++)
+            reOrderedLandings[i] = reOrderedLandings[i] * fish.getWeight(0,i);
+        Fisher fisher1 = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        // when(fisher1.getDailyCounter()).thenReturn(mock(FisherDailyCounter.class,RETURNS_DEEP_STUBS));
+        when(fisher1.getID()).thenReturn(1);
+        FisherDailyCounter dailyCounter = fisher1.getDailyCounter();
+        doAnswer(invocation -> {
+            int bin = (Integer)invocation.getArguments()[2];
+            return reOrderedLandings[bin];
+        }).when(dailyCounter).getSpecificLandings(any(Species.class), anyInt(), anyInt());
+        //fisher 2 returns garbage
+        Fisher fisher2 = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        when(fisher2.getID()).thenReturn(2);
+        when(fisher2.getDailyCounter().getSpecificLandings(any(Species.class),anyInt(),anyInt())).thenReturn(100d);
+
+//        SPRAgent agent = new SPRAgent(
+//                "testtag",
+//                fish,
+//                new Predicate<Fisher>() {
+//                    @Override
+//                    public boolean test(Fisher fisher) {
+//                        return fisher.getID()==1;
+//                    }
+//                },
+//                81,
+//                0.4946723,
+//                0.394192,
+//                100,
+//                1000,
+//                5,
+//                0.02d,
+//                2.94,
+//                48,
+//                new LbSPRFormula()
+//        );
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+
+        when(model.getFishers()).thenReturn(
+                ObservableList.observableList(
+                        fisher1,fisher2
+                )
+        );
+
+        agent.start(model);
+        agent.step(model);
+        double spr = agent.computeSPR();
+        //problem here fundamentally is that we are using the LBSPR formula from DLMtoolkit rather than the package itself
+        assertEquals(0.3315833,spr,.05);
+
+
+
+    }
+
 }

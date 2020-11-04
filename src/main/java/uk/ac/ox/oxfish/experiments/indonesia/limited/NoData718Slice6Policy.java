@@ -22,10 +22,10 @@ import java.util.function.Function;
 
 public class NoData718Slice6Policy {
 
-    public static final String CANDIDATES_CSV_FILE = "total_successes.csv";
+    public static final String CANDIDATES_CSV_FILE = "successes_ga.csv"; //"total_successes.csv";
     public static final int SEED = 0;
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_complete");
+            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_ga");
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
             NoData718Utilities.onlyBAU;
@@ -67,7 +67,7 @@ public class NoData718Slice6Policy {
     //additional data collectors
     private static final List<String> ADDITIONAL_PLUGINS =
             Lists.newArrayList(
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.322'\n" +
                             "    assumedLengthAtMaturity: '29.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +
@@ -80,7 +80,7 @@ public class NoData718Slice6Policy {
                             "    speciesName: Lethrinus laticaudis\n" +
                             "    surveyTag: spr_agent1_total\n" +
                             "    probabilityOfSamplingEachBoat: 1",
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.4438437'\n" +
                             "    assumedLengthAtMaturity: '50.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +
@@ -93,7 +93,7 @@ public class NoData718Slice6Policy {
                             "    speciesName: Lutjanus malabaricus\n" +
                             "    surveyTag: spr_agent2_total\n" +
                             "    probabilityOfSamplingEachBoat: 1",
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.291'\n" +
                             "    assumedLengthAtMaturity: '34.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +

@@ -70,6 +70,7 @@ public class NoData718Utilities {
         builder.setAssumedVarA(malabaricus.getAllometricAlpha().makeCopy());
         builder.setAssumedVarB(malabaricus.getAllometricBeta().makeCopy());
 
+        builder.setSpeciesName("Lutjanus malabaricus");
         builder.setSurveyTag("total_and_correct");
         builder.setProbabilityOfSamplingEachBoat(new FixedDoubleParameter(1));
 
