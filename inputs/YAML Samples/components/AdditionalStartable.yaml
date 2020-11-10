@@ -47,6 +47,7 @@ SPR Agent:
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
   surveyTag: spr_agent
+  useTNCFormula: true
 -------
 SPR Selective Agent:
   assumedKParameter: '0.4438437'
@@ -62,6 +63,7 @@ SPR Selective Agent:
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
   surveyTag: spr_agent
+  useTNCFormula: true
 -------
 SPR Fixed Sample Agent:
   assumedKParameter: '0.4438437'
@@ -75,8 +77,9 @@ SPR Fixed Sample Agent:
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
   surveyTag: spr_agent
-  tagsToSample:
-    population9: 100
+  tagsToSample: {
+    }
+  useTNCFormula: true
 -------
 SPR Oracle:
   dayOfMeasurement: 365
@@ -132,7 +135,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2020-05-20'
+  startDate: '2020-11-10'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -144,4 +147,56 @@ Effort Regulator:
 Additional Daily Collectors
 -------
 Catch at bin Collectors
+-------
+Herfindal Index
+-------
+ISlope-TAC Controller:
+  catchColumnName: Species 0 Landings
+  gainLambdaParameter: '0.4'
+  indicatorColumnName: Species 0 CPUE
+  interval: 5
+  precautionaryScaling: '0.8'
+  startingYear: 10
+-------
+Last catch as TAC Controller:
+  catchColumnName: Species 0 Landings
+  catchesToTargetMultiplier: '1.0'
+  startingYear: 10
+-------
+PID-TAC Controller:
+  averageToOffsetMultiplier: '0.8'
+  indicatorColumnName: Average Trip Duration
+  indicatorMultiplier: '0.8'
+  integrated: false
+  minimumTAC: 0.0
+  negative: false
+  numberOfYearsToAverageForCurrent: 1
+  numberOfYearsToAverageForOffset: 1
+  numberOfYearsToLookBackForTarget: 10
+  offsetColumnName: Species 0 Landings
+  overflowAtZeroProtection: true
+  startingYear: 10
+-------
+LBSPR Effort Controller:
+  cubicParameter: '0.3'
+  linearParameter: '0.05'
+  maxChangeEachYear: '0.1'
+  sprColumnName: SPR Lutjanus malabaricus spr_agent_total
+  sprTarget: '0.4'
+-------
+Schaefer Assessment Formula Controller:
+  carryingCapacityMaximum: '3.0E7'
+  carryingCapacityMinimum: '100000.0'
+  catchColumnName: Species 0 Landings
+  catchabilityMaximum: '1.0E-4'
+  catchabilityMinimum: '0.0'
+  indicatorColumnName: Species 0 CPHO
+  interval: 1
+  logisticGrowthMaximum: '0.8'
+  logisticGrowthMinimum: '0.1'
+  minimumTAC: '10000.0'
+  startingYear: 10
+-------
+Simple Fisher Sampler:
+  percentageSampled: '0.025'
 -------
