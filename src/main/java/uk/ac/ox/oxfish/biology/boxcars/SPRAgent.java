@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -70,6 +70,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
      */
     final protected CatchSampler sampler;
 
+    final private SPRFormula formula;
+
 
     public SPRAgent(
             String surveyTag, Species species,
@@ -78,7 +80,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
             double assumedKParameter, double assumedNaturalMortality,
             int assumedMaxAge,
             double assumedVirginRecruits,
-            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity) {
+            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity,
+            SPRFormula formula) {
 
         this(
                 surveyTag,
@@ -88,7 +91,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         assumedKParameter, assumedNaturalMortality,
         assumedMaxAge,
         assumedVirginRecruits,
-        assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity
+        assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity,
+                formula
         );
 
 
@@ -102,7 +106,8 @@ public class SPRAgent implements AdditionalStartable, Steppable {
             double assumedKParameter, double assumedNaturalMortality,
             int assumedMaxAge,
             double assumedVirginRecruits,
-            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity) {
+            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity,
+            SPRFormula formula) {
         /**
          * object that returns true whenever the fisher is to be sampled for this SPR computation
          */
@@ -126,6 +131,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
             }
         };
         this.sampler = sampler;
+        this.formula = formula;
 
     }
 
@@ -135,37 +141,31 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     public double computeSPR() {
 
 
-        double spr = SPR.computeSPR(
-                new StructuredAbundance(sampler.getAbundance(
-                        binLengthToWeightFunction
-                )),
-                species,
-                assumedNaturalMortality,
-                assumedKParameter,
-                assumedLinf,
-                assumedMaxAge,
-                assumedVirginRecruits,
-                assumedLengthBinCm,
-                new Function<Integer, Double>() {
-                    @Override
-                    public Double apply(Integer age) {
-                        return assumedVarA/1000 * Math.pow(species.getLengthAtAge(age, 0), assumedVarB);
-                    }
-                },
-                new Function<Integer, Double>() {
-                    @Override
-                    public Double apply(Integer age) {
-                        return species.getLengthAtAge(age, 0) < assumedLenghtAtMaturity ? 0d : 1d;
-                    }
+        return formula.computeSPR(this,new StructuredAbundance(sampler.getAbundance(
+                binLengthToWeightFunction
+        )));
 
-                }
+    }
 
+    @NotNull
+    public Function<Integer, Double> getAgeToMaturityFunction() {
+        return new Function<Integer, Double>() {
+            @Override
+            public Double apply(Integer age) {
+                return species.getLengthAtAge(age, 0) < assumedLenghtAtMaturity ? 0d : 1d;
+            }
 
-        );
+        };
+    }
 
-
-        return spr;
-
+    @NotNull
+    public Function<Integer, Double> getAgeToWeightFunction() {
+        return new Function<Integer, Double>() {
+            @Override
+            public Double apply(Integer age) {
+                return assumedVarA / 1000 * Math.pow(species.getLengthAtAge(age, 0), assumedVarB);
+            }
+        };
     }
 
 
@@ -349,5 +349,50 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     public List<Fisher> monitorObservedFishers() {
         return sampler.viewObservedFishers();
+    }
+
+
+    public Species getSpecies() {
+        return species;
+    }
+
+    public double getAssumedLinf() {
+        return assumedLinf;
+    }
+
+    public double getAssumedKParameter() {
+        return assumedKParameter;
+    }
+
+    public double getAssumedNaturalMortality() {
+        return assumedNaturalMortality;
+    }
+
+    public int getAssumedMaxAge() {
+        return assumedMaxAge;
+    }
+
+    public double getAssumedVirginRecruits() {
+        return assumedVirginRecruits;
+    }
+
+    public double getAssumedLengthBinCm() {
+        return assumedLengthBinCm;
+    }
+
+    public double getAssumedVarA() {
+        return assumedVarA;
+    }
+
+    public double getAssumedVarB() {
+        return assumedVarB;
+    }
+
+    public double getAssumedLenghtAtMaturity() {
+        return assumedLenghtAtMaturity;
+    }
+
+    public Function<Pair<Integer, Integer>, Double> getBinLengthToWeightFunction() {
+        return binLengthToWeightFunction;
     }
 }

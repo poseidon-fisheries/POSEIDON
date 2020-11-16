@@ -45,6 +45,8 @@ public class SPRAgentBuilderSelectiveSampling implements AlgorithmFactory<SPRAge
 
     private  DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
 
+    private boolean useTNCFormula = true;
+
 
     public SPRAgentBuilderSelectiveSampling() {
     }
@@ -105,7 +107,10 @@ public class SPRAgentBuilderSelectiveSampling implements AlgorithmFactory<SPRAge
                 assumedLengthBinCm.apply(random),
                 assumedVarA.apply(random),
                 assumedVarB.apply(random),
-                assumedLengthAtMaturity.apply(random));
+                assumedLengthAtMaturity.apply(random),
+                useTNCFormula ? new SPR() : new LbSPRFormula()
+
+                );
 
     }
 
@@ -204,5 +209,13 @@ public class SPRAgentBuilderSelectiveSampling implements AlgorithmFactory<SPRAge
 
     public void setAssumedLengthAtMaturity(DoubleParameter assumedLengthAtMaturity) {
         this.assumedLengthAtMaturity = assumedLengthAtMaturity;
+    }
+
+    public boolean isUseTNCFormula() {
+        return useTNCFormula;
+    }
+
+    public void setUseTNCFormula(boolean useTNCFormula) {
+        this.useTNCFormula = useTNCFormula;
     }
 }

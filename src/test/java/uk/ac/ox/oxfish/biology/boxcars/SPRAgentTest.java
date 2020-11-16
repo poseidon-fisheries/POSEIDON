@@ -95,7 +95,8 @@ public class SPRAgentTest {
                 5,
                 0.02d,
                 2.94,
-                48
+                48,
+                new SPR()
         );
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
 

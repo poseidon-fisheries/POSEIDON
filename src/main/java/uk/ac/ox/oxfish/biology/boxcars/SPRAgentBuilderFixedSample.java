@@ -17,7 +17,7 @@ public class SPRAgentBuilderFixedSample implements AlgorithmFactory<SPRAgent> {
     private LinkedHashMap<String,Integer> tagsToSample =
             new LinkedHashMap<>();
     {
-        tagsToSample.put("population9",100);
+     //   tagsToSample.put("population9",100);
     }
 
     private DoubleParameter assumedLinf = new FixedDoubleParameter(86);
@@ -40,34 +40,7 @@ public class SPRAgentBuilderFixedSample implements AlgorithmFactory<SPRAgent> {
 
     private  DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
 
-    public SPRAgentBuilderFixedSample() {
-    }
-
-
-    public SPRAgentBuilderFixedSample(String surveyTag, String speciesName,
-                                      LinkedHashMap<String, Integer> tagsToSample,
-                                      DoubleParameter assumedLinf,
-                                      DoubleParameter assumedKParameter,
-                                      DoubleParameter assumedNaturalMortality,
-                                      DoubleParameter simulatedMaxAge,
-                                      DoubleParameter simulatedVirginRecruits,
-                                      DoubleParameter assumedLengthBinCm, DoubleParameter assumedVarA,
-                                      DoubleParameter assumedVarB,
-                                      DoubleParameter assumedLengthAtMaturity) {
-        this.surveyTag = surveyTag;
-        this.speciesName = speciesName;
-        this.tagsToSample = tagsToSample;
-        this.assumedLinf = assumedLinf;
-        this.assumedKParameter = assumedKParameter;
-        this.assumedNaturalMortality = assumedNaturalMortality;
-        this.simulatedMaxAge = simulatedMaxAge;
-        this.simulatedVirginRecruits = simulatedVirginRecruits;
-        this.assumedLengthBinCm = assumedLengthBinCm;
-        this.assumedVarA = assumedVarA;
-        this.assumedVarB = assumedVarB;
-        this.assumedLengthAtMaturity = assumedLengthAtMaturity;
-    }
-
+    private boolean useTNCFormula = true;
 
 
     @Override
@@ -89,7 +62,9 @@ public class SPRAgentBuilderFixedSample implements AlgorithmFactory<SPRAgent> {
                 assumedLengthBinCm.apply(random),
                 assumedVarA.apply(random),
                 assumedVarB.apply(random),
-                assumedLengthAtMaturity.apply(random));
+                assumedLengthAtMaturity.apply(random),
+                useTNCFormula ? new SPR() : new LbSPRFormula()
+        );
 
     }
 
@@ -187,5 +162,13 @@ public class SPRAgentBuilderFixedSample implements AlgorithmFactory<SPRAgent> {
 
     public void setAssumedLengthAtMaturity(DoubleParameter assumedLengthAtMaturity) {
         this.assumedLengthAtMaturity = assumedLengthAtMaturity;
+    }
+
+    public boolean isUseTNCFormula() {
+        return useTNCFormula;
+    }
+
+    public void setUseTNCFormula(boolean useTNCFormula) {
+        this.useTNCFormula = useTNCFormula;
     }
 }

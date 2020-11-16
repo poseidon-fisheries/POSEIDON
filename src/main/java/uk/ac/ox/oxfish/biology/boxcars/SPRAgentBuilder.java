@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -18,6 +19,12 @@ public class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
     private  String surveyTag = "spr_agent";
 
     private  String speciesName = "Species 0";
+
+    /**
+     * if more formulas come up we can turn this into a full strategy
+     */
+    private boolean useTNCFormula = true;
+
 
     private  DoubleParameter probabilityOfSamplingEachBoat =
             new FixedDoubleParameter(0.33);
@@ -79,6 +86,8 @@ public class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
         final MersenneTwisterFast random = fishState.getRandom();
         final double samplingProbability = probabilityOfSamplingEachBoat.apply(random);
 
+        Preconditions.checkArgument(fishState.getBiology().getSpecie(speciesName.trim())!=null,
+                "There is no species " + speciesName);
         return new SPRAgent(surveyTag,
                     fishState.getBiology().getSpecie(speciesName),
                     new Predicate<Fisher>() {
@@ -95,7 +104,10 @@ public class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
                     assumedLengthBinCm.apply(random),
                     assumedVarA.apply(random),
                     assumedVarB.apply(random),
-                    assumedLengthAtMaturity.apply(random));
+                    assumedLengthAtMaturity.apply(random),
+                    useTNCFormula ? new SPR() : new LbSPRFormula()
+
+                );
 
     }
 
@@ -193,5 +205,13 @@ public class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
 
     public void setAssumedLengthAtMaturity(DoubleParameter assumedLengthAtMaturity) {
         this.assumedLengthAtMaturity = assumedLengthAtMaturity;
+    }
+
+    public boolean isUseTNCFormula() {
+        return useTNCFormula;
+    }
+
+    public void setUseTNCFormula(boolean useTNCFormula) {
+        this.useTNCFormula = useTNCFormula;
     }
 }
