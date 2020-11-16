@@ -87,15 +87,15 @@ public class ISlopeDemo {
 
 
     public static void main(String[] args) throws IOException {
-        mainIT1();
-
-      //    mainPID(false);
-          mainPID(true);
-        mainStockAssessmentFormula(false);
+//        mainIT1();
+//
+//      //    mainPID(false);
+//          mainPID(true);
+//        mainStockAssessmentFormula(false);
         //    mainStockAssessmentFormula(true);
 
         //mainSampling();
-   //     effortTest();
+        effortTest();
     //    fishingFrontExample();
     }
 

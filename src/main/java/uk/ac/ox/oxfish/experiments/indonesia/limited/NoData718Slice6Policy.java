@@ -22,13 +22,19 @@ import java.util.function.Function;
 
 public class NoData718Slice6Policy {
 
-    public static final String CANDIDATES_CSV_FILE = "total_successes.csv";
+    public static final Path CANDIDATES_CSV_FILE =
+            //NoData718Slice6.MAIN_DIRECTORY.resolve("successes_lowmk_long.csv");
+            NoData718Slice6.MAIN_DIRECTORY.resolve("successes_lowmk_complete_18.csv");
     public static final int SEED = 0;
+    private static final int ADDITIONAL_YEARS_TO_RUN = 15;
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_complete");
+            NoData718Slice6.MAIN_DIRECTORY.
+                    //resolve("ga_lowmk_scenarios_lag2").resolve("mpa");
+                                    resolve("spr_lowmk_arrays_complete_18").resolve("mpa");
+
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.onlyBAU;
+            NoData718Utilities.policiesMPA;
 
 
 
@@ -37,7 +43,7 @@ public class NoData718Slice6Policy {
     public static void main(String[] args) throws IOException {
 
         runPolicyDirectory(
-                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile(),
+                CANDIDATES_CSV_FILE.toFile(),
                 OUTPUT_FOLDER,
                 simulatedPolicies);
 
@@ -169,7 +175,7 @@ public class NoData718Slice6Policy {
                 outputFolder,
                 policies,
                 additionalColumns,
-                true, 15,
+                true, ADDITIONAL_YEARS_TO_RUN,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
                 plugins

@@ -1,15 +1,15 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.beust.jcommander.internal.Lists;
-import com.google.common.io.ByteStreams;
+import com.beust.jcommander.internal.Nullable;
 import com.google.common.io.Files;
 import com.opencsv.CSVReader;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
 import eva2.optimization.individuals.ESIndividualDoubleData;
-import eva2.optimization.individuals.GAIndividualDoubleData;
 import eva2.optimization.operator.selection.SelectTournament;
+import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.population.Population;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.statistics.InterfaceTextListener;
@@ -40,6 +40,8 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
 
     public static final int SEED = 0;
+    public static final int POP_SIZE = 5;
+    private static final int MIN_PRICE_SHOCK_YEAR = 6;
     /**
      * does this simulation include a "price shock" event
      */
@@ -61,21 +63,21 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
     private int maximumYearsToRun = 40;
 
-    private String logName = "total_log_tournament_optimization";
+    private String logName = "spr_lowmk_lag2_complete";
 
     private List<IntervalTarget> targets  = new LinkedList<>();
 
-    {
-        //example
-        targets.add(
-                new IntervalTarget("Percentage Mature Catches Atrobucca brevis spr_agent3",
-                        0.85,100,0)
-        );
-    }
+//    {
+//        //example
+//        targets.add(
+//                new IntervalTarget("Percentage Mature Catches Atrobucca brevis spr_agent3",
+//                                   0.85,100,0)
+//        );
+//    }
 
 
     private String baselineScenario = Paths.get("docs","indonesia_hub/runs/718/slice6limited",
-            "base.yaml").toString();
+                                                "base.yaml").toString();
 
 
     @Override
@@ -144,8 +146,8 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
                 priceShockValue, minimumYear, maximumYearsToRun, true
         );
         //bounds could be broken. Keep them reasonable
-        if(yearOfPriceShock<2)
-            yearOfPriceShock=2;
+        if(yearOfPriceShock< MIN_PRICE_SHOCK_YEAR)
+            yearOfPriceShock= MIN_PRICE_SHOCK_YEAR;
         if(yearOfPriceShock>50)
             yearOfPriceShock=50;
         return yearOfPriceShock;
@@ -210,15 +212,14 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
     );
 
-    public static void optimize(Path previousSuccesses) throws IOException {
+    public static void optimize(Path previousSuccesses, final Path problemFile) throws IOException {
 
 
         FishYAML yaml = new FishYAML();
         final NoData718Slice6OptimizationProblem optiProblem = yaml.loadAs(new FileReader(
-                        Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
-                                "optimization_with_price_shock_hardedge_lag3.yaml").toFile()
-                ),
-                NoData718Slice6OptimizationProblem.class);
+                                                                                   problemFile.toFile()
+                                                                           ),
+                                                                           NoData718Slice6OptimizationProblem.class);
 
 //        problem.evaluate(new double[]{-15.939, 9.029,-16.549, 11.999, 9.921, 12.034, 11.780,
 //                8.903,-14.335, 8.910, 13.342,-3.636, 9.747, 4.261, 13.999, 0.594, 9.944, 0.557,
@@ -228,14 +229,15 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 //                0.053,-10.526, 2.431,-0.089, 6.040,-13.369,-2.406, 8.218, 16.684});
 
         //  int type = Integer.parseInt();
-        int parallelThreads = 1;
+        int parallelThreads = 2;
 
-
-        CSVReader acceptanceReader = new CSVReader(
-                new FileReader(previousSuccesses.toFile())
-        );
-        final List<String[]> initialGuesses = acceptanceReader.readAll();
-
+        final List<String[]> initialGuesses = new LinkedList<>();
+        if(previousSuccesses!=null) {
+            CSVReader acceptanceReader = new CSVReader(
+                    new FileReader(previousSuccesses.toFile())
+            );
+            initialGuesses.addAll(acceptanceReader.readAll());
+        }
 
 
         //anonymous class to make sure we initialize the model well
@@ -257,7 +259,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
                     individual.setDoublePhenotype(convertedLine);
 
                     population.replaceIndividualAt(scenarioNumber,
-                            individual);
+                                                   individual);
                 }
             }
 
@@ -274,26 +276,29 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
         opt.setNumberOfPartners(1);
         params = OptimizerFactory.makeParams(
 
-                    opt,
-                    100,
-                    problem
-            );
+                opt,
+                200,
+                problem
+        );
 
 
 
 
+        params.setTerminator(new EvaluationTerminator(20000));
 
         OptimizerRunnable runnable = new OptimizerRunnable(params,
-                "eva"); //ignored, we are outputting to window
+                                                           "eva"); //ignored, we are outputting to window
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
         runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
 
+
         String name =
-                Files.getNameWithoutExtension("tournament.yaml");
+                Files.getNameWithoutExtension(problemFile.toString());
+
 
         FileWriter writer = new FileWriter(Paths.get("docs", "indonesia_hub/runs/718/slice6limited").getParent().
-                    resolve("_goodstart_log_"+ name+".log").toFile());
+                resolve(name+".log").toFile());
 
         runnable.setTextListener(new InterfaceTextListener() {
             @Override
@@ -327,10 +332,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
 
     public static void main(String[] args) throws IOException {
-        optimize(
-                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
-                        "ga_arrays.csv")
-        );
+
 
 //        FishYAML yaml = new FishYAML();
 //        final NoData718Slice6OptimizationProblem optiProblem = yaml.loadAs(new FileReader(
@@ -341,28 +343,65 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 //        prepareScenarios(
 //                optiProblem,
 //                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
-//                        "ga_scenarios"),
+//                        "ga_18_scenarios"),
 //                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
-//                        "ga_arrays.csv"),
+//                        "ga_18_arrays.csv"),
 //                4
 //        );
+//
+//
+//
+//        optimize(
+//                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
+//                        "ga_18_arrays.csv",
+//         Paths.get("docs", "indonesia_hub" +
+//                            "/runs/718" +
+//                            "/slice6limited",
+//                    "optimization_with_price_shock_hardedge_lag3.yaml")
+//        );
+
+        FishYAML yaml = new FishYAML();
+        final NoData718Slice6OptimizationProblem optiProblem = yaml.loadAs(new FileReader(
+                                                                                   Paths.get("docs",
+                                                                                             "indonesia_hub/runs/718/slice6limited",
+                                                                                             "optimization_with_spr+lowmk_lag2_complete.yaml").toFile()
+                                                                           ),
+                                                                           NoData718Slice6OptimizationProblem.class);
+
+//        optimize(null, Paths.get("docs", "indonesia_hub" +
+//                                         "/runs/718" +
+//                                         "/slice6limited",
+//                                 "optimization_with_spr+lowmk_lag2_complete.yaml"));
+
+        prepareScenarios(
+                optiProblem,
+                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
+                          "spr_lowmk_arrays_complete_18"),
+                Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
+                          "spr_lowmk_arrays_complete_18.csv"),
+
+                5
+        );
 
     }
 
     public static void prepareScenarios(NoData718Slice6OptimizationProblem problem,
                                         Path directory,
-                                        Path csvWithAcceptances,
+                                        @Nullable Path csvWithAcceptances,
                                         int priceShockLag) throws IOException {
 
-        CSVReader acceptanceReader = new CSVReader(
-                new FileReader(csvWithAcceptances.toFile())
-        );
-        final List<String[]> allSuccesses = acceptanceReader.readAll();
+        final List<String[]> allSuccesses = new LinkedList<>();
+        if(csvWithAcceptances != null){
+            CSVReader acceptanceReader = new CSVReader(
+                    new FileReader(csvWithAcceptances.toFile())
+            );
+            allSuccesses.addAll(acceptanceReader.readAll());
+        }
 
         directory.toFile().mkdirs();
 
 
-        final FileWriter listFile = new FileWriter(directory.getParent().resolve("successes_ga.csv").toFile());
+        final FileWriter listFile = new FileWriter(directory.getParent().resolve("_candidates.csv").toFile());
         listFile.write("scenario,price_shock_year,new_policy_year");
         listFile.write("\n");
         listFile.flush();
@@ -376,21 +415,21 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
             final Path scenarioPath = directory.resolve("scenario_" + scenarioNumber + ".yaml");
             Scenario scenario = getScenario(convertedLine,
-                    true,
-                    problem.getBaselineScenario(),
-                    problem.getParameters()
-                    );
+                                            true,
+                                            problem.getBaselineScenario(),
+                                            problem.getParameters()
+            );
             final FishYAML yaml = new FishYAML();
             yaml.dump(scenario,
-                    new FileWriter(scenarioPath.toFile()));
+                      new FileWriter(scenarioPath.toFile()));
 
 
             int yearOfShock = computeYearOfPriceShock(convertedLine[convertedLine.length-1],
-                    problem.getMinimumYear(),
-                    problem.getMaximumYearsToRun());
+                                                      problem.getMinimumYear(),
+                                                      problem.getMaximumYearsToRun());
 
             listFile.write(scenarioPath.toString() + "," +
-                    yearOfShock + "," + (yearOfShock+priceShockLag) +"\n");
+                                   yearOfShock + "," + (yearOfShock+priceShockLag) +"\n");
             listFile.flush();
         }
         listFile.close();
@@ -410,7 +449,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
         model.start();
         System.out.println("starting run");
         while (model.getYear() <= yearsToRun) {
-                model.schedule.step(model);
+            model.schedule.step(model);
 
         }
         model.schedule.step(model);
@@ -423,7 +462,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 
         int bestValue = 0;
 
-        for(int year=minimumYear; year<=yearsToRun; year++) {
+        for(int year=firstValidYear; year<=yearsToRun; year++) {
             int successesThisYear = 0;
             for (IntervalTarget target : targets) {
                 if(successes.get(target)[year])

@@ -195,7 +195,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     }
 
     /**
-     * computes % of ABUNDANCE (raw number) of the catch above Lmat
+     * computes % of ABUNDANCE (raw number) of the catch above lopt
      * @return
      */
     @VisibleForTesting
