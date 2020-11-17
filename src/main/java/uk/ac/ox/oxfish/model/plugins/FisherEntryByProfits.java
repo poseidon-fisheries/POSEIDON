@@ -26,10 +26,11 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Pausable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-public class FisherEntryByProfits implements AdditionalStartable, Steppable {
+public class FisherEntryByProfits implements AdditionalStartable, Steppable, Pausable {
 
 
     private final String profitDataColumnName;
@@ -44,6 +45,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
 
     private final double minProfitsToCoverFixedCosts;
+
+    public boolean paused = false;
 
     public FisherEntryByProfits(
             String profitDataColumnName, String costsFinalColumnName, String populationName,
@@ -101,6 +104,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
     @Override
     public void step(SimState simState) {
+        if(isPaused())
+            return;
         FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
                 model.getLatestYearlyObservation(profitDataColumnName),
@@ -111,5 +116,14 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
             for (int i = 0; i < newEntrants; i++)
                 model.createFisher(populationName);
         }
+    }
+
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 }

@@ -6,6 +6,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
@@ -72,6 +73,19 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
                                 );
                                 lbspr.start(model);
                                 lbspr.step(model);
+
+
+                                //creaqte also a collector
+                                fishState.getYearlyDataSet().registerGatherer(
+                                        "LBSPREffortPolicy output",
+                                        new Gatherer<FishState>() {
+                                            @Override
+                                            public Double apply(FishState fishState) {
+                                                return lbspr.getAccumulatedDelta();
+                                            }
+                                        },
+                                        Double.NaN
+                                );
                             }
                         },
                         StepOrder.DAWN,

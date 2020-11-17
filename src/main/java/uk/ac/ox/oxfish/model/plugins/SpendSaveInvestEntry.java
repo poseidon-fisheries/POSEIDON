@@ -7,13 +7,14 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Pausable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 /**
  * all populations sharing a tag will spend a fixed amount of money and if their
  * cash balance allow it they will build a new boat.
  */
-public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
+public class SpendSaveInvestEntry implements AdditionalStartable, Steppable, Pausable {
 
     private final double moneyNeededForANewEntry;
 
@@ -25,6 +26,16 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
      * which boats belong to it
      */
     private final String populationName;
+
+    public boolean paused = false;
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
 
 
     public SpendSaveInvestEntry(double moneyNeededForANewEntry,
@@ -68,7 +79,8 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
 
     @Override
     public void step(SimState simState) {
-
+        if(isPaused())
+            return;
         FishState model = ((FishState) simState);
 
 

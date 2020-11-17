@@ -23,18 +23,24 @@ import java.util.function.Function;
 public class NoData718Slice6Policy {
 
     public static final Path CANDIDATES_CSV_FILE =
-            //NoData718Slice6.MAIN_DIRECTORY.resolve("successes_lowmk_long.csv");
             NoData718Slice6.MAIN_DIRECTORY.resolve("successes_lowmk_complete_18.csv");
     public static final int SEED = 0;
-    private static final int ADDITIONAL_YEARS_TO_RUN = 15;
+    private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
             NoData718Slice6.MAIN_DIRECTORY.
-                    //resolve("ga_lowmk_scenarios_lag2").resolve("mpa");
-                                    resolve("spr_lowmk_arrays_complete_18").resolve("mpa");
+                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse");
+
+
+    private static final LinkedList<String> ADDITIONAL_COLUMNS =
+            new LinkedList<>();
+    static {
+        ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
+    }
 
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.policiesMPA;
+            NoData718Utilities.lbsprMsePolicies;
 
 
 
@@ -139,7 +145,12 @@ public class NoData718Slice6Policy {
         additionalColumns.add("Exogenous catches of Atrobucca brevis");
         additionalColumns.add("Others Landings");
         additionalColumns.add("Others Earnings");
+        additionalColumns.add("Total Effort");
         additionalColumns.add("SPR " + "Lutjanus malabaricus" + " " +"total_and_correct");
+
+        additionalColumns.addAll(ADDITIONAL_COLUMNS);
+
+
 
 
         FishYAML yaml = new FishYAML();
@@ -175,7 +186,7 @@ public class NoData718Slice6Policy {
                 outputFolder,
                 policies,
                 additionalColumns,
-                true, ADDITIONAL_YEARS_TO_RUN,
+                false, ADDITIONAL_YEARS_TO_RUN,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
                 plugins
