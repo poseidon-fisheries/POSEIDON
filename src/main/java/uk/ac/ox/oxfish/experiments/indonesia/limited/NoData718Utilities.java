@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketProxy;
@@ -435,6 +436,26 @@ public class NoData718Utilities {
                                                         FishYAML yaml = new FishYAML();
                                                         ((FlexibleScenario) scenario).getPlugins().add(yaml.loadAs(sprAgent,
                                                                 AlgorithmFactory.class));
+
+                                                        //fill in another column so that there is something to print out
+                                                        ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
+                                                                @Override
+                                                                public AdditionalStartable apply(FishState fishState) {
+
+                                                                        return new AdditionalStartable() {
+                                                                                @Override
+                                                                                public void start(FishState model) {
+                                                                                        model.getYearlyDataSet().registerGatherer("LBSPREffortPolicy output",
+                                                                                                new Gatherer<FishState>() {
+                                                                                                        @Override
+                                                                                                        public Double apply(FishState fishState) {
+                                                                                                                return 1d;
+                                                                                                        }
+                                                                                                },1);
+                                                                                }
+                                                                        };
+                                                                }
+                                                        });
                                                 }
                                         };
 
