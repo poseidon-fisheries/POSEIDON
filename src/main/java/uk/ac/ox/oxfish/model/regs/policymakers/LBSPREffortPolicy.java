@@ -107,4 +107,8 @@ public class LBSPREffortPolicy extends Controller {
         else
             return 1.0;
     }
+
+    public double getAccumulatedDelta() {
+        return accumulatedDelta;
+    }
 }
