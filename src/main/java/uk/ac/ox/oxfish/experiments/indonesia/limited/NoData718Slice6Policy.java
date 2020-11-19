@@ -28,7 +28,7 @@ public class NoData718Slice6Policy {
     private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
             NoData718Slice6.MAIN_DIRECTORY.
-                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse");
+                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse_noentry");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
@@ -40,7 +40,7 @@ public class NoData718Slice6Policy {
 
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.lbsprMsePolicies;
+            NoData718Utilities.lbsprMsePoliciesNoEntry;
 
 
 
@@ -186,7 +186,7 @@ public class NoData718Slice6Policy {
                 outputFolder,
                 policies,
                 additionalColumns,
-                false, ADDITIONAL_YEARS_TO_RUN,
+                true, ADDITIONAL_YEARS_TO_RUN,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
                 plugins

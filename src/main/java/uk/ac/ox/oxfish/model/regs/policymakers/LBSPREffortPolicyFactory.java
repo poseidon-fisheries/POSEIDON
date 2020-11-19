@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -45,6 +44,9 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
 
     private final String effortDefinition = "season";
 
+
+    private boolean blockEntryWhenSeasonIsNotFull = false;
+
     private int startingYear = 7;
 
     @Override
@@ -69,8 +71,8 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
                                         cubicParameter.apply(fishState.getRandom()),
                                         sprTarget.apply(fishState.getRandom()),
                                         maxChangeEachYear.apply(fishState.getRandom()),
-                                        effortActuators.get(effortDefinition)
-                                );
+                                        effortActuators.get(effortDefinition),
+                                        blockEntryWhenSeasonIsNotFull);
                                 lbspr.start(model);
                                 lbspr.step(model);
 
@@ -145,5 +147,13 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
+    }
+
+    public boolean isBlockEntryWhenSeasonIsNotFull() {
+        return blockEntryWhenSeasonIsNotFull;
+    }
+
+    public void setBlockEntryWhenSeasonIsNotFull(boolean blockEntryWhenSeasonIsNotFull) {
+        this.blockEntryWhenSeasonIsNotFull = blockEntryWhenSeasonIsNotFull;
     }
 }

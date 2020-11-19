@@ -333,9 +333,11 @@ public class NoData718Utilities {
 
 
 
-        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = new LinkedHashMap<>();
-        static {
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false);
 
+        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(boolean blockEntryWhenSeasonIsNotFull){
+
+                LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> toReturn = new LinkedHashMap<>();
                 double[] guessedMSE = new double[]{0.6, 0.8, 1, 1.2, 1.5, 2};
 
 
@@ -343,7 +345,7 @@ public class NoData718Utilities {
 
                 for (double mkRatio : guessedMSE) {
                         for (boolean includeGillnetters : new boolean[]{true, false}) {
-                                for (boolean useTncFormula : new boolean[]{true, false}) {
+                                for (boolean useTncFormula : new boolean[]{false,true}) {
 
 
                                         String sprAgent =
@@ -386,6 +388,7 @@ public class NoData718Utilities {
                                                                                                 "      maxChangeEachYear: '0.1'\n" +
                                                                                                 "      sprColumnName: SPR Lutjanus malabaricus spr_agent_forpolicy\n" +
                                                                                                 "      sprTarget: '0.4'\n" +
+                                                                                                "      blockEntryWhenSeasonIsNotFull: " + blockEntryWhenSeasonIsNotFull + "\n" +
                                                                                                 "      startingYear: " + shockYear;
 
                                                                                 //add policy
@@ -400,13 +403,13 @@ public class NoData718Utilities {
                                                         }
                                                 };
 
-                                        lbsprMsePolicies.put("lbspr_policy_mk" + mkRatio + "_gill" + includeGillnetters + "_tncformula" + useTncFormula,
+                                        toReturn.put("lbspr_policy_mk" + mkRatio + "_gill" + includeGillnetters + "_tncformula" + useTncFormula,
                                                 policy);
                                 }
                         }
                 }
 
-                lbsprMsePolicies.put(
+                toReturn.put(
                         "BAU",
                         //bau will also have the new SPR agent to (i) avoid scheduling discrepancies (ii) fill in that column for later printing
                         new Function<Integer, Consumer<Scenario>>() {
@@ -463,9 +466,12 @@ public class NoData718Utilities {
                         }
 
                 );
+                return toReturn;
 
-                //for MSE purposes
         }
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntry = buildLBSPRPolicies(true);
+
 
 
 }

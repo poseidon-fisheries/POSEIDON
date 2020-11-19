@@ -58,6 +58,7 @@ import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -168,6 +169,13 @@ public class FishState  extends SimState{
 
     private LinkedHashMap<StepOrder,AggregateSteppable> aggregateDailySteppables = new LinkedHashMap<>();
 
+    /**
+     * here you store all entryPlugins (any steppable that can automatically generate new fishers over time).
+     * This is useful for regulations to pause them
+     */
+
+    private List<EntryPlugin> entryPlugins;
+
     public int getStepsPerDay() {
         return stepsPerDay;
     }
@@ -213,6 +221,7 @@ public class FishState  extends SimState{
                 aggregateDailySteppables.put(order, new AggregateSteppable());
             }
 
+
     }
 
 
@@ -228,6 +237,10 @@ public class FishState  extends SimState{
 
         Preconditions.checkState(!started, "Already started!");
         super.start();
+
+        //prepare containers
+        entryPlugins = new LinkedList<>();
+
 
         //start the counter
         yearlyCounter.start(this);
@@ -912,6 +925,7 @@ public class FishState  extends SimState{
             map.turnOff();
         aggregateYearlySteppables.clear();
         aggregateDailySteppables.clear();
+        entryPlugins.clear(); //should automatically turn off because they were scheduled
 
     }
 
@@ -925,5 +939,14 @@ public class FishState  extends SimState{
 
     public String getHopefullyUniqueID() {
         return hopefullyUniqueID;
+    }
+
+
+    public List<EntryPlugin> getEntryPlugins() {
+        return entryPlugins;
+    }
+
+    public void setEntryPlugins(List<EntryPlugin> entryPlugins) {
+        this.entryPlugins = entryPlugins;
     }
 }
