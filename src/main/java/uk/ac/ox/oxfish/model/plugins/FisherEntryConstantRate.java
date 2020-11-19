@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
+public class FisherEntryConstantRate implements EntryPlugin {
 
 
     /**
@@ -46,6 +46,8 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
     private Stoppable stoppable;
 
     private final int doNotGrowBeforeThisYear;
+
+    private boolean isEntryPaused = false;
 
 
     public FisherEntryConstantRate(double growthRateInPercentage, String populationName) {
@@ -70,6 +72,10 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
         Preconditions.checkArgument(stoppable==null, "already started!");
         stoppable = model.scheduleEveryYear(this,
                                             StepOrder.AFTER_DATA);
+
+
+        if(!model.getEntryPlugins().contains(this))
+            model.getEntryPlugins().add(this);
     }
 
 
@@ -88,7 +94,7 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
     public void step(SimState simState) {
 
         FishState model = ((FishState) simState);
-        if(model.getYear()<doNotGrowBeforeThisYear)
+        if(isEntryPaused || model.getYear()<doNotGrowBeforeThisYear)
             return;
 
 
@@ -132,5 +138,15 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
      */
     public String getPopulationName() {
         return populationName;
+    }
+
+    @Override
+    public boolean isEntryPaused() {
+        return isEntryPaused;
+    }
+
+    @Override
+    public void setEntryPaused(boolean entryPaused) {
+        isEntryPaused = entryPaused;
     }
 }

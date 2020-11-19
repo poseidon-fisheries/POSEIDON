@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -25,11 +26,13 @@ public class LBSPREffortPolicy extends Controller {
      */
     private double accumulatedDelta = 1;
 
+    private final boolean blockEntryWhenSeasonIsNotFull;
+
 
     public LBSPREffortPolicy(String columnNameSPR, double linearParameter,
                              double cubicParameter, double sprTarget,
                              double maxChangeInPercentage,
-                             Actuator<FishState, Double> effortActuator) {
+                             Actuator<FishState, Double> effortActuator, boolean blockEntryWhenSeasonIsNotFull) {
 
         super(
                 (Sensor<FishState, Double>) system ->
@@ -44,6 +47,7 @@ public class LBSPREffortPolicy extends Controller {
         this.cubicParameter = cubicParameter;
         this.sprTarget = sprTarget;
         this.maxChangeInPercentage = maxChangeInPercentage;
+        this.blockEntryWhenSeasonIsNotFull = blockEntryWhenSeasonIsNotFull;
     }
 
     /**
@@ -88,6 +92,17 @@ public class LBSPREffortPolicy extends Controller {
 
         System.out.println("effort is now " + accumulatedDelta);
         accumulatedDelta = accumulatedDelta * (1+deltaToday);
+
+        if(accumulatedDelta>=1 && blockEntryWhenSeasonIsNotFull)
+            for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
+                entryPlugin.setEntryPaused(false);
+            }
+        if(accumulatedDelta<1 && blockEntryWhenSeasonIsNotFull)
+            for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
+                entryPlugin.setEntryPaused(true);
+            }
+
+
         return Math.min(accumulatedDelta,1);
     }
 

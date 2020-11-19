@@ -7,14 +7,13 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Pausable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 /**
  * all populations sharing a tag will spend a fixed amount of money and if their
  * cash balance allow it they will build a new boat.
  */
-public class SpendSaveInvestEntry implements AdditionalStartable, Steppable, Pausable {
+public class SpendSaveInvestEntry implements EntryPlugin {
 
     private final double moneyNeededForANewEntry;
 
@@ -63,6 +62,8 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable, Pau
         Preconditions.checkArgument(stoppable==null, "already started!");
         stoppable = model.scheduleEveryYear(this,
                 StepOrder.AFTER_DATA);
+        if(!model.getEntryPlugins().contains(this))
+            model.getEntryPlugins().add(this);
     }
 
 
@@ -122,5 +123,16 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable, Pau
 
     public void setNewEntryAllowed(boolean newEntryAllowed) {
         this.newEntryAllowed = newEntryAllowed;
+    }
+
+
+    @Override
+    public void setEntryPaused(boolean entryPaused) {
+            paused = entryPaused;
+    }
+
+    @Override
+    public boolean isEntryPaused() {
+        return paused;
     }
 }

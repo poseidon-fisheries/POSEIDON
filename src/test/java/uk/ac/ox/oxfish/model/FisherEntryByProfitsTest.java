@@ -102,7 +102,7 @@ public class FisherEntryByProfitsTest {
         when(model.getLatestYearlyObservation("a")).thenReturn(100d);
         when(model.getLatestYearlyObservation("b")).thenReturn(1000d);
 
-        profits.setPaused(true);
+        profits.setEntryPaused(true);
         profits.step(model);
         verify(model,times(0)).createFisher("c");
 
