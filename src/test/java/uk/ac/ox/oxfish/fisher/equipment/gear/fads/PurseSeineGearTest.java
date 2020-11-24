@@ -20,14 +20,13 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
 
 import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;
@@ -46,10 +45,15 @@ public class PurseSeineGearTest {
         when(fishState.getBiology()).thenReturn(new GlobalBiology());
         purseSeineGear = new PurseSeineGear(
             mock(FadManager.class),
-            1, 1, 0.1,
-            1, 1, 0.1,
             1,
-            new CatchSampler(ImmutableList.of(), mock(MersenneTwisterFast.class))
+            1,
+            0.1,
+            1,
+            1,
+            0.1,
+            1,
+            ImmutableMap.of(),
+            ImmutableList.of()
         );
     }
 
@@ -75,7 +79,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             mock(FadManager.class),
@@ -86,7 +91,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -97,7 +103,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -108,7 +115,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -119,7 +127,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -130,7 +139,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -141,7 +151,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             0,
-            purseSeineGear.getUnassociatedCatchSampler()
+            purseSeineGear.getCatchSamplers(),
+            purseSeineGear.getAttractionFields()
         )));
         assertFalse(purseSeineGear.isSame(new PurseSeineGear(
             purseSeineGear.getFadManager(),
@@ -152,7 +163,8 @@ public class PurseSeineGearTest {
             1,
             0.1,
             purseSeineGear.getSuccessfulFadSetProbability(),
-            new CatchSampler(ImmutableList.of(), mock(MersenneTwisterFast.class))
+            ImmutableMap.of(),
+            ImmutableList.of()
         )));
     }
 

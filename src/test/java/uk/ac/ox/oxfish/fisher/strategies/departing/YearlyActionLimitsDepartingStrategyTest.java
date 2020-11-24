@@ -21,6 +21,9 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -68,19 +71,19 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new DeployFad(fishState, fisher));
+        actionSpecificRegulations.observe(new FadDeploymentAction(fisher, 1));
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.observe(new FadSetAction(fisher, null, 1));
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new MakeUnassociatedSet(fishState, fisher));
+        actionSpecificRegulations.observe(new NonAssociatedSetAction(fisher, 1));
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new MakeFadSet(fishState, fisher, null));
+        actionSpecificRegulations.observe(new FadSetAction(fisher, null, 1));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 

@@ -22,15 +22,18 @@ package uk.ac.ox.oxfish.fisher.actions.fads;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -69,7 +72,14 @@ public class MakeFadSetTest {
         final double carryingCapacity = 0.0;
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
-        final Fad fad = new Fad(fadManager, fadBiology, ImmutableMap.of(), 0, 0);
+        final Fad fad = new Fad(
+            fadManager,
+            fadBiology,
+            ImmutableMap.of(),
+            0,
+            0,
+            new Int2D(1, 1)
+        );
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...
@@ -93,19 +103,20 @@ public class MakeFadSetTest {
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
-        final MakeFadSet makeFadSet = new MakeFadSet(model, fisher, fad);
+        final Action fadSetAction = new FadSetAction(fisher, fad, 1);
         when(random.nextDouble()).thenReturn(1.0);
-        makeFadSet.act(model, fisher, regulation, 0);
+        fadSetAction.act(model, fisher, regulation, 0);
         assertTrue(fadBiology.isEmpty());
         assertTrue(tileBiology.isEmpty());
 
         // Now we refill the FAD biology and make an unsuccessful set
         fillBiology(fadBiology);
         when(random.nextDouble()).thenReturn(0.0);
-        makeFadSet.act(model, fisher, regulation, 0);
+        fadSetAction.act(model, fisher, regulation, 0);
 
         // After that, the FAD biology should be empty and the tile biology should be full
         assertTrue(fadBiology.isEmpty());
         assertTrue(tileBiology.isFull());
     }
+
 }
