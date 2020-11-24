@@ -120,10 +120,14 @@ public class TunaMaximization {
 
     }
 
-    public void saveCalibratedScenario(double[] solution, Path calibratedScenarioPath) {
+    public void saveCalibratedScenario(double[] optimalParameters, Path calibratedScenarioPath) {
         try (FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
             GenericOptimization optimization = makeGenericOptimizationProblem(calibrationFilePath);
-            final Scenario scenario = optimization.buildScenario(solution);
+            Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
             new FishYAML().dump(scenario, fileWriter);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -178,13 +182,17 @@ public class TunaMaximization {
 
     private FishState runSimulation(
         GenericOptimization optimization,
-        double[] solution,
+        double[] optimalParameters,
         int runNumber,
         int numRuns
     ) {
         final FishState fishState = new FishState(System.currentTimeMillis());
         try {
-            final Scenario scenario = optimization.buildScenario(solution);
+            Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
             fishState.setScenario(scenario);
         } catch (FileNotFoundException e) {
             throw new IllegalStateException(e);
