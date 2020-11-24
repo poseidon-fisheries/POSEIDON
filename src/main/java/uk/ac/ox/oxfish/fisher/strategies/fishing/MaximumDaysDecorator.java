@@ -84,4 +84,8 @@ public class MaximumDaysDecorator implements FishingStrategy
     public  FishingStrategy accessDecorated(){
         return delegate;
     }
+
+    public int getDaysBeforeGoingHome() {
+        return daysBeforeGoingHome;
+    }
 }

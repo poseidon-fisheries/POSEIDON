@@ -90,4 +90,22 @@ public class FisherEntryByProfitsTest {
         verify(model,times(10)).createFisher("c");
 
     }
+
+
+    @Test
+    public void pausedMeansNoNewFishers() {
+
+        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100, 100,
+                0);
+
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        when(model.getLatestYearlyObservation("a")).thenReturn(100d);
+        when(model.getLatestYearlyObservation("b")).thenReturn(1000d);
+
+        profits.setEntryPaused(true);
+        profits.step(model);
+        verify(model,times(0)).createFisher("c");
+
+    }
+
 }

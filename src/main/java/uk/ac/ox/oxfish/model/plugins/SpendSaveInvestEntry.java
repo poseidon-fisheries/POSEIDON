@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
  * all populations sharing a tag will spend a fixed amount of money and if their
  * cash balance allow it they will build a new boat.
  */
-public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
+public class SpendSaveInvestEntry implements EntryPlugin {
 
     private final double moneyNeededForANewEntry;
 
@@ -25,6 +25,16 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
      * which boats belong to it
      */
     private final String populationName;
+
+    public boolean paused = false;
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
 
 
     public SpendSaveInvestEntry(double moneyNeededForANewEntry,
@@ -52,6 +62,8 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
         Preconditions.checkArgument(stoppable==null, "already started!");
         stoppable = model.scheduleEveryYear(this,
                 StepOrder.AFTER_DATA);
+        if(!model.getEntryPlugins().contains(this))
+            model.getEntryPlugins().add(this);
     }
 
 
@@ -68,7 +80,8 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
 
     @Override
     public void step(SimState simState) {
-
+        if(isPaused())
+            return;
         FishState model = ((FishState) simState);
 
 
@@ -110,5 +123,16 @@ public class SpendSaveInvestEntry implements AdditionalStartable, Steppable {
 
     public void setNewEntryAllowed(boolean newEntryAllowed) {
         this.newEntryAllowed = newEntryAllowed;
+    }
+
+
+    @Override
+    public void setEntryPaused(boolean entryPaused) {
+            paused = entryPaused;
+    }
+
+    @Override
+    public boolean isEntryPaused() {
+        return paused;
     }
 }

@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.MaximumTripLengthRegulation;
@@ -113,7 +115,8 @@ public class IndexTargetController extends Controller{
     }
 
 
-    public static final Actuator<FishState, Double> RATIO_TO_FLEET_SIZE = new Actuator<FishState, Double>() {
+    public static final Actuator<FishState, Double> RATIO_TO_FLEET_SIZE =
+            new Actuator<FishState, Double>() {
         @Override
         public void apply(FishState subject, Double effortRatio, FishState model) {
             if (!Double.isFinite(effortRatio))
@@ -135,7 +138,8 @@ public class IndexTargetController extends Controller{
         }
     };
 
-    public static final Actuator<FishState, Double> RATIO_TO_CATCHABILITY(final double originalCatchability){
+    public static final Actuator<FishState, Double> RATIO_TO_CATCHABILITY(
+            final double originalCatchability){
         return new Actuator<FishState, Double>() {
             @Override
             public void apply(FishState subject, Double effortRatio, FishState model) {
@@ -184,6 +188,31 @@ public class IndexTargetController extends Controller{
             }
         };
     }
+
+    public static final Actuator<FishState, Double> RATIO_TO_DAYSATSEA =
+            new Actuator<FishState, Double>() {
+            @Override
+            public void apply(FishState subject, Double effortRatio, FishState model) {
+                if (!Double.isFinite(effortRatio))
+                    return;
+
+                assert  effortRatio<=1 : "i assume it's never above 1!";
+                assert  effortRatio>=0 : "i assume it's always positive!";
+
+
+                for (Fisher fisher : model.getFishers()) {
+                    Preconditions.checkArgument(fisher.getFishingStrategy() instanceof MaximumDaysDecorator,
+                            "Fisher doesn't have a max days at sea already set up; use other actuator");
+                    final MaximumDaysDecorator strategy = (MaximumDaysDecorator) fisher.getFishingStrategy();
+                    final MaximumTripLengthRegulation newGearToUse =
+                            new MaximumTripLengthRegulation(
+                                    strategy.getDaysBeforeGoingHome() * 24 * effortRatio
+                            );
+                    fisher.setRegulation(newGearToUse);
+                }
+            }
+        };
+
 
 
     @Override

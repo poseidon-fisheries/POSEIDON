@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-public class FisherEntryByProfits implements AdditionalStartable, Steppable {
+public class FisherEntryByProfits implements EntryPlugin {
 
 
     private final String profitDataColumnName;
@@ -44,6 +44,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
 
     private final double minProfitsToCoverFixedCosts;
+
+    public boolean paused = false;
 
     public FisherEntryByProfits(
             String profitDataColumnName, String costsFinalColumnName, String populationName,
@@ -70,6 +72,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
         Preconditions.checkArgument(stoppable==null,"already started!");
         stoppable = model.scheduleEveryYear(this,
                                             StepOrder.POLICY_UPDATE);
+        if(!model.getEntryPlugins().contains(this))
+            model.getEntryPlugins().add(this);
     }
 
     /**
@@ -101,6 +105,8 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
     @Override
     public void step(SimState simState) {
+        if(isEntryPaused())
+            return;
         FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
                 model.getLatestYearlyObservation(profitDataColumnName),
@@ -111,5 +117,14 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
             for (int i = 0; i < newEntrants; i++)
                 model.createFisher(populationName);
         }
+    }
+
+
+    public boolean isEntryPaused() {
+        return paused;
+    }
+
+    public void setEntryPaused(boolean paused) {
+        this.paused = paused;
     }
 }

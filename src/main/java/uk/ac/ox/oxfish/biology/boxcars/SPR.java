@@ -26,9 +26,27 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.function.Function;
 
-public class SPR {
+public class SPR implements SPRFormula{
 
 
+
+
+
+    @Override
+    public double computeSPR(SPRAgent sprAgent, StructuredAbundance abundance) {
+        return SPR.computeSPR(
+                abundance,
+                sprAgent.getSpecies(),
+                sprAgent.getAssumedNaturalMortality(),
+                sprAgent.getAssumedKParameter(),
+                sprAgent.getAssumedLinf(),
+                100,
+                1000d,
+                sprAgent.getAssumedLengthBinCm(),
+                sprAgent.getAgeToWeightFunction(),
+                sprAgent.getAgeToMaturityFunction()
+        );
+    }
 
     public static double simulateVirginSpawningBiomassForBoxcarMethod(){
         throw new RuntimeException("to be done!");
@@ -70,33 +88,20 @@ public class SPR {
         double maxLength =  species.getLengthAtAge(Integer.MAX_VALUE,0);
         int bins =  (int)Math.ceil(maxLength / lengthBinCm) + 1;
         //find most frequent length!
-        int totalCount =0;
-        double[] count = new double[bins];
-        for(int bin=0; bin< abundance.getBins(); bin++) {
-            for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++)
-            {
+        CatchAtLength catchAtLength = new CatchAtLength(
+                abundance,
+                species,
+                lengthBinCm,
+                bins
+        );
 
-                double abundanceHere = abundance.getAbundance(subdivision, bin);
-                if(abundanceHere>0) {
-                    int countBin = (int) Math.round(species.getLength(subdivision, bin) / lengthBinCm);
-                    if(countBin>=count.length)
-                    {
-                        //we could be using a bad or simplified lengthInfinity
-                        assert species.getLength(subdivision,bin)>=lengthInfinity;
-                        countBin = count.length-1;
-                    }
-                    count[countBin]+=
-                            abundanceHere;
-                    totalCount+=abundanceHere;
-                }
-
-            }
-        }
-        if(totalCount==0)
+        if(catchAtLength.getTotalCount()==0)
             return Double.NaN;
         int mostFrequentBin = 0;
-        for(int i=1; i<count.length; i++)
-            mostFrequentBin = count[i]>count[mostFrequentBin] ? i : mostFrequentBin;
+
+        final double[] catchAtLengthArray = catchAtLength.getCatchAtLength();
+        for(int i = 1; i< catchAtLengthArray.length; i++)
+            mostFrequentBin = catchAtLengthArray[i]>catchAtLengthArray[mostFrequentBin] ? i : mostFrequentBin;
 
 
         //get the most frequent length (with respect to the 5cm bins, not the original species structure)

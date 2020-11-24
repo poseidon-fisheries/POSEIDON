@@ -65,6 +65,7 @@ Exit Decorator:
       hoursBetweenEachDeparture: '12.0'
 -------
 Full-time Seasonal Retired Decorator:
+  canReturnFromRetirement: true
   decorated:
     Max Hours Per Year:
       maxHoursOut: '1200.0'

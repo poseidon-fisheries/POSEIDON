@@ -22,13 +22,25 @@ import java.util.function.Function;
 
 public class NoData718Slice6Policy {
 
-    public static final String CANDIDATES_CSV_FILE = "total_successes.csv";
+    public static final Path CANDIDATES_CSV_FILE =
+            NoData718Slice6.MAIN_DIRECTORY.resolve("successes_lowmk_complete_18.csv");
     public static final int SEED = 0;
+    private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("outputs_complete");
+            NoData718Slice6.MAIN_DIRECTORY.
+                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse_noentry");
+
+
+    private static final LinkedList<String> ADDITIONAL_COLUMNS =
+            new LinkedList<>();
+    static {
+        ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
+    }
+
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.onlyBAU;
+            NoData718Utilities.lbsprMsePoliciesNoEntry;
 
 
 
@@ -37,7 +49,7 @@ public class NoData718Slice6Policy {
     public static void main(String[] args) throws IOException {
 
         runPolicyDirectory(
-                OUTPUT_FOLDER.getParent().resolve(CANDIDATES_CSV_FILE).toFile(),
+                CANDIDATES_CSV_FILE.toFile(),
                 OUTPUT_FOLDER,
                 simulatedPolicies);
 
@@ -67,7 +79,7 @@ public class NoData718Slice6Policy {
     //additional data collectors
     private static final List<String> ADDITIONAL_PLUGINS =
             Lists.newArrayList(
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.322'\n" +
                             "    assumedLengthAtMaturity: '29.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +
@@ -80,7 +92,7 @@ public class NoData718Slice6Policy {
                             "    speciesName: Lethrinus laticaudis\n" +
                             "    surveyTag: spr_agent1_total\n" +
                             "    probabilityOfSamplingEachBoat: 1",
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.4438437'\n" +
                             "    assumedLengthAtMaturity: '50.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +
@@ -93,7 +105,7 @@ public class NoData718Slice6Policy {
                             "    speciesName: Lutjanus malabaricus\n" +
                             "    surveyTag: spr_agent2_total\n" +
                             "    probabilityOfSamplingEachBoat: 1",
-                    "- SPR Fixed Sample Agent:\n" +
+                    "SPR Agent:\n" +
                             "    assumedKParameter: '0.291'\n" +
                             "    assumedLengthAtMaturity: '34.0'\n" +
                             "    assumedLengthBinCm: '5.0'\n" +
@@ -133,7 +145,12 @@ public class NoData718Slice6Policy {
         additionalColumns.add("Exogenous catches of Atrobucca brevis");
         additionalColumns.add("Others Landings");
         additionalColumns.add("Others Earnings");
+        additionalColumns.add("Total Effort");
         additionalColumns.add("SPR " + "Lutjanus malabaricus" + " " +"total_and_correct");
+
+        additionalColumns.addAll(ADDITIONAL_COLUMNS);
+
+
 
 
         FishYAML yaml = new FishYAML();
@@ -169,7 +186,7 @@ public class NoData718Slice6Policy {
                 outputFolder,
                 policies,
                 additionalColumns,
-                true, 15,
+                true, ADDITIONAL_YEARS_TO_RUN,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
                 plugins
