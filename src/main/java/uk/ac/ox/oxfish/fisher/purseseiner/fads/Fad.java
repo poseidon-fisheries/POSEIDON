@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
-import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Map;
 
@@ -41,11 +40,8 @@ import static com.google.common.collect.Streams.stream;
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class Fad implements Locatable {
-
-    private static final double BUOY_VALUE = 1000.0; // Buoy value in dollars, TODO: should be a parameter
 
     private final FadManager owner;
     private final TripRecord tripDeployed;
@@ -147,18 +143,8 @@ public class Fad implements Locatable {
 
     public FadManager getOwner() { return owner; }
 
-    public double valueOfSet(Fisher fisher) {
-        return valueOfFishFor(fisher) + valueOfBuoyFor(fisher);
-    }
-
     public double valueOfFishFor(Fisher fisher) {
         return new FishValueCalculator(fisher).valueOf(getBiology());
-    }
-
-    public double valueOfBuoyFor(Fisher fisher) {
-        // Because fishers return buoys to their rightful owners,
-        // picking up a buoy that is not their own doesn't pay for them
-        return getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
