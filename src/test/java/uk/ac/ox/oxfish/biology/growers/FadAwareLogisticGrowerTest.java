@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.growers;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
@@ -31,6 +32,7 @@ import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertTrue;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 
 public class FadAwareLogisticGrowerTest {
 
@@ -38,9 +40,11 @@ public class FadAwareLogisticGrowerTest {
     public void jonLandings() {
 
         TunaScenario scenario = new TunaScenario();
-        scenario.setBoatsFile(TunaScenario.input("dummy_boats.csv"));
-        scenario.setDeploymentValuesFile(TunaScenario.input("dummy_deployment_values.csv"));
+        scenario.setBoatsFile(input("dummy_boats.csv"));
+        scenario.setDeploymentValuesFile(input("dummy_deployment_values.csv"));
         scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
+        ((GravityDestinationStrategyFactory) scenario.getFisherDefinition().getDestinationStrategy())
+            .setMaxTripDurationFile(input("dummy_boats.csv"));
         scenario.getFisherDefinition().setRegulation(new NoFishingFactory());
         ((MultipleIndependentSpeciesBiomassFactory) scenario.getBiologyInitializers())
             .getFactories()
@@ -58,17 +62,9 @@ public class FadAwareLogisticGrowerTest {
             () -> state.getTotalBiomass(state.getBiology().getSpecie("Yellowfin tuna"));
         while (state.getYear() < 5) {
             state.schedule.step(state);
-            System.out.printf(
-                "Yellowfin biomass at step %d: %.2f%n",
-                state.schedule.getSteps(),
-                yellowfinBiomass.get()
-            );
         }
         state.schedule.step(state);
-        System.out.printf("Yellowfin biomass at step %d: %.2f%n", state.schedule.getSteps(), yellowfinBiomass.get());
-
         final double diff = Math.abs(889195.40 - yellowfinBiomass.get() / 1000d);
-        System.out.printf("Diff: %f", diff);
         assertTrue(diff < 10);
 
     }

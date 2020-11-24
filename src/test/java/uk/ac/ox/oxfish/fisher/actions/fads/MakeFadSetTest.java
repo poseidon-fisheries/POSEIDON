@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -86,12 +87,13 @@ public class MakeFadSetTest {
         when(seaTile.getBiology()).thenReturn(tileBiology);
         when(seaTile.isWater()).thenReturn(true);
         when(model.getBiology()).thenReturn(globalBiology);
-        when(model.getRandom()).thenReturn(random);
         when(model.getFadMap().getFadTile(any())).thenReturn(Optional.of(seaTile));
         when(fadMap.getFadTile(fad)).thenReturn(Optional.of(seaTile));
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getActionSpecificRegulations()).thenReturn(new ActiveActionRegulations());
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
+        when(fisher.grabState()).thenReturn(model);
+        when(fisher.grabRandomizer()).thenReturn(random);
         when(fisher.getLocation()).thenReturn(seaTile);
         when(fisher.getHold()).thenReturn(hold);
         when(fisher.getRegulation()).thenReturn(regulation);
@@ -103,16 +105,16 @@ public class MakeFadSetTest {
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
-        final Action fadSetAction = new FadSetAction(fisher, fad, 1);
+        final PurseSeinerAction fadSetAction = new FadSetAction(fisher, fad, 1);
         when(random.nextDouble()).thenReturn(1.0);
-        fadSetAction.act(model, fisher, regulation, 0);
+        fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
         assertTrue(fadBiology.isEmpty());
         assertTrue(tileBiology.isEmpty());
 
         // Now we refill the FAD biology and make an unsuccessful set
         fillBiology(fadBiology);
         when(random.nextDouble()).thenReturn(0.0);
-        fadSetAction.act(model, fisher, regulation, 0);
+        fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
 
         // After that, the FAD biology should be empty and the tile biology should be full
         assertTrue(fadBiology.isEmpty());
