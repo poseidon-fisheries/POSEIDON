@@ -22,18 +22,19 @@ package uk.ac.ox.oxfish.fisher.equipment.fads;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadManagerUtilsTest {
 
     @Test
     public void getFadManagerShouldFailForNonPurseSeineGear() {
         final Fisher fisher = mock(Fisher.class);
-        final FixedProportionGear gear = new FixedProportionGear(0);
+        final Gear gear = new FixedProportionGear(0);
         when(fisher.getGear()).thenReturn(gear);
         assertThrows(IllegalArgumentException.class, () -> getFadManager(fisher));
     }

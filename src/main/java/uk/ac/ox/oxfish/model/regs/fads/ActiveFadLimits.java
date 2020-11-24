@@ -24,7 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
@@ -32,7 +32,7 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
         ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;
 
-    public ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
+    ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
         this(new ConditionalFisherRelativeLimits(limits));
     }
 

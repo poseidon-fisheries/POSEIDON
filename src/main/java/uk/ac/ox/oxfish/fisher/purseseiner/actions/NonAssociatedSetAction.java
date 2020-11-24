@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
 
 public class NonAssociatedSetAction extends SchoolSetAction {
 

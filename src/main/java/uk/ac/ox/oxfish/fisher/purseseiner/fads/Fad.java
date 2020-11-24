@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -40,9 +41,7 @@ import static com.google.common.collect.Streams.stream;
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getMarkets;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.priceOfFishHere;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class Fad implements Locatable {
 
@@ -153,17 +152,13 @@ public class Fad implements Locatable {
     }
 
     public double valueOfFishFor(Fisher fisher) {
-        return valueOfFish(getMarkets(fisher));
+        return new FishValueCalculator(fisher).valueOf(getBiology());
     }
 
     public double valueOfBuoyFor(Fisher fisher) {
         // Because fishers return buoys to their rightful owners,
         // picking up a buoy that is not their own doesn't pay for them
         return getOwner() == getFadManager(fisher) ? BUOY_VALUE : 0;
-    }
-
-    public double valueOfFish(Iterable<Market> markets) {
-        return priceOfFishHere(getBiology(), markets);
     }
 
     public BiomassLocalBiology getBiology() { return biology; }

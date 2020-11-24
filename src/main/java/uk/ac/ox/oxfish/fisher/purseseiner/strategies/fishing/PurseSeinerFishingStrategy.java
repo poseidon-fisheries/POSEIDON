@@ -37,7 +37,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -58,7 +57,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.lang.Math.exp;
 import static java.util.Comparator.comparingDouble;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class PurseSeinerFishingStrategy implements FishingStrategy {

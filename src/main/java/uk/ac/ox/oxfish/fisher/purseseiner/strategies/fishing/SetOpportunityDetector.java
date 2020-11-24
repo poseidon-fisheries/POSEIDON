@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.partitioningBy;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.fadsHere;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class SetOpportunityDetector {
 
@@ -72,8 +72,10 @@ public class SetOpportunityDetector {
         if (fisher.getHold().getPercentageFilled() >= 1) {
             actions = Stream.of(); // no possible sets when hold is full
         } else {
-            final Map<Boolean, List<Fad>> fadsOwnedOrNot = fadsHere(fisher)
-                .collect(partitioningBy(fad -> fad.getOwner() == getFadManager(fisher)));
+            final FadManager fadManager = getFadManager(fisher);
+            final Map<Boolean, List<Fad>> fadsOwnedOrNot = fadManager
+                .getFadsHere()
+                .collect(partitioningBy(fad -> fad.getOwner() == fadManager));
             actions = Stream.of(
                 setsOnOwnFads(fadsOwnedOrNot.get(true)),
                 opportunisticFadSets(fadsOwnedOrNot.get(false)),

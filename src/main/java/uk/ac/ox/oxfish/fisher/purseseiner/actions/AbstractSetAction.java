@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -39,8 +40,6 @@ import static java.lang.Math.exp;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static java.util.Arrays.stream;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getMarkets;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.priceOfFishHere;
 
 public abstract class AbstractSetAction extends PurseSeinerAction {
 
@@ -71,8 +70,8 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
                 .map(biomass -> biomass * catchableProportion)
                 .toArray()
         );
-        final double priceOfPotentialCatch = priceOfFishHere(potentialCatch, getMarkets(fisher));
-        return 1 - exp(exponentialSteepnessCoefficient * -priceOfPotentialCatch);
+        final double valueOfPotentialCatch = new FishValueCalculator(fisher).valueOf(potentialCatch);
+        return 1 - exp(exponentialSteepnessCoefficient * -valueOfPotentialCatch);
     }
 
     public Optional<Catch> getCatchesKept() { return Optional.ofNullable(catchesKept); }

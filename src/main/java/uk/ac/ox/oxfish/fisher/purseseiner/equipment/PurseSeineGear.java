@@ -52,12 +52,10 @@ public class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
     private final double successfulFadSetProbability;
-
     private final Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers;
     private final Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers;
     private final Set<AttractionField> attractionFields;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
-
     public PurseSeineGear(
         FadManager fadManager,
         final double minimumFadSetDurationInHours,
@@ -95,7 +93,6 @@ public class PurseSeineGear implements Gear {
             successfulFadSetProbability
         );
     }
-
     private PurseSeineGear(
         FadManager fadManager,
         Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers,
@@ -109,6 +106,20 @@ public class PurseSeineGear implements Gear {
         this.catchSamplers = catchSamplers;
         this.attractionFields = ImmutableSet.copyOf(attractionFields);
 
+    }
+
+    public static PurseSeineGear getPurseSeineGear(Fisher fisher) {
+        return maybeGetPurseSeineGear(fisher).orElseThrow(() -> new IllegalArgumentException(
+            "PurseSeineGear not available. Fisher " +
+                fisher + " is using " + fisher.getGear().getClass() + "."
+        ));
+    }
+
+    public static Optional<PurseSeineGear> maybeGetPurseSeineGear(Fisher fisher) {
+        return Optional
+            .of(fisher.getGear())
+            .filter(gear -> gear instanceof PurseSeineGear)
+            .map(gear -> (PurseSeineGear) gear);
     }
 
     public Set<AttractionField> getAttractionFields() { return attractionFields; }

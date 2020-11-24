@@ -25,8 +25,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class SetAttractionModulator implements AttractionModulator {
 

@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
-import sim.util.Bag;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -32,6 +31,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -51,6 +51,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
@@ -63,7 +64,6 @@ public class FadManager {
         DolphinSetAction.class,
         NonAssociatedSetAction.class
     );
-
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor;
@@ -72,7 +72,6 @@ public class FadManager {
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
     private int numFadsInStock;
-
     public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
@@ -89,7 +88,6 @@ public class FadManager {
             new ActiveActionRegulations()
         );
     }
-
     public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
@@ -116,6 +114,17 @@ public class FadManager {
 
     public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
         observers.register(observedClass, observer);
+    }
+
+    public static FadManager getFadManager(Fisher fisher) {
+        return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
+            "PurseSeineGear required to get FadManager instance. Fisher " +
+                fisher + " is using " + fisher.getGear().getClass() + "."
+        ));
+    }
+
+    public static Optional<FadManager> maybeGetFadManager(Fisher fisher) {
+        return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
@@ -211,5 +220,9 @@ public class FadManager {
     }
 
     public Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> getBiomassLostMonitor() { return biomassLostMonitor; }
+
+    Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
+        return bagToStream(getFadMap().fadsAt(seaTile));
+    }
 
 }

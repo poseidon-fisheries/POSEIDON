@@ -20,9 +20,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
 
 public class DolphinSetAction extends SchoolSetAction {
 

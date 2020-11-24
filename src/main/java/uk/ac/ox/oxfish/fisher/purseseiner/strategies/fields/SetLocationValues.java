@@ -22,16 +22,14 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.market.Market;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.priceOfFishHere;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class SetLocationValues<A extends AbstractSetAction> extends MutableLocationValues<A> {
@@ -46,12 +44,12 @@ public abstract class SetLocationValues<A extends AbstractSetAction> extends Mut
 
     @Override Optional<Entry<Int2D, Double>> observeValue(final A setAction) {
         final Fisher fisher = setAction.getFisher();
-        final Collection<Market> markets = fisher.getHomePort().getMarketMap(fisher).getMarkets();
+        final FishValueCalculator fishValueCalculator = new FishValueCalculator(fisher);
         return setAction.getCatchesKept()
             .map(catchesKept -> {
                 final SeaTile seaTile = fisher.getLocation();
                 final Int2D location = new Int2D(seaTile.getGridX(), seaTile.getGridY());
-                return entry(location, priceOfFishHere(catchesKept, markets));
+                return entry(location, fishValueCalculator.valueOf(catchesKept));
             });
     }
 

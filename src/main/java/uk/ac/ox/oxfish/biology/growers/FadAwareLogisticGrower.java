@@ -45,7 +45,7 @@ import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.biology.growers.CommonLogisticGrower.allocateBiomassProportionally;
 import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocateBiomassAtRandom;
 import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.maybeGetFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
 import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;

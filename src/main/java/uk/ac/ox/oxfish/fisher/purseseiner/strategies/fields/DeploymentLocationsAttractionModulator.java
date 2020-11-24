@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimits;
 
 import java.util.function.DoubleUnaryOperator;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class DeploymentLocationsAttractionModulator implements AttractionModulator {
 
@@ -42,7 +42,7 @@ public class DeploymentLocationsAttractionModulator implements AttractionModulat
         );
     }
 
-    public DeploymentLocationsAttractionModulator(
+    private DeploymentLocationsAttractionModulator(
         final DoubleUnaryOperator pctActiveFadsLimitModulationFunction
     ) {
         this.pctActiveFadsLimitModulationFunction = pctActiveFadsLimitModulationFunction;
