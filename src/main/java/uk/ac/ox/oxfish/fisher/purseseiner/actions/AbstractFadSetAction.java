@@ -32,14 +32,12 @@ public abstract class AbstractFadSetAction extends AbstractSetAction {
 
     public AbstractFadSetAction(
         final Fisher fisher,
-        final Fad fad,
-        final double exponentialSteepnessCoefficient
+        final Fad fad
     ) {
         super(
             fisher,
             1.0, // TODO
             fad.getBiology(),
-            exponentialSteepnessCoefficient,
             true // TODO
         );
         this.fad = fad;

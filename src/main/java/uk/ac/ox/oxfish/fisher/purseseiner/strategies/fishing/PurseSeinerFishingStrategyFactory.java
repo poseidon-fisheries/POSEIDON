@@ -188,6 +188,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return new PurseSeinerFishingStrategy(
             this::loadAttractionWeights,
             this::makeSetOpportunityLocator,
+            makeExponentialSteepnessCoefficients(),
             searchActionSigmoidMidpoint,
             searchActionSigmoidSteepness,
             searchActionDecayConstant,
@@ -205,19 +206,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
             .map(ActionClasses::getActionClass)
             .collect(toImmutableMap(
                 identity(),
-                actionClass -> ActionWeightsCacheBoat.INSTANCE.get(attractionWeightsFile, TARGET_YEAR, fisher, actionClass)
+                actionClass -> ActionWeightsCacheBoat.INSTANCE.get(
+                    attractionWeightsFile,
+                    TARGET_YEAR,
+                    fisher,
+                    actionClass
+                )
             ));
     }
 
     private SetOpportunityDetector makeSetOpportunityLocator(final Fisher fisher) {
-
-        final ImmutableMap<Class<? extends AbstractSetAction>, Double> exponentialSteepnessCoefficients =
-            ImmutableMap.of(
-                NonAssociatedSetAction.class, nonAssociatedSetExponentialSteepnessCoefficient,
-                DolphinSetAction.class, dolphinSetExponentialSteepnessCoefficient,
-                FadSetAction.class, fadSetExponentialSteepnessCoefficient,
-                OpportunisticFadSetAction.class, opportunisticFadSetExponentialSteepnessCoefficient
-            );
 
         final ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
             setCompositionWeights = loadSetCompositionWeights(fisher.grabState());
@@ -227,10 +225,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
                 nonAssociatedSetGeneratorSigmoidMidpoint,
                 nonAssociatedSetGeneratorSigmoidSteepness,
                 setCompositionWeights.get(NonAssociatedSetAction.class),
-                fisher1 -> new NonAssociatedSetAction(
-                    fisher1,
-                    nonAssociatedSetExponentialSteepnessCoefficient
-                )
+                NonAssociatedSetAction::new
             );
 
         final SetOpportunityGenerator dolphinSetOpportunityGenerator =
@@ -238,10 +233,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
                 dolphinSetGeneratorSigmoidMidpoint,
                 dolphinSetGeneratorSigmoidSteepness,
                 setCompositionWeights.get(DolphinSetAction.class),
-                fisher1 -> new DolphinSetAction(
-                    fisher1,
-                    dolphinSetExponentialSteepnessCoefficient
-                )
+                DolphinSetAction::new
             );
 
         return new SetOpportunityDetector(
@@ -255,8 +247,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
                 DolphinSetAction.class, dolphinSetDetectionProbability,
                 OpportunisticFadSetAction.class, opportunisticFadSetDetectionProbability
             ),
-            exponentialSteepnessCoefficients,
             searchBonus
+        );
+    }
+
+    private ImmutableMap<Class<? extends AbstractSetAction>, Double> makeExponentialSteepnessCoefficients() {
+        return ImmutableMap.of(
+            NonAssociatedSetAction.class, nonAssociatedSetExponentialSteepnessCoefficient,
+            DolphinSetAction.class, dolphinSetExponentialSteepnessCoefficient,
+            FadSetAction.class, fadSetExponentialSteepnessCoefficient,
+            OpportunisticFadSetAction.class, opportunisticFadSetExponentialSteepnessCoefficient
         );
     }
 

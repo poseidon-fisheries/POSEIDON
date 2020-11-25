@@ -25,13 +25,9 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPur
 
 public class DolphinSetAction extends SchoolSetAction {
 
-    public DolphinSetAction(
-        final Fisher fisher,
-        final double exponentialSteepnessCoefficient
-    ) {
+    public DolphinSetAction(final Fisher fisher) {
         super(
             fisher,
-            exponentialSteepnessCoefficient,
             getPurseSeineGear(fisher).getCatchSamplers().get(DolphinSetAction.class),
             setDuration(fisher, DolphinSetAction.class)
         );

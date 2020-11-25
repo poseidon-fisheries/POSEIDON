@@ -39,7 +39,6 @@ public class SchoolSetAction extends AbstractSetAction {
 
     SchoolSetAction(
         final Fisher fisher,
-        final double exponentialSteepnessCoefficient,
         final CatchSampler catchSampler,
         final double setDuration
     ) {
@@ -47,7 +46,6 @@ public class SchoolSetAction extends AbstractSetAction {
             fisher,
             setDuration,
             makeSchoolBiology(fisher, catchSampler),
-            exponentialSteepnessCoefficient,
             true // TODO
         );
     }

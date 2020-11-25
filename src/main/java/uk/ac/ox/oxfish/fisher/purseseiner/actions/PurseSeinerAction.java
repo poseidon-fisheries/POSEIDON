@@ -30,20 +30,17 @@ public abstract class PurseSeinerAction implements Action, Locatable {
     private final SeaTile location;
     private final int step;
     private final double duration;
-    private final double value;
     private final boolean permitted;
 
     protected PurseSeinerAction(
         final Fisher fisher,
         final double duration,
-        final double value,
         final boolean permitted
     ) {
         this.fisher = fisher;
         this.location = fisher.getLocation();
         this.step = fisher.grabState().getStep();
         this.duration = duration;
-        this.value = value;
         this.permitted = permitted;
     }
 
@@ -52,8 +49,6 @@ public abstract class PurseSeinerAction implements Action, Locatable {
     public double getDuration() { return duration; }
 
     public Fisher getFisher() { return fisher; }
-
-    public double getValue() { return value; }
 
     public boolean isPermitted() { return permitted; }
 

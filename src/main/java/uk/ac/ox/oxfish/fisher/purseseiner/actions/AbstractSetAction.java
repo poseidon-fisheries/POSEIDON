@@ -50,33 +50,10 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
         final Fisher fisher,
         final double duration,
         final VariableBiomassBasedBiology targetBiology,
-        final double exponentialSteepnessCoefficient,
         final boolean permitted
     ) {
-        super(fisher, duration, computeValue(fisher, targetBiology, exponentialSteepnessCoefficient), permitted);
+        super(fisher, duration, permitted);
         this.targetBiology = targetBiology;
-    }
-
-    private static double computeValue(
-        final Fisher fisher,
-        final VariableBiomassBasedBiology targetBiology,
-        final double exponentialSteepnessCoefficient
-    ) {
-        assert targetBiology.getTotalBiomass() >= 0;
-        if (targetBiology.getTotalBiomass() == 0) {
-            return 0; // avoids div by 0 when calculating catchableProportion
-        } {
-            final Hold hold = fisher.getHold();
-            final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
-            final double catchableProportion = min(1, capacity / targetBiology.getTotalBiomass());
-            final Catch potentialCatch = new Catch(
-                stream(targetBiology.getCurrentBiomass())
-                    .map(biomass -> biomass * catchableProportion)
-                    .toArray()
-            );
-            final double valueOfPotentialCatch = new FishValueCalculator(fisher).valueOf(potentialCatch);
-            return 1 - exp(exponentialSteepnessCoefficient * -valueOfPotentialCatch);
-        }
     }
 
     public Optional<Catch> getCatchesKept() { return Optional.ofNullable(catchesKept); }

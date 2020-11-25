@@ -46,7 +46,6 @@ public class SetOpportunityDetector {
     private final Fisher fisher;
     private final List<SetOpportunityGenerator> setOpportunityGenerators;
     private final Map<Class<? extends AbstractSetAction>, Double> basicDetectionProbabilities;
-    private final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients;
     private final double searchBonus;
     private boolean hasSearched = false;
 
@@ -54,20 +53,17 @@ public class SetOpportunityDetector {
         final Fisher fisher,
         final Iterable<SetOpportunityGenerator> setOpportunityGenerators,
         final Map<Class<? extends AbstractSetAction>, Double> basicDetectionProbabilities,
-        final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients,
         final double searchBonus
     ) {
         checkArgument(basicDetectionProbabilities.values().stream().allMatch(v -> v >= 0 && v <= 1));
-        checkArgument(exponentialSteepNessCoefficients.values().stream().allMatch(v -> v >= 0));
         checkArgument(searchBonus >= 0 && searchBonus <= 1);
         this.fisher = fisher;
-        this.exponentialSteepNessCoefficients = exponentialSteepNessCoefficients;
         this.setOpportunityGenerators = ImmutableList.copyOf(setOpportunityGenerators);
         this.basicDetectionProbabilities = ImmutableMap.copyOf(basicDetectionProbabilities);
         this.searchBonus = searchBonus;
     }
 
-    @NotNull List<PurseSeinerAction> possibleSetActions() {
+    @NotNull List<AbstractSetAction> possibleSetActions() {
         final Stream<AbstractSetAction> actions;
         if (fisher.getHold().getPercentageFilled() >= 1) {
             actions = Stream.of(); // no possible sets when hold is full
@@ -87,15 +83,13 @@ public class SetOpportunityDetector {
     }
 
     private Stream<FadSetAction> setsOnOwnFads(Iterable<Fad> ownFads) {
-        final double beta = exponentialSteepNessCoefficients.get(FadSetAction.class);
-        return stream(ownFads).map(fad -> new FadSetAction(fisher, fad, beta));
+        return stream(ownFads).map(fad -> new FadSetAction(fisher, fad));
     }
 
     private Stream<OpportunisticFadSetAction> opportunisticFadSets(Iterable<Fad> otherFads) {
         final double p = getDetectionProbability(OpportunisticFadSetAction.class);
-        final double beta = exponentialSteepNessCoefficients.get(OpportunisticFadSetAction.class);
         return stream(otherFads)
-            .map(fad -> new OpportunisticFadSetAction(fisher, fad, beta))
+            .map(fad -> new OpportunisticFadSetAction(fisher, fad))
             .filter(__ -> fisher.grabRandomizer().nextBoolean(p));
     }
 

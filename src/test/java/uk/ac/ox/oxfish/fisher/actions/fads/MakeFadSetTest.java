@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
@@ -105,7 +104,7 @@ public class MakeFadSetTest {
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
-        final PurseSeinerAction fadSetAction = new FadSetAction(fisher, fad, 1);
+        final PurseSeinerAction fadSetAction = new FadSetAction(fisher, fad);
         when(random.nextDouble()).thenReturn(1.0);
         fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
         assertTrue(fadBiology.isEmpty());

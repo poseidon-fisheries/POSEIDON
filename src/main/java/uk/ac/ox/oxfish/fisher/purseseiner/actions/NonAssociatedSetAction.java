@@ -25,13 +25,9 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPur
 
 public class NonAssociatedSetAction extends SchoolSetAction {
 
-    public NonAssociatedSetAction(
-        final Fisher fisher,
-        final double exponentialSteepnessCoefficient
-    ) {
+    public NonAssociatedSetAction(final Fisher fisher) {
         super(
             fisher,
-            exponentialSteepnessCoefficient,
             getPurseSeineGear(fisher).getCatchSamplers().get(NonAssociatedSetAction.class),
             setDuration(fisher, NonAssociatedSetAction.class)
         );

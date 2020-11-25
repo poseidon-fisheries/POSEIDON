@@ -32,10 +32,9 @@ public class SearchAction extends PurseSeinerAction {
 
     public SearchAction(
         final Fisher fisher,
-        final double value,
         final SetOpportunityDetector setOpportunityDetector
     ) {
-        super(fisher, 1, value, true);
+        super(fisher, 1, true);
         this.setOpportunityDetector = setOpportunityDetector;
     }
 

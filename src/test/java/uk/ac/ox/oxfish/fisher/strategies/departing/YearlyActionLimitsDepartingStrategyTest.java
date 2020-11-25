@@ -71,19 +71,19 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new FadDeploymentAction(fisher, 1));
+        actionSpecificRegulations.observe(new FadDeploymentAction(fisher));
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new FadSetAction(fisher, null, 1));
+        actionSpecificRegulations.observe(new FadSetAction(fisher, null));
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new NonAssociatedSetAction(fisher, 1));
+        actionSpecificRegulations.observe(new NonAssociatedSetAction(fisher));
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new FadSetAction(fisher, null, 1));
+        actionSpecificRegulations.observe(new FadSetAction(fisher, null));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 

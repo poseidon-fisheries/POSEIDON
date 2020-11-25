@@ -30,7 +30,10 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
@@ -38,6 +41,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -54,7 +58,9 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.lang.Double.min;
 import static java.lang.Math.exp;
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingDouble;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
@@ -65,6 +71,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     private final double movingThreshold = 0.1; // TODO: this needs to be a parameter
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider;
+    private final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
     private final DoubleUnaryOperator searchActionValueFunction;
     private final double searchActionDecayConstant;
@@ -78,6 +85,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     public PurseSeinerFishingStrategy(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
+        final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients,
         final double searchActionSigmoidMidpoint,
         final double searchActionSigmoidSteepness,
         final double searchActionDecayConstant,
@@ -87,6 +95,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
+        this.exponentialSteepNessCoefficients = exponentialSteepNessCoefficients;
         this.searchActionValueFunction =
             new LogisticFunction(searchActionSigmoidMidpoint, searchActionSigmoidSteepness);
         this.searchActionDecayConstant = searchActionDecayConstant;
@@ -133,46 +142,46 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         if (fisher.getLocation().isLand()) return ImmutableList.of();
 
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        final List<PurseSeinerAction> setActions = setOpportunityDetector.possibleSetActions();
+        final List<AbstractSetAction> possibleSetActions =
+            setOpportunityDetector.possibleSetActions();
 
         final Stream<Entry<PurseSeinerAction, Double>> weightedSetActions =
-            setActions.stream().map(this::weightedAction);
+            possibleSetActions.stream().map(action -> weightedAction(
+                action,
+                valueOfSetAction(action, exponentialSteepNessCoefficients.get(action.getClass()))
+            ));
 
         // Generate a search action for each of the set classes with no opportunities,
         // and give them a weight equivalent to the class they replace
-        final ImmutableSet<? extends Class<?>> setActionClasses =
-            setActions.stream().map(Object::getClass).collect(toImmutableSet());
+        final ImmutableSet<? extends Class<?>> possibleSetActionClasses =
+            possibleSetActions.stream().map(Object::getClass).collect(toImmutableSet());
         final Stream<Entry<PurseSeinerAction, Double>> weightedSearchActions = Stream
             .of(
                 OpportunisticFadSetAction.class,
                 NonAssociatedSetAction.class,
                 DolphinSetAction.class
             )
-            .filter(actionClass -> !setActionClasses.contains(actionClass))
-            .map(actionClass ->
-                weightedAction(new SearchAction(
-                    fisher,
-                    computeActionValue(
-                        actionCounts.count(SearchAction.class),
-                        attractionFields.get(actionClass).getValueAt(gridLocation),
-                        searchActionValueFunction,
-                        searchActionDecayConstant
-                    ),
-                    setOpportunityDetector
-                ))
-            );
+            .filter(actionClass -> !possibleSetActionClasses.contains(actionClass))
+            .map(actionClass -> weightedAction(
+                new SearchAction(fisher, setOpportunityDetector),
+                valueOfLocationBasedAction(
+                    actionCounts.count(SearchAction.class),
+                    attractionFields.get(actionClass).getValueAt(gridLocation),
+                    searchActionValueFunction,
+                    searchActionDecayConstant
+                )
+            ));
 
         Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction = Stream
-            .of(new FadDeploymentAction(
-                fisher,
-                computeActionValue(
+            .of(weightedAction(
+                new FadDeploymentAction(fisher),
+                valueOfLocationBasedAction(
                     actionCounts.count(FadDeploymentAction.class),
                     attractionFields.get(FadDeploymentAction.class).getValueAt(gridLocation),
                     fadDeploymentActionValueFunction,
                     fadDeploymentActionDecayConstant
                 )
-            ))
-            .map(this::weightedAction);
+            ));
 
         return Streams
             .concat(
@@ -186,11 +195,37 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
 
     }
 
-    private Entry<PurseSeinerAction, Double> weightedAction(PurseSeinerAction action) {
-        return entry(action, action.getValue() * actionWeights.getOrDefault(action.getClass(), 0.0));
+    private Entry<PurseSeinerAction, Double> weightedAction(
+        PurseSeinerAction action,
+        double actionValue
+    ) {
+        return entry(action, actionValue * actionWeights.getOrDefault(action.getClass(), 0.0));
     }
 
-    private static double computeActionValue(
+    private double valueOfSetAction(
+        final AbstractSetAction action,
+        final double exponentialSteepnessCoefficient
+    ) {
+        final double totalBiomass = action.getTargetBiology().getTotalBiomass();
+        assert totalBiomass >= 0;
+        if (totalBiomass == 0) {
+            return 0; // avoids div by 0 when calculating catchableProportion
+        } else {
+            final Hold hold = action.getFisher().getHold();
+            final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
+            final double catchableProportion = min(1, capacity / totalBiomass);
+            final Catch potentialCatch = new Catch(
+                stream(action.getTargetBiology().getCurrentBiomass())
+                    .map(biomass -> biomass * catchableProportion)
+                    .toArray()
+            );
+            final double valueOfPotentialCatch =
+                new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
+            return 1 - exp(exponentialSteepnessCoefficient * -valueOfPotentialCatch);
+        }
+    }
+
+    private static double valueOfLocationBasedAction(
         final int previousActionsHere,
         final double locationValue,
         final DoubleUnaryOperator valueFunction,

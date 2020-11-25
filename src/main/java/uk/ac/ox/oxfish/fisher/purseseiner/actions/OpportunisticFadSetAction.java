@@ -29,10 +29,9 @@ public class OpportunisticFadSetAction extends AbstractFadSetAction {
 
     public OpportunisticFadSetAction(
         final Fisher fisher,
-        final Fad fad,
-        final double exponentialSteepnessCoefficient
+        final Fad fad
     ) {
-        super(fisher, fad, exponentialSteepnessCoefficient);
+        super(fisher, fad);
         checkArgument(getFadManager(getFisher()) != fad.getOwner());
     }
 

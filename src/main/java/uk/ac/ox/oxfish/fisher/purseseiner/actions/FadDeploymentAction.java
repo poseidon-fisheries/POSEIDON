@@ -30,14 +30,10 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadDeploymentAction extends PurseSeinerAction {
 
-    public FadDeploymentAction(
-        final Fisher fisher,
-        final double value
-    ) {
+    public FadDeploymentAction(final Fisher fisher) {
         super(
             fisher,
             0.0, // see https://github.com/poseidon-fisheries/tuna/issues/6
-            value,
             true // TODO
         );
     }
