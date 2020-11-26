@@ -41,7 +41,6 @@ public class FadAwareLogisticGrowerTest {
 
         TunaScenario scenario = new TunaScenario();
         scenario.setBoatsFile(input("dummy_boats.csv"));
-        scenario.setDeploymentValuesFile(input("dummy_deployment_values.csv"));
         scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
         ((GravityDestinationStrategyFactory) scenario.getFisherDefinition().getDestinationStrategy())
             .setMaxTripDurationFile(input("dummy_boats.csv"));

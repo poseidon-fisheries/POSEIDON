@@ -172,11 +172,13 @@ public class PurseSeineGear implements Gear {
     @Override public boolean isSame(Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PurseSeineGear that = (PurseSeineGear) o;
-        return Objects.equals(durationSamplers, that.durationSamplers) &&
+        final PurseSeineGear that = (PurseSeineGear) o;
+        return Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0 &&
+            Objects.equals(fadManager, that.fadManager) &&
+            Objects.equals(durationSamplers, that.durationSamplers) &&
             Objects.equals(catchSamplers, that.catchSamplers) &&
-            Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0 &&
-            Objects.equals(fadManager, that.fadManager);
+            Objects.equals(attractionFields, that.attractionFields) &&
+            Objects.equals(lastVisits, that.lastVisits);
     }
 
     public Quantity<Time> nextSetDuration(

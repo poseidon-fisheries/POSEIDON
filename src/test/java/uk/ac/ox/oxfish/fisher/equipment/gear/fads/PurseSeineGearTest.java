@@ -154,18 +154,6 @@ public class PurseSeineGearTest {
             purseSeineGear.getCatchSamplers(),
             purseSeineGear.getAttractionFields()
         )));
-        assertFalse(purseSeineGear.isSame(new PurseSeineGear(
-            purseSeineGear.getFadManager(),
-            1,
-            1,
-            0.1,
-            1,
-            1,
-            0.1,
-            purseSeineGear.getSuccessfulFadSetProbability(),
-            ImmutableMap.of(),
-            ImmutableList.of()
-        )));
     }
 
 }

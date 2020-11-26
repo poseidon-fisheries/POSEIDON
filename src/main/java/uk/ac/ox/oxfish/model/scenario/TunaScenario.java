@@ -174,7 +174,6 @@ public class TunaScenario implements Scenario {
         new FromSimpleFilePortInitializer(TARGET_YEAR, input("ports.csv"));
     private Path attractionWeightsFile = input("action_weights.csv");
     private Path mapFile = input("depth.csv");
-    private Path deploymentValuesFile = input("deployment_values.csv");
     private Path iattcShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
     private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
@@ -264,10 +263,6 @@ public class TunaScenario implements Scenario {
     @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
 
     @SuppressWarnings("unused") public void setMapFile(Path mapFile) { this.mapFile = mapFile; }
-
-    @SuppressWarnings("unused") public Path getDeploymentValuesFile() { return deploymentValuesFile; }
-
-    public void setDeploymentValuesFile(Path deploymentValuesFile) { this.deploymentValuesFile = deploymentValuesFile; }
 
     @SuppressWarnings("unused") public Path getIattcShapeFile() { return iattcShapeFile; }
 

@@ -19,13 +19,18 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.ImmutableDoubleArray;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
@@ -51,9 +56,21 @@ public class YearlyActionLimitsDepartingStrategyTest {
     public void shouldFisherLeavePort() {
 
         FishState fishState = mock(FishState.class);
+        final Fad fad = mock(Fad.class);
+
+        final CatchSampler catchSampler = mock(CatchSampler.class);
+        //noinspection UnstableApiUsage
+        when(catchSampler.next(any())).thenReturn(ImmutableDoubleArray.of());
 
         PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.nextSetDuration(any(), any())).thenReturn(getQuantity(1, HOUR));
+
+        when(purseSeineGear.getCatchSamplers()).thenReturn(
+            ImmutableMap.of(
+                NonAssociatedSetAction.class, catchSampler,
+                DolphinSetAction.class, catchSampler
+            ));
+
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fisher.getHold().getVolume()).thenReturn(Optional.of(getQuantity(1, CUBIC_METRE)));
@@ -64,6 +81,8 @@ public class YearlyActionLimitsDepartingStrategyTest {
         FadManager fadManager = new FadManager(null, fadInitializer, 0);
         fadManager.setActionSpecificRegulations(Stream.of(setLimits));
         fadManager.setFisher(fisher);
+        when(purseSeineGear.getFadManager()).thenReturn(fadManager);
+        when(fad.getOwner()).thenReturn(fadManager);
         final ActiveActionRegulations actionSpecificRegulations = fadManager.getActionSpecificRegulations();
 
         final YearlyActionLimitsDepartingStrategy strategy = new YearlyActionLimitsDepartingStrategy();
@@ -75,7 +94,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(3, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new FadSetAction(fisher, null));
+        actionSpecificRegulations.observe(new FadSetAction(fisher, fad));
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
@@ -83,7 +102,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new FadSetAction(fisher, null));
+        actionSpecificRegulations.observe(new DolphinSetAction(fisher));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
