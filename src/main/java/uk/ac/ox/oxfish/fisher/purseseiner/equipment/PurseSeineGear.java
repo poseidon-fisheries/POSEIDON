@@ -56,6 +56,7 @@ public class PurseSeineGear implements Gear {
     private final Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers;
     private final Set<AttractionField> attractionFields;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
+
     public PurseSeineGear(
         FadManager fadManager,
         final double minimumFadSetDurationInHours,
@@ -93,6 +94,7 @@ public class PurseSeineGear implements Gear {
             successfulFadSetProbability
         );
     }
+
     private PurseSeineGear(
         FadManager fadManager,
         Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers,

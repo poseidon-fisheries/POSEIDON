@@ -72,6 +72,7 @@ public class FadManager {
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
     private int numFadsInStock;
+
     public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
@@ -88,6 +89,7 @@ public class FadManager {
             new ActiveActionRegulations()
         );
     }
+
     public FadManager(
         FadMap fadMap,
         FadInitializer fadInitializer,
@@ -193,8 +195,6 @@ public class FadManager {
         numFadsInStock++;
     }
 
-    public FadMap getFadMap() { return fadMap; }
-
     private SeaTile getSeaTile(Double2D position) { return getSeaTile(position.x, position.y); }
 
     private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
@@ -224,5 +224,7 @@ public class FadManager {
     Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
         return bagToStream(getFadMap().fadsAt(seaTile));
     }
+
+    public FadMap getFadMap() { return fadMap; }
 
 }
