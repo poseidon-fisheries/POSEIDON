@@ -24,42 +24,43 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.lang.Math.exp;
-
 public class SetOpportunityGenerator {
 
-    private final double sigmoidMidpoint;
-    private final double sigmoidSteepness;
+    private final LogisticFunction probabilityFunction;
     private final Function<Fisher, AbstractSetAction> actionConstructor;
     private final Map<Species, Double> weights;
 
     public SetOpportunityGenerator(
-        final double sigmoidMidpoint,
-        final double sigmoidSteepness,
+        final double logisticMidpoint,
+        final double logisticSteepness,
         final Map<Species, Double> weights,
         final Function<Fisher, AbstractSetAction> actionConstructor
     ) {
-        this.sigmoidMidpoint = sigmoidMidpoint;
-        this.sigmoidSteepness = sigmoidSteepness;
+        this.probabilityFunction = new LogisticFunction(logisticMidpoint, logisticSteepness);
         this.weights = ImmutableMap.copyOf(weights);
         this.actionConstructor = actionConstructor;
     }
 
     Optional<AbstractSetAction> get(Fisher fisher, final LocalBiology biology) {
+        final double p = probabilityOfOpportunity(biology);
+        return fisher.grabRandomizer().nextBoolean(p)
+            ? Optional.of(actionConstructor.apply(fisher))
+            : Optional.empty();
+    }
+
+    private double probabilityOfOpportunity(final LocalBiology biology) {
         final double weightedBiomass = weights
             .entrySet()
             .stream()
             .mapToDouble(entry -> biology.getBiomass(entry.getKey()) * entry.getValue())
             .sum();
-        final double p = 1 / (1 + exp(-sigmoidSteepness * (weightedBiomass - sigmoidMidpoint)));
-        return fisher.grabRandomizer().nextBoolean(p)
-            ? Optional.of(actionConstructor.apply(fisher))
-            : Optional.empty();
+        return probabilityFunction.applyAsDouble(weightedBiomass);
     }
 
 }
