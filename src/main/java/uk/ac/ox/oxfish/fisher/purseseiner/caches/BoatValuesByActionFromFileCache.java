@@ -42,7 +42,7 @@ import static java.util.Collections.emptyMap;
  *     <li>action class</li>
  * </ul>
  * <p>
- * Currently implemented by {@link ActionWeightsCacheBoat}, where the values are doubles, and {@link LocationBoatValuesByActionCache},
+ * Currently implemented by {@link ActionWeightsCache}, where the values are doubles, and {@link LocationBoatValuesByActionCache},
  * where the values are maps from coordinates to doubles.
  *
  * @param <T> the type of the cached value

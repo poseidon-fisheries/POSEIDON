@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCacheBoat;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.BoatValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.model.FishState;
@@ -76,7 +76,7 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
         final Path attractionWeightsFile = ((TunaScenario) fisher.grabState().getScenario()).getAttractionWeightsFile();
         return stream(fields).collect(toImmutableMap(
             identity(),
-            field -> ActionWeightsCacheBoat.INSTANCE.get(
+            field -> ActionWeightsCache.INSTANCE.get(
                 attractionWeightsFile,
                 TARGET_YEAR,
                 fisher,
