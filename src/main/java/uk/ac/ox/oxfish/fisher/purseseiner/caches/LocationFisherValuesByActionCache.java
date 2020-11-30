@@ -37,9 +37,9 @@ import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
-public class LocationBoatValuesByActionCache extends BoatValuesByActionFromFileCache<Map<Coordinate, Double>> {
+public class LocationFisherValuesByActionCache extends FisherValuesByActionFromFileCache<Map<Coordinate, Double>> {
 
-    public LocationBoatValuesByActionCache() { super(Collections::emptyMap); }
+    public LocationFisherValuesByActionCache() { super(Collections::emptyMap); }
 
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Map<Coordinate, Double>>>> readValues(
         final Path locationValuesFile

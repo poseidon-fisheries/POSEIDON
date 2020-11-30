@@ -18,7 +18,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationBoatValuesByActionCache;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -67,7 +67,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private static final LocationBoatValuesByActionCache locationValuesCache = new LocationBoatValuesByActionCache();
+    private static final LocationFisherValuesByActionCache locationValuesCache = new LocationFisherValuesByActionCache();
 
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =

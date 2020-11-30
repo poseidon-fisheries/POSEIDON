@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.jetbrains.annotations.NotNull;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -33,13 +34,16 @@ public class TestUtilities {
     }
 
     public static NauticalMap makeMap(@NotNull int[][] altitude) {
-        assert (altitude.length > 0);
+        assert altitude.length > 0;
+        assert altitude[0].length > 0;
         ObjectGrid2D grid2D = new ObjectGrid2D(altitude.length, altitude[0].length);
         for (int i = 0; i < altitude.length; i++)
             for (int j = 0; j < altitude[i].length; j++)
                 grid2D.set(i, j, new SeaTile(i, j, altitude[i][j], new TileHabitat(0d)));
+        final GeomGridField gridField = new GeomGridField(grid2D);
+        gridField.setMBR(new Envelope(0, altitude.length, 0, altitude[0].length));
         return new NauticalMap(
-            new GeomGridField(grid2D),
+            gridField,
             new GeomVectorField(),
             new CartesianDistance(1),
             new StraightLinePathfinder()
@@ -53,8 +57,9 @@ public class TestUtilities {
     }
 
     public static Deque<SeaTile> makeRoute(NauticalMap map, int[]... points) {
-        LinkedList<SeaTile> route = new LinkedList<>();
+        final Deque<SeaTile> route = new LinkedList<>();
         for (int[] point : points) route.add(map.getSeaTile(point[0], point[1]));
         return route;
     }
+
 }

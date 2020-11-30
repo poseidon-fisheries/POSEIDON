@@ -28,11 +28,11 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
-public class ActionWeightsCache extends BoatValuesByActionFromFileCache<Double> {
+public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double> {
 
     public static final ActionWeightsCache INSTANCE = new ActionWeightsCache();
 
-    private ActionWeightsCache() { super(() -> 0.0); }
+    ActionWeightsCache() { super(() -> 0.0); }
 
     @Override
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Double>>> readValues(final Path valuesFile) {

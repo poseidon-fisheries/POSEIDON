@@ -41,7 +41,7 @@ import static uk.ac.ox.oxfish.model.scenario.TunaScenario.getBoatId;
  *
  * @param <T> the type of the cached value
  */
-public abstract class BoatValuesFromFileCache<T> {
+public abstract class FisherValuesFromFileCache<T> {
 
     private final LoadingCache<Path, Map<Integer, Map<String, T>>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));

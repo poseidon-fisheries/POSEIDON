@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.BoatValuesFromFileCache;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
@@ -41,7 +41,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class GravityDestinationStrategyFactory implements AlgorithmFactory<GravityDestinationStrategy> {
 
-    private static final BoatValuesFromFileCache<Double> maxTripDurationCache = new BoatValuesFromFileCache<Double>() {
+    private static final FisherValuesFromFileCache<Double> maxTripDurationCache = new FisherValuesFromFileCache<Double>() {
         protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
             return parseAllRecords(valuesFile).stream().collect(
                 groupingBy(

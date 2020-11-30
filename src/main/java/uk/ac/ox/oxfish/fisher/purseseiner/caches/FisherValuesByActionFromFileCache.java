@@ -42,17 +42,17 @@ import static java.util.Collections.emptyMap;
  *     <li>action class</li>
  * </ul>
  * <p>
- * Currently implemented by {@link ActionWeightsCache}, where the values are doubles, and {@link LocationBoatValuesByActionCache},
+ * Currently implemented by {@link ActionWeightsCache}, where the values are doubles, and {@link LocationFisherValuesByActionCache},
  * where the values are maps from coordinates to doubles.
  *
  * @param <T> the type of the cached value
  */
-public abstract class BoatValuesByActionFromFileCache<T>
-    extends BoatValuesFromFileCache<Map<Class<? extends PurseSeinerAction>, T>> {
+public abstract class FisherValuesByActionFromFileCache<T>
+    extends FisherValuesFromFileCache<Map<Class<? extends PurseSeinerAction>, T>> {
 
     private final Supplier<T> defaultValue;
 
-    BoatValuesByActionFromFileCache(final Supplier<T> defaultValue) {
+    FisherValuesByActionFromFileCache(final Supplier<T> defaultValue) {
         this.defaultValue = defaultValue;
     }
 
