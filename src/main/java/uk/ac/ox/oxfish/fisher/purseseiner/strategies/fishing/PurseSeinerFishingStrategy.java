@@ -86,21 +86,21 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
         final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients,
-        final double searchActionSigmoidMidpoint,
-        final double searchActionSigmoidSteepness,
+        final double searchActionLogisticMidpoint,
+        final double searchActionLogisticSteepness,
         final double searchActionDecayConstant,
-        final double fadDeploymentActionSigmoidMidpoint,
-        final double fadDeploymentActionSigmoidSteepness,
+        final double fadDeploymentActionLogisticMidpoint,
+        final double fadDeploymentActionLogisticSteepness,
         final double fadDeploymentActionDecayConstant
     ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
         this.exponentialSteepNessCoefficients = exponentialSteepNessCoefficients;
         this.searchActionValueFunction =
-            new LogisticFunction(searchActionSigmoidMidpoint, searchActionSigmoidSteepness);
+            new LogisticFunction(searchActionLogisticMidpoint, searchActionLogisticSteepness);
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionValueFunction =
-            new LogisticFunction(fadDeploymentActionSigmoidMidpoint, fadDeploymentActionSigmoidSteepness);
+            new LogisticFunction(fadDeploymentActionLogisticMidpoint, fadDeploymentActionLogisticSteepness);
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
     }
 

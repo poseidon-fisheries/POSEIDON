@@ -51,20 +51,20 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<PurseSeinerFishingStrategy> {
 
     private Path setCompositionWeightsPath = input("set_compositions.csv");
-    private double nonAssociatedSetGeneratorSigmoidMidpoint = 100_000;
-    private double nonAssociatedSetGeneratorSigmoidSteepness = 1;
-    private double dolphinSetGeneratorSigmoidMidpoint = 100_000;
-    private double dolphinSetGeneratorSigmoidSteepness = 1;
+    private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
+    private double nonAssociatedSetGeneratorLogisticSteepness = 1;
+    private double dolphinSetGeneratorLogisticMidpoint = 100_000;
+    private double dolphinSetGeneratorLogisticSteepness = 1;
     private double searchBonus = 0.1;
     private double nonAssociatedSetDetectionProbability = 0.1;
     private double dolphinSetDetectionProbability = 0.1;
     private double opportunisticFadSetDetectionProbability = 0.1;
 
-    private double searchActionSigmoidMidpoint = 0.1;
-    private double searchActionSigmoidSteepness = 1;
+    private double searchActionLogisticMidpoint = 0.1;
+    private double searchActionLogisticSteepness = 1;
     private double searchActionDecayConstant = 1;
-    private double fadDeploymentActionSigmoidMidpoint = 0.1;
-    private double fadDeploymentActionSigmoidSteepness = 1;
+    private double fadDeploymentActionLogisticMidpoint = 0.1;
+    private double fadDeploymentActionLogisticSteepness = 1;
     private double fadDeploymentActionDecayConstant = 1;
 
     private double fadSetExponentialSteepnessCoefficient = 1E-4;
@@ -101,16 +101,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         this.dolphinSetExponentialSteepnessCoefficient = dolphinSetExponentialSteepnessCoefficient;
     }
 
-    public double getSearchActionSigmoidMidpoint() { return searchActionSigmoidMidpoint; }
+    public double getSearchActionLogisticMidpoint() { return searchActionLogisticMidpoint; }
 
-    public void setSearchActionSigmoidMidpoint(final double searchActionSigmoidMidpoint) {
-        this.searchActionSigmoidMidpoint = searchActionSigmoidMidpoint;
+    public void setSearchActionLogisticMidpoint(final double searchActionLogisticMidpoint) {
+        this.searchActionLogisticMidpoint = searchActionLogisticMidpoint;
     }
 
-    public double getSearchActionSigmoidSteepness() { return searchActionSigmoidSteepness; }
+    public double getSearchActionLogisticSteepness() { return searchActionLogisticSteepness; }
 
-    public void setSearchActionSigmoidSteepness(final double searchActionSigmoidSteepness) {
-        this.searchActionSigmoidSteepness = searchActionSigmoidSteepness;
+    public void setSearchActionLogisticSteepness(final double searchActionLogisticSteepness) {
+        this.searchActionLogisticSteepness = searchActionLogisticSteepness;
     }
 
     public double getSearchActionDecayConstant() { return searchActionDecayConstant; }
@@ -119,16 +119,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         this.searchActionDecayConstant = searchActionDecayConstant;
     }
 
-    public double getFadDeploymentActionSigmoidMidpoint() { return fadDeploymentActionSigmoidMidpoint; }
+    public double getFadDeploymentActionLogisticMidpoint() { return fadDeploymentActionLogisticMidpoint; }
 
-    public void setFadDeploymentActionSigmoidMidpoint(final double fadDeploymentActionSigmoidMidpoint) {
-        this.fadDeploymentActionSigmoidMidpoint = fadDeploymentActionSigmoidMidpoint;
+    public void setFadDeploymentActionLogisticMidpoint(final double fadDeploymentActionLogisticMidpoint) {
+        this.fadDeploymentActionLogisticMidpoint = fadDeploymentActionLogisticMidpoint;
     }
 
-    public double getFadDeploymentActionSigmoidSteepness() { return fadDeploymentActionSigmoidSteepness; }
+    public double getFadDeploymentActionLogisticSteepness() { return fadDeploymentActionLogisticSteepness; }
 
-    public void setFadDeploymentActionSigmoidSteepness(final double fadDeploymentActionSigmoidSteepness) {
-        this.fadDeploymentActionSigmoidSteepness = fadDeploymentActionSigmoidSteepness;
+    public void setFadDeploymentActionLogisticSteepness(final double fadDeploymentActionLogisticSteepness) {
+        this.fadDeploymentActionLogisticSteepness = fadDeploymentActionLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
@@ -157,31 +157,31 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
 
     public void setSearchBonus(final double searchBonus) { this.searchBonus = searchBonus; }
 
-    public double getNonAssociatedSetGeneratorSigmoidMidpoint() { return nonAssociatedSetGeneratorSigmoidMidpoint; }
+    public double getNonAssociatedSetGeneratorLogisticMidpoint() { return nonAssociatedSetGeneratorLogisticMidpoint; }
 
     @SuppressWarnings("unused")
-    public void setNonAssociatedSetGeneratorSigmoidMidpoint(final double nonAssociatedSetGeneratorSigmoidMidpoint) {
-        this.nonAssociatedSetGeneratorSigmoidMidpoint = nonAssociatedSetGeneratorSigmoidMidpoint;
+    public void setNonAssociatedSetGeneratorLogisticMidpoint(final double nonAssociatedSetGeneratorLogisticMidpoint) {
+        this.nonAssociatedSetGeneratorLogisticMidpoint = nonAssociatedSetGeneratorLogisticMidpoint;
     }
 
-    public double getNonAssociatedSetGeneratorSigmoidSteepness() { return nonAssociatedSetGeneratorSigmoidSteepness; }
+    public double getNonAssociatedSetGeneratorLogisticSteepness() { return nonAssociatedSetGeneratorLogisticSteepness; }
 
-    public void setNonAssociatedSetGeneratorSigmoidSteepness(final double nonAssociatedSetGeneratorSigmoidSteepness) {
-        this.nonAssociatedSetGeneratorSigmoidSteepness = nonAssociatedSetGeneratorSigmoidSteepness;
+    public void setNonAssociatedSetGeneratorLogisticSteepness(final double nonAssociatedSetGeneratorLogisticSteepness) {
+        this.nonAssociatedSetGeneratorLogisticSteepness = nonAssociatedSetGeneratorLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
-    public double getDolphinSetGeneratorSigmoidMidpoint() { return dolphinSetGeneratorSigmoidMidpoint; }
+    public double getDolphinSetGeneratorLogisticMidpoint() { return dolphinSetGeneratorLogisticMidpoint; }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetGeneratorSigmoidMidpoint(final double dolphinSetGeneratorSigmoidMidpoint) {
-        this.dolphinSetGeneratorSigmoidMidpoint = dolphinSetGeneratorSigmoidMidpoint;
+    public void setDolphinSetGeneratorLogisticMidpoint(final double dolphinSetGeneratorLogisticMidpoint) {
+        this.dolphinSetGeneratorLogisticMidpoint = dolphinSetGeneratorLogisticMidpoint;
     }
 
-    public double getDolphinSetGeneratorSigmoidSteepness() { return dolphinSetGeneratorSigmoidSteepness; }
+    public double getDolphinSetGeneratorLogisticSteepness() { return dolphinSetGeneratorLogisticSteepness; }
 
-    public void setDolphinSetGeneratorSigmoidSteepness(final double dolphinSetGeneratorSigmoidSteepness) {
-        this.dolphinSetGeneratorSigmoidSteepness = dolphinSetGeneratorSigmoidSteepness;
+    public void setDolphinSetGeneratorLogisticSteepness(final double dolphinSetGeneratorLogisticSteepness) {
+        this.dolphinSetGeneratorLogisticSteepness = dolphinSetGeneratorLogisticSteepness;
     }
 
     @Override public PurseSeinerFishingStrategy apply(final FishState fishState) {
@@ -189,11 +189,11 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
             this::loadAttractionWeights,
             this::makeSetOpportunityLocator,
             makeExponentialSteepnessCoefficients(),
-            searchActionSigmoidMidpoint,
-            searchActionSigmoidSteepness,
+            searchActionLogisticMidpoint,
+            searchActionLogisticSteepness,
             searchActionDecayConstant,
-            fadDeploymentActionSigmoidMidpoint,
-            fadDeploymentActionSigmoidSteepness,
+            fadDeploymentActionLogisticMidpoint,
+            fadDeploymentActionLogisticSteepness,
             fadDeploymentActionDecayConstant
         );
     }
@@ -222,16 +222,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
 
         final SetOpportunityGenerator nonAssociatedSetOpportunityGenerator =
             new SetOpportunityGenerator(
-                nonAssociatedSetGeneratorSigmoidMidpoint,
-                nonAssociatedSetGeneratorSigmoidSteepness,
+                nonAssociatedSetGeneratorLogisticMidpoint,
+                nonAssociatedSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 NonAssociatedSetAction::new
             );
 
         final SetOpportunityGenerator dolphinSetOpportunityGenerator =
             new SetOpportunityGenerator(
-                dolphinSetGeneratorSigmoidMidpoint,
-                dolphinSetGeneratorSigmoidSteepness,
+                dolphinSetGeneratorLogisticMidpoint,
+                dolphinSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(DolphinSetAction.class),
                 DolphinSetAction::new
             );
