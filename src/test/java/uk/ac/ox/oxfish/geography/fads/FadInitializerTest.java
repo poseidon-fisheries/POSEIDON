@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 
 import javax.measure.Quantity;
@@ -16,6 +17,7 @@ import javax.measure.quantity.Mass;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 
@@ -43,7 +45,12 @@ public class FadInitializerTest {
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
-        fadManager.setFisher(mock(Fisher.class));
+        final SeaTile seaTile = mock(SeaTile.class);
+        when(seaTile.getGridX()).thenReturn(0);
+        when(seaTile.getGridY()).thenReturn(0);
+        final Fisher fisher = mock(Fisher.class);
+        when(fisher.getLocation()).thenReturn(seaTile);
+        fadManager.setFisher(fisher);
 
         final Fad fad = fadInitializer.apply(fadManager);
         for (Species species : globalBiology.getSpecies())
