@@ -29,8 +29,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -47,8 +45,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 
 public class MakeFadSetTest {
 

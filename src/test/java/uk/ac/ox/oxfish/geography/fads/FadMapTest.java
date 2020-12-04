@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -29,8 +29,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class FadMapTest {

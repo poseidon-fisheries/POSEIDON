@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.equipment.gear.fads;
+package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

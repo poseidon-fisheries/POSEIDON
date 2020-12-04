@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.equipment.fads;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
@@ -27,8 +27,6 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,8 +34,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 
 public class FadTest {
 

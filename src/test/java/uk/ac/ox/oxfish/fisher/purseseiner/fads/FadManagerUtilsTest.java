@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.equipment.fads;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;

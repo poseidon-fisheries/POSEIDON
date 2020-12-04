@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.equipment.fads;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
@@ -25,14 +25,13 @@ import org.junit.Before;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
 import static org.junit.Assert.assertThrows;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeUniformCurrentVectors;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeUniformCurrentVectors;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class FadManagerTest {
