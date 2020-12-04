@@ -42,10 +42,22 @@ public class SchoolSetAction extends AbstractSetAction {
         final CatchSampler catchSampler,
         final double setDuration
     ) {
+        this(
+            fisher,
+            makeSchoolBiology(fisher, catchSampler),
+            setDuration
+        );
+    }
+
+    SchoolSetAction(
+        final Fisher fisher,
+        final VariableBiomassBasedBiology targetBiology,
+        final double setDuration
+    ) {
         super(
             fisher,
             setDuration,
-            makeSchoolBiology(fisher, catchSampler),
+            targetBiology,
             true // TODO
         );
     }

@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.actions.fads;
+package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;

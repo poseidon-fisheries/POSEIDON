@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
@@ -29,6 +30,14 @@ public class NonAssociatedSetAction extends SchoolSetAction {
         super(
             fisher,
             getPurseSeineGear(fisher).getCatchSamplers().get(NonAssociatedSetAction.class),
+            setDuration(fisher, NonAssociatedSetAction.class)
+        );
+    }
+
+    public NonAssociatedSetAction(final Fisher fisher, final VariableBiomassBasedBiology targetBiology) {
+        super(
+            fisher,
+            targetBiology,
             setDuration(fisher, NonAssociatedSetAction.class)
         );
     }

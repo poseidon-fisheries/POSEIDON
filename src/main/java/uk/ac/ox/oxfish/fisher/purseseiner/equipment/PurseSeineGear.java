@@ -117,7 +117,7 @@ public class PurseSeineGear implements Gear {
         ));
     }
 
-    public static Optional<PurseSeineGear> maybeGetPurseSeineGear(Fisher fisher) {
+    public static Optional<PurseSeineGear>  maybeGetPurseSeineGear(Fisher fisher) {
         return Optional
             .of(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)

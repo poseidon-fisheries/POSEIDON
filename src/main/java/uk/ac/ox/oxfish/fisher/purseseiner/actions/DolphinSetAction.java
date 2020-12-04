@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
@@ -29,6 +30,14 @@ public class DolphinSetAction extends SchoolSetAction {
         super(
             fisher,
             getPurseSeineGear(fisher).getCatchSamplers().get(DolphinSetAction.class),
+            setDuration(fisher, DolphinSetAction.class)
+        );
+    }
+
+    public DolphinSetAction(final Fisher fisher, final VariableBiomassBasedBiology targetBiology) {
+        super(
+            fisher,
+            targetBiology,
             setDuration(fisher, DolphinSetAction.class)
         );
     }

@@ -63,22 +63,25 @@ public class SetOpportunityDetector {
     }
 
     @NotNull List<AbstractSetAction> possibleSetActions() {
-        final Stream<AbstractSetAction> actions;
+        final List<AbstractSetAction> actions;
         if (fisher.getHold().getPercentageFilled() >= 1) {
-            actions = Stream.of(); // no possible sets when hold is full
+            actions = ImmutableList.of(); // no possible sets when hold is full
         } else {
             final FadManager fadManager = getFadManager(fisher);
             final Map<Boolean, List<Fad>> fadsOwnedOrNot = fadManager
                 .getFadsHere()
                 .collect(partitioningBy(fad -> fad.getOwner() == fadManager));
-            actions = Stream.of(
-                setsOnOwnFads(fadsOwnedOrNot.get(true)),
-                opportunisticFadSets(fadsOwnedOrNot.get(false)),
-                setsFromOpportunityGenerators()
-            ).flatMap(identity());
+            actions = Stream
+                .of(
+                    setsOnOwnFads(fadsOwnedOrNot.get(true)),
+                    opportunisticFadSets(fadsOwnedOrNot.get(false)),
+                    setsFromOpportunityGenerators()
+                )
+                .flatMap(identity())
+                .collect(toImmutableList());
         }
         hasSearched = false;
-        return actions.collect(toImmutableList());
+        return actions;
     }
 
     private Stream<FadSetAction> setsOnOwnFads(Iterable<Fad> ownFads) {
@@ -106,6 +109,9 @@ public class SetOpportunityDetector {
         return basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
     }
 
-    public void notifyOfSearch() { hasSearched = true; }
+    public void notifyOfSearch() {
+        hasSearched = true;
+        System.out.println(hasSearched);
+    }
 
 }

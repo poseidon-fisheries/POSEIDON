@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -27,8 +26,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
 public class SetOpportunityGenerator {
 
@@ -42,8 +45,29 @@ public class SetOpportunityGenerator {
         final Map<Species, Double> weights,
         final Function<Fisher, AbstractSetAction> actionConstructor
     ) {
-        this.probabilityFunction = new LogisticFunction(logisticMidpoint, logisticSteepness);
-        this.weights = ImmutableMap.copyOf(weights);
+        this(
+            new LogisticFunction(logisticMidpoint, logisticSteepness),
+            weights,
+            actionConstructor
+        );
+    }
+
+    public SetOpportunityGenerator(
+        final LogisticFunction probabilityFunction,
+        final Map<Species, Double> weights,
+        final Function<Fisher, AbstractSetAction> actionConstructor
+    ) {
+        this.probabilityFunction = probabilityFunction;
+
+        // make sure all weights are >= 0 and at least one is > 0
+        checkArgument(weights.values().stream().allMatch(w -> w >= 0));
+        checkArgument(weights.values().stream().anyMatch(w -> w > 0));
+        final double sum = weights.values().stream().mapToDouble(Double::doubleValue).sum();
+
+        // normalize the weights so they sum up to one
+        this.weights = weights.entrySet().stream()
+            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sum));
+
         this.actionConstructor = actionConstructor;
     }
 
@@ -54,7 +78,8 @@ public class SetOpportunityGenerator {
             : Optional.empty();
     }
 
-    private double probabilityOfOpportunity(final LocalBiology biology) {
+    double probabilityOfOpportunity(final LocalBiology biology) {
+        checkArgument(weights.keySet().stream().mapToDouble(biology::getBiomass).allMatch(b -> b >= 0));
         final double weightedBiomass = weights
             .entrySet()
             .stream()
