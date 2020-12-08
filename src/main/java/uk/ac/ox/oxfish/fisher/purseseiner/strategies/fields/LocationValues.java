@@ -27,8 +27,10 @@ import java.util.stream.Stream;
 
 public interface LocationValues extends FisherStartable {
 
-    Stream<Map.Entry<Int2D, Double>> getValues();
-
+    default double getValueAt(int gridX, int gridY) {
+        return getValueAt(new Int2D(gridX, gridY));
+    }
     double getValueAt(Int2D location);
+    Stream<Map.Entry<Int2D, Double>> getValues();
 
 }

@@ -489,7 +489,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             ),
             new ActionAttractionField(
                 new OpportunisticFadSetLocationValues(
-                    this::loadLocationValues,
+                    fisher -> loadLocationValues(fisher, OpportunisticFadSetAction.class),
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new SetAttractionModulator(
@@ -505,7 +505,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             ),
             new ActionAttractionField(
                 new NonAssociatedSetLocationValues(
-                    this::loadLocationValues,
+                    fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class),
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new SetAttractionModulator(
@@ -521,7 +521,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             ),
             new ActionAttractionField(
                 new DolphinSetLocationValues(
-                    this::loadLocationValues,
+                    fisher -> loadLocationValues(fisher, DolphinSetAction.class),
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new SetAttractionModulator(
@@ -537,7 +537,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             ),
             new ActionAttractionField(
                 new DeploymentLocationValues(
-                    this::loadLocationValues,
+                    fisher -> loadLocationValues(fisher, FadDeploymentAction.class),
                     getDecayRateOfDeploymentLocationValues()
                 ),
                 new DeploymentLocationsAttractionModulator(

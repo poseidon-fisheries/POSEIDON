@@ -17,22 +17,24 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import com.google.common.collect.ImmutableMap;
+import org.junit.Test;
+import uk.ac.ox.oxfish.biology.Species;
 
-import java.util.Map;
-import java.util.function.Function;
+import static org.junit.Assert.assertEquals;
+import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class NonAssociatedSetLocationValues extends SetLocationValues<NonAssociatedSetAction> {
+public class BiomassLostEventTest {
 
-    public NonAssociatedSetLocationValues(
-        final Function<Fisher, Map<Int2D, Double>> loadValues,
-        final double decayRate
-    ) {
-        super(NonAssociatedSetAction.class, loadValues, decayRate);
+    @Test
+    public void getBiomassLost() {
+        final Species species = genericListOfSpecies(1).getSpecie(0);
+        final BiomassLostEvent biomassLostEvent =
+            new BiomassLostEvent(ImmutableMap.of(species, 1.0));
+        assertEquals(1.0, biomassLostEvent.getBiomassLost().get(species), EPSILON);
     }
 
 }

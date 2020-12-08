@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
@@ -39,13 +39,13 @@ public abstract class MutableLocationValues<A>
     extends PurseSeinerActionObserver<A>
     implements LocationValues, Steppable {
 
-    private final BiFunction<Fisher, Class<A>, Map<Int2D, Double>> valueLoader;
+    private final Function<Fisher, Map<Int2D, Double>> valueLoader;
     private final double decayRate;
     private Map<Int2D, Double> values;
 
     MutableLocationValues(
         final Class<A> observedClass,
-        final BiFunction<Fisher, Class<A>, Map<Int2D, Double>> valueLoader,
+        final Function<Fisher, Map<Int2D, Double>> valueLoader,
         final double decayRate
     ) {
         super(observedClass);
@@ -54,7 +54,7 @@ public abstract class MutableLocationValues<A>
     }
 
     @Override public void start(final FishState model, final Fisher fisher) {
-        this.values = new HashMap<>(valueLoader.apply(fisher, getObservedClass()));
+        this.values = new HashMap<>(valueLoader.apply(fisher));
         model.scheduleEveryYear(this, POLICY_UPDATE);
     }
 

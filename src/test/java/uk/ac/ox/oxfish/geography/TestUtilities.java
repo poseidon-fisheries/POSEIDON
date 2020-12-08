@@ -50,6 +50,10 @@ public class TestUtilities {
         );
     }
 
+    public static NauticalMap makeMap(int width, int height) {
+        return makeMap(width, height, -1);
+    }
+
     public static NauticalMap makeMap(int width, int height, int altitude) {
         int[][] altitudes = new int[width][height];
         for (int[] row : altitudes) Arrays.fill(row, altitude);

@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
@@ -36,7 +36,7 @@ public abstract class SetLocationValues<A extends AbstractSetAction> extends Mut
 
     public SetLocationValues(
         final Class<A> observedClass,
-        final BiFunction<Fisher, Class<A>, Map<Int2D, Double>> loadValues,
+        final Function<Fisher, Map<Int2D, Double>> loadValues,
         final double decayRate
     ) {
         super(observedClass, loadValues, decayRate);

@@ -26,14 +26,14 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class DeploymentLocationValues extends SetLocationValues<FadSetAction> {
 
     public DeploymentLocationValues(
-        final BiFunction<Fisher, Class<FadSetAction>, Map<Int2D, Double>> valueLoader,
+        final Function<Fisher, Map<Int2D, Double>> valueLoader,
         final double decayRate
     ) {
         super(FadSetAction.class, valueLoader, decayRate);

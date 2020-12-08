@@ -24,12 +24,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class DolphinSetLocationValues extends SetLocationValues<DolphinSetAction> {
 
     public DolphinSetLocationValues(
-        final BiFunction<Fisher, Class<DolphinSetAction>, Map<Int2D, Double>> loadValues,
+        final Function<Fisher, Map<Int2D, Double>> loadValues,
         final double decayRate
     ) {
         super(DolphinSetAction.class, loadValues, decayRate);

@@ -24,12 +24,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class OpportunisticFadSetLocationValues extends SetLocationValues<OpportunisticFadSetAction> {
 
     public OpportunisticFadSetLocationValues(
-        final BiFunction<Fisher, Class<OpportunisticFadSetAction>, Map<Int2D, Double>> loadValues,
+        final Function<Fisher, Map<Int2D, Double>> loadValues,
         final double decayRate
     ) {
         super(OpportunisticFadSetAction.class, loadValues, decayRate);
