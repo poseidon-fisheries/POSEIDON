@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
+import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
@@ -58,6 +59,7 @@ public class AdditionalStartables {
         NAMES.put(LastCatchToTACController.class, "Last catch as TAC Controller");
         NAMES.put(PIDControllerIndicatorTarget.class, "PID-TAC Controller");
         NAMES.put(LBSPREffortPolicyFactory.class, "LBSPR Effort Controller");
+        NAMES.put(LoptEffortPolicyFactory.class, "Lopt Effort Controller");
         NAMES.put(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller");
         NAMES.put(SimpleFishSamplerFactory.class,
                 "Simple Fisher Sampler");

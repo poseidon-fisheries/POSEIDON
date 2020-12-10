@@ -28,19 +28,20 @@ public class NoData718Slice6Policy {
     private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
             NoData718Slice6.MAIN_DIRECTORY.
-                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse_noentry");
+                            resolve("spr_lowmk_arrays_complete_18").resolve("lopt_noentry");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
             new LinkedList<>();
     static {
         ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
-        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
+        ADDITIONAL_COLUMNS.add( "Mean Length Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
     }
 
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.lbsprMsePoliciesNoEntry;
+            NoData718Utilities.loptMsePolicies;
 
 
 

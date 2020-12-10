@@ -113,5 +113,6 @@ public class SPRAgentTest {
 
         assertEquals(agent.computeMaturityRatio(),.995,.001);
         assertEquals(agent.computeLoptRatio(),.245,.001);
+        assertEquals(agent.computeMeanLength(),59.924,.001);
     }
 }

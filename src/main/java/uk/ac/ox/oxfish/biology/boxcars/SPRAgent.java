@@ -194,6 +194,25 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         return matureCatch/allCatches;
     }
 
+    public double computeMeanLength(){
+        double numberOfObservations = 0;
+        double sumLength = 0;
+        double[][] abundance = sampler.getAbundance(
+                binLengthToWeightFunction
+        );
+        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                assert Double.isFinite(abundance[subdivision][bin]) || bin==0; //for some formulas weight at 0 length is undefined
+                if(Double.isFinite(abundance[subdivision][bin])) {
+                    numberOfObservations += abundance[subdivision][bin];
+                    sumLength += abundance[subdivision][bin] * species.getLength(subdivision, bin);
+                }
+            }
+        }
+
+        return sumLength/numberOfObservations;
+    }
+
     /**
      * computes % of ABUNDANCE (raw number) of the catch above lopt
      * @return
@@ -299,6 +318,15 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                     public Double apply(FishState fishState) {
                         double ratio = computeLoptRatio();
                         return ratio;
+
+                    }
+                },Double.NaN);
+
+        model.getYearlyDataSet().registerGatherer("Mean Length Caught " + species + " " + surveyTag,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        return computeMeanLength();
 
                     }
                 },Double.NaN);
