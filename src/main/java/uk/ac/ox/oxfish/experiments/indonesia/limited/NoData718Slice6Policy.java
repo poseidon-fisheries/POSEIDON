@@ -35,7 +35,7 @@ public class NoData718Slice6Policy {
             new LinkedList<>();
     static {
         ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
-        ADDITIONAL_COLUMNS.add( "Mean Length Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add( "Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy");
         ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
     }
 
