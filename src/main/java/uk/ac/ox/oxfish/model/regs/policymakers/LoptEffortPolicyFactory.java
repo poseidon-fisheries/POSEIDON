@@ -27,7 +27,7 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
 
     private DoubleParameter howManyYearsToLookBackTo = new FixedDoubleParameter(5);
 
-    private final String effortDefinition = "season";
+    private String effortDefinition = "season";
 
 
     private boolean blockEntryWhenSeasonIsNotFull = false;
@@ -133,5 +133,9 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
+    }
+
+    public void setEffortDefinition(String effortDefinition) {
+        this.effortDefinition = effortDefinition;
     }
 }

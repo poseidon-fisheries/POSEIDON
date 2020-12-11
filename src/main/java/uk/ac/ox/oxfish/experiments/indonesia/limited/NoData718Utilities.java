@@ -523,6 +523,7 @@ public class NoData718Utilities {
                                                                                 String policyString =
                                                                                         "Lopt Effort Controller:\n" +
                                                                                                 "      bufferValue: '0.9'\n" +
+                                                                                                "      effortDefinition: 'season_hours_out'\n" +
                                                                                                 "      howManyYearsToLookBackTo: '5'\n" +
                                                                                                 "      meanLengthColumnName: Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy\n" +
                                                                                                 "      targetLength: " + (86d*3d)/(3d+mkRatio) +"\n" +
