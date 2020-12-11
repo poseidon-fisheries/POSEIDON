@@ -23,6 +23,9 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
         EFFORT_ACTUATORS.put("season",
                 IndexTargetController.RATIO_TO_SEASONAL_CLOSURE
                 );
+        EFFORT_ACTUATORS.put("season_hours_out",
+                IndexTargetController.RATIO_TO_PERSONAL_SEASONAL_CLOSURE
+                );
         EFFORT_ACTUATORS.put("fleet",
                 IndexTargetController.RATIO_TO_FLEET_SIZE
                 );
