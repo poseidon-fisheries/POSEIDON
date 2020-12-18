@@ -624,4 +624,10 @@ public Coordinate getCoordinates(int gridX, int gridY) {
         return getSeaTile(coordinate).getGridLocation();
     }
 
+    public double distance(Int2D here, Int2D there) {
+        SeaTile tileHere = getSeaTile(here.x, here.y);
+        SeaTile tileThere = getSeaTile(there.x, there.y);
+        return getDistance().distance(tileHere, tileThere, this);
+    }
+
 }

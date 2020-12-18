@@ -37,7 +37,7 @@ public class PortLocationValues implements LocationValues {
     }
 
     @Override public double getValueAt(final Int2D location) {
-        return location == portLocationValue.getKey()
+        return location.equals(portLocationValue.getKey())
             ? portLocationValue.getValue()
             : 0;
     }

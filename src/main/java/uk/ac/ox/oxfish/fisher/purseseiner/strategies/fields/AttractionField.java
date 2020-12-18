@@ -23,11 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.pow;
 
 public class AttractionField implements FisherStartable {
@@ -44,27 +44,30 @@ public class AttractionField implements FisherStartable {
         this.modulator = modulator;
     }
 
-    public Double2D netAttraction(Int2D here, Fisher fisher, FishState fishState) {
+    public Double2D netAttraction(Fisher fisher) {
+        final Int2D here = fisher.getLocation().getGridLocation();
         return locationValues
             .getValues()
             .filter(entry -> !entry.getKey().equals(here))
-            .map(entry -> attraction(here, entry.getKey(), entry.getValue(), fisher, fishState))
+            .map(entry -> attraction(here, entry.getKey(), entry.getValue(), fisher))
             .reduce(Double2D::add)
             .filter(v -> !v.equals(ZERO_VECTOR)) // avoids crashing normalize
             .map(Double2D::normalize)
             .orElse(ZERO_VECTOR);
     }
 
-    @NotNull
-    private Double2D attraction(
+    @NotNull Double2D attraction(
         final Int2D here,
         final Int2D there,
         final double value,
-        final Fisher fisher,
-        final FishState fishState
+        final Fisher fisher
     ) {
-        final double distance = distance(fishState.getMap(), here, there);
+        checkArgument(here != there, "here and there must be different");
+        final FishState fishState = fisher.grabState();
+        final double distance = fishState.getMap().distance(here, there);
         final double speed = fisher.getBoat().getSpeedInKph();
+        checkState(speed > 0, "boat speed must be > 0");
+        checkState(fishState.getHoursPerStep() > 0, "hour per step must be > 0");
         final double travelTime = distance / speed;
         final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
         final Double2D unitVector = new Double2D(there.x - here.x, there.y - here.y).normalize();
@@ -72,13 +75,9 @@ public class AttractionField implements FisherStartable {
         return attractionVector.multiply(modulator.modulate(there.x, there.y, t, fisher));
     }
 
-    private double distance(NauticalMap map, Int2D here, Int2D there) {
-        SeaTile tileHere = map.getSeaTile(here.x, here.y);
-        SeaTile tileThere = map.getSeaTile(there.x, there.y);
-        return map.getDistance().distance(tileHere, tileThere, map);
+    public double getValueAt(Int2D location) {
+        return locationValues.getValueAt(location);
     }
-
-    public double getValueAt(Int2D location) { return locationValues.getValueAt(location); }
 
     @Override public void start(final FishState model, final Fisher fisher) {
         locationValues.start(model, fisher);

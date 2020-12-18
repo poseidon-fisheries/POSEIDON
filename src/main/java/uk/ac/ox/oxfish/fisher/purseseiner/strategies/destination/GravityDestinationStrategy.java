@@ -85,7 +85,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         final NauticalMap map = fisher.grabState().getMap();
         final SeaTile portLocation = fisher.getHomePort().getLocation();
         final double distanceToPort = map.distance(fisher.getLocation(), portLocation);
-        final double travelTimeToPort = distanceToPort * fisher.getBoat().getSpeedInKph();
+        final double travelTimeToPort = distanceToPort / fisher.getBoat().getSpeedInKph();
         return fisher.getHoursAtSea() + travelTimeToPort >= maxTravelTime;
     }
 
@@ -96,8 +96,9 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         return attractionWeights
             .entrySet()
             .stream()
+            .filter(entry -> entry.getValue() > 0)
             .map(entry -> entry.getKey()
-                .netAttraction(here, fisher, fishState)
+                .netAttraction(fisher)
                 .multiply(entry.getValue())
             )
             .reduce(Double2D::add)
