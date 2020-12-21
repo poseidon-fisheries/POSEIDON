@@ -77,36 +77,15 @@ public class ITarget implements Sensor<FishState,Double> {
         this.yearsToLookBackToTarget = yearsToLookBackToTarget;
     }
 
-    @Override
-    public Double scan(FishState system) {
 
-        final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
+    public Double getPercentageChangeToTACDueToIndicator(FishState system){
         final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
-        //you need to have at least timeInterval*2 observations
-        if(catchColumn.size()< yearsToLookBackToTarget) //need a long enough time series!
-            return Double.NaN;
-        assert indicatorColumn.size() == catchColumn.size();
-
-
-        final int stepsBackToLook = Math.min(timeInterval, catchColumn.size());
-
-        //go backward and grab the last maxTimeLag observations
-        //transforming them if necessary
-        DoubleSummaryStatistics catchesThisInterval = new DoubleSummaryStatistics();
+        final int stepsBackToLook = Math.min(timeInterval, indicatorColumn.size());
         DoubleSummaryStatistics indicatorThisInterval = new DoubleSummaryStatistics();
         DoubleSummaryStatistics indicatorBothIntervals = new DoubleSummaryStatistics();
-        final Iterator<Double> catchesIterator = catchColumn.descendingIterator();
         final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
-
-
         for (int lag = 0; lag < stepsBackToLook;
              lag++) {
-
-
-            catchesThisInterval.accept(
-                    catchTransformer.apply(
-                            catchesIterator.next()
-            ));
             final Double observedIndicator = indicatorTransformer.apply(
                     indicatorIterator.next());
 
@@ -125,21 +104,54 @@ public class ITarget implements Sensor<FishState,Double> {
         double indicatorZero = indicatorAve * 0.8;
         double indicatorRecent = indicatorThisInterval.getAverage();
         double indicatorTarget = indicatorAve* indicatorMultiplier;
-
-        double catches = catchesThisInterval.getAverage();
-
-        //create baseline if it's not there!
-        if(!Double.isFinite(lastPolicy))
-             lastPolicy = catches * (1-precautionaryScaling);
-
         if(indicatorRecent<=indicatorZero) {
             //0.5 * TACstar * (Irecent/I0)^2
-            return  0.5* lastPolicy * Math.pow(indicatorRecent/indicatorZero,2);
+            return  0.5 * Math.pow(indicatorRecent/indicatorZero,2);
         }
         else
             //TAC=0.5TAC∗[1+(Irecent−I0)/(Itarget−I0)]
-            return 0.5* lastPolicy * (1d+ (indicatorRecent-indicatorZero)/
+            return 0.5 * (1d+ (indicatorRecent-indicatorZero)/
                     (indicatorTarget-indicatorZero));
+    }
+
+    @Override
+    public Double scan(FishState system) {
+
+        double percentageChangeDueToIndicator = getPercentageChangeToTACDueToIndicator(system);
+
+        final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
+        //you need to have at least timeInterval*2 observations
+        if(catchColumn.size()< yearsToLookBackToTarget) //need a long enough time series!
+            return Double.NaN;
+
+
+        final int stepsBackToLook = Math.min(timeInterval, catchColumn.size());
+
+        //if this is the first time we do policy, look at average catches to form a TAC baseline
+        if(!Double.isFinite(lastPolicy)) {
+            DoubleSummaryStatistics catchesThisInterval = new DoubleSummaryStatistics();
+            final Iterator<Double> catchesIterator = catchColumn.descendingIterator();
+
+
+            for (int lag = 0; lag < stepsBackToLook;
+                 lag++) {
+
+
+                catchesThisInterval.accept(
+                        catchTransformer.apply(
+                                catchesIterator.next()
+                        ));
+
+            }
+
+
+            double catches = catchesThisInterval.getAverage();
+
+
+            lastPolicy = catches * (1 - precautionaryScaling);
+        }
+
+        return lastPolicy * percentageChangeDueToIndicator;
     }
 
 

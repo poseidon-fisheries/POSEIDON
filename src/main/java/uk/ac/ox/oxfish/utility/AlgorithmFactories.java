@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
@@ -102,6 +103,7 @@ import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.model.network.factory.NetworkPredicates;
 import uk.ac.ox.oxfish.model.plugins.AdditionalStartables;
+import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactories;
 import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.PermitAllocationPolicies;
@@ -205,6 +207,8 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
         NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
+        CONSTRUCTOR_MAP.put(SPRAgent.class, CatchAtLengthFactories.CONSTRUCTORS);
+        NAMES_MAP.put(SPRAgent.class, CatchAtLengthFactories.NAMES);
         CONSTRUCTOR_MAP.put(TimeScalarFunction.class, TimeScalarFunctions.CONSTRUCTORS);
         NAMES_MAP.put(TimeScalarFunction.class, TimeScalarFunctions.NAMES);
         CONSTRUCTOR_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.CONSTRUCTORS);

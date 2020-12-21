@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EFFORT;
+
 public class SPRAgent implements AdditionalStartable, Steppable {
 
 
@@ -49,7 +51,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     private final double assumedKParameter;
 
-    private final double assumedNaturalMortality;
+    private double assumedNaturalMortality;
 
     private final int assumedMaxAge;
 
@@ -68,7 +70,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     /**
      * object sampling fishers to keep track of their landings
      */
-    final protected CatchSampler sampler;
+    final protected CatchAtLengthSampler sampler;
 
     final private SPRFormula formula;
 
@@ -87,11 +89,11 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 surveyTag,
                 species,
                 new StochasticCatchSampler(samplingSelector,species,surveyTag),
-        assumedLinf,
-        assumedKParameter, assumedNaturalMortality,
-        assumedMaxAge,
-        assumedVirginRecruits,
-        assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity,
+                assumedLinf,
+                assumedKParameter, assumedNaturalMortality,
+                assumedMaxAge,
+                assumedVirginRecruits,
+                assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity,
                 formula
         );
 
@@ -101,7 +103,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     public SPRAgent(
             String surveyTag, Species species,
-            CatchSampler sampler,
+            CatchAtLengthSampler sampler,
             double assumedLinf,
             double assumedKParameter, double assumedNaturalMortality,
             int assumedMaxAge,
@@ -292,14 +294,33 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
 
         model.getYearlyDataSet().registerGatherer("SPR " + species + " " + surveyTag,
-                                                  new Gatherer<FishState>() {
-                                                      @Override
-                                                      public Double apply(FishState fishState) {
-                                                          double spr = computeSPR();
-                                                          return spr;
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        double spr = computeSPR();
+                        return spr;
 
-                                                      }
-                                                  },Double.NaN);
+                    }
+                },Double.NaN);
+
+
+        model.getYearlyDataSet().registerGatherer("CPUE " + species + " " + surveyTag,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        double numerator = 0;
+                        final double[][] observedLandings = sampler.getLandings();
+                        for (double[] landingsPerSubdivision : observedLandings) {
+                            for (double landingsPerBin : landingsPerSubdivision) {
+                                numerator+=landingsPerBin;
+                            }
+                        }
+                        double denominator=0;
+                        for (Fisher fisher : sampler.viewObservedFishers())
+                            denominator+=fisher.getYearlyCounterColumn(EFFORT);
+                        return numerator/denominator;
+                    }
+                },Double.NaN);
 
 
         model.getYearlyDataSet().registerGatherer("Percentage Mature Catches " + species + " " + surveyTag,
@@ -422,5 +443,14 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     public Function<Pair<Integer, Integer>, Double> getBinLengthToWeightFunction() {
         return binLengthToWeightFunction;
+    }
+
+
+    public void setAssumedNaturalMortality(double assumedNaturalMortality) {
+        this.assumedNaturalMortality = assumedNaturalMortality;
+    }
+
+    public String getSurveyTag() {
+        return surveyTag;
     }
 }

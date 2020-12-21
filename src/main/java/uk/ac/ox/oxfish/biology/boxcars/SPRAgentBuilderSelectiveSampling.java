@@ -4,6 +4,7 @@ package uk.ac.ox.oxfish.biology.boxcars;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * creates an SPR agent but this time it has a fixed probability of sampling a boat for each matching tag
  */
-public class SPRAgentBuilderSelectiveSampling implements AlgorithmFactory<SPRAgent>  {
+public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
 
 
     private  String surveyTag = "spr_agent";

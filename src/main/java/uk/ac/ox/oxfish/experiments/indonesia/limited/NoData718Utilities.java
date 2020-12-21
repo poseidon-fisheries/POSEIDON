@@ -614,4 +614,75 @@ public class NoData718Utilities {
 
 
 
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> adaptivelbsprMsePolicies = new LinkedHashMap<>();
+        static {
+                FishYAML fishYAML = new FishYAML();
+
+                for (boolean includeGillnetters : new boolean[]{true, false}) {
+
+                        Function<Integer, Consumer<Scenario>> policy =
+                                new Function<Integer, Consumer<Scenario>>() {
+                                        @Override
+                                        public Consumer<Scenario> apply(Integer shockYear) {
+                                                return new Consumer<Scenario>() {
+                                                        @Override
+                                                        public void accept(Scenario scenario) {
+
+                                                                String policyString =
+                                                                        "LBSPR Effort Adaptive Controller:\n" +
+                                                                                "  blockEntryWhenSeasonIsNotFull: true\n" +
+                                                                                "  cpueHalfPeriod: '3.0'\n" +
+                                                                                "  cubicParameter: '0.3'\n" +
+                                                                                "  highestMKAllowed: '2.0'\n" +
+                                                                                "  linearParameter: '0.05'\n" +
+                                                                                "  lowerDiscrepancyThreshold: '-0.36'\n" +
+                                                                                "  lowestMKAllowed: '0.4'\n" +
+                                                                                "  maxChangeEachYear: '0.1'\n" +
+                                                                                "  sprAgentDelegate:\n" +
+                                                                                "    SPR Fixed Sample Agent:\n" +
+                                                                                "      assumedKParameter: '" + 0.3775984 / 0.6 + "'\n" +
+                                                                                "      assumedLengthAtMaturity: '50.0'\n" +
+                                                                                "      assumedLengthBinCm: '5.0'\n" +
+                                                                                "      assumedLinf: '86.0'\n" +
+                                                                                "      assumedNaturalMortality: '0.3775984'\n" +
+                                                                                "      assumedVarA: '0.00853'\n" +
+                                                                                "      assumedVarB: '3.137'\n" +
+                                                                                "      simulatedMaxAge: '100.0'\n" +
+                                                                                "      simulatedVirginRecruits: '1000.0'\n" +
+                                                                                "      speciesName: Lutjanus malabaricus\n" +
+                                                                                "      surveyTag: spr_agent_forpolicy\n" +
+                                                                                "      useTNCFormula: true" + "\n" +
+                                                                                "      tagsToSample:\n" +
+                                                                                "        population0: 16\n" +
+                                                                                "        population1: 16\n" +
+                                                                                (includeGillnetters ? "        population2: 4" : "        population2: 0") + "\n"+
+                                                                                "  sprTarget: '0.4'\n" +
+                                                                                "  startUpdatingMKAfterYear: '-1.0'\n" +
+                                                                                "  startingYear: " + shockYear + '\n'+
+                                                                                "  upperDiscrepancyThreshold: '-0.24'";
+
+
+                                                                //add policy
+                                                                ((FlexibleScenario) scenario).getPlugins().
+                                                                        add(fishYAML.loadAs(
+                                                                                policyString,
+                                                                                AlgorithmFactory.class));
+
+
+                                                        }
+                                                };
+                                        }
+                                };
+
+
+                        adaptivelbsprMsePolicies.put("adaptive_lbspr_policy_gill" + includeGillnetters,
+                                policy);
+
+                }
+
+        }
+
+
+
+
 }

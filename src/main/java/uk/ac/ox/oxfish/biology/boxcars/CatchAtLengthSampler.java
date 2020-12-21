@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * basically a CatchSample that keeps track of which boats to observe
  */
-public interface CatchSampler extends Startable {
+public interface CatchAtLengthSampler extends Startable {
 
     /**
      * Step to call (from the outside!) to tell the sampler to look at this day's data
