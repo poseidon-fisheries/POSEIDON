@@ -80,10 +80,8 @@ public class LBSPREffortPolicy extends Controller {
         if(!Double.isFinite(currentSPR) || currentSPR < 0 || currentSPR > 1)
             return accumulatedDelta;
 
-        double deltaToday =  cubicParameter *
-                Math.pow(currentSPR/targetSPR - 1d,3) +
-                linearParameter *
-                        (currentSPR/(targetSPR) - 1d);
+        double deltaToday =
+                lbsprPolicyEffortProportion(linearParameter,cubicParameter,currentSPR,targetSPR);
         if(deltaToday<-maxChangeInPercentage)
                 deltaToday = -maxChangeInPercentage;
         if(deltaToday>maxChangeInPercentage)
@@ -125,5 +123,21 @@ public class LBSPREffortPolicy extends Controller {
 
     public double getAccumulatedDelta() {
         return accumulatedDelta;
+    }
+
+    public String getColumnNameSPR() {
+        return columnNameSPR;
+    }
+
+    public double getLinearParameter() {
+        return linearParameter;
+    }
+
+    public double getCubicParameter() {
+        return cubicParameter;
+    }
+
+    public double getSprTarget() {
+        return sprTarget;
     }
 }

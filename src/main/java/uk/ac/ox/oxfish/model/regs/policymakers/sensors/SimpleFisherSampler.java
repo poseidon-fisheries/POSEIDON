@@ -80,7 +80,6 @@ public class SimpleFisherSampler implements AdditionalStartable {
                         @Override
                         public Double apply(FishState fishState) {
                             final String catches = catchesColumn;
-                            final String effort = "Total Effort";
 
 
                             final List<Fisher> fishers = sampleFishers(model.getFishers(), model.getRandom());
@@ -94,7 +93,8 @@ public class SimpleFisherSampler implements AdditionalStartable {
                                 numerator+=fisher.getYearlyData().getColumn(species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME).getLatest();
                             }
 
-                            return (numerator / denominator)/percentageOfFishersToSample;
+                            double cpue = (numerator / denominator);
+                            return cpue/percentageOfFishersToSample;
 
                         }
                     }, Double.NaN);

@@ -13,10 +13,7 @@ import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
-import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
+import uk.ac.ox.oxfish.model.regs.policymakers.*;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -37,9 +34,11 @@ public class AdditionalStartables {
         NAMES.put(SnapshotAbundanceResetterFactory.class, "Abundance Snapshot Resetter");
         NAMES.put(SnapshotBiomassResetterFactory.class, "Biomass Snapshot Resetter");
         NAMES.put(AbundanceGathererBuilder.class, "Abundance Gatherers");
+        //these three probably need a linkedhashmap of their own::
         NAMES.put(SPRAgentBuilder.class, "SPR Agent");
         NAMES.put(SPRAgentBuilderSelectiveSampling.class, "SPR Selective Agent");
         NAMES.put(SPRAgentBuilderFixedSample.class, "SPR Fixed Sample Agent");
+        /////////////////////////////////////////////////////
         NAMES.put(SprOracleBuilder.class, "SPR Oracle");
         NAMES.put(FishingMortalityAgentFactory.class, "Fishing Mortality Agent");
         NAMES.put(FisherEntryByProfitFactory.class, "Fish Entry By Profit");
@@ -59,8 +58,10 @@ public class AdditionalStartables {
         NAMES.put(LastCatchToTACController.class, "Last catch as TAC Controller");
         NAMES.put(PIDControllerIndicatorTarget.class, "PID-TAC Controller");
         NAMES.put(LBSPREffortPolicyFactory.class, "LBSPR Effort Controller");
+        NAMES.put(LBSPRffortPolicyAdaptingFactory.class, "LBSPR Effort Adaptive Controller");
         NAMES.put(LoptEffortPolicyFactory.class, "Lopt Effort Controller");
-        NAMES.put(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller");
+        NAMES.put(SurplusProductionDepletionFormulaController.class,
+                "Schaefer Assessment Formula Controller");
         NAMES.put(SimpleFishSamplerFactory.class,
                 "Simple Fisher Sampler");
 

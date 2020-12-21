@@ -135,7 +135,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2020-11-10'
+  startDate: '2020-12-21'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -178,11 +178,51 @@ PID-TAC Controller:
   startingYear: 10
 -------
 LBSPR Effort Controller:
+  blockEntryWhenSeasonIsNotFull: false
   cubicParameter: '0.3'
   linearParameter: '0.05'
   maxChangeEachYear: '0.1'
   sprColumnName: SPR Lutjanus malabaricus spr_agent_total
   sprTarget: '0.4'
+  startingYear: 7
+-------
+LBSPR Effort Adaptive Controller:
+  blockEntryWhenSeasonIsNotFull: false
+  cpueHalfPeriod: '3.0'
+  cubicParameter: '0.3'
+  highestMKAllowed: '2.0'
+  linearParameter: '0.05'
+  lowerDiscrepancyThreshold: '-0.36'
+  lowestMKAllowed: '0.4'
+  maxChangeEachYear: '0.1'
+  sprAgentDelegate:
+    SPR Agent:
+      assumedKParameter: '0.4438437'
+      assumedLengthAtMaturity: '50.0'
+      assumedLengthBinCm: '5.0'
+      assumedLinf: '86.0'
+      assumedNaturalMortality: '0.3775984'
+      assumedVarA: '0.00853'
+      assumedVarB: '3.137'
+      probabilityOfSamplingEachBoat: '0.33'
+      simulatedMaxAge: '100.0'
+      simulatedVirginRecruits: '1000.0'
+      speciesName: Species 0
+      surveyTag: spr_agent
+      useTNCFormula: true
+  sprTarget: '0.4'
+  startUpdatingMKAfterYear: '-1.0'
+  startingYear: 7
+  upperDiscrepancyThreshold: '-0.24'
+-------
+Lopt Effort Controller:
+  blockEntryWhenSeasonIsNotFull: false
+  bufferValue: '0.9'
+  effortDefinition: season
+  howManyYearsToLookBackTo: '5.0'
+  meanLengthColumnName: Mean Length Caught Lutjanus malabaricus spr_agent_total
+  startingYear: 7
+  targetLength: '60.0'
 -------
 Schaefer Assessment Formula Controller:
   carryingCapacityMaximum: '3.0E7'

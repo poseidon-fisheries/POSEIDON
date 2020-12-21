@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * tries to keep a precise number of boats for each tag in the sample
  */
-public class CatchSamplerFixedSample implements CatchSampler, Steppable {
+public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable {
 
 
 

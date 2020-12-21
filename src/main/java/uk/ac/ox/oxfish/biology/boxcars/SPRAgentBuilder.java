@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -14,7 +15,7 @@ import java.util.function.Predicate;
  * creates an SPR Agent (a method that yearly computes SPRs) by sampling
  * a random proportion of boats
  */
-public class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
+public class SPRAgentBuilder implements CatchAtLengthFactory {
 
     private  String surveyTag = "spr_agent";
 
