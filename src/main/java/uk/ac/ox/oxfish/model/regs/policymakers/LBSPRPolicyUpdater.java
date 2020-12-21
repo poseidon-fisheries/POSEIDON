@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 
 /**
@@ -126,6 +127,17 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         //before we update
         model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, controller.getIntervalInDays());
 
+
+        model.getYearlyDataSet().registerGatherer("M/K ratio " + internalSPRAgent.getSpecies() + " " +
+                        internalSPRAgent.getSurveyTag(),
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        return (internalSPRAgent.getAssumedNaturalMortality()/internalSPRAgent.getAssumedKParameter());
+                    }
+                },
+                Double.NaN
+        );
 
     }
 
