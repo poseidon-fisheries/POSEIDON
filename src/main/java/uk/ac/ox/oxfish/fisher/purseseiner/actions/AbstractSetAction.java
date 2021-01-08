@@ -44,16 +44,16 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
     AbstractSetAction(
         final Fisher fisher,
         final double duration,
-        final VariableBiomassBasedBiology targetBiology,
-        final boolean permitted
+        final VariableBiomassBasedBiology targetBiology
     ) {
-        super(fisher, duration, permitted);
+        super(fisher, duration);
         this.targetBiology = targetBiology;
     }
 
     public Optional<Catch> getCatchesKept() { return Optional.ofNullable(catchesKept); }
 
-    @Override public ActionResult act(
+    @Override
+    public ActionResult act(
         final FishState fishState,
         final Fisher fisher,
         final Regulation regulation,
@@ -89,4 +89,14 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
 
     public VariableBiomassBasedBiology getTargetBiology() { return targetBiology; }
 
+    @Override
+    public boolean checkIfPermitted() {
+        return super.checkIfPermitted() &&
+            getFisher().getRegulation().canFishHere(
+                getFisher(),
+                getLocation(),
+                getFisher().grabState(),
+                getStep()
+            );
+    }
 }

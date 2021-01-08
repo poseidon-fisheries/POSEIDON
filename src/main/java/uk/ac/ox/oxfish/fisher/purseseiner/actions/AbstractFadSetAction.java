@@ -37,8 +37,7 @@ public abstract class AbstractFadSetAction extends AbstractSetAction {
         super(
             fisher,
             1.0, // TODO
-            fad.getBiology(),
-            true // TODO
+            fad.getBiology()
         );
         this.fad = fad;
     }

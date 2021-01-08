@@ -57,8 +57,7 @@ public class SchoolSetAction extends AbstractSetAction {
         super(
             fisher,
             setDuration,
-            targetBiology,
-            true // TODO
+            targetBiology
         );
     }
 

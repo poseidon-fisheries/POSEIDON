@@ -24,6 +24,8 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+
 public abstract class PurseSeinerAction implements Action, Locatable {
 
     private final Fisher fisher;
@@ -34,14 +36,13 @@ public abstract class PurseSeinerAction implements Action, Locatable {
 
     protected PurseSeinerAction(
         final Fisher fisher,
-        final double duration,
-        final boolean permitted
+        final double duration
     ) {
         this.fisher = fisher;
         this.location = fisher.getLocation();
         this.step = fisher.grabState().getStep();
         this.duration = duration;
-        this.permitted = permitted;
+        this.permitted = checkIfPermitted();
     }
 
     public int getStep() { return step; }
@@ -52,6 +53,11 @@ public abstract class PurseSeinerAction implements Action, Locatable {
 
     public boolean isPermitted() { return permitted; }
 
-    @Override public SeaTile getLocation() { return location; }
+    @Override
+    public SeaTile getLocation() { return location; }
+
+    public boolean checkIfPermitted() {
+        return !getFadManager(fisher).getActionSpecificRegulations().isForbidden(this);
+    }
 
 }
