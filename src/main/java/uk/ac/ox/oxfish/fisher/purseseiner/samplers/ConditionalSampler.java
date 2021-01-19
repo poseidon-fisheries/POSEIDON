@@ -19,16 +19,12 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ConditionalSampler<E> {
 
@@ -39,7 +35,7 @@ public class ConditionalSampler<E> {
     private final Deque<E> queue = new LinkedList<>();
 
     ConditionalSampler(final Iterable<E> sample, final MersenneTwisterFast rng) {
-        this.sample = ImmutableList.copyOf(sample);
+        this.sample = newArrayList(sample);
         this.rng = new Random(rng.nextLong());
     }
 
@@ -59,9 +55,8 @@ public class ConditionalSampler<E> {
     }
 
     private void refillQueue() {
-        final List<E> list = new ArrayList<>(sample);
-        Collections.shuffle(list, rng);
-        queue.addAll(list);
+        Collections.shuffle(sample, rng);
+        queue.addAll(sample);
     }
 
 }
