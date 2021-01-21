@@ -20,15 +20,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Collections.emptyMap;
@@ -89,7 +85,17 @@ public abstract class FisherValuesByActionFromFileCache<T>
 
         ActionClasses(final Class<? extends PurseSeinerAction> actionClass) {this.actionClass = actionClass;}
 
+        public static Class<? extends AbstractSetAction> getSetActionClass(String setActionCode) {
+            //noinspection unchecked
+            return Optional
+                .of(ActionClasses.valueOf(setActionCode.toUpperCase()).getActionClass())
+                .filter(AbstractSetAction.class::isAssignableFrom)
+                .map(clazz -> (Class<? extends AbstractSetAction>) clazz)
+                .orElseThrow(() -> new IllegalStateException("Unknown set action code: " + setActionCode));
+        }
+
         public Class<? extends PurseSeinerAction> getActionClass() { return actionClass; }
+
     }
 
 }

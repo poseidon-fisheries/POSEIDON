@@ -232,7 +232,7 @@ public class TunaScenario implements Scenario {
             "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
             "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
         ));
-        purseSeineGearFactory.setNonAssociatedSetCatchSampleFile(unassociatedCatchSampleFile);
+        purseSeineGearFactory.getCatchSamplers().setCatchSamplesFile(input("set_samples.csv"));
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);

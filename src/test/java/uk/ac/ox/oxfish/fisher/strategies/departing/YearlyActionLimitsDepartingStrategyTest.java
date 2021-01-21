@@ -63,7 +63,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         when(catchSampler.next(any())).thenReturn(ImmutableDoubleArray.of());
 
         PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
-        when(purseSeineGear.nextSetDuration(any(), any())).thenReturn(getQuantity(1, HOUR));
+        when(purseSeineGear.nextSetDuration(any())).thenReturn(getQuantity(1, HOUR));
 
         when(purseSeineGear.getCatchSamplers()).thenReturn(
             ImmutableMap.of(

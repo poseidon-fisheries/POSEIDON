@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
 
+import java.util.Collection;
+
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 
@@ -30,7 +32,7 @@ public class CatchSampler {
 
     private final ConditionalSampler<ImmutableDoubleArray> sampler;
 
-    public CatchSampler(final Iterable<Iterable<Double>> sample, MersenneTwisterFast rng) {
+    public CatchSampler(final Collection<Collection<Double>> sample, MersenneTwisterFast rng) {
         this.sampler = new ConditionalSampler<>(
             stream(sample).map(ImmutableDoubleArray::copyOf).collect(toImmutableList()),
             rng

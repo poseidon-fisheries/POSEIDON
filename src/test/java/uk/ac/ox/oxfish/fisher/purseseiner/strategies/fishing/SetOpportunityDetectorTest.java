@@ -73,7 +73,7 @@ public class SetOpportunityDetectorTest {
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabRandomizer()).thenReturn(rng);
         when(gear.getFadManager()).thenReturn(fadManager);
-        when(gear.nextSetDuration(any(), any())).thenReturn(getQuantity(1, HOUR));
+        when(gear.nextSetDuration(any())).thenReturn(getQuantity(1, HOUR));
         when(ownFad.getOwner()).thenReturn(fadManager);
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.getFadsHere()).thenAnswer(__ -> Stream.of(ownFad, otherFad));

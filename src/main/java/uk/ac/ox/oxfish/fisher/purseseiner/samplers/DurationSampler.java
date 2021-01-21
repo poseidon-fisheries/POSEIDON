@@ -19,61 +19,34 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import org.apache.commons.math3.distribution.LogNormalDistribution;
+import uk.ac.ox.oxfish.utility.MTFApache;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
 
 public class DurationSampler {
 
-    private static final LoadingCache<List<Double>, DurationSampler> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(args -> {
-            checkArgument(checkNotNull(args).size() == 3);
-            return new DurationSampler(args.get(0), args.get(1), args.get(2));
-        }));
+    private final LogNormalDistribution logNormalDistribution;
 
-    private final double minimumDurationInHours;
-    private final double meanDurationInHours;
-    private final double standardDeviationInHours;
-
-    private DurationSampler(
-        final double minimumDurationInHours,
-        final double meanDurationInHours,
-        final double standardDeviationInHours
+    public DurationSampler(
+        final MersenneTwisterFast rng,
+        final double meanLogDurationInHours,
+        final double standardDeviationLogInHours
     ) {
-        this.minimumDurationInHours = minimumDurationInHours;
-        this.meanDurationInHours = meanDurationInHours;
-        this.standardDeviationInHours = standardDeviationInHours;
-    }
-
-    public static DurationSampler getInstance(
-        final double minimumDurationInHours,
-        final double meanDurationInHours,
-        final double standardDeviationInHours
-    ) {
-        return cache.getUnchecked(ImmutableList.of(
-            minimumDurationInHours,
-            meanDurationInHours,
-            standardDeviationInHours
-        ));
-    }
-
-    public Quantity<Time> nextDuration(MersenneTwisterFast rng) {
-        final double duration = Math.max(
-            minimumDurationInHours,
-            rng.nextGaussian() * standardDeviationInHours + meanDurationInHours
+        this.logNormalDistribution = new LogNormalDistribution(
+            new MTFApache(rng),
+            meanLogDurationInHours,
+            standardDeviationLogInHours
         );
-        return getQuantity(duration, HOUR);
+    }
+
+    public Quantity<Time> nextDuration() {
+        return getQuantity(logNormalDistribution.sample(), HOUR);
     }
 
 }

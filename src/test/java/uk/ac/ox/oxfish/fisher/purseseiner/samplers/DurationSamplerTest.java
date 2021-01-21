@@ -31,12 +31,15 @@ public class DurationSamplerTest {
     @Test
     public void nextDuration() {
 
-        final DurationSampler durationSampler =
-            DurationSampler.getInstance(1, 1, 0);
+        final DurationSampler durationSampler = new DurationSampler(
+            new MersenneTwisterFast(),
+            1.0,
+            0.0
+        );
 
         assertEquals(
             getQuantity(1.0, HOUR),
-            durationSampler.nextDuration(new MersenneTwisterFast())
+            durationSampler.nextDuration()
         );
     }
 

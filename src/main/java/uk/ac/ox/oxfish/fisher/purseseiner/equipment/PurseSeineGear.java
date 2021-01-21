@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -30,10 +29,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
@@ -42,11 +38,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class PurseSeineGear implements Gear {
 
@@ -58,44 +50,6 @@ public class PurseSeineGear implements Gear {
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
-        FadManager fadManager,
-        final double minimumFadSetDurationInHours,
-        final double averageFadSetDurationInHours,
-        final double stdDevOfFadSetDurationInHours,
-        final double minimumUnassociatedSetDurationInHours,
-        final double averageUnassociatedSetDurationInHours,
-        final double stdDevOfUnassociatedSetDurationInHours,
-        final double successfulFadSetProbability,
-        final Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers,
-        final Iterable<AttractionField> attractionFields
-    ) {
-        this(
-            fadManager,
-            ImmutableMap.of(
-                AbstractFadSetAction.class, DurationSampler.getInstance(
-                    minimumFadSetDurationInHours,
-                    averageFadSetDurationInHours,
-                    stdDevOfFadSetDurationInHours
-                ),
-                NonAssociatedSetAction.class, DurationSampler.getInstance(
-                    minimumUnassociatedSetDurationInHours,
-                    averageUnassociatedSetDurationInHours,
-                    stdDevOfUnassociatedSetDurationInHours
-                ),
-                // TODO: get durations for dolphin sets
-                DolphinSetAction.class, DurationSampler.getInstance(
-                    minimumUnassociatedSetDurationInHours,
-                    averageUnassociatedSetDurationInHours,
-                    stdDevOfUnassociatedSetDurationInHours
-                )
-            ),
-            catchSamplers,
-            attractionFields,
-            successfulFadSetProbability
-        );
-    }
-
-    private PurseSeineGear(
         FadManager fadManager,
         Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers,
         Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers,
@@ -117,7 +71,7 @@ public class PurseSeineGear implements Gear {
         ));
     }
 
-    public static Optional<PurseSeineGear>  maybeGetPurseSeineGear(Fisher fisher) {
+    public static Optional<PurseSeineGear> maybeGetPurseSeineGear(Fisher fisher) {
         return Optional
             .of(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
@@ -134,7 +88,8 @@ public class PurseSeineGear implements Gear {
 
     public FadManager getFadManager() { return fadManager; }
 
-    @Override public Catch fish(
+    @Override
+    public Catch fish(
         Fisher fisher,
         LocalBiology localBiology,
         SeaTile context,
@@ -171,7 +126,8 @@ public class PurseSeineGear implements Gear {
         );
     }
 
-    @Override public boolean isSame(Gear o) {
+    @Override
+    public boolean isSame(Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final PurseSeineGear that = (PurseSeineGear) o;
@@ -184,10 +140,9 @@ public class PurseSeineGear implements Gear {
     }
 
     public Quantity<Time> nextSetDuration(
-        Class<? extends AbstractSetAction> actionClass,
-        MersenneTwisterFast rng
+        Class<? extends AbstractSetAction> actionClass
     ) {
-        return durationSamplers.get(actionClass).nextDuration(rng);
+        return durationSamplers.get(actionClass).nextDuration();
     }
 
     public void recordVisit(Int2D gridLocation, int timeStep) {

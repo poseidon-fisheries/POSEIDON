@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -82,17 +81,18 @@ public class SchoolSetAction extends AbstractSetAction {
 
     static double setDuration(final Fisher fisher, Class<? extends AbstractSetAction> actionClass) {
         final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-        final MersenneTwisterFast rng = fisher.grabRandomizer();
-        return toHours(purseSeineGear.nextSetDuration(actionClass, rng));
+        return toHours(purseSeineGear.nextSetDuration(actionClass));
     }
 
-    @Override boolean checkSuccess() {
+    @Override
+    boolean checkSuccess() {
         // school sets are always successful since we're sampling from an empirical distribution
         // that includes failed sets with zeros for all species.
         return true;
     }
 
-    @Override public void reactToSuccessfulSet(FishState fishState, SeaTile locationOfSet) {
+    @Override
+    public void reactToSuccessfulSet(FishState fishState, SeaTile locationOfSet) {
         // Remove the catches from the underlying biology:
         final Catch catchObject = new Catch(getTargetBiology().getCurrentBiomass());
         locationOfSet.reactToThisAmountOfBiomassBeingFished(
@@ -102,10 +102,12 @@ public class SchoolSetAction extends AbstractSetAction {
         );
     }
 
-    @Override public void reactToFailedSet(FishState fishState, SeaTile locationOfSet) {
+    @Override
+    public void reactToFailedSet(FishState fishState, SeaTile locationOfSet) {
         throw new IllegalStateException("School sets shouldn't 'fail'.");
     }
 
-    @Override void notify(FadManager fadManager) { fadManager.reactTo(this); }
+    @Override
+    void notify(FadManager fadManager) { fadManager.reactTo(this); }
 
 }
