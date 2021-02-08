@@ -24,12 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses;
 import uk.ac.ox.oxfish.model.FishState;
@@ -71,6 +66,15 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double opportunisticFadSetExponentialSteepnessCoefficient = 1E-4;
     private double nonAssociatedSetExponentialSteepnessCoefficient = 1E-4;
     private double dolphinSetExponentialSteepnessCoefficient = 1E-4;
+    private double movingThreshold = 0.1;
+
+    public double getMovingThreshold() {
+        return movingThreshold;
+    }
+
+    public void setMovingThreshold(double movingThreshold) {
+        this.movingThreshold = movingThreshold;
+    }
 
     public double getFadSetExponentialSteepnessCoefficient() { return fadSetExponentialSteepnessCoefficient; }
 
@@ -184,7 +188,8 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         this.dolphinSetGeneratorLogisticSteepness = dolphinSetGeneratorLogisticSteepness;
     }
 
-    @Override public PurseSeinerFishingStrategy apply(final FishState fishState) {
+    @Override
+    public PurseSeinerFishingStrategy apply(final FishState fishState) {
         return new PurseSeinerFishingStrategy(
             this::loadAttractionWeights,
             this::makeSetOpportunityLocator,
@@ -194,7 +199,8 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
             searchActionDecayConstant,
             fadDeploymentActionLogisticMidpoint,
             fadDeploymentActionLogisticSteepness,
-            fadDeploymentActionDecayConstant
+            fadDeploymentActionDecayConstant,
+            movingThreshold
         );
     }
 

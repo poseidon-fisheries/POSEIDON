@@ -1,4 +1,5 @@
 Tuna:
+  attractionWeightsFile: inputs/tuna/action_weights.csv
   biologyInitializers:
     Multiple Species Biomass:
       addImaginarySpecies: false
@@ -75,25 +76,35 @@ Tuna:
           unfishable: false
   boatsFile: inputs/tuna/boats.csv
   costsFile: inputs/tuna/costs.csv
-  deploymentValuesFile: inputs/tuna/deployment_values.csv
   fadCarryingCapacitiesFile: inputs/tuna/fad_carrying_capacities.csv
   fadMortalityIncludedInExogenousCatches: true
   fisherDefinition:
-    departingStrategy: Purse-Seine Gear Departing Strategy
+    departingStrategy: Purse Seiner Departing Strategy
     destinationStrategy:
-      FAD Destination Strategy:
-        numberOfStepsToLookAheadForFadPositions: '10.0'
-        travelSpeedMultiplier: '1.0'
+      Gravity Destination Strategy:
+        maxTripDurationFile: inputs/tuna/boats.csv
     discardingStrategy: No Discarding
     fishingStrategy:
-      FAD Fishing Strategy:
-        fadDeploymentsCoefficient: '0.01'
-        fadDeploymentsProbabilityDecay: '0.01'
-        fadSetsProbabilityDecay: '0.01'
-        setsOnOtherFadsCoefficient: '0.01'
-        setsOnOwnFadsCoefficient: '0.01'
-        unassociatedSetsCoefficient: '1.0E-8'
-        unassociatedSetsProbabilityDecay: '0.01'
+      Purse Seiner Fishing Strategy:
+        dolphinSetDetectionProbability: 0.1
+        dolphinSetExponentialSteepnessCoefficient: 1.0E-4
+        dolphinSetGeneratorLogisticMidpoint: 100000.0
+        dolphinSetGeneratorLogisticSteepness: 1.0
+        fadDeploymentActionDecayConstant: 1.0
+        fadDeploymentActionLogisticMidpoint: 0.1
+        fadDeploymentActionLogisticSteepness: 1.0
+        fadSetExponentialSteepnessCoefficient: 1.0E-4
+        nonAssociatedSetDetectionProbability: 0.1
+        nonAssociatedSetExponentialSteepnessCoefficient: 1.0E-4
+        nonAssociatedSetGeneratorLogisticMidpoint: 100000.0
+        nonAssociatedSetGeneratorLogisticSteepness: 1.0
+        opportunisticFadSetDetectionProbability: 0.1
+        opportunisticFadSetExponentialSteepnessCoefficient: 1.0E-4
+        searchActionDecayConstant: 1.0
+        searchActionLogisticMidpoint: 0.1
+        searchActionLogisticSteepness: 1.0
+        searchBonus: 0.1
+        setCompositionWeightsPath: inputs/tuna/set_compositions.csv
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
@@ -106,11 +117,23 @@ Tuna:
             limitClass5: 120
             limitClass6a: 300
             limitClass6b: 450
-        averageFadSetDurationInHours: '2.799212'
-        averageUnassociatedSetDurationInHours: '2.301648'
         biomassLostMonitor: null
+        decayRateOfDeploymentLocationValues: 0.01
+        decayRateOfDolphinSetLocationValues: 0.01
+        decayRateOfNonAssociatedSetLocationValues: 0.01
+        decayRateOfOpportunisticFadSetLocationValues: 0.01
+        dolphinSetObservers: !!set {
+          }
+        dolphinSetPctHoldAvailableLogisticMidpoint: 0.5
+        dolphinSetPctHoldAvailableLogisticSteepness: 1.0
+        dolphinSetPctSetsRemainingLogisticMidpoint: 0.5
+        dolphinSetPctSetsRemainingLogisticSteepness: 1.0
+        dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
+        dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
         fadDeploymentObservers: !!set {
           }
+        fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
+        fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
         fadInitializerFactory:
           attractionRates:
             Bigeye tuna: '0.05'
@@ -124,15 +147,31 @@ Tuna:
           fishReleaseProbabilityInPercent: '0.0'
         fadSetObservers: !!set {
           }
+        fadSetPctHoldAvailableLogisticMidpoint: 0.5
+        fadSetPctHoldAvailableLogisticSteepness: 1.0
+        fadSetPctSetsRemainingLogisticMidpoint: 0.5
+        fadSetPctSetsRemainingLogisticSteepness: 1.0
         initialNumberOfFads: 999999
-        minimumFadSetDurationInHours: '1.066667'
-        minimumUnassociatedSetDurationInHours: '0.9'
-        stdDevOfFadSetDurationInHours: '0.7325816'
-        stdDevOfUnassociatedSetDurationInHours: '1.015816'
-        successfulSetProbability: '0.9231701'
-        unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
-        unassociatedSetObservers: !!set {
+        locationValuesFile: inputs/tuna/location_values.csv
+        nonAssociatedSetObservers: !!set {
           }
+        nonAssociatedSetPctHoldAvailableLogisticMidpoint: 0.5
+        nonAssociatedSetPctHoldAvailableLogisticSteepness: 1.0
+        nonAssociatedSetPctSetsRemainingLogisticMidpoint: 5.0
+        nonAssociatedSetPctSetsRemainingLogisticSteepness: 1.0
+        nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
+        nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
+        opportunisticFadSetPctHoldAvailableLogisticMidpoint: 0.5
+        opportunisticFadSetPctHoldAvailableLogisticSteepness: 1.0
+        opportunisticFadSetPctSetsRemainingLogisticMidpoint: 0.5
+        opportunisticFadSetPctSetsRemainingLogisticSteepness: 1.0
+        opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
+        opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
+        pctHoldSpaceLeftLogisticMidpoint: 0.9
+        pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
+        pctTravelTimeLeftLogisticMidpoint: 0.9
+        pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
+        successfulSetProbability: '0.9231701'
     gearStrategy: Never Change Gear
     holdSize: '100.0'
     hourlyEffortCost: nullparameter
@@ -186,9 +225,7 @@ Tuna:
   - Biomass Snapshot Resetter:
       restoreOriginalLocations: true
       yearsToReset: 1
-  portFilePath: inputs/tuna/ports.csv
   pricesFile: inputs/tuna/prices.csv
-  unassociatedCatchSampleFile: inputs/tuna/unassociated_catch_sample.csv
   weatherInitializer:
     Constant Weather:
       temperature: '30.0'

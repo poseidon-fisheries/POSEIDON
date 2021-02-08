@@ -20,8 +20,10 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget {
 
@@ -73,7 +75,9 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
     @Override public double getFixedTarget() { return fixedTarget; }
 
     @Override public double getValue(final FishState fishState) {
-        return fishState.getYearlyDataSet().getColumn(columnName).getLatest();
+        DataColumn column = fishState.getYearlyDataSet().getColumn(columnName);
+        checkNotNull(column, "Column " + columnName + " no found");
+        return column.getLatest();
     }
 
     @Override public String getColumnName() { return columnName; }

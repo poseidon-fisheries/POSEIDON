@@ -21,11 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
@@ -65,7 +61,8 @@ public class Monitors {
     private final RegionalDivision regionalDivision;
     private final Collection<Monitor<FadDeploymentAction, ?, ?>> fadDeploymentMonitors;
     private final Collection<Monitor<AbstractFadSetAction, ?, ?>> fadSetMonitors;
-    private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> unassociatedSetMonitors;
+    private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> nonAssociatedSetMonitors;
+    private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
 
@@ -130,12 +127,20 @@ public class Monitors {
             )
         );
 
-        unassociatedSetMonitors = ImmutableList.of(
-            makeActionCounter("unassociated sets"),
+        nonAssociatedSetMonitors = ImmutableList.of(
+            makeActionCounter("non-associated sets"),
             makeCatchFromSetAccumulator(
-                fishState, "catches from unassociated sets", SummingAccumulator::new),
+                fishState, "catches from non-associated sets", SummingAccumulator::new),
             makeCatchFromSetAccumulator(
-                fishState, "catches by unassociated sets", IterativeAveragingAccumulator::new)
+                fishState, "catches by non-associated sets", IterativeAveragingAccumulator::new)
+        );
+
+        dolphinSetMonitors = ImmutableList.of(
+            makeActionCounter("dolphin sets"),
+            makeCatchFromSetAccumulator(
+                fishState, "catches from dolphin sets", SummingAccumulator::new),
+            makeCatchFromSetAccumulator(
+                fishState, "catches by dolphin sets", IterativeAveragingAccumulator::new)
         );
 
         biomassLostMonitor = basicPerSpeciesMonitor(
@@ -219,7 +224,8 @@ public class Monitors {
         return concat(
             fadDeploymentMonitors,
             fadSetMonitors,
-            unassociatedSetMonitors,
+            nonAssociatedSetMonitors,
+            dolphinSetMonitors,
             ImmutableList.of(biomassLostMonitor),
             otherMonitors
         );
@@ -229,7 +235,9 @@ public class Monitors {
 
     public Collection<Monitor<AbstractFadSetAction, ?, ?>> getFadSetMonitors() { return fadSetMonitors; }
 
-    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> getUnassociatedSetMonitors() { return unassociatedSetMonitors; }
+    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> getNonAssociatedSetMonitors() { return nonAssociatedSetMonitors; }
+
+    public Collection<Monitor<DolphinSetAction, ?, ?>> getDolphinSetMonitors() { return dolphinSetMonitors; }
 
     public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
 

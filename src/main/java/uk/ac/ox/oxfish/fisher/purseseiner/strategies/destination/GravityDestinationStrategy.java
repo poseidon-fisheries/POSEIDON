@@ -64,7 +64,8 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     public double getMaxTravelTime() { return maxTravelTime; }
 
-    @Override public SeaTile chooseDestination(
+    @Override
+    public SeaTile chooseDestination(
         final Fisher fisher,
         final MersenneTwisterFast ignored,
         final FishState fishState,
@@ -123,7 +124,8 @@ public class GravityDestinationStrategy implements DestinationStrategy {
             .min(comparingDouble(neighbor -> map.distance(neighbor, target)));
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         attractionFields = ((PurseSeineGear) fisher.getGear()).getAttractionFields();
         attractionFields.forEach(field -> field.start(model, fisher));
         maxTravelTime = maxTravelTimeLoader.applyAsDouble(fisher);
@@ -154,6 +156,6 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     @FunctionalInterface
     interface AttractionWeightLoader
-        extends BiFunction<Iterable<ActionAttractionField>, Fisher, Map<ActionAttractionField, Double>> { }
+        extends BiFunction<Iterable<ActionAttractionField>, Fisher, Map<ActionAttractionField, Double>> {}
 
 }

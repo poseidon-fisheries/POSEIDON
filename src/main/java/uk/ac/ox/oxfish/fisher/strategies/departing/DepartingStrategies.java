@@ -57,7 +57,7 @@ public class DepartingStrategies {
         NAMES.put(FloridaLogisticDepartingFactory.class, "WFS Handline");
         NAMES.put(ExitDecoratorFactory.class, "Exit Decorator");
         NAMES.put(FullSeasonalRetiredDecoratorFactory.class, "Full-time Seasonal Retired Decorator");
-        NAMES.put(PurseSeinerDepartingStrategyFactory.class, "Purse-Seine Gear Departing Strategy");
+        NAMES.put(PurseSeinerDepartingStrategyFactory.class, "Purse Seiner Departing Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

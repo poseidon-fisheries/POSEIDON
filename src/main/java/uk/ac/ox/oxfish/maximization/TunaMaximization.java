@@ -17,23 +17,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
-import static java.nio.file.Files.createDirectories;
-import static java.util.Arrays.stream;
+import static java.lang.Runtime.getRuntime;
 import static java.util.stream.IntStream.rangeClosed;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaMaximization {
 
-    private static final int GB = 1024 * 1024 * 1024;
     private static final boolean VERBOSE = false;
     private final Path calibrationFilePath;
 
@@ -41,14 +34,13 @@ public class TunaMaximization {
 
     public static void main(String[] args) {
 
-        final int minMemoryPerThread = 1 * GB;
-        final int populationSize = 200;
-        final int maxFitnessCalls = 5000;
-        final int numEvaluationRuns = 30;
+        final int populationSize = 100;
+        final int maxFitnessCalls = 2000;
+        final int numEvaluationRuns = 10;
 
         //final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
 
-        final String folderName = "2020-08-10B";
+        final String folderName = "2021-02-08";
 
         final Path basePath =
             Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", folderName);
@@ -59,18 +51,17 @@ public class TunaMaximization {
 
         final TunaMaximization tunaMaximization = new TunaMaximization(calibrationFilePath);
 
-//        final double[] solution = tunaMaximization.calibrate(minMemoryPerThread, populationSize, maxFitnessCalls);
-
-        final double[] solution =
-            { 0.403, 5.861, 1.658,-7.726,-0.739, 1.428,-5.191,-8.892,-6.943,-1.381,-7.990, 6.557, 6.021};
-
+        final double[] solution = tunaMaximization.calibrate(populationSize, maxFitnessCalls);
         tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
+
+        //final double[] solution =
+        //    {-3.609, -2.596, -10.000, 7.383, -1.167, 2.764, 7.917, -10.000, -2.017, 4.244, -10.000, 9.991, -5.514, -1.702, -1.398, -6.299, 10.000, -9.396, 3.184, -2.770, -3.959, 6.734, 0.246, 2.841, -10.000, 0.464, -9.250, 10.000, -4.878, 10.000, 10.000, 0.861, 5.635, 4.216, -4.096, 2.840, -1.419, 4.251, -4.137, 2.479, 3.577, -6.640, -6.182, 7.600, -4.995, 1.867, 9.298, -9.086, -5.372, -6.284, -0.047, -10.000, 9.905};
         final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
         tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private double[] calibrate(
-        final int minMemoryPerThread,
         final int populationSize,
         final int maxFitnessCalls
     ) {
@@ -81,10 +72,7 @@ public class TunaMaximization {
             .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
             .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(VERBOSE));
 
-        final int numThreads = 8; //Math.min(
-//            (int) getRuntime().maxMemory() / minMemoryPerThread,
-//            getRuntime().availableProcessors()
-//        );
+        final int numThreads = getRuntime().availableProcessors();
 
         System.out.println("Requesting " + numThreads + " threads");
 
@@ -223,7 +211,8 @@ public class TunaMaximization {
             this.fileWriter = new FileWriter(outputFile.toFile());
         }
 
-        @Override public void close() throws IOException {
+        @Override
+        public void close() throws IOException {
             fileWriter.close();
         }
 

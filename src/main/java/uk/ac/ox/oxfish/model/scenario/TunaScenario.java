@@ -178,7 +178,6 @@ public class TunaScenario implements Scenario {
     private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
     private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
-    private Path unassociatedCatchSampleFile = input("unassociated_catch_sample.csv");
     private Path costsFile = input("costs.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
@@ -232,7 +231,6 @@ public class TunaScenario implements Scenario {
             "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
             "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
         ));
-        purseSeineGearFactory.getCatchSamplers().setCatchSamplesFile(input("set_samples.csv"));
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
@@ -282,12 +280,6 @@ public class TunaScenario implements Scenario {
 
     @SuppressWarnings("unused") public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) {
         this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile;
-    }
-
-    @SuppressWarnings("unused") public Path getUnassociatedCatchSampleFile() { return unassociatedCatchSampleFile; }
-
-    @SuppressWarnings("unused") public void setUnassociatedCatchSampleFile(Path unassociatedCatchSampleFile) {
-        this.unassociatedCatchSampleFile = unassociatedCatchSampleFile;
     }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
@@ -409,7 +401,8 @@ public class TunaScenario implements Scenario {
 
         purseSeineGearFactory.getFadDeploymentObservers().addAll(monitors.getFadDeploymentMonitors());
         purseSeineGearFactory.getFadSetObservers().addAll(monitors.getFadSetMonitors());
-        purseSeineGearFactory.getUnassociatedSetObservers().addAll(monitors.getUnassociatedSetMonitors());
+        purseSeineGearFactory.getNonAssociatedSetObservers().addAll(monitors.getNonAssociatedSetMonitors());
+        purseSeineGearFactory.getDolphinSetObservers().addAll(monitors.getDolphinSetMonitors());
         purseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));

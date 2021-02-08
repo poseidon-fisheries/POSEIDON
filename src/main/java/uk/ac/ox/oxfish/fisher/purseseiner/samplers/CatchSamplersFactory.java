@@ -22,13 +22,14 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.getSetActionClass;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class CatchSamplersFactory
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler>> {
 
-    private Path catchSamplesFile;
+    private Path catchSamplesFile = input("set_samples.csv");
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {

@@ -20,7 +20,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
@@ -33,6 +36,11 @@ public class FadSetAction extends AbstractFadSetAction {
     ) {
         super(fisher, fad);
         checkArgument(getFadManager(getFisher()) == fad.getOwner());
+    }
+
+    @Override
+    public ActionResult act(FishState fishState, Fisher fisher, Regulation regulation, double hoursLeft) {
+        return super.act(fishState, fisher, regulation, hoursLeft);
     }
 
     @Override public boolean isOwnFad() { return true; }

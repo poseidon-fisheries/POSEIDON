@@ -68,10 +68,10 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class PurseSeinerFishingStrategy implements FishingStrategy {
 
-    private final double movingThreshold = 0.1; // TODO: this needs to be a parameter
+    private final double movingThreshold;
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider;
-    private final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients;
+    private final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepnessCoefficients;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
     private final DoubleUnaryOperator searchActionValueFunction;
     private final double searchActionDecayConstant;
@@ -85,23 +85,25 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     public PurseSeinerFishingStrategy(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
-        final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepNessCoefficients,
+        final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepnessCoefficients,
         final double searchActionLogisticMidpoint,
         final double searchActionLogisticSteepness,
         final double searchActionDecayConstant,
         final double fadDeploymentActionLogisticMidpoint,
         final double fadDeploymentActionLogisticSteepness,
-        final double fadDeploymentActionDecayConstant
-    ) {
+        final double fadDeploymentActionDecayConstant,
+        double movingThreshold
+        ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
-        this.exponentialSteepNessCoefficients = exponentialSteepNessCoefficients;
+        this.exponentialSteepnessCoefficients = exponentialSteepnessCoefficients;
         this.searchActionValueFunction =
             new LogisticFunction(searchActionLogisticMidpoint, searchActionLogisticSteepness);
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionValueFunction =
             new LogisticFunction(fadDeploymentActionLogisticMidpoint, fadDeploymentActionLogisticSteepness);
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
+        this.movingThreshold = movingThreshold;
     }
 
     @Override public void start(final FishState model, final Fisher fisher) {
@@ -148,7 +150,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final Stream<Entry<PurseSeinerAction, Double>> weightedSetActions =
             possibleSetActions.stream().map(action -> weightedAction(
                 action,
-                valueOfSetAction(action, exponentialSteepNessCoefficients.get(action.getClass()))
+                valueOfSetAction(action, exponentialSteepnessCoefficients.get(action.getClass()))
             ));
 
         // Generate a search action for each of the set classes with no opportunities,
@@ -183,12 +185,19 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 )
             ));
 
-        return Streams
+        ImmutableList<Entry<PurseSeinerAction, Double>> list = Streams
             .concat(
                 weightedSetActions,
                 weightedSearchActions,
                 weightedFadDeploymentAction
-            )
+            ).collect(toImmutableList());
+
+//        System.out.println("---");
+//        list.stream()
+//            .sorted(comparingDouble(Entry::getValue))
+//            .forEach(System.out::println);
+
+        return list.stream()
             .filter(entry -> entry.getKey().isPermitted())
             .filter(entry -> entry.getValue() > movingThreshold)
             .collect(toImmutableList());

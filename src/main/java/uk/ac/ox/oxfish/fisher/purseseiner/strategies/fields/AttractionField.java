@@ -26,6 +26,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
+import java.util.stream.Stream;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.pow;
@@ -44,19 +46,24 @@ public class AttractionField implements FisherStartable {
         this.modulator = modulator;
     }
 
-    public Double2D netAttraction(Fisher fisher) {
+    public Stream<Double2D> attractionValues(Fisher fisher) {
         final Int2D here = fisher.getLocation().getGridLocation();
         return locationValues
             .getValues()
             .filter(entry -> !entry.getKey().equals(here))
-            .map(entry -> attraction(here, entry.getKey(), entry.getValue(), fisher))
+            .map(entry -> attraction(here, entry.getKey(), entry.getValue(), fisher));
+    }
+
+    public Double2D netAttraction(Fisher fisher) {
+        return attractionValues(fisher)
             .reduce(Double2D::add)
-            .filter(v -> !v.equals(ZERO_VECTOR)) // avoids crashing normalize
+            .filter(v -> v.length() > 0) // because very small vectors get length 0 and become infinite when normalized
             .map(Double2D::normalize)
             .orElse(ZERO_VECTOR);
     }
 
-    @NotNull Double2D attraction(
+    @NotNull
+    Double2D attraction(
         final Int2D here,
         final Int2D there,
         final double value,
@@ -79,7 +86,8 @@ public class AttractionField implements FisherStartable {
         return locationValues.getValueAt(location);
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         locationValues.start(model, fisher);
     }
 

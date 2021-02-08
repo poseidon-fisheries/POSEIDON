@@ -85,6 +85,7 @@ public class FadManager {
             ImmutableSet.of(),
             ImmutableSet.of(),
             ImmutableSet.of(),
+            ImmutableSet.of(),
             Optional.empty(),
             new ActiveActionRegulations()
         );
@@ -97,6 +98,7 @@ public class FadManager {
         Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
         Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
+        Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
         Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
         ActiveActionRegulations actionSpecificRegulations
     ) {
@@ -110,6 +112,7 @@ public class FadManager {
         fadDeploymentObservers.forEach(observer -> registerObserver(FadDeploymentAction.class, observer));
         fadSetObservers.forEach(observer -> registerObserver(AbstractFadSetAction.class, observer));
         nonAssociatedSetObservers.forEach(observer -> registerObserver(NonAssociatedSetAction.class, observer));
+        dolphinSetObservers.forEach(observer -> registerObserver(DolphinSetAction.class, observer));
         biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
         setActionSpecificRegulations(actionSpecificRegulations);
     }

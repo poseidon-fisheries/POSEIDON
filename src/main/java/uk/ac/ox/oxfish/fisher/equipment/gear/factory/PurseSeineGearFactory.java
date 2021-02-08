@@ -56,9 +56,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private Set<Observer<AbstractFadSetAction>> fadSetObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<AbstractFadSetAction>>> fadSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
-    private Set<Observer<NonAssociatedSetAction>> unassociatedSetObservers = new LinkedHashSet<>();
-    private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>> unassociatedSetObserversCache =
-        new CacheByFishState<>(__ -> ImmutableSet.copyOf(unassociatedSetObservers));
+    private Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers = new LinkedHashSet<>();
+    private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>> nonAssociatedSetObserversCache =
+        new CacheByFishState<>(__ -> ImmutableSet.copyOf(nonAssociatedSetObservers));
+    private Set<Observer<DolphinSetAction>> dolphinSetObservers = new LinkedHashSet<>();
+    private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
+        new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
     private double decayRateOfOpportunisticFadSetLocationValues = 0.01;
     private double decayRateOfNonAssociatedSetLocationValues = 0.01;
     private double decayRateOfDolphinSetLocationValues = 0.01;
@@ -99,6 +102,14 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
     private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
+
+    public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
+        return dolphinSetObservers;
+    }
+
+    public void setDolphinSetObservers(Set<Observer<DolphinSetAction>> dolphinSetObservers) {
+        this.dolphinSetObservers = dolphinSetObservers;
+    }
 
     public CatchSamplersFactory getCatchSamplers() {
         return catchSamplers;
@@ -348,11 +359,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     @SuppressWarnings("unused")
-    public Set<Observer<NonAssociatedSetAction>> getUnassociatedSetObservers() { return unassociatedSetObservers; }
+    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() { return nonAssociatedSetObservers; }
 
     @SuppressWarnings("unused")
-    public void setUnassociatedSetObservers(Set<Observer<NonAssociatedSetAction>> unassociatedSetObservers) {
-        this.unassociatedSetObservers = unassociatedSetObservers;
+    public void setNonAssociatedSetObservers(Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers) {
+        this.nonAssociatedSetObservers = nonAssociatedSetObservers;
     }
 
     @Override
@@ -370,7 +381,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             initialNumberOfFads,
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
-            unassociatedSetObserversCache.get(fishState),
+            nonAssociatedSetObserversCache.get(fishState),
+            dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations
         );
