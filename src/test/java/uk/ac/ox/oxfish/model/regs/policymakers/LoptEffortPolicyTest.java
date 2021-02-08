@@ -25,6 +25,7 @@ public class LoptEffortPolicyTest {
                         (subject, policy1, model) -> lastReturn[0] = policy1,
                         false);
 
+        policy.setMaxChangePerYear(1d);
 
         final FishState red = mock(FishState.class,RETURNS_DEEP_STUBS);
         //spr is too low!!!

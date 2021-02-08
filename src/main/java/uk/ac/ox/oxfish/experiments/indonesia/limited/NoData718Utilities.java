@@ -285,6 +285,9 @@ public class NoData718Utilities {
 
         static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policiesMPA = new LinkedHashMap();
 
+        static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> closedDaysNotAdaptive = new LinkedHashMap();
+
+
         static{
                 policiesMPA.put(
                         "BAU",
@@ -309,7 +312,7 @@ public class NoData718Utilities {
                 );
 
 
-                for(int days = 250; days>=100; days-=10) {
+                for(int days = 250; days>=0; days-=25) {
                         int finalDays = days;
                         policiesMPA.put(
                                 days+"_days_MPA_noentry",
@@ -331,21 +334,43 @@ public class NoData718Utilities {
         }
 
 
+        static{
+                for(int days = 250; days>=0; days-=25) {
+                        int finalDays = days;
+                        closedDaysNotAdaptive.put(
+                                days+"_days_noentry",
+                                //max days regulations include respect protected areas so it works if put in this order
+                                shockYear ->  NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                                                                                                     new String[]{"population0", "population1", "population2"}
+                                        , finalDays).andThen(
+                                        NoDataPolicy.removeEntry(shockYear)
+                                                                                 )
 
 
-        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false);
+                        );
+                }
+        }
 
-        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(boolean blockEntryWhenSeasonIsNotFull){
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false,
+                                                                                                                        false);
+
+        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(
+                boolean blockEntryWhenSeasonIsNotFull, boolean fewRuns){
 
                 LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> toReturn = new LinkedHashMap<>();
                 double[] guessedMSE = new double[]{0.6, 0.8, 1, 1.2, 1.5, 2};
+
+                //if few runs is what we want, ignore trying other formulas or gillnetters
+                boolean[] gillnetters = fewRuns ? new boolean[]{true} : new boolean[]{true, false};
+                boolean[] useTncFormulas = fewRuns ? new boolean[]{true} : new boolean[]{true, false};
 
 
                 FishYAML fishYAML = new FishYAML();
 
                 for (double mkRatio : guessedMSE) {
-                        for (boolean includeGillnetters : new boolean[]{true, false}) {
-                                for (boolean useTncFormula : new boolean[]{false,true}) {
+                        for (boolean includeGillnetters : gillnetters) {
+                                for (boolean useTncFormula : useTncFormulas) {
 
 
                                         String sprAgent =
@@ -610,8 +635,11 @@ public class NoData718Utilities {
         }
 
 
-        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntry = buildLBSPRPolicies(true);
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntry = buildLBSPRPolicies(true,
+                                                                                                                               false);
 
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntryFewRuns = buildLBSPRPolicies(true,
+                                                                                                                               true);
 
 
         static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> adaptivelbsprMsePolicies = new LinkedHashMap<>();
@@ -633,7 +661,7 @@ public class NoData718Utilities {
                                                                                 "  blockEntryWhenSeasonIsNotFull: true\n" +
                                                                                 "  cpueHalfPeriod: '3.0'\n" +
                                                                                 "  cubicParameter: '0.3'\n" +
-                                                                                "  highestMKAllowed: '2.0'\n" +
+                                                                                "  highestMKAllowed: '1.5'\n" +
                                                                                 "  linearParameter: '0.05'\n" +
                                                                                 "  lowerDiscrepancyThreshold: '-0.36'\n" +
                                                                                 "  lowestMKAllowed: '0.4'\n" +

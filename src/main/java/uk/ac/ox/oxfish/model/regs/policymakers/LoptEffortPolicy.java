@@ -17,6 +17,8 @@ public class LoptEffortPolicy extends Controller {
 
     private double theoreticalSuggestedEffort = 1d;
 
+    private double maxChangePerYear = .1;
+
 
     public LoptEffortPolicy(String meanLengthColumnName,
                             double buffer,
@@ -57,8 +59,10 @@ public class LoptEffortPolicy extends Controller {
         double ratio =  meanLengthColumn / lengthTarget;
         double effort = theoreticalSuggestedEffort *(1-buffer) * (0.5 + (1d-0.5) * ratio);
 
-        theoreticalSuggestedEffort = effort;
-        return Math.min(1d,effort);
+        theoreticalSuggestedEffort = Math.max(Math.min(effort,theoreticalSuggestedEffort*(1d+maxChangePerYear)),
+                                              theoreticalSuggestedEffort*(1d-maxChangePerYear));
+
+        return Math.min(1d,theoreticalSuggestedEffort);
 
     }
 
@@ -72,5 +76,23 @@ public class LoptEffortPolicy extends Controller {
 
     public void setTheoreticalSuggestedEffort(double theoreticalSuggestedEffort) {
         this.theoreticalSuggestedEffort = theoreticalSuggestedEffort;
+    }
+
+    /**
+     * Getter for property 'maxChangePerYear'.
+     *
+     * @return Value for property 'maxChangePerYear'.
+     */
+    public double getMaxChangePerYear() {
+        return maxChangePerYear;
+    }
+
+    /**
+     * Setter for property 'maxChangePerYear'.
+     *
+     * @param maxChangePerYear Value to set for property 'maxChangePerYear'.
+     */
+    public void setMaxChangePerYear(double maxChangePerYear) {
+        this.maxChangePerYear = maxChangePerYear;
     }
 }
