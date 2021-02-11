@@ -77,9 +77,14 @@ public class AttractionField implements FisherStartable {
         checkState(fishState.getHoursPerStep() > 0, "hour per step must be > 0");
         final double travelTime = distance / speed;
         final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
-        final Double2D unitVector = new Double2D(there.x - here.x, there.y - here.y).normalize();
-        final Double2D attractionVector = unitVector.multiply(value / pow(travelTime, 2));
-        return attractionVector.multiply(modulator.modulate(there.x, there.y, t, fisher));
+
+        return new Double2D(there.x - here.x, there.y - here.y)
+            .normalize() // normalized direction vector
+            .multiply(
+                // scale to modulated location value, decreasing with travel time
+                value * modulator.modulate(there.x, there.y, t, fisher)
+                    / pow(travelTime, 2)
+            );
     }
 
     public double getValueAt(Int2D location) {

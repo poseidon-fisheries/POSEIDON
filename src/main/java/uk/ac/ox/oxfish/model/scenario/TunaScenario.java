@@ -559,6 +559,7 @@ public class TunaScenario implements Scenario {
         factory.setGrower(new FadAwareLogisticGrowerFactory(logisticGrowthRate));
         factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
         factory.setBiomassSuppliedPerCell(false);
+        factory.setDifferentialPercentageToMove(new FixedDoubleParameter(0));
 
         final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
         factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));

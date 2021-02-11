@@ -112,7 +112,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
                     : closestNeighbor(fishState.getMap(), seaTile, target)
             )
             .orElseGet(() -> {
-                System.out.println(fisher + " stuck at " + seaTile);
+                //System.out.println(fisher + " stuck at " + seaTile);
                 return seaTile;
             });
     }

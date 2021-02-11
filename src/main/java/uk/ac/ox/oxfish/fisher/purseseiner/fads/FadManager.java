@@ -26,11 +26,7 @@ import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -48,9 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
@@ -110,15 +104,14 @@ public class FadManager {
         this.actionSpecificRegulations = actionSpecificRegulations;
 
         fadDeploymentObservers.forEach(observer -> registerObserver(FadDeploymentAction.class, observer));
-        fadSetObservers.forEach(observer -> registerObserver(AbstractFadSetAction.class, observer));
+        fadSetObservers.forEach(observer -> {
+            registerObserver(FadSetAction.class, observer);
+            registerObserver(OpportunisticFadSetAction.class, observer);
+        });
         nonAssociatedSetObservers.forEach(observer -> registerObserver(NonAssociatedSetAction.class, observer));
         dolphinSetObservers.forEach(observer -> registerObserver(DolphinSetAction.class, observer));
         biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
         setActionSpecificRegulations(actionSpecificRegulations);
-    }
-
-    public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
-        observers.register(observedClass, observer);
     }
 
     public static FadManager getFadManager(Fisher fisher) {
@@ -130,6 +123,10 @@ public class FadManager {
 
     public static Optional<FadManager> maybeGetFadManager(Fisher fisher) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
+    }
+
+    public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
+        observers.register(observedClass, observer);
     }
 
     public int getNumDeployedFads() { return deployedFads.size(); }

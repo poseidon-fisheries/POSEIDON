@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
-import com.google.common.io.Files;
 import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
@@ -20,8 +18,10 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 import static java.lang.Runtime.getRuntime;
+import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.rangeClosed;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -38,9 +38,7 @@ public class TunaMaximization {
         final int maxFitnessCalls = 2000;
         final int numEvaluationRuns = 10;
 
-        //final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
-
-        final String folderName = "2021-02-08";
+        final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
 
         final Path basePath =
             Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations", folderName);
@@ -52,12 +50,17 @@ public class TunaMaximization {
         final TunaMaximization tunaMaximization = new TunaMaximization(calibrationFilePath);
 
         final double[] solution = tunaMaximization.calibrate(populationSize, maxFitnessCalls);
-        tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
 
-        //final double[] solution =
-        //    {-3.609, -2.596, -10.000, 7.383, -1.167, 2.764, 7.917, -10.000, -2.017, 4.244, -10.000, 9.991, -5.514, -1.702, -1.398, -6.299, 10.000, -9.396, 3.184, -2.770, -3.959, 6.734, 0.246, 2.841, -10.000, 0.464, -9.250, 10.000, -4.878, 10.000, 10.000, 0.861, 5.635, 4.216, -4.096, 2.840, -1.419, 4.251, -4.137, 2.479, 3.577, -6.640, -6.182, 7.600, -4.995, 1.867, 9.298, -9.086, -5.372, -6.284, -0.047, -10.000, 9.905};
-        final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
-        tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
+//        final double[] solution =
+//            { 5.239, 8.498,-7.969,-8.018, 0.793, 4.287, 7.936,-3.039,-4.793, 2.819,-3.052, 1.202,-1.329, 3.493, 2.809, 6.895, 5.718, 2.430, 10.000,-3.681,-2.818,-9.183, 0.581,-2.970, 4.954, 2.987,-5.269,-2.514, 6.830, 8.055, 8.288,-7.423, 0.873,-4.476, 2.838, 7.909, 10.000, 3.577, 10.000,-1.025,-5.071,-0.750, 4.821,-8.655,-1.300,-10.000,-8.555,-0.108, 10.000,-0.894,-7.470, 6.631,-3.934, 7.132};
+//
+//        tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
+//        final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
+//        tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
+    }
+
+    public static void evaluate() {
+
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -72,7 +75,7 @@ public class TunaMaximization {
             .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
             .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(VERBOSE));
 
-        final int numThreads = getRuntime().availableProcessors();
+        final int numThreads = 4; //getRuntime().availableProcessors();
 
         System.out.println("Requesting " + numThreads + " threads");
 
@@ -97,11 +100,17 @@ public class TunaMaximization {
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
         runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
 
-        String name = Files.getNameWithoutExtension(calibrationFilePath.getFileName().toString());
-        final Path outputFile = calibrationFilePath.getParent().resolve(name + "_log.md");
-        try (final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(outputFile)) {
-            runnable.setTextListener(fileAndScreenWriter);
-            runnable.run();
+        try {
+            File outputFolder = calibrationFilePath.getParent().toFile();
+            Path outputPath = File.createTempFile("log_", ".md", outputFolder).toPath();
+            try (
+                final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(outputPath)
+            ) {
+                runnable.setTextListener(fileAndScreenWriter);
+                runnable.run();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

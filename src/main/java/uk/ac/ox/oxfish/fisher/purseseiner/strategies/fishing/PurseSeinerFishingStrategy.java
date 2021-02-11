@@ -165,7 +165,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             )
             .filter(actionClass -> !possibleSetActionClasses.contains(actionClass))
             .map(actionClass -> weightedAction(
-                new SearchAction(fisher, setOpportunityDetector),
+                new SearchAction(fisher, setOpportunityDetector, actionClass),
                 valueOfLocationBasedAction(
                     actionCounts.count(SearchAction.class),
                     attractionFields.get(actionClass).getValueAt(gridLocation),
@@ -208,7 +208,8 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         PurseSeinerAction action,
         double actionValue
     ) {
-        return entry(action, actionValue * actionWeights.getOrDefault(action.getClass(), 0.0));
+        Double w = actionWeights.getOrDefault(action.getClassForWeighting(), 0.0);
+        return entry(action, actionValue * w);
     }
 
     private double valueOfSetAction(

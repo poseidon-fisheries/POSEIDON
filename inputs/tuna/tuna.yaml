@@ -8,7 +8,7 @@ Tuna:
       - Single Species Biomass Normalized:
           biomassSuppliedPerCell: false
           carryingCapacity: '1.44094E9'
-          differentialPercentageToMove: '0.001'
+          differentialPercentageToMove: '0.0'
           grower:
             FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
@@ -31,7 +31,7 @@ Tuna:
       - Single Species Biomass Normalized:
           biomassSuppliedPerCell: false
           carryingCapacity: '4.776E9'
-          differentialPercentageToMove: '0.001'
+          differentialPercentageToMove: '0.0'
           grower:
             FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
@@ -54,7 +54,7 @@ Tuna:
       - Single Species Biomass Normalized:
           biomassSuppliedPerCell: false
           carryingCapacity: '1.20277E9'
-          differentialPercentageToMove: '0.001'
+          differentialPercentageToMove: '0.0'
           grower:
             FAD-Aware Logistic Grower:
               distributionalWeight: '-1.0'
@@ -94,6 +94,7 @@ Tuna:
         fadDeploymentActionLogisticMidpoint: 0.1
         fadDeploymentActionLogisticSteepness: 1.0
         fadSetExponentialSteepnessCoefficient: 1.0E-4
+        movingThreshold: 0.1
         nonAssociatedSetDetectionProbability: 0.1
         nonAssociatedSetExponentialSteepnessCoefficient: 1.0E-4
         nonAssociatedSetGeneratorLogisticMidpoint: 100000.0

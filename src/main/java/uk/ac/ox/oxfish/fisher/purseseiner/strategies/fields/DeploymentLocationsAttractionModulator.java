@@ -48,11 +48,12 @@ public class DeploymentLocationsAttractionModulator implements AttractionModulat
         this.pctActiveFadsLimitModulationFunction = pctActiveFadsLimitModulationFunction;
     }
 
-    @Override public double modulate(
+    @Override
+    public double modulate(
         final int x, final int y, final int t, final Fisher fisher
     ) {
-        return canFishThere(x, y, t, fisher) ?
-            pctActiveFadsLimitModulationFunction.applyAsDouble(1 - getPctActiveFads(fisher))
+        return canFishThere(x, y, t, fisher)
+            ? pctActiveFadsLimitModulationFunction.applyAsDouble(1 - getPctActiveFads(fisher))
             : 0;
     }
 
@@ -60,12 +61,9 @@ public class DeploymentLocationsAttractionModulator implements AttractionModulat
         final FadManager fadManager = getFadManager(fisher);
         return fadManager
             .getActionSpecificRegulations()
-            .regulationStream(FadDeploymentAction.class)
-            .filter(reg -> reg instanceof ActiveFadLimits)
-            .map(reg -> ((ActiveFadLimits) reg))
-            .mapToDouble(reg -> (double) fadManager.getNumDeployedFads() / reg.getLimit(fisher))
-            .min()
-            .orElse(0);
+            .getActiveFadLimits()
+            .map(reg -> (double) fadManager.getNumDeployedFads() / reg.getLimit(fisher))
+            .orElse(0.0);
     }
 
 }

@@ -79,7 +79,8 @@ public class SetAttractionModulator implements AttractionModulator {
         );
     }
 
-    @Override public double modulate(
+    @Override
+    public double modulate(
         final int x,
         final int y,
         final int t,
@@ -103,11 +104,8 @@ public class SetAttractionModulator implements AttractionModulator {
     private double pctSetsRemaining(final Fisher fisher) {
         return getFadManager(fisher)
             .getActionSpecificRegulations()
-            .getYearlyActionLimitRegulations()
-            .stream()
-            .filter(reg -> reg.getApplicableActions().contains(actionClass))
-            .mapToDouble(reg -> (double) reg.getNumRemainingActions(fisher) / reg.getLimit(fisher))
-            .min()
+            .getSetLimits()
+            .map(reg -> reg.getPctLimitRemaining(fisher))
             .orElse(1.0);
     }
 

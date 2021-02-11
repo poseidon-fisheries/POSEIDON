@@ -60,4 +60,14 @@ public abstract class PurseSeinerAction implements Action, Locatable {
         return !getFadManager(fisher).getActionSpecificRegulations().isForbidden(this);
     }
 
+    /**
+     *  This method is used to map an action to its weight in fisher preferences.
+     *  It normally returns the class of the action itself, but is overridden
+     *  in search action so that they can be weighted according to what kind
+     *  of action opportunity the agent is searching for.
+     */
+    public Class<? extends PurseSeinerAction> getClassForWeighting() {
+        return this.getClass();
+    }
+
 }

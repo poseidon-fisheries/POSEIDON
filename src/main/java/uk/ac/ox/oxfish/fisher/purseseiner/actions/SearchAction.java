@@ -29,16 +29,19 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 public class SearchAction extends PurseSeinerAction {
 
     private final SetOpportunityDetector setOpportunityDetector;
+    private final Class<? extends PurseSeinerAction> classForWeighting;
 
     public SearchAction(
         final Fisher fisher,
-        final SetOpportunityDetector setOpportunityDetector
-    ) {
+        final SetOpportunityDetector setOpportunityDetector,
+        Class<? extends PurseSeinerAction> classForWeighting) {
         super(fisher, 1);
         this.setOpportunityDetector = setOpportunityDetector;
+        this.classForWeighting = classForWeighting;
     }
 
-    @Override public ActionResult act(
+    @Override
+    public ActionResult act(
         final FishState fishState,
         final Fisher fisher,
         final Regulation regulation,
@@ -50,4 +53,12 @@ public class SearchAction extends PurseSeinerAction {
         return new ActionResult(new Arriving(), hoursLeft - getDuration());
     }
 
+    /**
+     * Fisher preferences for search actions are weighted according to the type of action opportunity
+     * they are searching for instead of the action class itself like in the super class.
+     */
+    @Override
+    public Class<? extends PurseSeinerAction> getClassForWeighting() {
+        return this.classForWeighting;
+    }
 }

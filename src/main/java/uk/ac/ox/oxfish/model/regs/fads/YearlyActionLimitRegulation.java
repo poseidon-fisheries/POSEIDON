@@ -41,24 +41,33 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         startableConsumer.accept(this);
     }
 
-    @Override public boolean isForbidden(PurseSeinerAction action) {
+    @Override
+    public boolean isForbidden(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         return counter >= getLimit(action.getFisher());
     }
 
+    public double getPctLimitRemaining(Fisher fisher) {
+        int limit = getLimit(fisher);
+        return (double) (limit - counter) / limit;
+    }
+
     public int getLimit(Fisher fisher) { return limits.getLimit(fisher); }
 
-    @Override public void step(SimState simState) {
+    @Override
+    public void step(SimState simState) {
         counter = 0;
     }
 
-    @Override public void start(FishState model) {
+    @Override
+    public void start(FishState model) {
         model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 
     public int getNumRemainingActions(Fisher fisher) { return getLimit(fisher) - counter; }
 
-    @Override public void observe(PurseSeinerAction action) {
+    @Override
+    public void observe(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         counter++;
     }

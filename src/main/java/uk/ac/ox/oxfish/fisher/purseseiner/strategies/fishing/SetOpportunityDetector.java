@@ -62,7 +62,8 @@ public class SetOpportunityDetector {
         this.searchBonus = searchBonus;
     }
 
-    @NotNull List<AbstractSetAction> possibleSetActions() {
+    @NotNull
+    List<AbstractSetAction> possibleSetActions() {
         final List<AbstractSetAction> actions;
         if (fisher.getHold().getPercentageFilled() >= 1) {
             actions = ImmutableList.of(); // no possible sets when hold is full
@@ -106,12 +107,13 @@ public class SetOpportunityDetector {
     }
 
     private double getDetectionProbability(Class<? extends AbstractSetAction> actionClass) {
-        return basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
+        double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
+        if (p > 1) p = 1; // even the search bonus can't push us above 1!
+        return p;
     }
 
     public void notifyOfSearch() {
         hasSearched = true;
-        System.out.println(hasSearched);
     }
 
 }
