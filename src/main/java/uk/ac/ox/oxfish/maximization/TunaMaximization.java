@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.maximization;
 
 import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
@@ -34,8 +35,8 @@ public class TunaMaximization {
 
     public static void main(String[] args) {
 
-        final int populationSize = 100;
-        final int maxFitnessCalls = 2000;
+        final int populationSize = 200;
+        final int maxFitnessCalls = 5000;
         final int numEvaluationRuns = 10;
 
         final String folderName = stream(args).findFirst().orElse(LocalDate.now().toString());
@@ -51,16 +52,12 @@ public class TunaMaximization {
 
         final double[] solution = tunaMaximization.calibrate(populationSize, maxFitnessCalls);
 
-//        final double[] solution =
-//            { 5.239, 8.498,-7.969,-8.018, 0.793, 4.287, 7.936,-3.039,-4.793, 2.819,-3.052, 1.202,-1.329, 3.493, 2.809, 6.895, 5.718, 2.430, 10.000,-3.681,-2.818,-9.183, 0.581,-2.970, 4.954, 2.987,-5.269,-2.514, 6.830, 8.055, 8.288,-7.423, 0.873,-4.476, 2.838, 7.909, 10.000, 3.577, 10.000,-1.025,-5.071,-0.750, 4.821,-8.655,-1.300,-10.000,-8.555,-0.108, 10.000,-0.894,-7.470, 6.631,-3.934, 7.132};
-//
-//        tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
-//        final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
-//        tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
-    }
+        // final double[] solution =
+        //    {-1.7023085096785586, 3.390807334225775, -10.0, 9.832137275068147, -8.905492349990276, 10.0, -8.86538894532567, -0.7701673884919678, -2.1896491189876675, 5.971443820255731, 5.766108791252238, -10.0, -1.5699859246913923, 10.0, 1.9001353296628898, 6.956476022912932, 10.0, -1.3549025645239539, -0.9278451842185644, 6.058659044014105, 7.497317002392419, -1.6808634972659506, -0.19964991580650704, 2.2660920630401367, -3.1686751990893876, -2.8198705752909383, -10.0, -6.190012113107348, -8.937442934688907, -9.762822378350377, 2.005936971572968, 2.556394676644074, -9.954715705858861, -4.294454164143142, 4.318319978320221, 3.668671020316231, -5.633206242658223, 3.57950537162915, 10.0, 4.816721245334941, 8.392658938635206, 3.6703662669225983, 3.4102903234775646, -4.131573574382304, -0.54857221937721, -7.658529498809894, 7.654988910506763, -8.404991144164065, -3.376850929825255, -8.249628412876314, -10.0, 10.0, -7.579135096893957, 5.431430212071597};
 
-    public static void evaluate() {
-
+        // tunaMaximization.saveCalibratedScenario(solution, calibratedScenarioPath);
+        // final CsvWriter csvWriter = new CsvWriter(csvOutputPath.toFile(), new CsvWriterSettings());
+        // tunaMaximization.evaluate(calibrationFilePath, csvWriter, numEvaluationRuns, solution);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -75,7 +72,7 @@ public class TunaMaximization {
             .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
             .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(VERBOSE));
 
-        final int numThreads = 4; //getRuntime().availableProcessors();
+        final int numThreads = Math.min(getRuntime().availableProcessors(), 16);
 
         System.out.println("Requesting " + numThreads + " threads");
 
@@ -103,6 +100,7 @@ public class TunaMaximization {
         try {
             File outputFolder = calibrationFilePath.getParent().toFile();
             Path outputPath = File.createTempFile("log_", ".md", outputFolder).toPath();
+            System.out.println("Logging to: " + outputPath);
             try (
                 final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(outputPath)
             ) {
