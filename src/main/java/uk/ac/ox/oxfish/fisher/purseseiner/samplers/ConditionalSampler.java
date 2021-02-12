@@ -40,13 +40,20 @@ public class ConditionalSampler<E> {
     }
 
     public E next(Predicate<E> condition) {
-        final Deque<E> skipped = new LinkedList<>();
+
+        // We keep a set of skipped entries to put back at the head
+        // of the queue after we have found an entry that meets the
+        // condition. The reason it's a set instead of a list is that
+        // some entries might get skipped over and over again and thus
+        // bloat the queue with duplicates, grinding everything to a halt.
+        final Collection<E> skipped = new LinkedHashSet<>();
+
         E result = null;
         while (result == null) {
             if (queue.isEmpty()) refillQueue();
             result = queue.removeFirst();
             if (!condition.test(result)) {
-                skipped.addFirst(result);
+                skipped.add(result);
                 result = null;
             }
         }
