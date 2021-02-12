@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
 import java.util.Collection;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CatchSampler {
@@ -34,7 +33,7 @@ public class CatchSampler {
 
     public CatchSampler(final Collection<Collection<Double>> sample, MersenneTwisterFast rng) {
         this.sampler = new ConditionalSampler<>(
-            stream(sample).map(ImmutableDoubleArray::copyOf).collect(toImmutableList()),
+            sample.stream().map(ImmutableDoubleArray::copyOf).collect(toImmutableList()),
             rng
         );
     }
