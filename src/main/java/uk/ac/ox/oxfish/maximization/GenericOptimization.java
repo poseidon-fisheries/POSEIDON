@@ -527,4 +527,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     public void setTranslateNANto(double translateNANto) {
         this.translateNANto = translateNANto;
     }
+
+    public static GenericOptimization fromFile(Path calibrationFile) {
+        FishYAML yamlReader = new FishYAML();
+        try (FileReader fileReader = new FileReader(calibrationFile.toFile())) {
+            return yamlReader.loadAs(fileReader, GenericOptimization.class);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 }
