@@ -19,12 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
 import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -33,16 +28,9 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -71,11 +59,9 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     private final double movingThreshold;
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider;
-    private final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepnessCoefficients;
+    private final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
-    private final DoubleUnaryOperator searchActionValueFunction;
     private final double searchActionDecayConstant;
-    private final DoubleUnaryOperator fadDeploymentActionValueFunction;
     private final double fadDeploymentActionDecayConstant;
     private ImmutableMap<? extends Class<? extends PurseSeinerAction>, ActionAttractionField> attractionFields;
     private SetOpportunityDetector setOpportunityDetector;
@@ -85,28 +71,21 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     public PurseSeinerFishingStrategy(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
-        final Map<Class<? extends AbstractSetAction>, Double> exponentialSteepnessCoefficients,
-        final double searchActionLogisticMidpoint,
-        final double searchActionLogisticSteepness,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
         final double searchActionDecayConstant,
-        final double fadDeploymentActionLogisticMidpoint,
-        final double fadDeploymentActionLogisticSteepness,
         final double fadDeploymentActionDecayConstant,
-        double movingThreshold
-        ) {
+        final double movingThreshold
+    ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
-        this.exponentialSteepnessCoefficients = exponentialSteepnessCoefficients;
-        this.searchActionValueFunction =
-            new LogisticFunction(searchActionLogisticMidpoint, searchActionLogisticSteepness);
+        this.actionValueFunctions = ImmutableMap.copyOf(actionValueFunctions);
         this.searchActionDecayConstant = searchActionDecayConstant;
-        this.fadDeploymentActionValueFunction =
-            new LogisticFunction(fadDeploymentActionLogisticMidpoint, fadDeploymentActionLogisticSteepness);
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
         this.movingThreshold = movingThreshold;
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
         setOpportunityDetector = setOpportunityLocatorProvider.apply(fisher);
         attractionFields =
@@ -128,7 +107,8 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
     }
 
-    @Override public boolean shouldFish(
+    @Override
+    public boolean shouldFish(
         final Fisher fisher,
         final MersenneTwisterFast random,
         final FishState fishState,
@@ -150,7 +130,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final Stream<Entry<PurseSeinerAction, Double>> weightedSetActions =
             possibleSetActions.stream().map(action -> weightedAction(
                 action,
-                valueOfSetAction(action, exponentialSteepnessCoefficients.get(action.getClass()))
+                valueOfSetAction(action, actionValueFunctions.get(action.getClass()))
             ));
 
         // Generate a search action for each of the set classes with no opportunities,
@@ -169,7 +149,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 valueOfLocationBasedAction(
                     actionCounts.count(SearchAction.class),
                     attractionFields.get(actionClass).getValueAt(gridLocation),
-                    searchActionValueFunction,
+                    actionValueFunctions.get(SearchAction.class),
                     searchActionDecayConstant
                 )
             ));
@@ -180,7 +160,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 valueOfLocationBasedAction(
                     actionCounts.count(FadDeploymentAction.class),
                     attractionFields.get(FadDeploymentAction.class).getValueAt(gridLocation),
-                    fadDeploymentActionValueFunction,
+                    actionValueFunctions.get(FadDeploymentAction.class),
                     fadDeploymentActionDecayConstant
                 )
             ));
@@ -191,11 +171,6 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 weightedSearchActions,
                 weightedFadDeploymentAction
             ).collect(toImmutableList());
-
-//        System.out.println("---");
-//        list.stream()
-//            .sorted(comparingDouble(Entry::getValue))
-//            .forEach(System.out::println);
 
         return list.stream()
             .filter(entry -> entry.getKey().isPermitted())
@@ -214,7 +189,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
 
     private double valueOfSetAction(
         final AbstractSetAction action,
-        final double exponentialSteepnessCoefficient
+        final DoubleUnaryOperator actionValueFunction
     ) {
         final double totalBiomass = action.getTargetBiology().getTotalBiomass();
         assert totalBiomass >= 0;
@@ -231,7 +206,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             );
             final double valueOfPotentialCatch =
                 new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
-            return 1 - exp(exponentialSteepnessCoefficient * -valueOfPotentialCatch);
+            return actionValueFunction.applyAsDouble(valueOfPotentialCatch);
         }
     }
 
@@ -246,7 +221,8 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         return value * decay;
     }
 
-    @Override public ActionResult act(
+    @Override
+    public ActionResult act(
         final FishState fishState,
         final Fisher fisher,
         final Regulation regulation,

@@ -16,21 +16,24 @@ public class TunaEvaluator implements Runnable {
 
     private final Path calibrationFilePath;
     private final double[] solution;
-    private int numRuns = 10;
+    private int numRuns = 1;
 
     public TunaEvaluator(Path calibrationFilePath, double[] solution) {
         this.calibrationFilePath = calibrationFilePath;
         this.solution = solution;
     }
 
-    @SuppressWarnings("unused")
-    public int getNumRuns() {
-        return numRuns;
-    }
+    public static void main(String[] args) {
 
-    @SuppressWarnings("unused")
-    public void setNumRuns(int numRuns) {
-        this.numRuns = numRuns;
+        double[] solution = {-2.215, -10.000, 9.917, 2.297, -8.628, 4.953, 4.575, -8.384, -10.000, -8.177, 10.000, 2.394, -7.054, 4.151, -10.000, 10.000, -10.000, 10.000, 10.000, 8.226, 9.795, 8.633, -10.000, -10.000, 6.368, 7.868, -7.203, -6.451, -1.582, 8.191, -0.469, -4.748, 3.718, -5.544, 9.824, -1.592, 9.451, 8.623, 2.879, -7.875, 10.000, -8.370, 4.009, -6.165, 6.632, 9.039, 3.556, -6.134, -6.509, -2.655, -10.000, 9.821, -8.838, 9.209};
+        Path baseFolderPath = Paths
+            .get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations");
+
+        new TunaEvaluator(
+            baseFolderPath.resolve("2021-02-16_20.42.51/calibration.yaml"),
+            solution
+        ).run();
+
     }
 
     @Override
@@ -77,8 +80,10 @@ public class TunaEvaluator implements Runnable {
         int numRuns
     ) {
         final FishState fishState = new FishState(System.currentTimeMillis());
-        fishState.setScenario(makeScenario(optimization, optimalParameters));
+        Scenario scenario = makeScenario(optimization, optimalParameters);
+        fishState.setScenario(scenario);
         fishState.start();
+
         do {
             fishState.schedule.step(fishState);
             System.out.printf(
@@ -107,6 +112,16 @@ public class TunaEvaluator implements Runnable {
         } catch (FileNotFoundException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @SuppressWarnings("unused")
+    public int getNumRuns() {
+        return numRuns;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNumRuns(int numRuns) {
+        this.numRuns = numRuns;
     }
 
 }

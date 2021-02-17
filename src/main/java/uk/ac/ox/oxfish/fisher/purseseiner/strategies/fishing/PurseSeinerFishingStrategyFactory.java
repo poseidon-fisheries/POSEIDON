@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -34,6 +35,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
@@ -43,6 +45,7 @@ import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
+@SuppressWarnings("unused")
 public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<PurseSeinerFishingStrategy> {
 
     private Path setCompositionWeightsPath = input("set_compositions.csv");
@@ -61,12 +64,79 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double fadDeploymentActionLogisticMidpoint = 0.1;
     private double fadDeploymentActionLogisticSteepness = 1;
     private double fadDeploymentActionDecayConstant = 1;
-
-    private double fadSetExponentialSteepnessCoefficient = 1E-4;
-    private double opportunisticFadSetExponentialSteepnessCoefficient = 1E-4;
-    private double nonAssociatedSetExponentialSteepnessCoefficient = 1E-4;
-    private double dolphinSetExponentialSteepnessCoefficient = 1E-4;
+    private double fadSetActionLogisticSteepness = 1;
+    private double fadSetActionLogisticMidpoint = 0.1;
+    private double opportunisticFadSetActionLogisticSteepness = 1;
+    private double opportunisticFadSetActionLogisticMidpoint = 0.1;
+    private double nonAssociatedSetActionLogisticSteepness = 1;
+    private double nonAssociatedSetActionLogisticMidpoint = 0.1;
+    private double dolphinSetActionLogisticSteepness = 1;
+    private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
+
+    public double getFadSetActionLogisticSteepness() {
+        return fadSetActionLogisticSteepness;
+    }
+
+    public void setFadSetActionLogisticSteepness(double fadSetActionLogisticSteepness) {
+        this.fadSetActionLogisticSteepness = fadSetActionLogisticSteepness;
+    }
+
+    public double getFadSetActionLogisticMidpoint() {
+        return fadSetActionLogisticMidpoint;
+    }
+
+    public void setFadSetActionLogisticMidpoint(double fadSetActionLogisticMidpoint) {
+        this.fadSetActionLogisticMidpoint = fadSetActionLogisticMidpoint;
+    }
+
+    public double getOpportunisticFadSetActionLogisticSteepness() {
+        return opportunisticFadSetActionLogisticSteepness;
+    }
+
+    public void setOpportunisticFadSetActionLogisticSteepness(double opportunisticFadSetActionLogisticSteepness) {
+        this.opportunisticFadSetActionLogisticSteepness = opportunisticFadSetActionLogisticSteepness;
+    }
+
+    public double getOpportunisticFadSetActionLogisticMidpoint() {
+        return opportunisticFadSetActionLogisticMidpoint;
+    }
+
+    public void setOpportunisticFadSetActionLogisticMidpoint(double opportunisticFadSetActionLogisticMidpoint) {
+        this.opportunisticFadSetActionLogisticMidpoint = opportunisticFadSetActionLogisticMidpoint;
+    }
+
+    public double getNonAssociatedSetActionLogisticSteepness() {
+        return nonAssociatedSetActionLogisticSteepness;
+    }
+
+    public void setNonAssociatedSetActionLogisticSteepness(double nonAssociatedSetActionLogisticSteepness) {
+        this.nonAssociatedSetActionLogisticSteepness = nonAssociatedSetActionLogisticSteepness;
+    }
+
+    public double getNonAssociatedSetActionLogisticMidpoint() {
+        return nonAssociatedSetActionLogisticMidpoint;
+    }
+
+    public void setNonAssociatedSetActionLogisticMidpoint(double nonAssociatedSetActionLogisticMidpoint) {
+        this.nonAssociatedSetActionLogisticMidpoint = nonAssociatedSetActionLogisticMidpoint;
+    }
+
+    public double getDolphinSetActionLogisticSteepness() {
+        return dolphinSetActionLogisticSteepness;
+    }
+
+    public void setDolphinSetActionLogisticSteepness(double dolphinSetActionLogisticSteepness) {
+        this.dolphinSetActionLogisticSteepness = dolphinSetActionLogisticSteepness;
+    }
+
+    public double getDolphinSetActionLogisticMidpoint() {
+        return dolphinSetActionLogisticMidpoint;
+    }
+
+    public void setDolphinSetActionLogisticMidpoint(double dolphinSetActionLogisticMidpoint) {
+        this.dolphinSetActionLogisticMidpoint = dolphinSetActionLogisticMidpoint;
+    }
 
     public double getMovingThreshold() {
         return movingThreshold;
@@ -74,35 +144,6 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
 
     public void setMovingThreshold(double movingThreshold) {
         this.movingThreshold = movingThreshold;
-    }
-
-    public double getFadSetExponentialSteepnessCoefficient() { return fadSetExponentialSteepnessCoefficient; }
-
-    public void setFadSetExponentialSteepnessCoefficient(final double fadSetExponentialSteepnessCoefficient) {
-        this.fadSetExponentialSteepnessCoefficient = fadSetExponentialSteepnessCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public double getOpportunisticFadSetExponentialSteepnessCoefficient() { return opportunisticFadSetExponentialSteepnessCoefficient; }
-
-    public void setOpportunisticFadSetExponentialSteepnessCoefficient(final double opportunisticFadSetExponentialSteepnessCoefficient) {
-        this.opportunisticFadSetExponentialSteepnessCoefficient = opportunisticFadSetExponentialSteepnessCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public double getNonAssociatedSetExponentialSteepnessCoefficient() { return nonAssociatedSetExponentialSteepnessCoefficient; }
-
-    @SuppressWarnings("unused")
-    public void setNonAssociatedSetExponentialSteepnessCoefficient(final double nonAssociatedSetExponentialSteepnessCoefficient) {
-        this.nonAssociatedSetExponentialSteepnessCoefficient = nonAssociatedSetExponentialSteepnessCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public double getDolphinSetExponentialSteepnessCoefficient() { return dolphinSetExponentialSteepnessCoefficient; }
-
-    @SuppressWarnings("unused")
-    public void setDolphinSetExponentialSteepnessCoefficient(final double dolphinSetExponentialSteepnessCoefficient) {
-        this.dolphinSetExponentialSteepnessCoefficient = dolphinSetExponentialSteepnessCoefficient;
     }
 
     public double getSearchActionLogisticMidpoint() { return searchActionLogisticMidpoint; }
@@ -193,12 +234,8 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return new PurseSeinerFishingStrategy(
             this::loadAttractionWeights,
             this::makeSetOpportunityLocator,
-            makeExponentialSteepnessCoefficients(),
-            searchActionLogisticMidpoint,
-            searchActionLogisticSteepness,
+            makeActionValueFunctions(),
             searchActionDecayConstant,
-            fadDeploymentActionLogisticMidpoint,
-            fadDeploymentActionLogisticSteepness,
             fadDeploymentActionDecayConstant,
             movingThreshold
         );
@@ -257,13 +294,15 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         );
     }
 
-    private ImmutableMap<Class<? extends AbstractSetAction>, Double> makeExponentialSteepnessCoefficients() {
-        return ImmutableMap.of(
-            NonAssociatedSetAction.class, nonAssociatedSetExponentialSteepnessCoefficient,
-            DolphinSetAction.class, dolphinSetExponentialSteepnessCoefficient,
-            FadSetAction.class, fadSetExponentialSteepnessCoefficient,
-            OpportunisticFadSetAction.class, opportunisticFadSetExponentialSteepnessCoefficient
-        );
+    Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> makeActionValueFunctions() {
+        return new ImmutableMap.Builder<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>()
+            .put(SearchAction.class, new LogisticFunction(searchActionLogisticMidpoint, searchActionLogisticSteepness))
+            .put(FadDeploymentAction.class, new LogisticFunction(fadDeploymentActionLogisticMidpoint, fadDeploymentActionLogisticSteepness))
+            .put(NonAssociatedSetAction.class, new LogisticFunction(nonAssociatedSetActionLogisticMidpoint, nonAssociatedSetActionLogisticSteepness))
+            .put(DolphinSetAction.class, new LogisticFunction(dolphinSetActionLogisticMidpoint, dolphinSetActionLogisticSteepness))
+            .put(FadSetAction.class, new LogisticFunction(fadSetActionLogisticMidpoint, fadSetActionLogisticSteepness))
+            .put(OpportunisticFadSetAction.class, new LogisticFunction(opportunisticFadSetActionLogisticMidpoint, opportunisticFadSetActionLogisticSteepness))
+            .build();
     }
 
     private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>> loadSetCompositionWeights(
