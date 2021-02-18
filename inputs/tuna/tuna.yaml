@@ -129,10 +129,6 @@ Tuna:
         decayRateOfOpportunisticFadSetLocationValues: 0.01
         dolphinSetObservers: !!set {
           }
-        dolphinSetPctHoldAvailableLogisticMidpoint: 0.5
-        dolphinSetPctHoldAvailableLogisticSteepness: 1.0
-        dolphinSetPctSetsRemainingLogisticMidpoint: 0.5
-        dolphinSetPctSetsRemainingLogisticSteepness: 1.0
         dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
         dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
         fadDeploymentObservers: !!set {
@@ -152,28 +148,18 @@ Tuna:
           fishReleaseProbabilityInPercent: '0.0'
         fadSetObservers: !!set {
           }
-        fadSetPctHoldAvailableLogisticMidpoint: 0.5
-        fadSetPctHoldAvailableLogisticSteepness: 1.0
-        fadSetPctSetsRemainingLogisticMidpoint: 0.5
-        fadSetPctSetsRemainingLogisticSteepness: 1.0
         initialNumberOfFads: 999999
         locationValuesFile: inputs/tuna/location_values.csv
         nonAssociatedSetObservers: !!set {
           }
-        nonAssociatedSetPctHoldAvailableLogisticMidpoint: 0.5
-        nonAssociatedSetPctHoldAvailableLogisticSteepness: 1.0
-        nonAssociatedSetPctSetsRemainingLogisticMidpoint: 5.0
-        nonAssociatedSetPctSetsRemainingLogisticSteepness: 1.0
         nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
         nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
-        opportunisticFadSetPctHoldAvailableLogisticMidpoint: 0.5
-        opportunisticFadSetPctHoldAvailableLogisticSteepness: 1.0
-        opportunisticFadSetPctSetsRemainingLogisticMidpoint: 0.5
-        opportunisticFadSetPctSetsRemainingLogisticSteepness: 1.0
         opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
         opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
         pctHoldSpaceLeftLogisticMidpoint: 0.9
         pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
+        pctSetsRemainingLogisticMidpoint: 0.5
+        pctSetsRemainingLogisticSteepness: 1.0
         pctTravelTimeLeftLogisticMidpoint: 0.9
         pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
         successfulSetProbability: '0.9231701'
