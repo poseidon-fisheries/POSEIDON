@@ -38,6 +38,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 
+@SuppressWarnings("unused")
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private static final LocationFisherValuesByActionCache locationValuesCache = new LocationFisherValuesByActionCache();
@@ -403,7 +404,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             new ActionAttractionField(
                 new FadLocationValues(),
                 new SetAttractionModulator(
-                    FadSetAction.class,
                     fadSetPctHoldAvailableLogisticMidpoint,
                     fadSetPctHoldAvailableLogisticSteepness,
                     fadSetPctSetsRemainingLogisticMidpoint,
@@ -417,7 +417,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    OpportunisticFadSetAction.class,
                     opportunisticFadSetPctHoldAvailableLogisticMidpoint,
                     opportunisticFadSetPctHoldAvailableLogisticSteepness,
                     opportunisticFadSetPctSetsRemainingLogisticMidpoint,
@@ -433,7 +432,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    NonAssociatedSetAction.class,
                     nonAssociatedSetPctHoldAvailableLogisticMidpoint,
                     nonAssociatedSetPctHoldAvailableLogisticSteepness,
                     nonAssociatedSetPctSetsRemainingLogisticMidpoint,
@@ -449,7 +447,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    DolphinSetAction.class,
                     dolphinSetPctHoldAvailableLogisticMidpoint,
                     dolphinSetPctHoldAvailableLogisticSteepness,
                     dolphinSetPctSetsRemainingLogisticMidpoint,

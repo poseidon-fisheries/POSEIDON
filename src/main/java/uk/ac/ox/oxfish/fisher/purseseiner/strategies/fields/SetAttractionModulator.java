@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 
 import java.util.function.DoubleUnaryOperator;
@@ -30,20 +29,17 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class SetAttractionModulator implements AttractionModulator {
 
-    private final Class<? extends AbstractSetAction> actionClass;
     private final DoubleUnaryOperator pctHoldAvailableModulationFunction;
     private final DoubleUnaryOperator pctSetsRemainingModulationFunction;
     private final DoubleUnaryOperator timeSinceLastVisitModulationFunction;
 
     public SetAttractionModulator(
-        final Class<? extends AbstractSetAction> actionClass,
         final double pctHoldAvailableLogisticMidpoint,
         final double pctHoldAvailableLogisticSteepness,
         final double pctSetsRemainingLogisticMidpoint,
         final double pctSetsRemainingLogisticSteepness
     ) {
         this(
-            actionClass,
             new LogisticFunction(pctHoldAvailableLogisticMidpoint, pctHoldAvailableLogisticSteepness),
             new LogisticFunction(pctSetsRemainingLogisticMidpoint, pctSetsRemainingLogisticSteepness),
             __ -> 1.0 // for when time since last visit doesn't matter (i.e., for sets on own FADs)
@@ -51,19 +47,16 @@ public class SetAttractionModulator implements AttractionModulator {
     }
 
     public SetAttractionModulator(
-        final Class<? extends AbstractSetAction> actionClass,
         final DoubleUnaryOperator pctHoldAvailableModulationFunction,
         final DoubleUnaryOperator pctSetsRemainingModulationFunction,
         final DoubleUnaryOperator timeSinceLastVisitModulationFunction
     ) {
-        this.actionClass = actionClass;
         this.pctHoldAvailableModulationFunction = pctHoldAvailableModulationFunction;
         this.pctSetsRemainingModulationFunction = pctSetsRemainingModulationFunction;
         this.timeSinceLastVisitModulationFunction = timeSinceLastVisitModulationFunction;
     }
 
     public SetAttractionModulator(
-        final Class<? extends AbstractSetAction> actionClass,
         final double pctHoldAvailableLogisticMidpoint,
         final double pctHoldAvailableLogisticSteepness,
         final double pctSetsRemainingLogisticMidpoint,
@@ -72,7 +65,6 @@ public class SetAttractionModulator implements AttractionModulator {
         final double timeSinceLastVisitLogisticSteepness
     ) {
         this(
-            actionClass,
             new LogisticFunction(pctHoldAvailableLogisticMidpoint, pctHoldAvailableLogisticSteepness),
             new LogisticFunction(pctSetsRemainingLogisticMidpoint, pctSetsRemainingLogisticSteepness),
             new LogisticFunction(timeSinceLastVisitLogisticMidpoint, timeSinceLastVisitLogisticSteepness)
