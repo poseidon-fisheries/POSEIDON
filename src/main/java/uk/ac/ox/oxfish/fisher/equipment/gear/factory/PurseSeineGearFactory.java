@@ -75,34 +75,38 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = input("location_values.csv");
+
     private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
     private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
+
     private double pctTravelTimeLeftLogisticMidpoint = 0.9;
     private double pctTravelTimeLeftLogisticSteepness = MAX_VALUE;
-    private double fadSetPctHoldAvailableLogisticMidpoint = 0.5;
-    private double fadSetPctHoldAvailableLogisticSteepness = 1;
-    private double fadSetPctSetsRemainingLogisticMidpoint = 0.5;
-    private double fadSetPctSetsRemainingLogisticSteepness = 1;
-    private double opportunisticFadSetPctHoldAvailableLogisticMidpoint = 0.5;
-    private double opportunisticFadSetPctHoldAvailableLogisticSteepness = 1;
-    private double opportunisticFadSetPctSetsRemainingLogisticMidpoint = 0.5;
-    private double opportunisticFadSetPctSetsRemainingLogisticSteepness = 1;
+    private double pctSetsRemainingLogisticMidpoint = 0.5; // not calibrated for now
+    private double pctSetsRemainingLogisticSteepness = 1; // not calibrated for now
     private double opportunisticFadSetTimeSinceLastVisitLogisticMidpoint = 5;
     private double opportunisticFadSetTimeSinceLastVisitLogisticSteepness = 1;
-    private double nonAssociatedSetPctHoldAvailableLogisticMidpoint = 0.5;
-    private double nonAssociatedSetPctHoldAvailableLogisticSteepness = 1;
-    private double nonAssociatedSetPctSetsRemainingLogisticMidpoint = 5;
-    private double nonAssociatedSetPctSetsRemainingLogisticSteepness = 1;
     private double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint = 5;
     private double nonAssociatedSetTimeSinceLastVisitLogisticSteepness = 1;
-    private double dolphinSetPctHoldAvailableLogisticMidpoint = 0.5;
-    private double dolphinSetPctHoldAvailableLogisticSteepness = 1;
-    private double dolphinSetPctSetsRemainingLogisticMidpoint = 0.5;
-    private double dolphinSetPctSetsRemainingLogisticSteepness = 1;
     private double dolphinSetTimeSinceLastVisitLogisticMidpoint = 5;
     private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
     private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
+
+    public double getPctSetsRemainingLogisticMidpoint() {
+        return pctSetsRemainingLogisticMidpoint;
+    }
+
+    public void setPctSetsRemainingLogisticMidpoint(double pctSetsRemainingLogisticMidpoint) {
+        this.pctSetsRemainingLogisticMidpoint = pctSetsRemainingLogisticMidpoint;
+    }
+
+    public double getPctSetsRemainingLogisticSteepness() {
+        return pctSetsRemainingLogisticSteepness;
+    }
+
+    public void setPctSetsRemainingLogisticSteepness(double pctSetsRemainingLogisticSteepness) {
+        this.pctSetsRemainingLogisticSteepness = pctSetsRemainingLogisticSteepness;
+    }
 
     public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
         return dolphinSetObservers;
@@ -155,32 +159,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.fadDeploymentPctActiveFadsLimitLogisticSteepness = fadDeploymentPctActiveFadsLimitLogisticSteepness;
     }
 
-    public double getOpportunisticFadSetPctHoldAvailableLogisticMidpoint() { return opportunisticFadSetPctHoldAvailableLogisticMidpoint; }
-
-    public void setOpportunisticFadSetPctHoldAvailableLogisticMidpoint(final double opportunisticFadSetPctHoldAvailableLogisticMidpoint) {
-        this.opportunisticFadSetPctHoldAvailableLogisticMidpoint = opportunisticFadSetPctHoldAvailableLogisticMidpoint;
-    }
-
-    public double getOpportunisticFadSetPctHoldAvailableLogisticSteepness() { return opportunisticFadSetPctHoldAvailableLogisticSteepness; }
-
-    public void setOpportunisticFadSetPctHoldAvailableLogisticSteepness(final double opportunisticFadSetPctHoldAvailableLogisticSteepness) {
-        this.opportunisticFadSetPctHoldAvailableLogisticSteepness =
-            opportunisticFadSetPctHoldAvailableLogisticSteepness;
-    }
-
-    public double getOpportunisticFadSetPctSetsRemainingLogisticMidpoint() { return opportunisticFadSetPctSetsRemainingLogisticMidpoint; }
-
-    public void setOpportunisticFadSetPctSetsRemainingLogisticMidpoint(final double opportunisticFadSetPctSetsRemainingLogisticMidpoint) {
-        this.opportunisticFadSetPctSetsRemainingLogisticMidpoint = opportunisticFadSetPctSetsRemainingLogisticMidpoint;
-    }
-
-    public double getOpportunisticFadSetPctSetsRemainingLogisticSteepness() { return opportunisticFadSetPctSetsRemainingLogisticSteepness; }
-
-    public void setOpportunisticFadSetPctSetsRemainingLogisticSteepness(final double opportunisticFadSetPctSetsRemainingLogisticSteepness) {
-        this.opportunisticFadSetPctSetsRemainingLogisticSteepness =
-            opportunisticFadSetPctSetsRemainingLogisticSteepness;
-    }
-
     @SuppressWarnings("unused")
     public double getOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint() { return opportunisticFadSetTimeSinceLastVisitLogisticMidpoint; }
 
@@ -197,34 +175,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     @SuppressWarnings("unused")
-    public double getNonAssociatedSetPctHoldAvailableLogisticMidpoint() { return nonAssociatedSetPctHoldAvailableLogisticMidpoint; }
-
-    public void setNonAssociatedSetPctHoldAvailableLogisticMidpoint(final double nonAssociatedSetPctHoldAvailableLogisticMidpoint) {
-        this.nonAssociatedSetPctHoldAvailableLogisticMidpoint = nonAssociatedSetPctHoldAvailableLogisticMidpoint;
-    }
-
-    public double getNonAssociatedSetPctHoldAvailableLogisticSteepness() { return nonAssociatedSetPctHoldAvailableLogisticSteepness; }
-
-    @SuppressWarnings("unused")
-    public void setNonAssociatedSetPctHoldAvailableLogisticSteepness(final double nonAssociatedSetPctHoldAvailableLogisticSteepness) {
-        this.nonAssociatedSetPctHoldAvailableLogisticSteepness = nonAssociatedSetPctHoldAvailableLogisticSteepness;
-    }
-
-    @SuppressWarnings("unused")
-    public double getNonAssociatedSetPctSetsRemainingLogisticMidpoint() { return nonAssociatedSetPctSetsRemainingLogisticMidpoint; }
-
-    public void setNonAssociatedSetPctSetsRemainingLogisticMidpoint(final double nonAssociatedSetPctSetsRemainingLogisticMidpoint) {
-        this.nonAssociatedSetPctSetsRemainingLogisticMidpoint = nonAssociatedSetPctSetsRemainingLogisticMidpoint;
-    }
-
-    public double getNonAssociatedSetPctSetsRemainingLogisticSteepness() { return nonAssociatedSetPctSetsRemainingLogisticSteepness; }
-
-    @SuppressWarnings("unused")
-    public void setNonAssociatedSetPctSetsRemainingLogisticSteepness(final double nonAssociatedSetPctSetsRemainingLogisticSteepness) {
-        this.nonAssociatedSetPctSetsRemainingLogisticSteepness = nonAssociatedSetPctSetsRemainingLogisticSteepness;
-    }
-
-    @SuppressWarnings("unused")
     public double getNonAssociatedSetTimeSinceLastVisitLogisticMidpoint() { return nonAssociatedSetTimeSinceLastVisitLogisticMidpoint; }
 
     public void setNonAssociatedSetTimeSinceLastVisitLogisticMidpoint(final double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint) {
@@ -235,34 +185,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     public void setNonAssociatedSetTimeSinceLastVisitLogisticSteepness(final double nonAssociatedSetTimeSinceLastVisitLogisticSteepness) {
         this.nonAssociatedSetTimeSinceLastVisitLogisticSteepness = nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
-    }
-
-    @SuppressWarnings("unused")
-    public double getDolphinSetPctHoldAvailableLogisticMidpoint() { return dolphinSetPctHoldAvailableLogisticMidpoint; }
-
-    @SuppressWarnings("unused")
-    public void setDolphinSetPctHoldAvailableLogisticMidpoint(final double dolphinSetPctHoldAvailableLogisticMidpoint) {
-        this.dolphinSetPctHoldAvailableLogisticMidpoint = dolphinSetPctHoldAvailableLogisticMidpoint;
-    }
-
-    public double getDolphinSetPctHoldAvailableLogisticSteepness() { return dolphinSetPctHoldAvailableLogisticSteepness; }
-
-    public void setDolphinSetPctHoldAvailableLogisticSteepness(final double dolphinSetPctHoldAvailableLogisticSteepness) {
-        this.dolphinSetPctHoldAvailableLogisticSteepness = dolphinSetPctHoldAvailableLogisticSteepness;
-    }
-
-    @SuppressWarnings("unused")
-    public double getDolphinSetPctSetsRemainingLogisticMidpoint() { return dolphinSetPctSetsRemainingLogisticMidpoint; }
-
-    @SuppressWarnings("unused")
-    public void setDolphinSetPctSetsRemainingLogisticMidpoint(final double dolphinSetPctSetsRemainingLogisticMidpoint) {
-        this.dolphinSetPctSetsRemainingLogisticMidpoint = dolphinSetPctSetsRemainingLogisticMidpoint;
-    }
-
-    public double getDolphinSetPctSetsRemainingLogisticSteepness() { return dolphinSetPctSetsRemainingLogisticSteepness; }
-
-    public void setDolphinSetPctSetsRemainingLogisticSteepness(final double dolphinSetPctSetsRemainingLogisticSteepness) {
-        this.dolphinSetPctSetsRemainingLogisticSteepness = dolphinSetPctSetsRemainingLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
@@ -277,30 +199,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     public void setDolphinSetTimeSinceLastVisitLogisticSteepness(final double dolphinSetTimeSinceLastVisitLogisticSteepness) {
         this.dolphinSetTimeSinceLastVisitLogisticSteepness = dolphinSetTimeSinceLastVisitLogisticSteepness;
-    }
-
-    public double getFadSetPctHoldAvailableLogisticMidpoint() { return fadSetPctHoldAvailableLogisticMidpoint; }
-
-    public void setFadSetPctHoldAvailableLogisticMidpoint(final double fadSetPctHoldAvailableLogisticMidpoint) {
-        this.fadSetPctHoldAvailableLogisticMidpoint = fadSetPctHoldAvailableLogisticMidpoint;
-    }
-
-    public double getFadSetPctHoldAvailableLogisticSteepness() { return fadSetPctHoldAvailableLogisticSteepness; }
-
-    public void setFadSetPctHoldAvailableLogisticSteepness(final double fadSetPctHoldAvailableLogisticSteepness) {
-        this.fadSetPctHoldAvailableLogisticSteepness = fadSetPctHoldAvailableLogisticSteepness;
-    }
-
-    public double getFadSetPctSetsRemainingLogisticMidpoint() { return fadSetPctSetsRemainingLogisticMidpoint; }
-
-    public void setFadSetPctSetsRemainingLogisticMidpoint(final double fadSetPctSetsRemainingLogisticMidpoint) {
-        this.fadSetPctSetsRemainingLogisticMidpoint = fadSetPctSetsRemainingLogisticMidpoint;
-    }
-
-    public double getFadSetPctSetsRemainingLogisticSteepness() { return fadSetPctSetsRemainingLogisticSteepness; }
-
-    public void setFadSetPctSetsRemainingLogisticSteepness(final double fadSetPctSetsRemainingLogisticSteepness) {
-        this.fadSetPctSetsRemainingLogisticSteepness = fadSetPctSetsRemainingLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
@@ -404,10 +302,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             new ActionAttractionField(
                 new FadLocationValues(),
                 new SetAttractionModulator(
-                    fadSetPctHoldAvailableLogisticMidpoint,
-                    fadSetPctHoldAvailableLogisticSteepness,
-                    fadSetPctSetsRemainingLogisticMidpoint,
-                    fadSetPctSetsRemainingLogisticSteepness
+                    pctHoldSpaceLeftLogisticMidpoint,
+                    pctHoldSpaceLeftLogisticSteepness,
+                    pctSetsRemainingLogisticMidpoint,
+                    pctSetsRemainingLogisticSteepness
                 ),
                 FadSetAction.class
             ),
@@ -417,10 +315,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    opportunisticFadSetPctHoldAvailableLogisticMidpoint,
-                    opportunisticFadSetPctHoldAvailableLogisticSteepness,
-                    opportunisticFadSetPctSetsRemainingLogisticMidpoint,
-                    opportunisticFadSetPctSetsRemainingLogisticSteepness,
+                    pctHoldSpaceLeftLogisticMidpoint,
+                    pctHoldSpaceLeftLogisticSteepness,
+                    pctSetsRemainingLogisticMidpoint,
+                    pctSetsRemainingLogisticSteepness,
                     opportunisticFadSetTimeSinceLastVisitLogisticMidpoint,
                     opportunisticFadSetTimeSinceLastVisitLogisticSteepness
                 ),
@@ -432,10 +330,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    nonAssociatedSetPctHoldAvailableLogisticMidpoint,
-                    nonAssociatedSetPctHoldAvailableLogisticSteepness,
-                    nonAssociatedSetPctSetsRemainingLogisticMidpoint,
-                    nonAssociatedSetPctSetsRemainingLogisticSteepness,
+                    pctHoldSpaceLeftLogisticMidpoint,
+                    pctHoldSpaceLeftLogisticSteepness,
+                    pctSetsRemainingLogisticMidpoint,
+                    pctSetsRemainingLogisticSteepness,
                     nonAssociatedSetTimeSinceLastVisitLogisticMidpoint,
                     nonAssociatedSetTimeSinceLastVisitLogisticSteepness
                 ),
@@ -447,10 +345,10 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new SetAttractionModulator(
-                    dolphinSetPctHoldAvailableLogisticMidpoint,
-                    dolphinSetPctHoldAvailableLogisticSteepness,
-                    dolphinSetPctSetsRemainingLogisticMidpoint,
-                    dolphinSetPctSetsRemainingLogisticSteepness,
+                    pctHoldSpaceLeftLogisticMidpoint,
+                    pctHoldSpaceLeftLogisticSteepness,
+                    pctSetsRemainingLogisticMidpoint,
+                    pctSetsRemainingLogisticSteepness,
                     dolphinSetTimeSinceLastVisitLogisticMidpoint,
                     dolphinSetTimeSinceLastVisitLogisticSteepness
                 ),

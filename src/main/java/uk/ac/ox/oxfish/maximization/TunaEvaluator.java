@@ -16,7 +16,7 @@ public class TunaEvaluator implements Runnable {
 
     private final Path calibrationFilePath;
     private final double[] solution;
-    private int numRuns = 1;
+    private int numRuns = 10;
 
     public TunaEvaluator(Path calibrationFilePath, double[] solution) {
         this.calibrationFilePath = calibrationFilePath;

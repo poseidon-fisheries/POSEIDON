@@ -48,7 +48,7 @@ public class TunaCalibrator implements Runnable {
         // Lots of code for not much, but this parse all integer numbers out from the
         // arguments and (if present) uses the max one to set the number of fitness calls
         // and the min one to set the population size. If there is only one, it's
-        // assumed the be the number of fitness calls.
+        // assumed to be the number of fitness calls.
         int[] numericArgs = stream(args).flatMapToInt(arg -> {
             try {
                 return IntStream.of(parseInt(arg));
