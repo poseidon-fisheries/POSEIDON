@@ -53,13 +53,13 @@ public class PortAttractionModulatorTest {
 
         when(fisher.getHoursAtSea()).thenReturn(0.0);
         when(hold.getPercentageFilled()).thenReturn(0.0);
-        assertEquals(0.0, modulator.modulate(0, 0, 0, fisher));
+        assertEquals(0.0, modulator.modulate(fisher));
 
         when(fisher.getHoursAtSea()).thenReturn(0.5);
-        assertEquals(0.5, modulator.modulate(0, 0, 0, fisher));
+        assertEquals(0.5, modulator.modulate(fisher));
 
         when(hold.getPercentageFilled()).thenReturn(1.0);
-        assertEquals(1.0, modulator.modulate(0, 0, 0, fisher));
+        assertEquals(1.0, modulator.modulate(fisher));
 
     }
 

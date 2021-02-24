@@ -25,7 +25,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
-public class PortAttractionModulator implements AttractionModulator {
+public class PortAttractionModulator implements GlobalAttractionModulator {
 
     private final DoubleUnaryOperator pctHoldSpaceLeftLogisticFunction;
     private final DoubleUnaryOperator pctTravelTimeLeftLogisticFunction;
@@ -43,9 +43,8 @@ public class PortAttractionModulator implements AttractionModulator {
             new LogisticFunction(pctTravelTimeLeftLogisticMidpoint, pctTravelTimeLeftLogisticSteepness);
     }
 
-    @Override public double modulate(
-        final int x, final int y, final int t, final Fisher fisher
-    ) {
+    @Override
+    public double modulate(Fisher fisher) {
         final double pctHoldSpaceLeft = 1.0 - fisher.getHold().getPercentageFilled();
         final double pctTravelTimeLeft = 1.0 - (fisher.getHoursAtSea() / maxTravelTime(fisher));
         return 1.0 -

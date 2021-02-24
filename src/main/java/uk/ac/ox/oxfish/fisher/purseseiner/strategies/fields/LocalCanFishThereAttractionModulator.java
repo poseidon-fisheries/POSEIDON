@@ -21,18 +21,15 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-@FunctionalInterface
-interface AttractionModulator {
+public enum LocalCanFishThereAttractionModulator implements LocalAttractionModulator {
 
-    default boolean canFishThere(final int x, final int y, final int t, final Fisher fisher) {
-        return fisher.getRegulation().canFishHere(
-            fisher,
-            fisher.grabState().getMap().getSeaTile(x, y),
-            fisher.grabState(),
-            t
-        );
+    INSTANCE;
+
+    @Override
+    public double modulate(
+        final int x, final int y, final int t, final Fisher fisher
+    ) {
+        return canFishThere(x, y, t, fisher) ? 1 : 0;
     }
-
-    double modulate(final int x, final int y, final int t, final Fisher fisher);
 
 }

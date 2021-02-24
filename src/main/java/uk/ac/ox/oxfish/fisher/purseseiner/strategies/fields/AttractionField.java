@@ -36,14 +36,17 @@ public class AttractionField implements FisherStartable {
 
     private static final Double2D ZERO_VECTOR = new Double2D(0, 0);
     private final LocationValues locationValues;
-    private final AttractionModulator modulator;
+    private final LocalAttractionModulator localModulator;
+    private final GlobalAttractionModulator globalModulator;
 
     AttractionField(
         final LocationValues locationValues,
-        final AttractionModulator modulator
+        final LocalAttractionModulator localModulator,
+        final GlobalAttractionModulator globalModulator
     ) {
         this.locationValues = locationValues;
-        this.modulator = modulator;
+        this.localModulator = localModulator;
+        this.globalModulator = globalModulator;
     }
 
     public Stream<Double2D> attractionValues(Fisher fisher) {
@@ -58,7 +61,7 @@ public class AttractionField implements FisherStartable {
         return attractionValues(fisher)
             .reduce(Double2D::add)
             .filter(v -> v.length() > 0) // because very small vectors get length 0 and become infinite when normalized
-            .map(Double2D::normalize)
+            .map(v -> v.normalize().multiply(globalModulator.modulate(fisher)))
             .orElse(ZERO_VECTOR);
     }
 
@@ -82,7 +85,7 @@ public class AttractionField implements FisherStartable {
             .normalize() // normalized direction vector
             .multiply(
                 // scale to modulated location value, decreasing with travel time
-                value * modulator.modulate(there.x, there.y, t, fisher)
+                value * localModulator.modulate(there.x, there.y, t, fisher)
                     / pow(travelTime, 2)
             );
     }

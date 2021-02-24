@@ -19,10 +19,21 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-public class PortAttractionField extends AttractionField {
+import uk.ac.ox.oxfish.fisher.Fisher;
 
-    public PortAttractionField(final GlobalAttractionModulator globalModulator) {
-        super(new PortLocationValues(), ConstantLocalAttractionModulator.INSTANCE, globalModulator);
+@FunctionalInterface
+public
+interface LocalAttractionModulator {
+
+    default boolean canFishThere(final int x, final int y, final int t, final Fisher fisher) {
+        return fisher.getRegulation().canFishHere(
+            fisher,
+            fisher.grabState().getMap().getSeaTile(x, y),
+            fisher.grabState(),
+            t
+        );
     }
+
+    double modulate(final int x, final int y, final int t, final Fisher fisher);
 
 }

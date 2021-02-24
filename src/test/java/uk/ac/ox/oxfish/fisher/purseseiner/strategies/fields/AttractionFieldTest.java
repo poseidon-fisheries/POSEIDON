@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
@@ -39,17 +38,17 @@ public class AttractionFieldTest {
 
     @Test
     public void test() {
-        final AttractionModulator attractionModulator =
-            mock(AttractionModulator.class);
+        final GlobalAttractionModulator globalAttractionModulator =
+            mock(GlobalAttractionModulator.class);
         final PortAttractionField portAttractionField =
-            new PortAttractionField(attractionModulator);
+            new PortAttractionField(globalAttractionModulator);
 
         final Fisher fisher = mock(Fisher.class);
         final Boat boat = mock(Boat.class);
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeCornerPortMap(3, 3);
 
-        when(attractionModulator.modulate(anyInt(), anyInt(), anyInt(), any())).thenReturn(1.0);
+        when(globalAttractionModulator.modulate(any())).thenReturn(1.0);
         when(fishState.getMap()).thenReturn(map);
         when(fishState.getHoursPerStep()).thenReturn(1.0);
         when(boat.getSpeedInKph()).thenReturn(1.0);

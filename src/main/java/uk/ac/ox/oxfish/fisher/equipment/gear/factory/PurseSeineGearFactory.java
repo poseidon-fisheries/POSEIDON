@@ -298,15 +298,17 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     private Stream<AttractionField> attractionFields() {
+        final GlobalSetAttractionModulator globalSetAttractionModulator = new GlobalSetAttractionModulator(
+            pctHoldSpaceLeftLogisticMidpoint,
+            pctHoldSpaceLeftLogisticSteepness,
+            pctSetsRemainingLogisticMidpoint,
+            pctSetsRemainingLogisticSteepness
+        );
         return Stream.of(
             new ActionAttractionField(
                 new FadLocationValues(),
-                new SetAttractionModulator(
-                    pctHoldSpaceLeftLogisticMidpoint,
-                    pctHoldSpaceLeftLogisticSteepness,
-                    pctSetsRemainingLogisticMidpoint,
-                    pctSetsRemainingLogisticSteepness
-                ),
+                LocalCanFishThereAttractionModulator.INSTANCE,
+                globalSetAttractionModulator,
                 FadSetAction.class
             ),
             new ActionAttractionField(
@@ -314,14 +316,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fisher -> loadLocationValues(fisher, OpportunisticFadSetAction.class),
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
-                new SetAttractionModulator(
-                    pctHoldSpaceLeftLogisticMidpoint,
-                    pctHoldSpaceLeftLogisticSteepness,
-                    pctSetsRemainingLogisticMidpoint,
-                    pctSetsRemainingLogisticSteepness,
+                new LocalSetAttractionModulator(
                     opportunisticFadSetTimeSinceLastVisitLogisticMidpoint,
                     opportunisticFadSetTimeSinceLastVisitLogisticSteepness
                 ),
+                globalSetAttractionModulator,
                 OpportunisticFadSetAction.class
             ),
             new ActionAttractionField(
@@ -329,14 +328,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class),
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
-                new SetAttractionModulator(
-                    pctHoldSpaceLeftLogisticMidpoint,
-                    pctHoldSpaceLeftLogisticSteepness,
-                    pctSetsRemainingLogisticMidpoint,
-                    pctSetsRemainingLogisticSteepness,
+                new LocalSetAttractionModulator(
                     nonAssociatedSetTimeSinceLastVisitLogisticMidpoint,
                     nonAssociatedSetTimeSinceLastVisitLogisticSteepness
                 ),
+                globalSetAttractionModulator,
                 NonAssociatedSetAction.class
             ),
             new ActionAttractionField(
@@ -344,14 +340,11 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fisher -> loadLocationValues(fisher, DolphinSetAction.class),
                     getDecayRateOfDolphinSetLocationValues()
                 ),
-                new SetAttractionModulator(
-                    pctHoldSpaceLeftLogisticMidpoint,
-                    pctHoldSpaceLeftLogisticSteepness,
-                    pctSetsRemainingLogisticMidpoint,
-                    pctSetsRemainingLogisticSteepness,
+                new LocalSetAttractionModulator(
                     dolphinSetTimeSinceLastVisitLogisticMidpoint,
                     dolphinSetTimeSinceLastVisitLogisticSteepness
                 ),
+                globalSetAttractionModulator,
                 DolphinSetAction.class
             ),
             new ActionAttractionField(
@@ -359,7 +352,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fisher -> loadLocationValues(fisher, FadDeploymentAction.class),
                     getDecayRateOfDeploymentLocationValues()
                 ),
-                new DeploymentLocationsAttractionModulator(
+                LocalCanFishThereAttractionModulator.INSTANCE,
+                new GlobalDeploymentAttractionModulator(
                     fadDeploymentPctActiveFadsLimitLogisticMidpoint,
                     fadDeploymentPctActiveFadsLimitLogisticSteepness
                 ),
