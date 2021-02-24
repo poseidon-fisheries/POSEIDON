@@ -32,6 +32,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulations;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,8 @@ public class SetOpportunityDetectorTest {
         final FishState fishState = mock(FishState.class);
         final Fad ownFad = mock(Fad.class);
         final Fad otherFad = mock(Fad.class);
+        final ActiveActionRegulations actionSpecificRegulations = mock(ActiveActionRegulations.class);
+        final Regulation regulation = mock(Regulation.class);
         when(fishState.getStep()).thenReturn(0);
         when(fisher.grabState()).thenReturn(fishState);
         when(fisher.getHold()).thenReturn(hold);
@@ -77,6 +82,10 @@ public class SetOpportunityDetectorTest {
         when(ownFad.getOwner()).thenReturn(fadManager);
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.getFadsHere()).thenAnswer(__ -> Stream.of(ownFad, otherFad));
+        when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);
+        when(actionSpecificRegulations.isForbidden(any())).thenReturn(false);
+        when(fisher.getRegulation()).thenReturn(regulation);
+        when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
         @SuppressWarnings("unchecked") final List<Class<? extends AbstractSetAction>> actionClasses =
             Stream.of(DEL, FAD, NOA, OFS)

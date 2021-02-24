@@ -22,9 +22,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 
+import static java.lang.Math.E;
+import static java.lang.Math.log;
 import static junit.framework.TestCase.assertEquals;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 public class DurationSamplerTest {
 
@@ -34,12 +37,13 @@ public class DurationSamplerTest {
         final DurationSampler durationSampler = new DurationSampler(
             new MersenneTwisterFast(),
             1.0,
-            0.0
+            Double.MIN_VALUE
         );
 
         assertEquals(
-            getQuantity(1.0, HOUR),
-            durationSampler.nextDuration()
+            E,
+            asDouble(durationSampler.nextDuration(), HOUR),
+            EPSILON
         );
     }
 
