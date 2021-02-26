@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.google.common.primitives.ImmutableDoubleArray;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
@@ -7,32 +8,55 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
+import java.util.stream.Stream;
 
+import static com.google.common.collect.Streams.findLast;
 import static java.util.stream.IntStream.rangeClosed;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class TunaEvaluator implements Runnable {
 
     private final Path calibrationFilePath;
     private final double[] solution;
-    private int numRuns = 10;
+    private int numRuns = 3;
 
     public TunaEvaluator(Path calibrationFilePath, double[] solution) {
         this.calibrationFilePath = calibrationFilePath;
         this.solution = solution;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public static void main(String[] args) {
 
-        double[] solution = {-2.215, -10.000, 9.917, 2.297, -8.628, 4.953, 4.575, -8.384, -10.000, -8.177, 10.000, 2.394, -7.054, 4.151, -10.000, 10.000, -10.000, 10.000, 10.000, 8.226, 9.795, 8.633, -10.000, -10.000, 6.368, 7.868, -7.203, -6.451, -1.582, 8.191, -0.469, -4.748, 3.718, -5.544, 9.824, -1.592, 9.451, 8.623, 2.879, -7.875, 10.000, -8.370, 4.009, -6.165, 6.632, 9.039, 3.556, -6.134, -6.509, -2.655, -10.000, 9.821, -8.838, 9.209};
-        Path baseFolderPath = Paths
-            .get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations");
+        String calibrationFolderName = "2021-02-24_14.55.14";
 
-        new TunaEvaluator(
-            baseFolderPath.resolve("2021-02-16_20.42.51/calibration.yaml"),
-            solution
-        ).run();
+        Path baseFolderPath = Paths.get(
+            System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
+        );
+
+        Path calibrationFolderPath = baseFolderPath.resolve(calibrationFolderName);
+        Path logFilePath = calibrationFolderPath.resolve("calibration_log.md");
+        Path calibrationFilePath = calibrationFolderPath.resolve("calibration.yaml");
+
+        ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
+        try (Stream<String> lines = Files.lines(logFilePath)) {
+            findLast(lines).ifPresent(lastLine -> {
+                String solutionString = substringBetween(lastLine, "{", "}");
+                try (Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
+                    while (scanner.hasNextDouble()) solutionBuilder.add(scanner.nextDouble());
+                }
+            });
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        double[] solution = solutionBuilder.build().toArray();
+        new TunaEvaluator(calibrationFilePath, solution).run();
 
     }
 
