@@ -148,7 +148,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 new SearchAction(fisher, setOpportunityDetector, actionClass),
                 valueOfLocationBasedAction(
                     actionCounts.count(SearchAction.class),
-                    attractionFields.get(actionClass).getValueAt(gridLocation),
+                    attractionFields.get(actionClass).getActionValueAt(gridLocation),
                     actionValueFunctions.get(SearchAction.class),
                     searchActionDecayConstant
                 )
@@ -159,7 +159,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 new FadDeploymentAction(fisher),
                 valueOfLocationBasedAction(
                     actionCounts.count(FadDeploymentAction.class),
-                    attractionFields.get(FadDeploymentAction.class).getValueAt(gridLocation),
+                    attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
                     actionValueFunctions.get(FadDeploymentAction.class),
                     fadDeploymentActionDecayConstant
                 )

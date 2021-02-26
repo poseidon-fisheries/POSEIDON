@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.pow;
 
@@ -38,6 +37,7 @@ public class AttractionField implements FisherStartable {
     private final LocationValues locationValues;
     private final LocalAttractionModulator localModulator;
     private final GlobalAttractionModulator globalModulator;
+    private Fisher fisher;
 
     AttractionField(
         final LocationValues locationValues,
@@ -49,45 +49,50 @@ public class AttractionField implements FisherStartable {
         this.globalModulator = globalModulator;
     }
 
-    public Stream<Double2D> attractionValues(Fisher fisher) {
-        final Int2D here = fisher.getLocation().getGridLocation();
-        return locationValues
-            .getValues()
-            .filter(entry -> !entry.getKey().equals(here))
-            .map(entry -> attraction(here, entry.getKey(), entry.getValue(), fisher));
-    }
-
-    public Double2D netAttraction(Fisher fisher) {
-        return attractionValues(fisher)
+    public Double2D netAttractionHere() {
+        return locations(fisher.getLocation().getGridLocation())
+            .filter(location -> location.distance > 0)
+            .map(this::attraction)
             .reduce(Double2D::add)
             .filter(v -> v.length() > 0) // because very small vectors get length 0 and become infinite when normalized
             .map(v -> v.normalize().multiply(globalModulator.modulate(fisher)))
             .orElse(ZERO_VECTOR);
     }
 
+    public Stream<Location> locations(Int2D here) {
+        return locationValues
+            .getValues()
+            .map(entry -> new Location(entry.getKey(), entry.getValue(), distance(here, entry.getKey())));
+    }
+
     @NotNull
-    Double2D attraction(
-        final Int2D here,
-        final Int2D there,
-        final double value,
-        final Fisher fisher
-    ) {
-        checkArgument(here != there, "here and there must be different");
+    Double2D attraction(final Location location) {
         final FishState fishState = fisher.grabState();
-        final double distance = fishState.getMap().distance(here, there);
         final double speed = fisher.getBoat().getSpeedInKph();
+        final Int2D here = fisher.getLocation().getGridLocation();
+        final Int2D there = location.gridLocation;
         checkState(speed > 0, "boat speed must be > 0");
         checkState(fishState.getHoursPerStep() > 0, "hour per step must be > 0");
-        final double travelTime = distance / speed;
+        final double travelTime = location.distance / speed;
         final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
 
         return new Double2D(there.x - here.x, there.y - here.y)
             .normalize() // normalized direction vector
             .multiply(
                 // scale to modulated location value, decreasing with travel time
-                value * localModulator.modulate(there.x, there.y, t, fisher)
+                location.value * localModulator.modulate(there.x, there.y, t, fisher)
                     / pow(travelTime, 2)
             );
+    }
+
+    private double distance(Int2D here, Int2D there) {
+        return fisher.grabState().getMap().distance(here, there);
+    }
+
+    public double getActionValueAt(Int2D here) {
+        return locations(here)
+            .mapToDouble(loc -> loc.value / pow(loc.distance + 1, 2))
+            .sum();
     }
 
     public double getValueAt(Int2D location) {
@@ -96,7 +101,20 @@ public class AttractionField implements FisherStartable {
 
     @Override
     public void start(final FishState model, final Fisher fisher) {
+        this.fisher = fisher;
         locationValues.start(model, fisher);
+    }
+
+    static class Location {
+        private final Int2D gridLocation;
+        private final double value;
+        private final double distance;
+
+        public Location(Int2D gridLocation, double value, double distance) {
+            this.gridLocation = gridLocation;
+            this.value = value;
+            this.distance = distance;
+        }
     }
 
 }

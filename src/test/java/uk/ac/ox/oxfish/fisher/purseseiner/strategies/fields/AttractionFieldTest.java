@@ -55,6 +55,7 @@ public class AttractionFieldTest {
         when(fisher.getBoat()).thenReturn(boat);
         when(fisher.grabState()).thenReturn(fishState);
         when(fisher.getHomePort()).thenReturn(map.getPorts().get(0));
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0));
 
         portAttractionField.start(fishState, fisher);
 
@@ -69,37 +70,38 @@ public class AttractionFieldTest {
         assertEquals(
             new Double2D(0, 1),
             portAttractionField.attraction(
-                new Int2D(0, 0), new Int2D(0, 1), 1.0, fisher
+                new AttractionField.Location(new Int2D(0, 1), 1.0, 1.0)
             )
         );
         when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 1));
         assertEquals(
             new Double2D(0, -1),
-            portAttractionField.netAttraction(fisher)
+            portAttractionField.netAttractionHere()
         );
 
         assertEquals(
             new Double2D(0, 0.25),
             portAttractionField.attraction(
-                new Int2D(0, 0), new Int2D(0, 2), 1.0, fisher
+                new AttractionField.Location(new Int2D(0, 2), 1.0, 2.0)
             )
         );
         when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 2));
         assertEquals(
             new Double2D(0, -1),
-            portAttractionField.netAttraction(fisher)
+            portAttractionField.netAttractionHere()
         );
 
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0));
         final Double2D expected = new Double2D(1.0, 1.0).normalize().multiply(0.5);
         final Double2D actual = portAttractionField.attraction(
-            new Int2D(0, 0), new Int2D(1, 1), 1.0, fisher
+            new AttractionField.Location(new Int2D(1, 1), 1.0, Math.sqrt(2.0))
         );
         assertEquals(expected.x, actual.x, EPSILON);
         assertEquals(expected.y, actual.y, EPSILON);
         when(fisher.getLocation()).thenReturn(map.getSeaTile(1, 1));
         assertEquals(
             new Double2D(-1, -1).normalize(),
-            portAttractionField.netAttraction(fisher)
+            portAttractionField.netAttractionHere()
         );
 
     }
