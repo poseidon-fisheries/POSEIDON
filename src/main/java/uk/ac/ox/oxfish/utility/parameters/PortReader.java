@@ -107,34 +107,6 @@ public class PortReader {
 
     }
 
-    /**
-     * Reads ports from a CSV file with only the "name", "lon" and "lat" columns
-     * and returns a collection of Ports. As opposed to `readFile`, it doesn't
-     * start the GasPriceMaker (the PortInitializer is responsible for doing so)
-     */
-    public Collection<Port> readSimplePortFile(
-        int targetYear,
-        Path pathToFile,
-        NauticalMap map,
-        Function<SeaTile, MarketMap> marketMap,
-        GasPriceMaker gasPriceMaker
-    ) {
-        Map<String, Port> ports = new LinkedHashMap<>();
-        for (Record record: parseAllRecords(pathToFile)) {
-            if (record.getInt("year") == targetYear) {
-                ports.computeIfAbsent(record.getString("port_name"), portName -> {
-                    SeaTile location = computePortLocation(map, portName,
-                        record.getDouble("lon"), record.getDouble("lat")
-                    );
-                    return new Port(portName, location, marketMap.apply(location),
-                        gasPriceMaker.supplyInitialPrice(location, portName)
-                    );
-                });
-            }
-        }
-        return ports.values();
-    }
-
     private SeaTile computePortLocation(NauticalMap map, String portName, double lon, double lat) {
         SeaTile location = map.getSeaTile(new Coordinate(lon, lat));
         Preconditions.checkArgument(
