@@ -19,16 +19,19 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
@@ -40,6 +43,10 @@ import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class GravityDestinationStrategyFactory implements AlgorithmFactory<GravityDestinationStrategy> {
+
+    // TODO: This is currently EPO specific, as it excludes tiles from the Atlantic, but should be made configurable.
+    private final Predicate<SeaTile> isValidDestination =
+        seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
 
     private static final FisherValuesFromFileCache<Double> maxTripDurationCache = new FisherValuesFromFileCache<Double>() {
         protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
@@ -65,7 +72,8 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
     @Override public GravityDestinationStrategy apply(final FishState fishState) {
         return new GravityDestinationStrategy(
             this::loadAttractionWeights,
-            this::loadMaxTripDuration
+            this::loadMaxTripDuration,
+            this.isValidDestination
         );
     }
 

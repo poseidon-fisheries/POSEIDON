@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
@@ -49,6 +50,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     private final AttractionWeightLoader attractionWeightLoader;
     private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
+    private final Predicate<SeaTile> isValidDestination;
     private Map<AttractionField, Double> attractionWeights;
     private SeaTile destination = null;
     private Set<AttractionField> attractionFields;
@@ -56,10 +58,12 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     GravityDestinationStrategy(
         final AttractionWeightLoader attractionWeightLoader,
-        final ToDoubleFunction<Fisher> maxTravelTimeLoader
+        final ToDoubleFunction<Fisher> maxTravelTimeLoader,
+        final Predicate<SeaTile> isValidDestination
     ) {
         this.attractionWeightLoader = attractionWeightLoader;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
+        this.isValidDestination = isValidDestination;
     }
 
     public double getMaxTravelTime() { return maxTravelTime; }
@@ -105,7 +109,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
             .map(v -> new Double2D(here.x + 0.5, here.y + 0.5).add(v.normalize()))
             .map(v -> fishState.getMap().getSeaTile((int) v.x, (int) v.y))
             .flatMap(target ->
-                target.isWater() || target.isPortHere()
+                (target.isWater() || target.isPortHere()) && isValidDestination.test(target)
                     ? Optional.of(target)
                     : closestNeighbor(fishState.getMap(), seaTile, target)
             )
@@ -119,6 +123,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         Stream<SeaTile> neighbors = bagToStream(map.getMooreNeighbors(origin, 1));
         return neighbors
             .filter(SeaTile::isWater)
+            .filter(isValidDestination)
             .min(comparingDouble(neighbor -> map.distance(neighbor, target)));
     }
 
