@@ -285,6 +285,9 @@ public class NoData718Utilities {
 
         static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policiesMPA = new LinkedHashMap();
 
+        static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> closedDaysNotAdaptive = new LinkedHashMap();
+
+
         static{
                 policiesMPA.put(
                         "BAU",
@@ -309,7 +312,7 @@ public class NoData718Utilities {
                 );
 
 
-                for(int days = 250; days>=100; days-=10) {
+                for(int days = 250; days>=0; days-=25) {
                         int finalDays = days;
                         policiesMPA.put(
                                 days+"_days_MPA_noentry",
@@ -331,21 +334,43 @@ public class NoData718Utilities {
         }
 
 
+        static{
+                for(int days = 250; days>=0; days-=25) {
+                        int finalDays = days;
+                        closedDaysNotAdaptive.put(
+                                days+"_days_noentry",
+                                //max days regulations include respect protected areas so it works if put in this order
+                                shockYear ->  NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                                                                                                     new String[]{"population0", "population1", "population2"}
+                                        , finalDays).andThen(
+                                        NoDataPolicy.removeEntry(shockYear)
+                                                                                 )
 
 
-        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false);
+                        );
+                }
+        }
 
-        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(boolean blockEntryWhenSeasonIsNotFull){
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false,
+                                                                                                                        false);
+
+        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(
+                boolean blockEntryWhenSeasonIsNotFull, boolean fewRuns){
 
                 LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> toReturn = new LinkedHashMap<>();
                 double[] guessedMSE = new double[]{0.6, 0.8, 1, 1.2, 1.5, 2};
+
+                //if few runs is what we want, ignore trying other formulas or gillnetters
+                boolean[] gillnetters = fewRuns ? new boolean[]{true} : new boolean[]{true, false};
+                boolean[] useTncFormulas = fewRuns ? new boolean[]{true} : new boolean[]{true, false};
 
 
                 FishYAML fishYAML = new FishYAML();
 
                 for (double mkRatio : guessedMSE) {
-                        for (boolean includeGillnetters : new boolean[]{true, false}) {
-                                for (boolean useTncFormula : new boolean[]{false,true}) {
+                        for (boolean includeGillnetters : gillnetters) {
+                                for (boolean useTncFormula : useTncFormulas) {
 
 
                                         String sprAgent =
@@ -470,7 +495,221 @@ public class NoData718Utilities {
 
         }
 
-        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntry = buildLBSPRPolicies(true);
+
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> loptMsePolicies = buildLoptPolicies(true);
+
+
+        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLoptPolicies(boolean blockEntryWhenSeasonIsNotFull){
+
+                LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> toReturn = new LinkedHashMap<>();
+                double[] guessedMK = new double[]{0.6, 0.8, 1, 1.2, 1.5, 2};
+
+
+                FishYAML fishYAML = new FishYAML();
+
+                for (double mkRatio : guessedMK) {
+                        for (boolean includeGillnetters : new boolean[]{true, false}) {
+                         //       for (boolean useTncFormula : new boolean[]{false,true}) {
+
+
+                                        String sprAgent =
+                                                "SPR Fixed Sample Agent:\n" +
+                                                        "      assumedKParameter: '" +  0.3775984 + "'\n" +
+                                                        "      assumedLengthAtMaturity: '50.0'\n" +
+                                                        "      assumedLengthBinCm: '5.0'\n" +
+                                                        "      assumedLinf: '86.0'\n" +
+                                                        "      assumedNaturalMortality: '0.3775984'\n" +
+                                                        "      assumedVarA: '0.00853'\n" +
+                                                        "      assumedVarB: '3.137'\n" +
+                                                        "      simulatedMaxAge: '100.0'\n" +
+                                                        "      simulatedVirginRecruits: '1000.0'\n" +
+                                                        "      speciesName: Lutjanus malabaricus\n" +
+                                                        "      surveyTag: spr_agent_forpolicy\n" +
+                                                        "      tagsToSample:\n" +
+                                                        "        population0: 16\n" +
+                                                        "        population1: 16\n" +
+                                                        (includeGillnetters ? "        population2: 4" : "        population2: 0");
+
+                                        Function<Integer, Consumer<Scenario>> policy =
+                                                new Function<Integer, Consumer<Scenario>>() {
+                                                        @Override
+                                                        public Consumer<Scenario> apply(Integer shockYear) {
+                                                                return new Consumer<Scenario>() {
+                                                                        @Override
+                                                                        public void accept(Scenario scenario) {
+
+                                                                                //add sensor
+                                                                                ((FlexibleScenario) scenario).getPlugins().
+                                                                                        add(fishYAML.loadAs(
+                                                                                                sprAgent,
+                                                                                                AlgorithmFactory.class));
+                                                                                //add policy
+                                                                                String policyString =
+                                                                                        "Lopt Effort Controller:\n" +
+                                                                                                "      bufferValue: '0.9'\n" +
+                                                                                                "      effortDefinition: 'season_hours_out'\n" +
+                                                                                                "      howManyYearsToLookBackTo: '5'\n" +
+                                                                                                "      meanLengthColumnName: Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy\n" +
+                                                                                                "      targetLength: " + (86d*3d)/(3d+mkRatio) +"\n" +
+                                                                                                "      blockEntryWhenSeasonIsNotFull: " + blockEntryWhenSeasonIsNotFull + "\n" +
+                                                                                                "      startingYear: " + shockYear;
+
+                                                                                //add policy
+                                                                                ((FlexibleScenario) scenario).getPlugins().
+                                                                                        add(fishYAML.loadAs(
+                                                                                                policyString,
+                                                                                                AlgorithmFactory.class));
+
+
+                                                                        }
+                                                                };
+                                                        }
+                                                };
+
+                                        toReturn.put("lopt_policy_mk" + mkRatio + "_gill" + includeGillnetters,
+                                                policy);
+                              //  }
+                        }
+                }
+
+                toReturn.put(
+                        "BAU",
+                        //bau will also have the new SPR agent to (i) avoid scheduling discrepancies (ii) fill in that column for later printing
+                        new Function<Integer, Consumer<Scenario>>() {
+                                @Override
+                                public Consumer<Scenario> apply(Integer integer) {
+                                        return new Consumer<Scenario>() {
+                                                @Override
+                                                public void accept(Scenario scenario) {
+                                                        String sprAgent =
+                                                                "SPR Fixed Sample Agent:\n" +
+                                                                        "      assumedKParameter: '" + 0.3775984 + "'\n" +
+                                                                        "      assumedLengthAtMaturity: '50.0'\n" +
+                                                                        "      assumedLengthBinCm: '5.0'\n" +
+                                                                        "      assumedLinf: '86.0'\n" +
+                                                                        "      assumedNaturalMortality: '0.3775984'\n" +
+                                                                        "      assumedVarA: '0.00853'\n" +
+                                                                        "      assumedVarB: '3.137'\n" +
+                                                                        "      simulatedMaxAge: '100.0'\n" +
+                                                                        "      simulatedVirginRecruits: '1000.0'\n" +
+                                                                        "      speciesName: Lutjanus malabaricus\n" +
+                                                                        "      surveyTag: spr_agent_forpolicy\n" +
+                                                                        "      useTNCFormula: " + true + "\n" +
+                                                                        "      tagsToSample:\n" +
+                                                                        "        population0: 16\n" +
+                                                                        "        population1: 16\n" +
+                                                                        "        population2: 0";
+                                                        FishYAML yaml = new FishYAML();
+                                                        ((FlexibleScenario) scenario).getPlugins().add(yaml.loadAs(sprAgent,
+                                                                AlgorithmFactory.class));
+
+                                                        //fill in another column so that there is something to print out
+                                                        ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
+                                                                @Override
+                                                                public AdditionalStartable apply(FishState fishState) {
+
+                                                                        return new AdditionalStartable() {
+                                                                                @Override
+                                                                                public void start(FishState model) {
+                                                                                        model.getYearlyDataSet().registerGatherer("LoptEffortPolicy output",
+                                                                                                new Gatherer<FishState>() {
+                                                                                                        @Override
+                                                                                                        public Double apply(FishState fishState) {
+                                                                                                                return 1d;
+                                                                                                        }
+                                                                                                },1);
+                                                                                }
+                                                                        };
+                                                                }
+                                                        });
+                                                }
+                                        };
+
+                                }
+                        }
+
+                );
+                return toReturn;
+
+        }
+
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntry = buildLBSPRPolicies(true,
+                                                                                                                               false);
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePoliciesNoEntryFewRuns = buildLBSPRPolicies(true,
+                                                                                                                               true);
+
+
+        static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> adaptivelbsprMsePolicies = new LinkedHashMap<>();
+        static {
+                FishYAML fishYAML = new FishYAML();
+
+                for (boolean includeGillnetters : new boolean[]{true, false}) {
+
+                        Function<Integer, Consumer<Scenario>> policy =
+                                new Function<Integer, Consumer<Scenario>>() {
+                                        @Override
+                                        public Consumer<Scenario> apply(Integer shockYear) {
+                                                return new Consumer<Scenario>() {
+                                                        @Override
+                                                        public void accept(Scenario scenario) {
+
+                                                                String policyString =
+                                                                        "LBSPR Effort Adaptive Controller:\n" +
+                                                                                "  blockEntryWhenSeasonIsNotFull: true\n" +
+                                                                                "  cpueHalfPeriod: '3.0'\n" +
+                                                                                "  cubicParameter: '0.3'\n" +
+                                                                                "  highestMKAllowed: '1.5'\n" +
+                                                                                "  linearParameter: '0.05'\n" +
+                                                                                "  lowerDiscrepancyThreshold: '-0.36'\n" +
+                                                                                "  lowestMKAllowed: '0.4'\n" +
+                                                                                "  maxChangeEachYear: '0.1'\n" +
+                                                                                "  sprAgentDelegate:\n" +
+                                                                                "    SPR Fixed Sample Agent:\n" +
+                                                                                "      assumedKParameter: '" + 0.3775984 / 0.6 + "'\n" +
+                                                                                "      assumedLengthAtMaturity: '50.0'\n" +
+                                                                                "      assumedLengthBinCm: '5.0'\n" +
+                                                                                "      assumedLinf: '86.0'\n" +
+                                                                                "      assumedNaturalMortality: '0.3775984'\n" +
+                                                                                "      assumedVarA: '0.00853'\n" +
+                                                                                "      assumedVarB: '3.137'\n" +
+                                                                                "      simulatedMaxAge: '100.0'\n" +
+                                                                                "      simulatedVirginRecruits: '1000.0'\n" +
+                                                                                "      speciesName: Lutjanus malabaricus\n" +
+                                                                                "      surveyTag: spr_agent_forpolicy\n" +
+                                                                                "      useTNCFormula: true" + "\n" +
+                                                                                "      tagsToSample:\n" +
+                                                                                "        population0: 16\n" +
+                                                                                "        population1: 16\n" +
+                                                                                (includeGillnetters ? "        population2: 4" : "        population2: 0") + "\n"+
+                                                                                "  sprTarget: '0.4'\n" +
+                                                                                "  startUpdatingMKAfterYear: '-1.0'\n" +
+                                                                                "  startingYear: " + shockYear + '\n'+
+                                                                                "  upperDiscrepancyThreshold: '-0.24'";
+
+
+                                                                //add policy
+                                                                ((FlexibleScenario) scenario).getPlugins().
+                                                                        add(fishYAML.loadAs(
+                                                                                policyString,
+                                                                                AlgorithmFactory.class));
+
+
+                                                        }
+                                                };
+                                        }
+                                };
+
+
+                        adaptivelbsprMsePolicies.put("adaptive_lbspr_policy_gill" + includeGillnetters,
+                                policy);
+
+                }
+
+        }
+
 
 
 

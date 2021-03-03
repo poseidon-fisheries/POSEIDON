@@ -38,6 +38,7 @@ public class NoData718Slice2PriceIncrease {
         speciesToSprAgent.put("Atrobucca brevis","spr_agent3");
         speciesToSprAgent.put("Lutjanus malabaricus","spr_agent2");
         speciesToSprAgent.put("Lethrinus laticaudis","spr_agent1");
+        speciesToSprAgent.put("Pristipomoides multidens","spr_agent4");
     }
 
 

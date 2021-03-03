@@ -18,15 +18,18 @@ import java.util.Map;
 public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
-    private final static Map<String, Actuator<FishState,Double>> effortActuators = new HashMap<>();
+    public final static Map<String, Actuator<FishState,Double>> EFFORT_ACTUATORS = new HashMap<>();
     static {
-        effortActuators.put("season",
+        EFFORT_ACTUATORS.put("season",
                 IndexTargetController.RATIO_TO_SEASONAL_CLOSURE
                 );
-        effortActuators.put("fleet",
+        EFFORT_ACTUATORS.put("season_hours_out",
+                IndexTargetController.RATIO_TO_PERSONAL_SEASONAL_CLOSURE
+                );
+        EFFORT_ACTUATORS.put("fleet",
                 IndexTargetController.RATIO_TO_FLEET_SIZE
                 );
-        effortActuators.put("daysatsea",
+        EFFORT_ACTUATORS.put("daysatsea",
                 IndexTargetController.RATIO_TO_DAYSATSEA
                 );
     }
@@ -53,8 +56,8 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
     public AdditionalStartable apply(FishState fishState) {
 
 
-        Preconditions.checkArgument(effortActuators.containsKey(effortDefinition),
-                "The valid effort actuators are " + effortActuators.keySet());
+        Preconditions.checkArgument(EFFORT_ACTUATORS.containsKey(effortDefinition),
+                "The valid effort actuators are " + EFFORT_ACTUATORS.keySet());
 
 
 
@@ -71,7 +74,7 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
                                         cubicParameter.apply(fishState.getRandom()),
                                         sprTarget.apply(fishState.getRandom()),
                                         maxChangeEachYear.apply(fishState.getRandom()),
-                                        effortActuators.get(effortDefinition),
+                                        EFFORT_ACTUATORS.get(effortDefinition),
                                         blockEntryWhenSeasonIsNotFull);
                                 lbspr.start(model);
                                 lbspr.step(model);

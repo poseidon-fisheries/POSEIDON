@@ -18,9 +18,9 @@ import static uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice4Price
 public class NoData718Slice6PriceIncrease {
 
     private static final String CANDIDATES_CSV_FILE =
-            "price_shock_candidates_min.csv";
+            "price_shock_candidates_min_small2.csv";
     private static Path OUTPUT_FOLDER =
-            NoData718Slice6.MAIN_DIRECTORY.resolve("price_shock_min");
+            NoData718Slice6.MAIN_DIRECTORY.resolve("price_shock_min_small2");
 
 
     static public LinkedHashMap<String,

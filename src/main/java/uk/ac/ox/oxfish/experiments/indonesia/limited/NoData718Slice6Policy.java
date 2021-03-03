@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -13,7 +12,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -27,20 +25,26 @@ public class NoData718Slice6Policy {
     public static final int SEED = 0;
     private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
+//            NoData718Slice6.MAIN_DIRECTORY.
+//                            resolve("spr_lowmk_arrays_complete_18").resolve("lopt_noentry");
             NoData718Slice6.MAIN_DIRECTORY.
-                            resolve("spr_lowmk_arrays_complete_18").resolve("lbsprmse_noentry");
+                            resolve("spr_lowmk_arrays_complete_18").resolve("adaptive");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
             new LinkedList<>();
     static {
         ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add( "Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add( "CPUE Lutjanus malabaricus spr_agent_forpolicy");
+        ADDITIONAL_COLUMNS.add( "M/K ratio Lutjanus malabaricus spr_agent_forpolicy");
+       // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
         ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
     }
 
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.lbsprMsePoliciesNoEntry;
+            NoData718Utilities.adaptivelbsprMsePolicies;
 
 
 
@@ -51,14 +55,16 @@ public class NoData718Slice6Policy {
         runPolicyDirectory(
                 CANDIDATES_CSV_FILE.toFile(),
                 OUTPUT_FOLDER,
-                simulatedPolicies);
+                simulatedPolicies, ADDITIONAL_COLUMNS);
 
 
     }
 
-    public static void runPolicyDirectory(File candidateFile,
-                                          Path outputFolder,
-                                          LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies) throws IOException {
+    public static void runPolicyDirectory(
+            File candidateFile,
+            Path outputFolder,
+            LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies,
+            final LinkedList<String> additionalColumns) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(
                 candidateFile
         ));
@@ -70,7 +76,7 @@ public class NoData718Slice6Policy {
             runOnePolicySimulation(
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
-                    Integer.parseInt(row[2]), outputFolder, policies
+                    Integer.parseInt(row[2]), outputFolder, policies, additionalColumns
             );
         }
     }
@@ -122,12 +128,13 @@ public class NoData718Slice6Policy {
 
             );
 
-    private static void runOnePolicySimulation(Path scenarioFile,
-                                               int yearOfPriceShock,
-                                               int yearOfPolicyShock,
-                                               Path outputFolder,
-                                               LinkedHashMap<String, Function<Integer,
-                                                       Consumer<Scenario>>> policies) throws IOException {
+    private static void runOnePolicySimulation(
+            Path scenarioFile,
+            int yearOfPriceShock,
+            int yearOfPolicyShock,
+            Path outputFolder,
+            LinkedHashMap<String, Function<Integer,
+                    Consumer<Scenario>>> policies, final LinkedList<String> policyColumns) throws IOException {
 
 
 
@@ -148,7 +155,7 @@ public class NoData718Slice6Policy {
         additionalColumns.add("Total Effort");
         additionalColumns.add("SPR " + "Lutjanus malabaricus" + " " +"total_and_correct");
 
-        additionalColumns.addAll(ADDITIONAL_COLUMNS);
+        additionalColumns.addAll(policyColumns);
 
 
 

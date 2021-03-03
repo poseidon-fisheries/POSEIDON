@@ -24,7 +24,6 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
@@ -39,7 +38,7 @@ import java.util.function.Predicate;
  * class that keeps track of what is caught per bin in a subset of fishers where the fish subset is specified
  * with some probability
  */
-public class StochasticCatchSampler implements ListChangeListener<Fisher>, CatchSampler {
+public class StochasticCatchSampler implements ListChangeListener<Fisher>, CatchAtLengthSampler {
 
 
     /**
@@ -70,6 +69,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
             Predicate<Fisher> samplingSelector,
             Species species,
             @Nullable String surveyTag) {
+        Preconditions.checkArgument(species!=null);
         this.samplingSelector = samplingSelector;
         this.delegate = new CatchSample(species,
                 new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]);

@@ -5,9 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.regs.MaximumTripLengthRegulation;
-import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.*;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -70,6 +68,33 @@ public class IndexTargetController extends Controller{
             }
         }
     };
+
+
+
+    public static final Actuator<FishState, Double> RATIO_TO_PERSONAL_SEASONAL_CLOSURE = new Actuator<FishState, Double>() {
+        @Override
+        public void apply(FishState subject, Double effortRatio, FishState model) {
+            if (!Double.isFinite(effortRatio))
+                return;
+
+            assert  effortRatio<=1 : "i assume it's never above 1!";
+            assert  effortRatio>=0 : "i assume it's always positive!";
+
+            System.out.println("season length " + (int)(365*effortRatio));
+
+
+            final MaxHoursOutRegulation season =
+                    new MaxHoursOutRegulation(new ProtectedAreasOnly(),
+
+                            (int)(365*24*effortRatio));
+
+            for (Fisher fisher : model.getFishers()) {
+                fisher.setRegulation(season);
+            }
+        }
+    };
+
+
 
 
     //public static final Actuator<FishState, Double> RATIO_TO_CATCHABILITY(final double originalCatchability)

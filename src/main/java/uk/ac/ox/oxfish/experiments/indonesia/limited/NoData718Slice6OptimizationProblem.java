@@ -1,16 +1,11 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
-import com.beust.jcommander.internal.Lists;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.opencsv.CSVReader;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
-import eva2.optimization.individuals.ESIndividualDoubleData;
-import eva2.optimization.individuals.GAIndividualDoubleData;
 import eva2.optimization.operator.selection.SelectTournament;
-import eva2.optimization.population.Population;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.statistics.InterfaceTextListener;
 import eva2.optimization.strategies.*;
@@ -304,7 +299,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
                         "ga_total_scenarios"),
                 Paths.get("docs", "indonesia_hub/runs/718/slice6limited",
                         "ga_total_arrays.csv"),
-                4
+                "successes_total_ga.csv"
         );
 
 
@@ -315,10 +310,11 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
 //        );
     }
 
-    public static void prepareScenarios(NoData718Slice6OptimizationProblem problem,
-                                        Path directory,
-                                        Path csvWithAcceptances,
-                                        int priceShockLag) throws IOException {
+    public static void prepareScenarios(
+            NoData718Slice6OptimizationProblem problem,
+            Path directory,
+            Path csvWithAcceptances,
+            final String nameOfCandidateFile) throws IOException {
 
         CSVReader acceptanceReader = new CSVReader(
                 new FileReader(csvWithAcceptances.toFile())
@@ -328,7 +324,7 @@ public class NoData718Slice6OptimizationProblem extends SimpleProblemDouble impl
         directory.toFile().mkdirs();
 
 
-        final FileWriter listFile = new FileWriter(directory.getParent().resolve("successes_total_ga.csv").toFile());
+        final FileWriter listFile = new FileWriter(directory.getParent().resolve(nameOfCandidateFile).toFile());
         listFile.write("scenario,price_shock_year,new_policy_year");
         listFile.write("\n");
         listFile.flush();
