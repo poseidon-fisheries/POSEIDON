@@ -22,9 +22,11 @@ package uk.ac.ox.oxfish.biology.growers;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
+import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -40,10 +42,16 @@ public class FadAwareLogisticGrowerTest {
     public void jonLandings() {
 
         TunaScenario scenario = new TunaScenario();
+        scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
-        scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
-        ((GravityDestinationStrategyFactory) scenario.getFisherDefinition().getDestinationStrategy())
+        scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
+        final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
+        ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
             .setMaxTripDurationFile(input("dummy_boats.csv"));
+        ((PurseSeineGearFactory) fisherDefinition.getGear())
+            .setLocationValuesFile(input("dummy_location_values.csv"));
+
+        scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
         scenario.getFisherDefinition().setRegulation(new NoFishingFactory());
         ((MultipleIndependentSpeciesBiomassFactory) scenario.getBiologyInitializers())
             .getFactories()
