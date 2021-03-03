@@ -72,14 +72,14 @@ public class SetOpportunityDetector {
             final Map<Boolean, List<Fad>> fadsOwnedOrNot = fadManager
                 .getFadsHere()
                 .collect(partitioningBy(fad -> fad.getOwner() == fadManager));
-            actions = Stream
+            Stream<AbstractSetAction> actionStream = Stream
                 .of(
                     setsOnOwnFads(fadsOwnedOrNot.get(true)),
                     opportunisticFadSets(fadsOwnedOrNot.get(false)),
                     setsFromOpportunityGenerators()
                 )
-                .flatMap(identity())
-                .collect(toImmutableList());
+                .flatMap(identity());
+            actions = actionStream.collect(toImmutableList());
         }
         hasSearched = false;
         return actions;
