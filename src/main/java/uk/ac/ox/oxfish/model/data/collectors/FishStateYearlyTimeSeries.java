@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +38,11 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
+import static tech.units.indriya.AbstractUnit.ONE;
+import static tech.units.indriya.unit.Units.HOUR;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.FishStateDailyTimeSeries.getAllMarketColumns;
+import static uk.ac.ox.oxfish.utility.Measures.KILOMETRE;
 
 /**
  * Aggregate data, yearly. Mostly just sums up what the daily data-set discovered
@@ -84,15 +87,10 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         for(Species species : observed.getSpecies())
         {
 
-
-            List<String> allPossibleColumns = getAllMarketColumns(observed.getAllMarketsForThisSpecie(species));
-            for(String column : allPossibleColumns)
-                registerGatherer(species + " " + column,
-                                 FishStateUtilities.generateYearlySum(
-                                         originalGatherer.getColumn(species + " " + column)),0d);
-
-
-
+            List<String> allMarketColumns = getAllMarketColumns(observed.getAllMarketsForThisSpecie(species));
+            for (String marketColumn : allMarketColumns) {
+                registerYearlySumGatherer(species + " " + marketColumn);
+            }
 
             //catches (includes discards)
             final String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
@@ -157,8 +155,6 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         }
                     },Double.NaN);
 
-
-
             final String price = species + " Average Sale Price";
             registerGatherer(price,
                              new Gatherer<FishState>() {
@@ -186,24 +182,22 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                      return  sumNumerator/sumDenominator;
 
                                  }
-                             },Double.NaN);
+                             },Double.NaN, currency, "Price");
 
 
 
 
         }
 
-        for(Species species : observed.getSpecies())
-        {
+        for (Species species : observed.getSpecies()) {
             final String biomass = "Biomass " + species.getName();
-            registerGatherer(biomass,
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState state1) {
-                                     return state1.getTotalBiomass(species);
-                                 }
-                             }
-                    , Double.NaN);
+            registerGatherer(
+                biomass,
+                fishState -> fishState.getTotalBiomass(species),
+                Double.NaN,
+                KILOGRAM,
+                "Biomass"
+            );
         }
 
         registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
@@ -218,7 +212,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         }).sum() /
                         observed.getFishers().size();
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
         registerGatherer("Median Cash-Flow", new Gatherer<FishState>() {
             @Override
@@ -237,7 +231,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
 
         registerGatherer("Actual Median Cash-Flow", new Gatherer<FishState>() {
@@ -266,7 +260,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
         registerGatherer("Actual Median Trip Profits", new Gatherer<FishState>() {
             @Override
@@ -295,7 +289,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                 else
                     return profits[profits.length/2];
             }
-        }, 0d);
+        }, 0d, currency, "Profits");
 
 
 
@@ -321,7 +315,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                     }
                                 }).average().orElse(0d);
             }
-        }, 0d);
+        }, 0d, currency, "Cash flow");
 
 
 
@@ -347,77 +341,66 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                     }
                                 }).average().orElse(0d);
             }
-        }, 0d);
+        }, 0d, currency, "Balance");
 
 
-        registerGatherer("Total Effort",
-                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")),
-                         0d);
+        registerYearlySumGatherer("Total Effort");
 
-
-        registerGatherer("Average Distance From Port", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.FISHING_DISTANCE);
-                            }
-                        }).filter(
-                        new DoublePredicate() {
-                            @Override
-                            public boolean test(double d) {
-                                return Double.isFinite(d);
-                            }
-                        }).sum() /
-                        observed.getFishers().size();
-            }
-        }, 0d);
+        registerGatherer(
+            "Average Distance From Port",
+            ignored -> observed.getFishers()
+                .stream()
+                .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.FISHING_DISTANCE))
+                .filter(Double::isFinite)
+                .sum() / observed.getFishers().size(),
+            0d,
+            KILOMETRE,
+            "Distance"
+        );
 
         //weighs by trips
-        registerGatherer("Weighted Average Distance From Port", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
+        registerGatherer(
+            "Weighted Average Distance From Port",
+            ignored -> {
                 double sum = 0;
                 double trips = 0;
                 for (Fisher fisher : state.getFishers()) {
                     double trip = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                    if(trip>0) {
+                    if (trip > 0) {
                         sum += fisher.getLatestYearlyObservation(
-                                FisherYearlyTimeSeries.FISHING_DISTANCE) * trip;
+                            FisherYearlyTimeSeries.FISHING_DISTANCE) * trip;
                         trips += trip;
                     }
                 }
-                return trips > 0 ?  sum / trips : 0d;
-            }
-        },0d);
+                return trips > 0 ? sum / trips : 0d;
+            },
+            0d,
+            KILOMETRE,
+            "Distance"
+        );
 
-        registerGatherer("Average Number of Trips", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                            }
-                        }).average().orElse(0d);
-            }
-        }, 0d);
+        registerGatherer(
+            "Average Number of Trips",
+            ignored -> observed.getFishers()
+                .stream()
+                .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS))
+                .average()
+                .orElse(0d),
+            0d,
+            ONE,
+            "Trips"
+        );
 
-        registerGatherer("Total Number of Trips", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                            }
-                        }).sum();
-            }
-        }, 0d);
+        registerGatherer(
+            "Total Number of Trips",
+            ignored -> observed.getFishers()
+                .stream()
+                .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS))
+                .sum(),
+            0d,
+            ONE,
+            "Trips"
+        );
 
         registerGatherer("Average Gas Expenditure", new Gatherer<FishState>() {
             @Override
@@ -437,7 +420,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         }).sum() /
                         observed.getFishers().size();
             }
-        }, 0d);
+        }, 0d, currency, "Expenditure");
 
 
         registerGatherer("Average Variable Costs", new Gatherer<FishState>() {
@@ -454,7 +437,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return costs.getAverage();
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         registerGatherer("Total Variable Costs", new Gatherer<FishState>() {
             @Override
@@ -470,7 +453,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return costs.getSum();
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         registerGatherer("Total Earnings", new Gatherer<FishState>() {
             @Override
@@ -486,7 +469,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return earnings.getSum();
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Earnings", new Gatherer<FishState>() {
             @Override
@@ -502,7 +485,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return earnings.getAverage();
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Trip Earnings", new Gatherer<FishState>() {
             @Override
@@ -534,7 +517,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return trips > 0 ? hoursOut/trips : 0d;
             }
-        }, 0d);
+        }, 0d, currency, "Earnings");
 
         registerGatherer("Average Trip Variable Costs", new Gatherer<FishState>() {
             @Override
@@ -566,7 +549,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
                 return trips > 0 ? hoursOut/trips : 0d;
             }
-        }, 0d);
+        }, 0d, currency, "Costs");
 
         registerGatherer("Average Trip Income", new Gatherer<FishState>() {
             @Override
@@ -637,87 +620,59 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         }, 0d);
 
         //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
-        registerGatherer("Average Trip Duration", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                double hoursOut = observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
-                            }
-                        }).filter(new DoublePredicate() { //skip boats that made no trips
-                    @Override
-                    public boolean test(double value) {
-                        return Double.isFinite(value);
-                    }
-                }).sum();
-                double trips = observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                            }
-                        }).filter(new DoublePredicate() { //skip boats that made no trips
-                    @Override
-                    public boolean test(double value) {
-                        return Double.isFinite(value);
-                    }
-                }).sum();
+        registerGatherer(
+            "Average Trip Duration",
+            ignored -> {
+                //skip boats that made no trips
+                double hoursOut = observed.getFishers().stream()
+                    .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT))
+                    .filter(Double::isFinite)
+                    .sum();
+                //skip boats that made no trips
+                double trips = observed.getFishers().stream()
+                    .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS))
+                    .filter(Double::isFinite)
+                    .sum();
+                return trips > 0 ? hoursOut / trips : 0d;
+            },
+            0d,
+            HOUR,
+            "Duration"
+        );
 
-                return trips > 0 ? hoursOut/trips : 0d;
-            }
-        }, 0d);
+        registerGatherer(
+            "Actual Average Hours Out",
+            ignored -> observed.getFishers().stream()
+                .filter(fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0)
+                .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT))
+                .average()
+                .orElse(0d),
+            0d,
+            HOUR,
+            "Duration"
+        );
 
-        registerGatherer("Actual Average Hours Out", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().
-                        filter(
-                                new Predicate<Fisher>() {
-                                    @Override
-                                    public boolean test(Fisher fisher) {
-                                        return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
+        registerGatherer(
+            "Average Hours Out",
+            ignored -> observed.getFishers().stream()
+                .mapToDouble(value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT))
+                .average()
+                .orElse(0d),
+            0d,
+            HOUR,
+            "Duration"
+        );
 
-                                    }
-                                }
-                        ).
-                        mapToDouble(
-                                new ToDoubleFunction<Fisher>() {
-                                    @Override
-                                    public double applyAsDouble(Fisher value) {
-                                        return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
-                                    }
-                                }).average().orElse(0d);
-            }
-        }, 0d);
-
-
-        registerGatherer("Average Hours Out", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
-                            }
-                        }).average().orElse(0d);
-            }
-        }, 0d);
-
-        registerGatherer("Number Of Active Fishers",
-                         fishState ->
-                                 (double)fishState.getFishers().stream().
-                                         filter(new Predicate<Fisher>() {
-                                             @Override
-                                             public boolean test(Fisher fisher) {
-                                                 return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)>0;
-                                             }
-                                         }).
-                                         count(),
-                         Double.NaN);
-
+        registerGatherer(
+            "Number Of Active Fishers",
+            fishState ->
+                (double) fishState.getFishers().stream().
+                    filter(fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0).
+                    count(),
+            Double.NaN,
+            ONE,
+            "Fishers"
+        );
 
         if(state.getPorts().size()>1)
         {
@@ -726,17 +681,20 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             {
 
                 String portname = port.getName();
-                for(Species species : state.getBiology().getSpecies())
-                {
 
+                for (Species species : state.getBiology().getSpecies()) {
+                    final String columnName = species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
                     state.getYearlyDataSet().registerGatherer(
-                            portname + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                            fishState -> fishState.getFishers().stream().
-                                    filter(fisher -> fisher.getHomePort().equals(port)).
-                                    mapToDouble(value -> value.getLatestYearlyObservation(
-                                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+                        portname + " " + columnName,
+                        fishState -> fishState.getFishers().stream()
+                            .filter(fisher -> fisher.getHomePort().equals(port))
+                            .mapToDouble(value -> value.getLatestYearlyObservation(columnName))
+                            .sum(),
+                        Double.NaN,
+                        KILOGRAM,
+                        "Biomass"
+                    );
                 }
-
 
                 state.getYearlyDataSet().registerGatherer(portname + " Total Income",
                                                           fishState ->
@@ -744,6 +702,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                           filter(fisher -> fisher.getHomePort().equals(port)).
                                                                           mapToDouble(value -> value.getLatestYearlyObservation(
                                                                                   FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
 
                 state.getYearlyDataSet().registerGatherer(portname + " Average Distance From Port",
                                                           fishState ->
@@ -818,13 +777,22 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                                   }).sum() /
                                                                           fishers.size();
                                                               }
-                                                          }, Double.NaN);
+                                                          }, Double.NaN, currency, "Cash flow");
             }
         }
 
 
     }
 
-
+    private void registerYearlySumGatherer(final String columnName) {
+        final DataColumn column = originalGatherer.getColumn(columnName);
+        registerGatherer(
+            columnName,
+            FishStateUtilities.generateYearlySum(column),
+            0d,
+            column.getUnit(),
+            column.getYLabel()
+        );
+    }
 
 }

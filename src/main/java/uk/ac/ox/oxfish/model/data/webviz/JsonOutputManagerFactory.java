@@ -38,6 +38,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Optional;
+
+import static com.google.common.collect.Streams.stream;
 
 public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutputManager> {
 
@@ -87,13 +90,16 @@ public final class JsonOutputManagerFactory implements AlgorithmFactory<JsonOutp
         if (prettyPrinting) gsonBuilder.setPrettyPrinting();
         final Gson gson = gsonBuilder.create();
 
+        //noinspection UnstableApiUsage
         return new JsonOutputManager(
             numYearsToSkip,
             new ImmutableList.Builder<JsonOutputPlugin<?>>()
                 .add(scenarioBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
                 .add(vesselsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
-                .add(fadsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
                 .add(regionsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
+                .addAll(stream(Optional
+                    .ofNullable(fadsBuilderFactory.makeJsonOutputPlugin(fishState, gson, scenarioTitle)))
+                    .iterator())
                 .addAll(heatmapBuilderFactories.stream()
                     .map(bf -> bf.makeJsonOutputPlugin(fishState, gson, scenarioTitle))
                     .iterator())

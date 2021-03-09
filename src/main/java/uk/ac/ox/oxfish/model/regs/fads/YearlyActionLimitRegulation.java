@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -41,25 +41,35 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         startableConsumer.accept(this);
     }
 
-    @Override public boolean isForbidden(PurseSeinerAction action) {
+    @Override
+    public boolean isForbidden(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         return counter >= getLimit(action.getFisher());
     }
 
+    public double getPctLimitRemaining(Fisher fisher) {
+        int limit = getLimit(fisher);
+        return (double) (limit - counter) / limit;
+    }
+
     public int getLimit(Fisher fisher) { return limits.getLimit(fisher); }
+
+    @Override
+    public void step(SimState simState) {
+        counter = 0;
+    }
+
+    @Override
+    public void start(FishState model) {
+        model.scheduleEveryYear(this, StepOrder.DAWN);
+    }
 
     public int getNumRemainingActions(Fisher fisher) { return getLimit(fisher) - counter; }
 
-    @Override public void reactToAction(PurseSeinerAction action) {
+    @Override
+    public void observe(PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         counter++;
     }
 
-    @Override public void step(SimState simState) {
-        counter = 0;
-    }
-
-    @Override public void start(FishState model) {
-        model.scheduleEveryYear(this, StepOrder.DAWN);
-    }
 }

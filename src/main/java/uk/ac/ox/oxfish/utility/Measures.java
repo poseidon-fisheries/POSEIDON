@@ -1,13 +1,24 @@
 package uk.ac.ox.oxfish.utility;
 
+import tech.units.indriya.function.MultiplyConverter;
+import tech.units.indriya.unit.BaseUnit;
+import tech.units.indriya.unit.TransformedUnit;
+
 import javax.measure.Quantity;
 import javax.measure.Unit;
+import javax.measure.quantity.Length;
 import javax.measure.quantity.Time;
 
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
+import static tech.units.indriya.unit.Units.METRE;
 
 public class Measures {
+
+    public static final Unit<Money> DOLLAR = new BaseUnit<>("$");
+
+    // we could use KILO(METRE) for pure conversions, but we need a new unit to specify the "km" symbol.
+    public static final Unit<Length> KILOMETRE = new TransformedUnit<>("km", METRE, MultiplyConverter.of(1000));
 
     /**
      * @param t A Time duration
@@ -32,6 +43,6 @@ public class Measures {
         return asDouble(getQuantity(sourceValue, sourceUnit), targetUnit);
     }
 
-
+    public interface Money extends Quantity<Money> { }
 
 }

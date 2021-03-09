@@ -22,25 +22,22 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.function.Predicate;
-
-import static java.util.Map.Entry;
+import java.util.List;
 
 public class ConditionalFisherRelativeLimits implements FisherRelativeLimits {
-    private final ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits;
 
-    public ConditionalFisherRelativeLimits(
-        ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits
-    ) {
-        this.limits = limits;
+    private final List<ConditionalLimit> limits;
+
+    ConditionalFisherRelativeLimits(Iterable<? extends ConditionalLimit> limits) {
+        this.limits = ImmutableList.copyOf(limits);
     }
 
     @Override public int getLimit(Fisher fisher) {
         return limits.stream()
-            .filter(entry -> entry.getKey().test(fisher))
+            .filter(limit -> limit.test(fisher))
             .findFirst()
-            .map(Entry::getValue)
+            .map(ConditionalLimit::getLimit)
             .orElseThrow(() -> new IllegalArgumentException("No limit applies to fisher " + fisher));
     }
+
 }

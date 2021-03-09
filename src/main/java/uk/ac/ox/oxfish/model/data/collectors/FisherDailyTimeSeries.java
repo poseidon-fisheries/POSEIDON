@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 /**
  * Dataset for each fisher being updated once a day
  * Created by carrknight on 8/4/15.
@@ -84,7 +86,10 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
                                      return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
                                  }
                              }),
-                             Double.NaN);
+                             Double.NaN,
+                            KILOGRAM,
+                            "Biomass"
+            );
 
             final String catches = species + " " + CATCHES_COLUMN_NAME;
 
@@ -95,7 +100,10 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
                                      return fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex());
                                  }
                              }),
-                             Double.NaN);
+                            Double.NaN,
+                            KILOGRAM,
+                            "Biomass"
+            );
 
         }
 

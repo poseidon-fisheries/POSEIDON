@@ -38,6 +38,7 @@ import sim.field.grid.IntGrid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
+import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -57,7 +58,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.IntStream.range;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -346,6 +351,10 @@ public class NauticalMap implements Startable
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
+    public SeaTile getSeaTile(Int2D gridLocation) {
+        return getSeaTile(gridLocation.x, gridLocation.y);
+    }
+
     /**
      * basically getting coordinates is an expensive call; so we store previous calls here
      */
@@ -495,8 +504,8 @@ public Coordinate getCoordinates(int gridX, int gridY) {
     }
 
 
-    public ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, NauticalMap map, double speedInKph) {
-        return distance.cumulativeTravelTimeAlongRouteInHours(route, map, speedInKph);
+    public List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(Deque<SeaTile> route, double speedInKph) {
+        return distance.cumulativeTravelTimeAlongRouteInHours(route, this, speedInKph);
     }
 
 
@@ -592,13 +601,33 @@ public Coordinate getCoordinates(int gridX, int gridY) {
             }
         }
 
-            return lineTiles;
-
+        return lineTiles;
 
     }
-
 
     public Pathfinder getPathfinder() {
         return pathfinder;
     }
+
+    public String asASCII() {
+        return range(0, getRasterBathymetry().getGridHeight())
+            .mapToObj(y ->
+                range(0, getRasterBathymetry().getGridWidth())
+                    .mapToObj(x -> getSeaTile(x, y))
+                    .map(tile -> tile.isWater() ? "~" : (tile.isPortHere() ? "@" : "*"))
+                    .collect(joining())
+            )
+            .collect(joining("\n"));
+    }
+
+    public Int2D getGridXY(Coordinate coordinate) {
+        return getSeaTile(coordinate).getGridLocation();
+    }
+
+    public double distance(Int2D here, Int2D there) {
+        SeaTile tileHere = getSeaTile(here.x, here.y);
+        SeaTile tileThere = getSeaTile(there.x, there.y);
+        return getDistance().distance(tileHere, tileThere, this);
+    }
+
 }

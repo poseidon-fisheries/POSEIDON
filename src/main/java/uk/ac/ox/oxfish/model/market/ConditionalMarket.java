@@ -78,7 +78,7 @@ public class ConditionalMarket implements Market {
                 Double.NaN);
 
         dailyObservations.registerGatherer(PRICE_COLUMN_NAME, Market::getMarginalPrice,
-                Double.NaN);
+                Double.NaN, dailyObservations.getCurrency(), "Price");
 
         started = true;
 

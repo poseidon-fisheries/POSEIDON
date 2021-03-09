@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +32,7 @@ import static java.lang.Math.abs;
 /**
  * computes error by the last number in the column against a fixed number
  */
-public class FixedDataLastStepTarget implements DataTarget {
+public class FixedDataLastStepTarget implements FixedDataTarget {
 
 
     private double fixedTarget = 100;
@@ -55,21 +54,23 @@ public class FixedDataLastStepTarget implements DataTarget {
     @Override
     public double computeError(FishState model) {
 
-        DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
+        final double value = getValue(model);
+        final double error = Math.pow(abs(value - fixedTarget), exponent);
 
-
-        if(VERBOSE) {
+        if (VERBOSE) {
             System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
             System.out.println("column: " + columnName);
-            System.out.println("output: " + simulationOutput.getLatest());
-            System.out.println("target : " + fixedTarget);
-            System.out.println("error : " + Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponent));
+            System.out.println("output: " + value);
+            System.out.println("target: " + fixedTarget);
+            System.out.println("error : " + error);
         }
 
-        return Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponent);
-
+        return error;
     }
 
+    @Override public double getValue(final FishState fishState) {
+        return fishState.getYearlyDataSet().getColumn(columnName).getLatest();
+    }
 
     public FixedDataLastStepTarget() {
     }
@@ -105,7 +106,7 @@ public class FixedDataLastStepTarget implements DataTarget {
      *
      * @return Value for property 'fixedTarget'.
      */
-    public double getFixedTarget() {
+    @Override public double getFixedTarget() {
         return fixedTarget;
     }
 
@@ -123,7 +124,7 @@ public class FixedDataLastStepTarget implements DataTarget {
      *
      * @return Value for property 'columnName'.
      */
-    public String getColumnName() {
+    @Override public String getColumnName() {
         return columnName;
     }
 

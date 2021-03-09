@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.event;
 
 import org.junit.Assert;
 import org.junit.Test;
+import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
@@ -69,6 +70,13 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         final SingleSpeciesBoxcarFactory boxy = new SingleSpeciesBoxcarFactory();
         scenario.setBiologyInitializer(boxy);
+
+        // Feed an empty ExogenousCatches factory to the scenario, as we'll build our own later
+        scenario.setExogenousCatches(__ -> new ExogenousCatches() {
+            @Override public void start(final FishState model) {}
+            @Override public void step(final SimState simState) {}
+        });
+
            boxy.setInitialBtOverK(new FixedDoubleParameter(1));
         //   boxy.setYearlyMortality(new FixedDoubleParameter(0d));
         //   boxy.setK(new FixedDoubleParameter(0d));

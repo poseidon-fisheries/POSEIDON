@@ -23,20 +23,24 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class BasicMonitor<O, V> extends AbstractMonitor<O, V> {
+public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
     private final Function<? super O, V> valueExtractor;
 
     public BasicMonitor(
-        String baseName,
-        IntervalPolicy resetInterval,
-        Supplier<Accumulator<V>> accumulatorSupplier,
-        Function<? super O, V> valueExtractor
+        final String baseName,
+        final IntervalPolicy resetInterval,
+        final Supplier<Accumulator<V>> accumulatorSupplier,
+        final Unit<Q> unit,
+        final String yLabel,
+        final Function<? super O, V> valueExtractor
     ) {
-        super(baseName, resetInterval, accumulatorSupplier);
+        super(baseName, resetInterval, accumulatorSupplier, unit, yLabel);
         this.valueExtractor = valueExtractor;
     }
 

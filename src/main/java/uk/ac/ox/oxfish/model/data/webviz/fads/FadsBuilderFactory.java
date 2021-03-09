@@ -19,12 +19,15 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.fads;
 
+import com.google.gson.Gson;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.FadsDefinition;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.colourStringToHtmlCode;
 
 public final class FadsBuilderFactory implements
@@ -41,10 +44,23 @@ public final class FadsBuilderFactory implements
 
     @Override public String getBaseName() { return Fads.class.getSimpleName(); }
 
-    @Override public FadsBuilder makeDataBuilder(FishState ignored) { return new FadsBuilder(); }
+    @Override public JsonOutputPlugin<Fads> makeJsonOutputPlugin(
+        final FishState fishState, final Gson gson, final String scenarioTitle
+    ) {
+        return fishState.getFadMap() == null
+            ? null
+            : JsonDataBuilderFactory.super.makeJsonOutputPlugin(fishState, gson, scenarioTitle);
+    }
+
+    @Override public FadsBuilder makeDataBuilder(FishState fishState) {
+        checkNotNull(fishState.getFadMap());
+        return new FadsBuilder();
+    }
 
     @Override public JsonBuilder<FadsDefinition> makeDefinitionBuilder(String scenarioTitle) {
-        return fishState -> new FadsDefinition(makeFileName(scenarioTitle), colourStringToHtmlCode(fadsColour));
+        return fishState -> fishState.getFadMap() == null
+            ? null
+            : new FadsDefinition(makeFileName(scenarioTitle), colourStringToHtmlCode(fadsColour));
     }
 
 }

@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -95,14 +95,14 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
         }
         //only one movement should have started!
         verify(model,times(1)).scheduleEveryDay(
-                Matchers.isA(BiomassDiffuserContainer.class)
+                ArgumentMatchers.isA(BiomassDiffuserContainer.class)
                 ,any());
         //two separate growers!
         verify(model,times(2)).registerStartable(
                 any(IndependentLogisticBiomassGrower.class)
         );
         verify(model,times(0)).scheduleEveryDay(
-                Matchers.isA(IndependentLogisticBiomassGrower.class)
+                ArgumentMatchers.isA(IndependentLogisticBiomassGrower.class)
                 ,any());
 
 

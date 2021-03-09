@@ -18,6 +18,6 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-after_success:
+after_script:
   # upload code coverage report to codecov.io
   - bash <(curl -s https://codecov.io/bash)

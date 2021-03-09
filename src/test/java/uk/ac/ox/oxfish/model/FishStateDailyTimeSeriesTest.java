@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -56,27 +57,30 @@ public class FishStateDailyTimeSeriesTest {
         when(state.getSpecies()).thenReturn(Collections.singletonList(species));
 
         //===> aggregate over two markets
-        Market market1 = mock(Market.class); TimeSeries<Market> data1 = mock(TimeSeries.class);
-        when(data1.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-100d);
-        when(data1.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(100d);
-        when(data1.getColumns()).thenReturn(
-                Lists.newArrayList(new DataColumn(AbstractMarket.LANDINGS_COLUMN_NAME),
-                                   new DataColumn(AbstractMarket.EARNINGS_COLUMN_NAME))
-        );
+        Market market1 = mock(Market.class);
+        TimeSeries<Market> data1 = mock(TimeSeries.class);
+        final DataColumn landingsColumn1 = mock(DataColumn.class);
+        when(landingsColumn1.getName()).thenReturn(AbstractMarket.LANDINGS_COLUMN_NAME);
+        when(landingsColumn1.getLatest()).thenReturn(-100d);
+        final DataColumn earningsColumn1 = mock(DataColumn.class);
+        when(earningsColumn1.getName()).thenReturn(AbstractMarket.EARNINGS_COLUMN_NAME);
+        when(earningsColumn1.getLatest()).thenReturn(100d);
+        when(data1.getColumns()).thenReturn(ImmutableList.of(landingsColumn1, earningsColumn1));
         when(market1.getData()).thenReturn(data1);
 
-        Market market2 = mock(Market.class,RETURNS_DEEP_STUBS); TimeSeries<Market> data2 = mock(TimeSeries.class);
-        when(data2.getColumns()).thenReturn(
-                Lists.newArrayList(new DataColumn(AbstractMarket.LANDINGS_COLUMN_NAME),
-                                   new DataColumn(AbstractMarket.EARNINGS_COLUMN_NAME))
-        );
-        when(data2.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-200d);
-        when(data2.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(200d);
+        Market market2 = mock(Market.class);
+        TimeSeries<Market> data2 = mock(TimeSeries.class);
+        final DataColumn landingsColumn2 = mock(DataColumn.class);
+        when(landingsColumn2.getName()).thenReturn(AbstractMarket.LANDINGS_COLUMN_NAME);
+        when(landingsColumn2.getLatest()).thenReturn(-200d);
+        final DataColumn earningsColumn2 = mock(DataColumn.class);
+        when(earningsColumn2.getName()).thenReturn(AbstractMarket.EARNINGS_COLUMN_NAME);
+        when(earningsColumn2.getLatest()).thenReturn(200d);
+        when(data2.getColumns()).thenReturn(ImmutableList.of(landingsColumn2, earningsColumn2));
         when(market2.getData()).thenReturn(data2);
 
         List<Market> markets = new LinkedList<>();markets.add(market1); markets.add(market2);
         when(state.getAllMarketsForThisSpecie(species)).thenReturn(markets);
-
 
         //and after all that set up, see if it aggregates correctly
         dataSet.start(state,state);

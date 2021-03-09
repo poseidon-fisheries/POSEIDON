@@ -19,6 +19,46 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.webviz.SteppableJsonBuilder;
 
-interface HeatmapBuilder extends SteppableJsonBuilder<Heatmap> { }
+import java.util.Collection;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
+
+public final class HeatmapBuilder implements SteppableJsonBuilder<Heatmap> {
+
+    private final HeatmapGatherer heatmapGatherer;
+
+    HeatmapBuilder(final HeatmapGatherer heatmapGatherer) {
+        this.heatmapGatherer = heatmapGatherer;
+    }
+
+    @Override
+    public Heatmap buildJsonObject(final FishState fishState) {
+        return new Heatmap(gridsToTimesteps());
+    }
+
+    private Collection<Timestep> gridsToTimesteps() {
+        return heatmapGatherer.getGrids().entrySet().stream().map(entry ->
+            new Timestep(entry.getKey(), gridToArray(entry.getValue()))
+        ).collect(toImmutableList());
+    }
+
+    private static double[] gridToArray(final DoubleGrid2D grid) {
+        return range(0, grid.getHeight()).boxed().flatMapToDouble(y ->
+            range(0, grid.getWidth()).mapToDouble(x ->
+                round(grid.get(x, y))
+            )
+        ).toArray();
+    }
+
+    @Override public void start(final FishState fishState) {
+        heatmapGatherer.start(fishState);
+    }
+
+}

@@ -19,41 +19,27 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
+import uk.ac.ox.oxfish.model.data.heatmaps.FadDensityHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 
 import java.util.Collection;
 
-public class AverageNumberOfActiveFadsHeatmapBuilderFactory implements HeatmapBuilderFactory {
+public class AverageNumberOfActiveFadsHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
-    private int interval = 30;
-    private String colour = "yellow";
-    private AveragingTimestepsBuilder timestepsBuilder = null;
+    @Override public String getTitle() { return "Number of active FADs"; }
 
-    @Override public String getTitle() { return "Average daily number of active FADs"; }
-
-    @Override public JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
-        return new MonochromeGradientColourMapBuilderFactory(colour, () -> timestepsBuilder.getMaxValueSeen());
-    }
-
-    @SuppressWarnings("unused") public int getInterval() { return interval; }
-
-    @SuppressWarnings("unused") public void setInterval(int interval) { this.interval = interval; }
-
-    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
-        final FadMap fadMap = fishState.getFadMap();
-        timestepsBuilder = new AveragingTimestepsBuilder(interval);
-        return new ExtractorBasedHeatmapBuilder(
-            seaTile -> fadMap.fadsAt(seaTile).numObjs,
-            timestepsBuilder
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
         );
     }
 
-    public String getColour() { return colour; }
-
-    public void setColour(final String colour) { this.colour = colour; }
+    @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
+        return new FadDensityHeatmapGatherer(getInterval());
+    }
 
 }

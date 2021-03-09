@@ -20,25 +20,46 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class TunaScenarioTest {
 
     @Test
+    public void canSaveToAndLoadFromYamlWithoutCrashing() {
+        TunaScenario scenario = new TunaScenario();
+        FishYAML yaml = new FishYAML();
+        final String output = yaml.dump(scenario);
+        System.out.println(output);
+        TunaScenario scenario2 = yaml.loadAs(output, TunaScenario.class);
+        assertNotNull(scenario2);
+    }
+
+    @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
         TunaScenario scenario = new TunaScenario();
-        scenario.setCostsFile(TunaScenario.input("no_costs.csv"));
-        scenario.setBoatsFile(TunaScenario.input("dummy_boats.csv"));
-        scenario.setDeploymentValuesFile(TunaScenario.input("dummy_deployment_values.csv"));
+        scenario.setCostsFile(input("no_costs.csv"));
+        scenario.setBoatsFile(input("dummy_boats.csv"));
+        scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
+        final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
+        ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
+            .setMaxTripDurationFile(input("dummy_boats.csv"));
+        ((PurseSeineGearFactory) fisherDefinition.getGear())
+            .setLocationValuesFile(input("dummy_location_values.csv"));
 
-        final FishingSeason regulation = new FishingSeason(true, 100);
+        final Regulation regulation = new FishingSeason(true, 100);
         scenario.getPlugins().add(state -> model -> {
                 model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
                 state.scheduleEveryYear(simState -> {
@@ -62,4 +83,5 @@ public class TunaScenarioTest {
         while (state.getYear() < 5) state.schedule.step(state);
         state.schedule.step(state);
     }
+
 }

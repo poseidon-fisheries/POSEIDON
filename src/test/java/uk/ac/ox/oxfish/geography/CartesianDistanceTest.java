@@ -20,17 +20,16 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.List;
+import java.util.Map.Entry;
 
 import static com.google.common.collect.Iterables.get;
-import static com.google.common.collect.Iterables.getLast;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -49,8 +48,8 @@ public class CartesianDistanceTest {
 
     }
 
-    private <T> void checkSecondValueOfPairs(Collection<Pair<T, Double>> pairs, double... values) {
-        assertArrayEquals(values, pairs.stream().mapToDouble(Pair::getSecond).toArray(), 0.01);
+    private <T> void checkSecondValueOfEntries(Collection<Entry<T, Double>> pairs, double... values) {
+        assertArrayEquals(values, pairs.stream().mapToDouble(Entry::getValue).toArray(), 0.01);
     }
 
     @Test
@@ -62,16 +61,16 @@ public class CartesianDistanceTest {
         final SeaTile startTile = map.getSeaTile(0, 0);
 
         final Deque<SeaTile> straightRoute = pathfinder.getRoute(map, startTile, map.getSeaTile(0, 2));
-        checkSecondValueOfPairs(distance.cumulativeDistanceAlongRouteInKm(straightRoute, map), 0.0, 1.0, 2.0);
+        checkSecondValueOfEntries(distance.cumulativeDistanceAlongRouteInKm(straightRoute, map), 0.0, 1.0, 2.0);
 
         final Deque<SeaTile> diagonalRoute = pathfinder.getRoute(map, startTile, map.getSeaTile(2, 2));
-        checkSecondValueOfPairs(distance.cumulativeDistanceAlongRouteInKm(diagonalRoute, map), 0.0, 1.41, 2.82);
+        checkSecondValueOfEntries(distance.cumulativeDistanceAlongRouteInKm(diagonalRoute, map), 0.0, 1.41, 2.82);
 
         for (SeaTile endTile : map.getAllSeaTilesAsList()) {
             // First value of cumulative distance should always be zero
             final Deque<SeaTile> route = pathfinder.getRoute(map, startTile, endTile);
-            final ImmutableList<Pair<SeaTile, Double>> cumDist = distance.cumulativeDistanceAlongRouteInKm(route, map);
-            assertEquals(0.0, get(cumDist, 0).getSecond(), 0.01);
+            final List<Entry<SeaTile, Double>> cumDist = distance.cumulativeDistanceAlongRouteInKm(route, map);
+            assertEquals(0.0, get(cumDist, 0).getValue(), 0.01);
         }
     }
 }

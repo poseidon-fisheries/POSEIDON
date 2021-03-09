@@ -24,7 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
 
@@ -38,4 +38,5 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
     boolean shouldFisherLeavePort(ActiveActionRegulations activeActionRegulations, Fisher fisher) {
         return activeActionRegulations.anyYearlyLimitedActionRemaining(fisher);
     }
+
 }

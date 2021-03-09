@@ -20,58 +20,129 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.ImmutableIntArray;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.zip;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static uk.ac.ox.oxfish.model.regs.fads.IATTC.capacityClass;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ActiveFadLimitsFactory implements AlgorithmFactory<ActiveFadLimits> {
 
-    public static final ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> iattcLimits =
-        ImmutableList.of(
-            makeLimit(ImmutableSet.of(6), v -> v >= 1200, 450),
-            makeLimit(ImmutableSet.of(6), v -> v < 1200, 300),
-            makeLimit(ImmutableSet.of(4, 5), __ -> true, 120),
-            makeLimit(ImmutableSet.of(1, 2, 3), __ -> true, 70)
-        );
-
     // since ActiveFadsLimit has no mutable internal state, we can cache and reuse instances
-    private final HashMap<ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>>, ActiveFadLimits> cache =
-        new HashMap<>();
+    private final Map<ImmutableIntArray, ActiveFadLimits> cache = new HashMap<>();
 
-    private ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits;
+    private final Collection<Predicate<Fisher>> predicates = ImmutableList.of(
+        fisher -> capacityClass(fisher) == 1,
+        fisher -> capacityClass(fisher) == 2,
+        fisher -> capacityClass(fisher) == 3,
+        fisher -> capacityClass(fisher) == 4,
+        fisher -> capacityClass(fisher) == 5,
+        fisher -> capacityClass(fisher) == 6 && fisher.getHold().getVolumeIn(CUBIC_METRE) < 1200,
+        fisher -> capacityClass(fisher) == 6 && fisher.getHold().getVolumeIn(CUBIC_METRE) >= 1200
+    );
 
-    public ActiveFadLimitsFactory() { this(iattcLimits); }
+    // These make my heart bleed, but it's the easiest way to make that class YAML-convenient
+    // The default values are the current IATTC FadLimits.
+    private int limitClass1 = 70;
+    private int limitClass2 = 70;
+    private int limitClass3 = 70;
+    private int limitClass4 = 120;
+    private int limitClass5 = 120;
+    private int limitClass6a = 300;
+    private int limitClass6b = 450;
 
-    public ActiveFadLimitsFactory(ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits) {
-        this.limits = limits;
-    }
-
-    public static SimpleImmutableEntry<Predicate<Fisher>, Integer> makeLimit(
-        ImmutableSet<Integer> capacityClasses,
-        Predicate<Double> volumePredicate,
-        int limit
+    public ActiveFadLimitsFactory(
+        final int limitClass1to3,
+        final int limitClass4to5,
+        final int limitClass6a,
+        final int limitClass6b
     ) {
-        return entry(
-            fisher -> capacityClasses.contains(capacityClass(fisher)) &&
-                volumePredicate.test(fisher.getHold().getVolumeIn(CUBIC_METRE)),
-            limit
+        this(
+            limitClass1to3,
+            limitClass1to3,
+            limitClass1to3,
+            limitClass4to5,
+            limitClass4to5,
+            limitClass6a,
+            limitClass6b
         );
     }
 
-    @SuppressWarnings("unused") public ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> getLimits() { return limits; }
+    public ActiveFadLimitsFactory(
+        final int limitClass1,
+        final int limitClass2,
+        final int limitClass3,
+        final int limitClass4,
+        final int limitClass5,
+        final int limitClass6a,
+        final int limitClass6b
+    ) {
+        this.limitClass1 = limitClass1;
+        this.limitClass2 = limitClass2;
+        this.limitClass3 = limitClass3;
+        this.limitClass4 = limitClass4;
+        this.limitClass5 = limitClass5;
+        this.limitClass6a = limitClass6a;
+        this.limitClass6b = limitClass6b;
+    }
 
-    @SuppressWarnings("unused") public void setLimits(ImmutableList<SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits) { this.limits = limits; }
+    public ActiveFadLimitsFactory() {}
+
+    @SuppressWarnings("unused") public int getLimitClass1() { return limitClass1; }
+
+    @SuppressWarnings("unused") public void setLimitClass1(final int limitClass1) { this.limitClass1 = limitClass1; }
+
+    @SuppressWarnings("unused") public int getLimitClass2() { return limitClass2; }
+
+    @SuppressWarnings("unused") public void setLimitClass2(final int limitClass2) { this.limitClass2 = limitClass2; }
+
+    @SuppressWarnings("unused") public int getLimitClass3() { return limitClass3; }
+
+    @SuppressWarnings("unused") public void setLimitClass3(final int limitClass3) { this.limitClass3 = limitClass3; }
+
+    @SuppressWarnings("unused") public int getLimitClass4() { return limitClass4; }
+
+    @SuppressWarnings("unused") public void setLimitClass4(final int limitClass4) { this.limitClass4 = limitClass4; }
+
+    @SuppressWarnings("unused") public int getLimitClass5() { return limitClass5; }
+
+    @SuppressWarnings("unused") public void setLimitClass5(final int limitClass5) { this.limitClass5 = limitClass5; }
+
+    @SuppressWarnings("unused") public int getLimitClass6a() { return limitClass6a; }
+
+    @SuppressWarnings("unused") public void setLimitClass6a(final int limitClass6a) {
+        this.limitClass6a = limitClass6a;
+    }
+
+    @SuppressWarnings("unused") public int getLimitClass6b() { return limitClass6b; }
+
+    @SuppressWarnings("unused") public void setLimitClass6b(final int limitClass6b) {
+        this.limitClass6b = limitClass6b;
+    }
 
     @Override public ActiveFadLimits apply(FishState fishState) {
-        return cache.computeIfAbsent(limits, __ -> new ActiveFadLimits(limits));
+        final ImmutableIntArray limits = ImmutableIntArray.of(
+            limitClass1,
+            limitClass2,
+            limitClass3,
+            limitClass4,
+            limitClass5,
+            limitClass6a,
+            limitClass6b
+        );
+        return cache.computeIfAbsent(limits, __ -> new ActiveFadLimits(
+            zip(predicates.stream(), limits.stream().boxed(), FadLimit::new).collect(toImmutableList())
+        ));
     }
+
 }

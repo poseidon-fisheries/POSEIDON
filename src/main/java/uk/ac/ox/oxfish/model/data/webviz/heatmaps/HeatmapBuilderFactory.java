@@ -19,6 +19,8 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDataBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
@@ -27,11 +29,28 @@ import uk.ac.ox.oxfish.model.data.webviz.scenarios.HeatmapDefinition;
 
 import java.util.Collection;
 
-public interface HeatmapBuilderFactory extends
-    JsonDataBuilderFactory<Heatmap>,
+abstract public class HeatmapBuilderFactory
+    implements JsonDataBuilderFactory<Heatmap>,
     JsonDefinitionBuilderFactory<HeatmapDefinition> {
 
-    @Override default JsonBuilder<HeatmapDefinition> makeDefinitionBuilder(String scenarioTitle) {
+    private int interval;
+    private String colour;
+    private HeatmapGatherer heatmapGatherer;
+
+    HeatmapBuilderFactory() { this(30, "yellow"); }
+
+    HeatmapBuilderFactory(final int interval, final String colour) {
+        this.interval = interval;
+        this.colour = colour;
+    }
+
+    HeatmapGatherer getHeatmapGatherer() { return heatmapGatherer; }
+
+    @Override public String getBaseName() { return "Heatmap of " + getTitle(); }
+
+    abstract public String getTitle();
+
+    @Override public JsonBuilder<HeatmapDefinition> makeDefinitionBuilder(String scenarioTitle) {
         return fishState -> new HeatmapDefinition(
             getTitle(),
             makeFileName(scenarioTitle),
@@ -40,9 +59,28 @@ public interface HeatmapBuilderFactory extends
         );
     }
 
-    String getTitle();
-    default String getLegend() { return getTitle(); }
-    JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory();
-    @Override default String getBaseName() { return "Heatmap of " + getTitle(); }
+    public String getLegend() { return getTitle(); }
+
+    JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new MonochromeGradientColourMapBuilderFactory(
+            getColour(),
+            heatmapGatherer::maxValueSeen
+        );
+    }
+
+    public String getColour() { return colour; }
+
+    public void setColour(final String colour) { this.colour = colour; }
+
+    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
+        heatmapGatherer = makeHeatmapGatherer(fishState);
+        return new HeatmapBuilder(heatmapGatherer);
+    }
+
+    abstract HeatmapGatherer makeHeatmapGatherer(FishState fishState);
+
+    public int getInterval() { return interval; }
+
+    public void setInterval(final int interval) { this.interval = interval; }
 
 }

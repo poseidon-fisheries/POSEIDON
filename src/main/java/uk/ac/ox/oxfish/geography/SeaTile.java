@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography;
 
+import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -95,6 +96,8 @@ public class SeaTile implements Startable, LocalBiology{
     public int getGridY() {
         return gridY;
     }
+
+    public Int2D getGridLocation() { return new Int2D(gridX, gridY); }
 
     public double getAltitude() {
         return altitude;

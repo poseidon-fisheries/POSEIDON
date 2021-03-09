@@ -25,12 +25,16 @@ import java.util.Collection;
 public final class VesselsDefinition {
 
     private final String path;
+    private final double size;
     private final Collection<VesselTypeDefinition> vesselTypes;
 
     public VesselsDefinition(
-        final String path, final Collection<VesselTypeDefinition> vesselTypeDefinitions
+        final String path,
+        final double size,
+        final Collection<VesselTypeDefinition> vesselTypeDefinitions
     ) {
         this.path = path;
+        this.size = size;
         this.vesselTypes = vesselTypeDefinitions;
     }
 

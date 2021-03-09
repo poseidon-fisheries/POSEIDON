@@ -19,16 +19,29 @@
 
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.NonAssociatedSetHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 
-public class UnassociatedSetCountingHeatmapBuilderFactory extends ActionCountingHeatmapBuilderFactory<MakeUnassociatedSet> {
+import java.util.Collection;
 
-    @Override ActionCountingExtractor<MakeUnassociatedSet> makeExtractor() {
-        return new UnassociatedSetCountingExtractor();
-    }
+public class UnassociatedSetCountingHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
     @Override public String getTitle() {
-        return "Number of unassociated sets over " + getInterval() + " day intervals";
+        return "Unassociated sets (" + getInterval() + " days)";
+    }
+
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
+        );
+    }
+
+    @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
+        return new NonAssociatedSetHeatmapGatherer(getInterval());
     }
 
 }

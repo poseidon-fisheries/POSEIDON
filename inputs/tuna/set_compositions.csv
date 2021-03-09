@@ -1,0 +1,7 @@
+set_type,species_code,weight
+DEL,BET,0
+DEL,SKJ,0.015
+DEL,YFT,0.985
+NOA,BET,0.014
+NOA,SKJ,0.75
+NOA,YFT,0.236

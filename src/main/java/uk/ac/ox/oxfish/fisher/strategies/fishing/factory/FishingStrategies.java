@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FadFishingThresholdStrategy;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
@@ -45,9 +45,8 @@ public class FishingStrategies {
         NAMES.put(FishUntilFullFactory.class, "Fish Until Full");
         NAMES.put(MaximumStepsFactory.class, "Until Full With Day Limit");
         NAMES.put(FloridaLogitReturnFactory.class, "WFS Logit Return");
-        NAMES.put(FadFishingStrategyFactory.class, "FAD Fishing Strategy");
-        NAMES.put(FadFishingThresholdFactory.class, "FAD Fishing Threshold Strategy");
         NAMES.put(MaximumDaysAYearFactory.class, "Maximum Days a Year Decorator");
+        NAMES.put(PurseSeinerFishingStrategyFactory.class, "Purse Seiner Fishing Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

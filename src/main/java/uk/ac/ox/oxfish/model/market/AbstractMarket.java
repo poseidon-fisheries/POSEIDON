@@ -32,6 +32,8 @@ import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 /**
  * Adds data collection to the interface
  * Created by carrknight on 5/3/15.
@@ -97,7 +99,7 @@ public abstract class AbstractMarket implements Market {
                                                    return dailyCounter.getColumn(EARNINGS_COLUMN_NAME);
                                                }
                                            },
-                                           Double.NaN);
+                                           Double.NaN, dailyObservations.getCurrency(), "Earnings");
 
         dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, new Gatherer<Market>() {
                                                @Override
@@ -105,10 +107,10 @@ public abstract class AbstractMarket implements Market {
                                                    return dailyCounter.getColumn(LANDINGS_COLUMN_NAME);
                                                }
                                            },
-                                           Double.NaN);
+                                           Double.NaN, KILOGRAM, "Biomass");
 
         dailyObservations.registerGatherer(PRICE_COLUMN_NAME, Market::getMarginalPrice,
-                                           Double.NaN);
+                                           Double.NaN, dailyObservations.getCurrency(), "Price");
 
         started = true;
 

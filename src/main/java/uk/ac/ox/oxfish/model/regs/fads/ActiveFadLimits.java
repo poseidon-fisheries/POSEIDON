@@ -19,33 +19,35 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.DeployFad;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
-import java.util.AbstractMap;
-import java.util.function.Predicate;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
-    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(DeployFad.class);
+    private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions =
+        ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;
 
-    public ActiveFadLimits(ImmutableList<AbstractMap.SimpleImmutableEntry<Predicate<Fisher>, Integer>> limits) {
+    ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
         this(new ConditionalFisherRelativeLimits(limits));
     }
 
-    public ActiveFadLimits(FisherRelativeLimits limits) {
+    private ActiveFadLimits(FisherRelativeLimits limits) {
         this.limits = limits;
     }
 
-    @Override public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
+    @Override
+    public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 
     @Override public boolean isForbidden(PurseSeinerAction action) {
         assert applicableActions.contains(action.getClass());
-        return action.getFadManager().getNumDeployedFads() >= limits.getLimit(action.getFisher());
+        return getFadManager(action.getFisher()).getNumDeployedFads() >= getLimit(action.getFisher());
     }
+
+    public int getLimit(final Fisher fisher) { return limits.getLimit(fisher); }
 
 }

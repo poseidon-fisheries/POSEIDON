@@ -22,17 +22,21 @@ package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
+import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.model.data.webviz.colours.ColourUtils.javaColorToHtmlCode;
 
-public final class BiomassSnapshotHeatmapBuilderFactory extends AbstractIntervalHeatmapBuilderFactory {
+public final class BiomassSnapshotHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
     private String speciesName = "Species 0";
 
@@ -41,11 +45,22 @@ public final class BiomassSnapshotHeatmapBuilderFactory extends AbstractInterval
         Color javaColor,
         int interval
     ) {
-        return stream(speciesNames)
-            .map(speciesName -> {
+        return forSpecies(
+            stream(speciesNames).collect(toImmutableMap(identity(), __ -> javaColor)),
+            interval
+        );
+    }
+
+    public static Collection<BiomassSnapshotHeatmapBuilderFactory> forSpecies(
+        Map<String, Color> speciesNamesAndColors,
+        int interval
+    ) {
+        return speciesNamesAndColors.entrySet()
+            .stream()
+            .map(entry -> {
                 final BiomassSnapshotHeatmapBuilderFactory instance = new BiomassSnapshotHeatmapBuilderFactory();
-                instance.speciesName = speciesName;
-                instance.setColour(javaColorToHtmlCode(javaColor));
+                instance.speciesName = entry.getKey();
+                instance.setColour(javaColorToHtmlCode(entry.getValue()));
                 instance.setInterval(interval);
                 return instance;
             })
@@ -56,13 +71,8 @@ public final class BiomassSnapshotHeatmapBuilderFactory extends AbstractInterval
 
     public void setSpeciesName(final String speciesName) { this.speciesName = speciesName; }
 
-    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
-        final Species species = getSpecies(fishState);
-        setTimestepsBuilder(new SnapshotAtIntervalTimestepBuilder(getInterval()));
-        return new ExtractorBasedHeatmapBuilder(
-            seaTile -> seaTile.getBiomass(species),
-            getTimestepsBuilder()
-        );
+    @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
+        return new BiomassHeatmapGatherer(getInterval(), getSpecies(fishState));
     }
 
     @NotNull private Species getSpecies(final FishState fishState) {
@@ -73,13 +83,6 @@ public final class BiomassSnapshotHeatmapBuilderFactory extends AbstractInterval
 
     @Override public String getTitle() { return speciesName + " biomass"; }
 
-    @Override public String getLegend() { return getTitle() + " (kg)"; }
-
-    @Override public MonochromeGradientColourMapBuilderFactory getColourMapBuilderFactory() {
-        return new MonochromeGradientColourMapBuilderFactory(
-            getColour(),
-            () -> getTimestepsBuilder().getMaxValueSeen()
-        );
-    }
+    @Override public String getLegend() { return getTitle() + " (t)"; }
 
 }

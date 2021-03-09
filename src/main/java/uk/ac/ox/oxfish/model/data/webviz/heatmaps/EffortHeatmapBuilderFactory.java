@@ -20,11 +20,14 @@
 package uk.ac.ox.oxfish.model.data.webviz.heatmaps;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.webviz.JsonBuilder;
+import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.TrawlsHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.webviz.JsonDefinitionBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.scenarios.ColourMapEntry;
 
-public class EffortHeatmapBuilderFactory extends AbstractIntervalHeatmapBuilderFactory {
+import java.util.Collection;
 
-    private SummingTimestepsBuilder timestepsBuilder = null; // will be set when the builder is constructed
+public class EffortHeatmapBuilderFactory extends HeatmapBuilderFactory {
 
     public EffortHeatmapBuilderFactory(final int interval, final String colour) {
         super(interval, colour);
@@ -34,15 +37,14 @@ public class EffortHeatmapBuilderFactory extends AbstractIntervalHeatmapBuilderF
         return "Number of trawls per " + getInterval() + " day intervals";
     }
 
-    @Override public MonochromeGradientColourMapBuilderFactory getColourMapBuilderFactory() {
-        return new MonochromeGradientColourMapBuilderFactory(getColour(), () -> timestepsBuilder.getMaxValueSeen());
+    @Override HeatmapGatherer makeHeatmapGatherer(final FishState fishState) {
+        return new TrawlsHeatmapGatherer(getInterval());
     }
 
-    @Override public JsonBuilder<Heatmap> makeDataBuilder(FishState fishState) {
-        this.timestepsBuilder = new SummingTimestepsBuilder(getInterval());
-        return new ExtractorBasedHeatmapBuilder(
-            seaTile -> fishState.getDailyTrawlsMap().get(seaTile.getGridX(), seaTile.getGridY()),
-            this.timestepsBuilder
+    @Override JsonDefinitionBuilderFactory<Collection<ColourMapEntry>> getColourMapBuilderFactory() {
+        return new LogTransparencyColourMapBuilderFactory(
+            getColour(),
+            getHeatmapGatherer()::maxValueSeen
         );
     }
 

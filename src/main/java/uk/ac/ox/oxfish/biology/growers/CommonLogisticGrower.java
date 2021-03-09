@@ -51,31 +51,13 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
     protected void grow(FishState model, List<BiomassLocalBiology> biologies) {
 
-        grow(model,biologies,biologies);
-    }
-
-
-    protected void grow(FishState model, List<BiomassLocalBiology> allBiologies,
-                        List<BiomassLocalBiology> nonFadHabitats) {
-
         double current = 0;
         double capacity = 0;
         //for each place
-        for(VariableBiomassBasedBiology biology : allBiologies)
-        {
+        for (VariableBiomassBasedBiology biology : biologies) {
             current += biology.getBiomass(species);
-
+            capacity += biology.getCarryingCapacity(species);
         }
-        //find all the biologies that are NOT FADS
-        //loop through them and get their carrying capacity
-        for(VariableBiomassBasedBiology biology : nonFadHabitats)
-        {
-            capacity +=biology.getCarryingCapacity(species);
-
-        }
-
-
-
 
         double recruitment = recruit(current, capacity, malthusianParameter);
         //compute recruitment
@@ -84,13 +66,13 @@ public class CommonLogisticGrower implements Startable, Steppable {
         if(recruitment>FishStateUtilities.EPSILON) {
             //distribute it
             if(distributionalWeight>0)
-                CommonLogisticGrower.allocateBiomassProportionally(nonFadHabitats,
+                CommonLogisticGrower.allocateBiomassProportionally(biologies,
                                                                    recruitment,
                                                                    species.getIndex(),
                                                                    distributionalWeight);
             else
                 DerisoSchnuteCommonGrower.allocateBiomassAtRandom(
-                        nonFadHabitats,
+                        biologies,
                         recruitment,
                         model.getRandom(),
                         species.getIndex()
@@ -104,16 +86,8 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
 
 
-        if(allBiologies.size()==0) //if you removed all the biologies then we are done
+        if(biologies.size()==0) //if you removed all the biologies then we are done
             turnOff();
-
-        afterRecruitmentHook();
-    }
-
-    /**
-     * ugly hook to get going
-     */
-    protected void afterRecruitmentHook(){
 
     }
 

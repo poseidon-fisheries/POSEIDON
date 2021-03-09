@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
@@ -66,12 +67,11 @@ public class DestinationStrategies {
         NAMES.put(LogitRPUEDestinationFactory.class, "Perfect RPUE Logit");
         NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
-        NAMES.put(FadDestinationStrategyFactory.class, "FAD Destination Strategy");
-        NAMES.put(FadGravityDestinationFactory.class, "FAD Gravity Destination Strategy");
         NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
+        NAMES.put(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private DestinationStrategies() {};
+    private DestinationStrategies() {}
 
 }

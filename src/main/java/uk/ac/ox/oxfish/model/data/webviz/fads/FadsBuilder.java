@@ -29,11 +29,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.webviz.SteppableJsonBuilder;
 
 import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Stream;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.round;
 
 public final class FadsBuilder implements SteppableJsonBuilder<Fads> {
@@ -46,18 +44,8 @@ public final class FadsBuilder implements SteppableJsonBuilder<Fads> {
 
     @Override public void step(final SimState simState) {
         final FishState fishState = (FishState) simState;
-        final Timestep timestep = Optional.ofNullable(fishState.getFadMap())
-            .map(fadMap -> new Timestep(fishState.getDay(), fadLocations(fishState.getMap(), fadMap)))
-            .orElseGet(() -> {
-                // Need to add at least 1000 dummy FADs to satisfy the web app
-                // https://github.com/poseidon-fisheries/poseidon-webviz/issues/34 and
-                // https://github.com/poseidon-fisheries/poseidon-webviz/issues/35
-                return new Timestep(
-                    fishState.getDay(),
-                    Stream.generate(() -> new double[]{0, 0}).limit(1000).collect(toList())
-                );
-            });
-        timestepsBuilder.add(timestep);
+        final FadMap fadMap = verifyNotNull(fishState.getFadMap());
+        timestepsBuilder.add(new Timestep(fishState.getDay(), fadLocations(fishState.getMap(), fadMap)));
     }
 
     private Collection<double[]> fadLocations(final NauticalMap nauticalMap, final FadMap fadMap) {

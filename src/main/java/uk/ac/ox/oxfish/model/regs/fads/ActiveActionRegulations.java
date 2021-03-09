@@ -19,22 +19,32 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
+import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 
-public class ActiveActionRegulations {
+public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
 
-    private ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
+    private final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation>
         actionSpecificRegulations;
+    private final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, YearlyActionLimitRegulation>
+        yearlyActionLimitRegulations;
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<ActiveFadLimits> activeFadLimits;
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<SetLimits> setLimits;
 
     public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
 
@@ -42,6 +52,35 @@ public class ActiveActionRegulations {
         ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this.actionSpecificRegulations = actionSpecificRegulations;
+
+        // Store the yearly action limit regulation in a separate collection because
+        // it is queried often and the filtering/casting is cumbersome
+        this.yearlyActionLimitRegulations =
+            actionSpecificRegulations
+                .entries()
+                .stream()
+                .filter(entry -> entry.getValue() instanceof YearlyActionLimitRegulation)
+                .collect(toImmutableSetMultimap(
+                    Map.Entry::getKey,
+                    entry -> (YearlyActionLimitRegulation) entry.getValue()
+                ));
+
+        this.activeFadLimits =
+            actionSpecificRegulations
+                .values()
+                .stream()
+                .filter(reg -> reg instanceof ActiveFadLimits).map(reg -> (ActiveFadLimits) reg)
+                .findFirst();
+
+        this.setLimits =
+            actionSpecificRegulations
+                .values()
+                .stream()
+                .filter(reg -> reg instanceof SetLimits).map(reg -> (SetLimits) reg)
+                // There are multiple references to set limit in the multimap values,
+                // but they should all refer to the same instance
+                .findFirst();
+
     }
 
     public ActiveActionRegulations(
@@ -58,38 +97,35 @@ public class ActiveActionRegulations {
             .inverse());
     }
 
+    public ImmutableSetMultimap<Class<? extends PurseSeinerAction>, YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
+        return yearlyActionLimitRegulations;
+    }
+
+    public Optional<ActiveFadLimits> getActiveFadLimits() {
+        return activeFadLimits;
+    }
+
     public boolean isForbidden(PurseSeinerAction purseSeinerAction) {
-        return regulationStream(purseSeinerAction).anyMatch(reg -> reg.isForbidden(purseSeinerAction));
+        return actionSpecificRegulations
+            .get(purseSeinerAction.getClass())
+            .stream()
+            .anyMatch(reg -> reg.isForbidden(purseSeinerAction));
     }
 
-    private Stream<ActionSpecificRegulation> regulationStream(PurseSeinerAction purseSeinerAction) {
-        return regulationStream(purseSeinerAction.getClass());
-    }
-
-    public Stream<ActionSpecificRegulation> regulationStream(Class<? extends PurseSeinerAction> actionClass) {
-        return actionSpecificRegulations.get(actionClass).stream();
-    }
-
-    public void reactToAction(PurseSeinerAction purseSeinerAction) {
-        regulationStream(purseSeinerAction).forEach(reg -> reg.reactToAction(purseSeinerAction));
+    public void observe(PurseSeinerAction purseSeinerAction) {
+        actionSpecificRegulations
+            .get(purseSeinerAction.getClass())
+            .forEach(reg -> reg.observe(purseSeinerAction));
     }
 
     public boolean anyYearlyLimitedActionRemaining(Fisher fisher) {
-        final ImmutableList<YearlyActionLimitRegulation> yearlyActionLimitRegulations =
-            getYearlyActionLimitRegulations();
-        return yearlyActionLimitRegulations.isEmpty() ||
-            yearlyActionLimitRegulations.stream().anyMatch(reg ->
+        return yearlyActionLimitRegulations.values().isEmpty() ||
+            yearlyActionLimitRegulations.values().stream().anyMatch(reg ->
                 reg.getNumRemainingActions(fisher) > 0
             );
     }
 
-    private ImmutableList<YearlyActionLimitRegulation> getYearlyActionLimitRegulations() {
-        return actionSpecificRegulations
-            .values()
-            .stream()
-            .filter(reg -> reg instanceof YearlyActionLimitRegulation)
-            .map(reg -> (YearlyActionLimitRegulation) reg)
-            .collect(toImmutableList());
+    public Optional<SetLimits> getSetLimits() {
+        return setLimits;
     }
-
 }

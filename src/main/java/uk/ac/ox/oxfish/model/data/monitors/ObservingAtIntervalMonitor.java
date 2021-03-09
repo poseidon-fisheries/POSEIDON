@@ -24,13 +24,14 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.utility.FishStateSteppable;
 
+import javax.measure.Quantity;
 import java.util.function.Function;
 
 import static uk.ac.ox.oxfish.model.StepOrder.DAILY_DATA_GATHERING;
 import static uk.ac.ox.oxfish.model.StepOrder.YEARLY_DATA_GATHERING;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 
-public class ObservingAtIntervalMonitor<O, V> extends MonitorDecorator<O, V> {
+public class ObservingAtIntervalMonitor<O, V, Q extends Quantity<Q>> extends MonitorDecorator<O, V, Q> {
 
     private final IntervalPolicy observationInterval;
     private final FishStateSteppable observingSteppable;
@@ -38,7 +39,7 @@ public class ObservingAtIntervalMonitor<O, V> extends MonitorDecorator<O, V> {
     public ObservingAtIntervalMonitor(
         IntervalPolicy observationInterval,
         Function<FishState, Iterable<O>> observablesExtractor,
-        Monitor<O, V> delegate
+        Monitor<O, V, Q> delegate
     ) {
         super(delegate);
         this.observationInterval = observationInterval;

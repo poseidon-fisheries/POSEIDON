@@ -20,9 +20,11 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
 import com.google.common.collect.ImmutableSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeFadSet;
-import uk.ac.ox.oxfish.fisher.actions.purseseiner.MakeUnassociatedSet;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.Startable;
 
 import java.util.function.Consumer;
@@ -30,7 +32,10 @@ import java.util.function.Consumer;
 public class SetLimits extends YearlyActionLimitRegulation {
 
     private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions = ImmutableSet.of(
-        MakeFadSet.class, MakeUnassociatedSet.class
+        FadSetAction.class,
+        OpportunisticFadSetAction.class,
+        DolphinSetAction.class,
+        NonAssociatedSetAction.class
     );
 
     public SetLimits(
@@ -40,5 +45,7 @@ public class SetLimits extends YearlyActionLimitRegulation {
         super(startableConsumer, limits);
     }
 
-    @Override public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
+    @Override
+    public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
+
 }

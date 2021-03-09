@@ -23,12 +23,15 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
-import java.util.Optional;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 
-public interface Monitor<O, V> extends Observer<O>, Startable {
+public interface Monitor<O, V, Q extends Quantity<Q>> extends Observer<O>, Startable {
 
     String getBaseName();
+    Unit<Q> getUnit();
     Iterable<V> extractValues(O observable);
     Accumulator<V> getAccumulator();
     void registerWith(TimeSeries<FishState> timeSeries);
