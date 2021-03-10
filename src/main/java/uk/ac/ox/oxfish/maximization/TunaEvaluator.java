@@ -33,7 +33,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(String[] args) {
 
-        String calibrationFolderName = "2021-02-24_14.55.14";
+        String calibrationFolderName = "2021-03-03_11.27.15";
 
         Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
