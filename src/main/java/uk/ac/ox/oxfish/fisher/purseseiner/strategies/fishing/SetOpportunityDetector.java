@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
+import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -34,10 +35,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.partitioningBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class SetOpportunityDetector {
@@ -69,31 +67,28 @@ public class SetOpportunityDetector {
             actions = ImmutableList.of(); // no possible sets when hold is full
         } else {
             final FadManager fadManager = getFadManager(fisher);
-            final Map<Boolean, List<Fad>> fadsOwnedOrNot = fadManager
-                .getFadsHere()
-                .collect(partitioningBy(fad -> fad.getOwner() == fadManager));
-            Stream<AbstractSetAction> actionStream = Stream
-                .of(
-                    setsOnOwnFads(fadsOwnedOrNot.get(true)),
-                    opportunisticFadSets(fadsOwnedOrNot.get(false)),
-                    setsFromOpportunityGenerators()
-                )
-                .flatMap(identity());
-            actions = actionStream.collect(toImmutableList());
+            final Bag fadsHere = fadManager.getFadMap().fadsAt(fisher.getLocation());
+            final double p = getDetectionProbability(OpportunisticFadSetAction.class);
+            ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
+            // using the bag directly for speed, here
+            for (int i = 0; i < fadsHere.numObjs; i++) {
+                Fad fad = (Fad) fadsHere.objs[i];
+                if (fad.getOwner() == fadManager)
+                    builder.add(new FadSetAction(fisher, fad));
+                else if (fisher.grabRandomizer().nextBoolean(p))
+                    builder.add(new OpportunisticFadSetAction(fisher, fad));
+            }
+            setsFromOpportunityGenerators().forEach(builder::add);
+            actions = builder.build();
         }
         hasSearched = false;
         return actions;
     }
 
-    private Stream<FadSetAction> setsOnOwnFads(Iterable<Fad> ownFads) {
-        return stream(ownFads).map(fad -> new FadSetAction(fisher, fad));
-    }
-
-    private Stream<OpportunisticFadSetAction> opportunisticFadSets(Iterable<Fad> otherFads) {
-        final double p = getDetectionProbability(OpportunisticFadSetAction.class);
-        return stream(otherFads)
-            .map(fad -> new OpportunisticFadSetAction(fisher, fad))
-            .filter(__ -> fisher.grabRandomizer().nextBoolean(p));
+    private double getDetectionProbability(Class<? extends AbstractSetAction> actionClass) {
+        double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
+        if (p > 1) p = 1; // even the search bonus can't push us above 1!
+        return p;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -104,12 +99,6 @@ public class SetOpportunityDetector {
                 final double p = getDetectionProbability(action.getClass());
                 return fisher.grabRandomizer().nextBoolean(p);
             });
-    }
-
-    private double getDetectionProbability(Class<? extends AbstractSetAction> actionClass) {
-        double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
-        if (p > 1) p = 1; // even the search bonus can't push us above 1!
-        return p;
     }
 
     public void notifyOfSearch() {

@@ -41,7 +41,6 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
 import static junit.framework.TestCase.assertEquals;
@@ -92,7 +91,7 @@ public class SetLocationValuesTest {
             values.start(fishState, fisher);
             assertEquals(
                 initialValues.entrySet(),
-                values.getValues().collect(toImmutableSet())
+                values.getValues()
             );
             range(0, 3).forEach(i -> assertEquals((double) i, values.getValueAt(i, i)));
             assertEquals(0.0, values.getValueAt(3, 3));
@@ -107,7 +106,7 @@ public class SetLocationValuesTest {
                 entry(new Int2D(1, 1), 1.0),
                 entry(new Int2D(2, 2), 2.0)
             ),
-            locationValues.get(0).getValues().collect(toImmutableSet())
+            locationValues.get(0).getValues()
         );
         rangeClosed(1, 2).forEach(i ->
             assertEquals(
@@ -116,7 +115,7 @@ public class SetLocationValuesTest {
                     entry(new Int2D(1, 1), 0.5),
                     entry(new Int2D(2, 2), 1.0)
                 ),
-                locationValues.get(i).getValues().collect(toImmutableSet())
+                locationValues.get(i).getValues()
             ));
         assertEquals(
             ImmutableSet.of( // decay rate: 1.0
@@ -124,7 +123,7 @@ public class SetLocationValuesTest {
                 entry(new Int2D(1, 1), 0.0),
                 entry(new Int2D(2, 2), 0.0)
             ),
-            locationValues.get(3).getValues().collect(toImmutableSet())
+            locationValues.get(3).getValues()
         );
 
         final Catch caught = new Catch(specie, 1000, globalBiology);

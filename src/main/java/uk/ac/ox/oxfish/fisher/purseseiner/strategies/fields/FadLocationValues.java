@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map.Entry;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.groupingBy;
@@ -39,7 +39,17 @@ public class FadLocationValues implements LocationValues {
 
     private Fisher fisher;
 
-    @Override public Stream<Entry<Int2D, Double>> getValues() {
+    @Override
+    public double getValueAt(final Int2D location) {
+        final SeaTile seaTile = fisher.grabState().getMap().getSeaTile(location);
+        return getFadManager(fisher)
+            .getFadsAt(seaTile)
+            .mapToDouble(fad -> fad.valueOfFishFor(fisher))
+            .sum();
+    }
+
+    @Override
+    public Set<Entry<Int2D, Double>> getValues() {
 
         FadManager fadManager = getFadManager(fisher);
         FadMap fadMap = fadManager.getFadMap();
@@ -53,19 +63,11 @@ public class FadLocationValues implements LocationValues {
                 fad.valueOfFishFor(fisher)
             ))))
             .collect(groupingBy(Entry::getKey, summingDouble(Entry::getValue)))
-            .entrySet()
-            .stream();
+            .entrySet();
     }
 
-    @Override public double getValueAt(final Int2D location) {
-        final SeaTile seaTile = fisher.grabState().getMap().getSeaTile(location);
-        return getFadManager(fisher)
-            .getFadsAt(seaTile)
-            .mapToDouble(fad -> fad.valueOfFishFor(fisher))
-            .sum();
-    }
-
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         this.fisher = fisher;
     }
 
