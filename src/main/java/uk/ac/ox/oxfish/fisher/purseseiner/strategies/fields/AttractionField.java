@@ -22,18 +22,18 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
+import sim.util.MutableDouble2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
-import java.util.stream.Stream;
+import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.pow;
 
 public class AttractionField implements FisherStartable {
 
-    private static final Double2D ZERO_VECTOR = new Double2D(0, 0);
     private final LocationValues locationValues;
     private final LocalAttractionModulator localModulator;
     private final GlobalAttractionModulator globalModulator;
@@ -47,22 +47,6 @@ public class AttractionField implements FisherStartable {
         this.locationValues = locationValues;
         this.localModulator = localModulator;
         this.globalModulator = globalModulator;
-    }
-
-    public Double2D netAttractionHere() {
-        return locations(fisher.getLocation().getGridLocation())
-            .filter(location -> location.distance > 0)
-            .map(this::attraction)
-            .reduce(Double2D::add)
-            .filter(v -> v.length() > 0) // because very small vectors get length 0 and become infinite when normalized
-            .map(v -> v.normalize().multiply(globalModulator.modulate(fisher)))
-            .orElse(ZERO_VECTOR);
-    }
-
-    public Stream<Location> locations(Int2D here) {
-        return locationValues
-            .getValues()
-            .map(entry -> new Location(entry.getKey(), entry.getValue(), distance(here, entry.getKey())));
     }
 
     @NotNull
@@ -85,14 +69,57 @@ public class AttractionField implements FisherStartable {
             );
     }
 
+
+    public Double2D netAttractionHere() {
+
+        final FishState fishState = fisher.grabState();
+        final double speed = fisher.getBoat().getSpeedInKph();
+        final Int2D here = fisher.getLocation().getGridLocation();
+
+        assert speed > 0 : "boat speed must be > 0";
+        assert fishState.getHoursPerStep() > 0 : "hours per step must be > 0";
+
+        // going all mutable here in order to minimize object creations
+        // this is a pretty tight loop in the simulation...
+
+        final MutableDouble2D netAttraction = new MutableDouble2D();
+        final MutableDouble2D locationAttraction = new MutableDouble2D();
+
+        for (Entry<Int2D, Double> entry : locationValues.getValues()) {
+            final Int2D there = entry.getKey();
+            final double travelTime = distance(here, there) / speed;
+            final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
+            locationAttraction.x = there.x - here.x;
+            locationAttraction.y = there.y - here.y;
+            if (locationAttraction.length() > 0) {
+                locationAttraction.normalize().multiplyIn(
+                    // scale to modulated "there" value, decreasing with travel time
+                    entry.getValue() * localModulator.modulate(there.x, there.y, t, fisher)
+                        / pow(travelTime, 2)
+                );
+            }
+            netAttraction.addIn(locationAttraction);
+        }
+
+        if (netAttraction.length() > 0) {
+            netAttraction.normalize().multiplyIn(globalModulator.modulate(fisher));
+        }
+
+        return new Double2D(netAttraction);
+
+    }
+
     private double distance(Int2D here, Int2D there) {
         return fisher.grabState().getMap().distance(here, there);
     }
 
     public double getActionValueAt(Int2D here) {
-        return locations(here)
-            .mapToDouble(loc -> loc.value / pow(loc.distance + 1, 2))
-            .sum();
+        double sum = 0.0;
+        for (Entry<Int2D, Double> entry : locationValues.getValues()) {
+            double distance = distance(here, entry.getKey());
+            sum += entry.getValue() / pow(distance + 1, 2);
+        }
+        return sum;
     }
 
     public double getValueAt(Int2D location) {

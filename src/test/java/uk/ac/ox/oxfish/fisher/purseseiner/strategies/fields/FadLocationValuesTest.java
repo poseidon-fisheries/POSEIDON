@@ -97,7 +97,7 @@ public class FadLocationValuesTest {
                 entry(new Int2D(0, 0), 2.0),
                 entry(new Int2D(1, 1), 1.0)
             ),
-            fadLocationValues.getValues().collect(toImmutableSet())
+            fadLocationValues.getValues()
         );
 
     }

@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
@@ -53,20 +53,24 @@ public abstract class MutableLocationValues<A>
         this.decayRate = decayRate;
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         this.values = new HashMap<>(valueLoader.apply(fisher));
         model.scheduleEveryYear(this, POLICY_UPDATE);
     }
 
-    @Override public Stream<Entry<Int2D, Double>> getValues() {
-        return values.entrySet().stream();
-    }
-
-    @Override public double getValueAt(final Int2D location) {
+    @Override
+    public double getValueAt(final Int2D location) {
         return values.getOrDefault(location, 0.0);
     }
 
-    @Override public void observe(final A observable) {
+    @Override
+    public Set<Entry<Int2D, Double>> getValues() {
+        return values.entrySet();
+    }
+
+    @Override
+    public void observe(final A observable) {
         observeValue(observable).ifPresent(entry ->
             values.merge(entry.getKey(), entry.getValue(), Double::sum)
         );
@@ -74,7 +78,8 @@ public abstract class MutableLocationValues<A>
 
     abstract Optional<Entry<Int2D, Double>> observeValue(final A observable);
 
-    @Override public void step(final SimState simState) {
+    @Override
+    public void step(final SimState simState) {
         // apply exponential decay
         values.replaceAll((location, value) -> value * (1 - decayRate));
     }

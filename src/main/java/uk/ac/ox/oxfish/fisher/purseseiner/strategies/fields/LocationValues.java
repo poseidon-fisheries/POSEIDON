@@ -22,15 +22,17 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public interface LocationValues extends FisherStartable {
 
     default double getValueAt(int gridX, int gridY) {
         return getValueAt(new Int2D(gridX, gridY));
     }
+
     double getValueAt(Int2D location);
-    Stream<Map.Entry<Int2D, Double>> getValues();
+
+    Set<Entry<Int2D, Double>> getValues();
 
 }

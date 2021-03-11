@@ -49,13 +49,17 @@ public class FishValueCalculator {
         T biomassContainer,
         ToDoubleBiFunction<T, Species> biomassExtractor
     ) {
-        return markets.stream().mapToDouble(market ->
-            biomassExtractor.applyAsDouble(biomassContainer, market.getSpecies()) * market.getMarginalPrice()
-        ).sum();
+        double sum = 0.0;
+        for (Market market : markets) {
+            double biomass = biomassExtractor.applyAsDouble(biomassContainer, market.getSpecies());
+            sum += biomass * market.getMarginalPrice();
+        }
+        return sum;
     }
 
     public double valueOf(LocalBiology biology) {
         return valueOf(biology, LocalBiology::getBiomass);
     }
+
 
 }
