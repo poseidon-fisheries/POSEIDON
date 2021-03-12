@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -32,10 +33,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class SetOpportunityDetector {
@@ -70,15 +69,20 @@ public class SetOpportunityDetector {
             final Bag fadsHere = fadManager.getFadMap().fadsAt(fisher.getLocation());
             final double p = getDetectionProbability(OpportunisticFadSetAction.class);
             ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
+            MersenneTwisterFast rng = fisher.grabRandomizer();
             // using the bag directly for speed, here
             for (int i = 0; i < fadsHere.numObjs; i++) {
                 Fad fad = (Fad) fadsHere.objs[i];
                 if (fad.getOwner() == fadManager)
                     builder.add(new FadSetAction(fisher, fad));
-                else if (fisher.grabRandomizer().nextBoolean(p))
+                else if (rng.nextBoolean(p))
                     builder.add(new OpportunisticFadSetAction(fisher, fad));
             }
-            setsFromOpportunityGenerators().forEach(builder::add);
+            for (SetOpportunityGenerator generator : setOpportunityGenerators) {
+                generator.get(fisher, fisher.getLocation())
+                    .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
+                    .ifPresent(builder::add);
+            }
             actions = builder.build();
         }
         hasSearched = false;
@@ -89,16 +93,6 @@ public class SetOpportunityDetector {
         double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
         if (p > 1) p = 1; // even the search bonus can't push us above 1!
         return p;
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private Stream<AbstractSetAction> setsFromOpportunityGenerators() {
-        return setOpportunityGenerators.stream()
-            .flatMap(g -> stream(g.get(fisher, fisher.getLocation())))
-            .filter(action -> {
-                final double p = getDetectionProbability(action.getClass());
-                return fisher.grabRandomizer().nextBoolean(p);
-            });
     }
 
     public void notifyOfSearch() {
