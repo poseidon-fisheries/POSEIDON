@@ -28,6 +28,7 @@ public class CsvParserUtil {
     static {
         defaultParserSettings.setLineSeparatorDetectionEnabled(true);
         defaultParserSettings.setHeaderExtractionEnabled(true);
+        defaultParserSettings.setReadInputOnSeparateThread(false);
     }
 
     public static List<Record> parseAllRecords(Path inputFilePath) {
