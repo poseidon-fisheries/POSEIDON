@@ -33,7 +33,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(String[] args) {
 
-        String calibrationFolderName = "2021-03-04_18.18.18";
+        String calibrationFolderName = "2021-03-11_18.15.34";
 
         Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
@@ -46,7 +46,7 @@ public class TunaEvaluator implements Runnable {
         ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
         try (Stream<String> lines = Files.lines(logFilePath)) {
             findLast(lines).ifPresent(lastLine -> {
-                String solutionString = substringBetween(lastLine, "{", "}");
+                String solutionString = substringBetween(lastLine, "{", "}").trim();
                 try (Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
                     while (scanner.hasNextDouble()) solutionBuilder.add(scanner.nextDouble());
                 }
