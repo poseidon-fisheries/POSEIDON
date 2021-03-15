@@ -19,46 +19,36 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.model.market.Market;
-
-import java.util.List;
-import java.util.function.ToDoubleBiFunction;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 public class FishValueCalculator {
 
-    private final List<Market> markets;
+    private final MarketMap marketMap;
 
     public FishValueCalculator(Fisher fisher) {
-        this(fisher.getHomePort().getMarketMap(fisher).getMarkets());
+        this(fisher.getHomePort().getMarketMap(fisher));
     }
 
-    public FishValueCalculator(final Iterable<Market> markets) {
-        this.markets = ImmutableList.copyOf(markets);
+    public FishValueCalculator(MarketMap marketMap) {
+        this.marketMap = marketMap;
     }
 
     public double valueOf(Catch catchesKept) {
-        return valueOf(catchesKept, Catch::getWeightCaught);
+        return valueOf(catchesKept.getBiomassArray());
     }
 
-    <T> double valueOf(
-        T biomassContainer,
-        ToDoubleBiFunction<T, Species> biomassExtractor
-    ) {
+    public double valueOf(double[] biomass) {
         double sum = 0.0;
-        for (Market market : markets) {
-            double biomass = biomassExtractor.applyAsDouble(biomassContainer, market.getSpecies());
-            sum += biomass * market.getMarginalPrice();
-        }
+        for (int i = 0; i < biomass.length; i++)
+            sum += biomass[i] * marketMap.getMarket(i).getMarginalPrice();
         return sum;
     }
 
-    public double valueOf(LocalBiology biology) {
-        return valueOf(biology, LocalBiology::getBiomass);
+    public double valueOf(VariableBiomassBasedBiology biology) {
+        return valueOf(biology.getCurrentBiomass());
     }
 
 

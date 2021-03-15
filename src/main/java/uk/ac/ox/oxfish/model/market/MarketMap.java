@@ -56,6 +56,7 @@ public class MarketMap {
         return marketList[species.getIndex()];
     }
 
+    public Market getMarket(int speciesIndex) { return marketList[speciesIndex]; }
 
     public TradeInfo sellFish(
             Hold hold, Species species, Fisher fisher,

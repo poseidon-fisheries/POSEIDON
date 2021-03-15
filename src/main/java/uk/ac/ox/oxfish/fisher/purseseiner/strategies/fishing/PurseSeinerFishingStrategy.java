@@ -25,7 +25,6 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
@@ -35,6 +34,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +48,6 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.lang.Double.min;
 import static java.lang.Math.exp;
-import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingDouble;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
@@ -199,11 +198,10 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             final Hold hold = action.getFisher().getHold();
             final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
             final double catchableProportion = min(1, capacity / totalBiomass);
-            final Catch potentialCatch = new Catch(
-                stream(action.getTargetBiology().getCurrentBiomass())
-                    .map(biomass -> biomass * catchableProportion)
-                    .toArray()
-            );
+            double[] biomass = action.getTargetBiology().getCurrentBiomass();
+            final double[] potentialCatch = Arrays.copyOf(biomass, biomass.length);
+            for (int i = 0; i < potentialCatch.length; i++)
+                potentialCatch[i] *= catchableProportion;
             final double valueOfPotentialCatch =
                 new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
             return actionValueFunction.applyAsDouble(valueOfPotentialCatch);
