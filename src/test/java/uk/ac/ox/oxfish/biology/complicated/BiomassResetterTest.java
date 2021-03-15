@@ -156,7 +156,7 @@ public class BiomassResetterTest {
         final double k = asDouble(oneTonne, KILOGRAM);
         seaTiles.forEach(seaTile -> seaTile.setBiology(new BiomassLocalBiology(k, globalBiology.getSize(), rng)));
 
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), 0);
+        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), 0, 0, 0);
         final FadMap fadMap = new FadMap(fishState.getMap(), currentVectors, globalBiology);
         when(fishState.getFadMap()).thenReturn(fadMap);
 

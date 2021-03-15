@@ -5,7 +5,6 @@ import sim.field.continuous.Continuous2D;
 import sim.util.Bag;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 
@@ -13,13 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.Collections.unmodifiableMap;
+import static com.google.common.base.Preconditions.*;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import static uk.ac.ox.oxfish.utility.MasonUtils.inBounds;
 
@@ -27,31 +22,26 @@ public class DriftingObjectsMap {
 
     private final Continuous2D field;
     private final CurrentVectors currentVectors;
-    private final BiFunction<Integer, Integer, SeaTile> getSeaTile;
     private final Map<Object, DriftingPath> objectPaths = new HashMap<>();
     private final Map<Object, BiConsumer<Double2D, Optional<Double2D>>> onMoveCallbacks = new HashMap<>();
+
     DriftingObjectsMap(
         CurrentVectors currentVectors,
         NauticalMap nauticalMap
     ) {
         this(
             new Continuous2D(1.0, nauticalMap.getWidth(), nauticalMap.getHeight()),
-            currentVectors,
-            nauticalMap::getSeaTile
+            currentVectors
         );
     }
 
     private DriftingObjectsMap(
         Continuous2D field,
-        CurrentVectors currentVectors,
-        BiFunction<Integer, Integer, SeaTile> getSeaTile
+        CurrentVectors currentVectors
     ) {
         this.field = field;
         this.currentVectors = currentVectors;
-        this.getSeaTile = getSeaTile;
     }
-
-    public DriftingPath getObjectPath(Object o) { return objectPaths.get(o); }
 
     public void applyDrift(int timeStep) {
         Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
@@ -65,7 +55,6 @@ public class DriftingObjectsMap {
             else
                 remove(o, oldLoc);
         });
-        currentVectors.removeCachedVectors(timeStep);
     }
 
     private void move(Object object, Double2D oldLocation, Double2D newLocation) {
@@ -108,7 +97,7 @@ public class DriftingObjectsMap {
     ) {
         setObjectLocation(object, location);
         onMoveCallbacks.put(object, onMove);
-        objectPaths.put(object, new DriftingPath(timeStep, location, currentVectors, getSeaTile));
+        objectPaths.put(object, new DriftingPath(timeStep, location, currentVectors));
     }
 
     @Nullable
