@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import sim.util.Int2D;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableMap;
@@ -16,17 +15,14 @@ public class DriftingPath {
     private final int initialTimeStep;
     private final Map<Integer, Optional<Double2D>> positions;
     private final CurrentVectors currentVectors;
-    private final BiFunction<Integer, Integer, SeaTile> getSeaTile;
 
     public DriftingPath(
         int initialTimeStep,
         Double2D initialPosition,
-        CurrentVectors currentVectors,
-        BiFunction<Integer, Integer, SeaTile> getSeaTile
+        CurrentVectors currentVectors
     ) {
         this.initialTimeStep = initialTimeStep;
         this.currentVectors = currentVectors;
-        this.getSeaTile = getSeaTile;
         positions = new HashMap<>();
         positions.put(initialTimeStep, Optional.of(initialPosition));
     }
@@ -44,14 +40,17 @@ public class DriftingPath {
     }
 
     Optional<Double2D> applyDrift(Double2D position, int timeStep) {
-        final SeaTile tile = getSeaTile.apply((int) position.x, (int) position.y);
-        final Optional<Double2D> vector = Optional.ofNullable(currentVectors.getVector(timeStep, tile));
-        final Optional<Double2D> newPosition = vector.map(position::add);
-        final Optional<SeaTile> newTile = newPosition.flatMap(p ->
-            Optional.ofNullable(getSeaTile.apply((int) p.x, (int) p.y))
-        );
-        // only return the new position if it's on a tile
-        return newTile.flatMap(__ -> newPosition);
+        return getGridLocation(position)
+            .map(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
+            .map(position::add)
+            .filter(newPosition -> getGridLocation(newPosition).isPresent());
+    }
+
+    private Optional<Int2D> getGridLocation(Double2D position) {
+        return position.x >= 0 && position.x < currentVectors.getGridWidth() &&
+            position.y >= 0 && position.y < currentVectors.getGridHeight()
+            ? Optional.of(new Int2D((int) position.x, (int) position.y))
+            : Optional.empty();
     }
 
     public Map<Integer, Optional<Double2D>> getPositions() { return unmodifiableMap(positions); }
