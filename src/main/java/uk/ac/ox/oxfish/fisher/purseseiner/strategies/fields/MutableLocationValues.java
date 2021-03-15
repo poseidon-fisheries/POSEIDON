@@ -39,6 +39,8 @@ public abstract class MutableLocationValues<A>
     extends PurseSeinerActionObserver<A>
     implements LocationValues, Steppable {
 
+    private static final int MAXIMUM_NUMBER_OF_VALUES = 50;
+
     private final Function<Fisher, Map<Int2D, Double>> valueLoader;
     private final double decayRate;
     private Map<Int2D, Double> values;
@@ -80,6 +82,14 @@ public abstract class MutableLocationValues<A>
 
     @Override
     public void step(final SimState simState) {
+
+        if (values.size() > MAXIMUM_NUMBER_OF_VALUES) {
+            // when reaching the limit, forget all the values that are below average
+            values.values().stream().mapToDouble(Double::doubleValue).average().ifPresent(average ->
+                values.entrySet().removeIf(entry -> entry.getValue() < average)
+            );
+        }
+
         // apply exponential decay
         values.replaceAll((location, value) -> value * (1 - decayRate));
     }
