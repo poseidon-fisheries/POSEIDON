@@ -115,7 +115,7 @@ public class TunaCalibrator implements Runnable {
             .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
             .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(verbose));
 
-        final int numThreads = Math.min(getRuntime().availableProcessors(), 32);
+        final int numThreads = Math.min(getRuntime().availableProcessors(), 16);
 
         System.out.println("Requesting " + numThreads + " threads");
 
