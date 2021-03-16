@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -85,13 +86,14 @@ public class SetOpportunityGeneratorTest {
                 globalBiology.getSpecie(0), weight0,
                 globalBiology.getSpecie(1), weight1
             ),
-            __ -> mock(AbstractSetAction.class)
+            __ -> mock(AbstractSetAction.class),
+            new ActiveOpportunities()
         );
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabRandomizer()).thenReturn(rng);
         return entry(
             setOpportunityGenerator.probabilityOfOpportunity(biology),
-            setOpportunityGenerator.get(fisher, biology)
+            setOpportunityGenerator.get(fisher, biology, new Int2D())
         );
     }
 

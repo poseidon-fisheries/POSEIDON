@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.List;
@@ -52,10 +51,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.HOUR;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.*;
 
 public class SetOpportunityDetectorTest {
 
@@ -99,7 +95,7 @@ public class SetOpportunityDetectorTest {
             ).map(action -> {
                 final SetOpportunityGenerator setOpportunityGenerator =
                     mock(SetOpportunityGenerator.class);
-                when(setOpportunityGenerator.get(any(), any()))
+                when(setOpportunityGenerator.get(any(), any(), any()))
                     .thenReturn(Optional.of(action));
                 return setOpportunityGenerator;
             }).collect(toImmutableList());

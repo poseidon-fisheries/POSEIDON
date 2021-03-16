@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.List;
 import java.util.Map;
@@ -65,28 +66,38 @@ public class SetOpportunityDetector {
         if (fisher.getHold().getPercentageFilled() >= 1) {
             actions = ImmutableList.of(); // no possible sets when hold is full
         } else {
-            final FadManager fadManager = getFadManager(fisher);
-            final Bag fadsHere = fadManager.getFadMap().fadsAt(fisher.getLocation());
-            final double p = getDetectionProbability(OpportunisticFadSetAction.class);
-            ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
-            MersenneTwisterFast rng = fisher.grabRandomizer();
-            // using the bag directly for speed, here
-            for (int i = 0; i < fadsHere.numObjs; i++) {
-                Fad fad = (Fad) fadsHere.objs[i];
-                if (fad.getOwner() == fadManager)
-                    builder.add(new FadSetAction(fisher, fad));
-                else if (rng.nextBoolean(p))
-                    builder.add(new OpportunisticFadSetAction(fisher, fad));
-            }
-            for (SetOpportunityGenerator generator : setOpportunityGenerators) {
-                generator.get(fisher, fisher.getLocation())
-                    .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
-                    .ifPresent(builder::add);
-            }
+            final ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
+            addFadSetOpportunities(builder);
+            addOtherSetOpportunities(builder);
             actions = builder.build();
         }
         hasSearched = false;
         return actions;
+    }
+
+    private void addOtherSetOpportunities(ImmutableList.Builder<AbstractSetAction> builder) {
+        final MersenneTwisterFast rng = fisher.grabRandomizer();
+        for (SetOpportunityGenerator generator : setOpportunityGenerators) {
+            SeaTile seaTile = fisher.getLocation();
+            generator.get(fisher, seaTile.getBiology(), seaTile.getGridLocation())
+                .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
+                .ifPresent(builder::add);
+        }
+    }
+
+    private void addFadSetOpportunities(ImmutableList.Builder<AbstractSetAction> builder) {
+        final MersenneTwisterFast rng = fisher.grabRandomizer();
+        final FadManager fadManager = getFadManager(fisher);
+        final Bag fadsHere = fadManager.getFadMap().fadsAt(fisher.getLocation());
+        final double p = getDetectionProbability(OpportunisticFadSetAction.class);
+        // using the bag directly for speed, here
+        for (int i = 0; i < fadsHere.numObjs; i++) {
+            Fad fad = (Fad) fadsHere.objs[i];
+            if (fad.getOwner() == fadManager)
+                builder.add(new FadSetAction(fisher, fad));
+            else if (rng.nextBoolean(p))
+                builder.add(new OpportunisticFadSetAction(fisher, fad));
+        }
     }
 
     private double getDetectionProbability(Class<? extends AbstractSetAction> actionClass) {
