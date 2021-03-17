@@ -106,7 +106,7 @@ public class FadMap implements Startable, Steppable {
     }
 
     public void deployFad(Fad fad, int timeStep, Double2D location) {
-        driftingObjectsMap.add(fad, timeStep, location, onMove(fad));
+        driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
     /**

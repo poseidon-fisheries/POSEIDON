@@ -4,9 +4,9 @@ import org.jetbrains.annotations.Nullable;
 import sim.field.continuous.Continuous2D;
 import sim.util.Bag;
 import sim.util.Double2D;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
-import uk.ac.ox.oxfish.geography.currents.DriftingPath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,6 @@ public class DriftingObjectsMap {
 
     private final Continuous2D field;
     private final CurrentVectors currentVectors;
-    private final Map<Object, DriftingPath> objectPaths = new HashMap<>();
     private final Map<Object, BiConsumer<Double2D, Optional<Double2D>>> onMoveCallbacks = new HashMap<>();
 
     DriftingObjectsMap(
@@ -43,18 +42,27 @@ public class DriftingObjectsMap {
         this.currentVectors = currentVectors;
     }
 
+    public CurrentVectors getCurrentVectors() {
+        return currentVectors;
+    }
+
     public void applyDrift(int timeStep) {
         Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
         bagToStream(objects).forEach(o -> {
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
-            final Optional<Double2D> newLoc = objectPaths.get(o)
-                .position(timeStep)
-                .filter(location -> inBounds(location, field));
+            final Optional<Double2D> newLoc = nextPosition(oldLoc, timeStep);
             if (newLoc.isPresent()) // TODO: use `ifPresentOrElse` once we upgrade to Java >=9.
                 move(o, oldLoc, newLoc.get());
             else
                 remove(o, oldLoc);
         });
+    }
+
+    private Optional<Double2D> nextPosition(Double2D position, int timeStep) {
+        return getGridLocation(position)
+            .flatMap(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
+            .map(position::add)
+            .filter(location -> inBounds(location, field));
     }
 
     private void move(Object object, Double2D oldLocation, Double2D newLocation) {
@@ -67,10 +75,16 @@ public class DriftingObjectsMap {
     private void remove(Object object, Double2D oldLocation) {
         final Object result = field.remove(object);
         checkNotNull(result, "Object not on the map!");
-        objectPaths.remove(object);
         Optional
             .ofNullable(onMoveCallbacks.remove(object))
             .ifPresent(f -> f.accept(oldLocation, Optional.empty()));
+    }
+
+    private Optional<Int2D> getGridLocation(Double2D position) {
+        return position.x >= 0 && position.x < currentVectors.getGridWidth() &&
+            position.y >= 0 && position.y < currentVectors.getGridHeight()
+            ? Optional.of(new Int2D((int) position.x, (int) position.y))
+            : Optional.empty();
     }
 
     private void setObjectLocation(Object object, Double2D newLocation) {
@@ -91,13 +105,11 @@ public class DriftingObjectsMap {
 
     public void add(
         Object object,
-        int timeStep,
         Double2D location,
         BiConsumer<Double2D, Optional<Double2D>> onMove
     ) {
         setObjectLocation(object, location);
         onMoveCallbacks.put(object, onMove);
-        objectPaths.put(object, new DriftingPath(timeStep, location, currentVectors));
     }
 
     @Nullable
