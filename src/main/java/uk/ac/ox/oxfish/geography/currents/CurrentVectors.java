@@ -1,13 +1,17 @@
 package uk.ac.ox.oxfish.geography.currents;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,13 +22,17 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectors {
 
-    private final Map<Integer, Map<Int2D, Double2D>> vectorCache = new ConcurrentHashMap<>();
+    // Even caching just 50 vectors per time step gives a hit rate of about 80%!
+    private static final int MAX_CACHE_ENTRIES = 50;
+    private final CacheBuilder<Object, Object> cacheBuilder =
+        CacheBuilder.newBuilder().maximumSize(MAX_CACHE_ENTRIES).recordStats();
+
+    private final Map<Integer, Cache<Int2D, Optional<Double2D>>> vectorCache = new ConcurrentHashMap<>();
     private final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
     private final int gridHeight;
     private final int gridWidth;
     private final int stepsPerDay;
-    private final int initialHashMapsCapacity;
 
     public CurrentVectors(
         TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
@@ -42,23 +50,11 @@ public class CurrentVectors {
         int gridHeight,
         int stepsPerDay
     ) {
-        this.initialHashMapsCapacity = initialHashMapsCapacity(vectorMaps);
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
         this.stepsPerDay = stepsPerDay;
-    }
-
-    private int initialHashMapsCapacity(Map<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps) {
-        // use half the size of the largest vector map (though they should all be the same size) as initial capacity.
-        // This should lead to *at most* two rehashings (given the default load factor of .75), but avoids all
-        // rehashings most of the time, as the cached vectors rarely exceed one quarter of the map.
-        return vectorMaps.values().stream()
-            .flatMap(map -> map.values().stream()).mapToInt(Map::size)
-            .max()
-            .orElse(0)
-            / 2;
     }
 
     @NotNull
@@ -70,6 +66,10 @@ public class CurrentVectors {
         final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
         final Double2D v2 = vectorAfter.multiply((totalOffset - offsetAfter) / totalOffset);
         return v1.add(v2);
+    }
+
+    public Map<Integer, Cache<Int2D, Optional<Double2D>>> getVectorCache() {
+        return vectorCache;
     }
 
     public int getGridHeight() {
@@ -94,25 +94,29 @@ public class CurrentVectors {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    Double2D getVector(int step, Int2D location) {
-        return vectorCache
-            .computeIfAbsent(step, __ -> new ConcurrentHashMap<>(initialHashMapsCapacity))
-            .computeIfAbsent(location, __ -> computeVector(step, location));
+    public Optional<Double2D> getVector(int step, Int2D location) {
+        try {
+            return vectorCache
+                .computeIfAbsent(step, __ -> cacheBuilder.build())
+                .get(location, () -> computeVector(step, location));
+        } catch (ExecutionException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
-     * Returns the current vector for seaTile at step. Returns null if we have no currents for that sea tile.
+     * Returns the current vector for seaTile at step. Returns an empty optional if we have no currents for that location.
      */
-    private Double2D computeVector(int step, Int2D location) {
+    private Optional<Double2D> computeVector(int step, Int2D location) {
         final int dayOfTheYear = getDayOfTheYear(step);
         if (vectorMaps.containsKey(dayOfTheYear)) {
             final Map<CurrentPattern, Map<Int2D, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
             final CurrentPattern currentPattern = currentPatternAtStep.apply(step);
             if (mapsAtStep.containsKey(currentPattern)) {
-                return mapsAtStep.get(currentPattern).get(location);
+                return Optional.ofNullable(mapsAtStep.get(currentPattern).get(location));
             }
         }
-        return getInterpolatedVector(location, step);
+        return Optional.ofNullable(getInterpolatedVector(location, step));
     }
 
     private VectorMapAtStep lookupVectorMap(

@@ -1,17 +1,20 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.google.common.cache.Cache;
 import com.google.common.primitives.ImmutableDoubleArray;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.OptionalDouble;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -33,7 +36,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(String[] args) {
 
-        String calibrationFolderName = "2021-03-15_18.23.35";
+        String calibrationFolderName = "2021-03-16_15.35.52";
 
         Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
@@ -78,6 +81,9 @@ public class TunaEvaluator implements Runnable {
             );
             rangeClosed(1, numRuns).forEach(runNumber -> {
                 final FishState fishState = runSimulation(optimization, solution, runNumber, numRuns);
+                fishState.getFadMap().getDriftingObjectsMap().getCurrentVectors().getVectorCache().values().stream()
+                    .mapToDouble(cache -> cache.stats().hitRate()).average()
+                    .ifPresent(hitRate -> System.out.println("Hit rate: " + hitRate));
                 optimization.getTargets().stream()
                     .filter(target -> target instanceof FixedDataTarget)
                     .map(target -> (FixedDataTarget) target)
