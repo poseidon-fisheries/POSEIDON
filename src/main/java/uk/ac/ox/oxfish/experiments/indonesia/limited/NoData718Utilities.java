@@ -351,6 +351,22 @@ public class NoData718Utilities {
                 }
         }
 
+        static public LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> fleetReductionNotAdaptive = new LinkedHashMap();
+        static {
+                for(double mortalityRate : new double[]{.01,.02,.03,.05,.1,.15}) {
+                        closedDaysNotAdaptive.put(
+                                FishStateUtilities.round5(mortalityRate)+"_fleet_noentry",
+                                //max days regulations include respect protected areas so it works if put in this order
+                                shockYear ->  NoDataPolicy.buildFleetReductionRegulation(shockYear,
+                                        new String[]{"population0", "population1", "population2"}
+                                        , mortalityRate).andThen(
+                                        NoDataPolicy.removeEntry(shockYear)
+                                )
+
+
+                        );
+                }
+        }
 
         static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false,
                                                                                                                         false);

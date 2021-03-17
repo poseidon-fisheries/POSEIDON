@@ -1,15 +1,11 @@
 package uk.ac.ox.oxfish.experiments;
 
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice3;
-import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+import uk.ac.ox.oxfish.utility.RejectionSampling;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,13 +27,13 @@ public class NoDataTachiuoSlice1 {
 
     public static void main(String[] args) throws IOException {
 
-        runSlice(
+        RejectionSampling.runSlice(
                 MAIN_DIRECTORY.resolve("base.yaml"),
                 MAIN_DIRECTORY.resolve("parameters.yaml"),
                 MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
                 MAIN_DIRECTORY,
                 0L,
-                MAX_YEARS_TO_RUN
+                MAX_YEARS_TO_RUN, modelInterruptors
         );
     }
 
@@ -102,84 +98,14 @@ public class NoDataTachiuoSlice1 {
     }
 
 
-
-
-
-
-    public static void runSlice(
-            Path baselineScenarioFile,
-            Path parameterFile,
-            Path listOfColumnsToPrintFile,
-            Path mainDirectory, long seed, int maxYearsToRun
-    ) throws IOException {
-
-
-        FishYAML yaml = new FishYAML();
-        final List<String> columnsToPrint =
-                yaml.loadAs(new FileReader(
-                                listOfColumnsToPrintFile.toFile()
-                        ),
-                        LinkedList.class);
-
-        final List<OptimizationParameter> parameters =
-                yaml.loadAs(new FileReader(
-                                parameterFile.toFile()
-                        ),
-                        LinkedList.class);
-
-
-        String computerName = FishStateUtilities.getComputerName();
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        int directoryIndex =  random.nextInt(999999);
-        Path scenarioDirectory = mainDirectory.resolve("scenarios").resolve(computerName+"_"+directoryIndex);
-        scenarioDirectory.toFile().mkdirs();
-        Path summaryDirectory = scenarioDirectory.resolve("summaries");
-        summaryDirectory.toFile().mkdir();
-
-
-
-
-        FileWriter summaryStatisticsWriter =
-                new FileWriter(summaryDirectory.resolve("summary_statistics_" + seed + ".csv").toFile());
-        summaryStatisticsWriter.write("run,year,scenario,variable,value\n");
-        summaryStatisticsWriter.flush();
-
-
-        System.out.println("working in directory: " + scenarioDirectory);
-
-        FileWriter parameterMasterFile = NoData718Slice3.initializeParameterMasterFile(summaryDirectory, parameters);
-
-
-        for(int i=0; i<50000; i++) {
-            final Path writtenScenario = NoData718Slice3.writeToFileOneScenario(scenarioDirectory,
-                    parameters,
-                    baselineScenarioFile,
-                    parameterMasterFile,
-                    new MersenneTwisterFast(),
-                    i
-            );
-            runOneScenario(
-                    seed,
-                    columnsToPrint,
-                    summaryStatisticsWriter,
-                    writtenScenario,
-                    maxYearsToRun
-            );
-        }
-
-    }
-
-
-
-
-
-
     @NotNull
     public static void runOneScenario(long randomSeed,
                                       List<String> columns,
                                       FileWriter summaryStatisticsWriter,
                                       Path scenarioFile,
-                                      int maxYearsToRun
+                                      int maxYearsToRun,
+                                      @Nullable
+                                              List<Predicate<FishState>> modelInterruptors
     ) throws IOException {
 
         System.out.println(scenarioFile.toFile().getAbsolutePath() );
@@ -199,7 +125,8 @@ public class NoDataTachiuoSlice1 {
             );
             StringBuffer tidy = new StringBuffer();
 
-            batchRunner.setModelInterruptors(modelInterruptors);
+            if(modelInterruptors != null)
+                batchRunner.setModelInterruptors(modelInterruptors);
 
 
             batchRunner.setColumnModifier(new BatchRunner.ColumnModifier() {

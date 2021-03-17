@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,9 @@ import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -53,7 +54,7 @@ public class NoDataPolicy {
     /**
      * steppable whose job is to hunt down the FisherEntryByProfits and turning them off!
      */
-    private static final Steppable REMOVE_ENTRY_EVENT = new Steppable(){
+    public static final Steppable REMOVE_ENTRY_EVENT = new Steppable(){
 
         @Override
         public void step(SimState simState) {
@@ -174,6 +175,59 @@ public class NoDataPolicy {
         };
 
     }
+
+
+    /**
+     * adds a removeEntry steppable happening at year X
+     */
+    public static Consumer<Scenario> buildFleetReductionRegulation(int shockYear,
+                                                                   String[] tagsToRegulate, double mortalityRate){
+        return new Consumer<Scenario>() {
+
+            @Override
+            public void accept(Scenario scenario) {
+                FlexibleScenario flexible = (FlexibleScenario) scenario;
+                flexible.getPlugins().add(
+                        fishState -> new AdditionalStartable() {
+                            @Override
+                            public void start(FishState model) {
+
+                                model.scheduleOnceAtTheBeginningOfYear(
+                                        (Steppable) simState -> {
+                                            for (Fisher fisher :
+                                                    ((FishState) simState).getFishers())
+                                            {
+
+                                                if (fisher.getTags().stream().anyMatch(Arrays.asList(tagsToRegulate)::contains)) {
+                                                    if(((FishState) simState).getRandom().nextBoolean(mortalityRate))
+                                                        fisher.setRegulation(new MaxHoursOutRegulation(new ProtectedAreasOnly(),
+                                                                0));
+
+                                                }
+                                            }
+                                        },
+                                        StepOrder.DAWN,
+                                        shockYear
+                                );
+
+
+                            }
+
+                            @Override
+                            public void turnOff() {
+
+                            }
+                        }
+                );
+            }
+
+
+
+        };
+
+    }
+
+
 
 
     /**

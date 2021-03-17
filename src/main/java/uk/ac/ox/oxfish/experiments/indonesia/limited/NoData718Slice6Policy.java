@@ -28,7 +28,7 @@ public class NoData718Slice6Policy {
 //            NoData718Slice6.MAIN_DIRECTORY.
 //                            resolve("spr_lowmk_arrays_complete_18").resolve("lopt_noentry");
             NoData718Slice6.MAIN_DIRECTORY.
-                            resolve("spr_lowmk_arrays_complete_18").resolve("adaptive");
+                    resolve("spr_lowmk_arrays_complete_18").resolve("adaptive");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
@@ -38,7 +38,7 @@ public class NoData718Slice6Policy {
         ADDITIONAL_COLUMNS.add( "Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy");
         ADDITIONAL_COLUMNS.add( "CPUE Lutjanus malabaricus spr_agent_forpolicy");
         ADDITIONAL_COLUMNS.add( "M/K ratio Lutjanus malabaricus spr_agent_forpolicy");
-       // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
+        // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
         ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
     }
 
