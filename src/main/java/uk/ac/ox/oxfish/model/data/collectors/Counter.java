@@ -121,10 +121,10 @@ public class Counter implements Startable, Steppable
 
         if(lazyColumnToInsert != null && lazyColumnToInsert != columnName)
             flushLazyValueInCounter();
-        else {
-            lazyColumnToInsert = columnName;
-            lazyValueToAdd = lazyValueToAdd + add;
-        }
+
+        lazyColumnToInsert = columnName;
+        lazyValueToAdd = lazyValueToAdd + add;
+
 
     }
 
