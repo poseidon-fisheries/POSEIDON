@@ -216,6 +216,9 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
 
         double currentIncome = fisher.getLatestYearlyObservation(targetVariable);
 
+        //if you couldn't make an observation, you can't adapt!
+        if(!Double.isFinite(currentIncome))
+            return;
         //update phase (did we meet our targets?)
         switch (status){
             case FULLTIME:

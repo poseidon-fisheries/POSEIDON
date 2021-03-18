@@ -149,7 +149,8 @@ public class TripRecord {
         }
 
         SeaTile tileFished = record.getTileFished();
-        lastFishingRecordOfTile.put(tileFished, record);
+        updateLastFishingRecordOfTile(tileFished, record);
+      //  lastFishingRecordOfTile.put(
 
 
         tilesFished.merge(tileFished,
@@ -203,6 +204,10 @@ public class TripRecord {
 
     public void completeTrip(double durationInHours, Port terminal)
     {
+        if (lastCachedTile != null) {
+            flushLastRecordOfTileCache();
+
+        }
         this.durationInHours = durationInHours;
         this.terminal = terminal;
         completed = true;

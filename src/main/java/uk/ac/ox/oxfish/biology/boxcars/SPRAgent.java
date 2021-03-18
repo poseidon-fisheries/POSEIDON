@@ -323,6 +323,22 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 },Double.NaN);
 
 
+
+        model.getYearlyDataSet().registerGatherer("Landings " + species + " " + surveyTag,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        double landings = 0;
+                        final double[][] observedLandings = sampler.getLandings();
+                        for (double[] landingsPerSubdivision : observedLandings) {
+                            for (double landingsPerBin : landingsPerSubdivision) {
+                                landings+=landingsPerBin;
+                            }
+                        }
+                        return landings;
+                    }
+                },Double.NaN);
+
         model.getYearlyDataSet().registerGatherer("Percentage Mature Catches " + species + " " + surveyTag,
                 new Gatherer<FishState>() {
                     @Override
@@ -371,6 +387,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                                                         species.getLength(subdivisionBinPair.getFirst(),
                                                                 subdivisionBinPair.getSecond()),
                                                         assumedVarB);
+
                                             }
                                         }
 

@@ -67,6 +67,7 @@ public class CounterTest {
         Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
         counter.start(mock(FishState.class));
         counter.count("Variable1",100);
+        counter.count("Variable2",100);
 
     }
 }

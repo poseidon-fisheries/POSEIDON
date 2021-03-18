@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ISlopeTACController implements AlgorithmFactory<AdditionalStartable> {
+public class ISlopeToTACControllerFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
     private String indicatorColumnName = "Species 0 CPUE";

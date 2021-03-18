@@ -45,7 +45,7 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
 
     private DoubleParameter maxChangeEachYear = new FixedDoubleParameter(.1);
 
-    private final String effortDefinition = "season";
+    private String effortDefinition = "season";
 
 
     private boolean blockEntryWhenSeasonIsNotFull = false;
@@ -158,5 +158,9 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
 
     public void setBlockEntryWhenSeasonIsNotFull(boolean blockEntryWhenSeasonIsNotFull) {
         this.blockEntryWhenSeasonIsNotFull = blockEntryWhenSeasonIsNotFull;
+    }
+
+    public void setEffortDefinition(String effortDefinition) {
+        this.effortDefinition = effortDefinition;
     }
 }

@@ -40,7 +40,7 @@ public class NoData718Slice7Policy {
     private static final int ADDITIONAL_YEARS_TO_RUN = 30;
     private static Path OUTPUT_FOLDER =
 
-            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("days");
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("lbspr");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
@@ -71,7 +71,7 @@ public class NoData718Slice7Policy {
 
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.closedDaysNotAdaptive;
+            NoData718Utilities.lbsprMsePoliciesNoEntry;
 
 
 

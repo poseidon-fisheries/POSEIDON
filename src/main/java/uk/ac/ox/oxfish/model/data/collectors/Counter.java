@@ -44,6 +44,14 @@ public class Counter implements Startable, Steppable
 
     private Stoppable receipt = null;
 
+    //some counters spend an inordinate amount of time
+    //updating the same column over and over again
+    //we can speed up the processing a lot by not inserting
+    //the last column (and just track its counts separately)
+    //until we absolutely need it
+    private String lazyColumnToInsert = null;
+    private double lazyValueToAdd = 0;
+
     public Counter(IntervalPolicy policy) {
         this.data = new LinkedHashMap<>();
         this.policy = policy;
@@ -61,6 +69,23 @@ public class Counter implements Startable, Steppable
          * reset all stuff
          */
         data.entrySet().forEach(datum -> datum.setValue(0d));
+    }
+
+
+    private void flushLazyValueInCounter(){
+        assert lazyColumnToInsert != null;
+        assert Double.isFinite(lazyValueToAdd);
+        data.compute(lazyColumnToInsert,
+                (s, oldValue) -> {
+                    if(oldValue==null)
+                        throw new NullPointerException("No column exists");
+                    else
+                        return oldValue + lazyValueToAdd;
+
+                });
+        lazyColumnToInsert = null;
+        lazyValueToAdd = 0;
+
     }
 
     /**
@@ -94,14 +119,13 @@ public class Counter implements Startable, Steppable
         if(add==0)
             return;
 
-        data.compute(columnName,
-                     (s, oldValue) -> {
-                         if(oldValue==null)
-                             throw new NullPointerException("No column exists");
-                         else
-                             return oldValue + add;
+        if(lazyColumnToInsert != null && lazyColumnToInsert != columnName)
+            flushLazyValueInCounter();
+        else {
+            lazyColumnToInsert = columnName;
+            lazyValueToAdd = lazyValueToAdd + add;
+        }
 
-                     });
     }
 
     /**
@@ -115,6 +139,8 @@ public class Counter implements Startable, Steppable
 
 
     public Double getColumn(String columnName){
+        if(lazyColumnToInsert!=null)
+            flushLazyValueInCounter();
         return data.get(columnName);
     }
 

@@ -387,7 +387,7 @@ public class Fisher implements Steppable, Startable{
             Log.trace("Fisher " + fisherID + " is going to start his step");
         }
 
-        //tell equipment!1003.347
+        //tell equipment!
         equipment.getBoat().newStep();
 
         //run the state machine
@@ -809,7 +809,8 @@ public class Fisher implements Steppable, Startable{
     {
         //preamble
         SeaTile here = status.getLocation();
-        Preconditions.checkState(here.isWater(), "can't fish on land!");
+        assert here.isWater() : "can't fish on land!";
+        //Preconditions.checkState(here.isWater(), );
         //compute the catches (but kill nothing yet)
         Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
                                                                localBiology,

@@ -6,9 +6,8 @@ import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.ISlopeTACController;
+import uk.ac.ox.oxfish.model.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
-import uk.ac.ox.oxfish.model.data.collectors.HerfindalIndexCollector;
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
@@ -54,7 +53,7 @@ public class AdditionalStartables {
         NAMES.put(HerfindalndexCollectorFactory.class, "Herfindal Index");
 
 
-        NAMES.put(ISlopeTACController.class, "ISlope-TAC Controller");
+        NAMES.put(ISlopeToTACControllerFactory.class, "ISlope-TAC Controller");
         NAMES.put(LastCatchToTACController.class, "Last catch as TAC Controller");
         NAMES.put(PIDControllerIndicatorTarget.class, "PID-TAC Controller");
         NAMES.put(LBSPREffortPolicyFactory.class, "LBSPR Effort Controller");
