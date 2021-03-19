@@ -29,8 +29,11 @@ import java.util.function.Function;
 public class SPR implements SPRFormula{
 
 
+    private final boolean removeSmallestPercentile;
 
-
+    public SPR(boolean removeSmallestPercentile) {
+        this.removeSmallestPercentile = removeSmallestPercentile;
+    }
 
     @Override
     public double computeSPR(SPRAgent sprAgent, StructuredAbundance abundance) {
@@ -44,7 +47,8 @@ public class SPR implements SPRFormula{
                 1000d,
                 sprAgent.getAssumedLengthBinCm(),
                 sprAgent.getAgeToWeightFunction(),
-                sprAgent.getAgeToMaturityFunction()
+                sprAgent.getAgeToMaturityFunction(),
+                removeSmallestPercentile
         );
     }
 
@@ -63,8 +67,11 @@ public class SPR implements SPRFormula{
             int maxSimulatedAge, //default = 100
             double initialVirginPopulation, //default 1000
             double lengthBinCm,
-            Function<Integer,Double> weightAtAgeFunction,
-            Function<Integer,Double> maturityAtAgeFunction
+            Function<Integer, Double> weightAtAgeFunction,
+            Function<Integer, Double> maturityAtAgeFunction,
+            //tnc formula actually removes the smallest percentile.
+            //this is actually quite useful in POSEIDON because we deal with fractional rather than real counts, most of the time!
+            boolean removeSmallestPercentile
 
     )
     {
@@ -105,15 +112,22 @@ public class SPR implements SPRFormula{
 
 
         //get the most frequent length (with respect to the 5cm bins, not the original species structure)
-        double mostFrequentLength = mostFrequentBin*lengthBinCm;
+        double mostFrequentLength = mostFrequentBin*lengthBinCm ;
         //get average length for all fish above mostFrequentLength
         double sumLengthAboveThreshold = 0;
         double sumAbundanceAbovethreshold = 0;
+
+        //quantile adjustments!
+        double adjustmentThreshold = removeSmallestPercentile ? catchAtLength.getTotalCount() * 0.01 : 0d;
+
+
         //also get the minimum length at which a catch occurred
         double minimumLengthCaught = Double.MAX_VALUE;
         for(int bin=0; bin< abundance.getBins(); bin++) {
+            double currentlyCounted = 0;
             for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
                 double currentAbundance = abundance.getAbundance(subdivision, bin);
+                currentlyCounted += currentAbundance;
                 if(currentAbundance > 0)
                 {
                     double currentLength = species.getLength(subdivision, bin);
@@ -122,7 +136,7 @@ public class SPR implements SPRFormula{
                         sumAbundanceAbovethreshold += currentAbundance;
 
                     }
-                    if(currentLength<minimumLengthCaught)
+                    if(currentlyCounted > adjustmentThreshold && currentLength<minimumLengthCaught)
                         minimumLengthCaught = currentLength;
                 }
             }

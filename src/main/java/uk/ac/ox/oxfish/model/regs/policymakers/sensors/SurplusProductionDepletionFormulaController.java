@@ -6,6 +6,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.SurplusProductionResult;
 import uk.ac.ox.oxfish.model.regs.policymakers.SurplusProductionStockAssessment;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
@@ -34,6 +35,10 @@ public class SurplusProductionDepletionFormulaController implements
 
     private int interval = 1;
     private int startingYear = 10;
+
+    private double lastAssessedCarryingCapacity = Double.NaN;
+    private double lastAssessedCurrentDepletion = Double.NaN;
+    private double lastAssessedLogisticGrowth = Double.NaN;
 
     @Override
     public AdditionalStartable apply(FishState fishState) {
@@ -78,6 +83,11 @@ public class SurplusProductionDepletionFormulaController implements
                             System.out.println("current_depletion: " + currentDepletion);
                             System.out.println("carrying_capacity: " + assessment.getCarryingCapacity());
                             System.out.println("logistic_growth: " + assessment.getLogisticGrowth());
+
+                            lastAssessedCarryingCapacity=assessment.getCarryingCapacity();
+                            lastAssessedCurrentDepletion=currentDepletion;
+                            lastAssessedLogisticGrowth=assessment.getLogisticGrowth();
+
                             if(tac<0)
                                 return minimumTAC.apply(fishState.getRandom());
 
@@ -92,6 +102,18 @@ public class SurplusProductionDepletionFormulaController implements
         return new AdditionalStartable() {
             @Override
             public void start(FishState model) {
+
+                model.getYearlyDataSet().registerGatherer("Last Assessed Carrying Capacity",
+                        (Gatherer<FishState>) fishState1 -> lastAssessedCarryingCapacity,Double.NaN
+                );
+                model.getYearlyDataSet().registerGatherer("Last Assessed Depletion",
+                        (Gatherer<FishState>) fishState1 -> lastAssessedCurrentDepletion,Double.NaN
+                );
+
+                model.getYearlyDataSet().registerGatherer("Last Assessed Logistic Growth",
+                        (Gatherer<FishState>) fishState1 -> lastAssessedLogisticGrowth,Double.NaN
+                );
+
 
                 model.scheduleOnceInXDays(
                         new Steppable() {

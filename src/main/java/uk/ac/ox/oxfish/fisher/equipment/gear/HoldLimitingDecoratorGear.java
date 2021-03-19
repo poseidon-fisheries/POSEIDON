@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
@@ -50,27 +51,35 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
                 new Catch(new StructuredAbundance[original.numberOfSpecies()], globalBiology) :
                 new Catch(new double[biomassArray.length]);
         } else {
-            //biomassArray gets changed as a side effect!
-            double proportionKept = Hold.throwOverboard(biomassArray, spaceLeft);
-            //if there isn't abundance information you are already done
-            if (!original.hasAbundanceInformation())
-                return new Catch(biomassArray);
-            else {
-                //otherwise reweigh
-                if (proportionKept >= 1)
-                    return original;
-                StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
-                for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
-                    //multiply every item by the proportion kept
-                    abundances[i] = new StructuredAbundance(original.getAbundance(i));
-                    double[][] structuredAbundance = abundances[i].asMatrix();
-                    for (int j = 0; j < structuredAbundance.length; j++)
-                        for (int k = 0; k < structuredAbundance[j].length; k++)
-                            structuredAbundance[j][k] *= proportionKept;
-                    //next species
-                }
-                return new Catch(abundances, globalBiology);
+            return boundCatchToLimit(original, globalBiology, biomassArray, spaceLeft);
+        }
+    }
+
+    @NotNull
+    public static Catch boundCatchToLimit(Catch original,
+                                           GlobalBiology globalBiology,
+                                           double[] biomassArray,
+                                           double maximumCatchAllowed) {
+        //biomassArray gets changed as a side effect!
+        double proportionKept = Hold.throwOverboard(biomassArray, maximumCatchAllowed);
+        //if there isn't abundance information you are already done
+        if (!original.hasAbundanceInformation())
+            return new Catch(biomassArray);
+        else {
+            //otherwise reweigh
+            if (proportionKept >= 1)
+                return original;
+            StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
+            for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
+                //multiply every item by the proportion kept
+                abundances[i] = new StructuredAbundance(original.getAbundance(i));
+                double[][] structuredAbundance = abundances[i].asMatrix();
+                for (int j = 0; j < structuredAbundance.length; j++)
+                    for (int k = 0; k < structuredAbundance[j].length; k++)
+                        structuredAbundance[j][k] *= proportionKept;
+                //next species
             }
+            return new Catch(abundances, globalBiology);
         }
     }
 

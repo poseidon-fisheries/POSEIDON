@@ -53,7 +53,7 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
                             public void step(SimState simState) {
                                 LoptEffortPolicy lopt = new LoptEffortPolicy(
                                         meanLengthColumnName,
-                                        bufferValue.apply(fishState.getRandom()),
+                                        1d-bufferValue.apply(fishState.getRandom()),
                                         targetLength.apply(fishState.getRandom()),
                                         howManyYearsToLookBackTo.apply(fishState.getRandom()).intValue(),
                                         effortActuators.get(effortDefinition),

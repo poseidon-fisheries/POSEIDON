@@ -10,7 +10,6 @@ import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
 import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.SurplusProductionStockAssessment;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -53,26 +52,71 @@ public class MeraOneSpeciesSlice1 {
                     return buildMaxDaysOutPolicy(150);
                 }
         );
+
+        //0 days at sea
+        TEST_POLICY_MAP.put("0_days",
+                fishState -> {
+                    return buildMaxDaysOutPolicy(0);
+                }
+        );
     }
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE =
             new LinkedHashMap<>();
     static {
         Iterable<String> actuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet();
-        boolean[] aggressiveType = new boolean[]{true,false};
+        boolean[] aggressiveType = new boolean[]{false};
         for (final String actuator : actuators) {
 
-            //policies that look at LBSPR
+//            //policies that look at LBSPR
             for (boolean aggressive : aggressiveType) {
+
+
+                //standard SPR
                 String name = "LBSPR_"+actuator;
                 if(aggressive)
                     name = name + "_aggressive";
+
+                String modifiedName = name + "_1.5mk";
+                EFFORT_ADAPTIVE.put(modifiedName,
+                        buildWrongMKLBSPRPolicy(actuator,
+                                aggressive,1.5));
+
+                modifiedName = name + "_1mk";
+                EFFORT_ADAPTIVE.put(modifiedName,
+                        buildWrongMKLBSPRPolicy(actuator,
+                                aggressive,1));
+
+
                 EFFORT_ADAPTIVE.put(name,
                         buildLBSPRPolicy(actuator,
-                                aggressive));
+                                aggressive, "SPR Lutjanus malabaricus spr_agent2", 1));
+
+
             }
 
             //policies that just look at Lopt
+            EFFORT_ADAPTIVE.put("LOPT_nobuffer_"+actuator,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    LoptEffortPolicyFactory regulation = new LoptEffortPolicyFactory();
+                                    regulation.setEffortDefinition(actuator);
+                                    regulation.setBlockEntryWhenSeasonIsNotFull(true);
+                                    regulation.setMeanLengthColumnName("Mean Length Caught Lutjanus malabaricus spr_agent2");
+                                    regulation.setStartingYear(0);
+                                    regulation.setBufferValue(new FixedDoubleParameter(1.0));
+                                    regulation.setTargetLength(new FixedDoubleParameter(67));
+                                    model.registerStartable(regulation.apply(model));
+
+                                }
+                            };
+                        }
+                    }
+            );
             EFFORT_ADAPTIVE.put("LOPT_"+actuator,
                     new AlgorithmFactory<AdditionalStartable>() {
                         @Override
@@ -85,6 +129,7 @@ public class MeraOneSpeciesSlice1 {
                                     regulation.setBlockEntryWhenSeasonIsNotFull(true);
                                     regulation.setMeanLengthColumnName("Mean Length Caught Lutjanus malabaricus spr_agent2");
                                     regulation.setStartingYear(0);
+                                    regulation.setTargetLength(new FixedDoubleParameter(67));
                                     model.registerStartable(regulation.apply(model));
 
                                 }
@@ -100,7 +145,9 @@ public class MeraOneSpeciesSlice1 {
     }
     @NotNull
     private static AlgorithmFactory<AdditionalStartable> buildLBSPRPolicy(final String effortType,
-                                                                          final boolean aggresssive) {
+                                                                          final boolean aggresssive,
+                                                                          final String sprColumnName,
+                                                                          final int yearsBeforeStart) {
         return new AlgorithmFactory<AdditionalStartable>() {
             @Override
             public AdditionalStartable apply(FishState fishState) {
@@ -110,10 +157,10 @@ public class MeraOneSpeciesSlice1 {
                         LBSPREffortPolicyFactory regulation = new LBSPREffortPolicyFactory();
                         regulation.setEffortDefinition(effortType);
                         if(aggresssive)
-                            regulation.setMaxChangeEachYear(new FixedDoubleParameter(.2));
+                            regulation.setMaxChangeEachYear(new FixedDoubleParameter(.9));
                         regulation.setBlockEntryWhenSeasonIsNotFull(true);
-                        regulation.setSprColumnName("SPR Lutjanus malabaricus spr_agent2");
-                        regulation.setStartingYear(0);
+                        regulation.setSprColumnName(sprColumnName);
+                        regulation.setStartingYear(yearsBeforeStart);
                         model.registerStartable(regulation.apply(model));
 
                     }
@@ -122,49 +169,67 @@ public class MeraOneSpeciesSlice1 {
         };
     }
 
+
+
+    private static AlgorithmFactory<AdditionalStartable> buildWrongMKLBSPRPolicy(final String effortType,
+                                                                                 final boolean aggresssive,
+                                                                                 double mkRatio){
+        String sprAgent =
+                "SPR Fixed Sample Agent:\n" +
+                        "      assumedKParameter: '" + 0.3775984 / mkRatio + "'\n" +
+                        "      assumedLengthAtMaturity: '50.0'\n" +
+                        "      assumedLengthBinCm: '5.0'\n" +
+                        "      assumedLinf: '86.0'\n" +
+                        "      assumedNaturalMortality: '0.3775984'\n" +
+                        "      assumedVarA: '0.00853'\n" +
+                        "      assumedVarB: '3.137'\n" +
+                        "      simulatedMaxAge: '100.0'\n" +
+                        "      simulatedVirginRecruits: '1000.0'\n" +
+                        "      speciesName: Lutjanus malabaricus\n" +
+                        "      surveyTag: spr_agent_forpolicy\n" +
+                        "      removeSmallestPercentile: true\n" +
+                        "      tagsToSample:\n" +
+                        "        population0: 18\n" +
+                        "      useTNCFormula: " + true;
+
+        FishYAML fishYAML = new FishYAML();
+        final AlgorithmFactory<? extends AdditionalStartable> sprStarter = fishYAML.loadAs(
+                sprAgent,
+                AlgorithmFactory.class);
+        return new AlgorithmFactory<AdditionalStartable>() {
+            @Override
+            public AdditionalStartable apply(FishState fishState) {
+
+                return new AdditionalStartable() {
+                    @Override
+                    public void start(FishState model) {
+                        (sprStarter.apply(fishState)).start(model);
+                        buildLBSPRPolicy(
+                                effortType,
+                                aggresssive,
+                                "SPR Lutjanus malabaricus spr_agent_forpolicy",
+                                1
+                        ).apply(fishState).start(model);
+                    }
+                };
+
+
+
+            }
+        };
+
+
+    }
+
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE =
             new LinkedHashMap<>();
     static{
         HashMap<String,String> nicknameOfIndexColumn = new LinkedHashMap<>();
+
+
+
         nicknameOfIndexColumn.put("cpue","CPUE Lutjanus malabaricus spr_agent2");
         nicknameOfIndexColumn.put("meanlength","Mean Length Caught Lutjanus malabaricus spr_agent2");
-        nicknameOfIndexColumn.put("accuratecpue","CPUE Lutjanus malabaricus");
-        nicknameOfIndexColumn.put("accuratecpho","CPHO Lutjanus malabaricus");
-
-        TAC_ADAPTIVE.put("schaefer",
-                new AlgorithmFactory<AdditionalStartable>() {
-                    @Override
-                    public AdditionalStartable apply(FishState fishState) {
-                        SurplusProductionDepletionFormulaController assessment =
-                                new SurplusProductionDepletionFormulaController();
-                        assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
-                        assessment.setCatchColumnName("Landings Lutjanus malabaricus spr_agent2");
-                        assessment.setStartingYear(0);
-                        return assessment.apply(fishState);
-
-                    }
-                }
-        );
-
-        TAC_ADAPTIVE.put("lastcatch", new AlgorithmFactory<AdditionalStartable>() {
-            @Override
-            public AdditionalStartable apply(FishState fishState) {
-                LastCatchToTACController controller = new LastCatchToTACController();
-                controller.setStartingYear(0);
-                return controller.apply(fishState);
-
-            }
-        });
-        TAC_ADAPTIVE.put("lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
-            @Override
-            public AdditionalStartable apply(FishState fishState) {
-                LastCatchToTACController controller = new LastCatchToTACController();
-                controller.setStartingYear(0);
-                controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
-                return controller.apply(fishState);
-
-            }
-        });
 
         for (Map.Entry<String, String> nickNameIndex : nicknameOfIndexColumn.entrySet()) {
 
@@ -183,6 +248,58 @@ public class MeraOneSpeciesSlice1 {
             );
 
 
+            TAC_ADAPTIVE.put("schaefer",
+                new AlgorithmFactory<AdditionalStartable>() {
+                    @Override
+                    public AdditionalStartable apply(FishState fishState) {
+                        SurplusProductionDepletionFormulaController assessment =
+                                new SurplusProductionDepletionFormulaController();
+                        assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
+                        assessment.setCatchColumnName("Landings Lutjanus malabaricus spr_agent2");
+                        assessment.setStartingYear(0);
+                        assessment.setCarryingCapacityMaximum(new FixedDoubleParameter(1.5E8));
+                        assessment.setCarryingCapacityMinimum(new FixedDoubleParameter(0.5E7));
+                        return assessment.apply(fishState);
+
+                    }
+                }
+        );
+
+        TAC_ADAPTIVE.put("lastcatch", new AlgorithmFactory<AdditionalStartable>() {
+            @Override
+            public AdditionalStartable apply(FishState fishState) {
+                LastCatchToTACController controller = new LastCatchToTACController();
+                controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                controller.setStartingYear(0);
+                return controller.apply(fishState);
+
+            }
+        });
+        TAC_ADAPTIVE.put("lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
+            @Override
+            public AdditionalStartable apply(FishState fishState) {
+                LastCatchToTACController controller = new LastCatchToTACController();
+                controller.setStartingYear(0);
+                controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
+                return controller.apply(fishState);
+
+            }
+        });
+        TAC_ADAPTIVE.put("lastcatch_50", new AlgorithmFactory<AdditionalStartable>() {
+            @Override
+            public AdditionalStartable apply(FishState fishState) {
+                LastCatchToTACController controller = new LastCatchToTACController();
+                controller.setStartingYear(0);
+                controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.5));
+                return controller.apply(fishState);
+
+            }
+        });
+
+
+
 
 
 
@@ -197,24 +314,51 @@ public class MeraOneSpeciesSlice1 {
 
     public static void main(String[] args) throws IOException {
 
+        if(args[0]=="rejectionSampling")
+            rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
+        else if(args[0]=="rejectionSampling_lowmk")
+            rejectionSampling("parameters_lowmk.yaml",
+                MAIN_DIRECTORY.resolve("lowmk").resolve("results"));
+
+
+        String typeOfPolicies = args[0];
+        LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies = null;
+        if(typeOfPolicies.equals("effort"))
+            selectedPolicies = EFFORT_ADAPTIVE;
+        if(typeOfPolicies.equals("test"))
+            selectedPolicies = TEST_POLICY_MAP;
+        if(typeOfPolicies.equals("tac"))
+            selectedPolicies = TAC_ADAPTIVE;
+        if(selectedPolicies==null)
+            throw new RuntimeException("failed to find the right type of policies");
+
+        Path pathToScenarioFiles = MAIN_DIRECTORY.resolve(args[1]);
+        Path pathToOutput = MAIN_DIRECTORY.resolve(args[2]);
+
+        runSetOfScenarios(pathToScenarioFiles,
+                pathToOutput,
+                selectedPolicies);
+
         //the rejection sampling bit
-        //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
+  //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
         //rejection sampling with lowmk
 //        rejectionSampling("parameters_lowmk.yaml",
 //                MAIN_DIRECTORY.resolve("lowmk").resolve("results"));
 
-        //running policy on rough scenarios
+//        running policy on rough scenarios
 //        runSetOfScenarios(MAIN_DIRECTORY.resolve("policy").resolve("rough_pass.csv"),
 //                MAIN_DIRECTORY.resolve("policy").resolve("rough").resolve("test"),
 //                TEST_POLICY_MAP
 //                );
-//        runSetOfScenarios(MAIN_DIRECTORY.resolve("lowmk").resolve("policy").resolve("rough_pass.csv"),
-//                MAIN_DIRECTORY.resolve("lowmk").resolve("policy").resolve("rough").resolve("test"),
-//                TEST_POLICY_MAP
-//                );
-//        runSetOfScenarios(MAIN_DIRECTORY.resolve("lowmk").resolve("policy").resolve("rough_pass.csv"),
-//                MAIN_DIRECTORY.resolve("lowmk").resolve("policy").resolve("rough").resolve("effort"),
+//
+//        runSetOfScenarios(MAIN_DIRECTORY.resolve("policy").resolve("rough_pass.csv"),
+//                MAIN_DIRECTORY.resolve("policy").resolve("rough").resolve("effort"),
 //                EFFORT_ADAPTIVE
+//        );
+
+//        runSetOfScenarios(MAIN_DIRECTORY.resolve("policy").resolve("rough_pass.csv"),
+//                MAIN_DIRECTORY.resolve("policy").resolve("rough").resolve("tac"),
+//                TAC_ADAPTIVE
 //        );
 
         //running policies on "best 100" (distance)
@@ -234,10 +378,10 @@ public class MeraOneSpeciesSlice1 {
 //                TEST_POLICY_MAP
 //        );
 
-                runSetOfScenarios(MAIN_DIRECTORY.resolve("policy").resolve("catchcurve_pass.csv"),
-                MAIN_DIRECTORY.resolve("policy").resolve("catchcurve").resolve("effort"),
-                EFFORT_ADAPTIVE
-        );
+//                runSetOfScenarios(MAIN_DIRECTORY.resolve("policy").resolve("catchcurve_pass.csv"),
+//                MAIN_DIRECTORY.resolve("policy").resolve("catchcurve").resolve("effort"),
+//                EFFORT_ADAPTIVE
+//        );
 
 
 //

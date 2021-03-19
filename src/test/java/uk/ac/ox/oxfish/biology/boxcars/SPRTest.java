@@ -82,7 +82,7 @@ public class SPRTest {
                     public Double apply(Integer age) {
                         return meristics.getLengthAtAge(age, 0) < 48 ? 0d : 1d;
                     }
-                }
+                }, false
 
         );
 
@@ -139,7 +139,7 @@ public class SPRTest {
                     public Double apply(Integer age) {
                         return meristics.getLengthAtAge(age, 0) < 34 ? 0d : 1d;
                     }
-                }
+                }, false
 
         );
 

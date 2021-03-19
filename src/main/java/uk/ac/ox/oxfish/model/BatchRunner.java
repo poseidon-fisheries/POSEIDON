@@ -160,8 +160,10 @@ public class BatchRunner
         for(String column : columnsToPrint) {
             DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
 
-            Preconditions.checkState(columnToPrint!=null, "Can't find column " + column);
-            columns.add(columnToPrint);
+            if(columnToPrint!=null) {
+                Preconditions.checkState(columnToPrint != null, "Can't find column " + column);
+                columns.add(columnToPrint);
+            }
         }
 
 

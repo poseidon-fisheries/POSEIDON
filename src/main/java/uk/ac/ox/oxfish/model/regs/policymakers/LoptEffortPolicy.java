@@ -57,7 +57,8 @@ public class LoptEffortPolicy extends Controller {
 
 
         double ratio =  meanLengthColumn / lengthTarget;
-        double effort = theoreticalSuggestedEffort *(1-buffer) * (0.5 + (1d-0.5) * ratio);
+        //TAE((1−buffer)(w+(1−w)r))
+        double effort = theoreticalSuggestedEffort *((1-buffer) * (0.5 + 0.5 * ratio));
 
         theoreticalSuggestedEffort = Math.max(Math.min(effort,theoreticalSuggestedEffort*(1d+maxChangePerYear)),
                                               theoreticalSuggestedEffort*(1d-maxChangePerYear));

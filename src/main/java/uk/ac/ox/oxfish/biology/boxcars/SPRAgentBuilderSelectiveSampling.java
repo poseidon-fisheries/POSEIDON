@@ -49,6 +49,12 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
     private boolean useTNCFormula = true;
 
 
+    /**
+     * if using TNC formula, shall we remove the smallest percentile of catches from the SPR?
+     * Both in real world and in the simulated one, it tends to improve numerical stability by quite a lot
+     */
+    private boolean removeSmallestPercentile = false;
+
     public SPRAgentBuilderSelectiveSampling() {
     }
 
@@ -109,7 +115,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
                 assumedVarA.apply(random),
                 assumedVarB.apply(random),
                 assumedLengthAtMaturity.apply(random),
-                useTNCFormula ? new SPR() : new LbSPRFormula()
+                useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
 
                 );
 
@@ -218,5 +224,13 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
 
     public void setUseTNCFormula(boolean useTNCFormula) {
         this.useTNCFormula = useTNCFormula;
+    }
+
+    public boolean isRemoveSmallestPercentile() {
+        return removeSmallestPercentile;
+    }
+
+    public void setRemoveSmallestPercentile(boolean removeSmallestPercentile) {
+        this.removeSmallestPercentile = removeSmallestPercentile;
     }
 }

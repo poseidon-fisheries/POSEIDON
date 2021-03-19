@@ -154,7 +154,7 @@ public class IndexTargetController extends Controller{
 
 
             for (Fisher fisher : model.getFishers()) {
-                if(model.getRandom().nextDouble()<=effortRatio)
+                if(model.getRandom().nextDouble()>effortRatio)
                     fisher.setRegulation(new FishingSeason(true,0));
                 else
                     fisher.setRegulation(new FishingSeason(true,365));
