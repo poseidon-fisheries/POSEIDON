@@ -49,11 +49,13 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 @SuppressWarnings("unused")
 public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<PurseSeinerFishingStrategy> {
 
+    private static final ActiveOpportunitiesFactory activeOpportunitiesFactory = new ActiveOpportunitiesFactory();
+
     private static final CacheByFishState<ActiveOpportunities> activeDolphinSetOpportunitiesCache =
-        new CacheByFishState<>(new ActiveOpportunitiesFactory());
+        new CacheByFishState<>(activeOpportunitiesFactory);
 
     private static final CacheByFishState<ActiveOpportunities> activeNonAssociatedSetOpportunitiesCache =
-        new CacheByFishState<>(new ActiveOpportunitiesFactory());
+        new CacheByFishState<>(activeOpportunitiesFactory);
 
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
