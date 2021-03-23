@@ -4,9 +4,9 @@ import com.google.common.collect.Ordering;
 import com.univocity.parsers.common.record.Record;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -30,6 +30,16 @@ public class CatchSamplersFactory
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler>> {
 
     private Path catchSamplesFile = input("set_samples.csv");
+    private SpeciesCodes speciesCodes;
+
+    @SuppressWarnings("unused")
+    public SpeciesCodes getSpeciesCodes() {
+        return speciesCodes;
+    }
+
+    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
+    }
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -63,9 +73,10 @@ public class CatchSamplersFactory
     private Collection<Double> getBiomasses(final Record record, final GlobalBiology globalBiology) {
         String[] columnNames = record.getMetaData().headers();
         return Arrays.stream(columnNames)
+            .filter(columnName -> !columnName.equals("set_type"))
             .flatMap(columnName -> stream(
                 Optional
-                    .ofNullable(TunaScenario.speciesNames.get(columnName.toUpperCase()))
+                    .of(speciesCodes.getSpeciesName(columnName.toUpperCase()))
                     .map(globalBiology::getSpecie)
                     .map(species -> entry(
                         species.getIndex(),

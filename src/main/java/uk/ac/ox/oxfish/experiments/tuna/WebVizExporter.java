@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -31,11 +33,7 @@ import uk.ac.ox.oxfish.model.data.webviz.JsonOutputPlugin;
 import uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.colours.ColourSeries;
 import uk.ac.ox.oxfish.model.data.webviz.events.SinglePeriodEventDefinitionBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.AverageNumberOfActiveFadsHeatmapBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.BiomassSnapshotHeatmapBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.FadSetCountingHeatmapBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.HeatmapBuilderFactory;
-import uk.ac.ox.oxfish.model.data.webviz.heatmaps.UnassociatedSetCountingHeatmapBuilderFactory;
+import uk.ac.ox.oxfish.model.data.webviz.heatmaps.*;
 import uk.ac.ox.oxfish.model.data.webviz.regions.SpecificRegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -57,14 +55,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.awt.Color.CYAN;
-import static java.awt.Color.GREEN;
-import static java.awt.Color.ORANGE;
-import static java.awt.Color.RED;
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
+import static java.awt.Color.*;
+import static java.time.Month.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.data.webviz.charts.ChartBuilderFactory.KG_TO_T_TRANSFORMER;
@@ -86,6 +78,8 @@ public final class WebVizExporter {
         basePath.resolve(Paths.get("poseidon-webviz", "public", "testdata"));
     private final Path csvOutputPath =
         basePath.resolve(Paths.get("tuna", "np", "runs", "webviz"));
+    private final SpeciesCodes speciesCodes =
+        new SpeciesCodesFromFileFactory(TunaScenario.input("species_codes.csv")).get();
 
     private final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
         new ActiveFadLimitsFactory();
@@ -105,9 +99,9 @@ public final class WebVizExporter {
             "When removing El Corralito closure, results do not differ significantly from business as usual scenario.",
             ImmutableList.of(currentFadLimits),
             scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                scenario.galapagosEezReg, TAG_FOR_ALL,
-                scenario.closureAReg, "closure A",
-                scenario.closureBReg, "closure B"
+                TunaScenario.galapagosEezReg, TAG_FOR_ALL,
+                TunaScenario.closureAReg, "closure A",
+                TunaScenario.closureBReg, "closure B"
             ))
         ),
         makePolicy(
@@ -127,16 +121,16 @@ public final class WebVizExporter {
             "Length of closure periods A and B increased by 40% (100 days instead of 72).",
             ImmutableList.of(currentFadLimits),
             scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                scenario.galapagosEezReg, TAG_FOR_ALL,
-                scenario.elCorralitoReg, TAG_FOR_ALL,
+                TunaScenario.galapagosEezReg, TAG_FOR_ALL,
+                TunaScenario.elCorralitoReg, TAG_FOR_ALL,
                 new TemporaryRegulationFactory(
-                    scenario.dayOfYear(JULY, 1),
-                    scenario.dayOfYear(OCTOBER, 8),
+                    TunaScenario.dayOfYear(JULY, 1),
+                    TunaScenario.dayOfYear(OCTOBER, 8),
                     new NoFishingFactory()
                 ), "closure A",
                 new TemporaryRegulationFactory(
-                    scenario.dayOfYear(NOVEMBER, 9),
-                    scenario.dayOfYear(FEBRUARY, 16),
+                    TunaScenario.dayOfYear(NOVEMBER, 9),
+                    TunaScenario.dayOfYear(FEBRUARY, 16),
                     new NoFishingFactory()
                 ), "closure B"
             ))
@@ -164,7 +158,7 @@ public final class WebVizExporter {
     @NotNull
     private JsonOutputManagerFactory makeJsonOutputManagerFactory(Runner<TunaScenario>.State runnerState) {
 
-        final Set<String> speciesNames = TunaScenario.speciesNames.values();
+        final Set<String> speciesNames = speciesCodes.getSpeciesNames();
 
         final JsonOutputManagerFactory jsonOutputManagerFactory = new JsonOutputManagerFactory();
         jsonOutputManagerFactory.setScenarioTitle(runnerState.getPolicy().getName());
