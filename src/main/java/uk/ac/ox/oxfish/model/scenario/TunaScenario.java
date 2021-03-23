@@ -19,16 +19,13 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
+import com.google.common.collect.*;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -70,8 +67,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -80,11 +77,7 @@ import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
-import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
+import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -104,29 +97,21 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static java.time.Month.JANUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
+import static java.time.Month.*;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.Measures.convert;
+import static uk.ac.ox.oxfish.utility.Measures.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -156,11 +141,10 @@ public class TunaScenario implements Scenario {
             //.put(EL_NINO, input("currents_el_nino.csv"))
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
-    public static final BiMap<String, String> speciesNames =
-        parseAllRecords(input("species_names.csv")).stream().collect(toImmutableBiMap(
-            r -> r.getString("species_code"),
-            r -> r.getString("species_name")
-        ));
+
+    private static final SpeciesCodesFromFileFactory speciesCodesFactory =
+        new SpeciesCodesFromFileFactory(input("species_codes.csv"));
+
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("2017_BET_DIST.csv"),
         "SKJ", input("2017_SKJ_DIST.csv"),
@@ -175,7 +159,6 @@ public class TunaScenario implements Scenario {
     private Path attractionWeightsFile = input("action_weights.csv");
     private Path mapFile = input("depth.csv");
     private Path iattcShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
-    private Path pricesFile = input("prices.csv");
     private Path boatsFile = input("boats.csv");
     private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
     private Path costsFile = input("costs.csv");
@@ -184,7 +167,6 @@ public class TunaScenario implements Scenario {
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             input("exogenous_catches.csv"),
             TARGET_YEAR,
-            (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode)),
             fadMortalityIncludedInExogenousCatches
         );
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(mapFile, 101, 0.5);
@@ -203,40 +185,13 @@ public class TunaScenario implements Scenario {
             false
         );
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
+    private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
+        new MarketMapFromPriceFileFactory(input("prices.csv"), TARGET_YEAR);
 
     public TunaScenario() {
-
         final SnapshotBiomassResetterFactory snapshotBiomassResetterFactory = new SnapshotBiomassResetterFactory();
         snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
         plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
-
-        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
-            galapagosEezReg, TAG_FOR_ALL,
-            elCorralitoReg, TAG_FOR_ALL,
-            closureAReg, "closure A",
-            closureBReg, "closure B"
-        ));
-
-        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
-        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
-            parseAllRecords(fadCarryingCapacitiesFile).stream()
-                .filter(r -> r.getInt("year") == TARGET_YEAR)
-                .collect(toMap(
-                    r -> speciesNames.get(r.getString("species_code")),
-                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
-                ))
-        );
-        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.05),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
-            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
-        ));
-
-        fisherDefinition.setRegulation(standardRegulations);
-        fisherDefinition.setGear(purseSeineGearFactory);
-        fisherDefinition.setFishingStrategy(new PurseSeinerFishingStrategyFactory());
-        fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
-        fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
     }
 
     public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
@@ -252,33 +207,47 @@ public class TunaScenario implements Scenario {
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
     }
 
+    @SuppressWarnings("unused")
+    public MarketMapFromPriceFileFactory getMarketMapFromPriceFileFactory() {
+        return marketMapFromPriceFileFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMarketMapFromPriceFileFactory(MarketMapFromPriceFileFactory marketMapFromPriceFileFactory) {
+        this.marketMapFromPriceFileFactory = marketMapFromPriceFileFactory;
+    }
+
     public Path getAttractionWeightsFile() { return attractionWeightsFile; }
 
-    @SuppressWarnings("unused") public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+    @SuppressWarnings("unused")
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
         this.attractionWeightsFile = attractionWeightsFile;
     }
 
-    @SuppressWarnings("unused") public Path getMapFile() { return mapFile; }
+    @SuppressWarnings("unused")
+    public Path getMapFile() { return mapFile; }
 
-    @SuppressWarnings("unused") public void setMapFile(Path mapFile) { this.mapFile = mapFile; }
+    @SuppressWarnings("unused")
+    public void setMapFile(Path mapFile) { this.mapFile = mapFile; }
 
-    @SuppressWarnings("unused") public Path getIattcShapeFile() { return iattcShapeFile; }
+    @SuppressWarnings("unused")
+    public Path getIattcShapeFile() { return iattcShapeFile; }
 
-    @SuppressWarnings("unused") public void setIattcShapeFile(Path iattcShapeFile) {
+    @SuppressWarnings("unused")
+    public void setIattcShapeFile(Path iattcShapeFile) {
         this.iattcShapeFile = iattcShapeFile;
     }
 
-    @SuppressWarnings("unused") public Path getPricesFile() { return pricesFile; }
-
-    @SuppressWarnings("unused") public void setPricesFile(Path pricesFile) { this.pricesFile = pricesFile; }
-
-    @SuppressWarnings("unused") public Path getBoatsFile() { return boatsFile; }
+    @SuppressWarnings("unused")
+    public Path getBoatsFile() { return boatsFile; }
 
     public void setBoatsFile(Path boatsFile) { this.boatsFile = boatsFile; }
 
-    @SuppressWarnings("unused") public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
+    @SuppressWarnings("unused")
+    public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
 
-    @SuppressWarnings("unused") public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) {
+    @SuppressWarnings("unused")
+    public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) {
         this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile;
     }
 
@@ -343,6 +312,10 @@ public class TunaScenario implements Scenario {
 
     @Override
     public ScenarioEssentials start(FishState model) {
+
+        System.out.println("Starting model...");
+
+        final SpeciesCodes speciesCodes = speciesCodesFactory.get();
         final BiologyInitializer biologyInitializer = biologyInitializers.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, globalBiology, model);
@@ -353,38 +326,53 @@ public class TunaScenario implements Scenario {
             nauticalMap, model.random, biologyInitializer, this.weatherInitializer.apply(model), globalBiology, model
         );
 
-        final Double gasPrice = gasPricePerLiter.apply(model.random);
-        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
+        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
+        purseSeineGearFactory.getCatchSamplers().setSpeciesCodes(speciesCodes);
+        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
+            parseAllRecords(fadCarryingCapacitiesFile).stream()
+                .filter(r -> r.getInt("year") == TARGET_YEAR)
+                .collect(toMap(
+                    r -> speciesCodes.getSpeciesName(r.getString("species_code")),
+                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
+                ))
+        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.05),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
+            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
+        ));
 
-        final MarketMap marketMap = makeMarketMap(globalBiology);
-        portInitializer
-            .buildPorts(nauticalMap, model.random, seaTile -> marketMap, model, gasPriceMaker)
-            .forEach(port -> port.setGasPricePerLiter(gasPrice));
+        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
+            galapagosEezReg, TAG_FOR_ALL,
+            elCorralitoReg, TAG_FOR_ALL,
+            closureAReg, "closure A",
+            closureBReg, "closure B"
+        ));
+
+        fisherDefinition.setRegulation(standardRegulations);
+        fisherDefinition.setGear(purseSeineGearFactory);
+        PurseSeinerFishingStrategyFactory fishingStrategy = new PurseSeinerFishingStrategyFactory();
+        fishingStrategy.setSpeciesCodes(speciesCodes);
+        fisherDefinition.setFishingStrategy(fishingStrategy);
+        fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
+        fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
-    }
-
-    private MarketMap makeMarketMap(GlobalBiology globalBiology) {
-        Map<String, Double> prices = parseAllRecords(pricesFile).stream()
-            .filter(
-                r -> r.getInt("year") == TARGET_YEAR
-            )
-            .collect(toMap(
-                r -> r.getString("species"),
-                r -> r.getDouble("price") / 1000.0 // convert price / tonne to price / kg
-            ));
-        final MarketMap marketMap = new MarketMap(globalBiology);
-        globalBiology.getSpecies().forEach(species -> {
-            final String speciesCode = speciesNames.inverse().get(species.getName());
-            marketMap.addMarket(species, new FixedPriceMarket(prices.get(speciesCode)));
-        });
-        return marketMap;
     }
 
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
-        System.out.println("populating model");
+        System.out.println("Populating model...");
+
+        final Double gasPrice = gasPricePerLiter.apply(model.random);
+        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
+
+        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
+        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(model);
+        portInitializer
+            .buildPorts(model.getMap(), model.random, seaTile -> marketMap, model, gasPriceMaker)
+            .forEach(port -> port.setGasPricePerLiter(gasPrice));
 
         final FadMap fadMap = (new FadMapFactory()).apply(model);
         model.setFadMap(fadMap);
@@ -394,8 +382,8 @@ public class TunaScenario implements Scenario {
         checkState(!ports.isEmpty());
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
+        PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) fisherDefinition.getGear();
 
-        final PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) fisherDefinition.getGear();
         final Monitors monitors = new Monitors(model);
         monitors.getMonitors().forEach(model::registerStartable);
 
@@ -488,6 +476,7 @@ public class TunaScenario implements Scenario {
 
         final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
 
+        exogenousCatchesFactory.setSpeciesCodes(speciesCodesFactory.get());
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
         model.registerStartable(exogenousCatches);
 
@@ -495,6 +484,33 @@ public class TunaScenario implements Scenario {
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
+    }
+
+    private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
+        String speciesCode,
+        double logisticGrowthRate,
+        Quantity<Mass> totalCarryingCapacity,
+        Quantity<Mass> totalBiomass
+    ) {
+        final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
+        factory.setSpeciesName(speciesCodesFactory.get().getSpeciesName(speciesCode));
+        factory.setGrower(new FadAwareLogisticGrowerFactory(logisticGrowthRate));
+        factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
+        factory.setBiomassSuppliedPerCell(false);
+        factory.setDifferentialPercentageToMove(new FixedDoubleParameter(0));
+
+        final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
+        factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
+
+        final FileBiomassAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
+        initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
+        initialCapacityAllocator.setInputFileHasHeader(true);
+        final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
+        polygonAllocatorFactory.setShapeFile(iattcShapeFile);
+        polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
+        factory.setInitialCapacityAllocator(polygonAllocatorFactory);
+
+        return factory;
     }
 
     /**
@@ -548,40 +564,14 @@ public class TunaScenario implements Scenario {
         fisher.getTags().add(oneOf(periods, rng));
     }
 
-    private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
-        String speciesCode,
-        double logisticGrowthRate,
-        Quantity<Mass> totalCarryingCapacity,
-        Quantity<Mass> totalBiomass
-    ) {
-        final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
-        factory.setSpeciesName(speciesNames.get(speciesCode));
-        factory.setGrower(new FadAwareLogisticGrowerFactory(logisticGrowthRate));
-        factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
-        factory.setBiomassSuppliedPerCell(false);
-        factory.setDifferentialPercentageToMove(new FixedDoubleParameter(0));
-
-        final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
-        factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
-
-        final FileBiomassAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
-        initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
-        initialCapacityAllocator.setInputFileHasHeader(true);
-        final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
-        polygonAllocatorFactory.setShapeFile(iattcShapeFile);
-        polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
-        factory.setInitialCapacityAllocator(polygonAllocatorFactory);
-
-        return factory;
-    }
-
     @SuppressWarnings("unused")
     public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() { return plugins; }
 
     @SuppressWarnings("unused")
     public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
 
-    @SuppressWarnings("unused") public Path getCostsFile() {
+    @SuppressWarnings("unused")
+    public Path getCostsFile() {
         return costsFile;
     }
 
@@ -589,7 +579,8 @@ public class TunaScenario implements Scenario {
         this.costsFile = costsFile;
     }
 
-    @SuppressWarnings("unused") public boolean isFadMortalityIncludedInExogenousCatches() {
+    @SuppressWarnings("unused")
+    public boolean isFadMortalityIncludedInExogenousCatches() {
         return fadMortalityIncludedInExogenousCatches;
     }
 

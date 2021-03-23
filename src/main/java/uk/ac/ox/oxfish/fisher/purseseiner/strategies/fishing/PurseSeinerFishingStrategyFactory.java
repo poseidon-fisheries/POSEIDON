@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
@@ -50,13 +51,11 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<PurseSeinerFishingStrategy> {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory = new ActiveOpportunitiesFactory();
-
     private static final CacheByFishState<ActiveOpportunities> activeDolphinSetOpportunitiesCache =
         new CacheByFishState<>(activeOpportunitiesFactory);
-
     private static final CacheByFishState<ActiveOpportunities> activeNonAssociatedSetOpportunitiesCache =
         new CacheByFishState<>(activeOpportunitiesFactory);
-
+    private SpeciesCodes speciesCodes;
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
     private double nonAssociatedSetGeneratorLogisticSteepness = 1;
@@ -66,7 +65,6 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double nonAssociatedSetDetectionProbability = 0.1;
     private double dolphinSetDetectionProbability = 0.1;
     private double opportunisticFadSetDetectionProbability = 0.1;
-
     private double searchActionLogisticMidpoint = 0.1;
     private double searchActionLogisticSteepness = 1;
     private double searchActionDecayConstant = 1;
@@ -82,6 +80,14 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double dolphinSetActionLogisticSteepness = 1;
     private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
+
+    public SpeciesCodes getSpeciesCodes() {
+        return speciesCodes;
+    }
+
+    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
+    }
 
     public double getFadSetActionLogisticSteepness() {
         return fadSetActionLogisticSteepness;
@@ -340,7 +346,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
             records.stream().collect(toImmutableMap(
                 r -> {
                     final String speciesCode = r.getString("species_code").toUpperCase();
-                    final String speciesName = TunaScenario.speciesNames.get(speciesCode);
+                    final String speciesName = speciesCodes.getSpeciesName(speciesCode);
                     return fishState.getBiology().getSpecie(speciesName);
                 },
                 r -> r.getDouble("weight")
