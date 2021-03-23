@@ -1,14 +1,17 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ISlopeToTACControllerFactory implements AlgorithmFactory<AdditionalStartable> {
+public class ISlopeTACController implements AlgorithmFactory<AdditionalStartable> {
 
 
     private String indicatorColumnName = "Species 0 CPUE";

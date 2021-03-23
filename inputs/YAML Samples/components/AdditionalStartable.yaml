@@ -43,6 +43,7 @@ SPR Agent:
   assumedVarA: '0.00853'
   assumedVarB: '3.137'
   probabilityOfSamplingEachBoat: '0.33'
+  removeSmallestPercentile: false
   simulatedMaxAge: '100.0'
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
@@ -59,6 +60,7 @@ SPR Selective Agent:
   assumedVarB: '3.137'
   probabilityOfSamplingEachTag: {
     }
+  removeSmallestPercentile: false
   simulatedMaxAge: '100.0'
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
@@ -73,6 +75,7 @@ SPR Fixed Sample Agent:
   assumedNaturalMortality: '0.3775984'
   assumedVarA: '0.00853'
   assumedVarB: '3.137'
+  removeSmallestPercentile: false
   simulatedMaxAge: '100.0'
   simulatedVirginRecruits: '1000.0'
   speciesName: Species 0
@@ -135,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2020-12-21'
+  startDate: '2021-03-22'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -180,6 +183,7 @@ PID-TAC Controller:
 LBSPR Effort Controller:
   blockEntryWhenSeasonIsNotFull: false
   cubicParameter: '0.3'
+  effortDefinition: season
   linearParameter: '0.05'
   maxChangeEachYear: '0.1'
   sprColumnName: SPR Lutjanus malabaricus spr_agent_total
@@ -205,6 +209,7 @@ LBSPR Effort Adaptive Controller:
       assumedVarA: '0.00853'
       assumedVarB: '3.137'
       probabilityOfSamplingEachBoat: '0.33'
+      removeSmallestPercentile: false
       simulatedMaxAge: '100.0'
       simulatedVirginRecruits: '1000.0'
       speciesName: Species 0
@@ -214,6 +219,14 @@ LBSPR Effort Adaptive Controller:
   startUpdatingMKAfterYear: '-1.0'
   startingYear: 7
   upperDiscrepancyThreshold: '-0.24'
+-------
+ITEControllerFactory:
+  blockEntryWhenSeasonIsNotFull: true
+  effortDefinition: season
+  indicatorColumnName: Average Trip Income
+  maxChangePerYear: '0.05'
+  multiplier: '1.0'
+  yearsBeforeStarting: 10
 -------
 Lopt Effort Controller:
   blockEntryWhenSeasonIsNotFull: false

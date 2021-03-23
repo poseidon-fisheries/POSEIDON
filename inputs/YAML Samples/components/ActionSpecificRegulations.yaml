@@ -1,13 +1,11 @@
 Active FAD limits:
-  limits:
-  - {
-    }
-  - {
-    }
-  - {
-    }
-  - {
-    }
+  limitClass1: 70
+  limitClass2: 70
+  limitClass3: 70
+  limitClass4: 120
+  limitClass5: 120
+  limitClass6a: 300
+  limitClass6b: 450
 -------
 General Set limits:
   limit: 2147483647

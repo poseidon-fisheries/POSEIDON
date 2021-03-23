@@ -4,9 +4,9 @@ Independent Logistic Grower:
 Common Logistic Grower:
   distributionalWeight: '-1.0'
   steepness: '0.7'
-  usesBeginningOfYearBiomassToGrow: false
 -------
-FAD-Aware Common Logistic Grower:
+FAD-Aware Logistic Grower:
   distributionalWeight: '-1.0'
   steepness: '0.7'
+  useLastYearBiomass: true
 -------

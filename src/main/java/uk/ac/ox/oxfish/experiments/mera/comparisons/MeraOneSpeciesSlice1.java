@@ -5,11 +5,12 @@ import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.ISlopeToTACControllerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
 import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicyFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -59,6 +60,87 @@ public class MeraOneSpeciesSlice1 {
                     return buildMaxDaysOutPolicy(0);
                 }
         );
+    }
+
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SCHAEFER_TEST =
+            new LinkedHashMap<>();
+
+    static{
+
+        SCHAEFER_TEST.put("schaefer_total",
+                new AlgorithmFactory<AdditionalStartable>() {
+                    @Override
+                    public AdditionalStartable apply(FishState fishState) {
+                        SurplusProductionDepletionFormulaController assessment =
+                                new SurplusProductionDepletionFormulaController();
+                        assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
+                        assessment.setCatchColumnName("Lutjanus malabaricus Landings");
+                        assessment.setStartingYear(0);
+                        assessment.setCarryingCapacityMaximum(new FixedDoubleParameter(1.5E8));
+                        assessment.setCarryingCapacityMinimum(new FixedDoubleParameter(0.5E7));
+                        return assessment.apply(fishState);
+
+                    }
+                }
+        );
+
+
+        SCHAEFER_TEST.put("schaefer_totalcatches",
+                new AlgorithmFactory<AdditionalStartable>() {
+                    @Override
+                    public AdditionalStartable apply(FishState fishState) {
+                        SurplusProductionDepletionFormulaController assessment =
+                                new SurplusProductionDepletionFormulaController();
+                        assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
+                        assessment.setCatchColumnName("Lutjanus malabaricus Catches (kg)");
+                        assessment.setStartingYear(0);
+                        assessment.setCarryingCapacityMaximum(new FixedDoubleParameter(1.5E8));
+                        assessment.setCarryingCapacityMinimum(new FixedDoubleParameter(0.5E7));
+                        return assessment.apply(fishState);
+
+                    }
+                }
+        );
+
+    }
+
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ITE =
+            new LinkedHashMap<>();
+
+    static{
+        Iterable<String> actuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet();
+        String[] indicators = new String[]{
+                "CPUE Lutjanus malabaricus spr_agent2",
+                "SPR Lutjanus malabaricus spr_agent2"
+        };
+        double[] multipliers = new double[]{1.0,1.5};
+        for(final String indicator : indicators){
+            for (final String actuator : actuators) {
+                for(double multiplier : multipliers){
+
+                    ITE.put("ITE10_"+actuator+"_"+multiplier+"_"+indicator,
+                            new AlgorithmFactory<AdditionalStartable>() {
+                                @Override
+                                public AdditionalStartable apply(FishState fishState) {
+                                    ITEControllerFactory iteControllerFactory =
+                                            new ITEControllerFactory();
+                                    iteControllerFactory.setMultiplier(new FixedDoubleParameter(multiplier));
+                                    iteControllerFactory.setIndicatorColumnName(indicator);
+                                    iteControllerFactory.setMaxChangePerYear(new FixedDoubleParameter(.1));
+                                    iteControllerFactory.setEffortDefinition(actuator);
+                                    iteControllerFactory.setBlockEntryWhenSeasonIsNotFull(true);
+                                    iteControllerFactory.setYearsBeforeStarting(0);
+                                    return iteControllerFactory.apply(fishState);
+
+                                }
+                            });
+
+
+
+                }
+
+            }
+        }
     }
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE =
@@ -203,7 +285,8 @@ public class MeraOneSpeciesSlice1 {
                 return new AdditionalStartable() {
                     @Override
                     public void start(FishState model) {
-                        (sprStarter.apply(fishState)).start(model);
+                        model.registerStartable(
+                                (sprStarter.apply(fishState)));
                         buildLBSPRPolicy(
                                 effortType,
                                 aggresssive,
@@ -233,6 +316,30 @@ public class MeraOneSpeciesSlice1 {
 
         for (Map.Entry<String, String> nickNameIndex : nicknameOfIndexColumn.entrySet()) {
 
+
+
+            TAC_ADAPTIVE.put("lastcatch", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setStartingYear(0);
+                    return controller.apply(fishState);
+
+                }
+            });
+            TAC_ADAPTIVE.put("lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setStartingYear(0);
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
+                    return controller.apply(fishState);
+
+                }
+            });
+
             String policyName = "islope"+nickNameIndex.getKey();
             TAC_ADAPTIVE.put(policyName,
                     new AlgorithmFactory<AdditionalStartable>() {
@@ -249,54 +356,33 @@ public class MeraOneSpeciesSlice1 {
 
 
             TAC_ADAPTIVE.put("schaefer",
-                new AlgorithmFactory<AdditionalStartable>() {
-                    @Override
-                    public AdditionalStartable apply(FishState fishState) {
-                        SurplusProductionDepletionFormulaController assessment =
-                                new SurplusProductionDepletionFormulaController();
-                        assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
-                        assessment.setCatchColumnName("Landings Lutjanus malabaricus spr_agent2");
-                        assessment.setStartingYear(0);
-                        assessment.setCarryingCapacityMaximum(new FixedDoubleParameter(1.5E8));
-                        assessment.setCarryingCapacityMinimum(new FixedDoubleParameter(0.5E7));
-                        return assessment.apply(fishState);
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            SurplusProductionDepletionFormulaController assessment =
+                                    new SurplusProductionDepletionFormulaController();
+                            assessment.setIndicatorColumnName("CPUE Lutjanus malabaricus spr_agent2");
+                            assessment.setCatchColumnName("Landings Lutjanus malabaricus spr_agent2");
+                            assessment.setStartingYear(0);
+                            assessment.setCarryingCapacityMaximum(new FixedDoubleParameter(1.5E8));
+                            assessment.setCarryingCapacityMinimum(new FixedDoubleParameter(0.5E7));
+                            return assessment.apply(fishState);
 
+                        }
                     }
+            );
+
+            TAC_ADAPTIVE.put("lastcatch_50", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setStartingYear(0);
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.5));
+                    return controller.apply(fishState);
+
                 }
-        );
-
-        TAC_ADAPTIVE.put("lastcatch", new AlgorithmFactory<AdditionalStartable>() {
-            @Override
-            public AdditionalStartable apply(FishState fishState) {
-                LastCatchToTACController controller = new LastCatchToTACController();
-                controller.setCatchColumnName("Lutjanus malabaricus Landings");
-                controller.setStartingYear(0);
-                return controller.apply(fishState);
-
-            }
-        });
-        TAC_ADAPTIVE.put("lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
-            @Override
-            public AdditionalStartable apply(FishState fishState) {
-                LastCatchToTACController controller = new LastCatchToTACController();
-                controller.setStartingYear(0);
-                controller.setCatchColumnName("Lutjanus malabaricus Landings");
-                controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
-                return controller.apply(fishState);
-
-            }
-        });
-        TAC_ADAPTIVE.put("lastcatch_50", new AlgorithmFactory<AdditionalStartable>() {
-            @Override
-            public AdditionalStartable apply(FishState fishState) {
-                LastCatchToTACController controller = new LastCatchToTACController();
-                controller.setStartingYear(0);
-                controller.setCatchColumnName("Lutjanus malabaricus Landings");
-                controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.5));
-                return controller.apply(fishState);
-
-            }
-        });
+            });
 
 
 
@@ -314,33 +400,40 @@ public class MeraOneSpeciesSlice1 {
 
     public static void main(String[] args) throws IOException {
 
-        if(args[0]=="rejectionSampling")
+        //java -jar oxfish_meraslice1.jar effort ./policy_new/distance_pass.csv ./policy_new/distance/effort
+        //java -jar oxfish_meraslice1.jar tac ./policy_new/distance_pass.csv ./policy_new/distance/tac
+        //java -jar oxfish_meraslice1.jar test ./policy_new/distance_pass.csv ./policy_new/distance/test
+        if(args[0].equals("rejectionSampling"))
             rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
-        else if(args[0]=="rejectionSampling_lowmk")
+        else if(args[0].equals("rejectionSampling_lowmk"))
             rejectionSampling("parameters_lowmk.yaml",
-                MAIN_DIRECTORY.resolve("lowmk").resolve("results"));
+                    MAIN_DIRECTORY.resolve("lowmk").resolve("results"));
+        else {
 
+            String typeOfPolicies = args[0];
+            LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies = null;
+            if (typeOfPolicies.equals("effort"))
+                selectedPolicies = EFFORT_ADAPTIVE;
+            if (typeOfPolicies.equals("test"))
+                selectedPolicies = TEST_POLICY_MAP;
+            if (typeOfPolicies.equals("tac"))
+                selectedPolicies = TAC_ADAPTIVE;
+            if (typeOfPolicies.equals("schaefer"))
+                selectedPolicies = SCHAEFER_TEST;
+            if (typeOfPolicies.equals("ite"))
+                selectedPolicies = ITE;
+            if (selectedPolicies == null)
+                throw new RuntimeException("failed to find the right type of policies");
 
-        String typeOfPolicies = args[0];
-        LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies = null;
-        if(typeOfPolicies.equals("effort"))
-            selectedPolicies = EFFORT_ADAPTIVE;
-        if(typeOfPolicies.equals("test"))
-            selectedPolicies = TEST_POLICY_MAP;
-        if(typeOfPolicies.equals("tac"))
-            selectedPolicies = TAC_ADAPTIVE;
-        if(selectedPolicies==null)
-            throw new RuntimeException("failed to find the right type of policies");
+            Path pathToScenarioFiles = MAIN_DIRECTORY.resolve(args[1]);
+            Path pathToOutput = MAIN_DIRECTORY.resolve(args[2]);
 
-        Path pathToScenarioFiles = MAIN_DIRECTORY.resolve(args[1]);
-        Path pathToOutput = MAIN_DIRECTORY.resolve(args[2]);
-
-        runSetOfScenarios(pathToScenarioFiles,
-                pathToOutput,
-                selectedPolicies);
-
+            runSetOfScenarios(pathToScenarioFiles,
+                    pathToOutput,
+                    selectedPolicies);
+        }
         //the rejection sampling bit
-  //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
+        //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
         //rejection sampling with lowmk
 //        rejectionSampling("parameters_lowmk.yaml",
 //                MAIN_DIRECTORY.resolve("lowmk").resolve("results"));

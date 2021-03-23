@@ -81,7 +81,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -325,13 +325,6 @@ Replicator:
       gravitationalConstant: '100.0'
       initialSpeed: '0.0'
 -------
-FAD Destination Strategy:
-  numberOfStepsToLookAheadForFadPositions: '10.0'
-  travelSpeedMultiplier: '1.0'
--------
-FAD Gravity Destination Strategy:
-  gravitationalConstraint: '1.0'
--------
 Generalized Cognitive Strategy:
   KExploration: '0.1'
   minAbsolute: '1.0'
@@ -343,4 +336,7 @@ Generalized Cognitive Strategy:
   weightLegal: '1.0'
   weightProfit: '1.0'
   weightReputation: '1.0'
+-------
+Gravity Destination Strategy:
+  maxTripDurationFile: inputs/tuna/boats.csv
 -------
