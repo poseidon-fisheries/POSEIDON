@@ -62,7 +62,7 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
         PIDController controller = new PIDController(
                 current,
                 target,
-                TargetToTACController.POLICY_TO_TAC_ACTUATOR,
+                TargetToTACController.POLICY_TO_ALLSPECIESTAC_ACTUATOR,
                 365,
                 0,
                 0,

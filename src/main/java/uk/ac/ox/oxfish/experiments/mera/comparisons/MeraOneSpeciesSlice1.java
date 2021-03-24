@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
+import com.beust.jcommander.internal.Lists;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -108,12 +109,13 @@ public class MeraOneSpeciesSlice1 {
             new LinkedHashMap<>();
 
     static{
-        Iterable<String> actuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet();
+        Iterable<String> actuators =
+                Lists.newArrayList("season","fleet");
         String[] indicators = new String[]{
                 "CPUE Lutjanus malabaricus spr_agent2",
                 "SPR Lutjanus malabaricus spr_agent2"
         };
-        double[] multipliers = new double[]{1.0,1.5};
+        double[] multipliers = new double[]{1.25,1.5};
         for(final String indicator : indicators){
             for (final String actuator : actuators) {
                 for(double multiplier : multipliers){
@@ -145,6 +147,11 @@ public class MeraOneSpeciesSlice1 {
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE =
             new LinkedHashMap<>();
+
+    private static final LinkedHashMap<String,AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE_ADDITIONAL =
+            new LinkedHashMap<>();
+
+
     static {
         Iterable<String> actuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet();
         boolean[] aggressiveType = new boolean[]{false};
@@ -169,6 +176,10 @@ public class MeraOneSpeciesSlice1 {
                         buildWrongMKLBSPRPolicy(actuator,
                                 aggressive,1));
 
+                modifiedName = name + "_0.6mk";
+                EFFORT_ADAPTIVE_ADDITIONAL.put(modifiedName,
+                        buildWrongMKLBSPRPolicy(actuator,
+                                aggressive,0.6));
 
                 EFFORT_ADAPTIVE.put(name,
                         buildLBSPRPolicy(actuator,
@@ -225,6 +236,9 @@ public class MeraOneSpeciesSlice1 {
 
 
     }
+
+
+
     @NotNull
     private static AlgorithmFactory<AdditionalStartable> buildLBSPRPolicy(final String effortType,
                                                                           final boolean aggresssive,
@@ -393,6 +407,86 @@ public class MeraOneSpeciesSlice1 {
         }
     }
 
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES =
+            new LinkedHashMap<>();
+    static{
+        HashMap<String,String> nicknameOfIndexColumn = new LinkedHashMap<>();
+
+
+
+        nicknameOfIndexColumn.put("cpue","CPUE Lutjanus malabaricus spr_agent2");
+        nicknameOfIndexColumn.put("meanlength","Mean Length Caught Lutjanus malabaricus spr_agent2");
+
+        for (Map.Entry<String, String> nickNameIndex : nicknameOfIndexColumn.entrySet()) {
+
+
+
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setStartingYear(0);
+                    controller.setTargetedSpecies("Lutjanus malabaricus");
+                    return controller.apply(fishState);
+
+                }
+            });
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setStartingYear(0);
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
+                    controller.setTargetedSpecies("Lutjanus malabaricus");
+
+                    return controller.apply(fishState);
+
+                }
+            });
+
+            String policyName = "multi_islope"+nickNameIndex.getKey();
+            TAC_ADAPTIVE_ONESPECIES.put(policyName,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            ISlopeToTACControllerFactory islope = new ISlopeToTACControllerFactory();
+                            islope.setCatchColumnName("Lutjanus malabaricus Landings");
+                            islope.setIndicatorColumnName(nickNameIndex.getValue());
+                            islope.setStartingYear(0);
+                            islope.setTargetedSpecies("Lutjanus malabaricus");
+
+                            return islope.apply(fishState);
+                        }
+                    }
+            );
+
+
+
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_50", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setStartingYear(0);
+                    controller.setTargetedSpecies("Lutjanus malabaricus");
+
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.5));
+                    return controller.apply(fishState);
+
+                }
+            });
+
+
+
+
+
+
+
+        }
+    }
+
 
 
     private static final Path MAIN_DIRECTORY =
@@ -414,10 +508,14 @@ public class MeraOneSpeciesSlice1 {
             LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies = null;
             if (typeOfPolicies.equals("effort"))
                 selectedPolicies = EFFORT_ADAPTIVE;
+            if (typeOfPolicies.equals("effort_additional"))
+                selectedPolicies = EFFORT_ADAPTIVE_ADDITIONAL;
             if (typeOfPolicies.equals("test"))
                 selectedPolicies = TEST_POLICY_MAP;
             if (typeOfPolicies.equals("tac"))
                 selectedPolicies = TAC_ADAPTIVE;
+            if (typeOfPolicies.equals("mtac"))
+                selectedPolicies = TAC_ADAPTIVE_ONESPECIES;
             if (typeOfPolicies.equals("schaefer"))
                 selectedPolicies = SCHAEFER_TEST;
             if (typeOfPolicies.equals("ite"))

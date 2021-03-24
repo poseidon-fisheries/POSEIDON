@@ -82,7 +82,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
     public void start(FishState model) {
 
         step(model);
-        receipt = model.scheduleEveryYear(this, StepOrder.DAWN);
+        receipt = model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
 
 
     }

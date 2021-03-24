@@ -256,19 +256,22 @@ public class IndexTargetController extends Controller{
         if(!Double.isFinite(newRatio))
             return lastPolicy;
 
+        double newPolicy = lastPolicy*newRatio;
+
         //keep it between 0 and 1
-        if(newRatio<MINIMUM_POLICY_ALLOWED)
-            newRatio=MINIMUM_POLICY_ALLOWED;
-        if(newRatio>1 && !canGoAboveZero)
-            newRatio=1;
+        if(newPolicy<MINIMUM_POLICY_ALLOWED)
+            newPolicy=MINIMUM_POLICY_ALLOWED;
+        if(newPolicy>1 && !canGoAboveZero)
+            newPolicy=1;
+
 
         //do not let it go past the maximum percentage change
-        if(newRatio> lastPolicy * (1+maxPercentageChange))
-            newRatio = lastPolicy * (1+maxPercentageChange);
-        if(newRatio< lastPolicy * (1-maxPercentageChange))
-            newRatio = lastPolicy * (1-maxPercentageChange);
+        if(newPolicy> lastPolicy * (1+maxPercentageChange))
+            newPolicy = lastPolicy * (1+maxPercentageChange);
+        if(newPolicy< lastPolicy * (1-maxPercentageChange))
+            newPolicy = lastPolicy * (1-maxPercentageChange);
 
-        lastPolicy = newRatio;
+        lastPolicy = newPolicy;
         return lastPolicy;
 
     }

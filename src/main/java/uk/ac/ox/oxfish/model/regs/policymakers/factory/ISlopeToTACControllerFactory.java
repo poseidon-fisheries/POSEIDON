@@ -17,6 +17,11 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
     private String indicatorColumnName = "Species 0 CPUE";
     private String catchColumnName = "Species 0 Landings";
 
+    /**
+     * does the quota affect all species, or is it specific to one? (notice that when that species quota is over, the whole fishery closes)
+     */
+    private String targetedSpecies = "";
+
     private DoubleParameter gainLambdaParameter = new FixedDoubleParameter(0.4);
 
     private DoubleParameter precautionaryScaling = new FixedDoubleParameter(0.8);
@@ -34,15 +39,28 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
                         new Steppable() {
                             @Override
                             public void step(SimState simState) {
-                                TargetToTACController controller = new TargetToTACController(
-                                        new ISlope(
-                                                catchColumnName,
-                                                indicatorColumnName,
-                                                gainLambdaParameter.apply(model.getRandom()),
-                                                precautionaryScaling.apply(model.getRandom()),
-                                                interval
-                                        )
-                                );
+                                TargetToTACController controller;
+                                if(targetedSpecies.trim().isEmpty())
+                                    controller = new TargetToTACController(
+                                            new ISlope(
+                                                    catchColumnName,
+                                                    indicatorColumnName,
+                                                    gainLambdaParameter.apply(model.getRandom()),
+                                                    precautionaryScaling.apply(model.getRandom()),
+                                                    interval
+                                            )
+                                    );
+                                else
+                                    controller = new TargetToTACController(
+                                            new ISlope(
+                                                    catchColumnName,
+                                                    indicatorColumnName,
+                                                    gainLambdaParameter.apply(model.getRandom()),
+                                                    precautionaryScaling.apply(model.getRandom()),
+                                                    interval
+                                            ),
+                                            targetedSpecies
+                                    );
                                 controller.start(model);
                                 controller.step(model);
                             }
@@ -102,6 +120,14 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
+    }
+
+    public String getTargetedSpecies() {
+        return targetedSpecies;
+    }
+
+    public void setTargetedSpecies(String targetedSpecies) {
+        this.targetedSpecies = targetedSpecies;
     }
 }
 

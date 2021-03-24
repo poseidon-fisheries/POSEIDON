@@ -18,6 +18,11 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
 
     private DoubleParameter catchesToTargetMultiplier = new FixedDoubleParameter(1);
 
+    /**
+     * does the quota affect all species, or is it specific to one? (notice that when that species quota is over, the whole fishery closes)
+     */
+    private String targetedSpecies = "";
+
 
     private String catchColumnName = "Species 0 Landings";
 
@@ -34,15 +39,25 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
                         new Steppable() {
                             @Override
                             public void step(SimState simState) {
-
-                                TargetToTACController controller = new TargetToTACController(
-                                        new FixedTargetAsMultipleOfOriginalObservation(
-                                                catchColumnName,
-                                                catchesToTargetMultiplier.apply(fishState.getRandom()),
-                                                1
-                                        ),
-                                        365
-                                );
+                                TargetToTACController controller;
+                                if(targetedSpecies.trim().isEmpty())
+                                    controller = new TargetToTACController(
+                                            new FixedTargetAsMultipleOfOriginalObservation(
+                                                    catchColumnName,
+                                                    catchesToTargetMultiplier.apply(fishState.getRandom()),
+                                                    1
+                                            ),
+                                            365
+                                    );
+                                else
+                                    controller = new TargetToTACController(
+                                            new FixedTargetAsMultipleOfOriginalObservation(
+                                                    catchColumnName,
+                                                    catchesToTargetMultiplier.apply(fishState.getRandom()),
+                                                    1
+                                            ),
+                                            365,
+                                            targetedSpecies);
                                 controller.start(model);
                                 controller.step(model);
                             }
@@ -79,5 +94,13 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
+    }
+
+    public String getTargetedSpecies() {
+        return targetedSpecies;
+    }
+
+    public void setTargetedSpecies(String targetedSpecies) {
+        this.targetedSpecies = targetedSpecies;
     }
 }

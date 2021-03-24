@@ -61,7 +61,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
             @Override
             public void start(FishState model) {
                 if(yearsBeforeStarting<=0)
-                    starterMethod(model,effortActuator);
+                    starterMethod(model,effortActuator).step(model);
                 else
                     fishState.scheduleOnceInXDays(
                             starterMethod(model, effortActuator),
