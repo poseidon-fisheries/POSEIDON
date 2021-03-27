@@ -49,6 +49,8 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
      */
     private int yearsBeforeStarting = 10;
 
+    private DoubleParameter yearsToLookBackForTarget = new FixedDoubleParameter(5);
+
     @Override
     public AdditionalStartable apply(FishState fishState) {
         Preconditions.checkArgument(LBSPREffortPolicyFactory.EFFORT_ACTUATORS.containsKey(effortDefinition),
@@ -87,7 +89,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
                                 new FixedTargetAsMultipleOfOriginalObservation(
                                         indicatorColumnName,
                                         multiplier.apply(model.getRandom()),
-                                        5
+                                        yearsToLookBackForTarget.apply(model.getRandom()).intValue()
                                 ),
                                 blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
                                         effortActuator, 365,
@@ -159,5 +161,13 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
 
     public void setYearsBeforeStarting(int yearsBeforeStarting) {
         this.yearsBeforeStarting = yearsBeforeStarting;
+    }
+
+    public DoubleParameter getYearsToLookBackForTarget() {
+        return yearsToLookBackForTarget;
+    }
+
+    public void setYearsToLookBackForTarget(DoubleParameter yearsToLookBackForTarget) {
+        this.yearsToLookBackForTarget = yearsToLookBackForTarget;
     }
 }
