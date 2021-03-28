@@ -107,6 +107,15 @@ public class TargetToTACController extends Controller {
                 itarget.getTimeInterval()*365);
     }
 
+    public TargetToTACController(
+            ITarget itarget,
+            String speciesAffectedByQuota
+    ){
+        this(itarget,
+                itarget.getTimeInterval()*365,
+                speciesAffectedByQuota);
+    }
+
 
     @Override
     public double computePolicy(double currentVariable,

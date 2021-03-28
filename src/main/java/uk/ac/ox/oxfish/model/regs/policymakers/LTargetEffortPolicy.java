@@ -1,12 +1,9 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Sensor;
-
-import java.util.DoubleSummaryStatistics;
 
 public class LTargetEffortPolicy extends Controller {
 
@@ -23,7 +20,7 @@ public class LTargetEffortPolicy extends Controller {
 
         super(
                 new PastAverageSensor(meanLengthColumnName,periodTimeInYears),
-                new FixedTargetAsMultipleOfOriginalObservation(meanLengthColumnName,1.0,
+                new UnchangingPastSensor(meanLengthColumnName,1.0,
                         periodTimeInYears*2),
                 closeEntryWhenNeeded ? new CloseReopenOnEffortDecorator(effortActuator):
                         effortActuator,
@@ -45,24 +42,25 @@ public class LTargetEffortPolicy extends Controller {
 
         suggestedEffort = oldPolicy * computePolicyMultiplier(recentAverageLength,
                 historicalAverageLength,
-                proportionAverageToTarget);
+                proportionAverageToTarget, 0.9);
         return suggestedEffort;
     }
 
 
-    public static double computePolicyMultiplier(double recentAverageLength,
-                                                 double historicalAverageLength,
-                                                 double proportionAverageToTarget){
+    public static double computePolicyMultiplier(double recentIndex,
+                                                 double historicalIndex,
+                                                 double proportionAverageToTarget,
+                                                 double proportionAverageToIndexZero){
 
-        double lZero = historicalAverageLength * 0.9;
-        final double lengthTarget = historicalAverageLength * proportionAverageToTarget;
+        double indexZero = historicalIndex * proportionAverageToIndexZero;
+        final double lengthTarget = historicalIndex * proportionAverageToTarget;
 
-        if(recentAverageLength < lZero)
-            return 0.5 * Math.pow(recentAverageLength/lZero,2);
+        if(recentIndex < indexZero)
+            return 0.5 * Math.pow(recentIndex/indexZero,2);
         else{
             //0.5 *   (1 + ((Lrecent - L0)/(Ltarget - L0)))
-            double numerator = recentAverageLength - lZero;
-            double denominator = lengthTarget - lZero;
+            double numerator = recentIndex - indexZero;
+            double denominator = lengthTarget - indexZero;
             return 0.5 * (1 + (numerator/denominator));
         }
 

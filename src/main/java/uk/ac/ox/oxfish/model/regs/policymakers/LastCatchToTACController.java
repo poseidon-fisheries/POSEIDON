@@ -5,8 +5,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -42,7 +41,7 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
                                 TargetToTACController controller;
                                 if(targetedSpecies.trim().isEmpty())
                                     controller = new TargetToTACController(
-                                            new FixedTargetAsMultipleOfOriginalObservation(
+                                            new UnchangingPastSensor(
                                                     catchColumnName,
                                                     catchesToTargetMultiplier.apply(fishState.getRandom()),
                                                     1
@@ -51,7 +50,7 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
                                     );
                                 else
                                     controller = new TargetToTACController(
-                                            new FixedTargetAsMultipleOfOriginalObservation(
+                                            new UnchangingPastSensor(
                                                     catchColumnName,
                                                     catchesToTargetMultiplier.apply(fishState.getRandom()),
                                                     1

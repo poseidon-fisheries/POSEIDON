@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.*;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -61,6 +62,7 @@ public class AdditionalStartables {
         NAMES.put(LBSPRffortPolicyAdaptingFactory.class, "LBSPR Effort Adaptive Controller");
         NAMES.put(ITEControllerFactory.class, "ITEControllerFactory");
         NAMES.put(LoptEffortPolicyFactory.class, "Lopt Effort Controller");
+        NAMES.put(ITargetTACFactory.class, "Itarget Controller");
         NAMES.put(SurplusProductionDepletionFormulaController.class,
                 "Schaefer Assessment Formula Controller");
         NAMES.put(SimpleFishSamplerFactory.class,

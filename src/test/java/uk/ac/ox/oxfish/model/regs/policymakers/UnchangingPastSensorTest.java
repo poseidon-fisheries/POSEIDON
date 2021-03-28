@@ -3,12 +3,12 @@ package uk.ac.ox.oxfish.model.regs.policymakers;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class FixedTargetAsMultipleOfOriginalObservationTest {
+public class UnchangingPastSensorTest {
 
     @Test
     public void targetIsSetCorrectly() {
@@ -29,8 +29,8 @@ public class FixedTargetAsMultipleOfOriginalObservationTest {
         FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(state.getYearlyDataSet().getColumn("indicator")).thenReturn(indicatorColumn);
 
-        FixedTargetAsMultipleOfOriginalObservation target =
-                new FixedTargetAsMultipleOfOriginalObservation("indicator",
+        UnchangingPastSensor target =
+                new UnchangingPastSensor("indicator",
                         1.5,3);
         assertEquals(target.scan(state),
                 1.4,.0001d);

@@ -335,7 +335,7 @@ public class ISlopeDemo {
                                                                                     indicator.getKey(),
                                                                                     1
                                                                             ),
-                                                                            new FixedTargetAsMultipleOfOriginalObservation(
+                                                                            new UnchangingPastSensor(
                                                                                     indicator.getKey(),
                                                                                     indicator.getValue(),
                                                                                     5
@@ -821,7 +821,7 @@ public class ISlopeDemo {
                                                                                         indicator.getKey(),
                                                                                         1
                                                                                 ),
-                                                                                new FixedTargetAsMultipleOfOriginalObservation(
+                                                                                new UnchangingPastSensor(
                                                                                         indicator.getKey(),
                                                                                         indicator.getValue(),
                                                                                         5

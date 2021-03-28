@@ -10,11 +10,11 @@ import java.util.function.Function;
 
 /**
  * mouthful for something relatively simple:
- * takes the ITarget way of setting a target: average indicator in the past X years
- * times a multiplier.
- * Once that's set, the sensor never updates its target
+ * the sensor looks at a column in the past, takes the average for however many steps asked
+ * maybe multiplies it by a value, and then when asked to sense again it just keeps returning
+ * the same number over and over again!
  */
-public class FixedTargetAsMultipleOfOriginalObservation implements
+public class UnchangingPastSensor implements
         Sensor<FishState,Double> {
 
 
@@ -22,12 +22,12 @@ public class FixedTargetAsMultipleOfOriginalObservation implements
 
 
     /**
-     * pipe observations through these, useful for rescaling: THIS HAPPENS BEFORE LOGGINg IT
+     * pipe observations through these, useful for rescaling:
      */
     private Function<Double,Double> indicatorTransformer = indicator -> indicator;
 
     /**
-     * Itarget is IAverage*IndicatorMultiplier
+     * do we need to multiply the average by something?
      */
     private final double indicatorMultiplier;
 
@@ -38,9 +38,16 @@ public class FixedTargetAsMultipleOfOriginalObservation implements
 
     private double targetSet = Double.NaN;
 
-    public FixedTargetAsMultipleOfOriginalObservation(String indicatorColumnName, double indicatorMultiplier, int yearsToLookBack) {
+    public UnchangingPastSensor(String indicatorColumnName, double indicatorMultiplier, int yearsToLookBack) {
         this.indicatorColumnName = indicatorColumnName;
         this.indicatorMultiplier = indicatorMultiplier;
+        this.yearsToLookBack = yearsToLookBack;
+    }
+
+
+    public UnchangingPastSensor(String indicatorColumnName, int yearsToLookBack) {
+        this.indicatorColumnName = indicatorColumnName;
+        this.indicatorMultiplier = 1.0;
         this.yearsToLookBack = yearsToLookBack;
     }
 

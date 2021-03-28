@@ -5,7 +5,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -42,8 +42,8 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
     @Override
     public AdditionalStartable apply(FishState fishState) {
 
-        FixedTargetAsMultipleOfOriginalObservation target = new
-                FixedTargetAsMultipleOfOriginalObservation(indicatorColumnName,
+        UnchangingPastSensor target = new
+                UnchangingPastSensor(indicatorColumnName,
                 indicatorMultiplier.apply(fishState.getRandom()),
                 numberOfYearsToLookBackForTarget);
 
@@ -53,8 +53,8 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
                 numberOfYearsToAverageForCurrent
         );
 
-        FixedTargetAsMultipleOfOriginalObservation offset = new
-                FixedTargetAsMultipleOfOriginalObservation(offsetColumnName,
+        UnchangingPastSensor offset = new
+                UnchangingPastSensor(offsetColumnName,
                 averageToOffsetMultiplier.apply(fishState.getRandom()),
                 numberOfYearsToAverageForOffset);
 

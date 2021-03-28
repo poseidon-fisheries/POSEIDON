@@ -6,12 +6,14 @@ import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LastCatchToTACController;
 import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.LTargetEffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
@@ -555,6 +557,10 @@ public class MeraOneSpeciesSlice1 {
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES =
             new LinkedHashMap<>();
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES_2 =
+            new LinkedHashMap<>();
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ITARGET =
+            new LinkedHashMap<>();
     static{
         HashMap<String,String> nicknameOfIndexColumn = new LinkedHashMap<>();
 
@@ -608,6 +614,131 @@ public class MeraOneSpeciesSlice1 {
                     }
             );
 
+            policyName = "multi_islope2"+nickNameIndex.getKey();
+            TAC_ADAPTIVE_ONESPECIES_2.put(policyName,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            ISlopeToTACControllerFactory islope = new ISlopeToTACControllerFactory();
+                            islope.setCatchColumnName("Lutjanus malabaricus Landings");
+                            islope.setIndicatorColumnName(nickNameIndex.getValue());
+                            islope.setPrecautionaryScaling(new FixedDoubleParameter(0.7));
+                            islope.setStartingYear(0);
+                            islope.setTargetedSpecies("Lutjanus malabaricus");
+
+                            return islope.apply(fishState);
+                        }
+                    }
+            );
+
+            policyName = "multi_islope3"+nickNameIndex.getKey();
+            TAC_ADAPTIVE_ONESPECIES_2.put(policyName,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            ISlopeToTACControllerFactory islope = new ISlopeToTACControllerFactory();
+                            islope.setCatchColumnName("Lutjanus malabaricus Landings");
+                            islope.setIndicatorColumnName(nickNameIndex.getValue());
+                            islope.setPrecautionaryScaling(new FixedDoubleParameter(0.6));
+                            islope.setStartingYear(0);
+                            islope.setTargetedSpecies("Lutjanus malabaricus");
+
+                            return islope.apply(fishState);
+                        }
+                    }
+            );
+
+            policyName = "multi_islope4"+nickNameIndex.getKey();
+            TAC_ADAPTIVE_ONESPECIES_2.put(policyName,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            ISlopeToTACControllerFactory islope = new ISlopeToTACControllerFactory();
+                            islope.setCatchColumnName("Lutjanus malabaricus Landings");
+                            islope.setIndicatorColumnName(nickNameIndex.getValue());
+                            islope.setPrecautionaryScaling(new FixedDoubleParameter(0.6));
+                            islope.setGainLambdaParameter(new FixedDoubleParameter(0.2));
+                            islope.setStartingYear(0);
+                            islope.setTargetedSpecies("Lutjanus malabaricus");
+
+                            return islope.apply(fishState);
+                        }
+                    }
+            );
+            for(boolean closeToo : new boolean[]{false,true}){
+                policyName = "multi_itarget1" + nickNameIndex.getKey();
+                if(closeToo)
+                    policyName = "closed_" + policyName;
+                TAC_ADAPTIVE_ITARGET.put(policyName,
+                        new AlgorithmFactory<AdditionalStartable>() {
+                            @Override
+                            public AdditionalStartable apply(FishState fishState) {
+                                ITargetTACFactory itarget = new ITargetTACFactory();
+                                itarget.setCatchColumnName("Lutjanus malabaricus Landings");
+                                itarget.setIndicatorColumnName(nickNameIndex.getValue());
+                                itarget.setPrecautionaryScaling(new FixedDoubleParameter(0));
+                                itarget.setIndicatorMultiplier(new FixedDoubleParameter(1.5));
+                                itarget.setInterval(5);
+                                itarget.setStartingYear(0);
+                                itarget.setTargetedSpecies("Lutjanus malabaricus");
+
+                                if(closeToo)
+                                    for (EntryPlugin entryPlugin : fishState.getEntryPlugins()) {
+                                        entryPlugin.setEntryPaused(true);
+                                    }
+                                return itarget.apply(fishState);
+                            }
+                        }
+                );
+                policyName = "multi_itarget1_70" + nickNameIndex.getKey();
+                if(closeToo)
+                    policyName = "closed_" + policyName;
+                TAC_ADAPTIVE_ITARGET.put(policyName,
+                        new AlgorithmFactory<AdditionalStartable>() {
+                            @Override
+                            public AdditionalStartable apply(FishState fishState) {
+                                ITargetTACFactory itarget = new ITargetTACFactory();
+                                itarget.setCatchColumnName("Lutjanus malabaricus Landings");
+                                itarget.setIndicatorColumnName(nickNameIndex.getValue());
+                                itarget.setPrecautionaryScaling(new FixedDoubleParameter(0.3));
+                                itarget.setIndicatorMultiplier(new FixedDoubleParameter(1.5));
+                                itarget.setInterval(5);
+                                itarget.setStartingYear(0);
+                                itarget.setTargetedSpecies("Lutjanus malabaricus");
+
+                                if(closeToo)
+                                    for (EntryPlugin entryPlugin : fishState.getEntryPlugins()) {
+                                        entryPlugin.setEntryPaused(true);
+                                    }
+                                return itarget.apply(fishState);
+                            }
+                        }
+                );
+                policyName = "multi_itarget4" + nickNameIndex.getKey();
+                if(closeToo)
+                    policyName = "closed_" + policyName;
+                TAC_ADAPTIVE_ITARGET.put(policyName,
+                        new AlgorithmFactory<AdditionalStartable>() {
+                            @Override
+                            public AdditionalStartable apply(FishState fishState) {
+                                ITargetTACFactory itarget = new ITargetTACFactory();
+                                itarget.setCatchColumnName("Lutjanus malabaricus Landings");
+                                itarget.setIndicatorColumnName(nickNameIndex.getValue());
+                                itarget.setPrecautionaryScaling(new FixedDoubleParameter(0.3));
+                                itarget.setIndicatorMultiplier(new FixedDoubleParameter(2.5));
+                                itarget.setInterval(5);
+                                itarget.setStartingYear(0);
+                                itarget.setTargetedSpecies("Lutjanus malabaricus");
+
+                                if(closeToo)
+                                    for (EntryPlugin entryPlugin : fishState.getEntryPlugins()) {
+                                        entryPlugin.setEntryPaused(true);
+                                    }
+                                return itarget.apply(fishState);
+                            }
+                        }
+                );
+            }
 
 
             TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_50", new AlgorithmFactory<AdditionalStartable>() {
@@ -662,10 +793,14 @@ public class MeraOneSpeciesSlice1 {
                 selectedPolicies = TAC_ADAPTIVE;
             if (typeOfPolicies.equals("mtac"))
                 selectedPolicies = TAC_ADAPTIVE_ONESPECIES;
+            if (typeOfPolicies.equals("mtac2"))
+                selectedPolicies = TAC_ADAPTIVE_ONESPECIES_2;
             if (typeOfPolicies.equals("schaefer"))
                 selectedPolicies = SCHAEFER_TEST;
             if (typeOfPolicies.equals("ite"))
                 selectedPolicies = ITE;
+            if (typeOfPolicies.equals("itarget"))
+                selectedPolicies = TAC_ADAPTIVE_ITARGET;
             if (typeOfPolicies.equals("wrongite"))
                 selectedPolicies = ITEWRONG;
             if (typeOfPolicies.equals("ltargete"))

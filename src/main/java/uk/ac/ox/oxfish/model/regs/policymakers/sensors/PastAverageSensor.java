@@ -11,12 +11,12 @@ import java.util.function.Function;
 public class PastAverageSensor implements Sensor<FishState,Double> {
 
 
-    private final  FixedTargetAsMultipleOfOriginalObservation delegate;
+    private final UnchangingPastSensor delegate;
 
 
     public PastAverageSensor(String indicatorColumnName, int yearsToLookBack) {
 
-        delegate = new FixedTargetAsMultipleOfOriginalObservation(
+        delegate = new UnchangingPastSensor(
                 indicatorColumnName,
                 1d,
                 yearsToLookBack

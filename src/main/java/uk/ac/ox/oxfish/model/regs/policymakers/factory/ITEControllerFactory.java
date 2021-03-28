@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.CloseReopenOnEffortDecorator;
 import uk.ac.ox.oxfish.model.regs.policymakers.IndexTargetController;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.FixedTargetAsMultipleOfOriginalObservation;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
@@ -86,7 +86,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
                                         indicatorColumnName,
                                         1
                                 ),
-                                new FixedTargetAsMultipleOfOriginalObservation(
+                                new UnchangingPastSensor(
                                         indicatorColumnName,
                                         multiplier.apply(model.getRandom()),
                                         yearsToLookBackForTarget.apply(model.getRandom()).intValue()
