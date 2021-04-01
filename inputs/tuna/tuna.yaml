@@ -1,79 +1,5 @@
 Tuna:
   attractionWeightsFile: inputs/tuna/action_weights.csv
-  biologyInitializers:
-    Multiple Species Biomass:
-      addImaginarySpecies: false
-      constantBiomass: false
-      factories:
-      - Single Species Biomass Normalized:
-          biomassSuppliedPerCell: false
-          carryingCapacity: '1.44094E9'
-          differentialPercentageToMove: '0.0'
-          grower:
-            FAD-Aware Logistic Grower:
-              distributionalWeight: '-1.0'
-              steepness: '0.265079184'
-              useLastYearBiomass: true
-          initialBiomassAllocator:
-            Equal Allocation:
-              constantValue: '0.2340305633822366'
-          initialCapacityAllocator:
-            Shape File Allocator:
-              delegate:
-                From File Allocator:
-                  biomassPath: inputs/tuna/2017_BET_DIST.csv
-                  inputFileHasHeader: true
-              insidePolygon: true
-              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
-          percentageLimitOnDailyMovement: '0.01'
-          speciesName: Bigeye tuna
-          unfishable: false
-      - Single Species Biomass Normalized:
-          biomassSuppliedPerCell: false
-          carryingCapacity: '4.776E9'
-          differentialPercentageToMove: '0.0'
-          grower:
-            FAD-Aware Logistic Grower:
-              distributionalWeight: '-1.0'
-              steepness: '1.1520938023450586'
-              useLastYearBiomass: true
-          initialBiomassAllocator:
-            Equal Allocation:
-              constantValue: '0.7468946817420435'
-          initialCapacityAllocator:
-            Shape File Allocator:
-              delegate:
-                From File Allocator:
-                  biomassPath: inputs/tuna/2017_SKJ_DIST.csv
-                  inputFileHasHeader: true
-              insidePolygon: true
-              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
-          percentageLimitOnDailyMovement: '0.01'
-          speciesName: Skipjack tuna
-          unfishable: false
-      - Single Species Biomass Normalized:
-          biomassSuppliedPerCell: false
-          carryingCapacity: '1.20277E9'
-          differentialPercentageToMove: '0.0'
-          grower:
-            FAD-Aware Logistic Grower:
-              distributionalWeight: '-1.0'
-              steepness: '0.878915170814038'
-              useLastYearBiomass: true
-          initialBiomassAllocator:
-            Equal Allocation:
-              constantValue: '0.42177224240711025'
-          initialCapacityAllocator:
-            Shape File Allocator:
-              delegate:
-                From File Allocator:
-                  biomassPath: inputs/tuna/2017_YFT_DIST.csv
-                  inputFileHasHeader: true
-              insidePolygon: true
-              shapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
-          percentageLimitOnDailyMovement: '0.01'
-          speciesName: Yellowfin tuna
-          unfishable: false
   boatsFile: inputs/tuna/boats.csv
   costsFile: inputs/tuna/costs.csv
   fadCarryingCapacitiesFile: inputs/tuna/fad_carrying_capacities.csv
@@ -203,7 +129,6 @@ Tuna:
     usePredictors: false
     weatherStrategy: Ignore Weather
   gasPricePerLiter: '0.01'
-  iattcShapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
   mapFile: inputs/tuna/depth.csv
   mapInitializer:
     From File Map:
@@ -212,11 +137,21 @@ Tuna:
       latLong: true
       mapFile: inputs/tuna/depth.csv
       mapPaddingInDegrees: '0.5'
+  marketMapFromPriceFileFactory:
+    priceFilePath: inputs/tuna/prices.csv
+    speciesCodes: null
+    targetYear: 2017
   plugins:
   - Biomass Snapshot Resetter:
       restoreOriginalLocations: true
       yearsToReset: 1
-  pricesFile: inputs/tuna/prices.csv
+  scheduledBiomassRelocator:
+    Scheduled Biomass Relocator Factory:
+      biomassAreaShapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+      biomassDistributionsFilePath: inputs/tuna/biomass_distributions.csv
+      endDate: '2017-12-31'
+      schaeferParamsFile: inputs/tuna/schaefer_params.csv
+      startDate: '2017-01-01'
   weatherInitializer:
     Constant Weather:
       temperature: '30.0'

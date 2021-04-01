@@ -55,7 +55,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         new CacheByFishState<>(activeOpportunitiesFactory);
     private static final CacheByFishState<ActiveOpportunities> activeNonAssociatedSetOpportunitiesCache =
         new CacheByFishState<>(activeOpportunitiesFactory);
-    private SpeciesCodes speciesCodes;
+    private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
     private double nonAssociatedSetGeneratorLogisticSteepness = 1;
@@ -80,14 +80,6 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double dolphinSetActionLogisticSteepness = 1;
     private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
-
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
-    }
-
-    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
-    }
 
     public double getFadSetActionLogisticSteepness() {
         return fadSetActionLogisticSteepness;
