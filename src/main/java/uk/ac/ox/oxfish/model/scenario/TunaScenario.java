@@ -143,7 +143,6 @@ public class TunaScenario implements Scenario {
     private final FromSimpleFilePortInitializer portInitializer =
         new FromSimpleFilePortInitializer(TARGET_YEAR, input("ports.csv"));
 
-    //private ScheduledBiomassRelocatorFactory scheduledBiomassRelocator = new ScheduledBiomassRelocatorFactory();
     private Path attractionWeightsFile = input("action_weights.csv");
     private Path mapFile = input("depth.csv");
     private Path boatsFile = input("boats.csv");
@@ -167,8 +166,41 @@ public class TunaScenario implements Scenario {
     private ScheduledBiomassReallocatorInitializerFactory scheduledBiomassRelocator = new ScheduledBiomassReallocatorInitializerFactory();
 
     public TunaScenario() {
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+
         final SnapshotBiomassResetterFactory snapshotBiomassResetterFactory = new SnapshotBiomassResetterFactory();
         snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
+
+        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
+        purseSeineGearFactory.getCatchSamplers().setSpeciesCodes(speciesCodes);
+        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
+            parseAllRecords(fadCarryingCapacitiesFile).stream()
+                .filter(r -> r.getInt("year") == TARGET_YEAR)
+                .collect(toMap(
+                    r -> speciesCodes.getSpeciesName(r.getString("species_code")),
+                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
+                ))
+        );
+        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.05),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
+            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
+        ));
+
+        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
+            galapagosEezReg, TAG_FOR_ALL,
+            elCorralitoReg, TAG_FOR_ALL,
+            closureAReg, "closure A",
+            closureBReg, "closure B"
+        ));
+
+        fisherDefinition.setRegulation(standardRegulations);
+        fisherDefinition.setGear(purseSeineGearFactory);
+        PurseSeinerFishingStrategyFactory fishingStrategy = new PurseSeinerFishingStrategyFactory();
+        fisherDefinition.setFishingStrategy(fishingStrategy);
+        fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
+        fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
+
         plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
     }
 
@@ -275,8 +307,6 @@ public class TunaScenario implements Scenario {
 
         System.out.println("Starting model...");
 
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
-
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, null, model);
         scheduledBiomassRelocator.setMapExtent(new MapExtent(nauticalMap));
         final ScheduledBiomassReallocatorInitializer biologyInitializer = scheduledBiomassRelocator.apply(model);
@@ -292,37 +322,6 @@ public class TunaScenario implements Scenario {
             globalBiology,
             model
         );
-
-        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
-        purseSeineGearFactory.getCatchSamplers().setSpeciesCodes(speciesCodes);
-        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
-            parseAllRecords(fadCarryingCapacitiesFile).stream()
-                .filter(r -> r.getInt("year") == TARGET_YEAR)
-                .collect(toMap(
-                    r -> speciesCodes.getSpeciesName(r.getString("species_code")),
-                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
-                ))
-        );
-        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.05),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
-            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
-        ));
-
-        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
-            galapagosEezReg, TAG_FOR_ALL,
-            elCorralitoReg, TAG_FOR_ALL,
-            closureAReg, "closure A",
-            closureBReg, "closure B"
-        ));
-
-        fisherDefinition.setRegulation(standardRegulations);
-        fisherDefinition.setGear(purseSeineGearFactory);
-        PurseSeinerFishingStrategyFactory fishingStrategy = new PurseSeinerFishingStrategyFactory();
-        fishingStrategy.setSpeciesCodes(speciesCodes);
-        fisherDefinition.setFishingStrategy(fishingStrategy);
-        fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
-        fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
