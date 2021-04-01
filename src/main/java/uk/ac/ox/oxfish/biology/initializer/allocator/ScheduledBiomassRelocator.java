@@ -1,28 +1,18 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import com.google.common.collect.ImmutableMap;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
+import java.util.Optional;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Streams.stream;
 
 /**
  * Redistributes the biomass around according to a "schedule" that maps a simulation step to a grid index.
@@ -34,47 +24,51 @@ import static com.google.common.collect.Streams.stream;
  */
 public class ScheduledBiomassRelocator implements Steppable {
 
-    private final Map<String, List<DoubleGrid2D>> biomassGrids;
-    private final IntUnaryOperator schedule;
+    private final Map<Integer, Map<String, DoubleGrid2D>> biomassGrids;
+    private final int period;
 
     /**
-     * @param biomassGrids A map from species names to collection of biomass grids
-     * @param schedule     A function from a simulation step to the desired index in the grids collection.
+     * @param biomassGrids A map from time step to species names to biomass grid
+     * @param period       The number to use as modulo for looping the schedule (normally 365)
      */
     public ScheduledBiomassRelocator(
-        Map<String, Collection<DoubleGrid2D>> biomassGrids,
-        IntUnaryOperator schedule
+        Map<Integer, Map<String, DoubleGrid2D>> biomassGrids,
+        int period
     ) {
-        this.biomassGrids = biomassGrids.entrySet().stream()
-            .collect(toImmutableMap(
-                Entry::getKey,
-                entry -> entry.getValue().stream().map(this::normalize).collect(toImmutableList())
-            ));
-        this.schedule = schedule;
+        this.biomassGrids = biomassGrids;
+        this.period = period;
     }
 
-    private DoubleGrid2D normalize(DoubleGrid2D grid) {
-        double sum = Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum();
-        return new DoubleGrid2D(grid).multiply(1 / sum);
+    public Map<Integer, Map<String, DoubleGrid2D>> getBiomassGrids() {
+        return biomassGrids;
     }
 
+    public int getPeriod() {
+        return period;
+    }
+
+    /**
+     * This is meant to be executed every step, but will do the reallocation if we have one scheduled on that step
+     */
     @Override
     public void step(SimState simState) {
         FishState fishState = (FishState) simState;
-        reallocate(fishState.getBiology(), fishState.getMap(), fishState.getStep());
+        if (fishState.getStep() > 0) // skip first step; we must rely on the initial allocators for that one
+            reallocate(fishState.getStep() % period, fishState.getBiology(), fishState.getMap());
     }
 
+    /**
+     * Reallocates biomass by mutating the biomass array of sea tiles directly.
+     * Only affects tiles with a {@code BiomassLocalBiology}.
+     */
     public void reallocate(
+        int gridIndex,
         GlobalBiology globalBiology,
-        NauticalMap nauticalMap,
-        int step
+        NauticalMap nauticalMap
     ) {
-        ImmutableMap<Species, Double> speciesBiomasses =
-            globalBiology.getSpecies().stream().collect(toImmutableMap(
-                Function.identity(),
-                nauticalMap::getTotalBiomass
-            ));
-        reallocate(speciesBiomasses, nauticalMap.getAllSeaTilesExcludingLandAsList(), step);
+        Optional
+            .ofNullable(biomassGrids.get(gridIndex)) // only run if we have a grid for that step
+            .ifPresent(grids -> reallocate(grids, globalBiology, nauticalMap));
     }
 
     /**
@@ -82,28 +76,27 @@ public class ScheduledBiomassRelocator implements Steppable {
      * Only affects tiles with a {@code BiomassLocalBiology}.
      */
     public void reallocate(
-        Map<Species, Double> totalBiomasses,
-        Iterable<SeaTile> seaTiles,
-        int step
+        Map<String, DoubleGrid2D> grids,
+        GlobalBiology globalBiology,
+        NauticalMap nauticalMap
     ) {
 
-        List<DoubleGrid2D> biomassGrids = totalBiomasses.entrySet()
-            .stream()
-            .map(entry -> getGridCopy(entry.getKey(), step).multiply(entry.getValue()))
-            .collect(toImmutableList());
+        ImmutableMap<Integer, DoubleGrid2D> indexedGrids =
+            grids.entrySet().stream().collect(toImmutableMap(
+                entry -> globalBiology.getSpecie(entry.getKey()).getIndex(),
+                entry -> {
+                    double totalBiomass = nauticalMap.getTotalBiomass(globalBiology.getSpecie(entry.getKey()));
+                    return new DoubleGrid2D(entry.getValue()).multiply(totalBiomass);
+                }
+            ));
 
-        stream(seaTiles)
+        nauticalMap.getAllSeaTilesExcludingLandAsList()
+            .stream()
             .filter(seaTile -> seaTile.getBiology() instanceof BiomassLocalBiology)
             .forEach(seaTile -> {
                 double[] biomass = ((BiomassLocalBiology) seaTile.getBiology()).getCurrentBiomass();
-                for (int i = 0; i < biomass.length; i++)
-                    biomass[i] = biomassGrids.get(i).get(seaTile.getGridX(), seaTile.getGridY());
+                indexedGrids.forEach((i, grid) -> biomass[i] = grid.get(seaTile.getGridX(), seaTile.getGridY()));
             });
     }
 
-    @NotNull
-    private DoubleGrid2D getGridCopy(Species species, int step) {
-        DoubleGrid2D grid = biomassGrids.get(species.getName()).get(schedule.applyAsInt(step));
-        return new DoubleGrid2D(grid);
-    }
 }

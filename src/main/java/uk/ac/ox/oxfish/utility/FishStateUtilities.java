@@ -1370,7 +1370,7 @@ public class FishStateUtilities {
      * Just makes it nicer to create AbstractMap.SimpleImmutableEntry objects.
      */
     public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> entry(K k, V v) {
-        return new AbstractMap.SimpleImmutableEntry<K, V>(k, v);
+        return new AbstractMap.SimpleImmutableEntry<>(k, v);
     }
 
 
