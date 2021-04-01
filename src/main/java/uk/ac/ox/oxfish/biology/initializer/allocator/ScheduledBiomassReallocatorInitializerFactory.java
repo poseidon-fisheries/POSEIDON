@@ -60,9 +60,29 @@ public class ScheduledBiomassReallocatorInitializerFactory
     private Path biomassAreaShapeFile = input("iattc_area").resolve("RFB_IATTC.shp");
 
     private Path schaeferParamsFile = input("schaefer_params.csv");
-    private LocalDate startDate = LocalDate.of(2017, 1, 1);
-    private LocalDate endDate = LocalDate.of(2017, 12, 31);
+
+    // Dates are strings because they're loaded from YAML
+    private String startDate = "2017-01-01";
+    private String endDate = "2017-12-31";
+
     private MapExtent mapExtent;
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    @SuppressWarnings("unused")
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
 
     @Override
     public int hashCode() {
@@ -89,23 +109,6 @@ public class ScheduledBiomassReallocatorInitializerFactory
             && Objects.equals(startDate, that.startDate)
             && Objects.equals(endDate, that.endDate)
             && Objects.equals(mapExtent, that.mapExtent);
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    @SuppressWarnings("unused")
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
     }
 
     @SuppressWarnings("unused")
@@ -164,7 +167,7 @@ public class ScheduledBiomassReallocatorInitializerFactory
         try {
             return cache.get(this, () -> new ScheduledBiomassRelocator(
                 buildBiomassGrids(),
-                (int) DAYS.between(startDate, endDate)
+                (int) DAYS.between(LocalDate.parse(startDate), LocalDate.parse(endDate))
             ));
         } catch (ExecutionException e) {
             throw new IllegalStateException(e);
@@ -194,9 +197,11 @@ public class ScheduledBiomassReallocatorInitializerFactory
     }
 
     private Map<Integer, Map<String, DoubleGrid2D>> buildBiomassGrids() {
-        checkNotNull(mapExtent);
-        checkNotNull(startDate);
-        checkNotNull(endDate);
+        checkNotNull(this.mapExtent);
+        checkNotNull(this.startDate);
+        checkNotNull(this.endDate);
+        LocalDate startDate = LocalDate.parse(this.startDate);
+        LocalDate endDate = LocalDate.parse(this.endDate);
         SpeciesCodes speciesCodes = speciesCodesSupplier.get();
 
         Predicate<Coordinate> isInsideBiomassArea =
