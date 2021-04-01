@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -13,7 +11,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.Double.POSITIVE_INFINITY;
+import static java.util.function.Function.identity;
+import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertArrayEquals;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -21,7 +22,7 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 public class ScheduledBiomassRelocatorTest extends TestCase {
 
     public void test() {
-        List<DoubleGrid2D> grids = ImmutableList.of(
+        ImmutableList<DoubleGrid2D> grids = ImmutableList.of(
             new DoubleGrid2D(new double[][]{{1, 1, 1}, {0, 0, 0}, {0, 0, 0}}),
             new DoubleGrid2D(new double[][]{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}),
             new DoubleGrid2D(new double[][]{{0, 0, 0}, {0, 0, 0}, {1, 1, 1}})
@@ -40,14 +41,17 @@ public class ScheduledBiomassRelocatorTest extends TestCase {
         assertEquals(initialBiomasses, ImmutableList.of(9.0, 9.0));
 
         ScheduledBiomassRelocator scheduledBiomassRelocator = new ScheduledBiomassRelocator(
-            ImmutableMap.of(
-                "Species 0", grids,
-                "Species 1", Lists.reverse(grids)
-            ),
-            t -> t
+            range(0, grids.size()).boxed().collect(toImmutableMap(
+                identity(),
+                i -> globalBiology.getSpecies().stream().collect(toImmutableMap(
+                    Species::getName,
+                    species -> (species.getIndex() == 0 ? grids : grids.reverse()).get(i)
+                ))
+            )),
+            3
         );
 
-        scheduledBiomassRelocator.reallocate(globalBiology, nauticalMap, 0);
+        scheduledBiomassRelocator.reallocate(0, globalBiology, nauticalMap);
 
         assertEquals(getBiomasses(globalBiology, nauticalMap), ImmutableList.of(9.0, 9.0));
 
@@ -61,7 +65,7 @@ public class ScheduledBiomassRelocatorTest extends TestCase {
             new double[][]{{0, 0, 0}, {0, 0, 0}, {3, 3, 3}}
         );
 
-        scheduledBiomassRelocator.reallocate(globalBiology, nauticalMap, 1);
+        scheduledBiomassRelocator.reallocate(1, globalBiology, nauticalMap);
 
         assertArrayEquals(
             getBiomassArray(nauticalMap, globalBiology.getSpecie(1)),
@@ -79,7 +83,7 @@ public class ScheduledBiomassRelocatorTest extends TestCase {
             for (int i = 0; i < biomass.length; i++) biomass[i] += 1;
         });
 
-        scheduledBiomassRelocator.reallocate(globalBiology, nauticalMap, 2);
+        scheduledBiomassRelocator.reallocate(2, globalBiology, nauticalMap);
 
         assertArrayEquals(
             getBiomassArray(nauticalMap, globalBiology.getSpecie(0)),

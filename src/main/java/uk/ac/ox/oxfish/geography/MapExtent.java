@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Math.floor;
 
 
 /**
@@ -13,8 +14,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * a dependency on the full NauticalMap.
  */
 public final class MapExtent {
-    private final int gridWidth;
-    private final int gridHeight;
+    private final int gridWidth;   // the width in cells
+    private final int gridHeight;  // the height in cells
+    private final double cellWidth;   // the width of a cell in degrees
+    private final double cellHeight;  // the height of a cell in degrees
     private final Envelope envelope;
 
     public MapExtent(NauticalMap map) {
@@ -25,6 +28,8 @@ public final class MapExtent {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.envelope = checkNotNull(envelope);
+        this.cellWidth = envelope.getWidth() / (double)this.getGridWidth();
+        this.cellHeight = envelope.getHeight() / (double)this.getGridHeight();
     }
 
     public int getGridWidth() {
@@ -50,5 +55,13 @@ public final class MapExtent {
         if (o == null || getClass() != o.getClass()) return false;
         MapExtent mapExtent = (MapExtent) o;
         return gridWidth == mapExtent.gridWidth && gridHeight == mapExtent.gridHeight && envelope.equals(mapExtent.envelope);
+    }
+
+    public int toGridX(double longitude) {
+        return (int) floor((longitude - envelope.getMinX()) / cellWidth);
+    }
+
+    public int toGridY(double latitude) {
+        return (int) floor((envelope.getMaxY() - latitude) / cellHeight);
     }
 }
