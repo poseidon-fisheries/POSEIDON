@@ -19,8 +19,8 @@ public class ScheduledBiomassReallocatorInitializerFactoryTest extends TestCase 
 
     public void testBuildBiomassGrids() {
         ScheduledBiomassReallocatorInitializerFactory scheduledBiomassReallocatorInitializerFactory = new ScheduledBiomassReallocatorInitializerFactory();
-        scheduledBiomassReallocatorInitializerFactory.setStartDate(LocalDate.of(2017, 1, 1));
-        scheduledBiomassReallocatorInitializerFactory.setEndDate(LocalDate.of(2017, 12, 31));
+        scheduledBiomassReallocatorInitializerFactory.setStartDate("2017-01-01");
+        scheduledBiomassReallocatorInitializerFactory.setEndDate("2017-12-31");
         Path depthFile = TunaScenario.input("depth.csv");
         MapInitializer mapInitializer = new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
