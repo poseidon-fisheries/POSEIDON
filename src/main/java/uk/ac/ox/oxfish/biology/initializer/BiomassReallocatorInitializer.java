@@ -1,9 +1,26 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ox.oxfish.biology.initializer;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
-import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledBiomassRelocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -12,18 +29,21 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 
-public class ScheduledBiomassReallocatorInitializer implements BiologyInitializer {
+/**
+ * Initializes the biology for multiple independent species and schedules a
+ * {@link uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocator}
+ * to run at every step. This class is similar to
+ * {@link uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer},
+ * but it doesn't allow imaginary species or movement rules.
+ */
+public class BiomassReallocatorInitializer implements BiologyInitializer {
 
-    private final ScheduledBiomassRelocator scheduledBiomassRelocator;
     private final List<SingleSpeciesBiomassInitializer> initializers;
 
-    public ScheduledBiomassReallocatorInitializer(
-        ScheduledBiomassRelocator scheduledBiomassRelocator,
-        Collection<SingleSpeciesBiomassInitializer> initializers
+    public BiomassReallocatorInitializer(
+        final Collection<SingleSpeciesBiomassInitializer> initializers
     ) {
-        this.scheduledBiomassRelocator = scheduledBiomassRelocator;
         this.initializers = ImmutableList.copyOf(initializers);
     }
 
@@ -32,16 +52,16 @@ public class ScheduledBiomassReallocatorInitializer implements BiologyInitialize
      */
     @Override
     public LocalBiology generateLocal(
-        GlobalBiology globalBiology,
-        SeaTile seaTile,
-        MersenneTwisterFast random,
-        int mapHeightInCells,
-        int mapWidthInCells,
-        NauticalMap map
+        final GlobalBiology globalBiology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
     ) {
         assert !initializers.isEmpty();
 
-        ImmutableList<LocalBiology> localBiologies =
+        final ImmutableList<LocalBiology> localBiologies =
             initializers.stream()
                 .map(initializer ->
                     // We need to call `generateLocal` on each initializer for its side-effects
@@ -54,31 +74,27 @@ public class ScheduledBiomassReallocatorInitializer implements BiologyInitialize
             .filter(biology -> biology instanceof BiomassLocalBiology)
             .findFirst()
             .orElse(new EmptyLocalBiology());
-
     }
 
     @Override
     public void processMap(
-        GlobalBiology biology,
-        NauticalMap map,
-        MersenneTwisterFast random,
-        FishState fishState
+        final GlobalBiology biology,
+        final NauticalMap map,
+        final MersenneTwisterFast random,
+        final FishState fishState
     ) {
         initializers.forEach(initializer -> {
             initializer.setForceMovementOff(true);
             initializer.processMap(biology, map, random, fishState);
         });
-
-        fishState.scheduleEveryStep(scheduledBiomassRelocator, DAWN);
     }
 
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast rng, FishState fishState) {
+    public GlobalBiology generateGlobal(final MersenneTwisterFast rng, final FishState fishState) {
         return new GlobalBiology(
             initializers.stream()
                 .map(initializer -> initializer.generateGlobal(rng, fishState).getSpecie(0))
                 .toArray(Species[]::new)
         );
     }
-
 }

@@ -1,5 +1,14 @@
 Tuna:
   attractionWeightsFile: inputs/tuna/action_weights.csv
+  biomassReallocatorFactory:
+    Biomass Reallocator:
+      biomassAreaShapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
+      biomassDistributionsFilePath: inputs/tuna/biomass_distributions.csv
+      endDate: '2017-12-31'
+      startDate: '2017-01-01'
+  biomassReallocatorInitializerFactory:
+    Biomass Reallocator Factory:
+      schaeferParamsFile: inputs/tuna/schaefer_params.csv
   boatsFile: inputs/tuna/boats.csv
   costsFile: inputs/tuna/costs.csv
   fadCarryingCapacitiesFile: inputs/tuna/fad_carrying_capacities.csv
@@ -141,17 +150,11 @@ Tuna:
     priceFilePath: inputs/tuna/prices.csv
     speciesCodes: null
     targetYear: 2017
-  plugins:
-  - Biomass Snapshot Resetter:
-      restoreOriginalLocations: true
-      yearsToReset: 1
-  scheduledBiomassRelocator:
-    Scheduled Biomass Relocator Factory:
-      biomassAreaShapeFile: inputs/tuna/iattc_area/RFB_IATTC.shp
-      biomassDistributionsFilePath: inputs/tuna/biomass_distributions.csv
-      endDate: '2017-12-31'
-      schaeferParamsFile: inputs/tuna/schaefer_params.csv
-      startDate: '2017-01-01'
+  multiSpeciesBiomassRestorerFactory:
+    Biomass Restorer:
+      biomassReallocatorFactory: null
+      schedule:
+        0: 364
   weatherInitializer:
     Constant Weather:
       temperature: '30.0'

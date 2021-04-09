@@ -371,7 +371,7 @@ public final class WebVizExporter {
                     );
                 });
             };
-            scenario.getPlugins().add(__ -> fishState ->
+            scenario.addPlugin(__ -> fishState ->
                 fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, POLICY_KICK_IN_YEAR)
             );
         };

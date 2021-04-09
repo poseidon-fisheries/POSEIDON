@@ -1,19 +1,19 @@
 /*
- *  POSEIDON, an agent-based model of fisheries
- *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -47,7 +47,7 @@ import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocate
 import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
-import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
@@ -74,7 +74,8 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         final Species species,
         final double malthusianParameter,
         final double distributionalWeight,
-        final boolean useLastYearBiomass, Iterable<BiomassLocalBiology> seaTileBiologies
+        final boolean useLastYearBiomass,
+        final Iterable<BiomassLocalBiology> seaTileBiologies
     ) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
@@ -83,8 +84,9 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         this.memorizer = useLastYearBiomass ? Optional.of(new Memorizer()) : Optional.empty();
     }
 
-    @SuppressWarnings("UnstableApiUsage") @Override
-    public void start(FishState fishState) {
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public void start(final FishState fishState) {
         // Schedule the grower to every year during the biology phase
         checkState(receipt == null, "Already started!");
         receipt = fishState.scheduleEveryYear(this, BIOLOGY_PHASE);
@@ -106,11 +108,12 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         memorizer.ifPresent(memorizer -> memorizer.start(fishState));
     }
 
-    @Override public void step(SimState simState) {
+    @Override
+    public void step(final SimState simState) {
 
         final FishState fishState = (FishState) simState;
 
-        System.out.printf("Growing %s biomass at day %d\n", species.getName(), fishState.getDay());
+        System.out.printf("Growing %s biomass at step %d\n", species.getName(), fishState.getStep());
 
         // the total carrying capacity (K) is the sum of the carrying capacities of all sea tiles
         final double totalCapacity =
@@ -152,7 +155,7 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         return concat(fadBiologies(fishState), seaTileBiologies.stream());
     }
 
-    private void allocateBiomass(final double biomassToAllocate, MersenneTwisterFast rng) {
+    private void allocateBiomass(final double biomassToAllocate, final MersenneTwisterFast rng) {
         if (distributionalWeight > 0)
             allocateBiomassProportionally(
                 seaTileBiologies,
@@ -169,8 +172,9 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
             );
     }
 
-    @NotNull @SuppressWarnings("UnstableApiUsage")
-    private Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
+    @NotNull
+    @SuppressWarnings("UnstableApiUsage")
+    private static Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
         return stream(Optional.ofNullable(fishState.getFadMap()))
             .flatMap(FadMap::allFads)
             .map(Fad::getBiology);
@@ -180,28 +184,32 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         private double memorizedBiomass;
 
-        @Override public void start(final FishState fishState) {
-            final StepOrder stepOrder = DATA_RESET;
+        @Override
+        public void start(final FishState fishState) {
+            // We have the Memorizer run at the DAWN step order, so it gives a chance to the
+            // BiomassReallocator to do its business of potentially resetting the biomass before it.
+            final StepOrder stepOrder = DAWN;
             fishState.scheduleOnce(
                 __ -> {
                     step(fishState);
-                    fishState.scheduleEveryYear(this, stepOrder);
+                    fishState.schedule.scheduleRepeating(this, stepOrder.ordinal(), 365);
                 },
                 stepOrder
             );
 
         }
 
-        @Override public void step(final SimState simState) {
+        @Override
+        public void step(final SimState simState) {
             final FishState fishState = (FishState) simState;
             memorizedBiomass =
                 allBiologies(fishState)
                     .mapToDouble(biology -> biology.getBiomass(species))
                     .sum();
             System.out.printf(
-                "Memorized %s biomass at day %d: %,.0f t\n",
+                "Memorized %s biomass at step %d: %,.0f t\n",
                 species.getName(),
-                fishState.getDay(),
+                fishState.getStep(),
                 memorizedBiomass / 1000
             );
         }

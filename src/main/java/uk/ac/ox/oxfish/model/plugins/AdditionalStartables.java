@@ -5,6 +5,8 @@ import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassRestorerFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
@@ -63,10 +65,8 @@ public class AdditionalStartables {
         NAMES.put(ITEControllerFactory.class, "ITEControllerFactory");
         NAMES.put(LoptEffortPolicyFactory.class, "Lopt Effort Controller");
         NAMES.put(ITargetTACFactory.class, "Itarget Controller");
-        NAMES.put(SurplusProductionDepletionFormulaController.class,
-                "Schaefer Assessment Formula Controller");
-        NAMES.put(SimpleFishSamplerFactory.class,
-                "Simple Fisher Sampler");
+        NAMES.put(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller");
+        NAMES.put(SimpleFishSamplerFactory.class, "Simple Fisher Sampler");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
