@@ -68,6 +68,9 @@ public class AdditionalStartables {
         NAMES.put(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller");
         NAMES.put(SimpleFishSamplerFactory.class, "Simple Fisher Sampler");
 
+        NAMES.put(BiomassReallocatorFactory.class, "Biomass Reallocator");
+        NAMES.put(BiomassRestorerFactory.class, "Biomass Restorer");
+
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
