@@ -19,16 +19,20 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
-import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
-import uk.ac.ox.oxfish.biology.initializer.ScheduledBiomassReallocatorInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledBiomassReallocatorInitializerFactory;
+import uk.ac.ox.oxfish.biology.initializer.BiomassReallocatorInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorInitializerFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassRestorerFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -40,6 +44,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -85,6 +90,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -142,7 +148,7 @@ public class TunaScenario implements Scenario {
         new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
     private final FromSimpleFilePortInitializer portInitializer =
         new FromSimpleFilePortInitializer(TARGET_YEAR, input("ports.csv"));
-
+    private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private Path attractionWeightsFile = input("action_weights.csv");
     private Path mapFile = input("depth.csv");
     private Path boatsFile = input("boats.csv");
@@ -159,20 +165,17 @@ public class TunaScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins;
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(input("prices.csv"), TARGET_YEAR);
 
-    private ScheduledBiomassReallocatorInitializerFactory scheduledBiomassRelocator = new ScheduledBiomassReallocatorInitializerFactory();
+    private BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory = new BiomassReallocatorInitializerFactory();
+    private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
+    private BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory();
 
     public TunaScenario() {
         final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
 
-        final SnapshotBiomassResetterFactory snapshotBiomassResetterFactory = new SnapshotBiomassResetterFactory();
-        snapshotBiomassResetterFactory.setRestoreOriginalLocations(true);
-
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
-        purseSeineGearFactory.getCatchSamplers().setSpeciesCodes(speciesCodes);
         purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
             parseAllRecords(fadCarryingCapacitiesFile).stream()
                 .filter(r -> r.getInt("year") == TARGET_YEAR)
@@ -187,7 +190,7 @@ public class TunaScenario implements Scenario {
             "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
         ));
 
-        AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
+        final AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
             galapagosEezReg, TAG_FOR_ALL,
             elCorralitoReg, TAG_FOR_ALL,
             closureAReg, "closure A",
@@ -196,25 +199,78 @@ public class TunaScenario implements Scenario {
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
-        PurseSeinerFishingStrategyFactory fishingStrategy = new PurseSeinerFishingStrategyFactory();
+        final AlgorithmFactory<PurseSeinerFishingStrategy> fishingStrategy = new PurseSeinerFishingStrategyFactory();
         fisherDefinition.setFishingStrategy(fishingStrategy);
         fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
         fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
 
-        plugins = Lists.newArrayList(snapshotBiomassResetterFactory);
     }
 
-    public static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+    public static Path input(final String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
-    public static int dayOfYear(Month month, int dayOfMonth) {
+    public static int dayOfYear(final Month month, final int dayOfMonth) {
         return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
     }
 
-    public static String getBoatId(Fisher fisher) {
+    public static String getBoatId(final Fisher fisher) {
         return fisher.getTags().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
+    }
+
+    /**
+     * Recursively find fixed rest time departing strategies and set minimumHoursToWait
+     */
+    private static void setFixedRestTime(final DepartingStrategy departingStrategy, final double minimumHoursToWait) {
+        if (departingStrategy instanceof FixedRestTimeDepartingStrategy)
+            ((FixedRestTimeDepartingStrategy) departingStrategy).setMinimumHoursToWait(minimumHoursToWait);
+        else if (departingStrategy instanceof CompositeDepartingStrategy)
+            ((CompositeDepartingStrategy) departingStrategy).getStrategies()
+                .forEach(s -> setFixedRestTime(s, minimumHoursToWait));
+    }
+
+    private static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher) {
+        // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
+        final int daysFromNow = 1 + dayOfYear(JULY, 15);
+        final Steppable assignClosurePeriod = simState -> {
+            if (fisher.getRegulation() instanceof MultipleRegulations) {
+                chooseClosurePeriod(fisher, model.getRandom());
+                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
+            }
+        };
+        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
+        model.scheduleOnceInXDays(
+            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
+            StepOrder.DAWN,
+            daysFromNow
+        );
+    }
+
+    private static void chooseClosurePeriod(final Fisher fisher, final MersenneTwisterFast rng) {
+        final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
+        fisher.getTags().removeIf(periods::contains);
+        fisher.getTags().add(oneOf(periods, rng));
+    }
+
+    @SuppressWarnings("unused")
+    public BiomassRestorerFactory getMultiSpeciesBiomassRestorerFactory() {
+        return biomassRestorerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMultiSpeciesBiomassRestorerFactory(final BiomassRestorerFactory biomassRestorerFactory) {
+        this.biomassRestorerFactory = biomassRestorerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public BiomassReallocatorFactory getBiomassReallocatorFactory() {
+        return biomassReallocatorFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setBiomassReallocatorFactory(final BiomassReallocatorFactory biomassReallocatorFactory) {
+        this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
 
     @SuppressWarnings("unused")
@@ -223,7 +279,7 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public void setMarketMapFromPriceFileFactory(MarketMapFromPriceFileFactory marketMapFromPriceFileFactory) {
+    public void setMarketMapFromPriceFileFactory(final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory) {
         this.marketMapFromPriceFileFactory = marketMapFromPriceFileFactory;
     }
 
@@ -238,18 +294,18 @@ public class TunaScenario implements Scenario {
     public Path getMapFile() { return mapFile; }
 
     @SuppressWarnings("unused")
-    public void setMapFile(Path mapFile) { this.mapFile = mapFile; }
+    public void setMapFile(final Path mapFile) { this.mapFile = mapFile; }
 
     @SuppressWarnings("unused")
     public Path getBoatsFile() { return boatsFile; }
 
-    public void setBoatsFile(Path boatsFile) { this.boatsFile = boatsFile; }
+    public void setBoatsFile(final Path boatsFile) { this.boatsFile = boatsFile; }
 
     @SuppressWarnings("unused")
     public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
 
     @SuppressWarnings("unused")
-    public void setFadCarryingCapacitiesFile(Path fadCarryingCapacitiesFile) {
+    public void setFadCarryingCapacitiesFile(final Path fadCarryingCapacitiesFile) {
         this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile;
     }
 
@@ -267,7 +323,7 @@ public class TunaScenario implements Scenario {
     }
 
     public void setMapInitializer(
-        FromFileMapInitializerFactory mapInitializer
+        final FromFileMapInitializerFactory mapInitializer
     ) {
         this.mapInitializer = mapInitializer;
     }
@@ -279,7 +335,7 @@ public class TunaScenario implements Scenario {
 
     @SuppressWarnings("unused")
     public void setWeatherInitializer(
-        AlgorithmFactory<? extends WeatherInitializer> weatherInitializer
+        final AlgorithmFactory<? extends WeatherInitializer> weatherInitializer
     ) {
         this.weatherInitializer = weatherInitializer;
     }
@@ -288,7 +344,7 @@ public class TunaScenario implements Scenario {
         return gasPricePerLiter;
     }
 
-    public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
+    public void setGasPricePerLiter(final DoubleParameter gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
@@ -298,18 +354,28 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public void setFisherDefinition(FisherDefinition fisherDefinition) {
+    public void setFisherDefinition(final FisherDefinition fisherDefinition) {
         this.fisherDefinition = fisherDefinition;
     }
 
     @Override
-    public ScenarioEssentials start(FishState model) {
+    public ScenarioEssentials start(final FishState model) {
 
         System.out.println("Starting model...");
 
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, null, model);
-        scheduledBiomassRelocator.setMapExtent(new MapExtent(nauticalMap));
-        final ScheduledBiomassReallocatorInitializer biologyInitializer = scheduledBiomassRelocator.apply(model);
+        final MapExtent mapExtent = new MapExtent(nauticalMap);
+
+        biomassReallocatorFactory.setMapExtent(mapExtent);
+        biomassReallocatorFactory.setSpeciesCodes(speciesCodesSupplier.get());
+        plugins.add(biomassReallocatorFactory);
+
+        biomassRestorerFactory.setBiomassReallocatorFactory(biomassReallocatorFactory);
+        plugins.add(biomassRestorerFactory);
+
+        biomassReallocatorInitializerFactory.setBiomassReallocatorFactory(biomassReallocatorFactory);
+        biomassReallocatorInitializerFactory.setMapExtent(mapExtent);
+        final BiomassReallocatorInitializer biologyInitializer = biomassReallocatorInitializerFactory.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
 
@@ -327,7 +393,7 @@ public class TunaScenario implements Scenario {
     }
 
     @Override
-    public ScenarioPopulation populateModel(FishState model) {
+    public ScenarioPopulation populateModel(final FishState model) {
 
         System.out.println("Populating model...");
 
@@ -347,8 +413,8 @@ public class TunaScenario implements Scenario {
         final List<Port> ports = model.getMap().getPorts();
         checkState(!ports.isEmpty());
 
-        FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
-        PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) fisherDefinition.getGear();
+        final FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
+        final PurseSeineGearFactory purseSeineGearFactory = (PurseSeineGearFactory) fisherDefinition.getGear();
 
         final Monitors monitors = new Monitors(model);
         monitors.getMonitors().forEach(model::registerStartable);
@@ -452,34 +518,6 @@ public class TunaScenario implements Scenario {
 
     }
 
-    /**
-     * Recursively find fixed rest time departing strategies and set minimumHoursToWait
-     */
-    private void setFixedRestTime(DepartingStrategy departingStrategy, double minimumHoursToWait) {
-        if (departingStrategy instanceof FixedRestTimeDepartingStrategy)
-            ((FixedRestTimeDepartingStrategy) departingStrategy).setMinimumHoursToWait(minimumHoursToWait);
-        else if (departingStrategy instanceof CompositeDepartingStrategy)
-            ((CompositeDepartingStrategy) departingStrategy).getStrategies()
-                .forEach(s -> setFixedRestTime(s, minimumHoursToWait));
-    }
-
-    private void scheduleClosurePeriodChoice(FishState model, Fisher fisher) {
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure period they will observe.
-        final int daysFromNow = 1 + dayOfYear(JULY, 15);
-        Steppable assignClosurePeriod = simState -> {
-            if (fisher.getRegulation() instanceof MultipleRegulations) {
-                chooseClosurePeriod(fisher, model.getRandom());
-                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
-            }
-        };
-        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
-        model.scheduleOnceInXDays(
-            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-            StepOrder.DAWN,
-            daysFromNow
-        );
-    }
-
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
             parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
@@ -497,24 +535,17 @@ public class TunaScenario implements Scenario {
         };
     }
 
-    private void chooseClosurePeriod(Fisher fisher, MersenneTwisterFast rng) {
-        final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
-        fisher.getTags().removeIf(periods::contains);
-        fisher.getTags().add(oneOf(periods, rng));
-    }
-
     @SuppressWarnings("unused")
-    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() { return plugins; }
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() { return Collections.unmodifiableList(plugins); }
 
-    @SuppressWarnings("unused")
-    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) { this.plugins = plugins; }
+    public void addPlugin(final AlgorithmFactory<? extends AdditionalStartable> plugin) { plugins.add(plugin); }
 
     @SuppressWarnings("unused")
     public Path getCostsFile() {
         return costsFile;
     }
 
-    public void setCostsFile(Path costsFile) {
+    public void setCostsFile(final Path costsFile) {
         this.costsFile = costsFile;
     }
 
@@ -524,17 +555,17 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public void setFadMortalityIncludedInExogenousCatches(boolean fadMortalityIncludedInExogenousCatches) {
+    public void setFadMortalityIncludedInExogenousCatches(final boolean fadMortalityIncludedInExogenousCatches) {
         this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
     }
 
     @SuppressWarnings("unused")
-    public ScheduledBiomassReallocatorInitializerFactory getScheduledBiomassRelocator() {
-        return scheduledBiomassRelocator;
+    public BiomassReallocatorInitializerFactory getBiomassReallocatorInitializerFactory() {
+        return biomassReallocatorInitializerFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setScheduledBiomassRelocator(ScheduledBiomassReallocatorInitializerFactory scheduledBiomassRelocator) {
-        this.scheduledBiomassRelocator = scheduledBiomassRelocator;
+    public void setBiomassReallocatorInitializerFactory(final BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory) {
+        this.biomassReallocatorInitializerFactory = biomassReallocatorInitializerFactory;
     }
 }

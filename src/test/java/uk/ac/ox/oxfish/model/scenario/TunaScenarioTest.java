@@ -38,18 +38,18 @@ public class TunaScenarioTest {
 
     @Test
     public void canSaveToAndLoadFromYamlWithoutCrashing() {
-        TunaScenario scenario = new TunaScenario();
-        FishYAML yaml = new FishYAML();
+        final TunaScenario scenario = new TunaScenario();
+        final FishYAML yaml = new FishYAML();
         final String output = yaml.dump(scenario);
         System.out.println(output);
-        TunaScenario scenario2 = yaml.loadAs(output, TunaScenario.class);
+        final TunaScenario scenario2 = yaml.loadAs(output, TunaScenario.class);
         assertNotNull(scenario2);
     }
 
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
-        TunaScenario scenario = new TunaScenario();
+        final TunaScenario scenario = new TunaScenario();
         scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
         scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
@@ -60,12 +60,12 @@ public class TunaScenarioTest {
             .setLocationValuesFile(input("dummy_location_values.csv"));
 
         final Regulation regulation = new FishingSeason(true, 100);
-        scenario.getPlugins().add(state -> model -> {
+        scenario.addPlugin(state -> model -> {
                 model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
                 state.scheduleEveryYear(simState -> {
                     final FishStateYearlyTimeSeries yearlyDataSet = ((FishState) simState).getYearlyDataSet();
-                    double catches = yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
-                    double landings = yearlyDataSet.getColumn("Skipjack tuna Landings").getLatest();
+                    final double catches = yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
+                    final double landings = yearlyDataSet.getColumn("Skipjack tuna Landings").getLatest();
                     System.out.printf("Catches:    %.2f%n", catches);
                     System.out.printf("Landings:   %.2f%n", landings);
                     System.out.printf("Difference: %.2f%n", Math.abs(catches - landings));
@@ -76,7 +76,7 @@ public class TunaScenarioTest {
             }
         );
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
         state.start();

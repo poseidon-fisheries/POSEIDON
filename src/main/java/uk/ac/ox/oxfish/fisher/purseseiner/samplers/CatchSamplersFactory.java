@@ -1,3 +1,22 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import com.google.common.collect.Ordering;
@@ -7,6 +26,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -29,17 +49,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class CatchSamplersFactory
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler>> {
 
+    private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path catchSamplesFile = input("set_samples.csv");
-    private SpeciesCodes speciesCodes;
-
-    @SuppressWarnings("unused")
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
-    }
-
-    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
-    }
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -47,12 +58,12 @@ public class CatchSamplersFactory
     }
 
     @SuppressWarnings("unused")
-    public void setCatchSamplesFile(Path catchSamplesFile) {
+    public void setCatchSamplesFile(final Path catchSamplesFile) {
         this.catchSamplesFile = catchSamplesFile;
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction>, CatchSampler> apply(FishState fishState) {
+    public Map<Class<? extends AbstractSetAction>, CatchSampler> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
         return parseAllRecords(catchSamplesFile)
             .stream()
@@ -71,7 +82,7 @@ public class CatchSamplersFactory
 
     @SuppressWarnings("UnstableApiUsage")
     private Collection<Double> getBiomasses(final Record record, final GlobalBiology globalBiology) {
-        String[] columnNames = record.getMetaData().headers();
+        final String[] columnNames = record.getMetaData().headers();
         return Arrays.stream(columnNames)
             .filter(columnName -> !columnName.equals("set_type"))
             .flatMap(columnName -> stream(
