@@ -1,20 +1,17 @@
 package uk.ac.ox.oxfish.maximization;
 
-import com.google.common.cache.Cache;
 import com.google.common.primitives.ImmutableDoubleArray;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.OptionalDouble;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -28,37 +25,37 @@ public class TunaEvaluator implements Runnable {
     private final double[] solution;
     private int numRuns = 10;
 
-    public TunaEvaluator(Path calibrationFilePath, double[] solution) {
+    TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
         this.calibrationFilePath = calibrationFilePath;
-        this.solution = solution;
+        this.solution = solution.clone();
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
-        String calibrationFolderName = "2021-03-16_15.35.52";
+        final String calibrationFolderName = "2021-04-10_11.05.24";
 
-        Path baseFolderPath = Paths.get(
+        final Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
         );
 
-        Path calibrationFolderPath = baseFolderPath.resolve(calibrationFolderName);
-        Path logFilePath = calibrationFolderPath.resolve("calibration_log.md");
-        Path calibrationFilePath = calibrationFolderPath.resolve("calibration.yaml");
+        final Path calibrationFolderPath = baseFolderPath.resolve(calibrationFolderName);
+        final Path logFilePath = calibrationFolderPath.resolve("calibration_log.md");
+        final Path calibrationFilePath = calibrationFolderPath.resolve("calibration.yaml");
 
-        ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
-        try (Stream<String> lines = Files.lines(logFilePath)) {
+        final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
+        try (final Stream<String> lines = Files.lines(logFilePath)) {
             findLast(lines).ifPresent(lastLine -> {
-                String solutionString = substringBetween(lastLine, "{", "}").trim();
-                try (Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
+                final String solutionString = substringBetween(lastLine, "{", "}").trim();
+                try (final Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
                     while (scanner.hasNextDouble()) solutionBuilder.add(scanner.nextDouble());
                 }
             });
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
 
-        double[] solution = solutionBuilder.build().toArray();
+        final double[] solution = solutionBuilder.build().toArray();
         new TunaEvaluator(calibrationFilePath, solution).run();
 
     }
@@ -70,7 +67,7 @@ public class TunaEvaluator implements Runnable {
         final CsvWriter csvWriter = new CsvWriter(csvOutputFilePath.toFile(), new CsvWriterSettings());
 
         try {
-            GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
+            final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
             csvWriter.writeHeaders(
                 "target_class",
                 "target_name",
@@ -103,14 +100,14 @@ public class TunaEvaluator implements Runnable {
         }
     }
 
-    private FishState runSimulation(
-        GenericOptimization optimization,
-        double[] optimalParameters,
-        int runNumber,
-        int numRuns
+    private static FishState runSimulation(
+        final GenericOptimization optimization,
+        final double[] optimalParameters,
+        final int runNumber,
+        final int numRuns
     ) {
         final FishState fishState = new FishState(System.currentTimeMillis());
-        Scenario scenario = makeScenario(optimization, optimalParameters);
+        final Scenario scenario = makeScenario(optimization, optimalParameters);
         fishState.setScenario(scenario);
         fishState.start();
 
@@ -129,9 +126,9 @@ public class TunaEvaluator implements Runnable {
         return fishState;
     }
 
-    Scenario makeScenario(
-        GenericOptimization optimization,
-        double[] optimalParameters
+    private static Scenario makeScenario(
+        final GenericOptimization optimization,
+        final double[] optimalParameters
     ) {
         try {
             return GenericOptimization.buildScenario(
@@ -139,7 +136,7 @@ public class TunaEvaluator implements Runnable {
                 Paths.get(optimization.getScenarioFile()).toFile(),
                 optimization.getParameters()
             );
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -150,7 +147,7 @@ public class TunaEvaluator implements Runnable {
     }
 
     @SuppressWarnings("unused")
-    public void setNumRuns(int numRuns) {
+    public void setNumRuns(final int numRuns) {
         this.numRuns = numRuns;
     }
 

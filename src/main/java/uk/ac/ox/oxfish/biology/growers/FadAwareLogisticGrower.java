@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -42,8 +41,6 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Streams.concat;
 import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.biology.growers.CommonLogisticGrower.allocateBiomassProportionally;
-import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocateBiomassAtRandom;
 import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
@@ -63,7 +60,6 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     private final Species species;
     private final double malthusianParameter;
-    private final double distributionalWeight;
     private final List<BiomassLocalBiology> seaTileBiologies;
     private final Optional<Memorizer> memorizer;
     private Optional<Accumulator<Double>> biomassLostAccumulator;
@@ -73,13 +69,11 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
     FadAwareLogisticGrower(
         final Species species,
         final double malthusianParameter,
-        final double distributionalWeight,
         final boolean useLastYearBiomass,
         final Iterable<BiomassLocalBiology> seaTileBiologies
     ) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
-        this.distributionalWeight = distributionalWeight;
         this.seaTileBiologies = ImmutableList.copyOf(seaTileBiologies);
         this.memorizer = useLastYearBiomass ? Optional.of(new Memorizer()) : Optional.empty();
     }
@@ -144,8 +138,13 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         assert biomassToAllocate >= -EPSILON : "biomassToAllocate: " + biomassToAllocate;
 
         if (biomassToAllocate > EPSILON) {
-            // if we have some new biomass to allocate, we distribute it among the sea tiles (not the FADs)
-            allocateBiomass(biomassToAllocate, fishState.getRandom());
+            // If we have some new biomass to allocate, we distribute it uniformly among the sea tiles (not the FADs).
+            // We expect the BiomassReallocator to kick right after, so it doesn't matter where we put it for now.
+            final double biomassToAddPerTile = biomassToAllocate / seaTileBiologies.size();
+            seaTileBiologies.forEach(biology -> {
+                final double newCurrentBiomass = biology.getBiomass(species) + biomassToAddPerTile;
+                biology.setCurrentBiomass(species, newCurrentBiomass);
+            });
             final String columnName = fishState.getSpecies().get(species.getIndex()) + " Recruitment";
             fishState.getYearlyCounter().count(columnName, biomassToAllocate);
         }
@@ -153,23 +152,6 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     private Stream<BiomassLocalBiology> allBiologies(final FishState fishState) {
         return concat(fadBiologies(fishState), seaTileBiologies.stream());
-    }
-
-    private void allocateBiomass(final double biomassToAllocate, final MersenneTwisterFast rng) {
-        if (distributionalWeight > 0)
-            allocateBiomassProportionally(
-                seaTileBiologies,
-                biomassToAllocate,
-                species.getIndex(),
-                distributionalWeight
-            );
-        else
-            allocateBiomassAtRandom(
-                seaTileBiologies,
-                biomassToAllocate,
-                rng,
-                species.getIndex()
-            );
     }
 
     @NotNull

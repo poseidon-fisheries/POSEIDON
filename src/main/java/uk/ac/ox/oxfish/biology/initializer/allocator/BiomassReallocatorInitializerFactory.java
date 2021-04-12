@@ -114,7 +114,7 @@ public class BiomassReallocatorInitializerFactory
                     new ConstantBiomassAllocator(Double.MAX_VALUE),
                     new NoMovement(),
                     speciesName,
-                    new FadAwareLogisticGrowerInitializer(logisticGrowthRate, -1, true),
+                    new FadAwareLogisticGrowerInitializer(logisticGrowthRate, true),
                     false,
                     false
                 );
