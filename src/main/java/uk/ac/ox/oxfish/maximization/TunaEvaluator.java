@@ -33,7 +33,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(final String[] args) {
 
-        final String calibrationFolderName = "2021-04-10_11.05.24";
+        final String calibrationFolderName = "2021-04-12_11.55.39";
 
         final Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
@@ -76,7 +76,7 @@ public class TunaEvaluator implements Runnable {
                 "output_value",
                 "error"
             );
-            rangeClosed(1, numRuns).forEach(runNumber -> {
+            rangeClosed(1, numRuns).parallel().forEach(runNumber -> {
                 final FishState fishState = runSimulation(optimization, solution, runNumber, numRuns);
                 fishState.getFadMap().getDriftingObjectsMap().getCurrentVectors().getVectorCache().values().stream()
                     .mapToDouble(cache -> cache.stats().hitRate()).average()
