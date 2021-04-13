@@ -37,16 +37,19 @@ public class AttractionField implements FisherStartable {
     private final LocationValues locationValues;
     private final LocalAttractionModulator localModulator;
     private final GlobalAttractionModulator globalModulator;
+    private final double distanceExponent;
     private Fisher fisher;
 
     AttractionField(
         final LocationValues locationValues,
         final LocalAttractionModulator localModulator,
-        final GlobalAttractionModulator globalModulator
+        final GlobalAttractionModulator globalModulator,
+        final double distanceExponent
     ) {
         this.locationValues = locationValues;
         this.localModulator = localModulator;
         this.globalModulator = globalModulator;
+        this.distanceExponent = distanceExponent;
     }
 
     @NotNull
@@ -65,7 +68,7 @@ public class AttractionField implements FisherStartable {
             .multiply(
                 // scale to modulated location value, decreasing with travel time
                 location.value * localModulator.modulate(there.x, there.y, t, fisher)
-                    / pow(travelTime, 2)
+                    / pow(travelTime, distanceExponent)
             );
     }
 
@@ -85,7 +88,7 @@ public class AttractionField implements FisherStartable {
         final MutableDouble2D netAttraction = new MutableDouble2D();
         final MutableDouble2D locationAttraction = new MutableDouble2D();
 
-        for (Entry<Int2D, Double> entry : locationValues.getValues()) {
+        locationValues.getValues().forEach(entry -> {
             final Int2D there = entry.getKey();
             final double travelTime = distance(here, there) / speed;
             final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
@@ -99,7 +102,7 @@ public class AttractionField implements FisherStartable {
                 );
             }
             netAttraction.addIn(locationAttraction);
-        }
+        });
 
         if (netAttraction.length() > 0) {
             netAttraction.normalize().multiplyIn(globalModulator.modulate(fisher));
@@ -109,20 +112,20 @@ public class AttractionField implements FisherStartable {
 
     }
 
-    private double distance(Int2D here, Int2D there) {
+    private double distance(final Int2D here, final Int2D there) {
         return fisher.grabState().getMap().distance(here, there);
     }
 
-    public double getActionValueAt(Int2D here) {
+    public double getActionValueAt(final Int2D here) {
         double sum = 0.0;
-        for (Entry<Int2D, Double> entry : locationValues.getValues()) {
-            double distance = distance(here, entry.getKey());
+        for (final Entry<Int2D, Double> entry : locationValues.getValues()) {
+            final double distance = distance(here, entry.getKey());
             sum += entry.getValue() / pow(distance + 1, 2);
         }
         return sum;
     }
 
-    public double getValueAt(Int2D location) {
+    public double getValueAt(final Int2D location) {
         return locationValues.getValueAt(location);
     }
 
@@ -137,7 +140,7 @@ public class AttractionField implements FisherStartable {
         private final double value;
         private final double distance;
 
-        public Location(Int2D gridLocation, double value, double distance) {
+        public Location(final Int2D gridLocation, final double value, final double distance) {
             this.gridLocation = gridLocation;
             this.value = value;
             this.distance = distance;

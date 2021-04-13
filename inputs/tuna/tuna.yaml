@@ -62,6 +62,7 @@ Tuna:
         decayRateOfDolphinSetLocationValues: 0.01
         decayRateOfNonAssociatedSetLocationValues: 0.01
         decayRateOfOpportunisticFadSetLocationValues: 0.01
+        distanceExponent: 1
         dolphinSetObservers: !!set {
           }
         dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0

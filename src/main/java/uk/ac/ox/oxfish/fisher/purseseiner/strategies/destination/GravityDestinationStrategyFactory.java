@@ -63,6 +63,7 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
 
     private Path maxTripDurationFile = input("boats.csv");
 
+    @SuppressWarnings("unused")
     public Path getMaxTripDurationFile() { return maxTripDurationFile; }
 
     public void setMaxTripDurationFile(final Path maxTripDurationFile) {
@@ -71,15 +72,15 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
 
     @Override public GravityDestinationStrategy apply(final FishState fishState) {
         return new GravityDestinationStrategy(
-            this::loadAttractionWeights,
+            GravityDestinationStrategyFactory::loadAttractionWeights,
             this::loadMaxTripDuration,
             this.isValidDestination
         );
     }
 
-    private Map<ActionAttractionField, Double> loadAttractionWeights(
-        Iterable<ActionAttractionField> fields,
-        Fisher fisher
+    private static Map<ActionAttractionField, Double> loadAttractionWeights(
+        final Iterable<ActionAttractionField> fields,
+        final Fisher fisher
     ) {
         final Path attractionWeightsFile = ((TunaScenario) fisher.grabState().getScenario()).getAttractionWeightsFile();
         return stream(fields).collect(toImmutableMap(
@@ -93,7 +94,7 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
         ));
     }
 
-    private double loadMaxTripDuration(Fisher fisher) {
+    private double loadMaxTripDuration(final Fisher fisher) {
         return maxTripDurationCache
             .get(maxTripDurationFile, TARGET_YEAR, fisher)
             .orElseThrow(() -> new IllegalStateException("No max trip duration known for " + fisher));
