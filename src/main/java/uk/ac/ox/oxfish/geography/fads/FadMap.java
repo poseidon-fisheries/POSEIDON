@@ -35,9 +35,9 @@ public class FadMap implements Startable, Steppable {
     private final GlobalBiology globalBiology;
     private Stoppable stoppable;
     public FadMap(
-        NauticalMap nauticalMap,
-        CurrentVectors currentVectors,
-        GlobalBiology globalBiology
+        final NauticalMap nauticalMap,
+        final CurrentVectors currentVectors,
+        final GlobalBiology globalBiology
     ) {
         this.nauticalMap = nauticalMap;
         this.globalBiology = globalBiology;
@@ -51,7 +51,7 @@ public class FadMap implements Startable, Steppable {
     public GlobalBiology getGlobalBiology() { return globalBiology; }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         stoppable = model.scheduleEveryDay(this, StepOrder.DAWN);
     }
 
@@ -61,8 +61,8 @@ public class FadMap implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
-        FishState fishState = (FishState) simState;
+    public void step(final SimState simState) {
+        final FishState fishState = (FishState) simState;
         driftingObjectsMap.applyDrift(fishState.getStep());
         allFads().forEach(fad -> {
             final Optional<VariableBiomassBasedBiology> seaTileBiology =
@@ -82,42 +82,43 @@ public class FadMap implements Startable, Steppable {
     }
 
     @NotNull
-    public Optional<SeaTile> getFadTile(Fad fad) {
+    public Optional<SeaTile> getFadTile(final Fad fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
     }
 
     @NotNull
-    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
+    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(final SeaTile seaTile) {
         return Optional.of(seaTile)
             .map(SeaTile::getBiology)
             .filter(biology -> biology instanceof VariableBiomassBasedBiology)
             .map(biology -> (VariableBiomassBasedBiology) biology);
     }
 
-    @NotNull public Optional<Double2D> getFadLocation(Fad fad) {
+    @NotNull
+    private Optional<Double2D> getFadLocation(final Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
     @NotNull
-    private Optional<SeaTile> getSeaTile(Double2D location) {
+    private Optional<SeaTile> getSeaTile(final Double2D location) {
         return Optional.ofNullable(
             nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
         );
     }
 
-    public void deployFad(Fad fad, int timeStep, Double2D location) {
+    public void deployFad(final Fad fad, final Double2D location) {
         driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
     /**
      * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
      */
-    public void deployFad(Fad fad, int timeStep, SeaTile seaTile) {
-        deployFad(fad, timeStep, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
+    public void deployFad(final Fad fad, final SeaTile seaTile) {
+        deployFad(fad, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
     }
 
     @NotNull
-    private BiConsumer<Double2D, Optional<Double2D>> onMove(Fad fad) {
+    private BiConsumer<Double2D, Optional<Double2D>> onMove(final Fad fad) {
         return (oldLoc, newLoc) -> {
             final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
             if (newSeaTile.isPresent()) {
@@ -140,16 +141,16 @@ public class FadMap implements Startable, Steppable {
         };
     }
 
-    public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
+    public void remove(final Fad fad) { driftingObjectsMap.remove(fad); }
 
     @NotNull
-    public Bag fadsAt(SeaTile seaTile) {
+    public Bag fadsAt(final SeaTile seaTile) {
         return fadsAt(seaTile.getGridX(), seaTile.getGridY());
     }
 
     @NotNull
-    public Bag fadsAt(int x, int y) {
-        Int2D location = new Int2D(x, y);
+    private Bag fadsAt(final int x, final int y) {
+        final Int2D location = new Int2D(x, y);
         final Bag bag = driftingObjectsMap.getField().getObjectsAtDiscretizedLocation(location);
         return bag == null ? new Bag() : bag;
     }
@@ -161,7 +162,7 @@ public class FadMap implements Startable, Steppable {
     @NotNull
     public Continuous2D getField() { return driftingObjectsMap.getField(); }
 
-    public double getTotalBiomass(Species species) {
+    public double getTotalBiomass(final Species species) {
         return allFads().mapToDouble(fad -> fad.getBiology().getBiomass(species)).sum();
     }
 }

@@ -25,8 +25,8 @@ public class DriftingObjectsMap {
     private final Map<Object, BiConsumer<Double2D, Optional<Double2D>>> onMoveCallbacks = new HashMap<>();
 
     DriftingObjectsMap(
-        CurrentVectors currentVectors,
-        NauticalMap nauticalMap
+        final CurrentVectors currentVectors,
+        final NauticalMap nauticalMap
     ) {
         this(
             new Continuous2D(1.0, nauticalMap.getWidth(), nauticalMap.getHeight()),
@@ -35,8 +35,8 @@ public class DriftingObjectsMap {
     }
 
     private DriftingObjectsMap(
-        Continuous2D field,
-        CurrentVectors currentVectors
+        final Continuous2D field,
+        final CurrentVectors currentVectors
     ) {
         this.field = field;
         this.currentVectors = currentVectors;
@@ -46,33 +46,33 @@ public class DriftingObjectsMap {
         return currentVectors;
     }
 
-    public void applyDrift(int timeStep) {
-        Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
+    void applyDrift(final int timeStep) {
+        final Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
         bagToStream(objects).forEach(o -> {
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
             final Optional<Double2D> newLoc = nextPosition(oldLoc, timeStep);
-            if (newLoc.isPresent()) // TODO: use `ifPresentOrElse` once we upgrade to Java >=9.
+            if (newLoc.isPresent())
                 move(o, oldLoc, newLoc.get());
             else
                 remove(o, oldLoc);
         });
     }
 
-    private Optional<Double2D> nextPosition(Double2D position, int timeStep) {
+    private Optional<Double2D> nextPosition(final Double2D position, final int timeStep) {
         return getGridLocation(position)
             .flatMap(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
             .map(position::add)
             .filter(location -> inBounds(location, field));
     }
 
-    private void move(Object object, Double2D oldLocation, Double2D newLocation) {
+    private void move(final Object object, final Double2D oldLocation, final Double2D newLocation) {
         setObjectLocation(object, newLocation);
         Optional
             .ofNullable(onMoveCallbacks.get(object))
             .ifPresent(f -> f.accept(oldLocation, Optional.of(newLocation)));
     }
 
-    private void remove(Object object, Double2D oldLocation) {
+    private void remove(final Object object, final Double2D oldLocation) {
         final Object result = field.remove(object);
         checkNotNull(result, "Object not on the map!");
         Optional
@@ -80,14 +80,14 @@ public class DriftingObjectsMap {
             .ifPresent(f -> f.accept(oldLocation, Optional.empty()));
     }
 
-    private Optional<Int2D> getGridLocation(Double2D position) {
+    private Optional<Int2D> getGridLocation(final Double2D position) {
         return position.x >= 0 && position.x < currentVectors.getGridWidth() &&
             position.y >= 0 && position.y < currentVectors.getGridHeight()
             ? Optional.of(new Int2D((int) position.x, (int) position.y))
             : Optional.empty();
     }
 
-    private void setObjectLocation(Object object, Double2D newLocation) {
+    private void setObjectLocation(final Object object, final Double2D newLocation) {
         checkArgument(inBounds(newLocation, field));
         final boolean result = field.setObjectLocation(object, newLocation);
         checkState(result);
@@ -99,21 +99,21 @@ public class DriftingObjectsMap {
      *
      * @param object the object to remove
      */
-    public void remove(Object object) {
+    public void remove(final Object object) {
         remove(object, field.getObjectLocationAsDouble2D(object));
     }
 
     public void add(
-        Object object,
-        Double2D location,
-        BiConsumer<Double2D, Optional<Double2D>> onMove
+        final Object object,
+        final Double2D location,
+        final BiConsumer<Double2D, Optional<Double2D>> onMove
     ) {
         setObjectLocation(object, location);
         onMoveCallbacks.put(object, onMove);
     }
 
     @Nullable
-    Double2D getObjectLocation(Object object) {
+    Double2D getObjectLocation(final Object object) {
         return field.getObjectLocation(object);
     }
 

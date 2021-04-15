@@ -163,7 +163,7 @@ public class FadManager {
 
     public Fad deployFad(SeaTile seaTile, int timeStep) {
         final Fad newFad = initFad();
-        fadMap.deployFad(newFad, timeStep, seaTile);
+        fadMap.deployFad(newFad, seaTile);
         return newFad;
     }
 
@@ -182,12 +182,12 @@ public class FadManager {
         deployFad(new Double2D(
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
-        ), timeStep);
+        ));
     }
 
-    private void deployFad(Double2D location, int timeStep) {
+    private void deployFad(Double2D location) {
         final Fad newFad = initFad();
-        fadMap.deployFad(newFad, timeStep, location);
+        fadMap.deployFad(newFad, location);
     }
 
     public void pickUpFad(Fad fad) {

@@ -21,14 +21,14 @@ public class CurrentVectorsTest {
     @Test
     public void positiveDaysOffset() {
         final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY, 0, 0);
-        assertEquals(0, currentVectors.positiveDaysOffset(1, 1));
-        assertEquals(1, currentVectors.positiveDaysOffset(1, 2));
-        assertEquals(364, currentVectors.positiveDaysOffset(1, 365));
-        assertEquals(1, currentVectors.positiveDaysOffset(365, 1));
+        assertEquals(0, CurrentVectors.positiveDaysOffset(1, 1));
+        assertEquals(1, CurrentVectors.positiveDaysOffset(1, 2));
+        assertEquals(364, CurrentVectors.positiveDaysOffset(1, 365));
+        assertEquals(1, CurrentVectors.positiveDaysOffset(365, 1));
     }
 
     @Test
-    public void negativeDaysOffset() {
+    public static void negativeDaysOffset() {
         final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY, 0, 0);
         assertEquals(0, currentVectors.negativeDaysOffset(1, 1));
         assertEquals(-1, currentVectors.negativeDaysOffset(2, 1));

@@ -6,10 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
@@ -35,20 +32,20 @@ public class CurrentVectors {
     private final int stepsPerDay;
 
     public CurrentVectors(
-        TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
-        int stepsPerDay,
-        int gridWidth,
-        int gridHeight
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
+        final int stepsPerDay,
+        final int gridWidth,
+        final int gridHeight
     ) {
         this(vectorMaps, __ -> Y2017, gridWidth, gridHeight, stepsPerDay);
     }
 
     public CurrentVectors(
-        TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
-        Function<Integer, CurrentPattern> currentPatternAtStep,
-        int gridWidth,
-        int gridHeight,
-        int stepsPerDay
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
+        final Function<Integer, CurrentPattern> currentPatternAtStep,
+        final int gridWidth,
+        final int gridHeight,
+        final int stepsPerDay
     ) {
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
@@ -59,8 +56,8 @@ public class CurrentVectors {
 
     @NotNull
     public static Double2D getInterpolatedVector(
-        Double2D vectorBefore, int offsetBefore,
-        Double2D vectorAfter, int offsetAfter
+        final Double2D vectorBefore, final int offsetBefore,
+        final Double2D vectorAfter, final int offsetAfter
     ) {
         final double totalOffset = (double) offsetBefore + offsetAfter;
         final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
@@ -69,7 +66,7 @@ public class CurrentVectors {
     }
 
     public Map<Integer, Cache<Int2D, Optional<Double2D>>> getVectorCache() {
-        return vectorCache;
+        return Collections.unmodifiableMap(vectorCache);
     }
 
     public int getGridHeight() {
@@ -80,9 +77,9 @@ public class CurrentVectors {
         return gridWidth;
     }
 
-    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
+    private int getDayOfTheYear(final int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
 
-    int positiveDaysOffset(int sourceDay, int targetDay) {
+    static int positiveDaysOffset(final int sourceDay, final int targetDay) {
         checkArgument(sourceDay >= 1 && sourceDay <= 365);
         checkArgument(targetDay >= 1 && targetDay <= 365);
         return sourceDay <= targetDay ?
@@ -90,16 +87,16 @@ public class CurrentVectors {
             (365 - sourceDay) + targetDay;
     }
 
-    int negativeDaysOffset(int sourceDay, int targetDay) {
+    static int negativeDaysOffset(final int sourceDay, final int targetDay) {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    public Optional<Double2D> getVector(int step, Int2D location) {
+    public Optional<Double2D> getVector(final int step, final Int2D location) {
         try {
             return vectorCache
                 .computeIfAbsent(step, __ -> cacheBuilder.build())
                 .get(location, () -> computeVector(step, location));
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -107,7 +104,7 @@ public class CurrentVectors {
     /**
      * Returns the current vector for seaTile at step. Returns an empty optional if we have no currents for that location.
      */
-    private Optional<Double2D> computeVector(int step, Int2D location) {
+    private Optional<Double2D> computeVector(final int step, final Int2D location) {
         final int dayOfTheYear = getDayOfTheYear(step);
         if (vectorMaps.containsKey(dayOfTheYear)) {
             final Map<CurrentPattern, Map<Int2D, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
@@ -120,11 +117,11 @@ public class CurrentVectors {
     }
 
     private VectorMapAtStep lookupVectorMap(
-        int step,
-        Function<Integer, Integer> keyLookup,
-        Supplier<Integer> keyFallback,
-        BiFunction<Integer, Integer, Integer> offsetFunction,
-        int stepDirection // +1 or -1
+        final int step,
+        final Function<Integer, Integer> keyLookup,
+        final Supplier<Integer> keyFallback,
+        final BiFunction<Integer, Integer, Integer> offsetFunction,
+        final int stepDirection // +1 or -1
     ) {
         final int oldDay = getDayOfTheYear(step);
         final Integer newKey = keyLookup.apply(oldDay);
@@ -138,22 +135,22 @@ public class CurrentVectors {
             lookupVectorMap(newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
     }
 
-    private VectorMapAtStep getVectorMapBefore(int step) {
+    private VectorMapAtStep getVectorMapBefore(final int step) {
         return lookupVectorMap(
             step,
             vectorMaps::floorKey,
             vectorMaps::lastKey,
-            this::negativeDaysOffset,
+            CurrentVectors::negativeDaysOffset,
             -1
         );
     }
 
-    private VectorMapAtStep getVectorMapAfter(int step) {
+    private VectorMapAtStep getVectorMapAfter(final int step) {
         return lookupVectorMap(
             step,
             vectorMaps::ceilingKey,
             vectorMaps::firstKey,
-            this::positiveDaysOffset,
+            CurrentVectors::positiveDaysOffset,
             +1
         );
     }
@@ -162,7 +159,7 @@ public class CurrentVectors {
      * Return the interpolated vector between the currents we have before and after step.
      * Returns null if we don't have currents for the desired sea tile.
      */
-    private Double2D getInterpolatedVector(Int2D location, int step) {
+    private Double2D getInterpolatedVector(final Int2D location, final int step) {
         final VectorMapAtStep vectorMapBefore = getVectorMapBefore(step - 1);
         final Double2D vectorBefore = vectorMapBefore.vectorMap.get(location);
         if (vectorBefore == null) return null;
@@ -179,7 +176,7 @@ public class CurrentVectors {
         final int step;
         final Map<Int2D, Double2D> vectorMap;
 
-        VectorMapAtStep(int step, Map<Int2D, Double2D> vectorMap) {
+        VectorMapAtStep(final int step, final Map<Int2D, Double2D> vectorMap) {
             this.step = step;
             this.vectorMap = vectorMap;
         }

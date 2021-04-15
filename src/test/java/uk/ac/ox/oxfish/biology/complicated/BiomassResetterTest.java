@@ -176,7 +176,7 @@ public class BiomassResetterTest {
             () -> 0
         );
         seaTiles.forEach(seaTile ->
-            fadMap.deployFad(fadInitializer.apply(mock(FadManager.class, RETURNS_DEEP_STUBS)), 0, seaTile)
+            fadMap.deployFad(fadInitializer.apply(mock(FadManager.class, RETURNS_DEEP_STUBS)), seaTile)
         );
 
         // record total biomass

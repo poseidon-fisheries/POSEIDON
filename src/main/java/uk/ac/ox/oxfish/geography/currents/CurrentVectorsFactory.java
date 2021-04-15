@@ -45,14 +45,14 @@ public enum CurrentVectorsFactory {
             }));
 
 
-    public CurrentVectors getCurrentVectors(MapExtent mapExtent, Map<CurrentPattern, Path> currentFiles) {
+    public CurrentVectors getCurrentVectors(final MapExtent mapExtent, final Map<CurrentPattern, Path> currentFiles) {
         return cache.getUnchecked(entry(mapExtent, currentFiles));
     }
 
     @SuppressWarnings("SameParameterValue")
-    private TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> makeVectorMaps(
-        MapExtent mapExtent,
-        Map<CurrentPattern, Path> currentFiles
+    private static TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> makeVectorMaps(
+        final MapExtent mapExtent,
+        final Map<CurrentPattern, Path> currentFiles
     ) {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> currentVectors = new TreeMap<>();
         final SparseGrid2D dummyGrid = new SparseGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
@@ -77,11 +77,11 @@ public enum CurrentVectorsFactory {
         return currentVectors;
     }
 
-    private Coordinate readCoordinate(Record record) {
+    private static Coordinate readCoordinate(final Record record) {
         return new Coordinate(record.getDouble("lon"), record.getDouble("lat"));
     }
 
-    private Double2D readVector(Record record, Coordinate startCoord, MapExtent mapExtent) {
+    private static Double2D readVector(final Record record, final Coordinate startCoord, final MapExtent mapExtent) {
         final Double2D metrePerSecondVector = new Double2D(
             record.getDouble("u"),
             record.getDouble("v")
@@ -94,7 +94,7 @@ public enum CurrentVectorsFactory {
      * This is slightly convoluted because the translation of distance into grid offsets depends on the latitude,
      * so we need to use lon/lat coordinates as an intermediate and then convert back to grid coordinates.
      */
-    private Double2D metrePerSecondToXyPerDaysVector(Double2D metrePerSecondVector, Coordinate startCoord, MapExtent mapExtent) {
+    private static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
         final Double2D metresPerDayVector = metrePerSecondVector.multiply(SECONDS_PER_DAY);
         final Double2D startXY = coordinateToXY(startCoord, mapExtent);
         final Double2D lonLatVector = metresVectorToLonLatVector(startCoord, metresPerDayVector.x, metresPerDayVector.y);
@@ -108,8 +108,8 @@ public enum CurrentVectorsFactory {
      * offsets, assuming that we are in the vicinity of {@code coord}. Adapted from
      * https://stackoverflow.com/a/2839560 and https://stackoverflow.com/a/7478827.
      */
-    private Double2D metresVectorToLonLatVector(Coordinate coord, Double u, Double v) {
-        double r = EquirectangularDistance.EARTH_RADIUS * 1000; // Earth radius in metres
+    private static Double2D metresVectorToLonLatVector(final Coordinate coord, final Double u, final Double v) {
+        final double r = EquirectangularDistance.EARTH_RADIUS * 1000; // Earth radius in metres
         final double dx = (180 / Math.PI) * (u / r) / Math.cos(Math.PI / 180.0 * coord.y);
         final double dy = (180 / Math.PI) * (v / r);
         return new Double2D(dx, dy);
