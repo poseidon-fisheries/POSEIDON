@@ -41,7 +41,7 @@ public class AttractionFieldTest {
         final GlobalAttractionModulator globalAttractionModulator =
             mock(GlobalAttractionModulator.class);
         final PortAttractionField portAttractionField =
-            new PortAttractionField(globalAttractionModulator, 2);
+            new PortAttractionField(globalAttractionModulator, 1, 2);
 
         final Fisher fisher = mock(Fisher.class);
         final Boat boat = mock(Boat.class);

@@ -91,7 +91,16 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
     private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
+    private double valueExponent = 1;
     private double distanceExponent = 1;
+
+    public double getValueExponent() {
+        return valueExponent;
+    }
+
+    public void setValueExponent(final double valueExponent) {
+        this.valueExponent = valueExponent;
+    }
 
     public double getDistanceExponent() {
         return distanceExponent;
@@ -319,6 +328,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 globalSetAttractionModulator,
                 FadSetAction.class,
+                valueExponent,
                 distanceExponent
             ),
             new ActionAttractionField(
@@ -332,6 +342,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 OpportunisticFadSetAction.class,
+                valueExponent,
                 distanceExponent
             ),
             new ActionAttractionField(
@@ -345,6 +356,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 NonAssociatedSetAction.class,
+                valueExponent,
                 distanceExponent
             ),
             new ActionAttractionField(
@@ -358,6 +370,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 DolphinSetAction.class,
+                valueExponent,
                 distanceExponent
             ),
             new ActionAttractionField(
@@ -371,6 +384,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fadDeploymentPctActiveFadsLimitLogisticSteepness
                 ),
                 FadDeploymentAction.class,
+                valueExponent,
                 distanceExponent
             ),
             new PortAttractionField(
@@ -380,6 +394,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     pctTravelTimeLeftLogisticMidpoint,
                     pctTravelTimeLeftLogisticSteepness
                 ),
+                valueExponent,
                 distanceExponent
             )
         );

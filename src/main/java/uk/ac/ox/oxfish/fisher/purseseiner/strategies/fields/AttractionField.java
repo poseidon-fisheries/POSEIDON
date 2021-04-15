@@ -37,6 +37,7 @@ public class AttractionField implements FisherStartable {
     private final LocationValues locationValues;
     private final LocalAttractionModulator localModulator;
     private final GlobalAttractionModulator globalModulator;
+    private final double valueExponent;
     private final double distanceExponent;
     private Fisher fisher;
 
@@ -44,11 +45,13 @@ public class AttractionField implements FisherStartable {
         final LocationValues locationValues,
         final LocalAttractionModulator localModulator,
         final GlobalAttractionModulator globalModulator,
+        final double valueExponent,
         final double distanceExponent
     ) {
         this.locationValues = locationValues;
         this.localModulator = localModulator;
         this.globalModulator = globalModulator;
+        this.valueExponent = valueExponent;
         this.distanceExponent = distanceExponent;
     }
 
@@ -67,7 +70,8 @@ public class AttractionField implements FisherStartable {
             .normalize() // normalized direction vector
             .multiply(
                 // scale to modulated location value, decreasing with travel time
-                location.value * localModulator.modulate(there.x, there.y, t, fisher)
+                pow(location.value, valueExponent)
+                    * localModulator.modulate(there.x, there.y, t, fisher)
                     / pow(travelTime, distanceExponent)
             );
     }

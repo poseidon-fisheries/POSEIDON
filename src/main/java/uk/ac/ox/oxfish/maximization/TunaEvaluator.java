@@ -34,7 +34,7 @@ public class TunaEvaluator implements Runnable {
     private final double[] solution;
     private int numRuns = getRuntime().availableProcessors();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Consumer<Scenario>> scenarioConsumer;
+    private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
     TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
         this.calibrationFilePath = calibrationFilePath;
@@ -44,7 +44,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(final String[] args) {
 
-        final String calibrationFolderName = "2021-04-12_15.24.48 (copy)";
+        final String calibrationFolderName = "2021-04-14_09.59.25";
 
         final Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
@@ -68,17 +68,17 @@ public class TunaEvaluator implements Runnable {
 
         final double[] solution = solutionBuilder.build().toArray();
         new TunaEvaluator(calibrationFilePath, solution)
-            .setScenarioConsumer(scenario -> {
-                final TunaScenario tunaScenario = (TunaScenario) scenario;
-                ((PurseSeineGearFactory) tunaScenario
-                    .getFisherDefinition()
-                    .getGear())
-                    .getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-                    "Bigeye tuna", new FixedDoubleParameter(1),
-                    "Yellowfin tuna", new FixedDoubleParameter(1),
-                    "Skipjack tuna", new FixedDoubleParameter(1)
-                ));
-            })
+//            .setScenarioConsumer(scenario -> {
+//                final TunaScenario tunaScenario = (TunaScenario) scenario;
+//                ((PurseSeineGearFactory) tunaScenario
+//                    .getFisherDefinition()
+//                    .getGear())
+//                    .getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+//                    "Bigeye tuna", new FixedDoubleParameter(1),
+//                    "Yellowfin tuna", new FixedDoubleParameter(1),
+//                    "Skipjack tuna", new FixedDoubleParameter(1)
+//                ));
+//            })
             .run();
 
     }
