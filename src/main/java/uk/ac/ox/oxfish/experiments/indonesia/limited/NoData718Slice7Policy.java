@@ -80,7 +80,6 @@ public class NoData718Slice7Policy {
         ADDITIONAL_COLUMNS.add(species + " Landings");
     }
 
-    spr_agent_agent" + numberOfAgents
 
 
     private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> simpleSelectivityShift =
