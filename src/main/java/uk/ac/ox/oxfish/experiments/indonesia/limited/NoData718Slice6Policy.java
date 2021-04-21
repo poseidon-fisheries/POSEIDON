@@ -55,7 +55,7 @@ public class NoData718Slice6Policy {
         runPolicyDirectory(
                 CANDIDATES_CSV_FILE.toFile(),
                 OUTPUT_FOLDER,
-                simulatedPolicies, ADDITIONAL_COLUMNS);
+                simulatedPolicies, ADDITIONAL_COLUMNS, new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
 
 
     }
@@ -64,7 +64,8 @@ public class NoData718Slice6Policy {
             File candidateFile,
             Path outputFolder,
             LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies,
-            final LinkedList<String> additionalColumns) throws IOException {
+            final LinkedList<String> additionalColumns,
+            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(
                 candidateFile
         ));
@@ -76,7 +77,8 @@ public class NoData718Slice6Policy {
             runOnePolicySimulation(
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
-                    Integer.parseInt(row[2]), outputFolder, policies, additionalColumns
+                    Integer.parseInt(row[2]), outputFolder, policies, additionalColumns,
+                    additionalPlugins
             );
         }
     }
@@ -134,7 +136,7 @@ public class NoData718Slice6Policy {
             int yearOfPolicyShock,
             Path outputFolder,
             LinkedHashMap<String, Function<Integer,
-                    Consumer<Scenario>>> policies, final LinkedList<String> policyColumns) throws IOException {
+                    Consumer<Scenario>>> policies, final LinkedList<String> policyColumns, LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
 
 
 
@@ -166,7 +168,7 @@ public class NoData718Slice6Policy {
         final LinkedList<
                 Pair<Integer,
                         AlgorithmFactory<? extends AdditionalStartable>>>
-                plugins = new LinkedList<>();
+                plugins = additionalPlugins;
         for (String additionalPlugin : ADDITIONAL_PLUGINS) {
             plugins.add(
                     new Pair<>(yearOfPolicyShock-1,

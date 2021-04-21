@@ -27,11 +27,14 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -57,14 +60,14 @@ public class NoData718Slice7Policy {
 //        ADDITIONAL_COLUMNS.add( "SPR Lutjanus malabaricus spr_agent_forpolicy");
 //        ADDITIONAL_COLUMNS.add( "Mean Length Caught Lutjanus malabaricus spr_agent_forpolicy");
 //        ADDITIONAL_COLUMNS.add( "CPUE Lutjanus malabaricus spr_agent_forpolicy");
-      //  ADDITIONAL_COLUMNS.add( "M/K ratio Lutjanus malabaricus spr_agent_forpolicy");
+        //  ADDITIONAL_COLUMNS.add( "M/K ratio Lutjanus malabaricus spr_agent_forpolicy");
         // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
 //        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
         //need to add a lot of multidens collectors here....
         String species = "Pristipomoides multidens";
         final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
         Preconditions.checkNotNull(agent, "species has no agent!");
-       // ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent + "_small");
+        // ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent + "_small");
         ADDITIONAL_COLUMNS.add("Exogenous catches of "+species);
 
         //ADDITIONAL_COLUMNS.add("SPR " + "Lutjanus malabaricus" + " " + "spr_agent" + "_total_and_correct");
@@ -77,7 +80,7 @@ public class NoData718Slice7Policy {
         ADDITIONAL_COLUMNS.add(species + " Landings");
     }
 
-
+    spr_agent_agent" + numberOfAgents
 
 
     private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> simpleSelectivityShift =
@@ -91,7 +94,7 @@ public class NoData718Slice7Policy {
 
             );
             simpleSelectivityShift.put("cmshift_faroff_allspecies_" + cmShift,
-                    selectivityShiftSimulations(finalCmShift, 2)
+                    selectivityShiftSimulations(finalCmShift, 1)
 
             );
         }
@@ -156,6 +159,57 @@ public class NoData718Slice7Policy {
         };
     }
 
+    private static final int[] SPR_AGENT_NUMBERS = new int[]{2,3,5,10,20,50,100,9999};
+
+    @NotNull
+    private static Function<Integer, Consumer<Scenario>> addSPRAgents() {
+
+
+        return yearOfShock -> scenario -> {
+            final FlexibleScenario cast = ((FlexibleScenario) scenario);
+            for (int numberOfAgents : SPR_AGENT_NUMBERS) {
+                String sprAgent =
+                        "SPR Fixed Sample Agent:\n" +
+                                "      assumedKParameter: '" + 0.3775984 + "'\n" +
+                                "      assumedLengthAtMaturity: '50.0'\n" +
+                                "      assumedLengthBinCm: '5.0'\n" +
+                                "      assumedLinf: '86.0'\n" +
+                                "      assumedNaturalMortality: '0.3775984'\n" +
+                                "      assumedVarA: '0.00853'\n" +
+                                "      assumedVarB: '3.137'\n" +
+                                "      simulatedMaxAge: '100.0'\n" +
+                                "      simulatedVirginRecruits: '1000.0'\n" +
+                                "      speciesName: Lutjanus malabaricus\n" +
+                                "      surveyTag: spr_agent_agent" + numberOfAgents + "\n" +
+                                "      useTNCFormula: " + true + "\n" +
+                                "      tagsToSample:\n" +
+                                "        population0: " + numberOfAgents + "\n" +
+                                "        population1: " + numberOfAgents + "\n" +
+                                "        population2: 0";
+                FishYAML yaml = new FishYAML();
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
+
+            }
+
+        };
+    }
+
+    private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> checkSPRDifferentials = new LinkedHashMap<>();
+    static {
+
+        checkSPRDifferentials.put("BAU_observed",addSPRAgents());
+        checkSPRDifferentials.put("5cmshifted_observed", new Function<Integer, Consumer<Scenario>>() {
+            @Override
+            public Consumer<Scenario> apply(Integer integer) {
+                return selectivityShiftSimulations(5,2).apply(integer).andThen(addSPRAgents().apply(0));
+            }
+        });
+
+
+
+    }
+
 
     private static Path OUTPUT_FOLDER =
 
@@ -163,17 +217,38 @@ public class NoData718Slice7Policy {
 
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
             simpleSelectivityShift;
-           // NoData718Utilities.simpleSelectivityShift;
+    // NoData718Utilities.simpleSelectivityShift;
+
+
 
 
     public static void main(String[] args) throws IOException {
 
-        runPolicyDirectory(
-                CANDIDATES_CSV_FILE.toFile(),
-                OUTPUT_FOLDER,
-                simulatedPolicies,
-                ADDITIONAL_COLUMNS);
+        if(args[0].equals("selectivity")) {
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    OUTPUT_FOLDER,
+                    simpleSelectivityShift,
+                    ADDITIONAL_COLUMNS,
+                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
+        }
+        else if(args[0].equals("sprnumbers")){
 
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            for (int numberOfAgents : SPR_AGENT_NUMBERS) {
+                columns.add( "SPR Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+                columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+                columns.add( "CPUE Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+                columns.add( "M/K ratio Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+            }
+
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    OUTPUT_FOLDER,
+                    checkSPRDifferentials,
+                    columns,
+                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
+        }
 
     }
 

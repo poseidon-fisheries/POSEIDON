@@ -1,7 +1,10 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -78,7 +81,7 @@ public class NoData718Slice6PolicyTest {
         NoData718Slice6Policy.runPolicyDirectory(
                 Paths.get("inputs", "tests", "slice718","candidates.csv").toFile(),
                 Paths.get("inputs", "tests", "slice718","output_policy"),
-                NoData718Utilities.policies, new LinkedList<>()
+                NoData718Utilities.policies, new LinkedList<>(), new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>()
         );
 
     }
