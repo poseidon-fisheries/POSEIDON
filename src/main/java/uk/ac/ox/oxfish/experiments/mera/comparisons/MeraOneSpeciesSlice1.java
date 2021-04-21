@@ -27,15 +27,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MeraOneSpeciesSlice1 {
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP =
             new LinkedHashMap<>();
+
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP_2 =
+            new LinkedHashMap<>();
+
     public static final int YEARS_TO_RUN_POLICIES = 40;
 
     static {
@@ -48,23 +49,30 @@ public class MeraOneSpeciesSlice1 {
         //200 days at sea
         TEST_POLICY_MAP.put("200_days",
                 fishState -> {
-                    return buildMaxDaysOutPolicy(200);
+                    return buildMaxDaysOutPolicy(200, true);
                 }
         );
         //150 days at sea
         TEST_POLICY_MAP.put("150_days",
                 fishState -> {
-                    return buildMaxDaysOutPolicy(150);
+                    return buildMaxDaysOutPolicy(150, true);
+                }
+        );
+        TEST_POLICY_MAP_2.put("150_days_notclosed",
+                fishState -> {
+                    return buildMaxDaysOutPolicy(150, false);
                 }
         );
 
         //0 days at sea
         TEST_POLICY_MAP.put("0_days",
                 fishState -> {
-                    return buildMaxDaysOutPolicy(0);
+                    return buildMaxDaysOutPolicy(0, true);
                 }
         );
     }
+
+
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SCHAEFER_TEST =
             new LinkedHashMap<>();
@@ -765,6 +773,42 @@ public class MeraOneSpeciesSlice1 {
     }
 
 
+    public static final String[] selectedPolicies = new String[]{
+            "0_days",
+            "150_days",
+            "BAU",
+            "multi_lastcatch",
+            "multi_lastcatch_70",
+            "closed_multi_itarget1cpue",
+            "LBSPR_season",
+            "LTARGETE_1_fleet",
+            "LTARGETE_1_season",
+            "LTARGETE_1_daysatsea",
+            "LTARGETE_4_season",
+            "LOPT_season"
+    };
+    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SELECTED =
+            new LinkedHashMap<>();
+    static {
+        LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ALL_OF_THEM =
+                new LinkedHashMap<>();
+        ALL_OF_THEM.putAll(EFFORT_ADAPTIVE);
+        ALL_OF_THEM.putAll(EFFORT_ADAPTIVE_ADDITIONAL);
+        ALL_OF_THEM.putAll(TEST_POLICY_MAP);
+        ALL_OF_THEM.putAll(TEST_POLICY_MAP_2);
+        ALL_OF_THEM.putAll(TAC_ADAPTIVE);
+        ALL_OF_THEM.putAll(TAC_ADAPTIVE_ONESPECIES);
+        ALL_OF_THEM.putAll(TAC_ADAPTIVE_ONESPECIES_2);
+        ALL_OF_THEM.putAll(SCHAEFER_TEST);
+        ALL_OF_THEM.putAll(ITE);
+        ALL_OF_THEM.putAll(TAC_ADAPTIVE_ITARGET);
+        ALL_OF_THEM.putAll(ITEWRONG);
+        ALL_OF_THEM.putAll(LTARGETE);
+
+        for (String policy : selectedPolicies) {
+            SELECTED.put(policy,ALL_OF_THEM.get(policy));
+        }
+    }
 
     private static final Path MAIN_DIRECTORY =
             Paths.get("docs","mera_hub","slice_1");
@@ -789,6 +833,8 @@ public class MeraOneSpeciesSlice1 {
                 selectedPolicies = EFFORT_ADAPTIVE_ADDITIONAL;
             if (typeOfPolicies.equals("test"))
                 selectedPolicies = TEST_POLICY_MAP;
+            if (typeOfPolicies.equals("test2"))
+                selectedPolicies = TEST_POLICY_MAP_2;
             if (typeOfPolicies.equals("tac"))
                 selectedPolicies = TAC_ADAPTIVE;
             if (typeOfPolicies.equals("mtac"))
@@ -805,6 +851,8 @@ public class MeraOneSpeciesSlice1 {
                 selectedPolicies = ITEWRONG;
             if (typeOfPolicies.equals("ltargete"))
                 selectedPolicies = LTARGETE;
+            if (typeOfPolicies.equals("select"))
+                selectedPolicies = SELECTED;
             if (selectedPolicies == null)
                 throw new RuntimeException("failed to find the right type of policies");
 
@@ -919,10 +967,11 @@ public class MeraOneSpeciesSlice1 {
 
 
     @NotNull
-    private static AdditionalStartable buildMaxDaysOutPolicy(int maxDaysOut) {
+    private static AdditionalStartable buildMaxDaysOutPolicy(int maxDaysOut, boolean blockEntry) {
         return model -> {
             //first remove all possible entries
-            NoDataPolicy.REMOVE_ENTRY_EVENT.step(model);
+            if(blockEntry)
+                NoDataPolicy.REMOVE_ENTRY_EVENT.step(model);
             //create a factory, feed it to the fisher factories just in case you turn entry back on
             MaxHoursOutFactory factory = new MaxHoursOutFactory();
             factory.setMaxHoursOut(new FixedDoubleParameter(maxDaysOut*24));

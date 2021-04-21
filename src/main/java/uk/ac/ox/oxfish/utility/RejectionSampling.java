@@ -167,6 +167,7 @@ public class RejectionSampling {
                 plugins.addAll(additionalPlugins);
             runner.setOutsidePlugins(plugins);
 
+            runner.setScaleSeedWithRunsDone(false);
             //remember to output the policy tag
             runner.setColumnModifier(new BatchRunner.ColumnModifier() {
                 @Override

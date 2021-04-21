@@ -21,12 +21,23 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -38,9 +49,6 @@ public class NoData718Slice7Policy {
             NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("successes_lowmk_ga.csv");
     public static final int SEED = 0;
     private static final int ADDITIONAL_YEARS_TO_RUN = 30;
-    private static Path OUTPUT_FOLDER =
-
-            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("lbspr");
 
 
     private static final LinkedList<String> ADDITIONAL_COLUMNS =
@@ -70,11 +78,92 @@ public class NoData718Slice7Policy {
     }
 
 
+
+
+    private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> simpleSelectivityShift =
+            new LinkedHashMap<>();
+    static {
+
+        for(int cmShift=0; cmShift<16; cmShift=cmShift+2) {
+            int finalCmShift = cmShift;
+            simpleSelectivityShift.put("cmshift_allboats_allspecies_" + cmShift,
+                    selectivityShiftSimulations(finalCmShift, 2)
+
+            );
+            simpleSelectivityShift.put("cmshift_faroff_allspecies_" + cmShift,
+                    selectivityShiftSimulations(finalCmShift, 2)
+
+            );
+        }
+
+
+    }
+
+    @NotNull
+    private static Function<Integer, Consumer<Scenario>> selectivityShiftSimulations(int finalCmShift, final int howManyPopulations) {
+        return yearOfShock -> scenario -> {
+            final FlexibleScenario cast = ((FlexibleScenario) scenario);
+            cast.getPlugins().add(
+                    fishState -> model -> fishState.scheduleOnceInXDays(
+                            new Steppable() {
+                                @Override
+                                public void step(SimState simState) {
+
+                                    for (int populations = 0; populations < howManyPopulations; populations++) {
+                                        //weird but effective way to copy
+                                        final AlgorithmFactory<? extends Gear> gearFactory =
+                                                cast.getFisherDefinitions().get(populations).getGear();
+
+
+                                        final HeterogeneousGearFactory heterogeneousGear = (HeterogeneousGearFactory) ((GarbageGearFactory) (
+                                                ((DelayGearDecoratorFactory) gearFactory).getDelegate())).getDelegate();
+                                        for (Map.Entry<String, HomogeneousGearFactory> individualGear : heterogeneousGear.gears.entrySet()) {
+                                            final SimpleLogisticGearFactory individualLogistic = (SimpleLogisticGearFactory) individualGear.getValue();
+                                            individualLogistic.setSelexParameter1(
+                                                    new FixedDoubleParameter(
+                                                            ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() + finalCmShift
+                                                    )
+                                            );
+                                        }
+
+                                        //all new boats will use this
+                                        final String populationTag = "population" + populations;
+                                        fishState.getFisherFactory(populationTag).setGear(
+                                                gearFactory
+                                        );
+                                        //all old boats will use this
+                                        fishState.getFishers().stream().
+                                                filter(fisher -> fisher.getTags().contains(populationTag)).forEach(
+                                                new Consumer<Fisher>() {
+                                                    @Override
+                                                    public void accept(Fisher fisher) {
+                                                        System.out.println("Changing gear!");
+                                                        fisher.setGear(((DelayGearDecoratorFactory) gearFactory).apply(fishState));
+                                                    }
+                                                }
+                                        );
+
+
+                                    }
+
+
+                                }
+                            }
+
+                            , StepOrder.DAWN, 365 * yearOfShock)
+            );
+
+        };
+    }
+
+
+    private static Path OUTPUT_FOLDER =
+
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift");
+
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            NoData718Utilities.lbsprMsePoliciesNoEntry;
-
-
-
+            simpleSelectivityShift;
+           // NoData718Utilities.simpleSelectivityShift;
 
 
     public static void main(String[] args) throws IOException {

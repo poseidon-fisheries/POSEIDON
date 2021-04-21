@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -453,64 +454,68 @@ public class NoData718Utilities {
                 toReturn.put(
                         "BAU",
                         //bau will also have the new SPR agent to (i) avoid scheduling discrepancies (ii) fill in that column for later printing
-                        new Function<Integer, Consumer<Scenario>>() {
-                                @Override
-                                public Consumer<Scenario> apply(Integer integer) {
-                                        return new Consumer<Scenario>() {
-                                                @Override
-                                                public void accept(Scenario scenario) {
-                                                        String sprAgent =
-                                                                "SPR Fixed Sample Agent:\n" +
-                                                                        "      assumedKParameter: '" + 0.3775984 + "'\n" +
-                                                                        "      assumedLengthAtMaturity: '50.0'\n" +
-                                                                        "      assumedLengthBinCm: '5.0'\n" +
-                                                                        "      assumedLinf: '86.0'\n" +
-                                                                        "      assumedNaturalMortality: '0.3775984'\n" +
-                                                                        "      assumedVarA: '0.00853'\n" +
-                                                                        "      assumedVarB: '3.137'\n" +
-                                                                        "      simulatedMaxAge: '100.0'\n" +
-                                                                        "      simulatedVirginRecruits: '1000.0'\n" +
-                                                                        "      speciesName: Lutjanus malabaricus\n" +
-                                                                        "      surveyTag: spr_agent_forpolicy\n" +
-                                                                        "      useTNCFormula: " + true + "\n" +
-                                                                        "      tagsToSample:\n" +
-                                                                        "        population0: 16\n" +
-                                                                        "        population1: 16\n" +
-                                                                        "        population2: 0";
-                                                        FishYAML yaml = new FishYAML();
-                                                        ((FlexibleScenario) scenario).getPlugins().add(yaml.loadAs(sprAgent,
-                                                                AlgorithmFactory.class));
-
-                                                        //fill in another column so that there is something to print out
-                                                        ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
-                                                                @Override
-                                                                public AdditionalStartable apply(FishState fishState) {
-
-                                                                        return new AdditionalStartable() {
-                                                                                @Override
-                                                                                public void start(FishState model) {
-                                                                                        model.getYearlyDataSet().registerGatherer("LBSPREffortPolicy output",
-                                                                                                new Gatherer<FishState>() {
-                                                                                                        @Override
-                                                                                                        public Double apply(FishState fishState) {
-                                                                                                                return 1d;
-                                                                                                        }
-                                                                                                },1);
-                                                                                }
-                                                                        };
-                                                                }
-                                                        });
-                                                }
-                                        };
-
-                                }
-                        }
+                        bauWithSprAgent("LBSPREffortPolicy output")
 
                 );
                 return toReturn;
 
         }
 
+        @NotNull
+        public static Function<Integer, Consumer<Scenario>> bauWithSprAgent(String s) {
+                return new Function<Integer, Consumer<Scenario>>() {
+                        @Override
+                        public Consumer<Scenario> apply(Integer integer) {
+                                return new Consumer<Scenario>() {
+                                        @Override
+                                        public void accept(Scenario scenario) {
+                                                String sprAgent =
+                                                        "SPR Fixed Sample Agent:\n" +
+                                                                "      assumedKParameter: '" + 0.3775984 + "'\n" +
+                                                                "      assumedLengthAtMaturity: '50.0'\n" +
+                                                                "      assumedLengthBinCm: '5.0'\n" +
+                                                                "      assumedLinf: '86.0'\n" +
+                                                                "      assumedNaturalMortality: '0.3775984'\n" +
+                                                                "      assumedVarA: '0.00853'\n" +
+                                                                "      assumedVarB: '3.137'\n" +
+                                                                "      simulatedMaxAge: '100.0'\n" +
+                                                                "      simulatedVirginRecruits: '1000.0'\n" +
+                                                                "      speciesName: Lutjanus malabaricus\n" +
+                                                                "      surveyTag: spr_agent_forpolicy\n" +
+                                                                "      useTNCFormula: " + true + "\n" +
+                                                                "      tagsToSample:\n" +
+                                                                "        population0: 16\n" +
+                                                                "        population1: 16\n" +
+                                                                "        population2: 0";
+                                                FishYAML yaml = new FishYAML();
+                                                ((FlexibleScenario) scenario).getPlugins().add(yaml.loadAs(sprAgent,
+                                                        AlgorithmFactory.class));
+
+                                                //fill in another column so that there is something to print out
+                                                ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
+                                                        @Override
+                                                        public AdditionalStartable apply(FishState fishState) {
+
+                                                                return new AdditionalStartable() {
+                                                                        @Override
+                                                                        public void start(FishState model) {
+                                                                                model.getYearlyDataSet().registerGatherer(s,
+                                                                                        new Gatherer<FishState>() {
+                                                                                                @Override
+                                                                                                public Double apply(FishState fishState) {
+                                                                                                        return 1d;
+                                                                                                }
+                                                                                        }, 1);
+                                                                        }
+                                                                };
+                                                        }
+                                                });
+                                        }
+                                };
+
+                        }
+                };
+        }
 
 
         static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> loptMsePolicies = buildLoptPolicies(true);
@@ -592,58 +597,7 @@ public class NoData718Utilities {
                 toReturn.put(
                         "BAU",
                         //bau will also have the new SPR agent to (i) avoid scheduling discrepancies (ii) fill in that column for later printing
-                        new Function<Integer, Consumer<Scenario>>() {
-                                @Override
-                                public Consumer<Scenario> apply(Integer integer) {
-                                        return new Consumer<Scenario>() {
-                                                @Override
-                                                public void accept(Scenario scenario) {
-                                                        String sprAgent =
-                                                                "SPR Fixed Sample Agent:\n" +
-                                                                        "      assumedKParameter: '" + 0.3775984 + "'\n" +
-                                                                        "      assumedLengthAtMaturity: '50.0'\n" +
-                                                                        "      assumedLengthBinCm: '5.0'\n" +
-                                                                        "      assumedLinf: '86.0'\n" +
-                                                                        "      assumedNaturalMortality: '0.3775984'\n" +
-                                                                        "      assumedVarA: '0.00853'\n" +
-                                                                        "      assumedVarB: '3.137'\n" +
-                                                                        "      simulatedMaxAge: '100.0'\n" +
-                                                                        "      simulatedVirginRecruits: '1000.0'\n" +
-                                                                        "      speciesName: Lutjanus malabaricus\n" +
-                                                                        "      surveyTag: spr_agent_forpolicy\n" +
-                                                                        "      useTNCFormula: " + true + "\n" +
-                                                                        "      tagsToSample:\n" +
-                                                                        "        population0: 16\n" +
-                                                                        "        population1: 16\n" +
-                                                                        "        population2: 0";
-                                                        FishYAML yaml = new FishYAML();
-                                                        ((FlexibleScenario) scenario).getPlugins().add(yaml.loadAs(sprAgent,
-                                                                AlgorithmFactory.class));
-
-                                                        //fill in another column so that there is something to print out
-                                                        ((FlexibleScenario) scenario).getPlugins().add(new AlgorithmFactory<AdditionalStartable>() {
-                                                                @Override
-                                                                public AdditionalStartable apply(FishState fishState) {
-
-                                                                        return new AdditionalStartable() {
-                                                                                @Override
-                                                                                public void start(FishState model) {
-                                                                                        model.getYearlyDataSet().registerGatherer("LoptEffortPolicy output",
-                                                                                                new Gatherer<FishState>() {
-                                                                                                        @Override
-                                                                                                        public Double apply(FishState fishState) {
-                                                                                                                return 1d;
-                                                                                                        }
-                                                                                                },1);
-                                                                                }
-                                                                        };
-                                                                }
-                                                        });
-                                                }
-                                        };
-
-                                }
-                        }
+                        bauWithSprAgent("LoptEffortPolicy output")
 
                 );
                 return toReturn;

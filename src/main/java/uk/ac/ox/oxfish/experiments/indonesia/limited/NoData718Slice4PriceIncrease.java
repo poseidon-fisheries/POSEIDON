@@ -194,6 +194,7 @@ public class NoData718Slice4PriceIncrease {
             BatchRunner runner = NoData718Slice2PriceIncrease.setupRunner(scenarioFile,
                     shockYear+ additionalYearsToRun,
                     null, SEED, additionalColumnsToPrint);
+            runner.setScaleSeedWithRunsDone(false);
 
             //give it the scenario
             runner.setScenarioSetup(policy);

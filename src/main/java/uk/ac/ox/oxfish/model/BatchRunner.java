@@ -125,7 +125,15 @@ public class BatchRunner
         this.heatmapGathererStartYear = heatmapGathererStartYear;
     }
 
+    private boolean scaleSeedWithRunsDone = true;
 
+    public boolean isScaleSeedWithRunsDone() {
+        return scaleSeedWithRunsDone;
+    }
+
+    public void setScaleSeedWithRunsDone(boolean scaleSeedWithRunsDone) {
+        this.scaleSeedWithRunsDone = scaleSeedWithRunsDone;
+    }
 
     public StringBuffer run(@Nullable StringBuffer writer) throws IOException {
 
@@ -136,7 +144,7 @@ public class BatchRunner
         long startTime = System.currentTimeMillis();
         FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
                 outputFolder == null ? null : getOutputFolder().resolve(simulationName),
-                initialSeed + runsDone,
+                scaleSeedWithRunsDone ? initialSeed + runsDone : initialSeed,
                 Log.LEVEL_INFO,
                 true, policyFile == null ?
                         null : policyFile.toString(),
