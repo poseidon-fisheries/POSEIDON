@@ -227,7 +227,7 @@ public class NoData718Slice7Policy {
         if(args[0].equals("selectivity")) {
             runPolicyDirectory(
                     CANDIDATES_CSV_FILE.toFile(),
-                    OUTPUT_FOLDER,
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift"),
                     simpleSelectivityShift,
                     ADDITIONAL_COLUMNS,
                     new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
@@ -244,7 +244,7 @@ public class NoData718Slice7Policy {
 
             runPolicyDirectory(
                     CANDIDATES_CSV_FILE.toFile(),
-                    OUTPUT_FOLDER,
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers"),
                     checkSPRDifferentials,
                     columns,
                     new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
