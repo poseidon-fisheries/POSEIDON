@@ -235,10 +235,10 @@ public class NoData718Slice7Policy {
 
             final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
             for (int numberOfAgents : SPR_AGENT_NUMBERS) {
-                columns.add( "SPR Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
-                columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
-                columns.add( "CPUE Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
-                columns.add( "M/K ratio Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+                columns.add( "SPR Lutjanus malabaricus spr_agent" + numberOfAgents);
+                columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent" + numberOfAgents);
+                columns.add( "CPUE Lutjanus malabaricus spr_agent" + numberOfAgents);
+                columns.add( "M/K ratio Lutjanus malabaricus spr_agent" + numberOfAgents);
             }
 
             runPolicyDirectory(

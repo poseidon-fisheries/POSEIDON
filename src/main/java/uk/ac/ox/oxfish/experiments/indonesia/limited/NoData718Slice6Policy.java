@@ -78,7 +78,7 @@ public class NoData718Slice6Policy {
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
                     Integer.parseInt(row[2]), outputFolder, policies, additionalColumns,
-                    additionalPlugins
+                    new LinkedList<>(additionalPlugins)
             );
         }
     }
@@ -136,7 +136,8 @@ public class NoData718Slice6Policy {
             int yearOfPolicyShock,
             Path outputFolder,
             LinkedHashMap<String, Function<Integer,
-                    Consumer<Scenario>>> policies, final LinkedList<String> policyColumns, LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
+                    Consumer<Scenario>>> policies, final LinkedList<String> policyColumns,
+            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
 
 
 
