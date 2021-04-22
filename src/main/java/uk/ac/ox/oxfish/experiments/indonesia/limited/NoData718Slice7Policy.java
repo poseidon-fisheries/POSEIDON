@@ -82,11 +82,13 @@ public class NoData718Slice7Policy {
 
 
 
+    private final static int[] validShifts = new int[]{20,12,8,6,2,0};
+
     private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> simpleSelectivityShift =
             new LinkedHashMap<>();
     static {
 
-        for(int cmShift=0; cmShift<16; cmShift=cmShift+2) {
+        for(int cmShift:validShifts) {
             int finalCmShift = cmShift;
             simpleSelectivityShift.put("cmshift_allboats_allspecies_" + cmShift,
                     selectivityShiftSimulations(finalCmShift, 2)
@@ -105,6 +107,52 @@ public class NoData718Slice7Policy {
     private static Function<Integer, Consumer<Scenario>> selectivityShiftSimulations(int finalCmShift, final int howManyPopulations) {
         return yearOfShock -> scenario -> {
             final FlexibleScenario cast = ((FlexibleScenario) scenario);
+            //add some more interesting trackers
+            String sprAgent =
+                    "SPR Fixed Sample Agent:\n" +
+                            "      assumedKParameter: '" + 0.3775984 + "'\n" +
+                            "      assumedLengthAtMaturity: '50.0'\n" +
+                            "      assumedLengthBinCm: '5.0'\n" +
+                            "      assumedLinf: '86.0'\n" +
+                            "      assumedNaturalMortality: '0.3775984'\n" +
+                            "      assumedVarA: '0.00853'\n" +
+                            "      assumedVarB: '3.137'\n" +
+                            "      simulatedMaxAge: '100.0'\n" +
+                            "      simulatedVirginRecruits: '1000.0'\n" +
+                            "      speciesName: Lutjanus malabaricus\n" +
+                            "      surveyTag: spr_agent_agent_onlylongliners\n" +
+                            "      useTNCFormula: " + true + "\n" +
+                            "      tagsToSample:\n" +
+                            "        population0: " + 100 + "\n" +
+                            "        population1: " + 100 + "\n" +
+                            "        population2: 0";
+            FishYAML yaml = new FishYAML();
+            cast.getPlugins().add(yaml.loadAs(sprAgent,
+                    AlgorithmFactory.class));
+            //
+            sprAgent =
+                    "SPR Fixed Sample Agent:\n" +
+                            "      assumedKParameter: '" + 0.3775984 + "'\n" +
+                            "      assumedLengthAtMaturity: '50.0'\n" +
+                            "      assumedLengthBinCm: '5.0'\n" +
+                            "      assumedLinf: '86.0'\n" +
+                            "      assumedNaturalMortality: '0.3775984'\n" +
+                            "      assumedVarA: '0.00853'\n" +
+                            "      assumedVarB: '3.137'\n" +
+                            "      simulatedMaxAge: '100.0'\n" +
+                            "      simulatedVirginRecruits: '1000.0'\n" +
+                            "      speciesName: Lutjanus malabaricus\n" +
+                            "      surveyTag: spr_agent_agent_onlygillnetters\n" +
+                            "      useTNCFormula: " + true + "\n" +
+                            "      tagsToSample:\n" +
+                            "        population0: " + 0 + "\n" +
+                            "        population1: " + 0 + "\n" +
+                            "        population2: 100";
+            cast.getPlugins().add(yaml.loadAs(sprAgent,
+                    AlgorithmFactory.class));
+
+            //now add stuff
+
             cast.getPlugins().add(
                     fishState -> model -> fishState.scheduleOnceInXDays(
                             new Steppable() {
@@ -121,9 +169,19 @@ public class NoData718Slice7Policy {
                                                 ((DelayGearDecoratorFactory) gearFactory).getDelegate())).getDelegate();
                                         for (Map.Entry<String, HomogeneousGearFactory> individualGear : heterogeneousGear.gears.entrySet()) {
                                             final SimpleLogisticGearFactory individualLogistic = (SimpleLogisticGearFactory) individualGear.getValue();
+
+                                            System.out.println(individualGear.getKey() + ": " +
+                                                    ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() + "--->" +
+                                                    (((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
+                                                            (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue() ))
+
+                                                    );
+
+
                                             individualLogistic.setSelexParameter1(
                                                     new FixedDoubleParameter(
-                                                            ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() + finalCmShift
+                                                            ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
+                                                                    (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue() )
                                                     )
                                             );
                                         }
@@ -139,7 +197,6 @@ public class NoData718Slice7Policy {
                                                 new Consumer<Fisher>() {
                                                     @Override
                                                     public void accept(Fisher fisher) {
-                                                        System.out.println("Changing gear!");
                                                         fisher.setGear(((DelayGearDecoratorFactory) gearFactory).apply(fishState));
                                                     }
                                                 }
@@ -224,6 +281,15 @@ public class NoData718Slice7Policy {
     public static void main(String[] args) throws IOException {
 
         if(args[0].equals("selectivity")) {
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            for (String agents : new String[]{"spr_agent_agent_onlygillnetters","spr_agent_agent_onlylongliners"}) {
+                columns.add( "SPR Lutjanus malabaricus " + agents);
+                columns.add( "Mean Length Caught Lutjanus malabaricus " + agents);
+                columns.add( "CPUE Lutjanus malabaricus " + agents);
+                columns.add( "M/K ratio Lutjanus malabaricus " + agents);
+            }
+
             runPolicyDirectory(
                     CANDIDATES_CSV_FILE.toFile(),
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift"),
