@@ -53,4 +53,31 @@ public class SimplifiedDoubleNormalFilter extends FormulaAbundanceFilter {
         return selex;
 
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        SimplifiedDoubleNormalFilter that = (SimplifiedDoubleNormalFilter) o;
+
+        if (Double.compare(that.lengthFullSelectivity, lengthFullSelectivity) != 0) return false;
+        if (Double.compare(that.slopeLeft, slopeLeft) != 0) return false;
+        return Double.compare(that.slopeRight, slopeRight) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        temp = Double.doubleToLongBits(lengthFullSelectivity);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(slopeLeft);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(slopeRight);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

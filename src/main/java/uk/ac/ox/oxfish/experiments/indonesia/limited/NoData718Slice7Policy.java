@@ -76,28 +76,34 @@ public class NoData718Slice7Policy {
         ADDITIONAL_COLUMNS.add("Bt/K " + species);
         ADDITIONAL_COLUMNS.add("Percentage Mature Catches " + species + " "+ agent);
         ADDITIONAL_COLUMNS.add("Percentage Lopt Catches " + species + " "+ agent);
+        ADDITIONAL_COLUMNS.add("Mean Length Caught " + species + " "+ agent);
+        ADDITIONAL_COLUMNS.add("CPUE " + species + " "+ agent);
         ADDITIONAL_COLUMNS.add(species + " Earnings");
         ADDITIONAL_COLUMNS.add(species + " Landings");
     }
 
 
 
-    private final static int[] validShifts = new int[]{20,12,8,6,2,0};
+    private final static int[] validShifts = new int[]{12,0,8,6,2,20};
 
     private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> simpleSelectivityShift =
             new LinkedHashMap<>();
     static {
 
         for(int cmShift:validShifts) {
-            int finalCmShift = cmShift;
+            simpleSelectivityShift.put("cmshift_reallyallboats_allspecies_" + cmShift,
+                    selectivityShiftSimulations(cmShift, 3)
+
+            );
+
             simpleSelectivityShift.put("cmshift_allboats_allspecies_" + cmShift,
-                    selectivityShiftSimulations(finalCmShift, 2)
+                    selectivityShiftSimulations(cmShift, 2)
 
             );
-            simpleSelectivityShift.put("cmshift_faroff_allspecies_" + cmShift,
-                    selectivityShiftSimulations(finalCmShift, 1)
-
-            );
+//            simpleSelectivityShift.put("cmshift_faroff_allspecies_" + cmShift,
+//                    selectivityShiftSimulations(cmShift, 1)
+//
+//            );
         }
 
 
@@ -168,22 +174,39 @@ public class NoData718Slice7Policy {
                                         final HeterogeneousGearFactory heterogeneousGear = (HeterogeneousGearFactory) ((GarbageGearFactory) (
                                                 ((DelayGearDecoratorFactory) gearFactory).getDelegate())).getDelegate();
                                         for (Map.Entry<String, HomogeneousGearFactory> individualGear : heterogeneousGear.gears.entrySet()) {
-                                            final SimpleLogisticGearFactory individualLogistic = (SimpleLogisticGearFactory) individualGear.getValue();
 
-                                            System.out.println(individualGear.getKey() + ": " +
-                                                    ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() + "--->" +
-                                                    (((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
-                                                            (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue() ))
+                                            //don't bother with fixed proportion
+                                            if(individualGear.getValue() instanceof FixedProportionHomogeneousGearFactory)
+                                                continue;
+                                            //if it is domed, shift it easily
+                                            if(individualGear.getValue() instanceof SimpleDomeShapedGearFactory)
+                                            {
+                                                final SimpleDomeShapedGearFactory domed = (SimpleDomeShapedGearFactory) individualGear.getValue();
+                                                domed.setLengthFullSelectivity( new FixedDoubleParameter(
+                                                        ((FixedDoubleParameter) domed.getLengthFullSelectivity()).getFixedValue() + finalCmShift
+                                                        )
+                                                );
+                                                System.out.println("dome selectivity shifted by " + finalCmShift);
+                                            }
+                                            else {
+                                                final SimpleLogisticGearFactory individualLogistic = (SimpleLogisticGearFactory) individualGear.getValue();
 
-                                                    );
+
+                                                System.out.println(individualGear.getKey() + ": " +
+                                                        ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() + "--->" +
+                                                        (((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
+                                                                (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue()))
+
+                                                );
 
 
-                                            individualLogistic.setSelexParameter1(
-                                                    new FixedDoubleParameter(
-                                                            ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
-                                                                    (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue() )
-                                                    )
-                                            );
+                                                individualLogistic.setSelexParameter1(
+                                                        new FixedDoubleParameter(
+                                                                ((FixedDoubleParameter) individualLogistic.getSelexParameter1()).getFixedValue() +
+                                                                        (finalCmShift * ((FixedDoubleParameter) individualLogistic.getSelexParameter2()).getFixedValue())
+                                                        )
+                                                );
+                                            }
                                         }
 
                                         //all new boats will use this
@@ -267,10 +290,6 @@ public class NoData718Slice7Policy {
     }
 
 
-    private static Path OUTPUT_FOLDER =
-
-            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift");
-
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
             simpleSelectivityShift;
     // NoData718Utilities.simpleSelectivityShift;
@@ -288,13 +307,16 @@ public class NoData718Slice7Policy {
                 columns.add( "Mean Length Caught Lutjanus malabaricus " + agents);
                 columns.add( "CPUE Lutjanus malabaricus " + agents);
                 columns.add( "M/K ratio Lutjanus malabaricus " + agents);
+                columns.add( "Percentage Mature Catches Lutjanus malabaricus " + agents);
+                columns.add( "Percentage Lopt Catches Lutjanus malabaricus " + agents);
             }
 
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_again").toFile().mkdirs();
             runPolicyDirectory(
                     CANDIDATES_CSV_FILE.toFile(),
-                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift"),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_again"),
                     simpleSelectivityShift,
-                    ADDITIONAL_COLUMNS,
+                    columns,
                     new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
         }
         else if(args[0].equals("sprnumbers")){
