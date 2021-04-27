@@ -56,7 +56,7 @@ public class SetOpportunityGenerator {
         );
     }
 
-    public SetOpportunityGenerator(
+    private SetOpportunityGenerator(
         final LogisticFunction probabilityFunction,
         final Map<Species, Double> weights,
         final Function<Fisher, AbstractSetAction> actionConstructor,
@@ -80,17 +80,17 @@ public class SetOpportunityGenerator {
     Optional<AbstractSetAction> get(
         final Fisher fisher,
         final LocalBiology biology,
-        final Int2D gridLocation
+        final Int2D gridLocation,
+        final int step
     ) {
         final boolean opportunity;
-        final int step = fisher.grabState().getStep();
         if (activeOpportunities.hasOpportunity(gridLocation, step)) {
             opportunity = true;
         } else {
             final double p = probabilityOfOpportunity(biology);
             opportunity = fisher.grabRandomizer().nextBoolean(p);
             if (opportunity) {
-                int duration = 1;
+                final int duration = 1;
                 activeOpportunities.addOpportunity(gridLocation, step, duration);
             }
         }

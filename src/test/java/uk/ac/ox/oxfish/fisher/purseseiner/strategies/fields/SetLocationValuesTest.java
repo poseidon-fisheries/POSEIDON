@@ -45,6 +45,7 @@ import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -65,7 +66,7 @@ public class SetLocationValuesTest {
         final Species specie = globalBiology.getSpecie(0);
         when(market.getSpecies()).thenReturn(specie);
         when(market.getMarginalPrice()).thenReturn(1.0);
-        when(marketMap.getMarkets()).thenReturn(ImmutableList.of(market));
+        when(marketMap.getMarket(anyInt())).thenReturn(market);
         when(port.getMarketMap(any())).thenReturn(marketMap);
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getLocation()).thenReturn(map.getSeaTile(3, 3));

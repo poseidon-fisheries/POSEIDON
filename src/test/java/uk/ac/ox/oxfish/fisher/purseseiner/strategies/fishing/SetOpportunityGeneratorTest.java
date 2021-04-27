@@ -66,7 +66,7 @@ public class SetOpportunityGeneratorTest {
 
     }
 
-    private Entry<Double, Optional<AbstractSetAction>> getP(
+    private static Entry<Double, Optional<AbstractSetAction>> getP(
         final double biomass0,
         final double weight0,
         final double biomass1,
@@ -74,7 +74,7 @@ public class SetOpportunityGeneratorTest {
     ) {
 
         final GlobalBiology globalBiology = genericListOfSpecies(2);
-        double[] biomasses = DoubleStream.of(biomass0, biomass1).toArray();
+        final double[] biomasses = DoubleStream.of(biomass0, biomass1).toArray();
         final LocalBiology biology = new BiomassLocalBiology(
             Arrays.copyOf(biomasses, biomasses.length),
             Arrays.copyOf(biomasses, biomasses.length)
@@ -93,7 +93,7 @@ public class SetOpportunityGeneratorTest {
         when(fisher.grabRandomizer()).thenReturn(rng);
         return entry(
             setOpportunityGenerator.probabilityOfOpportunity(biology),
-            setOpportunityGenerator.get(fisher, biology, new Int2D())
+            setOpportunityGenerator.get(fisher, biology, new Int2D(), 0)
         );
     }
 

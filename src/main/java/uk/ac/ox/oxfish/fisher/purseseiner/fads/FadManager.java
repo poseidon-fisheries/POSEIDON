@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
+import sim.util.Bag;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -68,9 +69,9 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
-        FadMap fadMap,
-        FadInitializer fadInitializer,
-        int numFadsInStock
+        final FadMap fadMap,
+        final FadInitializer fadInitializer,
+        final int numFadsInStock
     ) {
         this(
             fadMap,
@@ -86,15 +87,15 @@ public class FadManager {
     }
 
     public FadManager(
-        FadMap fadMap,
-        FadInitializer fadInitializer,
-        int numFadsInStock,
-        Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
-        Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
-        Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
-        Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
-        Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
-        ActiveActionRegulations actionSpecificRegulations
+        final FadMap fadMap,
+        final FadInitializer fadInitializer,
+        final int numFadsInStock,
+        final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
+        final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
+        final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
+        final Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
+        final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
+        final ActiveActionRegulations actionSpecificRegulations
     ) {
         checkArgument(numFadsInStock >= 0);
         this.fadMap = fadMap;
@@ -114,34 +115,28 @@ public class FadManager {
         setActionSpecificRegulations(actionSpecificRegulations);
     }
 
-    public static FadManager getFadManager(Fisher fisher) {
+    public static FadManager getFadManager(final Fisher fisher) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear required to get FadManager instance. Fisher " +
                 fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
-    public static Optional<FadManager> maybeGetFadManager(Fisher fisher) {
+    public static Optional<FadManager> maybeGetFadManager(final Fisher fisher) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public <T> void registerObserver(Class<T> observedClass, Observer<? super T> observer) {
+    public <T> void registerObserver(final Class<T> observedClass, final Observer<? super T> observer) {
         observers.register(observedClass, observer);
     }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
-    public Optional<Fad> oneOfDeployedFads() {
-        return getDeployedFads().isEmpty() ?
-            Optional.empty() :
-            Optional.of(oneOf(deployedFads, getFisher().grabRandomizer()));
-    }
-
     public Set<Fad> getDeployedFads() { return Collections.unmodifiableSet(deployedFads); }
 
     public Fisher getFisher() { return fisher; }
 
-    public void setFisher(Fisher fisher) {
+    public void setFisher(final Fisher fisher) {
         this.fisher = fisher;
     }
 
@@ -150,18 +145,16 @@ public class FadManager {
         return getFadsAt(fisher.getLocation());
     }
 
-    public Stream<Fad> getFadsAt(SeaTile location) {
+    public Stream<Fad> getFadsAt(final SeaTile location) {
         return bagToStream(fadMap.fadsAt(location));
     }
 
-    public int getNumFadsInStock() { return numFadsInStock; }
-
-    public void loseFad(Fad fad) {
+    public void loseFad(final Fad fad) {
         checkArgument(deployedFads.contains(fad));
         deployedFads.remove(fad);
     }
 
-    public Fad deployFad(SeaTile seaTile, int timeStep) {
+    public Fad deployFad(final SeaTile seaTile) {
         final Fad newFad = initFad();
         fadMap.deployFad(newFad, seaTile);
         return newFad;
@@ -178,38 +171,27 @@ public class FadManager {
     /**
      * Deploys a FAD at a random position in the given sea tile
      */
-    public void deployFad(SeaTile seaTile, int timeStep, MersenneTwisterFast random) {
+    public void deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
         deployFad(new Double2D(
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
         ));
     }
 
-    private void deployFad(Double2D location) {
+    private void deployFad(final Double2D location) {
         final Fad newFad = initFad();
         fadMap.deployFad(newFad, location);
     }
-
-    public void pickUpFad(Fad fad) {
-        fadMap.remove(fad);
-        numFadsInStock++;
-    }
-
-    private SeaTile getSeaTile(Double2D position) { return getSeaTile(position.x, position.y); }
-
-    private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
-
-    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y); }
 
     public ActiveActionRegulations getActionSpecificRegulations() {
         return actionSpecificRegulations;
     }
 
-    public void setActionSpecificRegulations(Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+    public void setActionSpecificRegulations(final Stream<ActionSpecificRegulation> actionSpecificRegulations) {
         setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
     }
 
-    private void setActionSpecificRegulations(ActiveActionRegulations actionSpecificRegulations) {
+    private void setActionSpecificRegulations(final ActiveActionRegulations actionSpecificRegulations) {
         observers.unregister(this.actionSpecificRegulations);
         this.actionSpecificRegulations = actionSpecificRegulations;
         POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(actionClass, actionSpecificRegulations));
@@ -221,8 +203,8 @@ public class FadManager {
 
     public Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> getBiomassLostMonitor() { return biomassLostMonitor; }
 
-    Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
-        return bagToStream(getFadMap().fadsAt(seaTile));
+    public Bag fadsAt(final SeaTile seaTile) {
+        return getFadMap().fadsAt(seaTile);
     }
 
     public FadMap getFadMap() { return fadMap; }

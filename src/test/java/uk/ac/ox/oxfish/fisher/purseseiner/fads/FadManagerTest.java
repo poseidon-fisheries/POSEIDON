@@ -69,7 +69,7 @@ public class FadManagerTest {
     public void cantInitFadWhenZeroFADsInStock() {
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
         assertThrows(IllegalStateException.class, () ->
-            fadManager.deployFad(nauticalMap.getSeaTile(0, 0), 0)
+            fadManager.deployFad(nauticalMap.getSeaTile(0, 0))
         );
     }
 

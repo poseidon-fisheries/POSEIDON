@@ -44,7 +44,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(final String[] args) {
 
-        final String calibrationFolderName = "2021-04-14_09.59.25";
+        final String calibrationFolderName = "2021-04-15_15.23.59";
 
         final Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"

@@ -67,7 +67,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     private Map<Class<? extends PurseSeinerAction>, Double> actionWeights;
     private List<Entry<PurseSeinerAction, Double>> potentialActions = ImmutableList.of();
 
-    public PurseSeinerFishingStrategy(
+    PurseSeinerFishingStrategy(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
@@ -99,7 +99,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 ));
     }
 
-    private <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
+    private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
         final double sumOfWeights =
             weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
         return weightMap.entrySet().stream()
@@ -153,7 +153,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 )
             ));
 
-        Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction = Stream
+        final Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction = Stream
             .of(weightedAction(
                 new FadDeploymentAction(fisher),
                 valueOfLocationBasedAction(
@@ -164,7 +164,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 )
             ));
 
-        ImmutableList<Entry<PurseSeinerAction, Double>> list = Streams
+        final ImmutableList<Entry<PurseSeinerAction, Double>> list = Streams
             .concat(
                 weightedSetActions,
                 weightedSearchActions,
@@ -179,14 +179,14 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     }
 
     private Entry<PurseSeinerAction, Double> weightedAction(
-        PurseSeinerAction action,
-        double actionValue
+        final PurseSeinerAction action,
+        final double actionValue
     ) {
-        Double w = actionWeights.getOrDefault(action.getClassForWeighting(), 0.0);
+        final Double w = actionWeights.getOrDefault(action.getClassForWeighting(), 0.0);
         return entry(action, actionValue * w);
     }
 
-    private double valueOfSetAction(
+    private static double valueOfSetAction(
         final AbstractSetAction action,
         final DoubleUnaryOperator actionValueFunction
     ) {
@@ -198,7 +198,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             final Hold hold = action.getFisher().getHold();
             final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
             final double catchableProportion = min(1, capacity / totalBiomass);
-            double[] biomass = action.getTargetBiology().getCurrentBiomass();
+            final double[] biomass = action.getTargetBiology().getCurrentBiomass();
             final double[] potentialCatch = Arrays.copyOf(biomass, biomass.length);
             for (int i = 0; i < potentialCatch.length; i++)
                 potentialCatch[i] *= catchableProportion;

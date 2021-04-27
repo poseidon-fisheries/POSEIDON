@@ -28,28 +28,27 @@ public class FishValueCalculator {
 
     private final MarketMap marketMap;
 
-    public FishValueCalculator(Fisher fisher) {
+    public FishValueCalculator(final Fisher fisher) {
         this(fisher.getHomePort().getMarketMap(fisher));
     }
 
-    public FishValueCalculator(MarketMap marketMap) {
+    private FishValueCalculator(final MarketMap marketMap) {
         this.marketMap = marketMap;
     }
 
-    public double valueOf(Catch catchesKept) {
+    public double valueOf(final Catch catchesKept) {
         return valueOf(catchesKept.getBiomassArray());
     }
 
-    public double valueOf(double[] biomass) {
+    public double valueOf(final double[] biomass) {
         double sum = 0.0;
         for (int i = 0; i < biomass.length; i++)
             sum += biomass[i] * marketMap.getMarket(i).getMarginalPrice();
         return sum;
     }
 
-    public double valueOf(VariableBiomassBasedBiology biology) {
+    public double valueOf(final VariableBiomassBasedBiology biology) {
         return valueOf(biology.getCurrentBiomass());
     }
-
 
 }

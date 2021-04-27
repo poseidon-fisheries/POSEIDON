@@ -16,21 +16,21 @@ public class ActiveOpportunities implements Startable, Steppable {
     private final Multimap<Integer, Int2D> opportunities = HashMultimap.create();
     private boolean isStarted = false;
 
-    public boolean hasOpportunity(Int2D gridLocation, int step) {
+    boolean hasOpportunity(final Int2D gridLocation, final int step) {
         return opportunities.containsEntry(step, gridLocation);
     }
 
-    public void addOpportunity(Int2D gridLocation, int step, int duration) {
+    void addOpportunity(final Int2D gridLocation, final int step, final int duration) {
         range(step, step + duration).forEach(t -> opportunities.put(t, gridLocation));
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         opportunities.removeAll(((FishState) simState).getStep() - 1);
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         if (isStarted) throw new IllegalStateException(this + "Already started");
         model.scheduleEveryDay(this, StepOrder.DAWN);
         isStarted = true;

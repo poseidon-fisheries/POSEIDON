@@ -39,7 +39,7 @@ public class FadMapTest {
     public void fadBeaching() {
 
         // Make a 3x3 map, with a one tile island in the middle
-        NauticalMap nauticalMap = makeMap(new int[][]{
+        final NauticalMap nauticalMap = makeMap(new int[][]{
             {-1, -1, -1},
             {-1, 10, -1},
             {-1, -1, -1}
@@ -51,7 +51,7 @@ public class FadMapTest {
         final Quantity<Mass> k = getQuantity(1, TONNE);
         final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
 
-        for (SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
+        for (final SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
             tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
         }
 
@@ -82,7 +82,7 @@ public class FadMapTest {
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final Fad fad = fadManager.deployFad(startTile, 0);
+        final Fad fad = fadManager.deployFad(startTile);
         fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology = (VariableBiomassBasedBiology) startTile.getBiology();

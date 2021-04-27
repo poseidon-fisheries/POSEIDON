@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Bag;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -41,6 +43,9 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public class SetOpportunityDetector {
 
     private final Fisher fisher;
+    private final FadManager fadManager;
+    private final MersenneTwisterFast rng;
+
     private final List<SetOpportunityGenerator> setOpportunityGenerators;
     private final Map<Class<? extends AbstractSetAction>, Double> basicDetectionProbabilities;
     private final double searchBonus;
@@ -55,6 +60,8 @@ public class SetOpportunityDetector {
         checkArgument(basicDetectionProbabilities.values().stream().allMatch(v -> v >= 0 && v <= 1));
         checkArgument(searchBonus >= 0 && searchBonus <= 1);
         this.fisher = fisher;
+        this.fadManager = getFadManager(fisher);
+        this.rng = fisher.grabRandomizer();
         this.setOpportunityGenerators = ImmutableList.copyOf(setOpportunityGenerators);
         this.basicDetectionProbabilities = ImmutableMap.copyOf(basicDetectionProbabilities);
         this.searchBonus = searchBonus;
@@ -68,31 +75,20 @@ public class SetOpportunityDetector {
         } else {
             final ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
             addFadSetOpportunities(builder);
-            addOtherSetOpportunities(builder);
+            final SeaTile seaTile = fisher.getLocation();
+            addOtherSetOpportunities(builder, seaTile.getBiology(), seaTile.getGridLocation(), fisher.grabState().getStep());
             actions = builder.build();
         }
         hasSearched = false;
         return actions;
     }
 
-    private void addOtherSetOpportunities(ImmutableList.Builder<AbstractSetAction> builder) {
-        final MersenneTwisterFast rng = fisher.grabRandomizer();
-        for (SetOpportunityGenerator generator : setOpportunityGenerators) {
-            SeaTile seaTile = fisher.getLocation();
-            generator.get(fisher, seaTile.getBiology(), seaTile.getGridLocation())
-                .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
-                .ifPresent(builder::add);
-        }
-    }
-
-    private void addFadSetOpportunities(ImmutableList.Builder<AbstractSetAction> builder) {
-        final MersenneTwisterFast rng = fisher.grabRandomizer();
-        final FadManager fadManager = getFadManager(fisher);
-        final Bag fadsHere = fadManager.getFadMap().fadsAt(fisher.getLocation());
+    private void addFadSetOpportunities(final ImmutableList.Builder<AbstractSetAction> builder) {
+        final Bag fadsHere = fadManager.fadsAt(fisher.getLocation());
         final double p = getDetectionProbability(OpportunisticFadSetAction.class);
         // using the bag directly for speed, here
         for (int i = 0; i < fadsHere.numObjs; i++) {
-            Fad fad = (Fad) fadsHere.objs[i];
+            final Fad fad = (Fad) fadsHere.objs[i];
             if (fad.getOwner() == fadManager)
                 builder.add(new FadSetAction(fisher, fad));
             else if (rng.nextBoolean(p))
@@ -100,7 +96,20 @@ public class SetOpportunityDetector {
         }
     }
 
-    private double getDetectionProbability(Class<? extends AbstractSetAction> actionClass) {
+    private void addOtherSetOpportunities(
+        final ImmutableList.Builder<AbstractSetAction> builder,
+        final LocalBiology biology,
+        final Int2D gridLocation,
+        final int step
+    ) {
+        for (final SetOpportunityGenerator generator : setOpportunityGenerators) {
+            generator.get(fisher, biology, gridLocation, step)
+                .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
+                .ifPresent(builder::add);
+        }
+    }
+
+    private double getDetectionProbability(final Class<? extends AbstractSetAction> actionClass) {
         double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
         if (p > 1) p = 1; // even the search bonus can't push us above 1!
         return p;
