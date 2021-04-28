@@ -38,8 +38,8 @@ public class TunaCalibrator implements Runnable {
             .resolve("calibration.yaml");
 
     private boolean verbose = false;
-    private int populationSize = 200;
-    private int maxFitnessCalls = 5000;
+    private int populationSize = 100;
+    private int maxFitnessCalls = 500;
 
     public static void main(final String[] args) {
 
