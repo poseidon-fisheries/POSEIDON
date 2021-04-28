@@ -196,11 +196,71 @@ public class BatchRunner
                             ",").append(column.get(year)).append("\n");
 
                 }
+        //if needed, push out also
+        outputDailyDataToWrite(model);
+
         //new run
         runsDone++;
         model.finish();
         return writer;
 
+    }
+
+
+    private StringBuffer tidyDailyDataWriter;
+
+    private List<String> dailyColumnsToPrint = new LinkedList<>();
+
+
+    private void outputDailyDataToWrite(FishState model){
+        //don't bother if there isn't anything to write
+        if(tidyDailyDataWriter == null || dailyColumnsToPrint==null || dailyColumnsToPrint.isEmpty())
+            return;
+
+        //columns!
+        LinkedList<DataColumn> columns = new LinkedList<>();
+        System.out.println(dailyColumnsToPrint);
+        for(String column : dailyColumnsToPrint) {
+            DataColumn columnToPrint = model.getDailyDataSet().getColumn(column);
+
+            if(columnToPrint!=null) {
+                Preconditions.checkState(columnToPrint != null,
+                        "Can't find column " + column);
+                columns.add(columnToPrint);
+            }
+        }
+
+        int daysSimulated = model.getDailyDataSet().numberOfObservations();
+        for(DataColumn column : columns)
+            for(int day=0; day<daysSimulated; day++) {
+                tidyDailyDataWriter.append(runsDone).append(",").append(day).append(",");
+                if(columnModifier!=null)
+                    columnModifier.consume(tidyDailyDataWriter,
+                            model,
+                            day);
+                tidyDailyDataWriter.append(column.getName()).append(
+                        ",").append(column.get(day)).append("\n");
+
+            }
+
+
+
+    }
+
+    public StringBuffer getTidyDailyDataWriter() {
+        return tidyDailyDataWriter;
+    }
+
+    public void setTidyDailyDataWriter(StringBuffer tidyDailyDataWriter) {
+        this.tidyDailyDataWriter = tidyDailyDataWriter;
+    }
+
+    public List<String> getDailyColumnsToPrint() {
+        return dailyColumnsToPrint;
+    }
+
+    public void setDailyColumnsToPrint(List<String> dailyColumnsToPrint) {
+        this.dailyColumnsToPrint = dailyColumnsToPrint;
     }
 
     public String guessSimulationName() {

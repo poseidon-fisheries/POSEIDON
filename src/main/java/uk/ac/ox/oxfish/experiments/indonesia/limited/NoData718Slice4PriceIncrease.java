@@ -153,7 +153,9 @@ public class NoData718Slice4PriceIncrease {
             //still inconsistent after the startable... starts, but at least until then it's okay
             @Nullable
                     LinkedList<Pair<Integer,
-                            AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
+                            AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins,
+            @Nullable
+            List<String> dailyColumnsToPrint) throws IOException {
 
         String filename =      scenarioFile.toAbsolutePath().toString().replace('/','$');
 
@@ -171,6 +173,16 @@ public class NoData718Slice4PriceIncrease {
         FileWriter fileWriter = new FileWriter(outputFolder.resolve(filename + ".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
+        //if needed, set up also a daily writer
+        FileWriter dailyFileWriter = null;
+        if(dailyColumnsToPrint!=null)
+        {
+            dailyFileWriter = new FileWriter(outputFolder.resolve(filename + ".daily").toFile());
+            dailyFileWriter.write("run,day,policy,variable,value\n");
+            dailyFileWriter.flush();
+
+        }
+
 
         for (Map.Entry<String, Function<Integer, Consumer<Scenario>>> policyRun : policyMap.entrySet()) {
             String policyName = policyRun.getKey();
@@ -196,6 +208,9 @@ public class NoData718Slice4PriceIncrease {
                     null, SEED, additionalColumnsToPrint);
             runner.setScaleSeedWithRunsDone(false);
 
+
+
+
             //give it the scenario
             runner.setScenarioSetup(policy);
             if(additionalPlugins!=null)
@@ -209,10 +224,22 @@ public class NoData718Slice4PriceIncrease {
                 }
             });
 
+            //set up daily columns, if needed
+            if(dailyFileWriter!=null) {
+                runner.setDailyColumnsToPrint(dailyColumnsToPrint);
+                runner.setTidyDailyDataWriter(new StringBuffer());
+            }
             StringBuffer tidy = new StringBuffer();
             runner.run(tidy);
             fileWriter.write(tidy.toString());
             fileWriter.flush();
+
+            //collect daily columns, if needed
+            if(dailyFileWriter!=null)
+            {
+                dailyFileWriter.write(runner.getTidyDailyDataWriter().toString());
+                dailyFileWriter.flush();
+            }
 
 
         }
@@ -250,7 +277,7 @@ public class NoData718Slice4PriceIncrease {
                         OUTPUT_FOLDER,
                         priceIncreasePolicies, null,
                         false, 5,null,
-                        null);
+                        null, null);
             }
             else {
                 System.err.println("Couldn't find scenario " + scenarioPath);

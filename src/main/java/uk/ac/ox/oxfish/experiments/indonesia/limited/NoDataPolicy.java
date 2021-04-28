@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -31,6 +32,7 @@ import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfits;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.plugins.SpendSaveInvestEntry;
 import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
+import uk.ac.ox.oxfish.model.regs.PortBasedWaitTimesDecorator;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -176,6 +178,61 @@ public class NoDataPolicy {
 
     }
 
+    /**
+     * adds a removeEntry steppable happening at year X
+     */
+    public static Consumer<Scenario> buildPauseRegulation(int shockYear, String[] tagsToRegulate, int dayPause){
+        return new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario scenario) {
+                FlexibleScenario flexible = (FlexibleScenario) scenario;
+                flexible.getPlugins().add(
+                        fishState -> new AdditionalStartable() {
+                            @Override
+                            public void start(FishState model) {
+
+                                HashMap<String,Integer> hoursToWait = new HashMap<>();
+                                hoursToWait.put("Port 0",dayPause*24);
+                                hoursToWait.put("Far-off",dayPause*24);
+                                hoursToWait.put("Far-Off",dayPause*24);
+                                model.scheduleOnceAtTheBeginningOfYear(
+                                        (Steppable) simState -> {
+                                            fisherloop:
+                                            for (Fisher fisher :
+                                                    ((FishState) simState).getFishers()) {
+
+                                                for (String tag : tagsToRegulate) {
+                                                    if (fisher.getTags().contains(tag)) {
+                                                        fisher.setRegulation(
+                                                                new PortBasedWaitTimesDecorator(
+                                                                        new ProtectedAreasOnly(),
+                                                                        hoursToWait
+                                                                ));
+                                                        continue fisherloop;
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        StepOrder.DAWN,
+                                        shockYear
+                                );
+
+
+                            }
+
+                            @Override
+                            public void turnOff() {
+
+                            }
+                        }
+                );
+            }
+
+
+
+        };
+
+    }
 
     /**
      * adds a removeEntry steppable happening at year X

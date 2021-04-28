@@ -253,7 +253,7 @@ task fatJarMeraSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.Sha
     }
 }
 
-task fatJar718NoData(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task  q(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodata718slice7.jar'
     from sourceSets.main.output //tells the task to include the project code

@@ -295,6 +295,15 @@ public class NoData718Slice7Policy {
     // NoData718Utilities.simpleSelectivityShift;
 
 
+    private static LinkedList<String> dailyColumnsToPrint = new LinkedList<>();
+    static {
+        dailyColumnsToPrint.add("Lutjanus malabaricus Landings");
+        dailyColumnsToPrint.add("Other Landings");
+        dailyColumnsToPrint.add("Pristipomoides multidens Landings");
+        dailyColumnsToPrint.add("Lethrinus laticaudis Landings");
+        dailyColumnsToPrint.add("Atrobucca brevis Landings");
+    }
+
 
 
     public static void main(String[] args) throws IOException {
@@ -317,7 +326,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_again"),
                     simpleSelectivityShift,
                     columns,
-                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
+                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null);
         }
         else if(args[0].equals("sprnumbers")){
 
@@ -334,7 +343,18 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers"),
                     checkSPRDifferentials,
                     columns,
-                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
+                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null);
+        }
+        else if(args[0].equals("season_simple")){
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("season_simple").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("season_simple"),
+                    NoData718Utilities.nonAdaptiveEffort,
+                    columns,
+                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), dailyColumnsToPrint);
         }
 
     }

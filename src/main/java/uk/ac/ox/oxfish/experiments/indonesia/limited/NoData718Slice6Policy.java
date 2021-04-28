@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.experiments.indonesia.limited;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.opencsv.CSVReader;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -55,7 +56,7 @@ public class NoData718Slice6Policy {
         runPolicyDirectory(
                 CANDIDATES_CSV_FILE.toFile(),
                 OUTPUT_FOLDER,
-                simulatedPolicies, ADDITIONAL_COLUMNS, new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>());
+                simulatedPolicies, ADDITIONAL_COLUMNS, new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null);
 
 
     }
@@ -65,7 +66,9 @@ public class NoData718Slice6Policy {
             Path outputFolder,
             LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> policies,
             final LinkedList<String> additionalColumns,
-            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
+            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins,
+            @Nullable
+            List<String> dailyColumnsToPrint) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(
                 candidateFile
         ));
@@ -78,7 +81,7 @@ public class NoData718Slice6Policy {
                     Paths.get(row[0]),
                     Integer.parseInt(row[1]),
                     Integer.parseInt(row[2]), outputFolder, policies, additionalColumns,
-                    new LinkedList<>(additionalPlugins)
+                    new LinkedList<>(additionalPlugins), dailyColumnsToPrint
             );
         }
     }
@@ -137,7 +140,9 @@ public class NoData718Slice6Policy {
             Path outputFolder,
             LinkedHashMap<String, Function<Integer,
                     Consumer<Scenario>>> policies, final LinkedList<String> policyColumns,
-            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins) throws IOException {
+            LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins,
+            @Nullable
+            List<String> dailyColumnsToPrint) throws IOException {
 
 
 
@@ -199,10 +204,10 @@ public class NoData718Slice6Policy {
                 true, ADDITIONAL_YEARS_TO_RUN,
                 NoData718Slice4PriceIncrease.priceShockAndSeedingGenerator(0).
                         apply(yearOfPriceShock),
-                plugins
+                plugins,
 
 
-        );
+                dailyColumnsToPrint);
 
 
 

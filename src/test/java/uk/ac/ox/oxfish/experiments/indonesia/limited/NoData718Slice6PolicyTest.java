@@ -81,7 +81,7 @@ public class NoData718Slice6PolicyTest {
         NoData718Slice6Policy.runPolicyDirectory(
                 Paths.get("inputs", "tests", "slice718","candidates.csv").toFile(),
                 Paths.get("inputs", "tests", "slice718","output_policy"),
-                NoData718Utilities.policies, new LinkedList<>(), new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>()
+                NoData718Utilities.policies, new LinkedList<>(), new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null
         );
 
     }
