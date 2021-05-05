@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.google.common.primitives.ImmutableIntArray;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
@@ -24,9 +25,10 @@ import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
-import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.stream;
 
+@SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator implements Runnable {
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
@@ -34,7 +36,7 @@ public class TunaCalibrator implements Runnable {
 
     private Path originalCalibrationFilePath =
         Paths
-            .get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations")
+            .get(System.getProperty("user.home"), "tuna", "calibration")
             .resolve("calibration.yaml");
 
     private boolean verbose = false;
@@ -45,21 +47,14 @@ public class TunaCalibrator implements Runnable {
 
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
 
-        // Lots of code for not much, but this parse all integer numbers out from the
-        // arguments and (if present) uses the max one to set the number of fitness calls
-        // and the min one to set the population size. If there is only one, it's
+        // Parse all given numeric arguments and use the max one to set the number of fitness
+        // calls and the min one to set the population size. If there is only one, it's
         // assumed to be the number of fitness calls.
-        final int[] numericArgs = stream(args).flatMapToInt(arg -> {
-            try {
-                return IntStream.of(parseInt(arg));
-            } catch (final NumberFormatException e) {
-                return IntStream.empty();
-            }
-        }).toArray();
-        if (numericArgs.length > 0) {
-            tunaCalibrator.setMaxFitnessCalls(stream(numericArgs).max().getAsInt());
-            if (numericArgs.length > 1) {
-                tunaCalibrator.setPopulationSize(stream(numericArgs).min().getAsInt());
+        final ImmutableIntArray numericArgs = getNumericArgs(args);
+        if (numericArgs.length() > 0) {
+            numericArgs.stream().max().ifPresent(tunaCalibrator::setMaxFitnessCalls);
+            if (numericArgs.length() > 1) {
+                numericArgs.stream().min().ifPresent(tunaCalibrator::setPopulationSize);
             }
         }
 
@@ -71,6 +66,56 @@ public class TunaCalibrator implements Runnable {
             .ifPresent(file -> tunaCalibrator.setOriginalCalibrationFilePath(file.toPath()));
 
         tunaCalibrator.run();
+    }
+
+    private static ImmutableIntArray getNumericArgs(final String[] args) {
+        return ImmutableIntArray.copyOf(stream(args).flatMapToInt(arg -> {
+            try {
+                return IntStream.of(parseInt(arg));
+            } catch (final NumberFormatException e) {
+                return IntStream.empty();
+            }
+        }));
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    @SuppressWarnings("unused")
+    public void setVerbose(final boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getOriginalCalibrationFilePath() {
+        return originalCalibrationFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    public int getPopulationSize() {
+        return populationSize;
+    }
+
+    @SuppressWarnings("unused")
+    public int getMaxFitnessCalls() {
+        return maxFitnessCalls;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setMaxFitnessCalls(final int maxFitnessCalls) {
+        this.maxFitnessCalls = maxFitnessCalls;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setPopulationSize(final int populationSize) {
+        this.populationSize = populationSize;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setOriginalCalibrationFilePath(final Path originalCalibrationFilePath) {
+        this.originalCalibrationFilePath = originalCalibrationFilePath;
     }
 
     @Override
@@ -92,9 +137,12 @@ public class TunaCalibrator implements Runnable {
     @NotNull
     private Path makeOutputFolder() {
         final String outputFolderName = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
-        final Path outputFolderPath = originalCalibrationFilePath.getParent().resolve(outputFolderName);
+        final Path outputFolderPath = originalCalibrationFilePath
+            .getParent()
+            .resolve(System.getProperty("user.name"))
+            .resolve(outputFolderName);
         try {
-            createDirectory(outputFolderPath);
+            createDirectories(outputFolderPath);
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
@@ -168,45 +216,5 @@ public class TunaCalibrator implements Runnable {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    @SuppressWarnings("unused")
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    @SuppressWarnings("unused")
-    public void setVerbose(final boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getOriginalCalibrationFilePath() {
-        return originalCalibrationFilePath;
-    }
-
-    @SuppressWarnings({"unused", "WeakerAccess"})
-    public void setOriginalCalibrationFilePath(final Path originalCalibrationFilePath) {
-        this.originalCalibrationFilePath = originalCalibrationFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public int getPopulationSize() {
-        return populationSize;
-    }
-
-    @SuppressWarnings({"unused", "WeakerAccess"})
-    public void setPopulationSize(final int populationSize) {
-        this.populationSize = populationSize;
-    }
-
-    @SuppressWarnings("unused")
-    public int getMaxFitnessCalls() {
-        return maxFitnessCalls;
-    }
-
-    @SuppressWarnings({"unused", "WeakerAccess"})
-    public void setMaxFitnessCalls(final int maxFitnessCalls) {
-        this.maxFitnessCalls = maxFitnessCalls;
     }
 }
