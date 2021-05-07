@@ -1,19 +1,18 @@
 package uk.ac.ox.oxfish.maximization;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableDoubleArray;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,7 +42,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(final String[] args) {
 
-        final String calibrationFolderName = "2021-04-16_14.49.50";
+        final String calibrationFolderName = "2021-04-30_12.27.49";
 
         final Path baseFolderPath = Paths.get(
             System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
@@ -69,19 +68,21 @@ public class TunaEvaluator implements Runnable {
         final Consumer<Scenario> scenarioConsumer = scenario -> {
             final TunaScenario tunaScenario = (TunaScenario) scenario;
             final PurseSeinerFishingStrategyFactory fishingStrategy = (PurseSeinerFishingStrategyFactory) tunaScenario.getFisherDefinition().getFishingStrategy();
-            fishingStrategy.setFadDeploymentActionLogisticMidpoint(2800);
-            fishingStrategy.setOpportunisticFadSetDetectionProbability(0.01);
-            ((PurseSeineGearFactory) tunaScenario
-                .getFisherDefinition()
-                .getGear())
-                .getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-                "Bigeye tuna", new FixedDoubleParameter(0.03),
-                "Yellowfin tuna", new FixedDoubleParameter(0.07),
-                "Skipjack tuna", new FixedDoubleParameter(0.03)
-            ));
+            fishingStrategy.setFadDeploymentActionLogisticMidpoint(5_000);
+            fishingStrategy.setFadDeploymentActionLogisticSteepness(0.0001);
+            fishingStrategy.setFadSetActionLogisticMidpoint(15_000);
+            fishingStrategy.setOpportunisticFadSetDetectionProbability(0.25);
+//            ((PurseSeineGearFactory) tunaScenario
+//                .getFisherDefinition()
+//                .getGear())
+//                .getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
+//                "Bigeye tuna", new FixedDoubleParameter(0.03),
+//                "Yellowfin tuna", new FixedDoubleParameter(0.07),
+//                "Skipjack tuna", new FixedDoubleParameter(0.1)
+//            ));
         };
         new TunaEvaluator(calibrationFilePath, solution)
-            .setScenarioConsumer(scenarioConsumer)
+//            .setScenarioConsumer(scenarioConsumer)
             .run();
 
     }
@@ -104,32 +105,25 @@ public class TunaEvaluator implements Runnable {
             );
             rangeClosed(1, numRuns).parallel().forEach(runNumber -> {
                 final FishState fishState = runSimulation(optimization, solution, runNumber, numRuns);
-                fishState.getFadMap().getDriftingObjectsMap().getCurrentVectors().getVectorCache().values().stream()
-                    .mapToDouble(cache -> cache.stats().hitRate()).average()
-                    .ifPresent(hitRate -> System.out.println("Hit rate: " + hitRate));
                 optimization.getTargets().stream()
                     .filter(target -> target instanceof FixedDataTarget)
                     .map(target -> (FixedDataTarget) target)
-                    .forEach(target ->
-                        csvWriter.writeRow(
-                            target.getClass().getSimpleName(),
-                            target.getColumnName(),
-                            target.getFixedTarget(),
-                            runNumber,
-                            target.getValue(fishState),
-                            target.computeError(fishState)
-                        )
-                    );
+                    .forEach(target -> {
+                        synchronized (csvWriter) {
+                            csvWriter.writeRow(
+                                target.getClass().getSimpleName(),
+                                target.getColumnName(),
+                                target.getFixedTarget(),
+                                runNumber,
+                                target.getValue(fishState),
+                                target.computeError(fishState)
+                            );
+                        }
+                    });
             });
         } finally {
             csvWriter.close();
         }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public TunaEvaluator setScenarioConsumer(final Consumer<Scenario> scenarioConsumer) {
-        this.scenarioConsumer = Optional.ofNullable(scenarioConsumer);
-        return this;
     }
 
     private FishState runSimulation(
@@ -182,6 +176,12 @@ public class TunaEvaluator implements Runnable {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public TunaEvaluator setScenarioConsumer(final Consumer<Scenario> scenarioConsumer) {
+        this.scenarioConsumer = Optional.ofNullable(scenarioConsumer);
+        return this;
     }
 
     @SuppressWarnings("unused")
