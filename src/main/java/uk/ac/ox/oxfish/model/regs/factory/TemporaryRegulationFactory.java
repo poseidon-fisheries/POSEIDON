@@ -13,6 +13,7 @@ public class TemporaryRegulationFactory implements AlgorithmFactory<TemporaryReg
     private DoubleParameter startDay;
     private DoubleParameter endDay;
     private AlgorithmFactory<? extends Regulation> delegate;
+    private AlgorithmFactory<? extends Regulation> inactiveDelegate = new AnarchyFactory();
 
     public TemporaryRegulationFactory(int startDay, int endDay, AlgorithmFactory<? extends Regulation> delegate) {
         this.startDay = new FixedDoubleParameter(startDay);
@@ -30,6 +31,15 @@ public class TemporaryRegulationFactory implements AlgorithmFactory<TemporaryReg
     @SuppressWarnings("unused") public void setEndDay(DoubleParameter endDay) { this.endDay = endDay; }
     public AlgorithmFactory<? extends Regulation> getDelegate() { return delegate; }
     public void setDelegate(AlgorithmFactory<? extends Regulation> delegate) { this.delegate = delegate; }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends Regulation> getInactiveDelegate() {
+        return inactiveDelegate;
+    }
+    @SuppressWarnings("unused")
+    public void setInactiveDelegate(AlgorithmFactory<? extends Regulation> inactiveDelegate) {
+        this.inactiveDelegate = inactiveDelegate;
+    }
 
     @Override public TemporaryRegulation apply(FishState fishState) {
         final MersenneTwisterFast rng = fishState.getRandom();

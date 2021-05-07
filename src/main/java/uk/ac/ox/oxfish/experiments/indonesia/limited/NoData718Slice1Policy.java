@@ -150,7 +150,7 @@ public class NoData718Slice1Policy {
 
         policies.put(
                 "180_days_noentry",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,180).andThen(
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,180, false).andThen(
                         NoDataPolicy.removeEntry(shockYear)
                 )
 
@@ -158,7 +158,7 @@ public class NoData718Slice1Policy {
 
         policies.put(
                 "150_days_noentry",
-                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,150).andThen(
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS,150, false).andThen(
                         NoDataPolicy.removeEntry(shockYear)
                 )
 

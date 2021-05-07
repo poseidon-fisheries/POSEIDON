@@ -130,7 +130,7 @@ public class NoData718Slice4Policy {
                 "150_days_noentry",
                 shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
                         new String[]{"population0","population1","population2"}
-                        ,100).andThen(
+                        ,100, false).andThen(
                         NoDataPolicy.removeEntry(shockYear)
                 )
 

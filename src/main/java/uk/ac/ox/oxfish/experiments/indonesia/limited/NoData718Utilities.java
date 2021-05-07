@@ -203,7 +203,7 @@ public class NoData718Utilities {
                                 days+"_days_noentry",
                                 shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
                                         new String[]{"population0", "population1", "population2"}
-                                        , finalDays).andThen(
+                                        , finalDays, false).andThen(
                                         NoDataPolicy.removeEntry(shockYear)
                                 )
 
@@ -320,7 +320,7 @@ public class NoData718Utilities {
                                 //max days regulations include respect protected areas so it works if put in this order
                                 shockYear ->  protectBestCell(shockYear).andThen(NoDataPolicy.buildMaxDaysRegulation(shockYear,
                                         new String[]{"population0", "population1", "population2"}
-                                        , finalDays).andThen(
+                                        , finalDays, false).andThen(
                                         NoDataPolicy.removeEntry(shockYear)
                                         )
                                 )
@@ -343,7 +343,7 @@ public class NoData718Utilities {
                                 //max days regulations include respect protected areas so it works if put in this order
                                 shockYear ->  NoDataPolicy.buildMaxDaysRegulation(shockYear,
                                         new String[]{"population0", "population1", "population2"}
-                                        , finalDays).andThen(
+                                        , finalDays, false).andThen(
                                         NoDataPolicy.removeEntry(shockYear)
                                 )
 
@@ -684,25 +684,25 @@ public class NoData718Utilities {
         static public LinkedHashMap<String,Function<Integer,Consumer<Scenario>>> nonAdaptiveEffort = new LinkedHashMap<>();
         static {
                 nonAdaptiveEffort.put(
-                        15+"_pause_noentry",
+                        30+"_pause_noentry",
                         shockYear -> NoDataPolicy.buildPauseRegulation(shockYear,
                                 new String[]{"population0", "population1", "population2"}
-                                , 15).andThen(
+                                , 30).andThen(
                                 NoDataPolicy.removeEntry(shockYear)
                         )
 
                 );
-
-                nonAdaptiveEffort.put(
-                        .03+"_yearlyReduction_noentry",
-                        shockYear -> Slice6Sweeps.setupFleetReductionConsumer(
-                                shockYear,
-                                .03
-                        ).andThen(
-                                NoDataPolicy.removeEntry(shockYear)
-                        )
-
-                );
+//
+//                nonAdaptiveEffort.put(
+//                        .03+"_yearlyReduction_noentry",
+//                        shockYear -> Slice6Sweeps.setupFleetReductionConsumer(
+//                                shockYear,
+//                                .03
+//                        ).andThen(
+//                                NoDataPolicy.removeEntry(shockYear)
+//                        )
+//
+//                );
 
 
                 nonAdaptiveEffort.put(
@@ -712,19 +712,31 @@ public class NoData718Utilities {
 
                 );
 
-
-                nonAdaptiveEffort.put(
-                        "noentry",
-                        shockYear -> NoDataPolicy.removeEntry(shockYear)
-
-                );
+//
+//                nonAdaptiveEffort.put(
+//                        "noentry",
+//                        shockYear -> NoDataPolicy.removeEntry(shockYear)
+//
+//                );
 
 
                 nonAdaptiveEffort.put(
                         150+"_days_noentry",
                         shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
                                 new String[]{"population0", "population1", "population2"}
-                                , 150).andThen(
+                                , 150, false).andThen(
+                                NoDataPolicy.removeEntry(shockYear)
+                        )
+
+                );
+
+
+
+                nonAdaptiveEffort.put(
+                        150+"_days_noentry_split",
+                        shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                new String[]{"population0", "population1", "population2"}
+                                , 150, true).andThen(
                                 NoDataPolicy.removeEntry(shockYear)
                         )
 
@@ -735,13 +747,13 @@ public class NoData718Utilities {
 
 
 
-                nonAdaptiveEffort.put(
-                        "tax_20",
-                        shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
-                                decreasePricesForAllSpeciesByAPercentage(.2d).apply(shockYear)
-                        )
-
-                );
+//                nonAdaptiveEffort.put(
+//                        "tax_20",
+//                        shockYear -> NoDataPolicy.removeEntry(shockYear).andThen(
+//                                decreasePricesForAllSpeciesByAPercentage(.2d).apply(shockYear)
+//                        )
+//
+//                );
 
         }
 

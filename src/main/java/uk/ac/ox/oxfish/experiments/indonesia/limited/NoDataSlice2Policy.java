@@ -25,7 +25,6 @@ import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
@@ -154,7 +153,7 @@ public class NoDataSlice2Policy {
         for(int dayLimit : new int[]{50,75,100,125,150,200,225,250}) {
             policies.put(
                     dayLimit+"_days_noentry",
-                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS, dayLimit).andThen(
+                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, ALL_TAGS, dayLimit, false).andThen(
                             NoDataPolicy.removeEntry(shockYear)
                     )
 
@@ -162,7 +161,7 @@ public class NoDataSlice2Policy {
 
             policies.put(
                     dayLimit+"_days_big_noentry",
-                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},dayLimit).andThen(
+                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear, new String[]{"population1"},dayLimit, false).andThen(
                             NoDataPolicy.removeEntry(shockYear))
 
             );

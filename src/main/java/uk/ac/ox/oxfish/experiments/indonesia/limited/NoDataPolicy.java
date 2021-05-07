@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.opencsv.CSVReader;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -31,11 +30,12 @@ import uk.ac.ox.oxfish.model.*;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfits;
 import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectorsFactory;
 import uk.ac.ox.oxfish.model.plugins.SpendSaveInvestEntry;
-import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
-import uk.ac.ox.oxfish.model.regs.PortBasedWaitTimesDecorator;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
+import uk.ac.ox.oxfish.model.regs.*;
+import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -129,7 +129,9 @@ public class NoDataPolicy {
     /**
      * adds a removeEntry steppable happening at year X
      */
-    public static Consumer<Scenario> buildMaxDaysRegulation(int shockYear, String[] tagsToRegulate, int maxDaysOut){
+    public static Consumer<Scenario> buildMaxDaysRegulation(int shockYear,
+                                                            String[] tagsToRegulate, int maxDaysOut,
+                                                            boolean randomSeasonalStart){
         return new Consumer<Scenario>() {
             @Override
             public void accept(Scenario scenario) {
@@ -146,12 +148,31 @@ public class NoDataPolicy {
                                                     ((FishState) simState).getFishers()) {
 
                                                 for (String tag : tagsToRegulate) {
-                                                    if (fisher.getTags().contains(tag)) {
-                                                        fisher.setRegulation(
-                                                                new MaxHoursOutRegulation(
-                                                                        new ProtectedAreasOnly(),
-                                                                        maxDaysOut * 24d
-                                                                ));
+                                                    if (fisher.getTags().contains(tag))
+                                                    {
+                                                        if(!randomSeasonalStart || model.getRandom().nextBoolean()) {
+                                                            fisher.setRegulation(
+                                                                    new MaxHoursOutRegulation(
+                                                                            new ProtectedAreasOnly(),
+                                                                            maxDaysOut * 24d
+                                                                    ));
+                                                        }
+                                                        else{
+                                                            final TemporaryRegulation lateStart =
+                                                                    new TemporaryRegulation(
+                                                                            100,
+                                                                            400,
+                                                                            new MaxHoursOutRegulation(
+                                                                                    new ProtectedAreasOnly(),
+                                                                                    maxDaysOut * 24d
+                                                                            ),
+                                                                            new NoFishing()
+
+                                                                    );
+                                                            fisher.setRegulation(lateStart);
+
+
+                                                        }
                                                         continue fisherloop;
                                                     }
                                                 }
@@ -312,50 +333,50 @@ public class NoDataPolicy {
 
         policies.put(
                 "150_days_noentry",
-                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,150).andThen(
+                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,150, false).andThen(
                         removeEntry(shockYear)
                 )
 
         );
         policies.put(
                 "100_days_noentry",
-                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,100).andThen(
+                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,100, false).andThen(
                         removeEntry(shockYear)
                 )
 
         );
         policies.put(
                 "100_days",
-                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,100)
+                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,100, false)
 
         );
         policies.put(
                 "150_days",
-                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,150)
+                shockYear -> buildMaxDaysRegulation(shockYear, ALL_TAGS,150, false)
 
         );
 
 
         policies.put(
                 "100_days_big",
-                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},100)
+                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},100, false)
 
         );
         policies.put(
                 "150_days_big",
-                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150)
+                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150, false)
 
         );
 
         policies.put(
                 "100_days_big_noentry",
-                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},100).andThen(
+                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},100, false).andThen(
                         removeEntry(shockYear))
 
         );
         policies.put(
                 "150_days_big_noentry",
-                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150).andThen(
+                shockYear -> buildMaxDaysRegulation(shockYear, new String[]{"population1"},150, false).andThen(
                         removeEntry(shockYear))
 
         );

@@ -5,8 +5,12 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,4 +76,44 @@ public class TemporaryRegulationTest {
         });
     }
 
+
+
+    @Test
+    public void doubleDelegate() {
+        //check that the right policy is active at the right time
+
+        //
+        final FishState state = mock(FishState.class);
+        when(state.getDayOfTheYear(anyInt())).thenReturn(0);
+        //active regulation mean you can't go out
+        final Regulation active = mock(Regulation.class);
+        when(active.allowedAtSea(any(),any())).thenReturn(false);
+        //inactive regulation means you can go out
+        final Regulation inactive = mock(Regulation.class);
+        when(active.allowedAtSea(any(),any())).thenReturn(true);
+
+        TemporaryRegulationFactory factory =
+                new TemporaryRegulationFactory(
+                        100, 200,
+                        fishState -> active
+                );
+        factory.setInactiveDelegate(fishState -> inactive);
+
+        final TemporaryRegulation regulation = factory.apply(state);
+
+        //day 10 :  allowed at sea
+        final Fisher fisher = mock(Fisher.class);
+        when(state.getDayOfTheYear(anyInt())).thenReturn(10);
+        assertTrue(regulation.allowedAtSea(fisher,state));
+
+        //day 150: not allowed at sea
+        when(state.getDayOfTheYear(anyInt())).thenReturn(150);
+        assertTrue(!regulation.allowedAtSea(fisher,state));
+
+
+        //day 250: allowed at sea
+        when(state.getDayOfTheYear(anyInt())).thenReturn(250);
+        assertTrue(regulation.allowedAtSea(fisher,state));
+
+    }
 }

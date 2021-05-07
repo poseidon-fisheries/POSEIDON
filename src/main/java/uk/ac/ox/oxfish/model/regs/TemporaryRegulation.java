@@ -20,17 +20,16 @@ import java.util.function.Predicate;
  */
 public class TemporaryRegulation implements Regulation {
 
-  //  private final int startDay;
-   // private final int endDay;
 
     /**
      * given the day of the year, it tells me which regulation is active.
      */
     private final Predicate<Integer> dayOfTheYearPredicate;
     private final Regulation delegateWhenActive;
-    private final Regulation delegateWhenInactive = new Anarchy();
+    private final Regulation delegateWhenInactive;
 
-    public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive) {
+    public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive,
+                               Regulation delegateWhenInactive) {
 
         this.dayOfTheYearPredicate = dayOfTheYear -> {
             assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
@@ -39,11 +38,19 @@ public class TemporaryRegulation implements Regulation {
                     : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
         };
         this.delegateWhenActive = delegateWhenActive;
+        this.delegateWhenInactive = delegateWhenInactive;
+    }
+
+
+    public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive) {
+        this(startDay,endDay,delegateWhenActive,new Anarchy());
+
     }
 
     public TemporaryRegulation(Predicate<Integer> dayOfTheYearPredicate, Regulation delegateWhenActive) {
         this.dayOfTheYearPredicate = dayOfTheYearPredicate;
         this.delegateWhenActive = delegateWhenActive;
+        this.delegateWhenInactive = new Anarchy();
     }
 
     public boolean isActive(int dayOfTheYear) {
