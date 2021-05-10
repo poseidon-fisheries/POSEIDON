@@ -23,10 +23,15 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Streams.findLast;
 import static java.lang.Runtime.getRuntime;
+import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.rangeClosed;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class TunaEvaluator implements Runnable {
+
+    private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
+        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-05-06_11.54.17"
+    );
 
     private final Path calibrationFilePath;
     private final double[] solution;
@@ -42,15 +47,13 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("UnstableApiUsage")
     public static void main(final String[] args) {
 
-        final String calibrationFolderName = "2021-04-30_12.27.49";
+        // Finds the first argument that is a folder name and uses it as the calibration folder
+        final Path calibrationFolder = getCalibrationFolder(args);
 
-        final Path baseFolderPath = Paths.get(
-            System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations"
-        );
+        System.out.println("Using " + calibrationFolder + " as the calibration folder.");
 
-        final Path calibrationFolderPath = baseFolderPath.resolve(calibrationFolderName);
-        final Path logFilePath = calibrationFolderPath.resolve("calibration_log.md");
-        final Path calibrationFilePath = calibrationFolderPath.resolve("calibration.yaml");
+        final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
+        final Path calibrationFilePath = calibrationFolder.resolve("calibration.yaml");
 
         final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
         try (final Stream<String> lines = Files.lines(logFilePath)) {
@@ -85,6 +88,21 @@ public class TunaEvaluator implements Runnable {
 //            .setScenarioConsumer(scenarioConsumer)
             .run();
 
+    }
+
+    private static Path getCalibrationFolder(final String[] args) {
+        return stream(args)
+            .map(Paths::get)
+            .filter(Files::isDirectory)
+            .map(path -> {
+                try {
+                    return path.toRealPath();
+                } catch (final IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            })
+            .findFirst()
+            .orElse(DEFAULT_CALIBRATION_FOLDER);
     }
 
     @Override
