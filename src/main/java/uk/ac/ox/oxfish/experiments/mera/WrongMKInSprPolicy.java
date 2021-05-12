@@ -3,12 +3,11 @@ package uk.ac.ox.oxfish.experiments.mera;
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarAbstractFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPRffortPolicyAdaptingFactory;
-import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -104,7 +103,7 @@ public class WrongMKInSprPolicy {
                         );
 
                         //change the REAL K so that it's just original M * (real K/M)
-                        final SingleSpeciesBoxcarFactory biology = (SingleSpeciesBoxcarFactory)
+                        final SingleSpeciesBoxcarAbstractFactory biology = (SingleSpeciesBoxcarAbstractFactory)
                                 ((PrototypeScenario) scenario).getBiologyInitializer();
                         biology.setK(
                                 new FixedDoubleParameter(
@@ -193,7 +192,7 @@ public class WrongMKInSprPolicy {
 
 
                     //change the REAL K so that it's just original M * (real K/M)
-                    final SingleSpeciesBoxcarFactory biology = (SingleSpeciesBoxcarFactory)
+                    final SingleSpeciesBoxcarAbstractFactory biology = (SingleSpeciesBoxcarAbstractFactory)
                             ((PrototypeScenario) scenario).getBiologyInitializer();
                     biology.setK(
                             new FixedDoubleParameter(

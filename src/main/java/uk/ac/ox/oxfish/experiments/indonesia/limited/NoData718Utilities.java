@@ -27,7 +27,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarAbstractFactory;
 import uk.ac.ox.oxfish.experiments.indonesia.Slice6Sweeps;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -62,7 +62,7 @@ public class NoData718Utilities {
         static final AlgorithmFactory<? extends AdditionalStartable>  CORRECT_LIFE_HISTORIES_CONSUMER(Scenario scenario) {
 
                 final FlexibleScenario flexible = (FlexibleScenario) scenario;
-                final SingleSpeciesBoxcarFactory malabaricus = (SingleSpeciesBoxcarFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
+                final SingleSpeciesBoxcarAbstractFactory malabaricus = (SingleSpeciesBoxcarAbstractFactory) ((MultipleIndependentSpeciesAbundanceFactory) flexible.getBiologyInitializer()).getFactories().
                         get(1);
                 Preconditions.checkArgument(malabaricus.getSpeciesName().equals("Lutjanus malabaricus"));
                 SPRAgentBuilder builder = new SPRAgentBuilder();

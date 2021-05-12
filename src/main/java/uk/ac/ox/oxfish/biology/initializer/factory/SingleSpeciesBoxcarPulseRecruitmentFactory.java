@@ -1,29 +1,24 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import uk.ac.ox.oxfish.biology.boxcars.BoxCarSimulator;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.complicated.SpreadYearlyRecruitDecorator;
 import uk.ac.ox.oxfish.biology.complicated.YearlyRecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class SingleSpeciesBoxcarPulseRecruitmentFactory  implements AlgorithmFactory<SingleSpeciesAbundanceInitializer>
 {
 
 
 
-    private final SingleSpeciesBoxcarFactory delegate  = new SingleSpeciesBoxcarFactory();
+    private final SingleSpeciesRegularBoxcarFactory delegate  = new SingleSpeciesRegularBoxcarFactory();
 
 
     private LinkedHashMap<Integer,DoubleParameter> spawningDayAndProportionOfYearlyRecruits = new LinkedHashMap<>();

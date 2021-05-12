@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -93,7 +94,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
 
         }
 
-        weights[0] = alpha * Math.pow(lengths[0],beta)/1000d;
+        weights[0] = bertnalanffyLengthToWeight(alpha, beta,  lengths[0]);
 
 
 
@@ -101,21 +102,15 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         {
             lengths[i] = lengths[i-1] + increment;
             //the allometric function turns it into grams, we want kg!
-            weights[i] = alpha * Math.pow(lengths[i],beta)/1000d;
+            weights[i] =  bertnalanffyLengthToWeight(alpha, beta,  lengths[i]);
 
         }
 
 
         //sometimes we need to know what is the length at specific age, we can compute that here!
-        double[] lengthAtAge = new double[100];
         double k = kYearlyParameter.apply(fishState.getRandom());
-        lengthAtAge[0] = LZero;
-        for(int i = 1; i< MAXIMUM_AGE_TRACKED; i++)
-        {
-            lengthAtAge[i] = LInfinity + ((LZero- LInfinity))*
-                    Math.exp(-k*i);
-        }
-
+        double[] lengthAtAge = bertalanffyLengthAtAge(LInfinity, LZero,k,
+                MAXIMUM_AGE_TRACKED);
 
 
         return new GrowthBinByList(1,
@@ -124,6 +119,24 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
                                    lengthAtAge);
 
 
+    }
+
+    @NotNull
+
+    public static double[] bertalanffyLengthAtAge(double LInfinity, double LZero,
+                                                   double kParameter, int maximumAgeTracked) {
+        double[] lengthAtAge = new double[100];
+        lengthAtAge[0] = LZero;
+        for(int i = 1; i< maximumAgeTracked; i++)
+        {
+            lengthAtAge[i] = LInfinity + ((LZero - LInfinity))*
+                    Math.exp(-kParameter*i);
+        }
+        return lengthAtAge;
+    }
+
+    public static double bertnalanffyLengthToWeight(double alpha, double beta, double currentLength) {
+        return alpha * Math.pow(currentLength, beta) / 1000d;
     }
 
     /**

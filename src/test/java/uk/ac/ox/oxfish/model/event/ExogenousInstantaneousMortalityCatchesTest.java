@@ -5,13 +5,11 @@ import org.junit.Test;
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarAbstractFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesRegularBoxcarFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.*;
 
 public class ExogenousInstantaneousMortalityCatchesTest {
 
@@ -68,7 +66,7 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         scenario.getFisherDefinitions().clear();
 
 
-        final SingleSpeciesBoxcarFactory boxy = new SingleSpeciesBoxcarFactory();
+        final SingleSpeciesBoxcarAbstractFactory boxy = new SingleSpeciesRegularBoxcarFactory();
         scenario.setBiologyInitializer(boxy);
 
         // Feed an empty ExogenousCatches factory to the scenario, as we'll build our own later
