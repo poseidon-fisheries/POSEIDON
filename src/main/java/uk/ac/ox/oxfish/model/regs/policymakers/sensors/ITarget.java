@@ -140,7 +140,7 @@ public class ITarget implements Sensor<FishState,Double> {
 
 
             lastPolicy = catches * (1 - precautionaryScaling);
-            return lastPolicy;
+  //          return lastPolicy;
         }
 
         return lastPolicy * percentageChangeDueToIndicator;
