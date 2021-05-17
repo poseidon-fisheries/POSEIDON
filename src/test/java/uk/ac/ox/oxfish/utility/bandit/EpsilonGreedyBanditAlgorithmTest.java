@@ -68,7 +68,7 @@ public class EpsilonGreedyBanditAlgorithmTest {
                 , .2);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
-            double reward = random.nextGaussian() / 2 + arm;
+            double reward = random.nextGaussian() / 4 + arm;
             bandit.observeReward(reward, arm);
         }
 
