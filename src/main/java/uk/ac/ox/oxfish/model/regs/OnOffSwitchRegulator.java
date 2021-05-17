@@ -34,7 +34,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * turns on and off all the agents given an allocation policy
+ * turns on and off all the agents given an allocation policy. THIS IS NOT A REGULATION, this is a steppable that assumes
+ * the agents have as regulation an "off-switch" regulation
  */
 public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 

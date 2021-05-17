@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.regs.AllowAllAllocationPolicy;
+import uk.ac.ox.oxfish.model.regs.ExogenousPercentagePermitFactory;
 import uk.ac.ox.oxfish.model.regs.MaxHoldSizeRandomAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -39,6 +40,7 @@ public class PermitAllocationPolicies {
     static {
         NAMES.put(AllowAllAllocationPolicyFactory.class, "No effort limit");
         NAMES.put(MaxHoldSizeRandomAllocationPolicyFactory.class, "Max hold size limit");
+        NAMES.put(ExogenousPercentagePermitFactory.class, "Yearly percentage of boats");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
 
