@@ -60,7 +60,8 @@ public class OnOffSwitchRegulatorTest {
         when(onlyFirstFisher.computeWhichFishersAreAllowed(fishers,state)).thenReturn(Lists.newArrayList(one));
         OnOffSwitchRegulator regulator = new OnOffSwitchRegulator(onlyFirstFisher, new LinkedList<>());
         regulator.start(state);
-        regulator.step(state);
+        //regulator now steps when immediately started
+     //   regulator.step(state);
 
         verify(((OffSwitchDecorator) one.getRegulation()),times(1)).setTurnedOff(false);
         verify(((OffSwitchDecorator) two.getRegulation()),times(1)).setTurnedOff(true);

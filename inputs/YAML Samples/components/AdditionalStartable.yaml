@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2021-03-22'
+  startDate: '2021-05-17'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -160,11 +160,13 @@ ISlope-TAC Controller:
   interval: 5
   precautionaryScaling: '0.8'
   startingYear: 10
+  targetedSpecies: ''
 -------
 Last catch as TAC Controller:
   catchColumnName: Species 0 Landings
   catchesToTargetMultiplier: '1.0'
   startingYear: 10
+  targetedSpecies: ''
 -------
 PID-TAC Controller:
   averageToOffsetMultiplier: '0.8'
@@ -224,9 +226,10 @@ ITEControllerFactory:
   blockEntryWhenSeasonIsNotFull: true
   effortDefinition: season
   indicatorColumnName: Average Trip Income
-  maxChangePerYear: '0.05'
+  maxChangePerYear: '0.1'
   multiplier: '1.0'
   yearsBeforeStarting: 10
+  yearsToLookBackForTarget: '5.0'
 -------
 Lopt Effort Controller:
   blockEntryWhenSeasonIsNotFull: false
@@ -236,6 +239,15 @@ Lopt Effort Controller:
   meanLengthColumnName: Mean Length Caught Lutjanus malabaricus spr_agent_total
   startingYear: 7
   targetLength: '60.0'
+-------
+Itarget Controller:
+  catchColumnName: Species 0 Landings
+  indicatorColumnName: Species 0 CPUE
+  indicatorMultiplier: '1.5'
+  interval: 5
+  precautionaryScaling: '0.0'
+  startingYear: 10
+  targetedSpecies: ''
 -------
 Schaefer Assessment Formula Controller:
   carryingCapacityMaximum: '3.0E7'

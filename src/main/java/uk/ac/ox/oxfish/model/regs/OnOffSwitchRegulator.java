@@ -71,8 +71,17 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 
         Preconditions.checkArgument(receipt==null, "Already started!");
 
-        receipt = model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
+        //should start every year, first day of the year.
+        model.scheduleOnceInXDays(
+                new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+                        receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.POLICY_UPDATE);
+                    }
+                }
+                , StepOrder.DAWN, 1);
 
+        step(model);
     }
 
     /**

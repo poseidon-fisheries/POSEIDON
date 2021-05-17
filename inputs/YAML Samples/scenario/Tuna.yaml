@@ -184,14 +184,17 @@ Tuna:
                 southLatitude: '-3.0'
                 westLongitude: '-110.0'
             endDay: '312.0'
+            inactiveDelegate: Anarchy
             startDay: '282.0'
         - Temporary Regulation:
             delegate: No Fishing
             endDay: '281.0'
+            inactiveDelegate: Anarchy
             startDay: '210.0'
         - Temporary Regulation:
             delegate: No Fishing
             endDay: '19.0'
+            inactiveDelegate: Anarchy
             startDay: '313.0'
         tags:
         - all

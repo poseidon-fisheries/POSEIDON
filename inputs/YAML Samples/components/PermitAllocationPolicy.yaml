@@ -3,3 +3,11 @@ No effort limit
 Max hold size limit:
   yearlyHoldSizeLimit: '10000.0'
 -------
+Yearly percentage of boats:
+  yearlyEffortAllowed:
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.4
+  - 0.5
+-------

@@ -115,6 +115,7 @@ Temporary Regulation:
       startingMPAs: [
         ]
   endDay: '1.0'
+  inactiveDelegate: Anarchy
   startDay: '1.0'
 -------
 Multiple Regulations:
