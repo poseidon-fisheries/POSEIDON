@@ -76,7 +76,7 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.POLICY_UPDATE);
+                        receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.DAWN);
                     }
                 }
                 , StepOrder.DAWN, 1);
