@@ -91,23 +91,23 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
     private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
-    private double valueExponent = 1;
-    private double distanceExponent = 1;
+    private double actionDistanceExponent = 1;
+    private double destinationDistanceExponent = 1;
 
-    public double getValueExponent() {
-        return valueExponent;
+    public double getActionDistanceExponent() {
+        return actionDistanceExponent;
     }
 
-    public void setValueExponent(final double valueExponent) {
-        this.valueExponent = valueExponent;
+    public void setActionDistanceExponent(final double actionDistanceExponent) {
+        this.actionDistanceExponent = actionDistanceExponent;
     }
 
-    public double getDistanceExponent() {
-        return distanceExponent;
+    public double getDestinationDistanceExponent() {
+        return destinationDistanceExponent;
     }
 
-    public void setDistanceExponent(final double distanceExponent) {
-        this.distanceExponent = distanceExponent;
+    public void setDestinationDistanceExponent(final double destinationDistanceExponent) {
+        this.destinationDistanceExponent = destinationDistanceExponent;
     }
 
     public double getPctSetsRemainingLogisticMidpoint() {
@@ -328,8 +328,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 globalSetAttractionModulator,
                 FadSetAction.class,
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new OpportunisticFadSetLocationValues(
@@ -342,8 +342,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 OpportunisticFadSetAction.class,
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new NonAssociatedSetLocationValues(
@@ -356,8 +356,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 NonAssociatedSetAction.class,
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new DolphinSetLocationValues(
@@ -370,8 +370,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 ),
                 globalSetAttractionModulator,
                 DolphinSetAction.class,
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new DeploymentLocationValues(
@@ -384,8 +384,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     fadDeploymentPctActiveFadsLimitLogisticSteepness
                 ),
                 FadDeploymentAction.class,
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new PortAttractionField(
                 new PortAttractionModulator(
@@ -394,8 +394,8 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     pctTravelTimeLeftLogisticMidpoint,
                     pctTravelTimeLeftLogisticSteepness
                 ),
-                valueExponent,
-                distanceExponent
+                actionDistanceExponent,
+                destinationDistanceExponent
             )
         );
     }

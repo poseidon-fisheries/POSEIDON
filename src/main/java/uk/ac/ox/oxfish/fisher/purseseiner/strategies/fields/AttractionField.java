@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.MutableDouble2D;
@@ -37,45 +36,23 @@ public class AttractionField implements FisherStartable {
     private final LocationValues locationValues;
     private final LocalAttractionModulator localModulator;
     private final GlobalAttractionModulator globalModulator;
-    private final double valueExponent;
-    private final double distanceExponent;
+    private final double actionDistanceExponent;
+    private final double destinationDistanceExponent;
     private Fisher fisher;
 
     AttractionField(
         final LocationValues locationValues,
         final LocalAttractionModulator localModulator,
         final GlobalAttractionModulator globalModulator,
-        final double valueExponent,
-        final double distanceExponent
+        final double actionDistanceExponent,
+        final double destinationDistanceExponent
     ) {
         this.locationValues = locationValues;
         this.localModulator = localModulator;
         this.globalModulator = globalModulator;
-        this.valueExponent = valueExponent;
-        this.distanceExponent = distanceExponent;
+        this.actionDistanceExponent = actionDistanceExponent;
+        this.destinationDistanceExponent = destinationDistanceExponent;
     }
-
-    @NotNull
-    Double2D attraction(final Location location) {
-        final FishState fishState = fisher.grabState();
-        final double speed = fisher.getBoat().getSpeedInKph();
-        final Int2D here = fisher.getLocation().getGridLocation();
-        final Int2D there = location.gridLocation;
-        checkState(speed > 0, "boat speed must be > 0");
-        checkState(fishState.getHoursPerStep() > 0, "hour per step must be > 0");
-        final double travelTime = location.distance / speed;
-        final int t = (int) (fishState.getStep() + travelTime / fishState.getHoursPerStep());
-
-        return new Double2D(there.x - here.x, there.y - here.y)
-            .normalize() // normalized direction vector
-            .multiply(
-                // scale to modulated location value, decreasing with travel time
-                pow(location.value, valueExponent)
-                    * localModulator.modulate(there.x, there.y, t, fisher)
-                    / pow(travelTime, distanceExponent)
-            );
-    }
-
 
     public Double2D netAttractionHere() {
 
@@ -102,7 +79,7 @@ public class AttractionField implements FisherStartable {
                 locationAttraction.normalize().multiplyIn(
                     // scale to modulated "there" value, decreasing with travel time
                     entry.getValue() * localModulator.modulate(there.x, there.y, t, fisher)
-                        / pow(travelTime, 2)
+                        / pow(travelTime, destinationDistanceExponent)
                 );
             }
             netAttraction.addIn(locationAttraction);
@@ -124,7 +101,7 @@ public class AttractionField implements FisherStartable {
         double sum = 0.0;
         for (final Entry<Int2D, Double> entry : locationValues.getValues()) {
             final double distance = distance(here, entry.getKey());
-            sum += entry.getValue() / pow(distance + 1, 2);
+            sum += entry.getValue() / pow(distance + 1, actionDistanceExponent);
         }
         return sum;
     }
