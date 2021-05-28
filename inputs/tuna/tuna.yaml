@@ -48,6 +48,7 @@ Tuna:
     fuelTankSize: '100000.0'
     gear:
       Purse Seine Gear:
+        actionDistanceExponent: 1.0
         actionSpecificRegulations:
         - Active FAD limits:
             limitClass1: 70
@@ -62,7 +63,7 @@ Tuna:
         decayRateOfDolphinSetLocationValues: 0.01
         decayRateOfNonAssociatedSetLocationValues: 0.01
         decayRateOfOpportunisticFadSetLocationValues: 0.01
-        distanceExponent: 1
+        destinationDistanceExponent: 1.0
         dolphinSetObservers: !!set {
           }
         dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
@@ -120,14 +121,17 @@ Tuna:
                 southLatitude: '-3.0'
                 westLongitude: '-110.0'
             endDay: '312.0'
+            inactiveDelegate: Anarchy
             startDay: '282.0'
         - Temporary Regulation:
             delegate: No Fishing
             endDay: '281.0'
+            inactiveDelegate: Anarchy
             startDay: '210.0'
         - Temporary Regulation:
             delegate: No Fishing
             endDay: '19.0'
+            inactiveDelegate: Anarchy
             startDay: '313.0'
         tags:
         - all
