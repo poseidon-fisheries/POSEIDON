@@ -40,8 +40,6 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
     private String weightsPerBin = ".1,1,5";
 
 
-    private String maturityPerBin = "0,0.5,1";
-
     private DoubleParameter mortalityRate = new FixedDoubleParameter(0.08);
 
 
@@ -68,7 +66,6 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
         double[] weights = Arrays.stream(weightsPerBin.split(",")).mapToDouble(mapper).toArray();
 
         //turn into maturity array
-        Double[] maturities = Arrays.stream(maturityPerBin.split(",")).map(mapper::applyAsDouble).toArray(Double[]::new);
 
         //create a meristic!
         return new FromListMeristics(
@@ -116,21 +113,4 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
         this.mortalityRate = mortalityRate;
     }
 
-    /**
-     * Getter for property 'maturityPerBin'.
-     *
-     * @return Value for property 'maturityPerBin'.
-     */
-    public String getMaturityPerBin() {
-        return maturityPerBin;
-    }
-
-    /**
-     * Setter for property 'maturityPerBin'.
-     *
-     * @param maturityPerBin Value to set for property 'maturityPerBin'.
-     */
-    public void setMaturityPerBin(String maturityPerBin) {
-        this.maturityPerBin = maturityPerBin;
-    }
 }

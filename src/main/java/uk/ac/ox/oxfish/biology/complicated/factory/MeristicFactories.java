@@ -46,6 +46,7 @@ public class MeristicFactories {
 
     static {
         NAMES.put(ListMeristicFactory.class, "Weight List Meristics");
+        NAMES.put(SimpleListMeristicFactory.class, "Length-Weight No Sex Meristics");
         NAMES.put(MeristicsFileFactory.class, "Stock Assessment Meristics From File");
         NAMES.put(EquallySpacedBertalanffyFactory.class, "Equally Spaced Von bertalanffy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);

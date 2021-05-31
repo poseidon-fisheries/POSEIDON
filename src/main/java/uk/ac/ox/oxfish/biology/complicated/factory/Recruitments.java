@@ -46,6 +46,7 @@ public class Recruitments {
     static {
         NAMES.put(LogisticRecruitmentFactory.class, "Logistic Recruitment");
         NAMES.put(RecruitmentBySpawningFactory.class, "Beverton-Holt");
+        NAMES.put(SimplifiedBevertonHoltRecruitmentFactory.class, "Beverton-Holt Simplified");
         NAMES.put(RecruitmentBySpawningJackKnifeMaturity.class, "Beverton-Holt Knife-Edge Maturity");
         NAMES.put(FixedRecruitmentFactory.class, "Fixed Recruitment");
         NAMES.put(LinearSSBRatioSpawningFactory.class, "Linear SSB Recruitment");

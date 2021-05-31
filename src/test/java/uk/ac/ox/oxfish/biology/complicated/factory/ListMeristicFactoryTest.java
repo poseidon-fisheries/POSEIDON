@@ -41,7 +41,7 @@ public class ListMeristicFactoryTest {
         ListMeristicFactory factory = new ListMeristicFactory();
         factory.setMortalityRate(new FixedDoubleParameter(.2));
         factory.setWeightsPerBin("1,2,3,4,5,6");
-        factory.setMaturityPerBin("1,2,3,4,5,6");
+        //factory.setMaturityPerBin("1,2,3,4,5,6");
         FromListMeristics meristics = factory.apply(mock(FishState.class));
 
         assertEquals(meristics.getMaxAge(),5);
