@@ -378,6 +378,23 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         return scenario;
     }
 
+    public static void saveCalibratedScenario(double[] optimalParameters, Path optimizationYamlFile,
+                                              Path pathWhereToSaveScenario) {
+
+
+        try (FileWriter fileWriter = new FileWriter(pathWhereToSaveScenario.toFile())) {
+            GenericOptimization optimization = GenericOptimization.fromFile(optimizationYamlFile);
+            Scenario scenario = GenericOptimization.buildScenario(
+                    optimalParameters,
+                    Paths.get(optimization.getScenarioFile()).toFile(),
+                    optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 
 
 

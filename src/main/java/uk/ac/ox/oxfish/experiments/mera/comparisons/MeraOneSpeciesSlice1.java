@@ -774,9 +774,10 @@ public class MeraOneSpeciesSlice1 {
 
 
     public static final String[] selectedPolicies = new String[]{
+            "BAU",
             "0_days",
             "150_days",
-            "BAU",
+
             "multi_lastcatch",
             "multi_lastcatch_70",
             "closed_multi_itarget1cpue",
@@ -784,10 +785,10 @@ public class MeraOneSpeciesSlice1 {
             "LTARGETE_1_fleet",
             "LTARGETE_1_season",
             "LTARGETE_1_daysatsea",
-            "LTARGETE_4_season",
-            "LOPT_season"
+            "LTARGETE_4_season"//,
+        //    "LOPT_season"
     };
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SELECTED =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SELECTED =
             new LinkedHashMap<>();
     static {
         LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ALL_OF_THEM =
@@ -928,7 +929,7 @@ public class MeraOneSpeciesSlice1 {
         );
     }
 
-    private static void runSetOfScenarios(Path scenarioFileList,
+    public static void runSetOfScenarios(Path scenarioFileList,
                                           Path outputDirectory,
                                           LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap
     ) throws IOException{

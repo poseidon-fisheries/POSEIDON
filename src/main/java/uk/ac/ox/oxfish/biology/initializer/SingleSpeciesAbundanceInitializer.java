@@ -55,8 +55,9 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 {
 
 
-
-
+    /**
+     * object containing the number of initial fish in the ocean!
+     */
     final private InitialAbundance initialAbundance;
 
     /**

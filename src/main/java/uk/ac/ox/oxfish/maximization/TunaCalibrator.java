@@ -156,18 +156,7 @@ public class TunaCalibrator implements Runnable {
     public void saveCalibratedScenario(double[] optimalParameters, Path calibrationFilePath) {
 
         final Path calibratedScenarioPath = calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
-            Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        GenericOptimization.saveCalibratedScenario(optimalParameters,calibrationFilePath,calibratedScenarioPath);
     }
 
     @SuppressWarnings("unused")

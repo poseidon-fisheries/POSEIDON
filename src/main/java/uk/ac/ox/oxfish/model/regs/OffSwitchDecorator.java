@@ -148,6 +148,10 @@ public class OffSwitchDecorator implements Regulation {
                                       this.isTurnedOff());
     }
 
+    public Regulation getDelegate() {
+        return delegate;
+    }
+
     @Override
     public void start(FishState model, Fisher fisher) {
         delegate.start(model, fisher);

@@ -70,6 +70,7 @@ public class BiologyInitializers {
         NAMES.put(YellowBycatchWithHistoryFactory.class, "Yellow Bycatch Factory with History");
         NAMES.put(LinearGetterBiologyFactory.class, "Linear Getter Biology");
         NAMES.put(SingleSpeciesRegularBoxcarFactory.class, "Boxcar Biology");
+        NAMES.put(SingleSpeciesBoxcarFromListFactory.class, "Boxcar Biology from List");
         NAMES.put(SingleSpeciesIrregularBoxcarFactory.class, "Irregular Boxcar Biology");
         NAMES.put(SingleSpeciesBoxcarPulseRecruitmentFactory.class, "Boxcar Biology with pulses");
         CONSTRUCTORS = Constructors.fromNames(NAMES);

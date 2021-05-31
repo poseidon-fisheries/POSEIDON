@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.model.FishState;
@@ -36,6 +37,8 @@ public class SingleSpeciesRegularBoxcarFactory extends SingleSpeciesBoxcarAbstra
 
     @Override
     protected GrowthBinByList generateBins(FishState state) {
+        Preconditions.checkArgument(getCmPerBin() * getNumberOfBins() >= getLInfinity().apply(state.getRandom()),
+                "The number of bins provided given their width won't reach l-infinity...");
         EquallySpacedBertalanffyFactory  meristic = new EquallySpacedBertalanffyFactory();
         meristic.setCmPerBin(getCmPerBin());
         meristic.setNumberOfBins(getNumberOfBins());

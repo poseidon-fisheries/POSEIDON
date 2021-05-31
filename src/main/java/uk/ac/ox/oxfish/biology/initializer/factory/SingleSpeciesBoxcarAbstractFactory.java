@@ -55,6 +55,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
     private AlgorithmFactory<? extends BiomassAllocator> recruitAllocator = new ConstantAllocatorFactory();
     private AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator = new ConstantAllocatorFactory();
 
+
     /**
      * Applies this function to the given argument.
      *

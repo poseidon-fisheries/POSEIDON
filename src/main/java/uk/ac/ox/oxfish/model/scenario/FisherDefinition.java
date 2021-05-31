@@ -158,13 +158,13 @@ public class FisherDefinition {
     {
 
         int numberOfInitialFishers =0;
-        for (Map.Entry<String, Integer> portNumber : initialFishersPerPort.entrySet()) {
-            numberOfInitialFishers+= portNumber.getValue();
+        for (Map.Entry<String, ? extends Number> portNumber : initialFishersPerPort.entrySet()) {
+            numberOfInitialFishers+= ((int)portNumber.getValue().intValue());
         }
         flatPortArray = new String[numberOfInitialFishers];
         int i=0;
-        for (Map.Entry<String, Integer> portNumber : initialFishersPerPort.entrySet()) {
-            for(int fishersToAdd=0; fishersToAdd< portNumber.getValue(); fishersToAdd++) {
+        for (Map.Entry<String, ? extends Number> portNumber : initialFishersPerPort.entrySet()) {
+            for(int fishersToAdd=0; fishersToAdd< portNumber.getValue().intValue(); fishersToAdd++) {
                 flatPortArray[i] = portNumber.getKey();
                 i++;
             }

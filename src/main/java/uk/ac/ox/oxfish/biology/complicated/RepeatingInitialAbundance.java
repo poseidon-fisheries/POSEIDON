@@ -50,7 +50,7 @@ public class RepeatingInitialAbundance  implements InitialAbundance{
     public void initialize(Species species) {
         abundance= new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         Preconditions.checkArgument(species.getNumberOfBins()==cohort.length,
-                                    "The number of boxes provided as inputs don't match the number of boxes the biology initializer expects!");
+                                    "The number of boxes provided as inputs don't match the number of boxes the biology initializer expects! " + species.getNumberOfBins() + "," + cohort.length);
 
         for(int i=0; i<species.getNumberOfSubdivisions(); i++)
             abundance[i] = Arrays.copyOf(cohort,cohort.length);

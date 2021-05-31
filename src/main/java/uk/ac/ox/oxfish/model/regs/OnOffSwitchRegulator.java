@@ -27,6 +27,7 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.ArrayList;
@@ -166,5 +167,23 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
      */
     public Collection<String> getTagsOfParticipants() {
         return tagsOfParticipants;
+    }
+
+
+    public boolean isStarted(){
+        return receipt!=null;
+    }
+
+
+    /**
+     * trawl through the startables in fishstate and turn off all the ones that are OnOffSwitchRegulators
+     * @param state
+     */
+    public static void turnOffAllSwitchRegulators(FishState state){
+        for (Startable viewStartable : state.viewStartables()) {
+            if (viewStartable instanceof OnOffSwitchRegulator)
+                if(((OnOffSwitchRegulator) viewStartable).isStarted())
+                    viewStartable.turnOff();
+        }
     }
 }
