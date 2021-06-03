@@ -11,7 +11,6 @@ Tuna:
       schaeferParamsFile: inputs/tuna/schaefer_params.csv
   boatsFile: inputs/tuna/boats.csv
   costsFile: inputs/tuna/costs.csv
-  fadCarryingCapacitiesFile: inputs/tuna/fad_carrying_capacities.csv
   fadMortalityIncludedInExogenousCatches: true
   fisherDefinition:
     departingStrategy: Purse Seiner Departing Strategy
@@ -77,11 +76,8 @@ Tuna:
             Bigeye tuna: '0.05'
             Yellowfin tuna: '0.0321960615'
             Skipjack tuna: '0.007183564999999999'
-          carryingCapacities:
-            Bigeye tuna: 254700.0
-            Yellowfin tuna: 278370.0
-            Skipjack tuna: 387000.0
           dudProbability: '0.0'
+          fadCarryingCapacitiesGammaParametersFilePath: inputs/tuna/fad_carrying_capacities_gamma_parameters.csv
           fishReleaseProbabilityInPercent: '0.0'
         fadSetObservers: !!set {
           }

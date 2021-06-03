@@ -46,6 +46,7 @@ import javax.measure.quantity.Mass;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.function.DoubleSupplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -161,8 +162,8 @@ public class BiomassResetterTest {
         when(fishState.getFadMap()).thenReturn(fadMap);
 
         // deploy one FAD in the center of each tile
-        final ImmutableMap<Species, Quantity<Mass>> carryingCapacities =
-            species.stream().collect(toImmutableMap(identity(), __ -> oneTonne));
+        final ImmutableMap<Species, DoubleSupplier> carryingCapacities =
+            species.stream().collect(toImmutableMap(identity(), __ -> () -> 1000));
         final double fadAttractionRate = 0.5;
         final ImmutableMap<Species, Double> fadAttractionRates =
             species.stream().collect(toImmutableMap(identity(), __ -> fadAttractionRate));

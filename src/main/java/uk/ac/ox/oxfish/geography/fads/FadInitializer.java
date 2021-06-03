@@ -30,19 +30,19 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
+import java.util.Collection;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Comparator.comparingInt;
 
 public class FadInitializer implements Function<FadManager, Fad> {
 
     private final double[] emptyBiomasses;
-    private final double[] carryingCapacities;
+    private final Collection<DoubleSupplier> carryingCapacitySuppliers;
     private final double fishReleaseProbability;
     private final ImmutableMap<Species, Double> attractionRates;
     private final MersenneTwisterFast rng;
@@ -50,28 +50,36 @@ public class FadInitializer implements Function<FadManager, Fad> {
     private final IntSupplier timeStepSupplier;
 
     public FadInitializer(
-        GlobalBiology globalBiology,
-        Map<Species, Quantity<Mass>> carryingCapacities,
-        Map<Species, Double> attractionRates,
-        MersenneTwisterFast rng,
-        double fishReleaseProbability,
-        double dudProbability,
-        IntSupplier timeStepSupplier
+        final GlobalBiology globalBiology,
+        final Map<Species, DoubleSupplier> carryingCapacitySuppliers,
+        final Map<Species, Double> attractionRates,
+        final MersenneTwisterFast rng,
+        final double fishReleaseProbability,
+        final double dudProbability,
+        final IntSupplier timeStepSupplier
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
-        this.carryingCapacities = new double[globalBiology.getSize()];
+        this.carryingCapacitySuppliers =
+            carryingCapacitySuppliers
+                .entrySet()
+                .stream()
+                .sorted(comparingInt(entry -> entry.getKey().getIndex()))
+                .map(Map.Entry::getValue)
+                .collect(toImmutableList());
         this.rng = rng;
         this.dudProbability = dudProbability;
         this.timeStepSupplier = timeStepSupplier;
-        carryingCapacities.forEach((species, qty) ->
-            this.carryingCapacities[species.getIndex()] = asDouble(qty, KILOGRAM)
-        );
         this.attractionRates = ImmutableMap.copyOf(attractionRates);
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
-    @Override public Fad apply(@NotNull FadManager fadManager) {
+    @Override
+    public Fad apply(@NotNull final FadManager fadManager) {
         final SeaTile seaTile = fadManager.getFisher().getLocation();
+        final double[] carryingCapacities =
+            carryingCapacitySuppliers.stream()
+                .mapToDouble(DoubleSupplier::getAsDouble)
+                .toArray();
         return new Fad(
             fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),

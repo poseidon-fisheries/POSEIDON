@@ -30,7 +30,7 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-05-06_11.54.17"
+        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-01_17.11.54"
     );
 
     private final Path calibrationFilePath;
@@ -71,10 +71,7 @@ public class TunaEvaluator implements Runnable {
         final Consumer<Scenario> scenarioConsumer = scenario -> {
             final TunaScenario tunaScenario = (TunaScenario) scenario;
             final PurseSeinerFishingStrategyFactory fishingStrategy = (PurseSeinerFishingStrategyFactory) tunaScenario.getFisherDefinition().getFishingStrategy();
-            fishingStrategy.setFadDeploymentActionLogisticMidpoint(5_000);
-            fishingStrategy.setFadDeploymentActionLogisticSteepness(0.0001);
-            fishingStrategy.setFadSetActionLogisticMidpoint(15_000);
-            fishingStrategy.setOpportunisticFadSetDetectionProbability(0.25);
+//            fishingStrategy.setFadSetActionLogisticMidpoint(1E6);
 //            ((PurseSeineGearFactory) tunaScenario
 //                .getFisherDefinition()
 //                .getGear())
@@ -85,7 +82,7 @@ public class TunaEvaluator implements Runnable {
 //            ));
         };
         new TunaEvaluator(calibrationFilePath, solution)
-//            .setScenarioConsumer(scenarioConsumer)
+  //          .setScenarioConsumer(scenarioConsumer)
             .run();
 
     }

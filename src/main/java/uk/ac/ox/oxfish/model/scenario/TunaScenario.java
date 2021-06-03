@@ -27,7 +27,6 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiomassReallocatorInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorFactory;
@@ -110,7 +109,8 @@ import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNI
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-import static uk.ac.ox.oxfish.utility.Measures.*;
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -152,7 +152,6 @@ public class TunaScenario implements Scenario {
     private Path attractionWeightsFile = input("action_weights.csv");
     private Path mapFile = input("depth.csv");
     private Path boatsFile = input("boats.csv");
-    private Path fadCarryingCapacitiesFile = input("fad_carrying_capacities.csv");
     private Path costsFile = input("costs.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
@@ -173,17 +172,8 @@ public class TunaScenario implements Scenario {
     private BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory();
 
     public TunaScenario() {
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
 
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
-        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
-            parseAllRecords(fadCarryingCapacitiesFile).stream()
-                .filter(r -> r.getInt("year") == TARGET_YEAR)
-                .collect(toMap(
-                    r -> speciesCodes.getSpeciesName(r.getString("species_code")),
-                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
-                ))
-        );
         purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.05),
             "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
@@ -300,14 +290,6 @@ public class TunaScenario implements Scenario {
     public Path getBoatsFile() { return boatsFile; }
 
     public void setBoatsFile(final Path boatsFile) { this.boatsFile = boatsFile; }
-
-    @SuppressWarnings("unused")
-    public Path getFadCarryingCapacitiesFile() { return fadCarryingCapacitiesFile; }
-
-    @SuppressWarnings("unused")
-    public void setFadCarryingCapacitiesFile(final Path fadCarryingCapacitiesFile) {
-        this.fadCarryingCapacitiesFile = fadCarryingCapacitiesFile;
-    }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;

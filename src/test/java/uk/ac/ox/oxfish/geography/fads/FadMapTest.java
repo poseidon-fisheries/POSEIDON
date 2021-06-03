@@ -18,17 +18,12 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -48,11 +43,11 @@ public class FadMapTest {
         final Species speciesA = new Species("A");
         final Species speciesB = new Species("B");
         final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
-        final Quantity<Mass> k = getQuantity(1, TONNE);
-        final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
+        final DoubleSupplier k = () -> 1000;
+        final ImmutableMap<Species, DoubleSupplier> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
 
         for (final SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
-            tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
+            tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k.getAsDouble()) : new EmptyLocalBiology());
         }
 
         // Make a current map that moves FADs west
