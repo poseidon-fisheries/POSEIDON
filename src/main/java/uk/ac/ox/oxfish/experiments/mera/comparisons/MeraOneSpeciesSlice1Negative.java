@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -14,7 +13,6 @@ import uk.ac.ox.oxfish.model.regs.factory.OffSwitchFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,9 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.DoublePredicate;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 
 public class MeraOneSpeciesSlice1Negative {
 
@@ -38,7 +33,7 @@ public class MeraOneSpeciesSlice1Negative {
      */
     //private static double[] modernSolution = new double[]{-1.6242490116906958,3.074371992734171,-1.9400293686354024,-0.00924982660923937,-5.227033193854416};
 
-   // private static double[] hotstartSolution = new double[]{-4.735450927515468, -3.9087532571219388 ,-0.23905122846579044 ,1.3957837344806767, -6.155061746539974};
+    // private static double[] hotstartSolution = new double[]{-4.735450927515468, -3.9087532571219388 ,-0.23905122846579044 ,1.3957837344806767, -6.155061746539974};
     private static double[] hotstartSolution = new double[]{-9.92488213526895,-12.02329087363163,1.420816710409177,-0.5010274106302548};
 
 
@@ -113,16 +108,59 @@ public class MeraOneSpeciesSlice1Negative {
     }
 
 
+    private static LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
+            new LinkedHashMap<>();
+    static {
+        selectedPolicies.put(
+                "250_days",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
+                }
+        );
+        selectedPolicies.put(
+                "333_days",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(333, true);
+                }
+        );
+        selectedPolicies.put(
+                "0_days",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(333, true);
+                }
+        );
+        String[] otherPolicies = {
+                "BAU",
+                "multi_lastcatch",
+                "multi_lastcatch_70",
+                "closed_multi_itarget1cpue",
+                "LBSPR_season",
+                "LTARGETE_1_fleet",
+                "LTARGETE_1_season",
+                "LTARGETE_1_daysatsea",
+                "LTARGETE_4_season"};
+
+        for(String policy : otherPolicies){
+            selectedPolicies.put(
+                    policy,
+                    MeraOneSpeciesSlice1.SELECTED.get(policy)
+            );
+        }
+
+
+    }
+
+
     public static void main(String[] args) throws IOException {
 
 
-      //  generateScenarioFiles();
+        //  generateScenarioFiles();
 
 
-        Path mainDirectory = Paths.get("docs","mera_hub","slice_1negative","automated_hotstart","results");
+        Path mainDirectory = Paths.get("docs","mera_hub","slice_1negative","automated_hotstart_yearly","results");
 
         LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
-                MeraOneSpeciesSlice1.SELECTED;
+               MeraOneSpeciesSlice1Negative.selectedPolicies;
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
         Path pathToOutput = mainDirectory.resolve("policy");
 
@@ -144,7 +182,7 @@ public class MeraOneSpeciesSlice1Negative {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies);
+                adjustedPolicies, 50);
 
 
     }

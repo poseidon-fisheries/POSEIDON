@@ -31,10 +31,10 @@ import java.util.*;
 
 public class MeraOneSpeciesSlice1 {
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP =
             new LinkedHashMap<>();
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP_2 =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TEST_POLICY_MAP_2 =
             new LinkedHashMap<>();
 
     public static final int YEARS_TO_RUN_POLICIES = 40;
@@ -74,7 +74,7 @@ public class MeraOneSpeciesSlice1 {
 
 
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SCHAEFER_TEST =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SCHAEFER_TEST =
             new LinkedHashMap<>();
 
     static{
@@ -116,7 +116,7 @@ public class MeraOneSpeciesSlice1 {
 
     }
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ITE =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ITE =
             new LinkedHashMap<>();
 
     static{
@@ -156,7 +156,7 @@ public class MeraOneSpeciesSlice1 {
         }
     }
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ITEWRONG =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ITEWRONG =
             new LinkedHashMap<>();
     static {
         Iterable<String> actuators =
@@ -178,7 +178,7 @@ public class MeraOneSpeciesSlice1 {
         }
     }
 
-    private static AlgorithmFactory<AdditionalStartable> buildWrongITESPRPolicy(final String effortType,
+    public static AlgorithmFactory<AdditionalStartable> buildWrongITESPRPolicy(final String effortType,
                                                                                 final double multiplier,
                                                                                 double mkRatio){
         final AlgorithmFactory<? extends AdditionalStartable> sprStarter = buildAdditionalSPRAgent(mkRatio);
@@ -215,13 +215,13 @@ public class MeraOneSpeciesSlice1 {
 
     }
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE =
             new LinkedHashMap<>();
 
-    private static final LinkedHashMap<String,AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE_ADDITIONAL =
+    public static final LinkedHashMap<String,AlgorithmFactory<? extends AdditionalStartable>> EFFORT_ADAPTIVE_ADDITIONAL =
             new LinkedHashMap<>();
 
-    private static final LinkedHashMap<String,AlgorithmFactory<? extends AdditionalStartable>> LTARGETE =
+    public static final LinkedHashMap<String,AlgorithmFactory<? extends AdditionalStartable>> LTARGETE =
             new LinkedHashMap<>();
 
 
@@ -391,7 +391,7 @@ public class MeraOneSpeciesSlice1 {
 
 
     @NotNull
-    private static AlgorithmFactory<AdditionalStartable> buildLBSPRPolicy(final String effortType,
+    public static AlgorithmFactory<AdditionalStartable> buildLBSPRPolicy(final String effortType,
                                                                           final boolean aggresssive,
                                                                           final String sprColumnName,
                                                                           final int yearsBeforeStart) {
@@ -418,7 +418,7 @@ public class MeraOneSpeciesSlice1 {
 
 
 
-    private static AlgorithmFactory<AdditionalStartable> buildWrongMKLBSPRPolicy(final String effortType,
+    public static AlgorithmFactory<AdditionalStartable> buildWrongMKLBSPRPolicy(final String effortType,
                                                                                  final boolean aggresssive,
                                                                                  double mkRatio){
         final AlgorithmFactory<? extends AdditionalStartable> sprStarter = buildAdditionalSPRAgent(mkRatio);
@@ -448,7 +448,7 @@ public class MeraOneSpeciesSlice1 {
 
     }
 
-    private static AlgorithmFactory<? extends AdditionalStartable> buildAdditionalSPRAgent(double mkRatio) {
+    public static AlgorithmFactory<? extends AdditionalStartable> buildAdditionalSPRAgent(double mkRatio) {
         String sprAgent =
                 "SPR Fixed Sample Agent:\n" +
                         "      assumedKParameter: '" + 0.3775984 / mkRatio + "'\n" +
@@ -474,7 +474,7 @@ public class MeraOneSpeciesSlice1 {
         return sprStarter;
     }
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE =
             new LinkedHashMap<>();
     static{
         HashMap<String,String> nicknameOfIndexColumn = new LinkedHashMap<>();
@@ -563,11 +563,11 @@ public class MeraOneSpeciesSlice1 {
         }
     }
 
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES =
             new LinkedHashMap<>();
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES_2 =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ONESPECIES_2 =
             new LinkedHashMap<>();
-    private static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ITARGET =
+    public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> TAC_ADAPTIVE_ITARGET =
             new LinkedHashMap<>();
     static{
         HashMap<String,String> nicknameOfIndexColumn = new LinkedHashMap<>();
@@ -862,7 +862,7 @@ public class MeraOneSpeciesSlice1 {
 
             runSetOfScenarios(pathToScenarioFiles,
                     pathToOutput,
-                    selectedPolicies);
+                    selectedPolicies, YEARS_TO_RUN_POLICIES);
         }
         //the rejection sampling bit
         //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
@@ -930,8 +930,8 @@ public class MeraOneSpeciesSlice1 {
     }
 
     public static void runSetOfScenarios(Path scenarioFileList,
-                                          Path outputDirectory,
-                                          LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap
+                                         Path outputDirectory,
+                                         LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap, int yearsToRun
     ) throws IOException{
         FishYAML yaml = new FishYAML();
         final List<String> columnsToPrint = yaml.loadAs(new FileReader(
@@ -949,7 +949,7 @@ public class MeraOneSpeciesSlice1 {
             RejectionSampling.runOneAcceptedScenario(
                     scenario,
                     shockYear,
-                    YEARS_TO_RUN_POLICIES,
+                    yearsToRun,
                     0,
                     outputDirectory,
                     policyMap,
@@ -968,7 +968,7 @@ public class MeraOneSpeciesSlice1 {
 
 
     @NotNull
-    private static AdditionalStartable buildMaxDaysOutPolicy(int maxDaysOut, boolean blockEntry) {
+    public static AdditionalStartable buildMaxDaysOutPolicy(int maxDaysOut, boolean blockEntry) {
         return model -> {
             //first remove all possible entries
             if(blockEntry)

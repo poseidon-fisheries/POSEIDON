@@ -28,12 +28,12 @@ import java.util.List;
 
 public class MeraOneSpeciesSlice1NegativeHotstarts {
 
-    private static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/slice_1negative/automated_hotstart/");
+    private static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/slice_1negative/automated_hotstart_yearly/");
 
         public static void main(String[] args) throws IOException {
         //calibration
-//        for (int hotstart = 1; hotstart < 50; hotstart++) {
-//            calibrate(MAIN_DIRECTORY.resolve(String.valueOf(hotstart)).resolve("optimization.yaml"));
+//        for (int hotstart = 5; hotstart < 64; hotstart++) {
+//            calibrate(MAIN_DIRECTORY.resolve("hotstarts").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"));
 //        }
 
         //create list of scenario runs
@@ -42,7 +42,7 @@ public class MeraOneSpeciesSlice1NegativeHotstarts {
         writer.write("scenario,year");
         writer.flush();
         for (int hotstart = 1; hotstart < 50; hotstart++){
-            final Path optimized = MAIN_DIRECTORY.resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
+            final Path optimized = MAIN_DIRECTORY.resolve("hotstarts").resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
             if(checkError(optimized)<10) {
                 System.out.println("Accepted!");
                 writer.write("\n");
