@@ -63,7 +63,7 @@ public class FadInitializer implements Function<FadManager, Fad> {
             carryingCapacitySuppliers
                 .entrySet()
                 .stream()
-                .sorted(comparingInt(entry -> entry.getKey().getIndex()))
+                .sorted(comparingInt(entry -> entry.getKey().getIndex())) // order by species index
                 .map(Map.Entry::getValue)
                 .collect(toImmutableList());
         this.rng = rng;

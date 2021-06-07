@@ -77,11 +77,14 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                         final String speciesName = speciesCodes.getSpeciesName(speciesCode);
                         return fishState.getBiology().getSpecie(speciesName);
                     },
-                    record -> (new Gamma(
-                        record.getDouble("shape"),
-                        record.getDouble("rate"),
-                        rng
-                    ))::nextDouble
+                    record -> {
+                        final Gamma gamma = new Gamma(
+                            record.getDouble("shape"),
+                            record.getDouble("rate"),
+                            rng
+                        );
+                        return () -> gamma.nextDouble() * 1000; // convert from tonnes to kg
+                    }
                 ));
 
         return new FadInitializer(

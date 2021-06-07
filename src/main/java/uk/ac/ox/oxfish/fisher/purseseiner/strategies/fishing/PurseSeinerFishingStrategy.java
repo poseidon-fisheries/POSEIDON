@@ -164,14 +164,12 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 )
             ));
 
-        final ImmutableList<Entry<PurseSeinerAction, Double>> list = Streams
+        return Streams
             .concat(
                 weightedSetActions,
                 weightedSearchActions,
                 weightedFadDeploymentAction
-            ).collect(toImmutableList());
-
-        return list.stream()
+            )
             .filter(entry -> entry.getKey().isPermitted())
             .filter(entry -> entry.getValue() > movingThreshold)
             .collect(toImmutableList());
