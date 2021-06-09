@@ -116,16 +116,4 @@ public class AttractionField implements FisherStartable {
         locationValues.start(model, fisher);
     }
 
-    static class Location {
-        private final Int2D gridLocation;
-        private final double value;
-        private final double distance;
-
-        public Location(final Int2D gridLocation, final double value, final double distance) {
-            this.gridLocation = gridLocation;
-            this.value = value;
-            this.distance = distance;
-        }
-    }
-
 }
