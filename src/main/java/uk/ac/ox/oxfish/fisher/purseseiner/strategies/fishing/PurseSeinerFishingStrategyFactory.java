@@ -79,13 +79,12 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double nonAssociatedSetActionLogisticMidpoint = 0.1;
     private double dolphinSetActionLogisticSteepness = 1;
     private double dolphinSetActionLogisticMidpoint = 0.1;
-    private double movingThreshold = 0.1;
 
     public double getFadSetActionLogisticSteepness() {
         return fadSetActionLogisticSteepness;
     }
 
-    public void setFadSetActionLogisticSteepness(double fadSetActionLogisticSteepness) {
+    public void setFadSetActionLogisticSteepness(final double fadSetActionLogisticSteepness) {
         this.fadSetActionLogisticSteepness = fadSetActionLogisticSteepness;
     }
 
@@ -93,7 +92,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return fadSetActionLogisticMidpoint;
     }
 
-    public void setFadSetActionLogisticMidpoint(double fadSetActionLogisticMidpoint) {
+    public void setFadSetActionLogisticMidpoint(final double fadSetActionLogisticMidpoint) {
         this.fadSetActionLogisticMidpoint = fadSetActionLogisticMidpoint;
     }
 
@@ -101,7 +100,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return opportunisticFadSetActionLogisticSteepness;
     }
 
-    public void setOpportunisticFadSetActionLogisticSteepness(double opportunisticFadSetActionLogisticSteepness) {
+    public void setOpportunisticFadSetActionLogisticSteepness(final double opportunisticFadSetActionLogisticSteepness) {
         this.opportunisticFadSetActionLogisticSteepness = opportunisticFadSetActionLogisticSteepness;
     }
 
@@ -109,7 +108,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return opportunisticFadSetActionLogisticMidpoint;
     }
 
-    public void setOpportunisticFadSetActionLogisticMidpoint(double opportunisticFadSetActionLogisticMidpoint) {
+    public void setOpportunisticFadSetActionLogisticMidpoint(final double opportunisticFadSetActionLogisticMidpoint) {
         this.opportunisticFadSetActionLogisticMidpoint = opportunisticFadSetActionLogisticMidpoint;
     }
 
@@ -117,7 +116,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return nonAssociatedSetActionLogisticSteepness;
     }
 
-    public void setNonAssociatedSetActionLogisticSteepness(double nonAssociatedSetActionLogisticSteepness) {
+    public void setNonAssociatedSetActionLogisticSteepness(final double nonAssociatedSetActionLogisticSteepness) {
         this.nonAssociatedSetActionLogisticSteepness = nonAssociatedSetActionLogisticSteepness;
     }
 
@@ -125,7 +124,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return nonAssociatedSetActionLogisticMidpoint;
     }
 
-    public void setNonAssociatedSetActionLogisticMidpoint(double nonAssociatedSetActionLogisticMidpoint) {
+    public void setNonAssociatedSetActionLogisticMidpoint(final double nonAssociatedSetActionLogisticMidpoint) {
         this.nonAssociatedSetActionLogisticMidpoint = nonAssociatedSetActionLogisticMidpoint;
     }
 
@@ -133,7 +132,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return dolphinSetActionLogisticSteepness;
     }
 
-    public void setDolphinSetActionLogisticSteepness(double dolphinSetActionLogisticSteepness) {
+    public void setDolphinSetActionLogisticSteepness(final double dolphinSetActionLogisticSteepness) {
         this.dolphinSetActionLogisticSteepness = dolphinSetActionLogisticSteepness;
     }
 
@@ -141,16 +140,8 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         return dolphinSetActionLogisticMidpoint;
     }
 
-    public void setDolphinSetActionLogisticMidpoint(double dolphinSetActionLogisticMidpoint) {
+    public void setDolphinSetActionLogisticMidpoint(final double dolphinSetActionLogisticMidpoint) {
         this.dolphinSetActionLogisticMidpoint = dolphinSetActionLogisticMidpoint;
-    }
-
-    public double getMovingThreshold() {
-        return movingThreshold;
-    }
-
-    public void setMovingThreshold(double movingThreshold) {
-        this.movingThreshold = movingThreshold;
     }
 
     public double getSearchActionLogisticMidpoint() { return searchActionLogisticMidpoint; }
@@ -239,17 +230,16 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     @Override
     public PurseSeinerFishingStrategy apply(final FishState fishState) {
         return new PurseSeinerFishingStrategy(
-            this::loadAttractionWeights,
+            PurseSeinerFishingStrategyFactory::loadAttractionWeights,
             this::makeSetOpportunityLocator,
             makeActionValueFunctions(),
             searchActionDecayConstant,
-            fadDeploymentActionDecayConstant,
-            movingThreshold
+            fadDeploymentActionDecayConstant
         );
     }
 
-    private Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
-        Fisher fisher
+    private static Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
+        final Fisher fisher
     ) {
         final Path attractionWeightsFile = ((TunaScenario) fisher.grabState().getScenario()).getAttractionWeightsFile();
         return stream(ActionClasses.values())
@@ -267,7 +257,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
 
     private SetOpportunityDetector makeSetOpportunityLocator(final Fisher fisher) {
 
-        FishState fishState = fisher.grabState();
+        final FishState fishState = fisher.grabState();
 
         final ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
             setCompositionWeights = loadSetCompositionWeights(fishState);
@@ -305,7 +295,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
         );
     }
 
-    Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> makeActionValueFunctions() {
+    private Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> makeActionValueFunctions() {
         return new ImmutableMap.Builder<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>()
             .put(SearchAction.class, new LogisticFunction(searchActionLogisticMidpoint, searchActionLogisticSteepness))
             .put(FadDeploymentAction.class, new LogisticFunction(fadDeploymentActionLogisticMidpoint, fadDeploymentActionLogisticSteepness))
