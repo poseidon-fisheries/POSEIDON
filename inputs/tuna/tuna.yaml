@@ -30,7 +30,6 @@ Tuna:
         fadDeploymentActionLogisticSteepness: 1.0
         fadSetActionLogisticMidpoint: 0.1
         fadSetActionLogisticSteepness: 1.0
-        movingThreshold: 0.1
         nonAssociatedSetActionLogisticMidpoint: 0.1
         nonAssociatedSetActionLogisticSteepness: 1.0
         nonAssociatedSetDetectionProbability: 0.1
