@@ -55,7 +55,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class PurseSeinerFishingStrategy implements FishingStrategy {
 
-    private static final double MOVING_THRESHOLD = 0.5;
+    private final double movingThreshold;
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider;
     private final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions;
@@ -72,13 +72,15 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
         final double searchActionDecayConstant,
-        final double fadDeploymentActionDecayConstant
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
     ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
         this.actionValueFunctions = ImmutableMap.copyOf(actionValueFunctions);
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
+        this.movingThreshold = movingThreshold;
     }
 
     @Override
@@ -169,7 +171,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 weightedFadDeploymentAction
             )
             .filter(entry -> entry.getKey().isPermitted())
-            .filter(entry -> entry.getValue() > MOVING_THRESHOLD)
+            .filter(entry -> entry.getValue() > movingThreshold)
             .collect(toImmutableList());
 
     }
