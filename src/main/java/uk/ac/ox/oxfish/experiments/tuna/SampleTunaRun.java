@@ -42,13 +42,12 @@ public class SampleTunaRun {
     private static final int NUM_RUNS_PER_POLICY = 1;
 
     private static final Path basePath =
-        Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
+        Paths.get(System.getProperty("user.home"), "Desktop", "tuna_tmp");
 
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("runs", "gatherers_test", "tuna_calibrated.yaml"));
+        basePath.resolve(Paths.get("tuna.yaml"));
 
-    private static final Path outputPath =
-        basePath.resolve(Paths.get("runs", "gatherers_test"));
+    private static final Path outputPath = scenarioPath.getParent();
 
     public static void main(final String[] args) {
         new Runner<>(TunaScenario.class, scenarioPath, outputPath)

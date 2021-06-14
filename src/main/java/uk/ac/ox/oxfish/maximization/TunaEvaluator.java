@@ -1,17 +1,14 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
-import com.univocity.parsers.csv.CsvWriter;
-import com.univocity.parsers.csv.CsvWriterSettings;
+import uk.ac.ox.oxfish.experiments.tuna.Policy;
+import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
-import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,13 +21,12 @@ import java.util.stream.Stream;
 import static com.google.common.collect.Streams.findLast;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
-import static java.util.stream.IntStream.rangeClosed;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-01_17.11.54"
+        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-11_12.56.34"
     );
 
     private final Path calibrationFilePath;
@@ -71,7 +67,7 @@ public class TunaEvaluator implements Runnable {
         final Consumer<Scenario> scenarioConsumer = scenario -> {
             final TunaScenario tunaScenario = (TunaScenario) scenario;
             final PurseSeinerFishingStrategyFactory fishingStrategy = (PurseSeinerFishingStrategyFactory) tunaScenario.getFisherDefinition().getFishingStrategy();
-//            fishingStrategy.setFadSetActionLogisticMidpoint(1E6);
+            //fishingStrategy.setFadDeploymentActionLogisticMidpoint(1);
 //            ((PurseSeineGearFactory) tunaScenario
 //                .getFisherDefinition()
 //                .getGear())
@@ -82,7 +78,7 @@ public class TunaEvaluator implements Runnable {
 //            ));
         };
         new TunaEvaluator(calibrationFilePath, solution)
-  //          .setScenarioConsumer(scenarioConsumer)
+            //.setScenarioConsumer(scenarioConsumer)
             .run();
 
     }
@@ -105,68 +101,25 @@ public class TunaEvaluator implements Runnable {
     @Override
     public void run() {
 
-        final Path csvOutputFilePath = calibrationFilePath.getParent().resolve("evaluation_results.csv");
-        final CsvWriter csvWriter = new CsvWriter(csvOutputFilePath.toFile(), new CsvWriterSettings());
+        final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
 
-        try {
-            final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
-            csvWriter.writeHeaders(
-                "target_class",
-                "target_name",
-                "target_value",
-                "run_number",
-                "output_value",
-                "error"
-            );
-            rangeClosed(1, numRuns).parallel().forEach(runNumber -> {
-                final FishState fishState = runSimulation(optimization, solution, runNumber, numRuns);
-                optimization.getTargets().stream()
-                    .filter(target -> target instanceof FixedDataTarget)
-                    .map(target -> (FixedDataTarget) target)
-                    .forEach(target -> {
-                        synchronized (csvWriter) {
-                            csvWriter.writeRow(
-                                target.getClass().getSimpleName(),
-                                target.getColumnName(),
-                                target.getFixedTarget(),
-                                runNumber,
-                                target.getValue(fishState),
-                                target.computeError(fishState)
-                            );
-                        }
-                    });
-            });
-        } finally {
-            csvWriter.close();
-        }
-    }
+        final Runner<Scenario> runner =
+            new Runner<>(() -> makeScenario(optimization, solution), calibrationFilePath.getParent())
+                .registerRowProvider(
+                    "evaluation_results.csv",
+                    fishState -> new EvaluationResultsRowProvider(fishState, optimization)
+                );
 
-    private FishState runSimulation(
-        final GenericOptimization optimization,
-        final double[] optimalParameters,
-        final int runNumber,
-        final int numRuns
-    ) {
-        final FishState fishState = new FishState(System.currentTimeMillis());
-        final Scenario scenario = makeScenario(optimization, optimalParameters);
-        scenarioConsumer.ifPresent(consumer -> consumer.accept(scenario));
-        saveEvaluatedScenario(scenario);
-        fishState.setScenario(scenario);
-        fishState.start();
+        runner.writeScenarioToFile("calibrated_scenario.yaml");
 
-        do {
-            fishState.schedule.step(fishState);
-            System.out.printf(
-                "---\nRun %3d / %3d, step %5d (year %2d / %2d, day %3d)\n",
-                runNumber,
-                numRuns,
-                fishState.getStep(),
-                fishState.getYear() + 1,
-                optimization.getSimulatedYears(),
-                fishState.getDayOfTheYear()
-            );
-        } while (fishState.getYear() < optimization.getSimulatedYears());
-        return fishState;
+        scenarioConsumer.ifPresent(consumer ->
+            runner.setPolicies(ImmutableList.of(
+                new Policy<>("Modified scenario", "", consumer)
+            ))
+        );
+
+        runner.run(optimization.getSimulatedYears(), numRuns);
+
     }
 
     private static Scenario makeScenario(
@@ -180,15 +133,6 @@ public class TunaEvaluator implements Runnable {
                 optimization.getParameters()
             );
         } catch (final FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private void saveEvaluatedScenario(final Scenario scenario) {
-        final Path evaluatedScenarioPath = calibrationFilePath.getParent().resolve("evaluated_scenario.yaml");
-        try (final FileWriter fileWriter = new FileWriter(evaluatedScenarioPath.toFile())) {
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }
