@@ -81,12 +81,13 @@ Tuna:
           fishReleaseProbabilityInPercent: '0.0'
         fadSetObservers: !!set {
           }
-        initialNumberOfFads: 999999
         locationValuesFile: inputs/tuna/location_values.csv
         nonAssociatedSetObservers: !!set {
           }
         nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
         nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
+        numFadsInStockLogisticMidpoint: 5.0
+        numFadsInStockLogisticSteepness: 1.0
         opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
         opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
         pctHoldSpaceLeftLogisticMidpoint: 0.9
@@ -96,7 +97,10 @@ Tuna:
         pctTravelTimeLeftLogisticMidpoint: 0.9
         pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
         successfulSetProbability: '0.9231701'
-    gearStrategy: Never Change Gear
+    gearStrategy:
+      FAD Refill:
+        fadCost: 1000.0
+        maxFadDeploymentsFile: inputs/tuna/max_deployments.csv
     holdSize: '100.0'
     hourlyEffortCost: nullparameter
     hourlyVariableCost: '0.0'

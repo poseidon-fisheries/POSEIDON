@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
@@ -42,6 +43,7 @@ public class GearStrategies {
         NAMES.put(PeriodicUpdateMileageFactory.class, "Periodic Gear Update Mileage");
         NAMES.put(PeriodicUpdateCatchabilityFactory.class, "Periodic Gear Update Catchability");
         NAMES.put(PeriodicUpdateSelectivityFactory.class, "Periodic Gear Update Selectivity");
+        NAMES.put(FadRefillGearStrategyFactory.class, "FAD Refill");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

@@ -48,7 +48,6 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadManager {
@@ -70,13 +69,11 @@ public class FadManager {
 
     public FadManager(
         final FadMap fadMap,
-        final FadInitializer fadInitializer,
-        final int numFadsInStock
+        final FadInitializer fadInitializer
     ) {
         this(
             fadMap,
             fadInitializer,
-            numFadsInStock,
             ImmutableSet.of(),
             ImmutableSet.of(),
             ImmutableSet.of(),
@@ -89,7 +86,6 @@ public class FadManager {
     public FadManager(
         final FadMap fadMap,
         final FadInitializer fadInitializer,
-        final int numFadsInStock,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
         final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
@@ -97,10 +93,8 @@ public class FadManager {
         final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
         final ActiveActionRegulations actionSpecificRegulations
     ) {
-        checkArgument(numFadsInStock >= 0);
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
-        this.numFadsInStock = numFadsInStock;
         this.biomassLostMonitor = biomassLostMonitor;
         this.actionSpecificRegulations = actionSpecificRegulations;
 
@@ -115,6 +109,10 @@ public class FadManager {
         setActionSpecificRegulations(actionSpecificRegulations);
     }
 
+    public <T> void registerObserver(final Class<T> observedClass, final Observer<? super T> observer) {
+        observers.register(observedClass, observer);
+    }
+
     public static FadManager getFadManager(final Fisher fisher) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear required to get FadManager instance. Fisher " +
@@ -126,8 +124,12 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public <T> void registerObserver(final Class<T> observedClass, final Observer<? super T> observer) {
-        observers.register(observedClass, observer);
+    public int getNumFadsInStock() {
+        return numFadsInStock;
+    }
+
+    public void setNumFadsInStock(final int numFadsInStock) {
+        this.numFadsInStock = numFadsInStock;
     }
 
     public int getNumDeployedFads() { return deployedFads.size(); }
@@ -138,11 +140,6 @@ public class FadManager {
 
     public void setFisher(final Fisher fisher) {
         this.fisher = fisher;
-    }
-
-    public Stream<Fad> getFadsHere() {
-        checkNotNull(fisher);
-        return getFadsAt(fisher.getLocation());
     }
 
     public Stream<Fad> getFadsAt(final SeaTile location) {
@@ -161,7 +158,7 @@ public class FadManager {
     }
 
     private Fad initFad() {
-        checkState(numFadsInStock >= 1);
+        checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
         final Fad newFad = fadInitializer.apply(this);
         deployedFads.add(newFad);

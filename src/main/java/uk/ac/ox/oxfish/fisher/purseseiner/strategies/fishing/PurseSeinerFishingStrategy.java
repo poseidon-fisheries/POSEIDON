@@ -51,6 +51,7 @@ import static java.lang.Math.exp;
 import static java.util.Comparator.comparingDouble;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class PurseSeinerFishingStrategy implements FishingStrategy {
@@ -153,16 +154,18 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                 )
             ));
 
-        final Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction = Stream
-            .of(weightedAction(
-                new FadDeploymentAction(fisher),
-                valueOfLocationBasedAction(
-                    actionCounts.count(FadDeploymentAction.class),
-                    attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
-                    actionValueFunctions.get(FadDeploymentAction.class),
-                    fadDeploymentActionDecayConstant
-                )
-            ));
+        final Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction =
+            getFadManager(fisher).getNumFadsInStock() < 1
+                ? Stream.empty()
+                : Stream.of(weightedAction(
+                    new FadDeploymentAction(fisher),
+                    valueOfLocationBasedAction(
+                        actionCounts.count(FadDeploymentAction.class),
+                        attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
+                        actionValueFunctions.get(FadDeploymentAction.class),
+                        fadDeploymentActionDecayConstant
+                    )
+                ));
 
         return Streams
             .concat(

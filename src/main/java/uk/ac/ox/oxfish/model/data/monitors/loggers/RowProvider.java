@@ -32,17 +32,17 @@ import static com.google.common.collect.Streams.stream;
 public interface RowProvider {
 
     static void writeRows(
-        CsvWriter csvWriter,
-        Collection<? extends RowProvider> rowProviders
+        final CsvWriter csvWriter,
+        final Collection<? extends RowProvider> rowProviders
     ) {
         writeRows(csvWriter, rowProviders, 1, true);
     }
 
     static void writeRows(
-        CsvWriter csvWriter,
-        Collection<? extends RowProvider> rowProviders,
-        int runNumber,
-        boolean writeHeaders
+        final CsvWriter csvWriter,
+        final Collection<? extends RowProvider> rowProviders,
+        final int runNumber,
+        final boolean writeHeaders
     ) {
         checkArgument(!rowProviders.isEmpty());
         rowProviders.stream().findFirst().ifPresent(first -> {

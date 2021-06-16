@@ -70,15 +70,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
-    private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = input("location_values.csv");
-
     private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
     private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
-
     private double pctTravelTimeLeftLogisticMidpoint = 0.9;
     private double pctTravelTimeLeftLogisticSteepness = MAX_VALUE;
     private double pctSetsRemainingLogisticMidpoint = 0.5; // not calibrated for now
@@ -93,6 +90,24 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
     private double actionDistanceExponent = 1;
     private double destinationDistanceExponent = 1;
+    private double numFadsInStockLogisticMidpoint = 5;
+    private double numFadsInStockLogisticSteepness = 1;
+
+    public double getNumFadsInStockLogisticMidpoint() {
+        return numFadsInStockLogisticMidpoint;
+    }
+
+    public void setNumFadsInStockLogisticMidpoint(final double numFadsInStockLogisticMidpoint) {
+        this.numFadsInStockLogisticMidpoint = numFadsInStockLogisticMidpoint;
+    }
+
+    public double getNumFadsInStockLogisticSteepness() {
+        return numFadsInStockLogisticSteepness;
+    }
+
+    public void setNumFadsInStockLogisticSteepness(final double numFadsInStockLogisticSteepness) {
+        this.numFadsInStockLogisticSteepness = numFadsInStockLogisticSteepness;
+    }
 
     public double getActionDistanceExponent() {
         return actionDistanceExponent;
@@ -252,14 +267,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     ) { this.fadInitializerFactory = fadInitializerFactory; }
 
     @SuppressWarnings("unused")
-    public int getInitialNumberOfFads() { return initialNumberOfFads; }
-
-    @SuppressWarnings("unused")
-    public void setInitialNumberOfFads(final int initialNumberOfFads) {
-        this.initialNumberOfFads = initialNumberOfFads;
-    }
-
-    @SuppressWarnings("unused")
     public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() { return fadDeploymentObservers; }
 
     @SuppressWarnings("unused")
@@ -295,7 +302,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
-            initialNumberOfFads,
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
@@ -381,7 +387,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 new GlobalDeploymentAttractionModulator(
                     fadDeploymentPctActiveFadsLimitLogisticMidpoint,
-                    fadDeploymentPctActiveFadsLimitLogisticSteepness
+                    fadDeploymentPctActiveFadsLimitLogisticSteepness,
+                    numFadsInStockLogisticMidpoint,
+                    numFadsInStockLogisticSteepness
                 ),
                 FadDeploymentAction.class,
                 actionDistanceExponent,

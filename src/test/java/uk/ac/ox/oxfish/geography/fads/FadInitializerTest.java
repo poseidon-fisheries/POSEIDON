@@ -41,7 +41,7 @@ public class FadInitializerTest {
         );
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer);
         final SeaTile seaTile = mock(SeaTile.class);
         when(seaTile.getGridX()).thenReturn(0);
         when(seaTile.getGridY()).thenReturn(0);

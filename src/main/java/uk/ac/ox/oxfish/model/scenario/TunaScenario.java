@@ -45,11 +45,13 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepart
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -189,6 +191,7 @@ public class TunaScenario implements Scenario {
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
+        fisherDefinition.setGearStrategy(new FadRefillGearStrategyFactory());
         final AlgorithmFactory<PurseSeinerFishingStrategy> fishingStrategy = new PurseSeinerFishingStrategyFactory();
         fisherDefinition.setFishingStrategy(fishingStrategy);
         fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
