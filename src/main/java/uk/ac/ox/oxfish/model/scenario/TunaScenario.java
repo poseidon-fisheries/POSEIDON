@@ -181,24 +181,24 @@ public class TunaScenario implements Scenario {
         final FadInitializerFactory fadInitializerFactory = purseSeineGearFactory.getFadInitializerFactory();
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
         fadInitializerFactory.setAttractionIntercepts(ImmutableMap.of(
-            "Bigeye tuna", 0.0,
-            "Yellowfin tuna", 0.0,
-            "Skipjack tuna", 0.0
+            "Bigeye tuna", new FixedDoubleParameter(0.0),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0),
+            "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
         fadInitializerFactory.setTileBiomassCoefficients(ImmutableMap.of(
-            "Bigeye tuna", 0.0,
-            "Yellowfin tuna", 0.0,
-            "Skipjack tuna", 0.0
+            "Bigeye tuna", new FixedDoubleParameter(0.0),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0),
+            "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
         fadInitializerFactory.setFadBiomassCoefficients(ImmutableMap.of(
-            "Bigeye tuna", 0.0,
-            "Yellowfin tuna", 0.0,
-            "Skipjack tuna", 0.0
+            "Bigeye tuna", new FixedDoubleParameter(0.0),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0),
+            "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
         fadInitializerFactory.setGrowthRates(ImmutableMap.of(
-            "Bigeye tuna", 0.1,
-            "Yellowfin tuna", 0.1,
-            "Skipjack tuna", 0.1
+            "Bigeye tuna", new FixedDoubleParameter(0.1),
+            "Yellowfin tuna", new FixedDoubleParameter(0.1),
+            "Skipjack tuna", new FixedDoubleParameter(0.1)
         ));
 
         final AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(

@@ -23,55 +23,55 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private Path fadCarryingCapacitiesFilePath = TunaScenario.input("fad_carrying_capacities.csv");
-    private Map<String, Double> attractionIntercepts = new HashMap<>();
-    private Map<String, Double> tileBiomassCoefficients = new HashMap<>();
-    private Map<String, Double> fadBiomassCoefficients = new HashMap<>();
-    private Map<String, Double> growthRates = new HashMap<>();
+    private Map<String, DoubleParameter> attractionIntercepts = new HashMap<>();
+    private Map<String, DoubleParameter> tileBiomassCoefficients = new HashMap<>();
+    private Map<String, DoubleParameter> fadBiomassCoefficients = new HashMap<>();
+    private Map<String, DoubleParameter> growthRates = new HashMap<>();
 
     @SuppressWarnings("unused")
-    public Map<String, Double> getAttractionIntercepts() {
+    public Map<String, DoubleParameter> getAttractionIntercepts() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return attractionIntercepts;
     }
 
     @SuppressWarnings("unused")
-    public void setAttractionIntercepts(final Map<String, Double> attractionIntercepts) {
+    public void setAttractionIntercepts(final Map<String, DoubleParameter> attractionIntercepts) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.attractionIntercepts = attractionIntercepts;
     }
 
     @SuppressWarnings("unused")
-    public Map<String, Double> getTileBiomassCoefficients() {
+    public Map<String, DoubleParameter> getTileBiomassCoefficients() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return tileBiomassCoefficients;
     }
 
     @SuppressWarnings("unused")
-    public void setTileBiomassCoefficients(final Map<String, Double> tileBiomassCoefficients) {
+    public void setTileBiomassCoefficients(final Map<String, DoubleParameter> tileBiomassCoefficients) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.tileBiomassCoefficients = tileBiomassCoefficients;
     }
 
     @SuppressWarnings("unused")
-    public Map<String, Double> getFadBiomassCoefficients() {
+    public Map<String, DoubleParameter> getFadBiomassCoefficients() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return fadBiomassCoefficients;
     }
 
     @SuppressWarnings("unused")
-    public void setFadBiomassCoefficients(final Map<String, Double> fadBiomassCoefficients) {
+    public void setFadBiomassCoefficients(final Map<String, DoubleParameter> fadBiomassCoefficients) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.fadBiomassCoefficients = fadBiomassCoefficients;
     }
 
     @SuppressWarnings("unused")
-    public Map<String, Double> getGrowthRates() {
+    public Map<String, DoubleParameter> getGrowthRates() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return growthRates;
     }
 
     @SuppressWarnings("unused")
-    public void setGrowthRates(final Map<String, Double> growthRates) {
+    public void setGrowthRates(final Map<String, DoubleParameter> growthRates) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.growthRates = growthRates;
     }
@@ -127,10 +127,10 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                         final String speciesName = entry.getKey().getName();
                         return new FadBiomassAttractor(
                             fishState.getRandom(),
-                            attractionIntercepts.get(speciesName),
-                            tileBiomassCoefficients.get(speciesName),
-                            fadBiomassCoefficients.get(speciesName),
-                            growthRates.get(speciesName),
+                            attractionIntercepts.get(speciesName).apply(rng),
+                            tileBiomassCoefficients.get(speciesName).apply(rng),
+                            fadBiomassCoefficients.get(speciesName).apply(rng),
+                            growthRates.get(speciesName).apply(rng),
                             entry.getValue().getAsDouble() // carrying capacity
                         );
                     }
