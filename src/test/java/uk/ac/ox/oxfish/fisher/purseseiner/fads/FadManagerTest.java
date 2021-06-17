@@ -51,8 +51,6 @@ public class FadManagerTest {
             globalBiology,
             ImmutableMap.of(),
             ImmutableMap.of(),
-            rng,
-            0,
             0,
             () -> 0
         );

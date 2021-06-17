@@ -58,8 +58,6 @@ public class FadMapTest {
             globalBiology,
             fadCarryingCapacities,
             ImmutableMap.of(),
-            rng,
-            0,
             0,
             () -> 0
         );

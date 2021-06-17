@@ -20,13 +20,13 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -44,18 +44,14 @@ public class FadInitializer implements Function<FadManager, Fad> {
     private final double[] emptyBiomasses;
     private final Collection<DoubleSupplier> carryingCapacitySuppliers;
     private final double fishReleaseProbability;
-    private final ImmutableMap<Species, Double> attractionRates;
-    private final MersenneTwisterFast rng;
-    private final double dudProbability;
+    private final Map<Species, FadBiomassAttractor> fadBiomassAttractors;
     private final IntSupplier timeStepSupplier;
 
     public FadInitializer(
         final GlobalBiology globalBiology,
         final Map<Species, DoubleSupplier> carryingCapacitySuppliers,
-        final Map<Species, Double> attractionRates,
-        final MersenneTwisterFast rng,
+        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
-        final double dudProbability,
         final IntSupplier timeStepSupplier
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
@@ -66,10 +62,8 @@ public class FadInitializer implements Function<FadManager, Fad> {
                 .sorted(comparingInt(entry -> entry.getKey().getIndex())) // order by species index
                 .map(Map.Entry::getValue)
                 .collect(toImmutableList());
-        this.rng = rng;
-        this.dudProbability = dudProbability;
         this.timeStepSupplier = timeStepSupplier;
-        this.attractionRates = ImmutableMap.copyOf(attractionRates);
+        this.fadBiomassAttractors = ImmutableMap.copyOf(fadBiomassAttractors);
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
@@ -83,7 +77,7 @@ public class FadInitializer implements Function<FadManager, Fad> {
         return new Fad(
             fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
-            rng.nextBoolean(dudProbability) ? ImmutableMap.of() : this.attractionRates,
+            fadBiomassAttractors,
             fishReleaseProbability,
             timeStepSupplier.getAsInt(),
             new Int2D(seaTile.getGridX(), seaTile.getGridY())

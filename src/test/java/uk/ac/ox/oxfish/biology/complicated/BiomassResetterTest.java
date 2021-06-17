@@ -171,8 +171,6 @@ public class BiomassResetterTest {
             globalBiology,
             carryingCapacities,
             fadAttractionRates,
-            rng,
-            0,
             0,
             () -> 0
         );

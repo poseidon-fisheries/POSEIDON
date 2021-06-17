@@ -72,13 +72,24 @@ Tuna:
         fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
         fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
         fadInitializerFactory:
-          attractionRates:
-            Bigeye tuna: '0.05'
-            Yellowfin tuna: '0.0321960615'
-            Skipjack tuna: '0.007183564999999999'
-          dudProbability: '0.0'
-          fadCarryingCapacitiesGammaParametersFilePath: inputs/tuna/fad_carrying_capacities_gamma_parameters.csv
+          attractionIntercepts:
+            Bigeye tuna: 0.0
+            Yellowfin tuna: 0.0
+            Skipjack tuna: 0.0
+          fadBiomassCoefficients:
+            Bigeye tuna: 0.0
+            Yellowfin tuna: 0.0
+            Skipjack tuna: 0.0
+          fadCarryingCapacitiesFilePath: inputs/tuna/fad_carrying_capacities.csv
           fishReleaseProbabilityInPercent: '0.0'
+          growthRates:
+            Bigeye tuna: 0.1
+            Yellowfin tuna: 0.1
+            Skipjack tuna: 0.1
+          tileBiomassCoefficients:
+            Bigeye tuna: 0.0
+            Yellowfin tuna: 0.0
+            Skipjack tuna: 0.0
         fadSetObservers: !!set {
           }
         locationValuesFile: inputs/tuna/location_values.csv

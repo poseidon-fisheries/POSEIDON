@@ -34,8 +34,6 @@ public class FadInitializerTest {
             globalBiology,
             carryingCapacities,
             ImmutableMap.of(),
-            rng,
-            0,
             0,
             () -> 0
         );

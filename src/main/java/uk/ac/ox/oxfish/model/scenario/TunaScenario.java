@@ -56,6 +56,7 @@ import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -176,10 +177,28 @@ public class TunaScenario implements Scenario {
     public TunaScenario() {
 
         final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
-        purseSeineGearFactory.getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.05),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0321960615),
-            "Skipjack tuna", new FixedDoubleParameter(0.007183564999999999)
+
+        final FadInitializerFactory fadInitializerFactory = purseSeineGearFactory.getFadInitializerFactory();
+        // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
+        fadInitializerFactory.setAttractionIntercepts(ImmutableMap.of(
+            "Bigeye tuna", 0.0,
+            "Yellowfin tuna", 0.0,
+            "Skipjack tuna", 0.0
+        ));
+        fadInitializerFactory.setTileBiomassCoefficients(ImmutableMap.of(
+            "Bigeye tuna", 0.0,
+            "Yellowfin tuna", 0.0,
+            "Skipjack tuna", 0.0
+        ));
+        fadInitializerFactory.setFadBiomassCoefficients(ImmutableMap.of(
+            "Bigeye tuna", 0.0,
+            "Yellowfin tuna", 0.0,
+            "Skipjack tuna", 0.0
+        ));
+        fadInitializerFactory.setGrowthRates(ImmutableMap.of(
+            "Bigeye tuna", 0.1,
+            "Yellowfin tuna", 0.1,
+            "Skipjack tuna", 0.1
         ));
 
         final AlgorithmFactory<? extends Regulation> standardRegulations = new MultipleRegulationsFactory(ImmutableMap.of(
