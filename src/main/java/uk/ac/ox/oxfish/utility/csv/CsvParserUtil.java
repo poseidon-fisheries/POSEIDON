@@ -64,6 +64,10 @@ public class CsvParserUtil {
         return getLocalDate(record, headerName, defaultDtmFormat, defaultZoneId);
     }
 
+    public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat) {
+        return getLocalDate(record, headerName, dtmFormat, defaultZoneId);
+    }
+
     public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat, ZoneId zoneId) {
         return record.getDate(headerName, dtmFormat).toInstant().atZone(zoneId).toLocalDate();
     }
