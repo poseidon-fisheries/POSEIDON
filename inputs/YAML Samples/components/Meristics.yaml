@@ -1,7 +1,16 @@
 Weight List Meristics:
-  maturityPerBin: 0,0.5,1
   mortalityRate: '0.08'
   weightsPerBin: .1,1,5
+-------
+Length-Weight No Sex Meristics:
+  lengths:
+  - 10.0
+  - 20.0
+  - 30.0
+  weights:
+  - 10.0
+  - 20.0
+  - 30.0
 -------
 Stock Assessment Meristics From File:
   pathToMeristicFile: inputs/california/biology/Sablefish/meristics.yaml

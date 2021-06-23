@@ -34,7 +34,7 @@ public class MaximumDaysDecorator implements FishingStrategy
 {
 
 
-    private final FishingStrategy delegate;
+    private FishingStrategy delegate;
 
     private final int daysBeforeGoingHome;
 
@@ -80,6 +80,14 @@ public class MaximumDaysDecorator implements FishingStrategy
     }
 
 
+    public FishingStrategy getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(FishingStrategy delegate) {
+        this.delegate = delegate;
+    }
+
     @VisibleForTesting
     public  FishingStrategy accessDecorated(){
         return delegate;
@@ -88,4 +96,6 @@ public class MaximumDaysDecorator implements FishingStrategy
     public int getDaysBeforeGoingHome() {
         return daysBeforeGoingHome;
     }
+
+
 }

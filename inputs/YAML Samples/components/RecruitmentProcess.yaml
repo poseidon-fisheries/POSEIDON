@@ -14,6 +14,15 @@ Beverton-Holt:
   virginRecruits: '4.0741397E7'
   yearlyDelay: '0.0'
 -------
+Beverton-Holt Simplified:
+  maturity:
+  - 0.0
+  - 0.5
+  - 0.1
+  spawningStockBiomass: '10000.0'
+  steepness: '0.6'
+  virginRecruits: '4.0741397E7'
+-------
 Beverton-Holt Knife-Edge Maturity:
   cumulativePhi: '14.2444066771724'
   halfFemalePopulation: false

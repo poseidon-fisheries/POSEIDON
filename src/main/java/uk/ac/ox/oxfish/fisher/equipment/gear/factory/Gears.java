@@ -53,6 +53,7 @@ public class Gears {
         NAMES.put(ThresholdGearFactory.class, "Threshold Gear Factory");
         NAMES.put(LogisticSelectivityGearFactory.class, "Logistic Selectivity Gear");
         NAMES.put(SimpleLogisticGearFactory.class, "Simple Logistic Selectivity Gear");
+        NAMES.put(SelectivityFromListGearFactory.class, "Selectivity from List Gear");
         NAMES.put(SimpleDomeShapedGearFactory.class, "Simple Dome Shaped Selectivity Gear");
         NAMES.put(DoubleNormalGearFactory.class, "Double Normal Selectivity Gear");
         NAMES.put(SablefishGearFactory.class, "Sablefish Trawl Selectivity Gear");

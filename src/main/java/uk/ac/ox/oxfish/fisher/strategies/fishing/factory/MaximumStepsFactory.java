@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -38,6 +39,9 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
      */
     private DoubleParameter daysAtSea = new FixedDoubleParameter(5);
 
+
+
+    private AlgorithmFactory<? extends FishingStrategy> delegate = new FishUntilFullFactory();
 
     public MaximumStepsFactory() {
     }
@@ -58,7 +62,8 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
 
         int rounded = (int) Math.round(daysAtSea.apply(state.random));
 
-        return new MaximumDaysDecorator(rounded);
+        return new MaximumDaysDecorator(delegate.apply(state),
+                rounded);
 
     }
 
@@ -68,5 +73,13 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
 
     public void setDaysAtSea(DoubleParameter daysAtSea) {
         this.daysAtSea = daysAtSea;
+    }
+
+    public AlgorithmFactory<? extends FishingStrategy> getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(AlgorithmFactory<? extends FishingStrategy> delegate) {
+        this.delegate = delegate;
     }
 }

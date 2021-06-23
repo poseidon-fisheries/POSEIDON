@@ -784,15 +784,20 @@ public class MeraOneSpeciesSlice1 {
             "LBSPR_season",
             "LTARGETE_1_fleet",
             "LTARGETE_1_season",
-            "LTARGETE_1_daysatsea",
+            "LTARGETE_4_fleet",//,
+
+            //    "LTARGETE_1_daysatsea",
             "LTARGETE_4_season"//,
         //    "LOPT_season"
     };
     public static final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> SELECTED =
             new LinkedHashMap<>();
+
+    public static  LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ALL_OF_THEM =
+            new LinkedHashMap<>();
+
     static {
-        LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> ALL_OF_THEM =
-                new LinkedHashMap<>();
+
         ALL_OF_THEM.putAll(EFFORT_ADAPTIVE);
         ALL_OF_THEM.putAll(EFFORT_ADAPTIVE_ADDITIONAL);
         ALL_OF_THEM.putAll(TEST_POLICY_MAP);
@@ -813,6 +818,7 @@ public class MeraOneSpeciesSlice1 {
 
     private static final Path MAIN_DIRECTORY =
             Paths.get("docs","mera_hub","slice_1");
+    public static final Path DEFAULT_PATH_TO_COLUMNS_TO_PRINT = MAIN_DIRECTORY.resolve("full_columns_to_print.yaml");
 
     public static void main(String[] args) throws IOException {
 
@@ -862,7 +868,7 @@ public class MeraOneSpeciesSlice1 {
 
             runSetOfScenarios(pathToScenarioFiles,
                     pathToOutput,
-                    selectedPolicies, YEARS_TO_RUN_POLICIES);
+                    selectedPolicies, YEARS_TO_RUN_POLICIES, DEFAULT_PATH_TO_COLUMNS_TO_PRINT);
         }
         //the rejection sampling bit
         //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
@@ -931,11 +937,12 @@ public class MeraOneSpeciesSlice1 {
 
     public static void runSetOfScenarios(Path scenarioFileList,
                                          Path outputDirectory,
-                                         LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap, int yearsToRun
+                                         LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap, int yearsToRun,
+                                         Path pathToColumnsToPrint
     ) throws IOException{
         FishYAML yaml = new FishYAML();
         final List<String> columnsToPrint = yaml.loadAs(new FileReader(
-                        MAIN_DIRECTORY.resolve("full_columns_to_print.yaml").toFile()),
+                        pathToColumnsToPrint.toFile()),
                 List.class);
 
         outputDirectory.toFile().mkdirs();

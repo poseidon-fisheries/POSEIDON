@@ -94,7 +94,9 @@ public class StructuredAbundance {
     public StructuredAbundance(StructuredAbundance other) {
         this.abundance = new double[other.getSubdivisions()][other.getBins()];
         for(int i=0; i<abundance.length; i++)
-            abundance[i] = Arrays.copyOf(other.abundance[i],other.abundance[i].length);
+            for (int j = 0; j < abundance[i].length; j++) {
+                abundance[i][j]=other.abundance[i][j];
+            }
     }
 
 

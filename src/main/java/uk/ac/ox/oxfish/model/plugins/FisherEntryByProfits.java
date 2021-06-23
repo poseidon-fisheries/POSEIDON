@@ -93,6 +93,7 @@ public class FisherEntryByProfits implements EntryPlugin {
     {
 
         double profitRate = (averageProfits-minProfitsToCoverFixedCosts)/(averageCosts+minProfitsToCoverFixedCosts);
+        System.out.println("profit rate: " + profitRate);
 
         if(profitRate<=0 || !Double.isFinite(profitRate))
             return 0;

@@ -189,7 +189,6 @@ Single Species Abundance:
       - 10000.0
   meristics:
     Weight List Meristics:
-      maturityPerBin: 0,0.5,1
       mortalityRate: '0.08'
       weightsPerBin: .1,1,5
   mortalityProcess:
@@ -267,7 +266,6 @@ Multiple Species Abundance:
           - 10000.0
       meristics:
         Weight List Meristics:
-          maturityPerBin: 0,0.5,1
           mortalityRate: '0.08'
           weightsPerBin: .1,1,5
       mortalityProcess:
@@ -306,7 +304,6 @@ Multiple Species Abundance:
           - 10000.0
       meristics:
         Weight List Meristics:
-          maturityPerBin: 0,0.5,1
           mortalityRate: '0.08'
           weightsPerBin: .1,1,5
       mortalityProcess:
@@ -420,6 +417,35 @@ Boxcar Biology:
     Equal Allocation:
       constantValue: '1.0'
   initialBtOverK: '1.0'
+  k: '0.364'
+  lengthAtMaturity: '50.0'
+  numberOfBins: 25
+  recruitAllocator:
+    Equal Allocation:
+      constantValue: '1.0'
+  speciesName: Red Fish
+  steepness: '0.6'
+  virginRecruits: '4.0741397E7'
+  yearlyMortality: '0.1'
+-------
+Boxcar Biology from List:
+  LInfinity: '113.0'
+  abundanceSimulator: null
+  allometricAlpha: '0.015'
+  allometricBeta: '2.961'
+  cmPerBin: 5.0
+  cumulativePhi: '14.2444066771724'
+  diffuser: No Diffusion
+  habitabilityAllocator:
+    Equal Allocation:
+      constantValue: '1.0'
+  initialAbundanceAllocator:
+    Equal Allocation:
+      constantValue: '1.0'
+  initialNumbersInEachBin:
+  - 10.0
+  - 30.0
+  - 100.0
   k: '0.364'
   lengthAtMaturity: '50.0'
   numberOfBins: 25

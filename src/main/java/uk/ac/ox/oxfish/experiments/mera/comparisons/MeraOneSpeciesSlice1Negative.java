@@ -2,7 +2,11 @@ package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
-import uk.ac.ox.oxfish.maximization.GenericOptimization;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.QuotaLimitDecorator;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.QuotaLimitDecoratorFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfitFactory;
@@ -14,7 +18,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,23 +27,20 @@ import java.util.function.Consumer;
 public class MeraOneSpeciesSlice1Negative {
 
     public static final double RATIO_CURRENT_TO_TARGET_PROFITS = .95d;
-    public static final double RATIO_MINIMUM_TO_CURRENT_MINIMUM_PROFITS = .75d;
+    public static final double RATIO_MINIMUM_TO_CURRENT_MINIMUM_PROFITS = 0d;
     public static final double RATIO_ENTRY_TO_CURRENT_MINIMUM_PROFITS = 1.25d;
 
     public static final String YEARS_TO_POLICY = "2";
     /**
      * solution to the optimization when using newer YKAN parameters
      */
-    //private static double[] modernSolution = new double[]{-1.6242490116906958,3.074371992734171,-1.9400293686354024,-0.00924982660923937,-5.227033193854416};
 
-    // private static double[] hotstartSolution = new double[]{-4.735450927515468, -3.9087532571219388 ,-0.23905122846579044 ,1.3957837344806767, -6.155061746539974};
-    private static double[] hotstartSolution = new double[]{-9.92488213526895,-12.02329087363163,1.420816710409177,-0.5010274106302548};
 
 
     /**
      * to apply to the running model when it is time to set up policies
      */
-    static private final Consumer<FishState> prepareScenarioForPolicy(boolean entryAllowed){
+    static public final Consumer<FishState> prepareHotstartScenarioForPolicy(boolean entryAllowed){
         return new Consumer<FishState>() {
             @Override
             public void accept(FishState fishState) {
@@ -62,11 +62,12 @@ public class MeraOneSpeciesSlice1Negative {
                 fishState.getFisherFactory("population0").setRegulations(newReg);
 
                 //3. set cost structure assuming 0 profits....
-                DoubleSummaryStatistics currentProfitsPerTrip = new DoubleSummaryStatistics();
+                DoubleSummaryStatistics currentProfitsPerHour = new DoubleSummaryStatistics();
+                System.out.println("Current profits per hour " + currentProfitsPerHour);
                 fishState.getFishers().stream().filter(fisher -> fisher.hasBeenActiveThisYear()).
                         mapToDouble(fisher -> fisher.getLatestYearlyObservation("TRIP_PROFITS_PER_HOUR")).
                         filter(v -> Double.isFinite(v)).
-                        forEach(currentProfitsPerTrip);
+                        forEach(currentProfitsPerHour);
 
                 //departing strategy (this is where the "exit" takes place
                 FullSeasonalRetiredDecoratorFactory departingFactory = new FullSeasonalRetiredDecoratorFactory();
@@ -75,9 +76,15 @@ public class MeraOneSpeciesSlice1Negative {
                 departingFactory.setVariableName("TRIP_PROFITS_PER_HOUR");
                 departingFactory.setCanReturnFromRetirement(false);
                 departingFactory.setFirstYearYouCanSwitch(new FixedDoubleParameter(1));
-                departingFactory.setMinimumVariable(new FixedDoubleParameter(currentProfitsPerTrip.getMin() * RATIO_MINIMUM_TO_CURRENT_MINIMUM_PROFITS));
-                //departingFactory.setMinimumVariable(new UniformDoubleParameter(0,currentProfitsPerTrip.getAverage()));
-                departingFactory.setTargetVariable(new FixedDoubleParameter(currentProfitsPerTrip.getAverage()* RATIO_CURRENT_TO_TARGET_PROFITS));
+                //you need to get this at least to stay in
+                final double minTarget = currentProfitsPerHour.getMin() * RATIO_MINIMUM_TO_CURRENT_MINIMUM_PROFITS;
+                System.out.println("minimum profits per hour to stay in " + minTarget);
+                departingFactory.setMinimumVariable(new FixedDoubleParameter(minTarget));
+                //you need to get this at least to get out
+                final double targetValue = currentProfitsPerHour.getAverage() * RATIO_CURRENT_TO_TARGET_PROFITS;
+                System.out.println("minimum profits per hour to increase effort " + targetValue);
+
+                departingFactory.setTargetVariable(new FixedDoubleParameter(targetValue));
                 departingFactory.setProbabilityStartingFullTime(new FixedDoubleParameter(1));
                 for (Fisher fisher : fishState.getFishers()) {
                     fisher.setDepartingStrategy(departingFactory.apply(fishState));
@@ -93,12 +100,20 @@ public class MeraOneSpeciesSlice1Negative {
                     factory.setProfitRatioToEntrantsMultiplier(new FixedDoubleParameter(10));
                     factory.setPopulationName("population0");
                     factory.setProfitDataColumnName("Actual Average Cash-Flow");
-                    factory.setFixedCostsToCover(new FixedDoubleParameter(latestProfitsMade* RATIO_ENTRY_TO_CURRENT_MINIMUM_PROFITS));
+                    final double fixedCostsToCoverToEntry = latestProfitsMade * RATIO_ENTRY_TO_CURRENT_MINIMUM_PROFITS;
+                    System.out.println(fixedCostsToCoverToEntry);
+                    factory.setFixedCostsToCover(new FixedDoubleParameter(fixedCostsToCoverToEntry));
                     fishState.registerStartable(factory.apply(fishState));
                 }
 
-
-
+                //4 make fishers aware of quotas
+                for (Fisher fisher : fishState.getFishers()) {
+                    fisher.setFishingStrategy(new QuotaLimitDecorator(fisher.getFishingStrategy()));
+                }
+                final AlgorithmFactory<? extends FishingStrategy> currentFishingStrategy = fishState.getFisherFactory("population0").getFishingStrategy();
+                final QuotaLimitDecoratorFactory newFishingStrategy = new QuotaLimitDecoratorFactory();
+                newFishingStrategy.setDecorated(currentFishingStrategy);
+                fishState.getFisherFactory("population0").setFishingStrategy(newFishingStrategy);
 
 
 
@@ -108,7 +123,7 @@ public class MeraOneSpeciesSlice1Negative {
     }
 
 
-    private static LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
+    static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
     static {
         selectedPolicies.put(
@@ -143,7 +158,7 @@ public class MeraOneSpeciesSlice1Negative {
         for(String policy : otherPolicies){
             selectedPolicies.put(
                     policy,
-                    MeraOneSpeciesSlice1.SELECTED.get(policy)
+                    MeraOneSpeciesSlice1.ALL_OF_THEM.get(policy)
             );
         }
 
@@ -173,7 +188,7 @@ public class MeraOneSpeciesSlice1Negative {
             adjustedPolicies.put(
                     policyFactory.getKey(),
                     fishState -> {
-                        prepareScenarioForPolicy(true).accept(fishState);
+                        prepareHotstartScenarioForPolicy(true).accept(fishState);
                         return policyFactory.getValue().apply(fishState);
 
 
@@ -182,35 +197,38 @@ public class MeraOneSpeciesSlice1Negative {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50);
+                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT);
 
 
     }
 
-    private static void generateScenarioFiles() throws IOException {
 
+//    private static double[] hotstartSolution = new double[]{-9.92488213526895,-12.02329087363163,1.420816710409177,-0.5010274106302548};
 
-        GenericOptimization.saveCalibratedScenario(
-                hotstartSolution,
-                Paths.get("docs","mera_hub","slice_1negative","hotstart","optimization_modernmalabaricus_unlimitedthroughput.yaml"),
-                Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","hotstart.yaml")
-        );
-
-        FileWriter writer = new FileWriter(
-                Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","scenario_list.csv").toFile()
-        );
-        writer.write("scenario,year");
-        writer.write("\n");
-        writer.write(Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","hotstart.yaml").toString()+
-                "," + YEARS_TO_POLICY);
-        writer.write("\n");
-//        writer.write(Paths.get("docs","mera_hub","slice_1negative","results","scenarios","original.yaml").toString()+
-//                ",50");
+//    private static void generateScenarioFiles() throws IOException {
+//
+//
+//        GenericOptimization.saveCalibratedScenario(
+//                hotstartSolution,
+//                Paths.get("docs","mera_hub","slice_1negative","hotstart","optimization_modernmalabaricus_unlimitedthroughput.yaml"),
+//                Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","hotstart.yaml")
+//        );
+//
+//        FileWriter writer = new FileWriter(
+//                Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","scenario_list.csv").toFile()
+//        );
+//        writer.write("scenario,year");
 //        writer.write("\n");
-
-        writer.flush();
-        writer.close();
-    }
+//        writer.write(Paths.get("docs","mera_hub","slice_1negative","hotstart","results","scenarios","hotstart.yaml").toString()+
+//                "," + YEARS_TO_POLICY);
+//        writer.write("\n");
+////        writer.write(Paths.get("docs","mera_hub","slice_1negative","results","scenarios","original.yaml").toString()+
+////                ",50");
+////        writer.write("\n");
+//
+//        writer.flush();
+//        writer.close();
+//    }
 
 
 }

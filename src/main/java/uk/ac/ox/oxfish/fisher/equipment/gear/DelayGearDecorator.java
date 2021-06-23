@@ -33,7 +33,7 @@ public class DelayGearDecorator implements GearDecorator {
     public DelayGearDecorator(Gear delegate, int hoursItTakeToFish) {
         this.delegate = delegate;
         this.hoursItTakeToFish = hoursItTakeToFish;
-        Preconditions.checkArgument(hoursItTakeToFish>0);
+        Preconditions.checkArgument(hoursItTakeToFish>=0);
         if(hoursItTakeToFish==1)
             Log.warn("It's weird to set gear delay to 1!");
 

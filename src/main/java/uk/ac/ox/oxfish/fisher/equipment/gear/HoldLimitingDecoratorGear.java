@@ -72,14 +72,14 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
             StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
             for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
                 //multiply every item by the proportion kept
-                abundances[i] = new StructuredAbundance(original.getAbundance(i));
+                abundances[i] = original.getAbundance(i);
                 double[][] structuredAbundance = abundances[i].asMatrix();
                 for (int j = 0; j < structuredAbundance.length; j++)
                     for (int k = 0; k < structuredAbundance[j].length; k++)
                         structuredAbundance[j][k] *= proportionKept;
                 //next species
             }
-            return new Catch(abundances, globalBiology);
+            return new Catch(abundances,globalBiology);
         }
     }
 
