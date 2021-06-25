@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -143,6 +144,8 @@ public class TunaCalibrator implements Runnable {
             .resolve(outputFolderName);
         try {
             createDirectories(outputFolderPath);
+            final String hostName = InetAddress.getLocalHost().getHostName() + "\n";
+            Files.write(outputFolderPath.resolve("hostname.txt"), hostName.getBytes());
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }

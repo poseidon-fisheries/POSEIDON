@@ -26,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-11_12.56.34"
+        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-24_16.37.09"
     );
 
     private final Path calibrationFilePath;
