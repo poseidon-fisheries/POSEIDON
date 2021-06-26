@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.util.ArrayList;
@@ -36,13 +37,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarPulseRecruitmentFactory.forceThroughYaml;
+
 /**
  * Created by carrknight on 3/13/17.
  */
 public class PortListInitializer implements PortInitializer {
 
 
-    private final LinkedHashMap<String,Coordinate> ports;
+    private LinkedHashMap<String,Coordinate> ports;
 
     /**
      * if this is set to false, we assume the coordinates provided are geographical coordinates;
@@ -51,6 +54,8 @@ public class PortListInitializer implements PortInitializer {
     private final boolean usingGridCoordinates;
 
     public PortListInitializer(LinkedHashMap<String, Coordinate> ports, boolean usingGridCoordinates) {
+//        this.ports = forceThroughYaml(ports,
+//                Coordinate.class);;
         this.ports = ports;
         this.usingGridCoordinates = usingGridCoordinates;
         Preconditions.checkArgument(ports.size()>0);
@@ -110,5 +115,15 @@ public class PortListInitializer implements PortInitializer {
 
     public LinkedHashMap<String, Coordinate> getPorts() {
         return ports;
+    }
+
+    public void setPorts(LinkedHashMap<String, Coordinate> ports) {
+        this.ports = ports;
+//        this.ports = forceThroughYaml(ports,
+//                Coordinate.class);
+    }
+
+    public boolean isUsingGridCoordinates() {
+        return usingGridCoordinates;
     }
 }

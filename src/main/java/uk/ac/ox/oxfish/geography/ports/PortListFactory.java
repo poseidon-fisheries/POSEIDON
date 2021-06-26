@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.ports;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarPulseRecruitmentFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
@@ -54,6 +55,7 @@ public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
     @Override
     public PortListInitializer apply(FishState state) {
 
+        ports = SingleSpeciesBoxcarPulseRecruitmentFactory.forceThroughYaml(ports,String.class);
         LinkedHashMap<String,Coordinate> coordinatedPorts = new LinkedHashMap<>();
 
         for (Map.Entry<String, String> stringPort : ports.entrySet()) {

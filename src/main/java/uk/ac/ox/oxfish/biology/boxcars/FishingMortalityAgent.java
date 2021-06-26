@@ -123,7 +123,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
 
         if(computeDailyFishingMortality) {
-            DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
+                DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
                     new Gatherer<FishState>() {
                         @Override
                         public Double apply(FishState fishState) {

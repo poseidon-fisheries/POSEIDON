@@ -25,8 +25,8 @@ public class SingleSpeciesBoxcarPulseRecruitmentFactory  implements AlgorithmFac
 
 
 
-    private static <KEY,VALUE>  LinkedHashMap<KEY,VALUE> forceThroughYaml( LinkedHashMap<KEY,?> original,
-                                                                           Class<VALUE> valueClass){
+    public static <KEY,VALUE>  LinkedHashMap<KEY,VALUE> forceThroughYaml(LinkedHashMap<KEY, ?> original,
+                                                                         Class<VALUE> valueClass){
 
         FishYAML yaml = new FishYAML();
         LinkedHashMap<KEY,VALUE> correctedMap = new LinkedHashMap<>();

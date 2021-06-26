@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter.quickParametrize;
+import static uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter.quickParametrizeRawNumber;
 
 /**
  * like simple optimization parameter, but puts the same number at multiple addresses
@@ -36,6 +37,11 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
     private boolean strict = false;
 
     private boolean alwaysPositive = false;
+    /**
+     * when this is set to true, it means the argument could never be a DoubleParameter. This usually doesn't matter
+     * but unfortunately it seems that YAML struggles with map<String,Number> and turn them into string,string maps
+     */
+    private boolean rawNumber = false;
 
     public MultipleOptimizationParameter() {
     }
@@ -72,7 +78,10 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
 
 
         for (String addressToModify : addressesToModify) {
-            quickParametrize(scenario, realValue, addressToModify);
+            if(!rawNumber)
+                quickParametrize(scenario, realValue, addressToModify);
+            else
+                quickParametrizeRawNumber(scenario,realValue,addressToModify);
 
         }
 
@@ -123,5 +132,13 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
 
     public void setStrict(boolean strict) {
         this.strict = strict;
+    }
+
+    public boolean isRawNumber() {
+        return rawNumber;
+    }
+
+    public void setRawNumber(boolean rawNumber) {
+        this.rawNumber = rawNumber;
     }
 }
