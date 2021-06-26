@@ -15,7 +15,7 @@ public class SalehBayOneSpeciesCalibration {
         //calibration
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++) {
             MeraFakeOMHotstarts.calibrate(MAIN_DIRECTORY.resolve("hotstarts_three").
-                    resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 50);
+                    resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 50, 25);
         }
     }
 

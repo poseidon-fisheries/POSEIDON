@@ -34,7 +34,7 @@ public class MeraFakeOMHotstarts {
 
         //calibration
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++) {
-            calibrate(MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30);
+            calibrate(MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30, 20);
         }
 
         //create list of scenario runs
@@ -74,7 +74,7 @@ public class MeraFakeOMHotstarts {
     }
 
 
-    public static void calibrate(Path optimizationFile, int populationSize) throws IOException {
+    public static void calibrate(Path optimizationFile, int populationSize, int defaultRange) throws IOException {
 
         //read the yaml
         Yaml reader = new Yaml();
@@ -85,7 +85,7 @@ public class MeraFakeOMHotstarts {
         SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(optimization);
         problem.setParallelThreads(1);
-        problem.setDefaultRange(20);
+        problem.setDefaultRange(defaultRange);
         //set up the nelder mead
         ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
         opt.setPopulationSize(populationSize);
