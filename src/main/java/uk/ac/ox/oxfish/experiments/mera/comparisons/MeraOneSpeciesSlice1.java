@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
 import com.beust.jcommander.internal.Lists;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -17,6 +18,7 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.LTargetEffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.RejectionSampling;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -28,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class MeraOneSpeciesSlice1 {
 
@@ -868,7 +871,7 @@ public class MeraOneSpeciesSlice1 {
 
             runSetOfScenarios(pathToScenarioFiles,
                     pathToOutput,
-                    selectedPolicies, YEARS_TO_RUN_POLICIES, DEFAULT_PATH_TO_COLUMNS_TO_PRINT);
+                    selectedPolicies, YEARS_TO_RUN_POLICIES, DEFAULT_PATH_TO_COLUMNS_TO_PRINT, null);
         }
         //the rejection sampling bit
         //      rejectionSampling("parameters.yaml", MAIN_DIRECTORY.resolve("results"));
@@ -938,7 +941,7 @@ public class MeraOneSpeciesSlice1 {
     public static void runSetOfScenarios(Path scenarioFileList,
                                          Path outputDirectory,
                                          LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> policyMap, int yearsToRun,
-                                         Path pathToColumnsToPrint
+                                         Path pathToColumnsToPrint, @Nullable Consumer<Scenario> commonScenarioConsumer
     ) throws IOException{
         FishYAML yaml = new FishYAML();
         final List<String> columnsToPrint = yaml.loadAs(new FileReader(
@@ -962,7 +965,7 @@ public class MeraOneSpeciesSlice1 {
                     policyMap,
                     columnsToPrint,
                     false,
-                    null,
+                    commonScenarioConsumer,
                     null
             );
 

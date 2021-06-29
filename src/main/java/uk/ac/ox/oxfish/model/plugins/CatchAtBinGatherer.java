@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
+import uk.ac.ox.oxfish.model.market.PerBinMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
@@ -50,7 +51,7 @@ public class CatchAtBinGatherer implements AdditionalStartable {
             if(species.getNumberOfBins()>0)
                 for(int age=0; age<species.getNumberOfBins(); age++)
                 {
-                    String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + NThresholdsMarket.AGE_BIN_PREFIX + age;
+                    String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + PerBinMarket.AGE_BIN_PREFIX + age;
                     int finalAge = age;
                     DataColumn dailyCatches = model.getDailyDataSet().registerGatherer(
                             columnName,

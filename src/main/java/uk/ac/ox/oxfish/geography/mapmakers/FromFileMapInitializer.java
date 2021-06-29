@@ -192,6 +192,7 @@ public class FromFileMapInitializer implements MapInitializer {
                 distance.distance(nauticalMap.getSeaTile(0,0),
                         nauticalMap.getSeaTile(1,1),
                         nauticalMap) );
+        System.out.println("the number of water tiles is: " + nauticalMap.getAllSeaTilesExcludingLandAsList().size() );
 
         return nauticalMap;
     }

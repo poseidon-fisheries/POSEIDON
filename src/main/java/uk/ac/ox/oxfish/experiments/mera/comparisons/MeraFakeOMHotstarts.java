@@ -9,7 +9,7 @@ import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.operator.terminators.FitnessValueTerminator;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.statistics.InterfaceTextListener;
-import eva2.optimization.strategies.ClusterBasedNichingEA;
+import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.problems.SimpleProblemWrapper;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
@@ -34,7 +34,7 @@ public class MeraFakeOMHotstarts {
 
         //calibration
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++) {
-            calibrate(MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30, 20);
+            calibrate(MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30, 20, 1);
         }
 
         //create list of scenario runs
@@ -58,7 +58,7 @@ public class MeraFakeOMHotstarts {
 
     }
 
-    private static double checkError(Path finalScenario) throws IOException {
+    static double checkError(Path finalScenario) throws IOException {
 
         //look at the log!
         final List<String> allLines = Files.readLines(finalScenario.getParent().resolve("optimization_log.log").toFile(),
@@ -74,7 +74,7 @@ public class MeraFakeOMHotstarts {
     }
 
 
-    public static void calibrate(Path optimizationFile, int populationSize, int defaultRange) throws IOException {
+    public static void calibrate(Path optimizationFile, int populationSize, int defaultRange, int acceptableFitness) throws IOException {
 
         //read the yaml
         Yaml reader = new Yaml();
@@ -87,9 +87,9 @@ public class MeraFakeOMHotstarts {
         problem.setParallelThreads(1);
         problem.setDefaultRange(defaultRange);
         //set up the nelder mead
-        ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
-        opt.setPopulationSize(populationSize);
-//        NelderMeadSimplex opt = new NelderMeadSimplex(populationSize);
+//        ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
+//        opt.setPopulationSize(populationSize);
+        NelderMeadSimplex opt = new NelderMeadSimplex(populationSize);
 
         OptimizationParameters params = OptimizerFactory.makeParams(
                 opt,
@@ -99,7 +99,7 @@ public class MeraFakeOMHotstarts {
 
         params.setTerminator(new CombinedTerminator(
                 new EvaluationTerminator(MAX_EVALUATIONS),
-                new FitnessValueTerminator(new double[]{1}),
+                new FitnessValueTerminator(new double[]{acceptableFitness}),
                 false
         ));
 

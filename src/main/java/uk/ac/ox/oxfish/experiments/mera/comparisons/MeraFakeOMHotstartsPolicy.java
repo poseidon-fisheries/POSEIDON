@@ -90,7 +90,7 @@ public class MeraFakeOMHotstartsPolicy {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT);
+                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT, null);
 
 
     }

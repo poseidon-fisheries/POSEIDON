@@ -43,8 +43,7 @@ public class MaxThroughputDecorator implements GearDecorator {
     ) {
         Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
         return HoldLimitingDecoratorGear.
-                    boundCatchToLimit(original, modelBiology,
-                            original.getBiomassArray(),maxBiomassPerCatch);
+                    boundCatchToLimit(original, modelBiology,maxBiomassPerCatch);
     }
 
     /**

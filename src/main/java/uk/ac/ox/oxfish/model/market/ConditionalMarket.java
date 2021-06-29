@@ -20,9 +20,9 @@ import static uk.ac.ox.oxfish.model.market.AbstractMarket.*;
 public class ConditionalMarket implements Market {
 
 
-    final private AbstractMarket defaultMarket;
+    final private MarketWithCounter defaultMarket;
 
-    final private AbstractMarket passThePredicateMarket;
+    final private MarketWithCounter passThePredicateMarket;
 
     /**
      * when true, the fisher has access to the passThePredicateMarket
@@ -35,8 +35,8 @@ public class ConditionalMarket implements Market {
     private boolean started;
 
 
-    public ConditionalMarket(AbstractMarket defaultMarket,
-                             AbstractMarket passThePredicateMarket,
+    public ConditionalMarket(MarketWithCounter defaultMarket,
+                             MarketWithCounter passThePredicateMarket,
                              Predicate<Fisher> marketChecker) {
         this.defaultMarket = defaultMarket;
         this.passThePredicateMarket = passThePredicateMarket;

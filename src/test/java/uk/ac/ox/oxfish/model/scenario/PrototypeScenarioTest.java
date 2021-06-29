@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
+import uk.ac.ox.oxfish.model.market.PerBinMarket;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.function.ToDoubleFunction;
@@ -127,7 +128,7 @@ public class PrototypeScenarioTest {
             state.schedule.step(state);
             for(int age=0; age<60; age++) {
                 // System.out.println(age);
-                landings+=state.getDailyDataSet().getLatestObservation( "Sablefish " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + NThresholdsMarket.AGE_BIN_PREFIX + age);
+                landings+=state.getDailyDataSet().getLatestObservation( "Sablefish " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + PerBinMarket.AGE_BIN_PREFIX + age);
             }
             assertEquals(landings,
                     state.getDailyDataSet().getLatestObservation("Sablefish "+FisherDailyTimeSeries.CATCHES_COLUMN_NAME),

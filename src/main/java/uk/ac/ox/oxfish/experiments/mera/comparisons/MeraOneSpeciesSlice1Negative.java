@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.experiments.mera.comparisons;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.QuotaLimitDecorator;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.QuotaLimitDecoratorFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -197,7 +195,7 @@ public class MeraOneSpeciesSlice1Negative {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT);
+                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT, null);
 
 
     }

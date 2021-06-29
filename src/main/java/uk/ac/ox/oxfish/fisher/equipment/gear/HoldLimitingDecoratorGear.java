@@ -43,24 +43,24 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
     }
 
     public static Catch limitToHoldCapacity(Catch original, Hold hold, GlobalBiology globalBiology) {
-        double[] biomassArray = original.getBiomassArray();
+
         double spaceLeft = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
         assert spaceLeft >= 0;
         if (spaceLeft == 0) {
             return original.hasAbundanceInformation() ?
                 new Catch(new StructuredAbundance[original.numberOfSpecies()], globalBiology) :
-                new Catch(new double[biomassArray.length]);
+                new Catch(new double[original.getBiomassArray().length]);
         } else {
-            return boundCatchToLimit(original, globalBiology, biomassArray, spaceLeft);
+            return boundCatchToLimit(original, globalBiology, spaceLeft);
         }
     }
 
     @NotNull
     public static Catch boundCatchToLimit(Catch original,
                                            GlobalBiology globalBiology,
-                                           double[] biomassArray,
                                            double maximumCatchAllowed) {
         //biomassArray gets changed as a side effect!
+        double[] biomassArray = original.getBiomassArray();
         double proportionKept = Hold.throwOverboard(biomassArray, maximumCatchAllowed);
         //if there isn't abundance information you are already done
         if (!original.hasAbundanceInformation())
@@ -69,18 +69,23 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
             //otherwise reweigh
             if (proportionKept >= 1)
                 return original;
-            StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
-            for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
-                //multiply every item by the proportion kept
-                abundances[i] = original.getAbundance(i);
-                double[][] structuredAbundance = abundances[i].asMatrix();
-                for (int j = 0; j < structuredAbundance.length; j++)
-                    for (int k = 0; k < structuredAbundance[j].length; k++)
-                        structuredAbundance[j][k] *= proportionKept;
-                //next species
-            }
-            return new Catch(abundances,globalBiology);
+            return keepOnlyProportionOfCatch(original, globalBiology, biomassArray, proportionKept);
         }
+    }
+
+    @NotNull
+    public static Catch keepOnlyProportionOfCatch(Catch original, GlobalBiology globalBiology, double[] biomassArray, double proportionKept) {
+        StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
+        for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
+            //multiply every item by the proportion kept
+            abundances[i] = original.getAbundance(i);
+            double[][] structuredAbundance = abundances[i].asMatrix();
+            for (int j = 0; j < structuredAbundance.length; j++)
+                for (int k = 0; k < structuredAbundance[j].length; k++)
+                    structuredAbundance[j][k] *= proportionKept;
+            //next species
+        }
+        return new Catch(abundances, globalBiology);
     }
 
     @Override

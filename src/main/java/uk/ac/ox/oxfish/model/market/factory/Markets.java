@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.WeightLimitMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -49,6 +50,7 @@ public class Markets {
         NAMES.put(NPricesMarketFactory.class, "Many Prices Market");
         NAMES.put(SpeciesMarketMappedFactory.class, "Multiple Three Prices Markets");
         NAMES.put(ThreePricesWithPremium.class, "Three Prices Market with premium");
+        NAMES.put(WeightLimitMarketFactory.class, "Weight Limit Market");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

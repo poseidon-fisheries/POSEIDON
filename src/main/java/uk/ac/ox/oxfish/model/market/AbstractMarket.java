@@ -38,7 +38,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
  * Adds data collection to the interface
  * Created by carrknight on 5/3/15.
  */
-public abstract class AbstractMarket implements Market {
+public abstract class AbstractMarket implements MarketWithCounter {
 
 
     public static final String LANDINGS_COLUMN_NAME = "Landings";
@@ -165,7 +165,7 @@ public abstract class AbstractMarket implements Market {
         return dailyObservations;
     }
 
-    protected Counter getDailyCounter() {
+    public Counter getDailyCounter() {
         return dailyCounter;
     }
 
