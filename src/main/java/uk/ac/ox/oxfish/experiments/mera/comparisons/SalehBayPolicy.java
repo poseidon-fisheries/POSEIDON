@@ -164,7 +164,7 @@ public class SalehBayPolicy {
             //entry
             final FisherEntryByProfitFactory entryObject = new FisherEntryByProfitFactory();
             entryObject.setFixedCostsToCover(new FixedDoubleParameter(1875000d)); //basically they need to cover the target before getting in!
-            entryObject.setProfitDataColumnName("Average Trip Earnings");
+            entryObject.setProfitDataColumnName("Average Trip Income");
             entryObject.setCostsFinalColumnName("Average Trip Variable Costs");
             entryObject.setPopulationName("population0");
             flexible.getPlugins().add(
