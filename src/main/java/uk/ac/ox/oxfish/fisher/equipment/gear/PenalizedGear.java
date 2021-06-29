@@ -30,6 +30,8 @@ public class PenalizedGear implements GearDecorator {
     @Override
     public Catch fish(Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing, GlobalBiology modelBiology) {
         final Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
+        if(original.getTotalWeight()<=0)
+            return original;
         return HoldLimitingDecoratorGear.keepOnlyProportionOfCatch(
                 original,
                 modelBiology,

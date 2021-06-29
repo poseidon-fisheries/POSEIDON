@@ -33,6 +33,36 @@ public class SalehBayPolicy {
 
     static {
 
+
+        selectedPolicies.put(
+                "reduce_catchability_10",
+                fishState -> model -> {
+                    {
+
+                        for (Fisher fisher : model.getFishers()) {
+                            final HoldLimitingDecoratorGear parentGear = (HoldLimitingDecoratorGear) fisher.getGear();
+                            final Gear originalDelegate = parentGear.getDelegate();
+                            parentGear.setDelegate(
+                                    new PenalizedGear(.1,originalDelegate)
+                            );
+
+                        }
+                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                            final HoldLimitingDecoratorFactory parentFactory = (HoldLimitingDecoratorFactory) fisherFactory.getValue().getGear();
+                            final AlgorithmFactory<? extends Gear> originalDelegate = parentFactory.getDelegate();
+                            final PenalizedGearFactory penaltyDelegate = new PenalizedGearFactory();
+                            penaltyDelegate.setDelegate(originalDelegate);
+                            penaltyDelegate.setPercentageCatchLost(new FixedDoubleParameter(.1));
+                            parentFactory.setDelegate(penaltyDelegate);
+
+
+                        }
+
+                    }
+                }
+        );
+
+
         selectedPolicies.put(
                 "250_days",
                 fishState -> {
@@ -92,33 +122,6 @@ public class SalehBayPolicy {
                 }
         );
 
-        selectedPolicies.put(
-                "reduce_catchability_10",
-                fishState -> model -> {
-                    {
-
-                        for (Fisher fisher : model.getFishers()) {
-                            final HoldLimitingDecoratorGear parentGear = (HoldLimitingDecoratorGear) fisher.getGear();
-                            final Gear originalDelegate = parentGear.getDelegate();
-                            parentGear.setDelegate(
-                                    new PenalizedGear(.1,originalDelegate)
-                            );
-
-                        }
-                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                            final HoldLimitingDecoratorFactory parentFactory = (HoldLimitingDecoratorFactory) fisherFactory.getValue().getGear();
-                            final AlgorithmFactory<? extends Gear> originalDelegate = parentFactory.getDelegate();
-                            final PenalizedGearFactory penaltyDelegate = new PenalizedGearFactory();
-                            penaltyDelegate.setDelegate(originalDelegate);
-                            penaltyDelegate.setPercentageCatchLost(new FixedDoubleParameter(.1));
-                            parentFactory.setDelegate(penaltyDelegate);
-
-
-                        }
-
-                    }
-                }
-        );
 
         selectedPolicies.put("bau",
                 new AlgorithmFactory<AdditionalStartable>() {
