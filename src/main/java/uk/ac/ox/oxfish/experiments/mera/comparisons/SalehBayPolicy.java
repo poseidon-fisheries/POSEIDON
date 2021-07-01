@@ -64,17 +64,45 @@ public class SalehBayPolicy {
 
 
         selectedPolicies.put(
+                "reduce_catchability_90",
+                fishState -> model -> {
+                    {
+
+                        for (Fisher fisher : model.getFishers()) {
+                            final HoldLimitingDecoratorGear parentGear = (HoldLimitingDecoratorGear) fisher.getGear();
+                            final Gear originalDelegate = parentGear.getDelegate();
+                            parentGear.setDelegate(
+                                    new PenalizedGear(.9,originalDelegate)
+                            );
+
+                        }
+                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                            final HoldLimitingDecoratorFactory parentFactory = (HoldLimitingDecoratorFactory) fisherFactory.getValue().getGear();
+                            final AlgorithmFactory<? extends Gear> originalDelegate = parentFactory.getDelegate();
+                            final PenalizedGearFactory penaltyDelegate = new PenalizedGearFactory();
+                            penaltyDelegate.setDelegate(originalDelegate);
+                            penaltyDelegate.setPercentageCatchLost(new FixedDoubleParameter(.9));
+                            parentFactory.setDelegate(penaltyDelegate);
+
+
+                        }
+
+                    }
+                }
+        );
+
+        selectedPolicies.put(
                 "250_days",
                 fishState -> {
                     return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
                 }
         );
-        selectedPolicies.put(
-                "333_days",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(333, true);
-                }
-        );
+//        selectedPolicies.put(
+//                "333_days",
+//                fishState -> {
+//                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(333, true);
+//                }
+//        );
         selectedPolicies.put(
                 "0_days",
                 fishState -> {
@@ -123,7 +151,7 @@ public class SalehBayPolicy {
         );
 
 
-        selectedPolicies.put("bau",
+        selectedPolicies.put("BAU",
                 new AlgorithmFactory<AdditionalStartable>() {
                     @Override
                     public AdditionalStartable apply(FishState fishState) {
