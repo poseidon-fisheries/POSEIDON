@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFadBiomassAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -125,7 +126,7 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                     Entry::getKey, // species name
                     entry -> {
                         final String speciesName = entry.getKey().getName();
-                        return new FadBiomassAttractor(
+                        return new LogisticFadBiomassAttractor(
                             fishState.getRandom(),
                             attractionIntercepts.get(speciesName).apply(rng),
                             tileBiomassCoefficients.get(speciesName).apply(rng),

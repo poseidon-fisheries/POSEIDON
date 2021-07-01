@@ -18,52 +18,10 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import ec.util.MersenneTwisterFast;
+public interface FadBiomassAttractor {
+    double getCarryingCapacity();
 
-import static java.lang.Math.*;
+    boolean shouldAttract(double cellBiomass, double totalFadBiomass);
 
-public class FadBiomassAttractor {
-
-    private final MersenneTwisterFast rng;
-    private final double intercept;
-    private final double tileBiomassCoefficient;
-    private final double fadBiomassCoefficient;
-    private final double growthRate;
-    private final double carryingCapacity;
-
-    public FadBiomassAttractor(
-        final MersenneTwisterFast rng,
-        final double intercept,
-        final double tileBiomassCoefficient,
-        final double fadBiomassCoefficient,
-        final double growthRate,
-        final double carryingCapacity
-    ) {
-        this.rng = rng;
-        this.intercept = intercept;
-        this.tileBiomassCoefficient = tileBiomassCoefficient;
-        this.fadBiomassCoefficient = fadBiomassCoefficient;
-        this.growthRate = growthRate;
-        this.carryingCapacity = carryingCapacity;
-    }
-
-    public double getCarryingCapacity() {
-        return carryingCapacity;
-    }
-
-    boolean shouldAttract(final double cellBiomass, final double totalFadBiomass) {
-        return rng.nextDouble() < probabilityOfAttraction(cellBiomass, totalFadBiomass);
-    }
-
-    private double probabilityOfAttraction(final double cellBiomass, final double totalFadBiomass) {
-        return 1 / (1 + exp(-(intercept + tileBiomassCoefficient * cellBiomass + fadBiomassCoefficient * totalFadBiomass)));
-    }
-
-    double biomassAttracted(final double tileBiomass, final double fadBiomass, final double totalFadBiomass) {
-        return min(
-            tileBiomass,
-            max(1, growthRate * tileBiomass * fadBiomass * (1 - totalFadBiomass / carryingCapacity))
-        );
-    }
-
+    double biomassAttracted(double tileBiomass, double fadBiomass, double totalFadBiomass);
 }
