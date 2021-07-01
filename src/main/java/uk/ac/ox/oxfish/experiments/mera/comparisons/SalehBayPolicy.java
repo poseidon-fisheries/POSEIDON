@@ -159,6 +159,7 @@ public class SalehBayPolicy {
                 exitRules.setFirstYearYouCanSwitch(new FixedDoubleParameter(0));
                 exitRules.setCanReturnFromRetirement(true);
                 exitRules.setMaxHoursOutWhenSeasonal(new FixedDoubleParameter(7200d/2d));
+                fisherDefinition.setDepartingStrategy(exitRules);
 
             }
             //entry
