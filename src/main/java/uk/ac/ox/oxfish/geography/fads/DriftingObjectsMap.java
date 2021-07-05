@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import org.jetbrains.annotations.Nullable;
 import sim.field.continuous.Continuous2D;
-import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -38,6 +37,8 @@ public class DriftingObjectsMap {
         final Continuous2D field,
         final CurrentVectors currentVectors
     ) {
+        checkArgument(field.getHeight() == currentVectors.getGridHeight());
+        checkArgument(field.getWidth() == currentVectors.getGridWidth());
         this.field = field;
         this.currentVectors = currentVectors;
     }
@@ -47,20 +48,19 @@ public class DriftingObjectsMap {
     }
 
     void applyDrift(final int timeStep) {
-        final Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
-        bagToStream(objects).forEach(o -> {
+        for (final Object o : field.allObjects.toArray()) { // makes a copy, as objects can be removed
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
             final Optional<Double2D> newLoc = nextPosition(oldLoc, timeStep);
             if (newLoc.isPresent())
                 move(o, oldLoc, newLoc.get());
             else
                 remove(o, oldLoc);
-        });
+        }
     }
 
     private Optional<Double2D> nextPosition(final Double2D position, final int timeStep) {
         return getGridLocation(position)
-            .flatMap(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
+            .map(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
             .map(position::add)
             .filter(location -> inBounds(location, field));
     }
@@ -121,6 +121,8 @@ public class DriftingObjectsMap {
         return bagToStream(field.allObjects);
     }
 
-    public Continuous2D getField() { return field; }
+    public Continuous2D getField() {
+        return field;
+    }
 
 }

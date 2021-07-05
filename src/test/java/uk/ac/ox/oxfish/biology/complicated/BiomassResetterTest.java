@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFadBiomassAttractor;
@@ -152,7 +153,12 @@ public class BiomassResetterTest {
         final double k = asDouble(oneTonne, KILOGRAM);
         seaTiles.forEach(seaTile -> seaTile.setBiology(new BiomassLocalBiology(k, globalBiology.getSize(), rng)));
 
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), 0, 0, 0);
+        final CurrentVectors currentVectors = new CurrentVectors(
+            new TreeMap<>(),
+            1,
+            fishState.getMap().getWidth(),
+            fishState.getMap().getHeight()
+        );
         final FadMap fadMap = new FadMap(fishState.getMap(), currentVectors, globalBiology);
         when(fishState.getFadMap()).thenReturn(fadMap);
 
@@ -179,7 +185,7 @@ public class BiomassResetterTest {
 
         // record total biomass
         final ImmutableList<LocalBiology> seaTileBiologies =
-            seaTiles.stream().map(seaTile -> seaTile.getBiology()).collect(toImmutableList());
+            seaTiles.stream().map(SeaTile::getBiology).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialSeaTileBiomasses = totalBiomasses(globalBiology, seaTileBiologies);
 
         // record the abundance as it is
@@ -194,7 +200,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(fad -> fad.getBiology()).collect(toImmutableList());
+            fadMap.allFads().map(Fad::getBiology).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses = totalBiomasses(globalBiology, fadBiologies);
 
         // Check that FADs have attracted the right biomass
