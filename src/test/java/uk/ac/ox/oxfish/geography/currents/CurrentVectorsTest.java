@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.Main.STEPS_PER_DAY;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectors.getInterpolatedVector;
 
@@ -20,7 +19,6 @@ public class CurrentVectorsTest {
 
     @Test
     public void positiveDaysOffset() {
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY, 0, 0);
         assertEquals(0, CurrentVectors.positiveDaysOffset(1, 1));
         assertEquals(1, CurrentVectors.positiveDaysOffset(1, 2));
         assertEquals(364, CurrentVectors.positiveDaysOffset(1, 365));
@@ -28,12 +26,11 @@ public class CurrentVectorsTest {
     }
 
     @Test
-    public static void negativeDaysOffset() {
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY, 0, 0);
-        assertEquals(0, currentVectors.negativeDaysOffset(1, 1));
-        assertEquals(-1, currentVectors.negativeDaysOffset(2, 1));
-        assertEquals(-364, currentVectors.negativeDaysOffset(365, 1));
-        assertEquals(-1, currentVectors.negativeDaysOffset(1, 365));
+    public void negativeDaysOffset() {
+        assertEquals(0, CurrentVectors.negativeDaysOffset(1, 1));
+        assertEquals(-1, CurrentVectors.negativeDaysOffset(2, 1));
+        assertEquals(-364, CurrentVectors.negativeDaysOffset(365, 1));
+        assertEquals(-1, CurrentVectors.negativeDaysOffset(1, 365));
     }
 
     @Test
