@@ -65,7 +65,6 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
         return maxFadDeploymentsFile;
     }
 
-    @SuppressWarnings("unused")
     public void setMaxFadDeploymentsFile(final Path maxFadDeploymentsFile) {
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }

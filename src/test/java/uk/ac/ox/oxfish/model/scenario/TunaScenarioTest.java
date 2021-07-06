@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
@@ -53,11 +54,14 @@ public class TunaScenarioTest {
         scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
         scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
+
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
         ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
             .setMaxTripDurationFile(input("dummy_boats.csv"));
         ((PurseSeineGearFactory) fisherDefinition.getGear())
             .setLocationValuesFile(input("dummy_location_values.csv"));
+        ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
+            .setMaxFadDeploymentsFile(input("dummy_max_deployments.csv"));
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.addPlugin(state -> model -> {

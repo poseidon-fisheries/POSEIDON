@@ -72,6 +72,7 @@ public class FadMapTest {
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);
+        fadManager.setNumFadsInStock(1);
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
