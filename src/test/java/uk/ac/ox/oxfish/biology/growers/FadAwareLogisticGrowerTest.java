@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,6 +31,7 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 
@@ -55,14 +57,13 @@ public class FadAwareLogisticGrowerTest {
         state.setScenario(scenario);
         state.start();
 
-        final Supplier<Double> yellowfinBiomass =
-            () -> state.getTotalBiomass(state.getBiology().getSpecie("Yellowfin tuna"));
         while (state.getYear() < 5) {
             state.schedule.step(state);
         }
         state.schedule.step(state);
-        final double diff = Math.abs(889195.40 - yellowfinBiomass.get() / 1000d);
-        assertTrue(diff < 10);
+
+        final Species yft = state.getBiology().getSpecie("Yellowfin tuna");
+        assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
     }
 
