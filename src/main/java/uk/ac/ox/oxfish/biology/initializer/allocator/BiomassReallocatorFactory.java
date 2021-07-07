@@ -170,7 +170,7 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
                 entry -> (int) DAYS.between(startDate, entry.getKey()),
                 entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
                     Map.Entry::getKey,
-                    subEntry -> normalize(makeGrid(mapExtent, isInsideBiomassArea, subEntry.getValue()))
+                    subEntry -> makeGrid(mapExtent, isInsideBiomassArea, subEntry.getValue())
                 ))
             ));
 
@@ -186,14 +186,6 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
         }
         biomassArea.computeUnion();
         return biomassArea;
-    }
-
-    /**
-     * @return a copy of {@code grid} where the values sum up to 1.0
-     */
-    private static DoubleGrid2D normalize(final DoubleGrid2D grid) {
-        final double sum = Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum();
-        return new DoubleGrid2D(grid).multiply(1 / sum);
     }
 
     private static DoubleGrid2D makeGrid(

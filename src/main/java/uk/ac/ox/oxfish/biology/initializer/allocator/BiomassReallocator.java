@@ -32,11 +32,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.ToIntFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -70,9 +67,60 @@ public class BiomassReallocator implements Steppable, AdditionalStartable {
             .collect(toImmutableSortedMap(
                 Comparator.naturalOrder(),
                 Entry::getKey,
-                entry -> ImmutableMap.copyOf(entry.getValue()))
-            );
+                entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
+                    Entry::getKey,
+                    gridEntry -> normalize(gridEntry.getValue())
+                    )
+                )
+            ));
         this.period = period;
+    }
+
+    /**
+     * @return a copy of {@code grid} where the values sum up to 1.0
+     */
+    private static DoubleGrid2D normalize(final DoubleGrid2D grid) {
+        final double sum = Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum();
+        return new DoubleGrid2D(grid).multiply(1 / sum);
+    }
+
+    private static ImmutableMap<Integer, DoubleGrid2D> makeNewBiomassGrids(
+        final Map<String, DoubleGrid2D> biomassDistributionGridPerSpeciesName,
+        final Map<String, Double> totalBiomassPerSpeciesName,
+        final ToIntFunction<String> getSpeciesIndex
+    ) {
+        return biomassDistributionGridPerSpeciesName
+            .entrySet()
+            .stream()
+            .flatMap(entry -> {
+                final String speciesName = entry.getKey();
+                final DoubleGrid2D grid2D = entry.getValue();
+                //noinspection UnstableApiUsage
+                return stream(Optional
+                    .ofNullable(totalBiomassPerSpeciesName.get(speciesName))
+                    .map(biomass -> entry(
+                        getSpeciesIndex.applyAsInt(speciesName),
+                        new DoubleGrid2D(grid2D).multiply(biomass)
+                    )));
+            })
+            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
+    }
+
+    /**
+     * Reallocates biomass but mutating the biomass array of sea tiles directly.
+     * Only affects tiles with a {@code BiomassLocalBiology}.
+     */
+    private static void reallocate(
+        final Map<Integer, DoubleGrid2D> indexedBiomassGrids,
+        final Collection<SeaTile> seaTiles
+    ) {
+        seaTiles
+            .stream()
+            .filter(seaTile -> seaTile.getBiology() instanceof BiomassLocalBiology)
+            .forEach(seaTile -> {
+                final double[] biomass = ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
+                indexedBiomassGrids.forEach((i, grid) -> biomass[i] = grid.get(seaTile.getGridX(), seaTile.getGridY()));
+            });
     }
 
     public Map<Integer, Map<String, DoubleGrid2D>> getBiomassDistributionGridsPerStep() {
@@ -127,45 +175,6 @@ public class BiomassReallocator implements Steppable, AdditionalStartable {
                     );
                 System.out.printf("Reallocating biomass at step %d using grid %d\n", step, entry.getKey());
                 reallocate(indexedBiomassGrids, seaTiles);
-            });
-    }
-
-    private static ImmutableMap<Integer, DoubleGrid2D> makeNewBiomassGrids(
-        final Map<String, DoubleGrid2D> biomassDistributionGridPerSpeciesName,
-        final Map<String, Double> totalBiomassPerSpeciesName,
-        final ToIntFunction<String> getSpeciesIndex
-    ) {
-        return biomassDistributionGridPerSpeciesName
-            .entrySet()
-            .stream()
-            .flatMap(entry -> {
-                final String speciesName = entry.getKey();
-                final DoubleGrid2D grid2D = entry.getValue();
-                //noinspection UnstableApiUsage
-                return stream(Optional
-                    .ofNullable(totalBiomassPerSpeciesName.get(speciesName))
-                    .map(biomass -> entry(
-                        getSpeciesIndex.applyAsInt(speciesName),
-                        new DoubleGrid2D(grid2D).multiply(biomass)
-                    )));
-            })
-            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-    }
-
-    /**
-     * Reallocates biomass but mutating the biomass array of sea tiles directly.
-     * Only affects tiles with a {@code BiomassLocalBiology}.
-     */
-    private static void reallocate(
-        final Map<Integer, DoubleGrid2D> indexedBiomassGrids,
-        final Collection<SeaTile> seaTiles
-    ) {
-        seaTiles
-            .stream()
-            .filter(seaTile -> seaTile.getBiology() instanceof BiomassLocalBiology)
-            .forEach(seaTile -> {
-                final double[] biomass = ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
-                indexedBiomassGrids.forEach((i, grid) -> biomass[i] = grid.get(seaTile.getGridX(), seaTile.getGridY()));
             });
     }
 
