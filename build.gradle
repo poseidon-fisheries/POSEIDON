@@ -119,8 +119,8 @@ processTestResources.doFirst {
 //this makes tests multi-threaded when called from gradle. Useful!
 test {
     minHeapSize = "1024m"
-    maxHeapSize = "2048m"
-    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 3)
+    maxHeapSize = "6G" // GitHub actions gives us 7G memory, so this should be safe for running online tests
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
 }
 
 task shadowJarFoo(type: ShadowJar) {
