@@ -2,7 +2,7 @@ name: Spotbugs
 on: [push, pull_request]
 jobs:
   build:
-    name: Sportbugs
+    name: Spotbugs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
