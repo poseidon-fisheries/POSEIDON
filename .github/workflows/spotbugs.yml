@@ -11,4 +11,4 @@ jobs:
         run: ./gradlew spotbugsMain        
       - uses: jwgmeligmeyling/spotbugs-github-action@master
         with:
-          path: '**/spotbugsXml.xml'
+          path: build/reports/spotbugs/main.xml
