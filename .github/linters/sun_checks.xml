@@ -21,6 +21,7 @@
 
     - disable indentation rules
     - allow `__` as a lambda parameter name
+    - disable `NoWhitespaceBeforeCaseDefaultColon`, which is not yet supported in stable checkstyle release
 
     Note that the file is called sun_checks.xml even if we are using Google style
     because this is the file name where Super Linter looks for its settings.
@@ -271,7 +272,7 @@
                     PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,
                     RECORD_COMPONENT_DEF"/>
     </module>
-    <module name="NoWhitespaceBeforeCaseDefaultColon"/>
+    <!-- module name="NoWhitespaceBeforeCaseDefaultColon"/ -->
     <module name="OverloadMethodsDeclarationOrder"/>
     <module name="VariableDeclarationUsageDistance"/>
     <module name="CustomImportOrder">
