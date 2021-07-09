@@ -334,6 +334,10 @@ idea {
     }
 }
 
+spotbugs {
+    ignoreFailures = true
+}
+
 jacocoTestReport {
     reports {
         xml.enabled = true
