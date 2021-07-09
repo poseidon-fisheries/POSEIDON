@@ -6,6 +6,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id "com.github.spotbugs" version "4.7.2"
 }
 
 application {
@@ -101,7 +102,6 @@ dependencies {
 
     //guava. Useful for PreConditions and sometimes specialized collections
     implementation "com.google.guava:guava:28.2-jre"
-    implementation "com.google.code.findbugs:jsr305:3.0.2"
 
     //json test
     testImplementation "com.google.code.gson:gson:2.8.5"
