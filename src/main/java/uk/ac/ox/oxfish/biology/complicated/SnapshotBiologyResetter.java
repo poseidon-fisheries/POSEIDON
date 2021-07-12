@@ -1,5 +1,10 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -8,10 +13,7 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import uk.ac.ox.oxfish.utility.BiomassLogger;
 
 /**
  * the plugin/additionalStartable version of AbundanceResetter + BiomassSnapshot
@@ -114,13 +116,25 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
                         for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
                                 resetter : resetters.entrySet()) {
-                            if(!restoreOriginalLocations) {
+                            if (!restoreOriginalLocations) {
                                 resetter.getValue().takeSnapshort(
-                                        model.getMap(),
-                                        resetter.getKey().getSpecies());
+                                    model.getMap(),
+                                    resetter.getKey().getSpecies());
                             }
-                            resetter.getKey().resetAbundance(model.getMap(),model.getRandom());
 
+                            final double biomassBefore = ((FishState) simState)
+                                .getTotalBiomass(resetter.getKey().getSpecies());
+
+                            resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
+
+                            BiomassLogger.INSTANCE.add(
+                                ((FishState) simState).getStep(),
+                                DATA_RESET,
+                                "RESET",
+                                resetter.getKey().getSpecies(),
+                                biomassBefore,
+                                (((FishState) simState).getTotalBiomass(resetter.getKey().getSpecies()))
+                            );
 
                         }
 

@@ -20,6 +20,9 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
@@ -29,6 +32,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.BiomassLogger;
 
 public class BiomassResetter implements BiologyResetter {
 
@@ -57,6 +61,16 @@ public class BiomassResetter implements BiologyResetter {
     public void recordHowMuchBiomassThereIs(FishState fishState) {
         fadMap = fishState.getFadMap();
         recordedBiomass = fishState.getMap().getTotalBiomass(species);
+
+        BiomassLogger.INSTANCE.add(
+            fishState.getStep(),
+            DAWN,
+            "MEMORIZE_FOR_RESET",
+            species,
+            recordedBiomass,
+            recordedBiomass
+        );
+
     }
 
     /**

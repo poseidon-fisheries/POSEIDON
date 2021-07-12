@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import java.io.File;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -29,6 +30,7 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
 import java.nio.file.Paths;
 import java.util.function.Supplier;
+import uk.ac.ox.oxfish.utility.BiomassLogger;
 
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
@@ -61,6 +63,9 @@ public class FadAwareLogisticGrowerTest {
             state.schedule.step(state);
         }
         state.schedule.step(state);
+
+        BiomassLogger.INSTANCE.writeToFile(new File("log.csv"));
+
         final double diff = Math.abs(889195.40 - yellowfinBiomass.get() / 1000d);
         assertTrue(diff < 10);
 

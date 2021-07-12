@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import uk.ac.ox.oxfish.utility.BiomassLogger;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Streams.concat;
@@ -149,6 +150,15 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
             final String columnName = fishState.getSpecies().get(species.getIndex()) + " Recruitment";
             fishState.getYearlyCounter().count(columnName, biomassToAllocate);
         }
+
+        BiomassLogger.INSTANCE.add(
+            fishState.getStep(),
+            BIOLOGY_PHASE,
+            "GROW",
+            species,
+            currentBiomass,
+            allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum()
+        );
     }
 
     private Stream<BiomassLocalBiology> allBiologies(final FishState fishState) {
@@ -206,6 +216,14 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
                 allBiologies(fishState)
                     .mapToDouble(biology -> biology.getBiomass(species))
                     .sum();
+            BiomassLogger.INSTANCE.add(
+                fishState.getStep(),
+                DATA_RESET,
+                "MEMORIZE_FOR_GROWTH",
+                species,
+                memorizedBiomass,
+                memorizedBiomass
+            );
             System.out.printf(
                 "Memorized %s biomass at step %d: %,.0f t\n",
                 species.getName(),
