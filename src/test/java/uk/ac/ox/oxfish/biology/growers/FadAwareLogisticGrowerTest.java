@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 import uk.ac.ox.oxfish.utility.BiomassLogger;
+import uk.ac.ox.oxfish.utility.GrowthLogger;
 
 import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
@@ -64,7 +65,9 @@ public class FadAwareLogisticGrowerTest {
         }
         state.schedule.step(state);
 
-        BiomassLogger.INSTANCE.writeToFile(new File("log.csv"));
+        BiomassLogger.INSTANCE.writeToFile(new File("log_fail.csv"));
+
+        GrowthLogger.INSTANCE.writeToFile(new File("growth_fail.csv"));
 
         final double diff = Math.abs(889195.40 - yellowfinBiomass.get() / 1000d);
         assertTrue(diff < 10);
