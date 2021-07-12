@@ -1,6 +1,12 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.function.Function;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -8,13 +14,8 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.BiomassLogger;
 import uk.ac.ox.oxfish.utility.FishStateSteppable;
-
-import java.util.Map;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 /**
  * This class does a similar job as the various implementations of
@@ -50,7 +51,12 @@ public class BiomassRestorer implements AdditionalStartable {
                 // at BIOLOGY_PHASE step order, but before the data gatherers at later orders
                 schedule(fishState1, restoringStep, POLICY_UPDATE, fishState2 -> {
                     System.out.printf("Restoring biomass recorded at step %d at step %d\n", recordingStep, fishState2.getStep());
+
+
                     restoreBiomass(recordedBiomass, fishState2);
+
+
+
                 });
             })
         );
@@ -68,16 +74,27 @@ public class BiomassRestorer implements AdditionalStartable {
     private static ImmutableMap<String, Double> recordBiomass(final FishState fishState) {
         final FadMap fadMap = fishState.getFadMap();
         final NauticalMap nauticalMap = fishState.getMap();
-        return fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
-            Species::getName,
-            species -> nauticalMap.getTotalBiomass(species) + (fadMap == null ? 0 : fadMap.getTotalBiomass(species))
-        ));
+        final ImmutableMap<String, Double> recordedBiomasses =
+            fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
+                Species::getName,
+                species -> nauticalMap.getTotalBiomass(species) + (fadMap == null ? 0
+                    : fadMap.getTotalBiomass(species))
+            ));
+        recordedBiomasses.forEach((species, biomass) ->
+                BiomassLogger.INSTANCE.add(fishState.getStep(), DAWN, "MEMORIZE_FOR_RESTORE",
+                    fishState.getSpecies(species), biomass, biomass)
+            );
+        return recordedBiomasses;
     }
 
     private void restoreBiomass(final Map<String, Double> recordedBiomass, final FishState fishState) {
         final GlobalBiology globalBiology = fishState.getBiology();
         final NauticalMap nauticalMap = fishState.getMap();
         final FadMap fadMap = fishState.getFadMap();
+
+
+
+
         // if we have a snapshot of the biomass, we need to subtract the biomass
         // that's currently under FADs in order to avoid reallocating it
         final ImmutableMap<String, Double> biomassToReallocate =
@@ -86,12 +103,30 @@ public class BiomassRestorer implements AdditionalStartable {
                 entry -> entry.getValue() -
                     (fadMap == null ? 0 : fadMap.getTotalBiomass(globalBiology.getSpecie(entry.getKey())))
             ));
+
+        final ImmutableMap<String, Double> biomassesBefore =
+            biomassToReallocate.keySet().stream().collect(toImmutableMap(
+                Function.identity(),
+                speciesName -> fishState.getTotalBiomass(fishState.getSpecies(speciesName))
+            ));
+
         biomassReallocator.reallocate(
             fishState.getStep(),
             biomassToReallocate,
             globalBiology,
             nauticalMap.getAllSeaTilesExcludingLandAsList()
         );
+
+        biomassesBefore.forEach((speciesName, biomassBefore) ->
+            BiomassLogger.INSTANCE.add(
+                fishState.getStep(),
+                POLICY_UPDATE,
+                "RESTORE",
+                fishState.getSpecies(speciesName),
+                biomassBefore,
+                fishState.getTotalBiomass(fishState.getSpecies(speciesName)))
+        );
+
     }
 
 }

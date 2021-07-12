@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.utility.BiomassLogger;
+import uk.ac.ox.oxfish.utility.GrowthLogger;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Streams.concat;
@@ -48,6 +49,7 @@ import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocate
 import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -132,6 +134,8 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         // we call the logistic function (r  * biomassToUse * (1 - biomassToUse / K))
         // to get the new biomass resulting from growth and recruitment
         final double newBiomass = logisticRecruitment(biomassToUse, totalCapacity, malthusianParameter);
+
+        GrowthLogger.INSTANCE.add(species, biomassToUse, totalCapacity, malthusianParameter, newBiomass);
 
         // we calculate how much space we have left in the ocean to put new biomass
         final double availableCapacity = totalCapacity - currentBiomass;
