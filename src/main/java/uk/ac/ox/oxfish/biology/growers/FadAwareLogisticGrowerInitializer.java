@@ -29,18 +29,28 @@ import java.util.Map;
 
 public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitializer {
 
+    private double carryingCapacity;
     private double malthusianParameter;
-    private double distributionalWeight;
     private boolean useLastYearBiomass;
 
     public FadAwareLogisticGrowerInitializer(
+        final double carryingCapacity,
         final double malthusianParameter,
-        final double distributionalWeight,
         final boolean useLastYearBiomass
     ) {
+        this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
-        this.distributionalWeight = distributionalWeight;
         this.useLastYearBiomass = useLastYearBiomass;
+    }
+
+    @SuppressWarnings("unused")
+    public double getCarryingCapacity() {
+        return carryingCapacity;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCarryingCapacity(final double carryingCapacity) {
+        this.carryingCapacity = carryingCapacity;
     }
 
     @SuppressWarnings("unused")
@@ -49,12 +59,6 @@ public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitiali
     @SuppressWarnings("unused")
     public void setMalthusianParameter(final double malthusianParameter) {
         this.malthusianParameter = malthusianParameter;
-    }
-
-    public double getDistributionalWeight() { return distributionalWeight; }
-
-    public void setDistributionalWeight(final double distributionalWeight) {
-        this.distributionalWeight = distributionalWeight;
     }
 
     @SuppressWarnings("unused")
@@ -74,8 +78,8 @@ public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitiali
     ) {
         state.registerStartable(new FadAwareLogisticGrower(
             species,
+            carryingCapacity,
             malthusianParameter,
-            distributionalWeight,
             useLastYearBiomass,
             tiles.values()
         ));

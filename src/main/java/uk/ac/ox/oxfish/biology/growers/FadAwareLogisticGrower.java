@@ -19,8 +19,22 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Streams.concat;
+import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocateBiomassAtRandom;
+import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
+import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -34,24 +48,8 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import uk.ac.ox.oxfish.utility.BiomassLogger;
 import uk.ac.ox.oxfish.utility.GrowthLogger;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Streams.concat;
-import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.biology.growers.CommonLogisticGrower.allocateBiomassProportionally;
-import static uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower.allocateBiomassAtRandom;
-import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
-import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
-import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
  * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
@@ -65,8 +63,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 public class FadAwareLogisticGrower implements Startable, Steppable {
 
     private final Species species;
+    private final double carryingCapacity;
     private final double malthusianParameter;
-    private final double distributionalWeight;
     private final List<BiomassLocalBiology> seaTileBiologies;
     private final Optional<Memorizer> memorizer;
     private Optional<Accumulator<Double>> biomassLostAccumulator;
@@ -75,14 +73,14 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     FadAwareLogisticGrower(
         final Species species,
+        final double carryingCapacity,
         final double malthusianParameter,
-        final double distributionalWeight,
         final boolean useLastYearBiomass,
         final Iterable<BiomassLocalBiology> seaTileBiologies
     ) {
+        this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
         this.species = species;
-        this.distributionalWeight = distributionalWeight;
         this.seaTileBiologies = ImmutableList.copyOf(seaTileBiologies);
         this.memorizer = useLastYearBiomass ? Optional.of(new Memorizer()) : Optional.empty();
     }
@@ -118,10 +116,6 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         System.out.printf("Growing %s biomass at step %d\n", species.getName(), fishState.getStep());
 
-        // the total carrying capacity (K) is the sum of the carrying capacities of all sea tiles
-        final double totalCapacity =
-            seaTileBiologies.stream().mapToDouble(biology -> biology.getCarryingCapacity(species)).sum();
-
         // the current biomass is the sum of biomass in all local habitats, including sea tiles and FADs
         final double currentBiomass =
             allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum();
@@ -133,12 +127,12 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         // we call the logistic function (r  * biomassToUse * (1 - biomassToUse / K))
         // to get the new biomass resulting from growth and recruitment
-        final double newBiomass = logisticRecruitment(biomassToUse, totalCapacity, malthusianParameter);
+        final double newBiomass = logisticRecruitment(biomassToUse, carryingCapacity, malthusianParameter);
 
-        GrowthLogger.INSTANCE.add(species, biomassToUse, totalCapacity, malthusianParameter, newBiomass);
+        GrowthLogger.INSTANCE.add(species, biomassToUse, carryingCapacity, malthusianParameter, newBiomass);
 
         // we calculate how much space we have left in the ocean to put new biomass
-        final double availableCapacity = totalCapacity - currentBiomass;
+        final double availableCapacity = carryingCapacity - currentBiomass;
 
         // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs drifting out,
         // while making sure we won't be exceeding the total carrying capacity of the ocean tiles
@@ -170,20 +164,12 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
     }
 
     private void allocateBiomass(final double biomassToAllocate, final MersenneTwisterFast rng) {
-        if (distributionalWeight > 0)
-            allocateBiomassProportionally(
-                seaTileBiologies,
-                biomassToAllocate,
-                species.getIndex(),
-                distributionalWeight
-            );
-        else
-            allocateBiomassAtRandom(
-                seaTileBiologies,
-                biomassToAllocate,
-                rng,
-                species.getIndex()
-            );
+        allocateBiomassAtRandom(
+            seaTileBiologies,
+            biomassToAllocate,
+            rng,
+            species.getIndex()
+        );
     }
 
     @NotNull

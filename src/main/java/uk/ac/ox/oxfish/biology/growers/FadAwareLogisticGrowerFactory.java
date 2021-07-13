@@ -28,11 +28,7 @@ public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareL
 
     private DoubleParameter steepness = new FixedDoubleParameter(0.7);
 
-    /**
-     * when this is set to anything above 0, growth will be distributed with higher proportion to the area with higher
-     * unfilled carrying capacity
-     */
-    private DoubleParameter distributionalWeight = new FixedDoubleParameter(-1);
+    private DoubleParameter carryingCapacity = new FixedDoubleParameter(0.0);
 
     private boolean useLastYearBiomass = true;
 
@@ -47,10 +43,18 @@ public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareL
     @Override
     public FadAwareLogisticGrowerInitializer apply(final FishState state) {
         return new FadAwareLogisticGrowerInitializer(
+            carryingCapacity.apply(state.getRandom()),
             steepness.apply(state.getRandom()),
-            distributionalWeight.apply(state.getRandom()),
             useLastYearBiomass
         );
+    }
+
+    public DoubleParameter getCarryingCapacity() {
+        return carryingCapacity;
+    }
+
+    public void setCarryingCapacity(final DoubleParameter carryingCapacity) {
+        this.carryingCapacity = carryingCapacity;
     }
 
     public DoubleParameter getSteepness() {
@@ -59,14 +63,6 @@ public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareL
 
     public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
-    }
-
-    @SuppressWarnings("unused") public DoubleParameter getDistributionalWeight() {
-        return distributionalWeight;
-    }
-
-    @SuppressWarnings("unused") public void setDistributionalWeight(final DoubleParameter distributionalWeight) {
-        this.distributionalWeight = distributionalWeight;
     }
 
 }
