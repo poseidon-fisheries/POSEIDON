@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # needed to find a merge base to identify modified files
       - name: Lint Code Base
         uses: github/super-linter@v4.2.2
         env:
