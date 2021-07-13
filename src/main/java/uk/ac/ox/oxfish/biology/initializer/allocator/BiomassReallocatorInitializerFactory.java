@@ -50,7 +50,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class BiomassReallocatorInitializerFactory
     implements AlgorithmFactory<BiomassReallocatorInitializer> {
 
-    private AlgorithmFactory<BiomassReallocator> biomassReallocatorFactory;
+    private AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory;
     private SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path schaeferParamsFile = input("schaefer_params.csv");
     private MapExtent mapExtent;
@@ -97,7 +97,7 @@ public class BiomassReallocatorInitializerFactory
      */
     @NotNull
     private List<SingleSpeciesBiomassInitializer> makeBiomassInitializers(
-        final Map<String, GridAllocator> initialAllocators,
+        final Map<String, ? extends GridAllocator> initialAllocators,
         final SpeciesCodes speciesCodes
     ) {
         return parseAllRecords(schaeferParamsFile)
@@ -114,7 +114,7 @@ public class BiomassReallocatorInitializerFactory
                     new ConstantBiomassAllocator(Double.MAX_VALUE),
                     new NoMovement(),
                     speciesName,
-                    new FadAwareLogisticGrowerInitializer(logisticGrowthRate, true),
+                    new FadAwareLogisticGrowerInitializer(asDouble(carryingCapacity, KILOGRAM), logisticGrowthRate, true),
                     false,
                     false
                 );
@@ -126,7 +126,7 @@ public class BiomassReallocatorInitializerFactory
         this.mapExtent = mapExtent;
     }
 
-    public void setBiomassReallocatorFactory(final AlgorithmFactory<BiomassReallocator> biomassReallocatorFactory) {
+    public void setBiomassReallocatorFactory(final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory) {
         this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
 }

@@ -19,7 +19,19 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Streams.concat;
+import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
+import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -34,19 +46,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Streams.concat;
-import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
-import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 /**
  * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
  * memorized biomass from the previous year instead of using the current biomass.
@@ -59,6 +58,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 public class FadAwareLogisticGrower implements Startable, Steppable {
 
     private final Species species;
+    private final double carryingCapacity;
     private final double malthusianParameter;
     private final List<BiomassLocalBiology> seaTileBiologies;
     private final Optional<Memorizer> memorizer;
@@ -68,10 +68,12 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     FadAwareLogisticGrower(
         final Species species,
+        final double carryingCapacity,
         final double malthusianParameter,
         final boolean useLastYearBiomass,
         final Iterable<BiomassLocalBiology> seaTileBiologies
     ) {
+        this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
         this.species = species;
         this.seaTileBiologies = ImmutableList.copyOf(seaTileBiologies);
@@ -109,10 +111,6 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         System.out.printf("Growing %s biomass at step %d\n", species.getName(), fishState.getStep());
 
-        // the total carrying capacity (K) is the sum of the carrying capacities of all sea tiles
-        final double totalCapacity =
-            seaTileBiologies.stream().mapToDouble(biology -> biology.getCarryingCapacity(species)).sum();
-
         // the current biomass is the sum of biomass in all local habitats, including sea tiles and FADs
         final double currentBiomass =
             allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum();
@@ -124,10 +122,10 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         // we call the logistic function (r  * biomassToUse * (1 - biomassToUse / K))
         // to get the new biomass resulting from growth and recruitment
-        final double newBiomass = logisticRecruitment(biomassToUse, totalCapacity, malthusianParameter);
+        final double newBiomass = logisticRecruitment(biomassToUse, carryingCapacity, malthusianParameter);
 
         // we calculate how much space we have left in the ocean to put new biomass
-        final double availableCapacity = totalCapacity - currentBiomass;
+        final double availableCapacity = carryingCapacity - currentBiomass;
 
         // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs drifting out,
         // while making sure we won't be exceeding the total carrying capacity of the ocean tiles

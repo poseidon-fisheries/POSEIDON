@@ -29,15 +29,28 @@ import java.util.Map;
 
 public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitializer {
 
+    private double carryingCapacity;
     private double malthusianParameter;
     private boolean useLastYearBiomass;
 
     public FadAwareLogisticGrowerInitializer(
+        final double carryingCapacity,
         final double malthusianParameter,
         final boolean useLastYearBiomass
     ) {
+        this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
         this.useLastYearBiomass = useLastYearBiomass;
+    }
+
+    @SuppressWarnings("unused")
+    public double getCarryingCapacity() {
+        return carryingCapacity;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCarryingCapacity(final double carryingCapacity) {
+        this.carryingCapacity = carryingCapacity;
     }
 
     @SuppressWarnings("unused")
@@ -65,6 +78,7 @@ public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitiali
     ) {
         state.registerStartable(new FadAwareLogisticGrower(
             species,
+            carryingCapacity,
             malthusianParameter,
             useLastYearBiomass,
             tiles.values()

@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareLogisticGrowerInitializer> {
 
     private DoubleParameter steepness = new FixedDoubleParameter(0.7);
+    private DoubleParameter carryingCapacity = new FixedDoubleParameter(0.0);
 
     private boolean useLastYearBiomass = true;
 
@@ -41,9 +42,18 @@ public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareL
     @Override
     public FadAwareLogisticGrowerInitializer apply(final FishState state) {
         return new FadAwareLogisticGrowerInitializer(
+            carryingCapacity.apply(state.getRandom()),
             steepness.apply(state.getRandom()),
             useLastYearBiomass
         );
+    }
+
+    public DoubleParameter getCarryingCapacity() {
+        return carryingCapacity;
+    }
+
+    public void setCarryingCapacity(final DoubleParameter carryingCapacity) {
+        this.carryingCapacity = carryingCapacity;
     }
 
     public DoubleParameter getSteepness() {
