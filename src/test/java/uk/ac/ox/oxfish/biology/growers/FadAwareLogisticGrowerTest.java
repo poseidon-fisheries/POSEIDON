@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
@@ -44,6 +45,7 @@ public class FadAwareLogisticGrowerTest {
         scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
         scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
+        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
         ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
             .setMaxTripDurationFile(input("dummy_boats.csv"));

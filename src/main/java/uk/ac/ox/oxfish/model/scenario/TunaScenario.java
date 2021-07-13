@@ -173,6 +173,7 @@ public class TunaScenario implements Scenario {
     private BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory = new BiomassReallocatorInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory();
+    private FadMapFactory fadMapFactory = new FadMapFactory();
 
     public TunaScenario() {
 
@@ -410,7 +411,7 @@ public class TunaScenario implements Scenario {
             .buildPorts(model.getMap(), model.random, seaTile -> marketMap, model, gasPriceMaker)
             .forEach(port -> port.setGasPricePerLiter(gasPrice));
 
-        final FadMap fadMap = (new FadMapFactory()).apply(model);
+        final FadMap fadMap = fadMapFactory.apply(model);
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);
 
@@ -572,4 +573,14 @@ public class TunaScenario implements Scenario {
     public void setBiomassReallocatorInitializerFactory(final BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory) {
         this.biomassReallocatorInitializerFactory = biomassReallocatorInitializerFactory;
     }
+
+    public FadMapFactory getFadMapFactory() {
+        return fadMapFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
+    }
+
 }
