@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -54,6 +55,7 @@ public class TunaScenarioTest {
         scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
         scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
+        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
 
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
         ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
