@@ -21,14 +21,21 @@
 package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgent;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticSimpleFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.MaximumOfFilters;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -40,6 +47,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -302,11 +310,66 @@ public class NoData718Slice7Policy {
         dailyColumnsToPrint.add("Pristipomoides multidens Landings");
         dailyColumnsToPrint.add("Lethrinus laticaudis Landings");
         dailyColumnsToPrint.add("Atrobucca brevis Landings");
+
+        dailyColumnsToPrint.add("Average Daily Fishing Mortality Atrobucca brevis");
+        dailyColumnsToPrint.add("Yearly Fishing Mortality Atrobucca brevis");
+        dailyColumnsToPrint.add("Average Daily Fishing Mortality Pristipomoides multidens");
+        dailyColumnsToPrint.add("Yearly Fishing Mortality Pristipomoides multidens");
+        dailyColumnsToPrint.add("Average Daily Fishing Mortality Lethrinus laticaudis");
+        dailyColumnsToPrint.add("Yearly Fishing Mortality Lethrinus laticaudis");
+        dailyColumnsToPrint.add("Average Daily Fishing Mortality Lutjanus malabaricus");
+        dailyColumnsToPrint.add("Yearly Fishing Mortality Lutjanus malabaricus");
+
     }
 
 
 
     public static void main(String[] args) throws IOException {
+
+        final LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> additionalPlugins = new LinkedList<>();
+        //add fishing mortality per species!
+        //we are going to have to trawl around in the fisher factories, ugh
+        String[] species = new String[]{
+                "Pristipomoides multidens",
+                "Lethrinus laticaudis",
+                "Lutjanus malabaricus",
+                "Atrobucca brevis"
+        };
+        for (String speciesName : species) {
+
+            final AdditionalStartable fMortalityAgent =
+                    new AdditionalStartable() {
+
+                        @Override
+                        public void start(FishState model) {
+                            List<LogisticSimpleFilter> fleetFilters = new LinkedList<>();
+                            //go through all fisher factories
+                            for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                                final FisherFactory factory = fisherFactory.getValue();
+                                final HeterogeneousGearFactory gear = ((HeterogeneousGearFactory) ((GarbageGearFactory) ((DelayGearDecoratorFactory) factory.getGear()).getDelegate()).getDelegate());
+                                //if they do catch this species
+                                if(gear.getGears().get(speciesName)!=null && gear.getGears().get(speciesName) instanceof SimpleLogisticGearFactory){
+                                    final SimpleLogisticGearFactory logisticFactory = (SimpleLogisticGearFactory) gear.getGears().get(speciesName);
+                                    //copy its parameters
+                                    fleetFilters.add(new LogisticSimpleFilter(true,false,
+                                            logisticFactory.getSelexParameter1().apply(model.getRandom()),
+                                            logisticFactory.getSelexParameter2().apply(model.getRandom())
+                                            ));
+
+                                }
+                            }
+
+                            Species correctSpecies = model.getSpecies(speciesName);
+                            MaximumOfFilters vulnerability = new MaximumOfFilters(Iterables.toArray(fleetFilters,LogisticSimpleFilter.class));
+                            FishingMortalityAgent newAgent = new FishingMortalityAgent(vulnerability,correctSpecies,true);
+                            model.registerStartable(newAgent);
+
+                        }
+                    };
+
+            additionalPlugins.add(new Pair<>(1, fishState -> fMortalityAgent));
+        }
+
 
         if(args[0].equals("selectivity")) {
 
@@ -326,7 +389,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_again"),
                     simpleSelectivityShift,
                     columns,
-                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null);
+                    additionalPlugins, null);
         }
         else if(args[0].equals("sprnumbers")){
 
@@ -343,7 +406,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers"),
                     checkSPRDifferentials,
                     columns,
-                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), null);
+                    additionalPlugins, null);
         }
         else if(args[0].equals("season_simple")){
 
@@ -354,7 +417,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("season_simple"),
                     NoData718Utilities.nonAdaptiveEffort,
                     columns,
-                    new LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>>(), dailyColumnsToPrint);
+                    additionalPlugins, dailyColumnsToPrint);
         }
 
     }

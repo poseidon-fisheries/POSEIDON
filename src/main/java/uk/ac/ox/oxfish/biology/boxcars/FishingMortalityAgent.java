@@ -228,7 +228,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
 
                 numerator+= catches[subdivision][bin];
-                denominator+= totalAbundance[subdivision][bin];
+                denominator+= vulnerable[subdivision][bin];
 
             }
 
