@@ -419,6 +419,17 @@ public class NoData718Slice7Policy {
                     columns,
                     additionalPlugins, dailyColumnsToPrint);
         }
+        else if(args[0].equals("days_at_sea")){
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("days_at_sea").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("days_at_sea"),
+                    NoData718Utilities.daysAtSea,
+                    columns,
+                    additionalPlugins, dailyColumnsToPrint);
+        }
 
     }
 

@@ -680,6 +680,36 @@ public class NoData718Utilities {
 
         }
 
+        static public LinkedHashMap<String,Function<Integer,Consumer<Scenario>>> daysAtSea = new LinkedHashMap<>();
+        static {
+
+                int daysToTry[] = new int[]{250,200,150,100,50,25};
+                for(int days : daysToTry) {
+                        int finalDays = days;
+                        daysAtSea.put(
+                                days+"_days_noentry",
+                                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                        new String[]{"population0", "population1", "population2"}
+                                        , finalDays, false).andThen(
+                                        NoDataPolicy.removeEntry(shockYear)
+                                )
+
+                        );
+                }
+                for(int days : new int[]{200,100,50}) {
+                        int finalDays = days;
+                        daysAtSea.put(
+                                days+"_days_yesentry",
+                                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                        new String[]{"population0", "population1", "population2"}
+                                        , finalDays, false)
+                        );
+
+                }
+
+
+        }
+
 
         static public LinkedHashMap<String,Function<Integer,Consumer<Scenario>>> nonAdaptiveEffort = new LinkedHashMap<>();
         static {
