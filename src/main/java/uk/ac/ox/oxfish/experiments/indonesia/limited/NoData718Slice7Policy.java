@@ -72,22 +72,27 @@ public class NoData718Slice7Policy {
         // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
 //        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
         //need to add a lot of multidens collectors here....
-        String species = "Pristipomoides multidens";
-        final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
-        Preconditions.checkNotNull(agent, "species has no agent!");
-        // ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent + "_small");
-        ADDITIONAL_COLUMNS.add("Exogenous catches of "+species);
+       // String species = "Pristipomoides multidens";
+        for(String species : NoData718Slice2PriceIncrease.speciesToSprAgent.keySet()){
+            final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
+            Preconditions.checkNotNull(agent, "species has no agent!");
+            // ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent + "_small");
+            ADDITIONAL_COLUMNS.add("Exogenous catches of " + species);
 
-        //ADDITIONAL_COLUMNS.add("SPR " + "Lutjanus malabaricus" + " " + "spr_agent" + "_total_and_correct");
-        ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent);
-        ADDITIONAL_COLUMNS.add("Biomass " + species);
-        ADDITIONAL_COLUMNS.add("Bt/K " + species);
-        ADDITIONAL_COLUMNS.add("Percentage Mature Catches " + species + " "+ agent);
-        ADDITIONAL_COLUMNS.add("Percentage Lopt Catches " + species + " "+ agent);
-        ADDITIONAL_COLUMNS.add("Mean Length Caught " + species + " "+ agent);
-        ADDITIONAL_COLUMNS.add("CPUE " + species + " "+ agent);
-        ADDITIONAL_COLUMNS.add(species + " Earnings");
-        ADDITIONAL_COLUMNS.add(species + " Landings");
+            //ADDITIONAL_COLUMNS.add("SPR " + "Lutjanus malabaricus" + " " + "spr_agent" + "_total_and_correct");
+            ADDITIONAL_COLUMNS.add("SPR " + species + " " + agent);
+            ADDITIONAL_COLUMNS.add("Biomass " + species);
+            ADDITIONAL_COLUMNS.add("Bt/K " + species);
+            ADDITIONAL_COLUMNS.add("Percentage Mature Catches " + species + " " + agent);
+            ADDITIONAL_COLUMNS.add("Percentage Lopt Catches " + species + " " + agent);
+            ADDITIONAL_COLUMNS.add("Mean Length Caught " + species + " " + agent);
+            ADDITIONAL_COLUMNS.add("CPUE " + species + " " + agent);
+            ADDITIONAL_COLUMNS.add(species + " Earnings");
+            ADDITIONAL_COLUMNS.add(species + " Landings");
+            ADDITIONAL_COLUMNS.add("Average Daily Fishing Mortality " + species);
+            ADDITIONAL_COLUMNS.add("Yearly Fishing Mortality " + species);
+        }
+
     }
 
 
@@ -311,14 +316,6 @@ public class NoData718Slice7Policy {
         dailyColumnsToPrint.add("Lethrinus laticaudis Landings");
         dailyColumnsToPrint.add("Atrobucca brevis Landings");
 
-        dailyColumnsToPrint.add("Average Daily Fishing Mortality Atrobucca brevis");
-        dailyColumnsToPrint.add("Yearly Fishing Mortality Atrobucca brevis");
-        dailyColumnsToPrint.add("Average Daily Fishing Mortality Pristipomoides multidens");
-        dailyColumnsToPrint.add("Yearly Fishing Mortality Pristipomoides multidens");
-        dailyColumnsToPrint.add("Average Daily Fishing Mortality Lethrinus laticaudis");
-        dailyColumnsToPrint.add("Yearly Fishing Mortality Lethrinus laticaudis");
-        dailyColumnsToPrint.add("Average Daily Fishing Mortality Lutjanus malabaricus");
-        dailyColumnsToPrint.add("Yearly Fishing Mortality Lutjanus malabaricus");
 
     }
 
@@ -428,7 +425,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("days_at_sea"),
                     NoData718Utilities.daysAtSea,
                     columns,
-                    additionalPlugins, dailyColumnsToPrint);
+                    additionalPlugins, null);
         }
 
     }
