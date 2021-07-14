@@ -81,5 +81,8 @@ public class Scenarios {
         SCENARIOS.put("Tuna", TunaScenario::new);
         DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
 
+        SCENARIOS.put("EPO", EpoScenario::new);
+        DESCRIPTIONS.put("EPO", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
+
     }
 }
