@@ -18,17 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import com.google.common.collect.ImmutableList;
-import junit.framework.TestCase;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-
-import java.util.List;
-
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.Double.POSITIVE_INFINITY;
@@ -36,15 +25,127 @@ import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertArrayEquals;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
+import static uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocator.getBiomassPerSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import junit.framework.TestCase;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
+
 public class BiomassReallocatorTest extends TestCase {
+
+    public void test() {
+        final ImmutableList<DoubleGrid2D> grids = Stream
+            .of(
+                new double[][] {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}},
+                new double[][] {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}},
+                new double[][] {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}}
+            )
+            .map(DoubleGrid2D::new)
+            .map(BiomassReallocatorFactory::normalize)
+            .collect(toImmutableList());
+
+        final GlobalBiology globalBiology = genericListOfSpecies(2);
+        final NauticalMap nauticalMap = makeMap(3, 3);
+        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
+            seaTile.setBiology(new BiomassLocalBiology(
+                    new double[] {1, 1},
+                    new double[] {POSITIVE_INFINITY, POSITIVE_INFINITY}
+                )
+            )
+        );
+
+        final List<Double> initialBiomasses = getBiomasses(globalBiology, nauticalMap);
+        assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
+
+        final BiomassReallocator biomassReallocator = new BiomassReallocator(
+            AllocationGrids.from(
+                range(0, grids.size()).boxed().collect(toImmutableMap(
+                    identity(),
+                    i -> globalBiology.getSpecies().stream().collect(toImmutableMap(
+                        Species::getName,
+                        species -> (species.getIndex() == 0 ? grids : grids.reverse()).get(i)
+                    ))
+                ))
+            ),
+            3
+        );
+
+        final List<SeaTile> seaTiles =
+            nauticalMap.getAllSeaTilesExcludingLandAsList();
+        final Map<String, Double> biomassPerSpecies =
+            getBiomassPerSpecies(globalBiology, nauticalMap);
+        biomassReallocator.reallocate(0, globalBiology, seaTiles, biomassPerSpecies);
+
+        assertEquals(
+            ImmutableList.of(9.0, 9.0),
+            getBiomasses(globalBiology, nauticalMap)
+        );
+
+        assertArrayEquals(
+            new double[][] {{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
+        );
+
+        assertArrayEquals(
+            new double[][] {{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
+        );
+
+        biomassReallocator.reallocate(1, globalBiology, seaTiles, biomassPerSpecies);
+
+        assertArrayEquals(
+            new double[][] {{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
+        );
+
+        assertArrayEquals(
+            new double[][] {{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
+        );
+
+        nauticalMap.getAllSeaTilesAsList().forEach(seaTile -> {
+            final double[] biomass =
+                ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
+            for (int i = 0; i < biomass.length; i++) {
+                biomass[i] += 1;
+            }
+        });
+
+        biomassReallocator.reallocate(
+            2,
+            globalBiology,
+            seaTiles,
+            getBiomassPerSpecies(globalBiology, nauticalMap)
+        );
+
+        assertArrayEquals(
+            new double[][] {{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
+        );
+
+        assertArrayEquals(
+            new double[][] {{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
+        );
+
+    }
 
     private static ImmutableList<Double> getBiomasses(
         final GlobalBiology globalBiology,
         final NauticalMap nauticalMap
     ) {
-        return globalBiology.getSpecies().stream().map(nauticalMap::getTotalBiomass).collect(toImmutableList());
+        return globalBiology.getSpecies().stream().map(nauticalMap::getTotalBiomass)
+            .collect(toImmutableList());
     }
 
     private static double[][] getBiomassArray(final NauticalMap map, final Species species) {
@@ -55,84 +156,5 @@ public class BiomassReallocatorTest extends TestCase {
             }
         }
         return biomassArray;
-    }
-
-    public void test() {
-        final ImmutableList<DoubleGrid2D> grids = ImmutableList.of(
-            new DoubleGrid2D(new double[][]{{1, 1, 1}, {0, 0, 0}, {0, 0, 0}}),
-            new DoubleGrid2D(new double[][]{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}),
-            new DoubleGrid2D(new double[][]{{0, 0, 0}, {0, 0, 0}, {1, 1, 1}})
-        );
-
-        final GlobalBiology globalBiology = genericListOfSpecies(2);
-        final NauticalMap nauticalMap = makeMap(3, 3);
-        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
-            seaTile.setBiology(new BiomassLocalBiology(
-                    new double[]{1, 1},
-                    new double[]{POSITIVE_INFINITY, POSITIVE_INFINITY}
-                )
-            )
-        );
-
-        final List<Double> initialBiomasses = getBiomasses(globalBiology, nauticalMap);
-        assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
-
-        final BiomassReallocator biomassReallocator = new BiomassReallocator(
-            range(0, grids.size()).boxed().collect(toImmutableMap(
-                identity(),
-                i -> globalBiology.getSpecies().stream().collect(toImmutableMap(
-                    Species::getName,
-                    species -> (species.getIndex() == 0 ? grids : grids.reverse()).get(i)
-                ))
-            )),
-            3
-        );
-
-        biomassReallocator.reallocate(0, globalBiology, nauticalMap);
-
-        assertEquals(
-            ImmutableList.of(9.0, 9.0),
-            getBiomasses(globalBiology, nauticalMap)
-        );
-
-        assertArrayEquals(
-            new double[][]{{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
-        );
-
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
-
-        biomassReallocator.reallocate(1, globalBiology, nauticalMap);
-
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-            );
-
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
-
-        nauticalMap.getAllSeaTilesAsList().forEach(seaTile -> {
-            final double[] biomass = ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
-            for (int i = 0; i < biomass.length; i++) biomass[i] += 1;
-        });
-
-        biomassReallocator.reallocate(2, globalBiology, nauticalMap);
-
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
-        );
-
-        assertArrayEquals(
-            new double[][]{{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
-
     }
 }

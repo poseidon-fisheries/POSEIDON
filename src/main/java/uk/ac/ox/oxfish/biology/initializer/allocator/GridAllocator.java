@@ -9,10 +9,16 @@ class GridAllocator implements BiomassAllocator {
 
     private final DoubleGrid2D grid;
 
-    GridAllocator(DoubleGrid2D grid) {this.grid = grid;}
+    GridAllocator(final DoubleGrid2D grid) {
+        this.grid = grid;
+    }
 
     @Override
-    public double allocate(SeaTile seaTile, NauticalMap map, MersenneTwisterFast random) {
+    public double allocate(
+        final SeaTile seaTile,
+        final NauticalMap map,
+        final MersenneTwisterFast random
+    ) {
         return grid.get(seaTile.getGridX(), seaTile.getGridY());
     }
 }

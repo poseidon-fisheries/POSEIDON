@@ -18,12 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.ToIntFunction;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
@@ -32,62 +40,89 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.ToIntFunction;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 /**
- * Redistributes the biomass around according to a "schedule" that maps a simulation step to a grid index.
- * The biomass grids are normalized upon construction, but care must be taken to have the all non-empty
- * grid locations match with {@code SeaTile} that have a BiomassLocal biology, otherwise biomass will be lost.
- * The biomass grids are stored in mutable {@code DoubleGrid2D} fields, but those should never be mutated, so
- * the class is safe to share between parallel simulations. Note that the {@code reallocate} method mutates
- * the tiles biomass arrays directly.
+ * Redistributes the biomass around according to a "schedule" that maps a simulation step to a grid
+ * index. The biomass grids are normalized upon construction, but care must be taken to have the all
+ * non-empty grid locations match with {@code SeaTile} that have a BiomassLocal biology, otherwise
+ * biomass will be lost. The biomass grids are stored in mutable {@code DoubleGrid2D} fields, but
+ * those should never be mutated, so the class is safe to share between parallel simulations. Note
+ * that the {@code reallocate} method mutates the tiles biomass arrays directly.
  */
 public class BiomassReallocator implements Steppable, AdditionalStartable {
 
-    private final ImmutableSortedMap<Integer, Map<String, DoubleGrid2D>> biomassDistributionGridsPerStep;
+    private final AllocationGrids<String> allocationGrids;
     private final int period;
 
     /**
-     * @param biomassDistributionGridsPerStep A map from time step to species names to biomass grid
-     * @param period                          The number to use as modulo for looping the schedule (normally 365)
+     * Constructs a new BiomassReallocator.
+     *
+     * @param allocationGrids The distribution grids used to reallocate biomass
+     * @param period          The number to use as modulo for looping the schedule (normally 365)
      */
     public BiomassReallocator(
-        final Map<Integer, Map<String, DoubleGrid2D>> biomassDistributionGridsPerStep,
+        final AllocationGrids<String> allocationGrids,
         final int period
     ) {
-        this.biomassDistributionGridsPerStep = biomassDistributionGridsPerStep.entrySet().stream()
-            .collect(toImmutableSortedMap(
-                Comparator.naturalOrder(),
-                Entry::getKey,
-                entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
-                    Entry::getKey,
-                    gridEntry -> normalize(gridEntry.getValue())
-                    )
-                )
-            ));
+        this.allocationGrids = allocationGrids;
         this.period = period;
     }
 
+    AllocationGrids<String> getAllocationGrids() {
+        return allocationGrids;
+    }
+
+    public int getPeriod() {
+        return period;
+    }
+
     /**
-     * @return a copy of {@code grid} where the values sum up to 1.0
+     * This is meant to be executed every step, but will only do the reallocation if we have one
+     * scheduled on that step.
      */
-    private static DoubleGrid2D normalize(final DoubleGrid2D grid) {
-        final double sum = Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum();
-        return new DoubleGrid2D(grid).multiply(1 / sum);
+    @Override
+    public void step(final SimState simState) {
+        final FishState fishState = (FishState) simState;
+        allocationGrids
+            .atStep(fishState.getStep() % period)
+            .ifPresent(grids -> {
+                final NauticalMap map = fishState.getMap();
+                final GlobalBiology globalBiology = fishState.getBiology();
+                performReallocation(
+                    globalBiology,
+                    map.getAllSeaTilesExcludingLandAsList(),
+                    getBiomassPerSpecies(globalBiology, map),
+                    grids
+                );
+            });
+    }
+
+    private static void performReallocation(
+        final GlobalBiology globalBiology,
+        final Collection<? extends SeaTile> seaTiles,
+        final Map<String, Double> biomassPerSpecies,
+        final Map<String, ? extends DoubleGrid2D> grids
+    ) {
+        final ImmutableMap<Integer, DoubleGrid2D> indexedBiomassGrids =
+            makeNewBiomassGrids(
+                grids,
+                biomassPerSpecies,
+                speciesName -> globalBiology.getSpecie(speciesName).getIndex()
+            );
+        seaTiles
+            .stream()
+            .filter(seaTile -> seaTile.getBiology() instanceof VariableBiomassBasedBiology)
+            .forEach(seaTile -> {
+                final double[] biomass =
+                    ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
+                indexedBiomassGrids.forEach(
+                    (i, grid) -> biomass[i] = grid.get(seaTile.getGridX(), seaTile.getGridY()));
+            });
     }
 
     private static ImmutableMap<Integer, DoubleGrid2D> makeNewBiomassGrids(
-        final Map<String, DoubleGrid2D> biomassDistributionGridPerSpeciesName,
+        final Map<String, ? extends DoubleGrid2D> biomassDistributionGridPerSpeciesName,
         final Map<String, Double> totalBiomassPerSpeciesName,
-        final ToIntFunction<String> getSpeciesIndex
+        final ToIntFunction<? super String> getSpeciesIndex
     ) {
         return biomassDistributionGridPerSpeciesName
             .entrySet()
@@ -106,76 +141,34 @@ public class BiomassReallocator implements Steppable, AdditionalStartable {
             .collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
 
-    /**
-     * Reallocates biomass but mutating the biomass array of sea tiles directly.
-     * Only affects tiles with a {@code BiomassLocalBiology}.
-     */
-    private static void reallocate(
-        final Map<Integer, DoubleGrid2D> indexedBiomassGrids,
-        final Collection<SeaTile> seaTiles
+    static ImmutableMap<String, Double> getBiomassPerSpecies(
+        final GlobalBiology globalBiology,
+        final NauticalMap nauticalMap
     ) {
-        seaTiles
-            .stream()
-            .filter(seaTile -> seaTile.getBiology() instanceof BiomassLocalBiology)
-            .forEach(seaTile -> {
-                final double[] biomass = ((VariableBiomassBasedBiology) seaTile.getBiology()).getCurrentBiomass();
-                indexedBiomassGrids.forEach((i, grid) -> biomass[i] = grid.get(seaTile.getGridX(), seaTile.getGridY()));
-            });
-    }
-
-    public Map<Integer, Map<String, DoubleGrid2D>> getBiomassDistributionGridsPerStep() {
-        return biomassDistributionGridsPerStep;
-    }
-
-    public int getPeriod() {
-        return period;
+        return globalBiology.getSpecies().stream().collect(toImmutableMap(
+            Species::getName,
+            nauticalMap::getTotalBiomass
+        ));
     }
 
     /**
-     * This is meant to be executed every step, but will do the reallocation if we have one scheduled on that step
-     */
-    @Override
-    public void step(final SimState simState) {
-        final FishState fishState = (FishState) simState;
-        final int step = fishState.getStep();
-        if (biomassDistributionGridsPerStep.containsKey(step % period)) {
-            final GlobalBiology globalBiology = fishState.getBiology();
-            final NauticalMap nauticalMap = fishState.getMap();
-            reallocate(step, globalBiology, nauticalMap);
-        }
-    }
-
-    public void reallocate(final int step, final GlobalBiology globalBiology, final NauticalMap nauticalMap) {
-        final ImmutableMap<String, Double> biomassPerSpecies =
-            globalBiology.getSpecies().stream().collect(toImmutableMap(
-                Species::getName,
-                nauticalMap::getTotalBiomass
-            ));
-        reallocate(step, biomassPerSpecies, globalBiology, nauticalMap.getAllSeaTilesExcludingLandAsList());
-    }
-
-    /**
-     * Reallocates biomass by mutating the biomass array of sea tiles directly.
-     * Only affects tiles with a {@code BiomassLocalBiology}.
+     * Reallocates biomass by mutating the biomass array of sea tiles directly. Only affects tiles
+     * with a {@code BiomassLocalBiology}.
      */
     public void reallocate(
         final int step,
-        final Map<String, Double> biomassPerSpecies,
         final GlobalBiology globalBiology,
-        final Collection<SeaTile> seaTiles
+        final Collection<? extends SeaTile> seaTiles,
+        final Map<String, Double> biomassPerSpecies
     ) {
-        Optional
-            .ofNullable(biomassDistributionGridsPerStep.floorEntry(step % period))
-            .ifPresent(entry -> {
-                final ImmutableMap<Integer, DoubleGrid2D> indexedBiomassGrids =
-                    makeNewBiomassGrids(
-                        entry.getValue(),
-                        biomassPerSpecies,
-                        speciesName -> globalBiology.getSpecie(speciesName).getIndex()
-                    );
-                System.out.printf("Reallocating biomass at step %d using grid %d\n", step, entry.getKey());
-                reallocate(indexedBiomassGrids, seaTiles);
-            });
+        allocationGrids
+            .atOrBeforeStep(step % period)
+            .ifPresent(grids -> performReallocation(
+                globalBiology,
+                seaTiles,
+                biomassPerSpecies,
+                grids
+            ));
     }
 
     @Override

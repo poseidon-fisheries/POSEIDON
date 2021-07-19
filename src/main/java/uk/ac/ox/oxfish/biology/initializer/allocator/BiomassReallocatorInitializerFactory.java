@@ -18,6 +18,22 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.toList;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.NoMovement;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -29,23 +45,6 @@ import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.stream.Collectors.toList;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class BiomassReallocatorInitializerFactory
     implements AlgorithmFactory<BiomassReallocatorInitializer> {
@@ -77,14 +76,16 @@ public class BiomassReallocatorInitializerFactory
         final Map<String, GridAllocator> initialAllocators =
             biomassReallocatorFactory
                 .apply(fishState)
-                .getBiomassDistributionGridsPerStep()
-                .get(0)
-                .entrySet()
-                .stream()
-                .collect(toImmutableMap(
-                    Entry::getKey,
-                    entry -> new GridAllocator(entry.getValue())
-                ));
+                .getAllocationGrids()
+                .atStep(0)
+                .map(grids -> grids.entrySet().stream()
+                    .collect(toImmutableMap(
+                        Entry::getKey,
+                        entry -> new GridAllocator(entry.getValue())
+                    )))
+                .orElseThrow(() ->
+                    new IllegalStateException("No allocation grids found for step 0")
+                );
 
         final List<SingleSpeciesBiomassInitializer> biomassInitializers =
             makeBiomassInitializers(initialAllocators, speciesCodes);
@@ -93,7 +94,10 @@ public class BiomassReallocatorInitializerFactory
     }
 
     /**
-     * @param initialAllocators A map from species names to allocators
+     * Creates biomass initializers by loading the relevant values from file.
+     *
+     * @param initialAllocators A map from species names to allocators.
+     * @param speciesCodes      The object to use to map species codes to names
      */
     @NotNull
     private List<SingleSpeciesBiomassInitializer> makeBiomassInitializers(
@@ -105,8 +109,10 @@ public class BiomassReallocatorInitializerFactory
             .map(r -> {
                 final String speciesName = speciesCodes.getSpeciesName(r.getString("species_code"));
                 final Double logisticGrowthRate = r.getDouble("logistic_growth_rate");
-                final Quantity<Mass> carryingCapacity = getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE);
-                final Quantity<Mass> totalBiomass = getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE);
+                final Quantity<Mass> carryingCapacity =
+                    getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE);
+                final Quantity<Mass> totalBiomass =
+                    getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE);
                 return new SingleSpeciesBiomassInitializer(
                     new ConstantInitialBiomass(asDouble(totalBiomass, KILOGRAM)),
                     initialAllocators.get(speciesName),
@@ -114,7 +120,8 @@ public class BiomassReallocatorInitializerFactory
                     new ConstantBiomassAllocator(Double.MAX_VALUE),
                     new NoMovement(),
                     speciesName,
-                    new FadAwareLogisticGrowerInitializer(asDouble(carryingCapacity, KILOGRAM), logisticGrowthRate, true),
+                    new FadAwareLogisticGrowerInitializer(asDouble(carryingCapacity, KILOGRAM),
+                        logisticGrowthRate, true),
                     false,
                     false
                 );
@@ -126,7 +133,8 @@ public class BiomassReallocatorInitializerFactory
         this.mapExtent = mapExtent;
     }
 
-    public void setBiomassReallocatorFactory(final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory) {
+    public void setBiomassReallocatorFactory(
+        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory) {
         this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
 }

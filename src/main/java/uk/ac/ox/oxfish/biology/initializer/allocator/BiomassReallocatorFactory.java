@@ -18,10 +18,30 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static com.google.common.collect.Ordering.natural;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.stream.Collectors.groupingBy;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.univocity.parsers.common.record.Record;
 import com.vividsolutions.jts.geom.Coordinate;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.DoubleGrid2D;
@@ -33,24 +53,8 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.ShapeFileImporterModified;
 
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.common.collect.Ordering.natural;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
 public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallocator> {
+
     // `equals` and `hashCode` need to be defined to use the objects of this class as cache keys
     // Using the factory object as cache key allows to always return the same object for the
     // same factory configuration.
@@ -66,15 +70,31 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
 
     @Override
     public int hashCode() {
-        return Objects.hash(speciesCodes, biomassDistributionsFilePath, biomassAreaShapeFile, mapExtent, startDate, endDate);
+        return Objects
+            .hash(
+                speciesCodes,
+                biomassDistributionsFilePath,
+                biomassAreaShapeFile,
+                mapExtent,
+                startDate,
+                endDate
+            );
     }
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         final BiomassReallocatorFactory that = (BiomassReallocatorFactory) o;
-        return Objects.equals(speciesCodes, that.speciesCodes) && Objects.equals(biomassDistributionsFilePath, that.biomassDistributionsFilePath) && Objects.equals(biomassAreaShapeFile, that.biomassAreaShapeFile) && Objects.equals(mapExtent, that.mapExtent) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+        return Objects.equals(speciesCodes, that.speciesCodes) && Objects
+            .equals(biomassDistributionsFilePath, that.biomassDistributionsFilePath) && Objects
+            .equals(biomassAreaShapeFile, that.biomassAreaShapeFile) && Objects
+            .equals(mapExtent, that.mapExtent) && Objects.equals(startDate, that.startDate)
+            && Objects.equals(endDate, that.endDate);
     }
 
     public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
@@ -95,6 +115,7 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
     public Path getBiomassAreaShapeFile() {
         return biomassAreaShapeFile;
     }
+
     @SuppressWarnings("unused")
     public void setBiomassAreaShapeFile(final Path biomassAreaShapeFile) {
         this.biomassAreaShapeFile = biomassAreaShapeFile;
@@ -137,7 +158,7 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
         }
     }
 
-    private Map<Integer, Map<String, DoubleGrid2D>> buildBiomassGrids() {
+    private AllocationGrids<String> buildBiomassGrids() {
         checkNotNull(this.speciesCodes);
         checkNotNull(this.mapExtent);
         checkNotNull(this.startDate);
@@ -163,24 +184,27 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
                     groupingBy(r -> speciesCodes.getSpeciesName(r.getString("species_code")))
                 ));
 
-        return recordsByDateAndSpeciesName.entrySet()
-            .stream()
-            .collect(toImmutableSortedMap(
-                natural(),
-                entry -> (int) DAYS.between(startDate, entry.getKey()),
-                entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
-                    Map.Entry::getKey,
-                    subEntry -> makeGrid(mapExtent, isInsideBiomassArea, subEntry.getValue())
+        return new AllocationGrids<>(
+            recordsByDateAndSpeciesName
+                .entrySet()
+                .stream()
+                .collect(toImmutableSortedMap(
+                    natural(),
+                    entry -> (int) DAYS.between(startDate, entry.getKey()),
+                    entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
+                        Map.Entry::getKey,
+                        subEntry -> makeGrid(mapExtent, isInsideBiomassArea, subEntry.getValue())
+                    ))
                 ))
-            ));
-
+        );
     }
 
     @NotNull
     private static GeomVectorField readShapeFile(final Path shapeFile) {
         final GeomVectorField biomassArea = new GeomVectorField();
         try {
-            ShapeFileImporterModified.read(shapeFile.toUri().toURL(), biomassArea, null, MasonGeometry.class);
+            ShapeFileImporterModified
+                .read(shapeFile.toUri().toURL(), biomassArea, null, MasonGeometry.class);
         } catch (final FileNotFoundException | MalformedURLException e) {
             throw new IllegalStateException(e);
         }
@@ -190,17 +214,27 @@ public class BiomassReallocatorFactory implements AlgorithmFactory<BiomassReallo
 
     private static DoubleGrid2D makeGrid(
         final MapExtent mapExtent,
-        final Predicate<Coordinate> isInsideBiomassArea,
-        final Iterable<Record> records
+        final Predicate<? super Coordinate> isInsideBiomassArea,
+        final Iterable<? extends Record> records
     ) {
-        final DoubleGrid2D grid = new DoubleGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
+        final DoubleGrid2D grid =
+            new DoubleGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
         records.forEach(record -> {
             final double lon = record.getDouble("lon");
             final double lat = record.getDouble("lat");
             final Coordinate coordinate = new Coordinate(lon, lat);
-            if (isInsideBiomassArea.test(coordinate))
+            if (isInsideBiomassArea.test(coordinate)) {
                 grid.set(mapExtent.toGridX(lon), mapExtent.toGridY(lat), record.getDouble("value"));
+            }
         });
-        return grid;
+        return normalize(grid);
+    }
+
+    /**
+     * Returns a copy of {@code grid} where the values sum up to 1.0
+     */
+    static DoubleGrid2D normalize(final DoubleGrid2D grid) {
+        final double sum = Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum();
+        return new DoubleGrid2D(grid).multiply(1 / sum);
     }
 }

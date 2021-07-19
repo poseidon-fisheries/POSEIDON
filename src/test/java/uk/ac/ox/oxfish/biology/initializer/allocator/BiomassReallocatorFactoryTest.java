@@ -45,8 +45,8 @@ public class BiomassReallocatorFactoryTest extends TestCase {
         biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(mock(FishState.class));
         assertEquals(365, biomassReallocator.getPeriod());
-        assertEquals(12, biomassReallocator.getBiomassDistributionGridsPerStep().size());
-        final Collection<Map<String, DoubleGrid2D>> biomassGrids = biomassReallocator.getBiomassDistributionGridsPerStep().values();
+        assertEquals(12, biomassReallocator.getAllocationGrids().size());
+        final Collection<Map<String, DoubleGrid2D>> biomassGrids = biomassReallocator.getAllocationGrids().values();
         biomassGrids.forEach(gridsPerSpecies -> {
             assertEquals(3, gridsPerSpecies.size());
             gridsPerSpecies.values().forEach(grid -> {
