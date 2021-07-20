@@ -24,6 +24,8 @@ import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertArrayEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocator.getBiomassPerSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -39,7 +41,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassReallocatorTest extends TestCase {
 
@@ -51,7 +53,7 @@ public class BiomassReallocatorTest extends TestCase {
                 new double[][] {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}}
             )
             .map(DoubleGrid2D::new)
-            .map(BiomassReallocatorFactory::normalize)
+            .map(AllocationGridsSupplier::normalize)
             .collect(toImmutableList());
 
         final GlobalBiology globalBiology = genericListOfSpecies(2);
@@ -80,11 +82,13 @@ public class BiomassReallocatorTest extends TestCase {
             3
         );
 
-        final List<SeaTile> seaTiles =
-            nauticalMap.getAllSeaTilesExcludingLandAsList();
         final Map<String, Double> biomassPerSpecies =
             getBiomassPerSpecies(globalBiology, nauticalMap);
-        biomassReallocator.reallocate(0, globalBiology, seaTiles, biomassPerSpecies);
+
+        final FishState fishState = mock(FishState.class);
+
+        when(fishState.getStep()).thenReturn(0);
+        biomassReallocator.reallocate(fishState, globalBiology, nauticalMap, biomassPerSpecies);
 
         assertEquals(
             ImmutableList.of(9.0, 9.0),
@@ -101,7 +105,8 @@ public class BiomassReallocatorTest extends TestCase {
             getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
         );
 
-        biomassReallocator.reallocate(1, globalBiology, seaTiles, biomassPerSpecies);
+        when(fishState.getStep()).thenReturn(1);
+        biomassReallocator.reallocate(fishState, globalBiology, nauticalMap, biomassPerSpecies);
 
         assertArrayEquals(
             new double[][] {{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
@@ -121,10 +126,11 @@ public class BiomassReallocatorTest extends TestCase {
             }
         });
 
+        when(fishState.getStep()).thenReturn(2);
         biomassReallocator.reallocate(
-            2,
+            fishState,
             globalBiology,
-            seaTiles,
+            nauticalMap,
             getBiomassPerSpecies(globalBiology, nauticalMap)
         );
 

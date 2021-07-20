@@ -42,7 +42,6 @@ public class BiomassReallocatorFactoryTest extends TestCase {
         final Path depthFile = TunaScenario.input("depth.csv");
         final MapInitializer mapInitializer = new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
-        biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(mock(FishState.class));
         assertEquals(365, biomassReallocator.getPeriod());
         assertEquals(12, biomassReallocator.getAllocationGrids().size());

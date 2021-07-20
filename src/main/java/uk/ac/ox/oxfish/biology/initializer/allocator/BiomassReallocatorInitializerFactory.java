@@ -134,7 +134,8 @@ public class BiomassReallocatorInitializerFactory
     }
 
     public void setBiomassReallocatorFactory(
-        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory) {
+        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory
+    ) {
         this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
 }

@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassRestorerFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -69,6 +70,7 @@ public class AdditionalStartables {
         NAMES.put(SimpleFishSamplerFactory.class, "Simple Fisher Sampler");
 
         NAMES.put(BiomassReallocatorFactory.class, "Biomass Reallocator");
+        NAMES.put(AbundanceReallocatorFactory.class, "Abundance Reallocator");
         NAMES.put(BiomassRestorerFactory.class, "Biomass Restorer");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);

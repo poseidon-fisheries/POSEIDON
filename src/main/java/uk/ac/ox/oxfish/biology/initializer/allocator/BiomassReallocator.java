@@ -20,7 +20,6 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 import com.google.common.collect.ImmutableMap;
@@ -29,15 +28,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -48,10 +44,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * those should never be mutated, so the class is safe to share between parallel simulations. Note
  * that the {@code reallocate} method mutates the tiles biomass arrays directly.
  */
-public class BiomassReallocator implements Steppable, AdditionalStartable {
-
-    private final AllocationGrids<String> allocationGrids;
-    private final int period;
+public class BiomassReallocator extends Reallocator<String> {
 
     /**
      * Constructs a new BiomassReallocator.
@@ -63,37 +56,21 @@ public class BiomassReallocator implements Steppable, AdditionalStartable {
         final AllocationGrids<String> allocationGrids,
         final int period
     ) {
-        this.allocationGrids = allocationGrids;
-        this.period = period;
+        super(allocationGrids, period);
     }
 
-    AllocationGrids<String> getAllocationGrids() {
-        return allocationGrids;
-    }
-
-    public int getPeriod() {
-        return period;
-    }
-
-    /**
-     * This is meant to be executed every step, but will only do the reallocation if we have one
-     * scheduled on that step.
-     */
     @Override
-    public void step(final SimState simState) {
-        final FishState fishState = (FishState) simState;
-        allocationGrids
-            .atStep(fishState.getStep() % period)
-            .ifPresent(grids -> {
-                final NauticalMap map = fishState.getMap();
-                final GlobalBiology globalBiology = fishState.getBiology();
-                performReallocation(
-                    globalBiology,
-                    map.getAllSeaTilesExcludingLandAsList(),
-                    getBiomassPerSpecies(globalBiology, map),
-                    grids
-                );
-            });
+    void performReallocation(
+        final GlobalBiology globalBiology,
+        final NauticalMap nauticalMap,
+        final Map<String, ? extends DoubleGrid2D> grids
+    ) {
+        performReallocation(
+            globalBiology,
+            nauticalMap.getAllSeaTilesExcludingLandAsList(),
+            getBiomassPerSpecies(globalBiology, nauticalMap),
+            grids
+        );
     }
 
     private static void performReallocation(
@@ -151,28 +128,20 @@ public class BiomassReallocator implements Steppable, AdditionalStartable {
         ));
     }
 
-    /**
-     * Reallocates biomass by mutating the biomass array of sea tiles directly. Only affects tiles
-     * with a {@code BiomassLocalBiology}.
-     */
-    public void reallocate(
-        final int step,
+    void reallocate(
+        final FishState fishState,
         final GlobalBiology globalBiology,
-        final Collection<? extends SeaTile> seaTiles,
-        final Map<String, Double> biomassPerSpecies
+        final NauticalMap nauticalMap,
+        final Map<String, Double> biomassToReallocate
     ) {
-        allocationGrids
-            .atOrBeforeStep(step % period)
+        getAllocationGrids()
+            .atOrBeforeStep(fishState.getStep() % getPeriod())
             .ifPresent(grids -> performReallocation(
                 globalBiology,
-                seaTiles,
-                biomassPerSpecies,
+                nauticalMap.getAllSeaTilesExcludingLandAsList(),
+                biomassToReallocate,
                 grids
             ));
     }
 
-    @Override
-    public void start(final FishState fishState) {
-        fishState.scheduleEveryStep(this, DAWN);
-    }
 }

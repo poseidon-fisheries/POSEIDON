@@ -38,7 +38,7 @@ class AllocationGrids<K> {
     // map from step to species name to grid
     private final ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> grids;
 
-    AllocationGrids(
+    private AllocationGrids(
         final ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> grids
     ) {
         // Make sure all grids sum to 1.

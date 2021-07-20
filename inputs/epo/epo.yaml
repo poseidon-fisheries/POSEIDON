@@ -1,0 +1,16 @@
+EPO:
+  abundanceReallocatorInitializerFactory:
+    abundanceReallocatorFactory:
+      Abundance Reallocator:
+        biomassDistributionsFilePath: inputs/epo/grids.csv
+        period: 365
+        speciesCodesFilePath: inputs/epo/species_codes.csv
+    binsFilePath: inputs/epo/bins.csv
+    speciesCodesFilePath: inputs/epo/species_codes.csv
+  mapInitializerFactory:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo/depth.csv
+      mapPaddingInDegrees: '0.5'

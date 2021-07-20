@@ -51,7 +51,8 @@ public class BiomassRestorer implements AdditionalStartable {
                 schedule(fishState1, restoringStep, POLICY_UPDATE, fishState2 -> {
                     System.out
                         .printf("Restoring biomass recorded at step %d at step %d\n", recordingStep,
-                            fishState2.getStep());
+                            fishState2.getStep()
+                        );
                     restoreBiomass(recordedBiomass, fishState2);
                 });
             })
@@ -95,12 +96,15 @@ public class BiomassRestorer implements AdditionalStartable {
                         : fadMap.getTotalBiomass(globalBiology.getSpecie(entry.getKey()))
                     )
                 ));
+
         biomassReallocator.reallocate(
-            fishState.getStep(),
+            fishState,
             globalBiology,
-            nauticalMap.getAllSeaTilesExcludingLandAsList(),
+            nauticalMap,
             biomassToReallocate
         );
+
     }
+
 
 }

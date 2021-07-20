@@ -25,16 +25,21 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
-import uk.ac.ox.oxfish.biology.initializer.TunaAbundanceInitializerFactory;
+import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocatorFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -46,13 +51,22 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class EpoScenario implements Scenario {
 
     private static final Path INPUT_PATH = Paths.get("inputs", "epo");
-
-    private AlgorithmFactory<? extends BiologyInitializer> biologyInitializerFactory =
-        new TunaAbundanceInitializerFactory(
+    private Set<AdditionalStartable> additionalStartables = new HashSet<>();
+    private AbundanceInitializerFactory abundanceInitializerFactory =
+        new AbundanceInitializerFactory(
             INPUT_PATH.resolve("species_codes.csv"),
-            INPUT_PATH.resolve("bins.csv")
+            INPUT_PATH.resolve("bins.csv"),
+            new AbundanceReallocatorFactory(
+                INPUT_PATH.resolve("species_codes.csv"),
+                INPUT_PATH.resolve("grids.csv"),
+                365,
+                ImmutableMap.of(
+                    "Skipjack tuna", 14,
+                    "Bigeye tuna", 8,
+                    "Yellowfin tuna", 9
+                )
+            )
         );
-
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             INPUT_PATH.resolve("depth.csv"),
@@ -73,14 +87,27 @@ public class EpoScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializerFactory() {
-        return biologyInitializerFactory;
+    public Set<AdditionalStartable> getAdditionalStartables() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return additionalStartables;
     }
 
     @SuppressWarnings("unused")
-    public void setBiologyInitializerFactory(
-        final AlgorithmFactory<? extends BiologyInitializer> biologyInitializerFactory) {
-        this.biologyInitializerFactory = biologyInitializerFactory;
+    public void setAdditionalStartables(final Set<AdditionalStartable> additionalStartables) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.additionalStartables = additionalStartables;
+    }
+
+    @SuppressWarnings("unused")
+    public AbundanceInitializerFactory getAbundanceReallocatorInitializerFactory() {
+        return abundanceInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceReallocatorInitializerFactory(
+        final AbundanceInitializerFactory abundanceInitializerFactory
+    ) {
+        this.abundanceInitializerFactory = abundanceInitializerFactory;
     }
 
     @Override
@@ -88,20 +115,26 @@ public class EpoScenario implements Scenario {
 
         final MersenneTwisterFast rng = fishState.getRandom();
 
-        final BiologyInitializer biologyInitializer =
-            biologyInitializerFactory.apply(fishState);
-
-        final GlobalBiology globalBiology =
-            biologyInitializer.generateGlobal(rng, fishState);
-
         final NauticalMap nauticalMap =
             mapInitializerFactory
                 .apply(fishState)
-                .makeMap(fishState.random, globalBiology, fishState);
+                .makeMap(fishState.random, null, fishState);
+
+        abundanceInitializerFactory
+            .getAbundanceReallocatorFactory()
+            .setMapExtent(new MapExtent(nauticalMap));
+
+        final AbundanceInitializer abundanceInitializer =
+            abundanceInitializerFactory.apply(fishState);
+
+        additionalStartables.add(abundanceInitializer.getAbundanceReallocator());
+
+        final GlobalBiology globalBiology =
+            abundanceInitializer.generateGlobal(rng, fishState);
 
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
-        nauticalMap.initializeBiology(biologyInitializer, rng, globalBiology);
-        biologyInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
+        nauticalMap.initializeBiology(abundanceInitializer, rng, globalBiology);
+        abundanceInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -127,6 +160,8 @@ public class EpoScenario implements Scenario {
                 0
             ));
 
+        additionalStartables.forEach(fishState::registerStartable);
+
         return new ScenarioPopulation(population, network, fisherFactories);
     }
 
@@ -137,7 +172,8 @@ public class EpoScenario implements Scenario {
 
     @SuppressWarnings("unused")
     public void setMapInitializerFactory(
-        final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
+        final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
+    ) {
         this.mapInitializerFactory = mapInitializerFactory;
     }
 }
