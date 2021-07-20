@@ -1,8 +1,7 @@
 POSEIDON
 ========
 
-
-![travis passing, for sure](https://api.travis-ci.org/CarrKnight/POSEIDON.svg?branch=master)
+[![tests](https://github.com/CarrKnight/POSEIDON/actions/workflows/tests.yml/badge.svg)](https://github.com/CarrKnight/POSEIDON/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/CarrKnight/POSEIDON/branch/master/graph/badge.svg)](https://codecov.io/gh/CarrKnight/POSEIDON)
 
 This is the code for POSEIDON, a fishery agent-based model; currently under review but open-source under GPL.
 For all intents and purposes please consider this code pre-alpha.   
