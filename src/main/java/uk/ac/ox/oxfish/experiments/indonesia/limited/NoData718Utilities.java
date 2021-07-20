@@ -59,6 +59,7 @@ import java.util.function.Function;
 public class NoData718Utilities {
 
 
+
         static final AlgorithmFactory<? extends AdditionalStartable>  CORRECT_LIFE_HISTORIES_CONSUMER(Scenario scenario) {
 
                 final FlexibleScenario flexible = (FlexibleScenario) scenario;
@@ -372,7 +373,7 @@ public class NoData718Utilities {
         static public LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> lbsprMsePolicies = buildLBSPRPolicies(false,
                 false);
 
-        static private LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(
+        static protected LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> buildLBSPRPolicies(
                 boolean blockEntryWhenSeasonIsNotFull, boolean fewRuns){
 
                 LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> toReturn = new LinkedHashMap<>();
@@ -786,7 +787,46 @@ public class NoData718Utilities {
 //                );
 
         }
+        public static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> processor_simple = new LinkedHashMap<>();
+        static{
+                processor_simple.put(
+                        "BAU",
+                        shockYear -> scenario -> {
+                        }
 
+                );
+                processor_simple.put(
+                        150+"_days_noentry",
+                        shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                new String[]{"population0", "population1", "population2"}
+                                , 150, false).andThen(
+                                NoDataPolicy.removeEntry(shockYear)
+                        )
+
+                );
+
+
+
+                processor_simple.put(
+                        150+"_days_noentry_split",
+                        shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                                new String[]{"population0", "population1", "population2"}
+                                , 150, true).andThen(
+                                NoDataPolicy.removeEntry(shockYear)
+                        )
+
+                );
+
+                processor_simple.put(
+                        60+"_pause_noentry",
+                        shockYear -> NoDataPolicy.buildPauseRegulation(shockYear,
+                                new String[]{"population0", "population1", "population2"}
+                                , 60).andThen(
+                                NoDataPolicy.removeEntry(shockYear)
+                        )
+
+                );
+        }
 
 
 }

@@ -72,7 +72,7 @@ public class NoData718Slice7Policy {
         // ADDITIONAL_COLUMNS.add("LoptEffortPolicy output");
 //        ADDITIONAL_COLUMNS.add("LBSPREffortPolicy output");
         //need to add a lot of multidens collectors here....
-       // String species = "Pristipomoides multidens";
+        // String species = "Pristipomoides multidens";
         for(String species : NoData718Slice2PriceIncrease.speciesToSprAgent.keySet()){
             final String agent = NoData718Slice2PriceIncrease.speciesToSprAgent.get(species);
             Preconditions.checkNotNull(agent, "species has no agent!");
@@ -95,6 +95,55 @@ public class NoData718Slice7Policy {
 
     }
 
+    private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> majorPolicies = new LinkedHashMap<>();
+    static {
+        for (int cmShift : new int[]{6, 8}) {
+            majorPolicies.put("cmshift_reallyallboats_allspecies_" + cmShift,
+                    selectivityShiftSimulations(cmShift, 3, 1.0)
+
+            );
+        }
+        majorPolicies.put("BAU",addSPRAgents());
+
+
+        majorPolicies.put(
+                "noentry",
+                shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                        new String[]{"population0", "population1", "population2"}
+                        , 999, false).andThen(
+                        NoDataPolicy.removeEntry(shockYear)
+                )
+
+        );
+
+        int daysToTry[] = new int[]{250,200,150,100,50,25,0};
+        for(int days : daysToTry) {
+            int finalDays = days;
+            majorPolicies.put(
+                    days+"_days_noentry",
+                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                            new String[]{"population0", "population1", "population2"}
+                            , finalDays, false).andThen(
+                            NoDataPolicy.removeEntry(shockYear)
+                    )
+
+            );
+        }
+        for(int days : new int[]{200,100,   50}) {
+            int finalDays = days;
+            majorPolicies.put(
+                    days+"_days_yesentry",
+                    shockYear -> NoDataPolicy.buildMaxDaysRegulation(shockYear,
+                            new String[]{"population0", "population1", "population2"}
+                            , finalDays, false)
+            );
+
+        }
+        final LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> lbsprs =
+                NoData718Utilities.buildLBSPRPolicies(false, true);
+        majorPolicies.putAll(lbsprs);
+
+    }
 
 
     private final static int[] validShifts = new int[]{12,0,8,6,2,20};
@@ -105,12 +154,12 @@ public class NoData718Slice7Policy {
 
         for(int cmShift:validShifts) {
             simpleSelectivityShift.put("cmshift_reallyallboats_allspecies_" + cmShift,
-                    selectivityShiftSimulations(cmShift, 3)
+                    selectivityShiftSimulations(cmShift, 3, 1.0)
 
             );
 
             simpleSelectivityShift.put("cmshift_allboats_allspecies_" + cmShift,
-                    selectivityShiftSimulations(cmShift, 2)
+                    selectivityShiftSimulations(cmShift, 2, 1.0)
 
             );
 //            simpleSelectivityShift.put("cmshift_faroff_allspecies_" + cmShift,
@@ -122,8 +171,25 @@ public class NoData718Slice7Policy {
 
     }
 
+
+    private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> percentageSelectivityShift =
+            new LinkedHashMap<>();
+    static {
+        int cmShift = 6;
+        for(double takeupRatio : new double[]{1.0,0.9,0.8,0.7,0.5,0.25,0}) {
+            percentageSelectivityShift.put("cmshift_reallyallboats_allspecies_" + cmShift +"_adoption_" + takeupRatio,
+                    selectivityShiftSimulations(cmShift, 3, takeupRatio)
+
+            );
+
+        }
+
+
+    }
+
     @NotNull
-    private static Function<Integer, Consumer<Scenario>> selectivityShiftSimulations(int finalCmShift, final int howManyPopulations) {
+    private static Function<Integer, Consumer<Scenario>> selectivityShiftSimulations(int finalCmShift, final int howManyPopulations,
+                                                                                     double probabilityOfAdoptingGear) {
         return yearOfShock -> scenario -> {
             final FlexibleScenario cast = ((FlexibleScenario) scenario);
             //add some more interesting trackers
@@ -196,7 +262,7 @@ public class NoData718Slice7Policy {
                                             {
                                                 final SimpleDomeShapedGearFactory domed = (SimpleDomeShapedGearFactory) individualGear.getValue();
                                                 domed.setLengthFullSelectivity( new FixedDoubleParameter(
-                                                        ((FixedDoubleParameter) domed.getLengthFullSelectivity()).getFixedValue() + finalCmShift
+                                                                ((FixedDoubleParameter) domed.getLengthFullSelectivity()).getFixedValue() + finalCmShift
                                                         )
                                                 );
                                                 System.out.println("dome selectivity shifted by " + finalCmShift);
@@ -224,16 +290,30 @@ public class NoData718Slice7Policy {
 
                                         //all new boats will use this
                                         final String populationTag = "population" + populations;
+                                        final AlgorithmFactory<? extends Gear> currentGear = fishState.getFisherFactory(populationTag).getGear();
                                         fishState.getFisherFactory(populationTag).setGear(
-                                                gearFactory
+                                                new AlgorithmFactory<Gear>() {
+                                                    @Override
+                                                    public Gear apply(FishState fishState) {
+                                                        if(fishState.getRandom().nextDouble()<probabilityOfAdoptingGear){
+                                                            return gearFactory.apply(fishState);
+                                                        }
+                                                        else
+                                                            return currentGear.apply(fishState);
+
+
+                                                    }
+                                                }
                                         );
-                                        //all old boats will use this
+                                        //each boat has a fixed % chance of using this
                                         fishState.getFishers().stream().
                                                 filter(fisher -> fisher.getTags().contains(populationTag)).forEach(
                                                 new Consumer<Fisher>() {
                                                     @Override
                                                     public void accept(Fisher fisher) {
-                                                        fisher.setGear(((DelayGearDecoratorFactory) gearFactory).apply(fishState));
+                                                        if(fishState.getRandom().nextDouble()<probabilityOfAdoptingGear) {
+                                                            fisher.setGear(((DelayGearDecoratorFactory) gearFactory).apply(fishState));
+                                                        }
                                                     }
                                                 }
                                         );
@@ -251,7 +331,7 @@ public class NoData718Slice7Policy {
         };
     }
 
-    private static final int[] SPR_AGENT_NUMBERS = new int[]{2,3,5,10,20,50,100,9999};
+    private static final int[] SPR_AGENT_NUMBERS = new int[]{1,2,3,5,10,20,50,100,9999};
 
     @NotNull
     private static Function<Integer, Consumer<Scenario>> addSPRAgents() {
@@ -277,7 +357,7 @@ public class NoData718Slice7Policy {
                                 "      tagsToSample:\n" +
                                 "        population0: " + numberOfAgents + "\n" +
                                 "        population1: " + numberOfAgents + "\n" +
-                                "        population2: 0";
+                                "        population2: " + numberOfAgents;
                 FishYAML yaml = new FishYAML();
                 cast.getPlugins().add(yaml.loadAs(sprAgent,
                         AlgorithmFactory.class));
@@ -294,18 +374,13 @@ public class NoData718Slice7Policy {
         checkSPRDifferentials.put("5cmshifted_observed", new Function<Integer, Consumer<Scenario>>() {
             @Override
             public Consumer<Scenario> apply(Integer integer) {
-                return selectivityShiftSimulations(5,2).apply(integer).andThen(addSPRAgents().apply(0));
+                return selectivityShiftSimulations(5,2, 1.0).apply(integer).andThen(addSPRAgents().apply(0));
             }
         });
 
 
 
     }
-
-
-    private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> simulatedPolicies =
-            simpleSelectivityShift;
-    // NoData718Utilities.simpleSelectivityShift;
 
 
     private static LinkedList<String> dailyColumnsToPrint = new LinkedList<>();
@@ -351,7 +426,7 @@ public class NoData718Slice7Policy {
                                     fleetFilters.add(new LogisticSimpleFilter(true,false,
                                             logisticFactory.getSelexParameter1().apply(model.getRandom()),
                                             logisticFactory.getSelexParameter2().apply(model.getRandom())
-                                            ));
+                                    ));
 
                                 }
                             }
@@ -388,6 +463,26 @@ public class NoData718Slice7Policy {
                     columns,
                     additionalPlugins, null);
         }
+        else if(args[0].equals("selectivity_takeup")) {
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            for (String agents : new String[]{"spr_agent_agent_onlygillnetters","spr_agent_agent_onlylongliners"}) {
+                columns.add( "SPR Lutjanus malabaricus " + agents);
+                columns.add( "Mean Length Caught Lutjanus malabaricus " + agents);
+                columns.add( "CPUE Lutjanus malabaricus " + agents);
+                columns.add( "M/K ratio Lutjanus malabaricus " + agents);
+                columns.add( "Percentage Mature Catches Lutjanus malabaricus " + agents);
+                columns.add( "Percentage Lopt Catches Lutjanus malabaricus " + agents);
+            }
+
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_percentage").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("selectivityshift_percentage"),
+                    percentageSelectivityShift,
+                    columns,
+                    additionalPlugins, null);
+        }
         else if(args[0].equals("sprnumbers")){
 
             final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
@@ -413,6 +508,28 @@ public class NoData718Slice7Policy {
                     CANDIDATES_CSV_FILE.toFile(),
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("season_simple"),
                     NoData718Utilities.nonAdaptiveEffort,
+                    columns,
+                    additionalPlugins, dailyColumnsToPrint);
+        }
+        else if(args[0].equals("processor_simple")){
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("processor_simple").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("processor_simple"),
+                    NoData718Utilities.processor_simple,
+                    columns,
+                    additionalPlugins, dailyColumnsToPrint);
+        }
+        else if(args[0].equals("major_policies")){
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies"),
+                    majorPolicies,
                     columns,
                     additionalPlugins, dailyColumnsToPrint);
         }

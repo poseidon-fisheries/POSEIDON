@@ -160,7 +160,7 @@ public class NoDataPolicy {
                                                         else{
                                                             final TemporaryRegulation lateStart =
                                                                     new TemporaryRegulation(
-                                                                            100,
+                                                                            150,
                                                                             400,
                                                                             new MaxHoursOutRegulation(
                                                                                     new ProtectedAreasOnly(),

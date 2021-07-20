@@ -35,11 +35,12 @@ public class NoData718Slice7Calibration {
     public static void calibrate() throws IOException {
 
         FishYAML yaml = new FishYAML();
-        final NoData718Slice6OptimizationProblem optiProblem = yaml.loadAs(new FileReader(
-                                                                                   Paths.get("docs", "indonesia_hub/runs/718/slice7limited",
-                                                                                             OPTIMIZATION_FILE).toFile()
-                                                                           ),
-                                                                           NoData718Slice6OptimizationProblem.class);
+        final NoData718Slice6OptimizationProblem optiProblem =
+                yaml.loadAs(new FileReader(
+                                Paths.get("docs", "indonesia_hub/runs/718/slice7limited",
+                                        OPTIMIZATION_FILE).toFile()
+                        ),
+                        NoData718Slice6OptimizationProblem.class);
 
         //  int type = Integer.parseInt();
         int parallelThreads = 2;
@@ -73,7 +74,7 @@ public class NoData718Slice7Calibration {
                         individual.setDoublePhenotype(convertedLine);
 
                         population.replaceIndividualAt(scenarioNumber,
-                                                       individual);
+                                individual);
                     }
                 }
 
@@ -98,7 +99,7 @@ public class NoData718Slice7Calibration {
         params.setTerminator(new EvaluationTerminator(50000));
 
         OptimizerRunnable runnable = new OptimizerRunnable(params,
-                                                           "eva"); //ignored, we are outputting to window
+                "eva"); //ignored, we are outputting to window
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
         runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
@@ -107,7 +108,7 @@ public class NoData718Slice7Calibration {
         String name = "additional";
 
         FileWriter writer = new FileWriter(Paths.get("docs",
-                                                     "indonesia_hub/runs/718/slice7limited").
+                "indonesia_hub/runs/718/slice7limited").
                 resolve("calibration_log_"+ name+".log").toFile());
         runnable.setTextListener(new InterfaceTextListener() {
             @Override
@@ -140,7 +141,7 @@ public class NoData718Slice7Calibration {
     }
 
     public static Path MAIN_DIRECTORY = Paths.get("docs",
-                                                  "indonesia_hub/runs/718/slice7limited");
+            "indonesia_hub/runs/718/slice7limited");
 
 
 
