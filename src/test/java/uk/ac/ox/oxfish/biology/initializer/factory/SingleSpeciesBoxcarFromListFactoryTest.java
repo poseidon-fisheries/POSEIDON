@@ -2,8 +2,11 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
+import org.jfree.util.Log;
+import org.jfree.util.LogTarget;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
+import org.mockito.ArgumentCaptor;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;
@@ -14,7 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SingleSpeciesBoxcarFromListFactoryTest {
@@ -43,17 +48,18 @@ public class SingleSpeciesBoxcarFromListFactoryTest {
     @Test
     public void tooFewBins() {
 
+        // Add a fake logger
+        final LogTarget logTarget = mock(LogTarget.class);
+        Log.getInstance().addTarget(logTarget);
 
-        //puts in the population we put out
-        double[] populationArray = {1000.6980456204348, 6.121015839632853};
-        assertThrows(IllegalArgumentException.class,
-                new ThrowingRunnable() {
-                    @Override
-                    public void run() throws Throwable {
-                        buildPopulation(populationArray);
-                    }
-                }
-        );
+        final double[] populationArray = new double[20];
+        buildPopulation(populationArray);
+
+        final ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        verify(logTarget).log(anyInt(), captor.capture());
+        assertTrue(captor.getAllValues().contains(
+            "The number of bins provided given their width won't reach l-infinity..."
+        ));
 
     }
 
