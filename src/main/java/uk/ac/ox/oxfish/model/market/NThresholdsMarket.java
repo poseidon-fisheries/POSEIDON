@@ -14,11 +14,32 @@ import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 
 /**
- * basically a generalization of the "ThreePricesMarket":
- * depending on which bin you are, you get a different price
+ * An old way to construct flexible price markets which is now kind of a facade
+ * except it bootstraps its own price when setting a price
  */
-public class NThresholdsMarket implements MarketWithCounter {
+public class NThresholdsMarket extends FlexibleAbundanceMarket {
 
+    public static final PricingStrategy PLACE_HOLDER_SINGLETON = new PricingStrategy() {
+        @Override
+        public double getPricePerKg(Species speciesBeingSold, Fisher seller, int biologicalBin, double quantitySold) {
+            throw new RuntimeException("Price not setup yet!");
+        }
+
+        @Override
+        public void reactToSale(TradeInfo info) {
+
+        }
+
+        @Override
+        public double getMarginalPrice() {
+            return 0;
+        }
+
+        @Override
+        public void start(FishState model) {
+
+        }
+    };
     /**
      * say we have a price for fish below bin 5, between bin 5 and 10, and 11 or above
      * then here we would have [5,10]
@@ -31,16 +52,13 @@ public class NThresholdsMarket implements MarketWithCounter {
      */
     final private double pricePerSegment[];
 
-    /**
-     * just a simple variable averaging the price per segment. Meaningless but returned when asked for marginal price
-     */
-    final private double averageHeadPrice;
 
-
-    private  PerBinMarket delegate;
 
     public NThresholdsMarket(int[] binThresholds, double[] pricePerSegment)
     {
+        //until you set a species you can't set prices. This is okay
+        //because it's also the behaviour of the general AbstractMarket
+        super(PLACE_HOLDER_SINGLETON);
         this.binThresholds = binThresholds;
         //all the bins must be in order already!
         for (int i = 1; i < binThresholds.length; i++) {
@@ -50,24 +68,25 @@ public class NThresholdsMarket implements MarketWithCounter {
         this.pricePerSegment = pricePerSegment;
         Preconditions.checkArgument(this.pricePerSegment.length==this.binThresholds.length+1);
 
-        averageHeadPrice = Arrays.stream(pricePerSegment).average().getAsDouble();
     }
 
     @Override
     public void setSpecies(Species species) {
-        double[] pricePerBin = new double[species.getNumberOfBins()];
-        for(int age =0; age<species.getNumberOfBins();age++) {
-            //look for the correct bin
-            pricePerBin[age] = pricePerSegment[0];
-            for (int i = 0; i < binThresholds.length; i++) {
-                if (age > binThresholds[i])
-                    pricePerBin[age] = pricePerSegment[i + 1];
-                else
-                    break;
+        super.setSpecies(species);
+        if(getPricingStrategy()==PLACE_HOLDER_SINGLETON) {
+            double[] pricePerBin = new double[species.getNumberOfBins()];
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
+                //look for the correct bin
+                pricePerBin[age] = pricePerSegment[0];
+                for (int i = 0; i < binThresholds.length; i++) {
+                    if (age > binThresholds[i])
+                        pricePerBin[age] = pricePerSegment[i + 1];
+                    else
+                        break;
+                }
             }
+            setPricingStrategy(new PerBinPricingStrategy(pricePerBin));
         }
-        delegate = new PerBinMarket(pricePerBin);
-        delegate.setSpecies(species);
     }
 
     static public NThresholdsMarket ThreePricesMarket(
@@ -84,38 +103,8 @@ public class NThresholdsMarket implements MarketWithCounter {
         );
     }
 
-    @Override
-    public TradeInfo sellFish(Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species) {
-        return delegate.sellFish(hold, fisher, regulation, state, species);
-    }
-
-    @Override
-    public TimeSeries<Market> getData() {
-        return delegate.getData();
-    }
-
-    @Override
-    public Species getSpecies() {
-        return delegate.getSpecies();
-    }
-
-    @Override
-    public boolean isStarted() {
-        return delegate.isStarted();
-    }
 
 
-    @Override
-    public double getMarginalPrice() {
-        //simply returns the average price, since we don't really know much better
-
-        return delegate.getMarginalPrice();
-    }
-
-    @Override
-    public void start(FishState state) {
-        delegate.start(state);
-    }
 
     public int[] getBinThresholds() {
         return binThresholds;
@@ -126,8 +115,4 @@ public class NThresholdsMarket implements MarketWithCounter {
     }
 
 
-    @Override
-    public Counter getDailyCounter() {
-        return delegate.getDailyCounter();
-    }
 }

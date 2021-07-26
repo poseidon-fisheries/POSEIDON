@@ -11,8 +11,9 @@ public class SalehBayCalibration {
 
 
     public static final int SCENARIOS_TO_RUN = 100;
+    public static final String CALIBRATION_DIRECTORY_NAME = "calibration";
 
-    static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/diding");
+    static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/diding/slice2");
 
     public static void main(String[] args) throws IOException {
         //calibration(args);
@@ -27,7 +28,7 @@ public class SalehBayCalibration {
         writer.flush();
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++){
             System.out.println(hotstart);
-            final Path optimized = MAIN_DIRECTORY.resolve("hotstarts_three").resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
+            final Path optimized = MAIN_DIRECTORY.resolve("calibration").resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
             if(optimized.toFile().exists()) {
                 if (checkError(optimized) < 10) {
                     System.out.println("Accepted!");
@@ -44,7 +45,7 @@ public class SalehBayCalibration {
 
 
     private static void calibration(String[] args) throws IOException {
-        int startingScenario = 0;
+        int startingScenario = 1;
         int scenariosToRun = SCENARIOS_TO_RUN;
         if(args.length == 1) {
             startingScenario = Integer.parseInt(args[0]);
@@ -52,7 +53,7 @@ public class SalehBayCalibration {
         }
         //calibration
         for (int hotstart = startingScenario; hotstart < scenariosToRun; hotstart++) {
-            MeraFakeOMHotstarts.calibrate(MAIN_DIRECTORY.resolve("hotstarts_three").
+            MeraFakeOMHotstarts.calibrate(MAIN_DIRECTORY.resolve(CALIBRATION_DIRECTORY_NAME).
                     resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 50, 20, 3);
         }
     }

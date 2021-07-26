@@ -100,4 +100,8 @@ public class StartingMPA {
     public void setHeight(int height) {
         this.height = height;
     }
+
+    public static void quicklyAddMPAToSeaTile(SeaTile tile){
+        tile.assignMpa(NauticalMap.MPA_SINGLETON);
+    }
 }

@@ -38,8 +38,10 @@ public class SingleSpeciesRegularBoxcarFactory extends SingleSpeciesBoxcarAbstra
 
     @Override
     protected GrowthBinByList generateBins(FishState state) {
-        if(getCmPerBin() * getNumberOfBins() + getCmPerBin()/2 >= getLInfinity().apply(state.getRandom()))
+        if(getCmPerBin() * getNumberOfBins() + getCmPerBin()/2 <= getLInfinity().apply(state.getRandom()))
             Log.warn("The number of bins provided given their width won't reach l-infinity...");
+        Preconditions.checkArgument(getCmPerBin() * getNumberOfBins() + getCmPerBin()/2 >=  getLInfinity().apply(state.getRandom())/2,
+                "bins do not reach even half of L_infinity. The biology is inconsistent!");
         EquallySpacedBertalanffyFactory  meristic = new EquallySpacedBertalanffyFactory();
         meristic.setCmPerBin(getCmPerBin());
         meristic.setNumberOfBins(getNumberOfBins());

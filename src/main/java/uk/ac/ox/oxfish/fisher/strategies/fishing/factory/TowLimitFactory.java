@@ -52,7 +52,7 @@ public class TowLimitFactory implements AlgorithmFactory<MaximumDaysDecorator> {
         return
                 new MaximumDaysDecorator(
                 new TowLimitFishingStrategy(towLimits.apply(state.getRandom()).intValue()),
-                maxDaysOut.apply(state.getRandom()).intValue()
+                maxDaysOut.apply(state.getRandom()).doubleValue()
                 );
     }
 

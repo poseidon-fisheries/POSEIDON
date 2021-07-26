@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.mapmakers;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.io.Files;
 import com.vividsolutions.jts.geom.Envelope;
@@ -70,15 +71,28 @@ public class FromFileMapInitializer implements MapInitializer {
      */
     final private boolean latLong;
 
+    /**
+     * additional information to force certain tiles to be of a specific depth.
+     * Useful to model straits that are too narrow and would get pixeliz
+     */
+    final private Table<Integer,Integer,Double> overridenDepths;
 
     public FromFileMapInitializer(
         Path filePath, int gridWidthInCells, double mapPaddingInDegrees, boolean header, boolean latLong
+    ) {
+       this(filePath,gridWidthInCells,mapPaddingInDegrees,header,latLong,HashBasedTable.create(1,1));
+    }
+
+    public FromFileMapInitializer(
+            Path filePath, int gridWidthInCells, double mapPaddingInDegrees, boolean header, boolean latLong,
+            Table<Integer,Integer,Double> overridenDepths
     ) {
         this.filePath = filePath;
         this.gridWidthInCells = gridWidthInCells;
         this.mapPaddingInDegrees = mapPaddingInDegrees;
         this.header = header;
         this.latLong = latLong;
+       this.overridenDepths = overridenDepths;
     }
 
     @Override
@@ -136,6 +150,14 @@ public class FromFileMapInitializer implements MapInitializer {
                             gridWidthInCells,
                             gridHeightInCells
                     );
+
+                    for (Table.Cell<Integer, Integer, Double> overriddenCell : overridenDepths.cellSet()) {
+                        final LinkedList<Double> value = new LinkedList<>();
+                        value.add(overriddenCell.getValue());
+                        sampledAltitudeGrid.put(overriddenCell.getRowKey(),
+                                overriddenCell.getColumnKey(),
+                                value);
+                    }
 
                     return sampledAltitudeToNauticalMap(sampledAltitudeGrid, mbr, gridHeightInCells, gridWidthInCells,
                             latLong);
@@ -196,4 +218,6 @@ public class FromFileMapInitializer implements MapInitializer {
 
         return nauticalMap;
     }
+
+
 }

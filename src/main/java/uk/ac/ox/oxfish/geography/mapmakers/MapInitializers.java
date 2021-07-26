@@ -50,6 +50,7 @@ public class MapInitializers {
         NAMES.put(OsmoseBoundedMapInitializerFactory.class, "OSMOSE Bounded Map");
         NAMES.put(MapWithFarOffPortsInitializerFactory.class, "Map with far-off ports");
         NAMES.put(FromFileMapInitializerFactory.class, "From File Map");
+        NAMES.put(FromFileMapInitializerWithOverridesFactory.class, "From File Map With Overrides");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

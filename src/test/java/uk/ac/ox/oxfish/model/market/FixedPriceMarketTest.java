@@ -21,11 +21,16 @@
 package uk.ac.ox.oxfish.model.market;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.factory.AbundanceAwareFixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -42,6 +47,28 @@ public class FixedPriceMarketTest {
         Fisher seller = mock(Fisher.class);
 
         market.sellFishImplementation(100.0,seller,new Anarchy(),mock(FishState.class),mock(Species.class));
+        verify(seller).earn(200.0);
+
+    }
+
+    @Test
+    public void transactionAbundance() throws Exception {
+
+        AbundanceAwareFixedPriceMarketFactory aware = new AbundanceAwareFixedPriceMarketFactory();
+        aware.setMarketPrice(new FixedDoubleParameter(2.0));
+        AbstractMarket market = aware.apply(mock(FishState.class));
+
+        Fisher seller = mock(Fisher.class);
+        Species species = mock(Species.class);
+        when(species.getNumberOfBins()).thenReturn(1);
+
+        final Hold hold =  mock(Hold.class);
+        when(hold.getWeightOfBin(species,0)).thenReturn(100d);
+        when(hold.hasAbundanceInformation()).thenReturn(true);
+        market.setSpecies(species);
+        market.start(mock(FishState.class));
+
+        market.sellFish(hold,seller,new Anarchy(),mock(FishState.class),species);
         verify(seller).earn(200.0);
 
     }

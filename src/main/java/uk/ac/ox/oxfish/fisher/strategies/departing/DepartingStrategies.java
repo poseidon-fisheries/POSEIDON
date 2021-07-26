@@ -53,6 +53,7 @@ public class DepartingStrategies {
         NAMES.put(MonthlyDepartingFactory.class, "Monthly Departing");
         NAMES.put(UnifiedAmateurishDynamicFactory.class, "Unified Amateurish Dynamic Programming");
         NAMES.put(MaxHoursPerYearDepartingFactory.class, "Max Hours Per Year");
+        NAMES.put(MaxHoursOutWithRestingTimeDepartingStrategy.class, "Max Hours Per Year Plus Resting Time");
         NAMES.put(LonglineFloridaLogisticDepartingFactory.class, "WFS Longline");
         NAMES.put(FloridaLogisticDepartingFactory.class, "WFS Handline");
         NAMES.put(ExitDecoratorFactory.class, "Exit Decorator");

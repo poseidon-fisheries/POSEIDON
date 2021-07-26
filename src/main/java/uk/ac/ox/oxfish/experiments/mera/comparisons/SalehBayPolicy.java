@@ -7,8 +7,13 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.PenalizedGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PenalizedGearFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
+import uk.ac.ox.oxfish.model.market.ThresholdWeightPrice;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfitFactory;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
@@ -32,6 +37,66 @@ public class SalehBayPolicy {
             new LinkedHashMap<>();
 
     static {
+
+
+        selectedPolicies.put("price_change",
+                new AlgorithmFactory<AdditionalStartable>() {
+                    @Override
+                    public AdditionalStartable apply(FishState fishState) {
+                        return new AdditionalStartable() {
+                            @Override
+                            public void start(FishState model) {
+
+                                for (Port port : model.getPorts()) {
+                                    for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                                        final FlexibleAbundanceMarket castMarket = (FlexibleAbundanceMarket) ((MarketProxy) market).getDelegate();
+
+                                        castMarket.setPricingStrategy(
+                                                new ThresholdWeightPrice(
+                                                        castMarket.getMarginalPrice(),
+                                                        0,
+                                                        0.5
+                                                )
+                                        );
+                                    }
+                                }
+                            }
+                        };
+                    }
+                });
+
+        int[][] coordinatesForMPA = new int[][]{
+                {16,28},
+                {15,20},
+                {16,20},
+                {16,19},
+                {15,19},
+                {9,21},
+                {8,16},
+                {9,17},
+                {10,17},
+                {9,18},
+                {10,18}
+        };
+        selectedPolicies.put(
+                "mpa_estimate",
+                fishState -> model -> {
+                    {
+
+                        for (int[] coordinate : coordinatesForMPA) {
+                            StartingMPA.quicklyAddMPAToSeaTile(model.getMap().getSeaTile(coordinate[0],coordinate[1]));
+
+                        }
+
+                        for (Fisher fisher : model.getFishers())
+                            fisher.setRegulation(new ProtectedAreasOnly());
+                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                            fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
+                        }
+
+                    }
+                }
+        );
 
 
         selectedPolicies.put(
@@ -63,46 +128,46 @@ public class SalehBayPolicy {
         );
 
 
-        selectedPolicies.put(
-                "reduce_catchability_90",
-                fishState -> model -> {
-                    {
-
-                        for (Fisher fisher : model.getFishers()) {
-                            final HoldLimitingDecoratorGear parentGear = (HoldLimitingDecoratorGear) fisher.getGear();
-                            final Gear originalDelegate = parentGear.getDelegate();
-                            parentGear.setDelegate(
-                                    new PenalizedGear(.9,originalDelegate)
-                            );
-
-                        }
-                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                            final HoldLimitingDecoratorFactory parentFactory = (HoldLimitingDecoratorFactory) fisherFactory.getValue().getGear();
-                            final AlgorithmFactory<? extends Gear> originalDelegate = parentFactory.getDelegate();
-                            final PenalizedGearFactory penaltyDelegate = new PenalizedGearFactory();
-                            penaltyDelegate.setDelegate(originalDelegate);
-                            penaltyDelegate.setPercentageCatchLost(new FixedDoubleParameter(.9));
-                            parentFactory.setDelegate(penaltyDelegate);
-
-
-                        }
-
-                    }
-                }
-        );
-
-        selectedPolicies.put(
-                "250_days",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
-                }
-        );
 //        selectedPolicies.put(
-//                "333_days",
-//                fishState -> {
-//                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(333, true);
+//                "reduce_catchability_90",
+//                fishState -> model -> {
+//                    {
+//
+//                        for (Fisher fisher : model.getFishers()) {
+//                            final HoldLimitingDecoratorGear parentGear = (HoldLimitingDecoratorGear) fisher.getGear();
+//                            final Gear originalDelegate = parentGear.getDelegate();
+//                            parentGear.setDelegate(
+//                                    new PenalizedGear(.9,originalDelegate)
+//                            );
+//
+//                        }
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+//                            final HoldLimitingDecoratorFactory parentFactory = (HoldLimitingDecoratorFactory) fisherFactory.getValue().getGear();
+//                            final AlgorithmFactory<? extends Gear> originalDelegate = parentFactory.getDelegate();
+//                            final PenalizedGearFactory penaltyDelegate = new PenalizedGearFactory();
+//                            penaltyDelegate.setDelegate(originalDelegate);
+//                            penaltyDelegate.setPercentageCatchLost(new FixedDoubleParameter(.9));
+//                            parentFactory.setDelegate(penaltyDelegate);
+//
+//
+//                        }
+//
+//                    }
 //                }
 //        );
+
+        selectedPolicies.put(
+                "75pc_effort",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy((int)((3456*.75)/24), true);
+                }
+        );
+        selectedPolicies.put(
+                "3mo_closed",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildSeasonalLimit(365-(30*3), true);
+                }
+        );
         selectedPolicies.put(
                 "0_days",
                 fishState -> {
@@ -110,45 +175,25 @@ public class SalehBayPolicy {
                 }
         );
 
-        selectedPolicies.put(
-                "mpa_10",
-                fishState -> model -> {
-                    {
-
-                        StartingMPA mpa = new StartingMPA(7,6,2,4);
-                        mpa.buildMPA(model.getMap());
-                        model.getMap().recomputeTilesMPA();
-
-                        for (Fisher fisher : model.getFishers())
-                            fisher.setRegulation(new ProtectedAreasOnly());
-                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                            fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
-                        }
-
-                    }
-                }
-        );
-
-        selectedPolicies.put(
-                "mpa_20",
-                fishState -> model -> {
-                    {
-
-                        StartingMPA mpa = new StartingMPA(7,6,2,4);
-                        mpa.buildMPA(model.getMap());
-                        mpa = new StartingMPA(2,0,4,2);
-                        mpa.buildMPA(model.getMap());
-                        model.getMap().recomputeTilesMPA();
-
-                        for (Fisher fisher : model.getFishers())
-                            fisher.setRegulation(new ProtectedAreasOnly());
-                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                            fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
-                        }
-
-                    }
-                }
-        );
+//        selectedPolicies.put(
+//                "mpa_10",
+//                fishState -> model -> {
+//                    {
+//
+//                        StartingMPA mpa = new StartingMPA(7,6,2,4);
+//                        mpa.buildMPA(model.getMap());
+//                        model.getMap().recomputeTilesMPA();
+//
+//                        for (Fisher fisher : model.getFishers())
+//                            fisher.setRegulation(new ProtectedAreasOnly());
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+//                            fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
+//                        }
+//
+//                    }
+//                }
+//        );
+//
 
 
         selectedPolicies.put("BAU",
@@ -165,7 +210,6 @@ public class SalehBayPolicy {
                 });
 
 
-
     }
 
 
@@ -179,7 +223,7 @@ public class SalehBayPolicy {
             for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
                 //we are going to have to change the departing strategy here...
                 FullSeasonalRetiredDecoratorFactory exitRules = new FullSeasonalRetiredDecoratorFactory();
-                exitRules.setVariableName("Average Trip Income");
+                exitRules.setVariableName("PROFITS_PER_TRIP");
                 exitRules.setInertia(new FixedDoubleParameter(1d));
                 exitRules.setDecorated(fisherDefinition.getDepartingStrategy());
                 exitRules.setTargetVariable(new FixedDoubleParameter(1875000d)); //that's 375000 times 5
@@ -220,10 +264,11 @@ public class SalehBayPolicy {
         //what we do is that we intercept policies from the original slice 1 and before we let them start we also apply
         //our prepareScenarioForPolicy consumer ahead of time
 
-        final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = selectedPolicies;
+        final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies =
+                selectedPolicies;
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50, SalehBayCalibration.MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
+                adjustedPolicies, 30, SalehBayCalibration.MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),
                 addEntryAndExit);
 
 

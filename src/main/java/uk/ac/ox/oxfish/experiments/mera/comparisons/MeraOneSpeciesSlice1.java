@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
@@ -986,6 +987,25 @@ public class MeraOneSpeciesSlice1 {
             //create a factory, feed it to the fisher factories just in case you turn entry back on
             MaxHoursOutFactory factory = new MaxHoursOutFactory();
             factory.setMaxHoursOut(new FixedDoubleParameter(maxDaysOut*24));
+            for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                fisherFactory.getValue().setRegulations(factory);
+            }
+            //also change the rule to all existing agents!
+            for (Fisher fisher : model.getFishers()) {
+                fisher.setRegulation(factory.apply(model));
+            }
+        };
+    }
+
+    @NotNull
+    public static AdditionalStartable buildSeasonalLimit(int seasonLengthInDays, boolean blockEntry) {
+        return model -> {
+            //first remove all possible entries
+            if(blockEntry)
+                NoDataPolicy.REMOVE_ENTRY_EVENT.step(model);
+            //create a factory, feed it to the fisher factories just in case you turn entry back on
+            FishingSeasonFactory factory = new FishingSeasonFactory();
+            factory.setSeasonLength(new FixedDoubleParameter(seasonLengthInDays));
             for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
                 fisherFactory.getValue().setRegulations(factory);
             }

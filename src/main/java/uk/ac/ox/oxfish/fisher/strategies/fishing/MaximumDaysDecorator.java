@@ -36,15 +36,15 @@ public class MaximumDaysDecorator implements FishingStrategy
 
     private FishingStrategy delegate;
 
-    private final int daysBeforeGoingHome;
+    private final double daysBeforeGoingHome;
 
-    public MaximumDaysDecorator(int daysBeforeGoingHome) {
+    public MaximumDaysDecorator(double daysBeforeGoingHome) {
         this(new FishUntilFullStrategy(1d),daysBeforeGoingHome);
 
 
     }
 
-    public MaximumDaysDecorator(FishingStrategy delegate, int daysBeforeGoingHome) {
+    public MaximumDaysDecorator(FishingStrategy delegate, double daysBeforeGoingHome) {
         this.delegate = delegate;
         this.daysBeforeGoingHome = daysBeforeGoingHome;
     }
@@ -93,7 +93,7 @@ public class MaximumDaysDecorator implements FishingStrategy
         return delegate;
     }
 
-    public int getDaysBeforeGoingHome() {
+    public double getDaysBeforeGoingHome() {
         return daysBeforeGoingHome;
     }
 

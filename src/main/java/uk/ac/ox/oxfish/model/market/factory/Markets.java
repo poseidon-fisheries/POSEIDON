@@ -43,6 +43,7 @@ public class Markets {
 
     static {
         NAMES.put(FixedPriceMarketFactory.class, "Fixed Price Market");
+        NAMES.put(AbundanceAwareFixedPriceMarketFactory.class, "Abundance Aware Fixed Price Market");
         NAMES.put(ArrayFixedPriceMarket.class, "Fixed Price Market Array");
         NAMES.put(CongestedMarketFactory.class, "Congested Market");
         NAMES.put(MACongestedMarketFactory.class, "Moving Average Congested Market");

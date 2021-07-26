@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.mapmakers;
 
+import com.google.common.collect.HashBasedTable;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
@@ -48,6 +49,30 @@ public class FromFileMapInitializerTest {
 
         //because cell range is 1 to 5, gridX should have -6 as depth (because the input goes negative only form 1 to 4)
         assertEquals(map.getSeaTile(1,1).getAltitude(),+10,.0001);
+        assertEquals(map.getSeaTile(1,0).getAltitude(),+10,.0001);
+        assertEquals(map.getSeaTile(0,1).getAltitude(),-6,.0001);
+        assertEquals(map.getSeaTile(0,0).getAltitude(),-6,.0001);
+
+    }
+
+
+
+    @Test
+    public void overridesChangeAltitude() {
+        Path path = Paths.get("inputs", "tests", "map.csv");
+        final HashBasedTable<Integer, Integer, Double> override = HashBasedTable.create(1, 1);
+        override.put(1,1,-1234d);
+        FromFileMapInitializer initializer = new FromFileMapInitializer(
+                path,2, DEFAULT_MAP_PADDING_IN_DEGREES, true,false,
+                override
+        );
+        NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
+                new GlobalBiology(mock(Species.class)),
+                mock(FishState.class));
+        assertEquals(map.getHeight(),2);
+        assertEquals(map.getWidth(),2);
+        //because cell range is 1 to 5, gridX should have -6 as depth (because the input goes negative only form 1 to 4)
+        assertEquals(map.getSeaTile(1,1).getAltitude(),-1234d,.0001);
         assertEquals(map.getSeaTile(1,0).getAltitude(),+10,.0001);
         assertEquals(map.getSeaTile(0,1).getAltitude(),-6,.0001);
         assertEquals(map.getSeaTile(0,0).getAltitude(),-6,.0001);
