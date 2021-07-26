@@ -6,6 +6,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id "com.github.spotbugs" version "4.7.2"
 }
 
 application {
@@ -101,7 +102,6 @@ dependencies {
 
     //guava. Useful for PreConditions and sometimes specialized collections
     implementation "com.google.guava:guava:28.2-jre"
-    implementation "com.google.code.findbugs:jsr305:3.0.2"
 
     //json test
     testImplementation "com.google.code.gson:gson:2.8.5"
@@ -119,8 +119,8 @@ processTestResources.doFirst {
 //this makes tests multi-threaded when called from gradle. Useful!
 test {
     minHeapSize = "1024m"
-    maxHeapSize = "2048m"
-    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 3)
+    maxHeapSize = "6G" // GitHub actions gives us 7G memory, so this should be safe for running online tests
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
 }
 
 task shadowJarFoo(type: ShadowJar) {
@@ -344,6 +344,10 @@ idea {
         downloadJavadoc = true // defaults to false
         downloadSources = true
     }
+}
+
+spotbugs {
+    ignoreFailures = true
 }
 
 jacocoTestReport {

@@ -1,0 +1,14 @@
+name: Spotbugs
+on: [push, pull_request]
+jobs:
+  build:
+    name: Spotbugs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Run spotbugs with Gradle
+        run: ./gradlew spotbugsMain        
+      - uses: jwgmeligmeyling/spotbugs-github-action@master
+        with:
+          path: build/reports/spotbugs/main.xml
