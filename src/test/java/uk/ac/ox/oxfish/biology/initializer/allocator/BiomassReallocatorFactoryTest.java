@@ -38,10 +38,15 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 public class BiomassReallocatorFactoryTest extends TestCase {
 
     public void testBuildBiomassGrids() {
-        final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory();
+        final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
+            TunaScenario.input("species_codes.csv"),
+            TunaScenario.input("biomass_distributions.csv"),
+            365
+        );
         final Path depthFile = TunaScenario.input("depth.csv");
         final MapInitializer mapInitializer = new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
+        biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(mock(FishState.class));
         assertEquals(365, biomassReallocator.getPeriod());
         assertEquals(12, biomassReallocator.getAllocationGrids().size());

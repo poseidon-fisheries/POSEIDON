@@ -18,6 +18,8 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.nio.file.Path;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
@@ -26,6 +28,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class BiomassReallocatorFactory
     extends ReallocatorFactory
     implements AlgorithmFactory<BiomassReallocator> {
+
+    private MapExtent mapExtent;
 
     public BiomassReallocatorFactory() {
     }
@@ -38,13 +42,22 @@ public class BiomassReallocatorFactory
         super(speciesCodesFilePath, biomassDistributionsFilePath, period);
     }
 
+    public MapExtent getMapExtent() {
+        return mapExtent;
+    }
+
+    public void setMapExtent(final MapExtent mapExtent) {
+        this.mapExtent = mapExtent;
+    }
+
     @Override
     public BiomassReallocator apply(final FishState fishState) {
+        checkNotNull(mapExtent, "Need to call setMapExtent() before using");
         final AllocationGrids<String> grids =
             new AllocationGridsSupplier(
                 getSpeciesCodesFilePath(),
                 getBiomassDistributionsFilePath(),
-                new MapExtent(fishState.getMap())
+                mapExtent
             ).get();
         return new BiomassReallocator(grids, getPeriod());
     }

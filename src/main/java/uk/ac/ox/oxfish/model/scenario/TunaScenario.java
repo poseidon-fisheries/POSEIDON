@@ -19,11 +19,48 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
+import static java.time.Month.JANUARY;
+import static java.time.Month.JULY;
+import static java.time.Month.NOVEMBER;
+import static java.time.Month.OCTOBER;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static si.uom.NonSI.KNOT;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.CUBIC_METRE;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
+import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
+import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import ec.util.MersenneTwisterFast;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Speed;
+import javax.measure.quantity.Volume;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -77,43 +114,14 @@ import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
-import uk.ac.ox.oxfish.model.regs.factory.*;
+import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
+import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
+import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
+import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import javax.measure.quantity.Speed;
-import javax.measure.quantity.Volume;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static java.time.Month.*;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static si.uom.NonSI.KNOT;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.*;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaScenario implements Scenario {
@@ -380,7 +388,8 @@ public class TunaScenario implements Scenario {
         plugins.add(biomassRestorerFactory);
 
         biomassReallocatorInitializerFactory.setBiomassReallocatorFactory(biomassReallocatorFactory);
-        biomassReallocatorInitializerFactory.setMapExtent(mapExtent);
+        ((BiomassReallocatorFactory) biomassReallocatorInitializerFactory.getBiomassReallocatorFactory())
+            .setMapExtent(mapExtent);
         final BiomassReallocatorInitializer biologyInitializer = biomassReallocatorInitializerFactory.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));

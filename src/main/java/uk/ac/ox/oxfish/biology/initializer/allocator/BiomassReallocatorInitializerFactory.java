@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 import static si.uom.NonSI.TONNE;
@@ -41,7 +40,6 @@ import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiomassReallocatorInitializer;
 import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -52,7 +50,16 @@ public class BiomassReallocatorInitializerFactory
     private AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory;
     private SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path schaeferParamsFile = input("schaefer_params.csv");
-    private MapExtent mapExtent;
+
+    public AlgorithmFactory<? extends BiomassReallocator> getBiomassReallocatorFactory() {
+        return biomassReallocatorFactory;
+    }
+
+    public void setBiomassReallocatorFactory(
+        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory
+    ) {
+        this.biomassReallocatorFactory = biomassReallocatorFactory;
+    }
 
     public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
         this.speciesCodes = speciesCodes;
@@ -70,8 +77,6 @@ public class BiomassReallocatorInitializerFactory
 
     @Override
     public BiomassReallocatorInitializer apply(final FishState fishState) {
-
-        checkNotNull(mapExtent, "Need to call setMapExtent() before using");
 
         final Map<String, GridAllocator> initialAllocators =
             biomassReallocatorFactory
@@ -121,21 +126,12 @@ public class BiomassReallocatorInitializerFactory
                     new NoMovement(),
                     speciesName,
                     new FadAwareLogisticGrowerInitializer(asDouble(carryingCapacity, KILOGRAM),
-                        logisticGrowthRate, true),
+                        logisticGrowthRate, true
+                    ),
                     false,
                     false
                 );
             })
             .collect(toList());
-    }
-
-    public void setMapExtent(final MapExtent mapExtent) {
-        this.mapExtent = mapExtent;
-    }
-
-    public void setBiomassReallocatorFactory(
-        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory
-    ) {
-        this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
 }
