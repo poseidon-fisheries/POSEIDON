@@ -19,7 +19,13 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.junit.Assert.assertEquals;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
+
 import com.google.common.collect.ImmutableMap;
+import java.nio.file.Paths;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
@@ -29,17 +35,16 @@ import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
-import java.nio.file.Paths;
-import java.util.function.Supplier;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-
 public class FadAwareLogisticGrowerTest {
 
     @Test
     public void jonLandings() {
+
+        addCsvLogger(
+            DEBUG,
+            "biomass_events",
+            "step,stepOrder,process,species,biomassBefore,biomassAfter"
+        );
 
         final TunaScenario scenario = new TunaScenario();
         scenario.setCostsFile(input("no_costs.csv"));
@@ -52,7 +57,8 @@ public class FadAwareLogisticGrowerTest {
         ((PurseSeineGearFactory) fisherDefinition.getGear())
             .setLocationValuesFile(input("dummy_location_values.csv"));
 
-        scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
+        scenario.getExogenousCatchesFactory()
+            .setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
         scenario.getFisherDefinition().setRegulation(new NoFishingFactory());
 
         final FishState state = new FishState();
@@ -67,6 +73,8 @@ public class FadAwareLogisticGrowerTest {
         final Species yft = state.getBiology().getSpecie("Yellowfin tuna");
         assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
+
     }
+
 
 }

@@ -1,5 +1,13 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -9,16 +17,12 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * the plugin/additionalStartable version of AbundanceResetter + BiomassSnapshot
  */
 public class SnapshotBiologyResetter implements AdditionalStartable {
 
-
+    private static final Logger logger = LogManager.getLogger("biomass_events");
 
     private final HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters;
 
@@ -119,15 +123,26 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
                                         model.getMap(),
                                         resetter.getKey().getSpecies());
                             }
-                            resetter.getKey().resetAbundance(model.getMap(),model.getRandom());
 
+                            final double biomassBefore = ((FishState) simState)
+                                .getTotalBiomass(resetter.getKey().getSpecies());
 
+                            resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
+
+                            logger.debug(new ObjectArrayMessage(
+                                ((FishState) simState).getStep(),
+                                DATA_RESET,
+                                "RESET",
+                                resetter.getKey().getSpecies(),
+                                biomassBefore,
+                                (((FishState) simState).getTotalBiomass(resetter.getKey()
+                                    .getSpecies()))
+                            ));
                         }
 
 
                     }
                 },
-                StepOrder.
                 DATA_RESET,
                 yearsBeforeReset
         );

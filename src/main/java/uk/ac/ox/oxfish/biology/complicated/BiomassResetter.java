@@ -20,8 +20,13 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -31,6 +36,8 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassResetter implements BiologyResetter {
+
+    private static final Logger logger = LogManager.getLogger("biomass_events");
 
     /**
      * biomass allocator: I expect this to be normalized!
@@ -57,6 +64,16 @@ public class BiomassResetter implements BiologyResetter {
     public void recordHowMuchBiomassThereIs(FishState fishState) {
         fadMap = fishState.getFadMap();
         recordedBiomass = fishState.getMap().getTotalBiomass(species);
+
+        logger.debug(new ObjectArrayMessage(
+            fishState.getStep(),
+            DAWN,
+            "MEMORIZE_FOR_RESET",
+            species,
+            recordedBiomass,
+            recordedBiomass
+        ));
+
     }
 
     /**
