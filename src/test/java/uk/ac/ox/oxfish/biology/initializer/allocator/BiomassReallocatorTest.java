@@ -27,7 +27,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
-import static uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocator.getBiomassPerSpecies;
+import static uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocator.getBiomassPerSpeciesExcludingFads;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 import com.google.common.collect.ImmutableList;
@@ -82,8 +82,8 @@ public class BiomassReallocatorTest extends TestCase {
             3
         );
 
-        final Map<String, Double> biomassPerSpecies =
-            getBiomassPerSpecies(globalBiology, nauticalMap);
+        final Map<Species, Double> biomassPerSpecies =
+            getBiomassPerSpeciesExcludingFads(globalBiology, nauticalMap);
 
         final FishState fishState = mock(FishState.class);
 
@@ -131,7 +131,7 @@ public class BiomassReallocatorTest extends TestCase {
             fishState,
             globalBiology,
             nauticalMap,
-            getBiomassPerSpecies(globalBiology, nauticalMap)
+            getBiomassPerSpeciesExcludingFads(globalBiology, nauticalMap)
         );
 
         assertArrayEquals(

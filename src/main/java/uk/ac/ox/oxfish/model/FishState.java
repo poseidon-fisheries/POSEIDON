@@ -20,17 +20,24 @@
 
 package uk.ac.ox.oxfish.model;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Doubles;
-
 import ec.util.MersenneTwisterFast;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -501,6 +508,14 @@ public class FishState  extends SimState{
     {
         final double fadBiomass = fadMap == null ? 0 : fadMap.getTotalBiomass(species);
         return fadBiomass + map.getTotalBiomass(species);
+    }
+
+    /**
+     * Returns a map from species to their total biomass (including FAD biomass).
+     */
+    public Map<Species, Double> getTotalBiomasses() {
+        return biology.getSpecies().stream()
+            .collect(toImmutableMap(identity(), this::getTotalBiomass));
     }
 
     public double getTotalAbundance(Species species,int bin)

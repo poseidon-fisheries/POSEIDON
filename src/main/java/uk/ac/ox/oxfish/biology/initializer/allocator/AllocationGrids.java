@@ -63,6 +63,10 @@ class AllocationGrids<K> {
         );
     }
 
+    public ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> getGrids() {
+        return grids;
+    }
+
     Optional<Map<K, DoubleGrid2D>> atStep(final Integer step) {
         return Optional.ofNullable(grids.get(step));
     }

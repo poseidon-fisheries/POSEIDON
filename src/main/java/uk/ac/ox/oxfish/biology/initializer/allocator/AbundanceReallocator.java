@@ -61,11 +61,12 @@ public class AbundanceReallocator extends Reallocator<Entry<String, SizeGroup>> 
         this.binToSizeGroupMappings = ImmutableMap.copyOf(binToSizeGroupMappings);
     }
 
+
     @Override
     void performReallocation(
         final GlobalBiology globalBiology,
         final NauticalMap nauticalMap,
-        final Map<Entry<String, SizeGroup>, ? extends DoubleGrid2D> grids
+        final Map<Entry<String, SizeGroup>, DoubleGrid2D> grids
     ) {
         final Map<SeaTile, AbundanceLocalBiology> seaTileBiologies =
             getSeaTileBiologies(nauticalMap);

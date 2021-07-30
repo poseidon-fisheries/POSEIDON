@@ -1,11 +1,16 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -22,10 +27,14 @@ import uk.ac.ox.oxfish.utility.FishStateSteppable;
  */
 public class BiomassRestorer implements AdditionalStartable {
 
+    private static final Logger logger = LogManager.getLogger("biomass_events");
+
     private final BiomassReallocator biomassReallocator;
     private final Map<Integer, Integer> schedule;
 
     /**
+     * Create a new BiomassRestorer.
+     *
      * @param biomassReallocator The {@link BiomassReallocator} that will distribute the fish when
      *                           biomass is restored
      * @param schedule           A map from the step to record the biomass from the step to restore
@@ -45,9 +54,9 @@ public class BiomassRestorer implements AdditionalStartable {
             // record the biomass at dawn, before anything else happens
             schedule(fishState, recordingStep, DAWN, fishState1 -> {
                 System.out.println("Taking biomass record at step " + fishState1.getStep());
-                final ImmutableMap<String, Double> recordedBiomass = recordBiomass(fishState1);
-                // Schedule the biomass restoration at POLICY_UPDATE step order so it runs after the grower
-                // at BIOLOGY_PHASE step order, but before the data gatherers at later orders
+                final Map<Species, Double> recordedBiomass = recordBiomass(fishState1);
+                // Schedule the biomass restoration at POLICY_UPDATE step order so it runs after the
+                // grower at BIOLOGY_PHASE step order, but before the data gatherers at later orders
                 schedule(fishState1, restoringStep, POLICY_UPDATE, fishState2 -> {
                     System.out
                         .printf("Restoring biomass recorded at step %d at step %d\n", recordingStep,
@@ -68,40 +77,65 @@ public class BiomassRestorer implements AdditionalStartable {
         fishState.schedule.scheduleOnce(step, stepOrder.ordinal(), stepper);
     }
 
-    private static ImmutableMap<String, Double> recordBiomass(final FishState fishState) {
-        final FadMap fadMap = fishState.getFadMap();
-        final NauticalMap nauticalMap = fishState.getMap();
-        return fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
-            Species::getName,
-            species -> nauticalMap.getTotalBiomass(species) + (fadMap == null ? 0
-                : fadMap.getTotalBiomass(species))
-        ));
+    private static Map<Species, Double> recordBiomass(final FishState fishState) {
+
+        final Map<Species, Double> recordedBiomass = fishState.getTotalBiomasses();
+
+        recordedBiomass.forEach((species, biomass) ->
+            logger.debug(new ObjectArrayMessage(
+                fishState.getStep(),
+                DAWN,
+                "MEMORIZE_FOR_RESTORE",
+                species,
+                biomass,
+                biomass
+            )));
+
+        return recordedBiomass;
     }
 
     private void restoreBiomass(
-        final Map<String, Double> recordedBiomass,
+        final Map<Species, Double> recordedBiomass,
         final FishState fishState
     ) {
         final GlobalBiology globalBiology = fishState.getBiology();
         final NauticalMap nauticalMap = fishState.getMap();
         final FadMap fadMap = fishState.getFadMap();
+
         // if we have a snapshot of the biomass, we need to subtract the biomass
         // that's currently under FADs in order to avoid reallocating it
-        final ImmutableMap<String, Double> biomassToReallocate =
+
+        final Map<Species, Double> biomassUnderFads =
+            fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
+                identity(),
+                species -> fadMap == null ? 0 : fadMap.getTotalBiomass(species)
+            ));
+
+        final Map<Species, Double> biomassToReallocate =
             recordedBiomass.entrySet().stream()
                 .collect(toImmutableMap(
-                    Map.Entry::getKey,
-                    entry -> entry.getValue() - (fadMap == null
-                        ? 0
-                        : fadMap.getTotalBiomass(globalBiology.getSpecie(entry.getKey()))
-                    )
+                    Entry::getKey,
+                    entry -> entry.getValue() - biomassUnderFads.get(entry.getKey())
                 ));
+
+        final Map<Species, Double> biomassBefore = fishState.getTotalBiomasses();
 
         biomassReallocator.reallocate(
             fishState,
             globalBiology,
             nauticalMap,
             biomassToReallocate
+        );
+
+        fishState.getTotalBiomasses().forEach((species, biomassAfter) ->
+            logger.debug(() -> new ObjectArrayMessage(
+                fishState.getStep(),
+                POLICY_UPDATE,
+                "RESTORE",
+                species.getName(),
+                biomassBefore.get(species),
+                biomassAfter
+            ))
         );
 
     }
