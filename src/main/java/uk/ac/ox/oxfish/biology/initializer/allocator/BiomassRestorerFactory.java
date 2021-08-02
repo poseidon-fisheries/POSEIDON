@@ -18,37 +18,46 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer> {
 
     private ImmutableMap<Integer, Integer> schedule = ImmutableMap.of(0, 364);
-    private BiomassReallocatorFactory biomassReallocatorFactory;
+    private ScheduledBiomassReallocatorFactory scheduledBiomassReallocatorFactory;
 
     @SuppressWarnings("unused")
-    public BiomassReallocatorFactory getBiomassReallocatorFactory() {
-        return biomassReallocatorFactory;
+    public ScheduledBiomassReallocatorFactory getBiomassReallocatorFactory() {
+        return scheduledBiomassReallocatorFactory;
     }
 
-    public void setBiomassReallocatorFactory(final BiomassReallocatorFactory biomassReallocatorFactory) {
-        this.biomassReallocatorFactory = biomassReallocatorFactory;
+    public void setBiomassReallocatorFactory(
+        final ScheduledBiomassReallocatorFactory scheduledBiomassReallocatorFactory
+    ) {
+        this.scheduledBiomassReallocatorFactory = scheduledBiomassReallocatorFactory;
     }
 
-    public Map<Integer, Integer> getSchedule() { return schedule; }
+    public Map<Integer, Integer> getSchedule() {
+        return schedule;
+    }
 
     public void setSchedule(final Map<Integer, Integer> schedule) {
         this.schedule = ImmutableMap.copyOf(schedule);
     }
 
     @Override
-    public BiomassRestorer apply(final FishState fishState) {
-        checkNotNull(biomassReallocatorFactory);
-        return new BiomassRestorer(biomassReallocatorFactory.apply(fishState), schedule);
+    public BiomassRestorer apply(
+        final FishState fishState
+    ) {
+        checkNotNull(scheduledBiomassReallocatorFactory);
+        return new BiomassRestorer(
+            scheduledBiomassReallocatorFactory.apply(fishState).getReallocator(),
+            new BiomassAggregator(),
+            schedule
+        );
     }
 }

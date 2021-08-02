@@ -16,29 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.biology.initializer.allocator;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
-class AllocationGridsSupplier extends AbstractAllocationGridsSupplier<String> {
+public class AbundanceFad extends Fad<AbundanceLocalBiology> {
 
-    AllocationGridsSupplier(
-        final Path speciesCodesFilePath,
-        final Path gridsFilePath,
-        final MapExtent mapExtent,
-        final int period
-    ) {
-        super(speciesCodesFilePath, gridsFilePath, mapExtent, period);
-    }
-
-    @Override
-    String extractKeyFromRecord(
-        final SpeciesCodes speciesCodes,
-        final Record record
-    ) {
-        return speciesCodes.getSpeciesName(record.getString("species_code"));
+    public AbundanceFad(final AbundanceLocalBiology biology) {
+        super(biology);
     }
 }

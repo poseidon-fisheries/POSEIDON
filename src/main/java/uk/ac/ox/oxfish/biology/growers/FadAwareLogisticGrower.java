@@ -28,7 +28,6 @@ import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
 import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -36,7 +35,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.MapMessage;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -44,7 +42,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -173,8 +171,8 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
     @SuppressWarnings("UnstableApiUsage")
     private static Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
         return stream(Optional.ofNullable(fishState.getFadMap()))
-            .flatMap(FadMap::allFads)
-            .map(Fad::getBiology);
+            .flatMap(FadMap::allBiomassFads)
+            .map(BiomassFad::getBiology);
     }
 
     private class Memorizer implements Steppable, Startable {

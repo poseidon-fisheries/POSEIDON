@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -70,7 +70,7 @@ public class MakeFadSetTest {
         final double carryingCapacity = 0.0;
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
         fillBiology(fadBiology);
-        final Fad fad = new Fad(
+        final BiomassFad fad = new BiomassFad(
             fadManager,
             fadBiology,
             ImmutableMap.of(),

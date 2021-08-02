@@ -164,7 +164,7 @@ public class Monitors {
         otherMonitors = ImmutableList.of(
             new ObservingAtIntervalMonitor<>(
                 EVERY_YEAR,
-                model -> model.getFadMap().allFads()::iterator,
+                model -> model.getFadMap().allBiomassFads()::iterator,
                 basicPerRegionMonitor(
                     "active FADs",
                     EVERY_YEAR,
@@ -177,7 +177,7 @@ public class Monitors {
             ),
             new ObservingAtIntervalMonitor<>(
                 EVERY_YEAR,
-                model -> model.getFadMap().allFads()::iterator,
+                model -> model.getFadMap().allBiomassFads()::iterator,
                 perSpeciesPerRegionMonitor(
                     "biomass under FADs",
                     EVERY_YEAR,

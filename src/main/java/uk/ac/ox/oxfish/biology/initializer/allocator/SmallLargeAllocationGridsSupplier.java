@@ -45,9 +45,10 @@ class SmallLargeAllocationGridsSupplier
     SmallLargeAllocationGridsSupplier(
         final Path speciesCodesFilePath,
         final Path gridsFilePath,
-        final MapExtent mapExtent
+        final MapExtent mapExtent,
+        final int period
     ) {
-        super(speciesCodesFilePath, gridsFilePath, mapExtent);
+        super(speciesCodesFilePath, gridsFilePath, mapExtent, period);
     }
 
     @Override

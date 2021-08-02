@@ -24,7 +24,7 @@ import org.junit.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -36,7 +36,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -61,9 +60,9 @@ public class FadLocationValuesTest {
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
 
-        final List<Fad> fads = range(0, 3)
+        final List<BiomassFad> fads = range(0, 3)
             .mapToObj(__ -> {
-                final Fad fad = mock(Fad.class);
+                final BiomassFad fad = mock(BiomassFad.class);
                 when(fad.valueOfFishFor(fisher)).thenReturn(1.0);
                 return fad;
             })

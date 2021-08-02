@@ -21,18 +21,18 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 public abstract class AbstractFadSetAction extends AbstractSetAction {
 
-    private final Fad fad;
+    private final BiomassFad fad;
 
     public AbstractFadSetAction(
         final Fisher fisher,
-        final Fad fad
+        final BiomassFad fad
     ) {
         super(
             fisher,
@@ -42,7 +42,7 @@ public abstract class AbstractFadSetAction extends AbstractSetAction {
         this.fad = fad;
     }
 
-    public Fad getFad() { return fad; }
+    public BiomassFad getFad() { return fad; }
 
     @Override boolean checkSuccess() {
         final PurseSeineGear purseSeineGear = (PurseSeineGear) getFisher().getGear();

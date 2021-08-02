@@ -18,47 +18,32 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import java.util.List;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+
+import java.util.Collection;
 import java.util.Map;
-import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
-/**
- *
- */
-abstract class Reallocator<K, A> {
+class BiomassAggregator extends Aggregator<Double, BiomassLocalBiology> {
 
-    private final AllocationGrids<K> allocationGrids;
-
-    Reallocator(final AllocationGrids<K> allocationGrids) {
-        this.allocationGrids = allocationGrids;
+    BiomassAggregator() {
+        super(BiomassLocalBiology.class);
     }
 
-    public AllocationGrids<K> getAllocationGrids() {
-        return allocationGrids;
-    }
-
-    public void reallocate(
-        final int step,
+    @Override
+    Map<Species, Double> aggregate(
         final GlobalBiology globalBiology,
-        final List<SeaTile> seaTiles,
-        final Map<Species, A> aggregations
+        final Collection<BiomassLocalBiology> localBiologies
     ) {
-        reallocate(
-            allocationGrids.atOrBeforeStep(step),
-            globalBiology,
-            seaTiles,
-            aggregations
-        );
+        return globalBiology.getSpecies().stream().collect(toImmutableMap(
+            identity(),
+            species -> localBiologies
+                .stream()
+                .mapToDouble(biology -> biology.getBiomass(species))
+                .sum()
+        ));
     }
-
-    public abstract void reallocate(
-        Map<K, DoubleGrid2D> allocationGrids,
-        GlobalBiology globalBiology,
-        List<SeaTile> seaTiles,
-        Map<Species, A> aggregations
-    );
-
 }

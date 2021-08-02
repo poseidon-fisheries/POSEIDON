@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -56,7 +56,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
     public void shouldFisherLeavePort() {
 
         FishState fishState = mock(FishState.class);
-        final Fad fad = mock(Fad.class);
+        final BiomassFad fad = mock(BiomassFad.class);
 
         final CatchSampler catchSampler = mock(CatchSampler.class);
         //noinspection UnstableApiUsage

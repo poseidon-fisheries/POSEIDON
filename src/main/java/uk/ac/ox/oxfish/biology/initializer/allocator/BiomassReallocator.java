@@ -20,11 +20,10 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
-import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -32,9 +31,7 @@ import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Redistributes the biomass around according to a "schedule" that maps a simulation step to a grid
@@ -44,48 +41,26 @@ import uk.ac.ox.oxfish.model.FishState;
  * those should never be mutated, so the class is safe to share between parallel simulations. Note
  * that the {@code reallocate} method mutates the tiles biomass arrays directly.
  */
-public class BiomassReallocator extends Reallocator<String> {
+public class BiomassReallocator extends Reallocator<String, Double> {
 
-    /**
-     * Constructs a new BiomassReallocator.
-     *
-     * @param allocationGrids The distribution grids used to reallocate biomass
-     * @param period          The number to use as modulo for looping the schedule (normally 365)
-     */
-    public BiomassReallocator(
-        final AllocationGrids<String> allocationGrids,
-        final int period
-    ) {
-        super(allocationGrids, period);
+    BiomassReallocator(final AllocationGrids<String> allocationGrids) {
+        super(allocationGrids);
     }
 
     @Override
-    void performReallocation(
+    public void reallocate(
+        final Map<String, DoubleGrid2D> allocationGrids,
         final GlobalBiology globalBiology,
-        final NauticalMap nauticalMap,
-        final Map<String, DoubleGrid2D> grids
-    ) {
-        performReallocation(
-            globalBiology,
-            nauticalMap.getAllSeaTilesExcludingLandAsList(),
-            getBiomassPerSpeciesExcludingFads(globalBiology, nauticalMap),
-            grids
-        );
-    }
-
-    private static void performReallocation(
-        final GlobalBiology globalBiology,
-        final Collection<SeaTile> seaTiles,
-        final Map<Species, Double> biomassPerSpecies,
-        final Map<String, DoubleGrid2D> grids
+        final List<SeaTile> seaTiles,
+        final Map<Species, Double> aggregations
     ) {
         final Map<Species, DoubleGrid2D> gridsPerSpecies =
-            grids.entrySet().stream().collect(toImmutableMap(
+            allocationGrids.entrySet().stream().collect(toImmutableMap(
                 entry -> globalBiology.getSpecie(entry.getKey()),
                 Entry::getValue
             ));
         final Map<Integer, DoubleGrid2D> indexedBiomassGrids =
-            makeNewBiomassGrids(gridsPerSpecies, biomassPerSpecies);
+            makeNewBiomassGrids(gridsPerSpecies, aggregations);
         seaTiles
             .stream()
             .filter(seaTile -> seaTile.getBiology() instanceof VariableBiomassBasedBiology)
@@ -116,32 +91,6 @@ public class BiomassReallocator extends Reallocator<String> {
                     )));
             })
             .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-    }
-
-    static Map<Species, Double> getBiomassPerSpeciesExcludingFads(
-        final GlobalBiology globalBiology,
-        final NauticalMap nauticalMap
-    ) {
-        return globalBiology.getSpecies().stream().collect(toImmutableMap(
-            identity(),
-            nauticalMap::getTotalBiomass
-        ));
-    }
-
-    void reallocate(
-        final FishState fishState,
-        final GlobalBiology globalBiology,
-        final NauticalMap nauticalMap,
-        final Map<Species, Double> biomassToReallocate
-    ) {
-        getAllocationGrids()
-            .atOrBeforeStep(fishState.getStep() % getPeriod())
-            .ifPresent(grids -> performReallocation(
-                globalBiology,
-                nauticalMap.getAllSeaTilesExcludingLandAsList(),
-                biomassToReallocate,
-                grids
-            ));
     }
 
 }

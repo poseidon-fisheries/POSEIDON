@@ -85,10 +85,11 @@ public class AbundanceInitializer implements BiologyInitializer {
                     entry -> globalBiology.getSpecie(entry.getKey()),
                     entry -> binsToAbundance(entry.getValue())
                 ));
-        abundanceReallocator.reallocateAtStep(
+        abundanceReallocator.reallocate(
             0,
-            aggregatedAbundances,
-            nauticalMap
+            globalBiology,
+            nauticalMap.getAllSeaTilesExcludingLandAsList(),
+            aggregatedAbundances
         );
     }
 

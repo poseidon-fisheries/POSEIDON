@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -140,7 +140,7 @@ public class SetLocationValuesTest {
         delValues.observe(dolphinSetAction);
         assertEquals(1000.0, delValues.getValueAt(3, 3));
 
-        final Fad fad = mock(Fad.class);
+        final BiomassFad fad = mock(BiomassFad.class);
         when(fadSetAction.getFad()).thenReturn(fad);
         when(fad.getLocationDeployed()).thenReturn(new Int2D(3, 3));
         dplValues.observe(fadSetAction);

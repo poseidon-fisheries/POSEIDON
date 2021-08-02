@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.math.DoubleMath.fuzzyEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
@@ -31,15 +32,18 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.IntPredicate;
 import sim.field.grid.DoubleGrid2D;
 
 class AllocationGrids<K> {
 
     // map from step to species name to grid
     private final ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> grids;
+    private final int period;
 
     private AllocationGrids(
-        final ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> grids
+        final ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> grids,
+        final int period
     ) {
         // Make sure all grids sum to 1.
         checkArgument(
@@ -49,18 +53,26 @@ class AllocationGrids<K> {
                 .allMatch(grid -> fuzzyEquals(Arrays.stream(grid.toArray()).sum(), 1.0, EPSILON))
         );
         this.grids = grids;
+        this.period = period;
     }
 
     public static <K> AllocationGrids<K> from(
-        final Map<Integer, ? extends Map<K, DoubleGrid2D>> grids
+        final Map<Integer, ? extends Map<K, DoubleGrid2D>> grids,
+        final int period
     ) {
-        return new AllocationGrids<>(grids.entrySet().stream()
-            .collect(toImmutableSortedMap(
-                Comparator.naturalOrder(),
-                Entry::getKey,
-                entry -> ImmutableMap.copyOf(entry.getValue())
-            ))
+        return new AllocationGrids<>(
+            grids.entrySet().stream()
+                .collect(toImmutableSortedMap(
+                    Comparator.naturalOrder(),
+                    Entry::getKey,
+                    entry -> ImmutableMap.copyOf(entry.getValue())
+                )),
+            period
         );
+    }
+
+    public int getPeriod() {
+        return period;
     }
 
     public ImmutableSortedMap<? super Integer, Map<K, DoubleGrid2D>> getGrids() {
@@ -68,11 +80,14 @@ class AllocationGrids<K> {
     }
 
     Optional<Map<K, DoubleGrid2D>> atStep(final Integer step) {
-        return Optional.ofNullable(grids.get(step));
+        return Optional.ofNullable(grids.get(step % period));
     }
 
-    Optional<Map<K, DoubleGrid2D>> atOrBeforeStep(final Integer step) {
-        return Optional.ofNullable(grids.floorEntry(step).getValue());
+    Map<K, DoubleGrid2D> atOrBeforeStep(final Integer step) {
+        final Entry<? super Integer, Map<K, DoubleGrid2D>> floorEntry =
+            grids.floorEntry(step % period);
+        checkNotNull(floorEntry, "No grids at or before step " + step);
+        return floorEntry.getValue();
     }
 
     public int size() {
@@ -81,6 +96,10 @@ class AllocationGrids<K> {
 
     public Collection<Map<K, DoubleGrid2D>> values() {
         return grids.values();
+    }
+
+    public IntPredicate getSchedule() {
+        return step -> grids.containsKey(step % period);
     }
 
 }

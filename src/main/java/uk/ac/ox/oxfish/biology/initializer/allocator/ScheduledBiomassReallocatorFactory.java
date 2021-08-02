@@ -25,16 +25,17 @@ import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class BiomassReallocatorFactory
+public class ScheduledBiomassReallocatorFactory
     extends ReallocatorFactory
-    implements AlgorithmFactory<BiomassReallocator> {
+    implements AlgorithmFactory<ScheduledBiomassReallocator> {
 
     private MapExtent mapExtent;
 
-    public BiomassReallocatorFactory() {
+    @SuppressWarnings("unused") // need empty constructor for YAML
+    public ScheduledBiomassReallocatorFactory() {
     }
 
-    public BiomassReallocatorFactory(
+    public ScheduledBiomassReallocatorFactory(
         final Path speciesCodesFilePath,
         final Path biomassDistributionsFilePath,
         final int period
@@ -51,14 +52,19 @@ public class BiomassReallocatorFactory
     }
 
     @Override
-    public BiomassReallocator apply(final FishState fishState) {
+    public ScheduledBiomassReallocator apply(final FishState fishState) {
         checkNotNull(mapExtent, "Need to call setMapExtent() before using");
         final AllocationGrids<String> grids =
             new AllocationGridsSupplier(
                 getSpeciesCodesFilePath(),
                 getBiomassDistributionsFilePath(),
-                mapExtent
+                mapExtent,
+                getPeriod()
             ).get();
-        return new BiomassReallocator(grids, getPeriod());
+        return new ScheduledBiomassReallocator(
+            new BiomassReallocator(grids),
+            new BiomassAggregator(),
+            grids.getSchedule()
+        );
     }
 }

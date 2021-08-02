@@ -25,7 +25,7 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,7 +39,7 @@ import java.util.function.IntSupplier;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Comparator.comparingInt;
 
-public class FadInitializer implements Function<FadManager, Fad> {
+public class FadInitializer implements Function<FadManager, BiomassFad> {
 
     private final double[] emptyBiomasses;
     private final Collection<DoubleSupplier> carryingCapacitySuppliers;
@@ -68,13 +68,13 @@ public class FadInitializer implements Function<FadManager, Fad> {
     }
 
     @Override
-    public Fad apply(@NotNull final FadManager fadManager) {
+    public BiomassFad apply(@NotNull final FadManager fadManager) {
         final SeaTile seaTile = fadManager.getFisher().getLocation();
         final double[] carryingCapacities =
             carryingCapacitySuppliers.stream()
                 .mapToDouble(DoubleSupplier::getAsDouble)
                 .toArray();
-        return new Fad(
+        return new BiomassFad(
             fadManager,
             new BiomassLocalBiology(emptyBiomasses, carryingCapacities),
             fadBiomassAttractors,

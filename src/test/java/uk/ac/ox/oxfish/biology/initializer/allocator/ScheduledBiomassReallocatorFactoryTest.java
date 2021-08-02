@@ -18,8 +18,12 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
+import java.nio.file.Path;
+import java.util.Arrays;
 import junit.framework.TestCase;
-import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
@@ -27,36 +31,36 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-public class BiomassReallocatorFactoryTest extends TestCase {
+public class ScheduledBiomassReallocatorFactoryTest extends TestCase {
 
     public void testBuildBiomassGrids() {
-        final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
+        final ScheduledBiomassReallocatorFactory
+            scheduledBiomassReallocatorFactory = new ScheduledBiomassReallocatorFactory(
             TunaScenario.input("species_codes.csv"),
             TunaScenario.input("biomass_distributions.csv"),
             365
         );
         final Path depthFile = TunaScenario.input("depth.csv");
-        final MapInitializer mapInitializer = new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
+        final MapInitializer mapInitializer =
+            new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
-        biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
-        final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(mock(FishState.class));
-        assertEquals(365, biomassReallocator.getPeriod());
-        assertEquals(12, biomassReallocator.getAllocationGrids().size());
-        final Collection<Map<String, DoubleGrid2D>> biomassGrids = biomassReallocator.getAllocationGrids().values();
-        biomassGrids.forEach(gridsPerSpecies -> {
+        scheduledBiomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
+        final ScheduledBiomassReallocator biomassReallocator =
+            scheduledBiomassReallocatorFactory.apply(mock(FishState.class));
+        final AllocationGrids<String> allocationGrids =
+            biomassReallocator.getReallocator().getAllocationGrids();
+        assertEquals(365, allocationGrids.getPeriod());
+        assertEquals(12, allocationGrids.size());
+        allocationGrids.values().forEach(gridsPerSpecies -> {
             assertEquals(3, gridsPerSpecies.size());
             gridsPerSpecies.values().forEach(grid -> {
                 assertEquals(100, grid.getHeight());
                 assertEquals(101, grid.getWidth());
-                assertEquals(1.0, Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(), EPSILON);
+                assertEquals(
+                    1.0,
+                    Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(),
+                    EPSILON
+                );
             });
         });
     }

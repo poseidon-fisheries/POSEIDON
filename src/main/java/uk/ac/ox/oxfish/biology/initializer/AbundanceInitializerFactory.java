@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.comparingInt;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
-import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -48,7 +49,8 @@ public class AbundanceInitializerFactory
 
     private Path speciesCodesFilePath;
     private Path binsFilePath;
-    private AbundanceReallocatorFactory abundanceReallocatorFactory;
+
+    private AbundanceReallocator abundanceReallocator;
 
     /**
      * Empty constructor to allow YAML instantiation.
@@ -60,12 +62,10 @@ public class AbundanceInitializerFactory
 
     public AbundanceInitializerFactory(
         final Path speciesCodesFilePath,
-        final Path binsFilePath,
-        final AbundanceReallocatorFactory abundanceReallocatorFactory
+        final Path binsFilePath
     ) {
         this.speciesCodesFilePath = speciesCodesFilePath;
         this.binsFilePath = binsFilePath;
-        this.abundanceReallocatorFactory = abundanceReallocatorFactory;
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
@@ -98,18 +98,6 @@ public class AbundanceInitializerFactory
     }
 
     @SuppressWarnings("unused")
-    public AbundanceReallocatorFactory getAbundanceReallocatorFactory() {
-        return abundanceReallocatorFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceReallocatorFactory(
-        final AbundanceReallocatorFactory abundanceReallocatorFactory
-    ) {
-        this.abundanceReallocatorFactory = abundanceReallocatorFactory;
-    }
-
-    @SuppressWarnings("unused")
     public Path getSpeciesCodesFilePath() {
         return speciesCodesFilePath;
     }
@@ -131,10 +119,19 @@ public class AbundanceInitializerFactory
 
     @Override
     public AbundanceInitializer apply(final FishState fishState) {
+        checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator() before using");
         return new AbundanceInitializer(
             new SpeciesCodesFromFileFactory(this.speciesCodesFilePath).get(),
             binsCache.getUnchecked(this.binsFilePath),
-            abundanceReallocatorFactory.apply(fishState)
+            abundanceReallocator
         );
+    }
+
+    public AbundanceReallocator getAbundanceReallocator() {
+        return abundanceReallocator;
+    }
+
+    public void setAbundanceReallocator(AbundanceReallocator abundanceReallocator) {
+        this.abundanceReallocator = abundanceReallocator;
     }
 }

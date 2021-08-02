@@ -47,16 +47,16 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class BiomassReallocatorInitializerFactory
     implements AlgorithmFactory<BiomassReallocatorInitializer> {
 
-    private AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory;
+    private AlgorithmFactory<ScheduledBiomassReallocator> biomassReallocatorFactory;
     private SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path schaeferParamsFile = input("schaefer_params.csv");
 
-    public AlgorithmFactory<? extends BiomassReallocator> getBiomassReallocatorFactory() {
+    public AlgorithmFactory<ScheduledBiomassReallocator> getBiomassReallocatorFactory() {
         return biomassReallocatorFactory;
     }
 
     public void setBiomassReallocatorFactory(
-        final AlgorithmFactory<? extends BiomassReallocator> biomassReallocatorFactory
+        final AlgorithmFactory<ScheduledBiomassReallocator> biomassReallocatorFactory
     ) {
         this.biomassReallocatorFactory = biomassReallocatorFactory;
     }
@@ -81,6 +81,7 @@ public class BiomassReallocatorInitializerFactory
         final Map<String, GridAllocator> initialAllocators =
             biomassReallocatorFactory
                 .apply(fishState)
+                .getReallocator()
                 .getAllocationGrids()
                 .atStep(0)
                 .map(grids -> grids.entrySet().stream()

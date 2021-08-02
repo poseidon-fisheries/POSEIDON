@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -76,7 +76,7 @@ public class FadMapTest {
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final Fad fad = fadManager.deployFad(startTile);
+        final BiomassFad fad = fadManager.deployFad(startTile);
         fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology = (VariableBiomassBasedBiology) startTile.getBiology();

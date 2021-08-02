@@ -61,7 +61,7 @@ public class FadManager {
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor;
-    private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
+    private final ListOrderedSet<BiomassFad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
@@ -134,7 +134,7 @@ public class FadManager {
 
     public int getNumDeployedFads() { return deployedFads.size(); }
 
-    public Set<Fad> getDeployedFads() { return Collections.unmodifiableSet(deployedFads); }
+    public Set<BiomassFad> getDeployedFads() { return Collections.unmodifiableSet(deployedFads); }
 
     public Fisher getFisher() { return fisher; }
 
@@ -142,25 +142,25 @@ public class FadManager {
         this.fisher = fisher;
     }
 
-    public Stream<Fad> getFadsAt(final SeaTile location) {
+    public Stream<BiomassFad> getFadsAt(final SeaTile location) {
         return bagToStream(fadMap.fadsAt(location));
     }
 
-    public void loseFad(final Fad fad) {
+    public void loseFad(final BiomassFad fad) {
         checkArgument(deployedFads.contains(fad));
         deployedFads.remove(fad);
     }
 
-    public Fad deployFad(final SeaTile seaTile) {
-        final Fad newFad = initFad();
+    public BiomassFad deployFad(final SeaTile seaTile) {
+        final BiomassFad newFad = initFad();
         fadMap.deployFad(newFad, seaTile);
         return newFad;
     }
 
-    private Fad initFad() {
+    private BiomassFad initFad() {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
-        final Fad newFad = fadInitializer.apply(this);
+        final BiomassFad newFad = fadInitializer.apply(this);
         deployedFads.add(newFad);
         return newFad;
     }
@@ -176,7 +176,7 @@ public class FadManager {
     }
 
     private void deployFad(final Double2D location) {
-        final Fad newFad = initFad();
+        final BiomassFad newFad = initFad();
         fadMap.deployFad(newFad, location);
     }
 

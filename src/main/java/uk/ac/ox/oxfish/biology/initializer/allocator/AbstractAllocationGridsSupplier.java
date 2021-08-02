@@ -49,6 +49,7 @@ abstract class AbstractAllocationGridsSupplier<K>
     private final Path speciesCodesFilePath;
     private final Path gridsFilePath;
     private final MapExtent mapExtent;
+    private final int period;
 
     private final LoadingCache<AbstractAllocationGridsSupplier<K>, AllocationGrids<K>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
@@ -56,11 +57,13 @@ abstract class AbstractAllocationGridsSupplier<K>
     AbstractAllocationGridsSupplier(
         final Path speciesCodesFilePath,
         final Path gridsFilePath,
-        final MapExtent mapExtent
+        final MapExtent mapExtent,
+        final int period
     ) {
         this.speciesCodesFilePath = speciesCodesFilePath;
         this.gridsFilePath = gridsFilePath;
         this.mapExtent = mapExtent;
+        this.period = period;
     }
 
     @Override
@@ -122,7 +125,8 @@ abstract class AbstractAllocationGridsSupplier<K>
                         Map.Entry::getKey,
                         subEntry -> makeGrid(mapExtent, subEntry.getValue())
                     ))
-                ))
+                )),
+            period
         );
     }
 

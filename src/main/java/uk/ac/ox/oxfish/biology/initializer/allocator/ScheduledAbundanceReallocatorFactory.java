@@ -29,13 +29,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.IntFunction;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmallLargeAllocationGridsSupplier.SizeGroup;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class AbundanceReallocatorFactory
-    extends ReallocatorFactory
-    implements AlgorithmFactory<AbundanceReallocator> {
+public class ScheduledAbundanceReallocatorFactory
+    extends ReallocatorFactory implements
+    AlgorithmFactory<ScheduledAbundanceReallocator> {
 
     private Map<String, Integer> firstLargeBinPerSpecies;
     private MapExtent mapExtent;
@@ -44,10 +45,10 @@ public class AbundanceReallocatorFactory
      * Empty constructor to allow YAML instantiation.
      */
     @SuppressWarnings("unused")
-    public AbundanceReallocatorFactory() {
+    public ScheduledAbundanceReallocatorFactory() {
     }
 
-    public AbundanceReallocatorFactory(
+    public ScheduledAbundanceReallocatorFactory(
         final Path speciesCodesFilePath,
         final Path biomassDistributionsFilePath,
         final int period,
@@ -66,19 +67,24 @@ public class AbundanceReallocatorFactory
     }
 
     @Override
-    public AbundanceReallocator apply(final FishState fishState) {
+    public ScheduledAbundanceReallocator apply(final FishState fishState) {
         checkNotNull(mapExtent, "Need to call setMapExtent() before using");
         final AllocationGrids<Entry<String, SizeGroup>> grids =
             new SmallLargeAllocationGridsSupplier(
                 getSpeciesCodesFilePath(),
                 getBiomassDistributionsFilePath(),
-                this.mapExtent
+                this.mapExtent,
+                getPeriod()
             ).get();
         final Map<String, IntFunction<SizeGroup>> binToSizeGroupMappings =
             firstLargeBinPerSpecies.entrySet().stream().collect(toImmutableMap(
                 Entry::getKey,
                 entry -> bin -> bin >= entry.getValue() ? LARGE : SMALL
             ));
-        return new AbundanceReallocator(grids, getPeriod(), binToSizeGroupMappings);
+        return new ScheduledAbundanceReallocator(
+            new AbundanceReallocator(grids, binToSizeGroupMappings),
+            new AbundanceAggregator(),
+            grids.getSchedule()
+        );
     }
 }

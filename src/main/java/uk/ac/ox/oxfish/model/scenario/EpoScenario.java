@@ -32,7 +32,8 @@ import java.util.Set;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledAbundanceReallocator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledAbundanceReallocatorFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -51,22 +52,24 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class EpoScenario implements Scenario {
 
     private static final Path INPUT_PATH = Paths.get("inputs", "epo");
+    final ScheduledAbundanceReallocatorFactory scheduledAbundanceReallocatorFactory =
+        new ScheduledAbundanceReallocatorFactory(
+            INPUT_PATH.resolve("species_codes.csv"),
+            INPUT_PATH.resolve("grids.csv"),
+            365,
+            ImmutableMap.of(
+                "Skipjack tuna", 14,
+                "Bigeye tuna", 8,
+                "Yellowfin tuna", 9
+            )
+        );
     private Set<AdditionalStartable> additionalStartables = new HashSet<>();
     private AbundanceInitializerFactory abundanceInitializerFactory =
         new AbundanceInitializerFactory(
             INPUT_PATH.resolve("species_codes.csv"),
-            INPUT_PATH.resolve("bins.csv"),
-            new AbundanceReallocatorFactory(
-                INPUT_PATH.resolve("species_codes.csv"),
-                INPUT_PATH.resolve("grids.csv"),
-                365,
-                ImmutableMap.of(
-                    "Skipjack tuna", 14,
-                    "Bigeye tuna", 8,
-                    "Yellowfin tuna", 9
-                )
-            )
+            INPUT_PATH.resolve("bins.csv")
         );
+
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             INPUT_PATH.resolve("depth.csv"),
@@ -120,14 +123,17 @@ public class EpoScenario implements Scenario {
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
-        abundanceInitializerFactory
-            .getAbundanceReallocatorFactory()
-            .setMapExtent(new MapExtent(nauticalMap));
+        scheduledAbundanceReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
+        final ScheduledAbundanceReallocator scheduledAbundanceReallocator =
+            scheduledAbundanceReallocatorFactory.apply(fishState);
+        additionalStartables.add(scheduledAbundanceReallocator);
+
+        abundanceInitializerFactory.setAbundanceReallocator(
+            scheduledAbundanceReallocator.getReallocator()
+        );
 
         final AbundanceInitializer abundanceInitializer =
             abundanceInitializerFactory.apply(fishState);
-
-        additionalStartables.add(abundanceInitializer.getAbundanceReallocator());
 
         final GlobalBiology globalBiology =
             abundanceInitializer.generateGlobal(rng, fishState);

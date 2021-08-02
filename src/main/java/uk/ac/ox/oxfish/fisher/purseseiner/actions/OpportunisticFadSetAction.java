@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
@@ -29,7 +29,7 @@ public class OpportunisticFadSetAction extends AbstractFadSetAction {
 
     public OpportunisticFadSetAction(
         final Fisher fisher,
-        final Fad fad
+        final BiomassFad fad
     ) {
         super(fisher, fad);
         checkArgument(getFadManager(getFisher()) != fad.getOwner());

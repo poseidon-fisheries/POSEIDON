@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFadBiomassAttractor;
@@ -200,7 +200,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(Fad::getBiology).collect(toImmutableList());
+            fadMap.allBiomassFads().map(BiomassFad::getBiology).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses = totalBiomasses(globalBiology, fadBiologies);
 
         // Check that FADs have attracted the right biomass

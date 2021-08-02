@@ -48,7 +48,7 @@ public class FadTest {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, 0.75);
         fillBiology(fadBiology);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final Fad fad = new Fad(
+        final BiomassFad fad = new BiomassFad(
             fadManager,
             fadBiology,
             ImmutableMap.of(),

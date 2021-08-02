@@ -66,7 +66,7 @@ import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiomassReallocatorInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledBiomassReallocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassRestorerFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
@@ -179,7 +179,8 @@ public class TunaScenario implements Scenario {
 
     private BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory = new BiomassReallocatorInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
-    private BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
+    private ScheduledBiomassReallocatorFactory
+        scheduledBiomassReallocatorFactory = new ScheduledBiomassReallocatorFactory(
         input("species_codes.csv"),
         input("biomass_distributions.csv"),
         365
@@ -288,13 +289,13 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public BiomassReallocatorFactory getBiomassReallocatorFactory() {
-        return biomassReallocatorFactory;
+    public ScheduledBiomassReallocatorFactory getBiomassReallocatorFactory() {
+        return scheduledBiomassReallocatorFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setBiomassReallocatorFactory(final BiomassReallocatorFactory biomassReallocatorFactory) {
-        this.biomassReallocatorFactory = biomassReallocatorFactory;
+    public void setBiomassReallocatorFactory(final ScheduledBiomassReallocatorFactory scheduledBiomassReallocatorFactory) {
+        this.scheduledBiomassReallocatorFactory = scheduledBiomassReallocatorFactory;
     }
 
     @SuppressWarnings("unused")
@@ -382,13 +383,14 @@ public class TunaScenario implements Scenario {
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, null, model);
         final MapExtent mapExtent = new MapExtent(nauticalMap);
 
-        plugins.add(biomassReallocatorFactory);
+        plugins.add(scheduledBiomassReallocatorFactory);
 
-        biomassRestorerFactory.setBiomassReallocatorFactory(biomassReallocatorFactory);
+        biomassRestorerFactory.setBiomassReallocatorFactory(scheduledBiomassReallocatorFactory);
         plugins.add(biomassRestorerFactory);
 
-        biomassReallocatorInitializerFactory.setBiomassReallocatorFactory(biomassReallocatorFactory);
-        ((BiomassReallocatorFactory) biomassReallocatorInitializerFactory.getBiomassReallocatorFactory())
+        biomassReallocatorInitializerFactory.setBiomassReallocatorFactory(
+            scheduledBiomassReallocatorFactory);
+        ((ScheduledBiomassReallocatorFactory) biomassReallocatorInitializerFactory.getBiomassReallocatorFactory())
             .setMapExtent(mapExtent);
         final BiomassReallocatorInitializer biologyInitializer = biomassReallocatorInitializerFactory.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);

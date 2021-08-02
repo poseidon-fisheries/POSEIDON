@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -88,7 +88,7 @@ public class SetOpportunityDetector {
         final double p = getDetectionProbability(OpportunisticFadSetAction.class);
         // using the bag directly for speed, here
         for (int i = 0; i < fadsHere.numObjs; i++) {
-            final Fad fad = (Fad) fadsHere.objs[i];
+            final BiomassFad fad = (BiomassFad) fadsHere.objs[i];
             if (fad.getOwner() == fadManager)
                 builder.add(new FadSetAction(fisher, fad));
             else if (rng.nextBoolean(p))

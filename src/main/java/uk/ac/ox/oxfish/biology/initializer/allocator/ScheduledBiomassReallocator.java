@@ -18,27 +18,17 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import java.util.function.IntPredicate;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-class AllocationGridsSupplier extends AbstractAllocationGridsSupplier<String> {
+public class ScheduledBiomassReallocator extends
+    ScheduledReallocator<String, Double, BiomassLocalBiology, BiomassAggregator, BiomassReallocator> {
 
-    AllocationGridsSupplier(
-        final Path speciesCodesFilePath,
-        final Path gridsFilePath,
-        final MapExtent mapExtent,
-        final int period
+    public ScheduledBiomassReallocator(
+        final BiomassReallocator reallocator,
+        final BiomassAggregator aggregator,
+        final IntPredicate schedule
     ) {
-        super(speciesCodesFilePath, gridsFilePath, mapExtent, period);
-    }
-
-    @Override
-    String extractKeyFromRecord(
-        final SpeciesCodes speciesCodes,
-        final Record record
-    ) {
-        return speciesCodes.getSpeciesName(record.getString("species_code"));
+        super(reallocator, aggregator, schedule);
     }
 }

@@ -22,28 +22,37 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.initializer.allocator.SmallLargeAllocationGridsSupplier.SizeGroup;
 
-public class BiomassRestorer extends Restorer<String, Double, BiomassLocalBiology> {
+public class AbundanceRestorer extends Restorer<Entry<String, SizeGroup>, double[][], AbundanceLocalBiology> {
 
-    BiomassRestorer(
-        final BiomassReallocator reallocator,
-        final Aggregator<Double, BiomassLocalBiology> aggregator,
+    AbundanceRestorer(
+        final AbundanceReallocator reallocator,
+        final AbundanceAggregator aggregator,
         final Map<Integer, Integer> schedule
     ) {
         super(reallocator, aggregator, schedule);
     }
 
     @Override
-    public Map<Species, Double> subtract(
-        final Map<Species, Double> initialAggregations,
-        final Map<Species, Double> aggregationsToSubtract
+    public Map<Species, double[][]> subtract(
+        final Map<Species, double[][]> initialAggregations,
+        final Map<Species, double[][]> aggregationsToSubtract
     ) {
         return initialAggregations.entrySet().stream()
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> entry.getValue() - aggregationsToSubtract.get(entry.getKey())
+                entry -> {
+                    final DoubleGrid2D snapshotAbundance =
+                        new DoubleGrid2D(entry.getValue());
+                    final DoubleGrid2D fadsAbundance =
+                        new DoubleGrid2D(aggregationsToSubtract.get(entry.getKey()));
+                    return snapshotAbundance.add(fadsAbundance.multiply(-1)).getField();
+                }
             ));
     }
+
 }

@@ -6,7 +6,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -47,7 +47,7 @@ public class FadInitializerTest {
         when(fisher.getLocation()).thenReturn(seaTile);
         fadManager.setFisher(fisher);
 
-        final Fad fad = fadInitializer.apply(fadManager);
+        final BiomassFad fad = fadInitializer.apply(fadManager);
         for (final Species species : globalBiology.getSpecies())
             assertEquals(fad.getBiology().getBiomass(species), 0, 0);
     }

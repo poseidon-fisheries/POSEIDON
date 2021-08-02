@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.model.event;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -60,9 +60,9 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
         } else{
             //
             List<LocalBiology> locals = new LinkedList<>(seaTiles);
-            model.getFadMap().allFads().map(new Function<Fad, LocalBiology>() {
+            model.getFadMap().allBiomassFads().map(new Function<BiomassFad, LocalBiology>() {
                 @Override
-                public LocalBiology apply(Fad fad) {
+                public LocalBiology apply(BiomassFad fad) {
                     return fad.getBiology();
                 }
             }).forEach(new Consumer<LocalBiology>() {
