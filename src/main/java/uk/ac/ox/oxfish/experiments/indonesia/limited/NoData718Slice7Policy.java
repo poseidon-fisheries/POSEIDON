@@ -45,10 +45,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -340,29 +337,74 @@ public class NoData718Slice7Policy {
         return yearOfShock -> scenario -> {
             final FlexibleScenario cast = ((FlexibleScenario) scenario);
             for (int numberOfAgents : SPR_AGENT_NUMBERS) {
-                String sprAgent =
-                        "SPR Fixed Sample Agent:\n" +
-                                "      assumedKParameter: '" + 0.3775984 + "'\n" +
-                                "      assumedLengthAtMaturity: '50.0'\n" +
-                                "      assumedLengthBinCm: '5.0'\n" +
-                                "      assumedLinf: '86.0'\n" +
-                                "      assumedNaturalMortality: '0.3775984'\n" +
-                                "      assumedVarA: '0.00853'\n" +
-                                "      assumedVarB: '3.137'\n" +
-                                "      simulatedMaxAge: '100.0'\n" +
-                                "      simulatedVirginRecruits: '1000.0'\n" +
-                                "      speciesName: Lutjanus malabaricus\n" +
-                                "      surveyTag: spr_agent_agent" + numberOfAgents + "\n" +
-                                "      useTNCFormula: " + true + "\n" +
-                                "      tagsToSample:\n" +
-                                "        population0: " + numberOfAgents + "\n" +
-                                "        population1: " + numberOfAgents + "\n" +
-                                "        population2: " + numberOfAgents;
                 FishYAML yaml = new FishYAML();
+
+                for (boolean hadrian : new boolean[]{false, true}) {
+                    String sprAgent =
+                            buildSPRAgentHelper(
+                                    50,
+                                    0.4438437,
+                                    86,
+                                    0.3775984,
+                                    0.00853,
+                                    3.137,
+                                    hadrian,
+                                    numberOfAgents,
+                                    "spr_agent_agent",
+                                    "Lutjanus malabaricus"
+                            );
+                    cast.getPlugins().add(yaml.loadAs(sprAgent,
+                            AlgorithmFactory.class));
+                }
+                String sprAgent =
+                        buildSPRAgentHelper(
+                                29,
+                                0.322,
+                                59,
+                                0.495,
+                                0.0197,
+                                2.99,
+                                false,
+                                numberOfAgents,
+                                "spr_laticaudis_agent",
+                                "Lethrinus laticaudis"
+                        );
                 cast.getPlugins().add(yaml.loadAs(sprAgent,
                         AlgorithmFactory.class));
-
+                sprAgent =
+                        buildSPRAgentHelper(
+                                34,
+                                0.291,
+                                68,
+                                0.447,
+                                0.0128,
+                                2.94,
+                                false,
+                                numberOfAgents,
+                                "spr_brevis_agent",
+                                "Atrobucca brevis"
+                        );
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
+                sprAgent =
+                        buildSPRAgentHelper(
+                                50,
+                                0.4438437,
+                                86,
+                                0.3775984,
+                                0.02,
+                                2.94,
+                                false,
+                                numberOfAgents,
+                                "spr_multi_agent",
+                                "Pristipomoides multidens"
+                        );
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
             }
+
+
+
 
         };
     }
@@ -371,10 +413,10 @@ public class NoData718Slice7Policy {
     static {
 
         checkSPRDifferentials.put("BAU_observed",addSPRAgents());
-        checkSPRDifferentials.put("5cmshifted_observed", new Function<Integer, Consumer<Scenario>>() {
+        checkSPRDifferentials.put("8cmshifted_observed", new Function<Integer, Consumer<Scenario>>() {
             @Override
             public Consumer<Scenario> apply(Integer integer) {
-                return selectivityShiftSimulations(5,2, 1.0).apply(integer).andThen(addSPRAgents().apply(0));
+                return selectivityShiftSimulations(8,2, 1.0).apply(integer).andThen(addSPRAgents().apply(0));
             }
         });
 
@@ -485,13 +527,41 @@ public class NoData718Slice7Policy {
         }
         else if(args[0].equals("sprnumbers")){
 
+            final String[] variablesToTrack =
+                    new String[]{"SPR","Mean Length Caught","CPUE",
+                            "Percentage Mature Catches",
+                            "Percentage Lopt Catches"};
+
             final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
-            for (int numberOfAgents : SPR_AGENT_NUMBERS) {
-                columns.add( "SPR Lutjanus malabaricus spr_agent" + numberOfAgents);
-                columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent" + numberOfAgents);
-                columns.add( "CPUE Lutjanus malabaricus spr_agent" + numberOfAgents);
-                columns.add( "M/K ratio Lutjanus malabaricus spr_agent" + numberOfAgents);
+            HashMap<String,String> speciesToAgentNameMap = new HashMap<>();
+            speciesToAgentNameMap.put("Lutjanus malabaricus","spr_agent_agent");
+            speciesToAgentNameMap.put("Lethrinus laticaudis","spr_laticaudis_agent");
+            speciesToAgentNameMap.put("Atrobucca brevis","spr_brevis_agent");
+            speciesToAgentNameMap.put("Pristipomoides multidens","spr_multi_agent");
+            for (Map.Entry<String, String> speciesToAgent : speciesToAgentNameMap.entrySet()) {
+                for (int numberOfAgents : SPR_AGENT_NUMBERS)
+                {
+                    for (String variable : variablesToTrack)
+                    {
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue()  + numberOfAgents);
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" hadrian_" + speciesToAgent.getValue()  + numberOfAgents);
+
+                    }
+
+//                    columns.add( "Mean Length Caught "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue()  + numberOfAgents);
+//                    columns.add( "CPUE "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue() + numberOfAgents);
+//                    columns.add( "SPR "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue() + " " + numberOfAgents);
+//                    columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//                    columns.add( "CPUE Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//                    columns.add( "M/K ratio Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//
+//                    columns.add( "SPR Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//                    columns.add( "Mean Length Caught Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//                    columns.add( "CPUE Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+//                    columns.add( "M/K ratio Lutjanus malabaricus spr_agent_agent" + numberOfAgents);
+                }
             }
+
 
             runPolicyDirectory(
                     CANDIDATES_CSV_FILE.toFile(),
@@ -545,6 +615,38 @@ public class NoData718Slice7Policy {
                     additionalPlugins, null);
         }
 
+    }
+
+
+    private static String buildSPRAgentHelper(double lengthAtMaturity,
+                                              double KParameter,
+                                              double lInf,
+                                              double naturalMortality,
+                                              double variableA,
+                                              double variableB,
+                                              boolean hadrian,
+                                              int numberOfAgents,
+                                              String baseTag, final String speciesName){
+        String tag =  hadrian? "hadrian_" + baseTag : baseTag;
+
+        return
+                "SPR Fixed Sample Agent:\n" +
+                        "      assumedKParameter: '" + KParameter + "'\n" +
+                        "      assumedLengthAtMaturity: '" + lengthAtMaturity + "'\n" +
+                        "      assumedLengthBinCm: '5.0'\n" +
+                        "      assumedLinf: '" + lInf + "'\n" +
+                        "      assumedNaturalMortality: '" + naturalMortality + "'\n" +
+                        "      assumedVarA: '" + variableA + "'\n" +
+                        "      assumedVarB: '" + variableB + "'\n" +
+                        "      simulatedMaxAge: '100.0'\n" +
+                        "      simulatedVirginRecruits: '1000.0'\n" +
+                        "      speciesName: " + speciesName + "\n" +
+                        "      surveyTag: "+tag + numberOfAgents + "\n" +
+                        "      useTNCFormula: " + !hadrian + "\n" +
+                        "      tagsToSample:\n" +
+                        "        population0: " + numberOfAgents + "\n" +
+                        "        population1: " + numberOfAgents + "\n" +
+                        "        population2: " + numberOfAgents;
     }
 
 }

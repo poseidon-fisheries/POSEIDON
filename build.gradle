@@ -177,18 +177,7 @@ task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.
     }
 }
 
-task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    mergeServiceFiles()
-    archiveFileName = 'salehbaycalibration.jar'
-    from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
-    configurations = [project.configurations.implementation]
 
-    //tells the task to shadow in the jars files in the 'runtime' scope
-    manifest {
-        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.mera.comparisons.SalehBayOneSpeciesCalibration'
-    }
-}
 
 task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
@@ -255,13 +244,13 @@ task fatJarMeraSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.Sha
 
 task fatJarSalehBay(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
-    archiveFileName = 'oxfish_salehbay.jar'
+    archiveFileName = 'oxfish_salehbay_policy.jar'
     from sourceSets.main.output //tells the task to include the project code
     project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
     //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
-        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.mera.comparisons.SalehBayCalibration'
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.mera.comparisons.SalehBayPolicy'
     }
 }
 
