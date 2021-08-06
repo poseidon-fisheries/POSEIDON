@@ -22,11 +22,10 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-
-import java.util.Arrays;
 
 /**
  * A simple local biology that has carrying capacity and actual biomass.
@@ -45,6 +44,16 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      */
     private double[] carryingCapacity;
 
+    /**
+     * Initialize the local biology with biomass information only.
+     * Carrying capacity is set to an array of NaN.
+     * @param currentBiomass the biomass available.
+     */
+    public BiomassLocalBiology(final double[] currentBiomass) {
+        this.currentBiomass = Arrays.copyOf(currentBiomass, currentBiomass.length);
+        this.carryingCapacity = new double[currentBiomass.length];
+        Arrays.fill(carryingCapacity, Double.NaN);
+    }
 
     /**
      * initialize the local biology

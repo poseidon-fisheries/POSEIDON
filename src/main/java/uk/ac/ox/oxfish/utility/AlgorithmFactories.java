@@ -46,6 +46,7 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.biology.initializer.allocator.Allocators;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
+import uk.ac.ox.oxfish.biology.tuna.ScheduledBiologicalProcesses;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;

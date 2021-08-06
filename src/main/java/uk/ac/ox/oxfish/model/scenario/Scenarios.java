@@ -48,6 +48,7 @@ public class Scenarios {
         SCENARIOS.put("Abstract",PrototypeScenario::new);
         DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
 
+        /*
         SCENARIOS.put("Flexible",FlexibleScenario::new);
         DESCRIPTIONS.put("Flexible", "The conceptual model, with multiple populations");
 
@@ -80,7 +81,7 @@ public class Scenarios {
 
         SCENARIOS.put("Tuna", TunaScenario::new);
         DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
-
+*/
         SCENARIOS.put("EPO", EpoScenario::new);
         DESCRIPTIONS.put("EPO", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
 

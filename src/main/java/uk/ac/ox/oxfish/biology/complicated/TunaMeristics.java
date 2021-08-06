@@ -27,6 +27,7 @@ import com.google.common.collect.Streams;
 import com.google.common.primitives.ImmutableDoubleArray;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Tuna-style meristics track male and females separately.
@@ -34,10 +35,12 @@ import java.util.List;
 @SuppressWarnings("UnstableApiUsage")
 public class TunaMeristics implements Meristics {
 
-    public static final int NUMBER_OF_SUBDIVISIONS = 2; // MALE and FEMALE
+    private static final int NUMBER_OF_SUBDIVISIONS = 2; // MALE and FEMALE
     private final int numberOfBins;
     private final List<ImmutableDoubleArray> weights;
     private final List<ImmutableDoubleArray> lengths;
+    private final List<ImmutableDoubleArray> proportionalMortalities;
+    private final ImmutableDoubleArray maturity;
 
     /**
      * Constructs a new TunaMeristics object.
@@ -49,12 +52,20 @@ public class TunaMeristics implements Meristics {
      */
     public TunaMeristics(
         final Iterable<double[]> weights,
-        final Iterable<double[]> lengths
+        final Iterable<double[]> lengths,
+        final Iterable<double[]> proportionalMortalities,
+        final double[] maturity
     ) {
         this(
-            stream(weights).map(ImmutableDoubleArray::copyOf).collect(toImmutableList()),
-            stream(lengths).map(ImmutableDoubleArray::copyOf).collect(toImmutableList())
+            copyArrays(weights),
+            copyArrays(lengths),
+            copyArrays(proportionalMortalities),
+            ImmutableDoubleArray.copyOf(maturity)
         );
+    }
+
+    private static List<ImmutableDoubleArray> copyArrays(final Iterable<double[]> arrays) {
+        return stream(arrays).map(ImmutableDoubleArray::copyOf).collect(toImmutableList());
     }
 
     /**
@@ -68,19 +79,47 @@ public class TunaMeristics implements Meristics {
      */
     public TunaMeristics(
         final Collection<ImmutableDoubleArray> weights,
-        final Collection<ImmutableDoubleArray> lengths
+        final Collection<ImmutableDoubleArray> lengths,
+        final Collection<ImmutableDoubleArray> proportionalMortalities,
+        final ImmutableDoubleArray maturity
     ) {
-        checkArgument(weights.size() == NUMBER_OF_SUBDIVISIONS);
-        checkArgument(lengths.size() == NUMBER_OF_SUBDIVISIONS);
+        final ImmutableList<Collection<ImmutableDoubleArray>> subdividedCollections =
+            ImmutableList.of(
+                weights,
+                lengths,
+                proportionalMortalities
+            );
+        // Check that all subdivided collections have the right number of subdivisions
+        checkArgument(
+            subdividedCollections.stream()
+                .map(Collection::size)
+                .allMatch(size -> size == NUMBER_OF_SUBDIVISIONS)
+        );
+
+        // Check that all arrays have the same number of bins
         final int[] arraySizes = Streams
-            .concat(weights.stream(), lengths.stream())
+            .concat(
+                subdividedCollections.stream().flatMap(Collection::stream),
+                Stream.of(maturity)
+            )
             .mapToInt(ImmutableDoubleArray::length)
             .distinct()
             .toArray();
         checkArgument(arraySizes.length == 1);
+
         this.numberOfBins = arraySizes[0];
         this.weights = ImmutableList.copyOf(weights);
         this.lengths = ImmutableList.copyOf(lengths);
+        this.proportionalMortalities = ImmutableList.copyOf(proportionalMortalities);
+        this.maturity = maturity;
+    }
+
+    public ImmutableDoubleArray getMaturity() {
+        return maturity;
+    }
+
+    public List<ImmutableDoubleArray> getProportionalMortalities() {
+        return proportionalMortalities;
     }
 
     @Override
@@ -107,4 +146,5 @@ public class TunaMeristics implements Meristics {
     public double getLengthAtAge(final int ageInYears, final int subdivision) {
         throw new UnsupportedOperationException();
     }
+
 }

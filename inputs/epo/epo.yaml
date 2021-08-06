@@ -1,12 +1,20 @@
 EPO:
-  abundanceReallocatorInitializerFactory:
-    abundanceReallocatorFactory:
-      Abundance Reallocator:
-        biomassDistributionsFilePath: inputs/epo/grids.csv
-        period: 365
-        speciesCodesFilePath: inputs/epo/species_codes.csv
-    binsFilePath: inputs/epo/bins.csv
-    speciesCodesFilePath: inputs/epo/species_codes.csv
+  abundanceInitializerFactory:
+    Abundance Initializer Factory:
+      binsFilePath: inputs/epo/bins.csv
+  abundanceReallocatorFactory:
+    Abundance Reallocator:
+      biomassDistributionsFilePath: inputs/epo/grids.csv
+      firstLargeBinPerSpecies:
+        Skipjack tuna: 14
+        Bigeye tuna: 8
+        Yellowfin tuna: 9
+  abundanceRestorerFactory:
+    schedule:
+      0: 364
+  fadMapFactory:
+    currentFiles:
+      Y2017: inputs/epo/currents_2017.csv
   mapInitializerFactory:
     From File Map:
       gridWidthInCell: '101.0'
@@ -14,3 +22,11 @@ EPO:
       latLong: true
       mapFile: inputs/epo/depth.csv
       mapPaddingInDegrees: '0.5'
+  recruitmentProcessesFactory:
+    recruitmentParametersFilePath: inputs/epo/recruitment_parameters.csv
+  scheduledAbundanceProcessesFactory:
+    biologicalProcessesDates:
+    - '2017-01-01'
+    - '2017-04-01'
+    - '2017-07-01'
+    - '2017-10-01'

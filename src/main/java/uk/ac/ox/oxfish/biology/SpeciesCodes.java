@@ -2,10 +2,10 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class SpeciesCodes {
 
@@ -14,7 +14,7 @@ public class SpeciesCodes {
     /**
      * @param bimap A map from species code to species name.
      */
-    public SpeciesCodes(Map<String, String> bimap) {
+    public SpeciesCodes(final Map<String, String> bimap) {
         this.bimap = ImmutableBiMap.copyOf(bimap);
     }
 
@@ -27,14 +27,20 @@ public class SpeciesCodes {
         return bimap.keySet();
     }
 
-    public String getSpeciesName(String speciesCode) {
-        return Optional.ofNullable(bimap.get(speciesCode))
-            .orElseThrow(() -> new IllegalArgumentException("Unknown species name for code " + speciesCode));
+    public Species getSpeciesFromCode(final GlobalBiology globalBiology, final String speciesCode) {
+        return globalBiology.getSpecie(getSpeciesName(speciesCode));
     }
 
-    public String getSpeciesCode(String speciesName) {
+    public String getSpeciesName(final String speciesCode) {
+        return Optional.ofNullable(bimap.get(speciesCode))
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unknown species name for code " + speciesCode));
+    }
+
+    public String getSpeciesCode(final String speciesName) {
         return Optional.ofNullable(bimap.inverse().get(speciesName))
-            .orElseThrow(() -> new IllegalArgumentException("Unknown species code for name " + speciesName));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unknown species code for name " + speciesName));
 
     }
 

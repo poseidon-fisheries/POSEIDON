@@ -25,15 +25,17 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
-import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -79,20 +81,22 @@ public class AbundanceInitializer implements BiologyInitializer {
         final MersenneTwisterFast rng,
         final FishState fishState
     ) {
-        final Map<Species, double[][]> aggregatedAbundances =
-            binsPerSpecies.entrySet().stream()
-                .collect(toImmutableMap(
-                    entry -> globalBiology.getSpecie(entry.getKey()),
-                    entry -> binsToAbundance(entry.getValue())
-                ));
+        final AbundanceLocalBiology aggregatedAbundance =
+            new AbundanceLocalBiology(
+                binsPerSpecies.entrySet()
+                    .stream()
+                    .collect(toImmutableMap(
+                        entry -> globalBiology.getSpecie(entry.getKey()),
+                        entry -> binsToAbundanceMatrix(entry.getValue())
+                    ))
+            );
         abundanceReallocator.reallocate(
             0,
             globalBiology,
             nauticalMap.getAllSeaTilesExcludingLandAsList(),
-            aggregatedAbundances
+            aggregatedAbundance
         );
     }
-
 
     @Override
     public GlobalBiology generateGlobal(
@@ -106,14 +110,16 @@ public class AbundanceInitializer implements BiologyInitializer {
                 final String speciesName = entry.getKey();
                 final List<Bin> bins = entry.getValue();
                 final TunaMeristics tunaMeristics = new TunaMeristics(
-                    ImmutableList.of(
-                        bins.stream().mapToDouble(bin -> bin.maleWeight).toArray(),
-                        bins.stream().mapToDouble(bin -> bin.femaleWeight).toArray()
+                    makeList(
+                        bins, bin -> bin.maleWeight, bin -> bin.femaleWeight
                     ),
-                    ImmutableList.of(
-                        bins.stream().mapToDouble(bin -> bin.maleLength).toArray(),
-                        bins.stream().mapToDouble(bin -> bin.femaleLength).toArray()
-                    )
+                    makeList(
+                        bins, bin -> bin.maleLength, bin -> bin.femaleLength
+                    ),
+                    makeList(
+                        bins, bin -> bin.maleNaturalMortality, bin -> bin.femaleNaturalMortality
+                    ),
+                    bins.stream().mapToDouble(bin -> bin.maturity).toArray()
                 );
                 return new Species(speciesName, tunaMeristics);
             })
@@ -121,7 +127,18 @@ public class AbundanceInitializer implements BiologyInitializer {
         return new GlobalBiology(species);
     }
 
-    private static double[][] binsToAbundance(final List<? extends Bin> bins) {
+    private static ImmutableList<double[]> makeList(
+        final Collection<Bin> bins,
+        final ToDoubleFunction<Bin> getMaleValue,
+        final ToDoubleFunction<Bin> getFemaleValue
+    ) {
+        return ImmutableList.of(
+            bins.stream().mapToDouble(getMaleValue).toArray(),
+            bins.stream().mapToDouble(getFemaleValue).toArray()
+        );
+    }
+
+    private static double[][] binsToAbundanceMatrix(final List<? extends Bin> bins) {
         final int numSubdivisions = 2; // MALE and FEMALE
         final double[][] abundance = new double[numSubdivisions][bins.size()];
         setAll(abundance[MALE], i -> bins.get(i).numberOfMales);

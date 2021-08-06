@@ -22,15 +22,15 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * A local biology object based on abundance.
@@ -75,6 +75,33 @@ public class AbundanceLocalBiology implements LocalBiology
         Arrays.fill(lastComputedBiomass,Double.NaN);
     }
 
+    /**
+     * Creates a new abundance object using the provided abundance map.
+     *
+     * @param abundance A map from species to abundance matrices. The matrices are copied.
+     */
+    public AbundanceLocalBiology(final Map<Species, double[][]> abundance) {
+        abundance.forEach((species, matrix) ->
+            this.abundance.put(
+                species,
+                Arrays.stream(matrix)
+                    .map(a -> Arrays.copyOf(a, a.length))
+                    .toArray(double[][]::new)
+            )
+        );
+        lastComputedBiomass = new double[abundance.size()];
+        Arrays.fill(lastComputedBiomass, Double.NaN);
+    }
+
+    /**
+     * Constructs a new AbundanceLocalBiology by making a copy of another.
+     *
+     * @param other the other AbundanceLocalBiology object to make a copy of.
+     */
+    @SuppressWarnings("CopyConstructorMissesField") // the call to `this` takes care of that
+    public AbundanceLocalBiology(final AbundanceLocalBiology other) {
+        this(other.abundance);
+    }
 
     /**
      * the biomass at this location for a single species.

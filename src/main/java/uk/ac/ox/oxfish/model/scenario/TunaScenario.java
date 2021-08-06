@@ -64,11 +64,14 @@ import javax.measure.quantity.Volume;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
-import uk.ac.ox.oxfish.biology.initializer.BiomassReallocatorInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.ScheduledBiomassReallocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorInitializerFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassRestorerFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializer;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassReallocator;
+import uk.ac.ox.oxfish.biology.tuna.BiomassReallocatorFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassRestorerFactory;
+import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -93,7 +96,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -177,15 +179,17 @@ public class TunaScenario implements Scenario {
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(input("prices.csv"), TARGET_YEAR);
 
-    private BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory = new BiomassReallocatorInitializerFactory();
+    private BiomassReallocatorFactory biomassReallocatorFactory =
+        new BiomassReallocatorFactory(
+            input("biomass_distributions.csv"),
+            365
+        );
+
+    private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
-    private ScheduledBiomassReallocatorFactory
-        scheduledBiomassReallocatorFactory = new ScheduledBiomassReallocatorFactory(
-        input("species_codes.csv"),
-        input("biomass_distributions.csv"),
-        365
-    );
-    private FadMapFactory fadMapFactory = new FadMapFactory();
+    private ScheduledBiomassProcessesFactory
+        scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
+    private FadMapFactory fadMapFactory = new FadMapFactory(currentFiles);
 
     public TunaScenario() {
 
@@ -289,13 +293,13 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public ScheduledBiomassReallocatorFactory getBiomassReallocatorFactory() {
-        return scheduledBiomassReallocatorFactory;
+    public ScheduledBiomassProcessesFactory getBiomassReallocatorFactory() {
+        return scheduledBiomassProcessesFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setBiomassReallocatorFactory(final ScheduledBiomassReallocatorFactory scheduledBiomassReallocatorFactory) {
-        this.scheduledBiomassReallocatorFactory = scheduledBiomassReallocatorFactory;
+    public void setBiomassReallocatorFactory(final ScheduledBiomassProcessesFactory scheduledBiomassProcessesFactory) {
+        this.scheduledBiomassProcessesFactory = scheduledBiomassProcessesFactory;
     }
 
     @SuppressWarnings("unused")
@@ -381,18 +385,22 @@ public class TunaScenario implements Scenario {
         System.out.println("Starting model...");
 
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, null, model);
-        final MapExtent mapExtent = new MapExtent(nauticalMap);
 
-        plugins.add(scheduledBiomassReallocatorFactory);
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        biomassReallocatorFactory.setSpeciesCodes(speciesCodes);
+        biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
+        final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(model);
+        scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);
 
-        biomassRestorerFactory.setBiomassReallocatorFactory(scheduledBiomassReallocatorFactory);
+        plugins.add(fadMapFactory);
+        plugins.add(scheduledBiomassProcessesFactory);
+
+        biomassRestorerFactory.setBiomassReallocator(biomassReallocator);
         plugins.add(biomassRestorerFactory);
 
-        biomassReallocatorInitializerFactory.setBiomassReallocatorFactory(
-            scheduledBiomassReallocatorFactory);
-        ((ScheduledBiomassReallocatorFactory) biomassReallocatorInitializerFactory.getBiomassReallocatorFactory())
-            .setMapExtent(mapExtent);
-        final BiomassReallocatorInitializer biologyInitializer = biomassReallocatorInitializerFactory.apply(model);
+        biomassInitializerFactory.setBiomassReallocator(biomassReallocator);
+
+        final BiomassInitializer biologyInitializer = biomassInitializerFactory.apply(model);
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
 
@@ -422,10 +430,6 @@ public class TunaScenario implements Scenario {
         portInitializer
             .buildPorts(model.getMap(), model.random, seaTile -> marketMap, model, gasPriceMaker)
             .forEach(port -> port.setGasPricePerLiter(gasPrice));
-
-        final FadMap fadMap = fadMapFactory.apply(model);
-        model.setFadMap(fadMap);
-        model.registerStartable(fadMap);
 
         final List<Port> ports = model.getMap().getPorts();
         checkState(!ports.isEmpty());
@@ -577,13 +581,13 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public BiomassReallocatorInitializerFactory getBiomassReallocatorInitializerFactory() {
-        return biomassReallocatorInitializerFactory;
+    public BiomassInitializerFactory getBiomassReallocatorInitializerFactory() {
+        return biomassInitializerFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setBiomassReallocatorInitializerFactory(final BiomassReallocatorInitializerFactory biomassReallocatorInitializerFactory) {
-        this.biomassReallocatorInitializerFactory = biomassReallocatorInitializerFactory;
+    public void setBiomassReallocatorInitializerFactory(final BiomassInitializerFactory biomassInitializerFactory) {
+        this.biomassInitializerFactory = biomassInitializerFactory;
     }
 
     public FadMapFactory getFadMapFactory() {

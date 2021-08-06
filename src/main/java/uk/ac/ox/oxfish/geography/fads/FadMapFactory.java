@@ -18,7 +18,11 @@ import static com.google.common.base.Preconditions.checkState;
 
 public class FadMapFactory implements AlgorithmFactory<FadMap> {
 
-    private Map<CurrentPattern, Path> currentFiles = TunaScenario.currentFiles;
+    public FadMapFactory(final Map<CurrentPattern, Path> currentFiles) {
+        this.currentFiles = ImmutableMap.copyOf(currentFiles);
+    }
+
+    private Map<CurrentPattern, Path> currentFiles;
 
     @SuppressWarnings("unused")
     public Map<CurrentPattern, Path> getCurrentFiles() {

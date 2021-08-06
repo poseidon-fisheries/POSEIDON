@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -31,7 +32,7 @@ import java.util.stream.Stream;
  * - It's a MASON Steppable, which applies drift when stepped.
  * - It has methods for deploying and removing FADs, setting the appropriate callback in the former case.
  */
-public class FadMap implements Startable, Steppable {
+public class FadMap implements AdditionalStartable, Steppable {
 
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
@@ -55,6 +56,7 @@ public class FadMap implements Startable, Steppable {
 
     @Override
     public void start(final FishState model) {
+        model.setFadMap(this);
         stoppable = model.scheduleEveryDay(this, StepOrder.DAWN);
     }
 

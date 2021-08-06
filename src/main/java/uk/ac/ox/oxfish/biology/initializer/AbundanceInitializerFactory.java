@@ -33,9 +33,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
-import uk.ac.ox.oxfish.biology.initializer.allocator.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -47,10 +47,10 @@ public class AbundanceInitializerFactory
             CacheLoader.from(AbundanceInitializerFactory::binsPerSpecies)
         );
 
-    private Path speciesCodesFilePath;
     private Path binsFilePath;
 
     private AbundanceReallocator abundanceReallocator;
+    private SpeciesCodes speciesCodes;
 
     /**
      * Empty constructor to allow YAML instantiation.
@@ -61,10 +61,8 @@ public class AbundanceInitializerFactory
     }
 
     public AbundanceInitializerFactory(
-        final Path speciesCodesFilePath,
         final Path binsFilePath
     ) {
-        this.speciesCodesFilePath = speciesCodesFilePath;
         this.binsFilePath = binsFilePath;
     }
 
@@ -97,14 +95,8 @@ public class AbundanceInitializerFactory
             ));
     }
 
-    @SuppressWarnings("unused")
-    public Path getSpeciesCodesFilePath() {
-        return speciesCodesFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSpeciesCodesFilePath(final Path speciesCodesFilePath) {
-        this.speciesCodesFilePath = speciesCodesFilePath;
+    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
     }
 
     @SuppressWarnings("unused")
@@ -119,19 +111,16 @@ public class AbundanceInitializerFactory
 
     @Override
     public AbundanceInitializer apply(final FishState fishState) {
+        checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator() before using");
         return new AbundanceInitializer(
-            new SpeciesCodesFromFileFactory(this.speciesCodesFilePath).get(),
+            speciesCodes,
             binsCache.getUnchecked(this.binsFilePath),
             abundanceReallocator
         );
     }
 
-    public AbundanceReallocator getAbundanceReallocator() {
-        return abundanceReallocator;
-    }
-
-    public void setAbundanceReallocator(AbundanceReallocator abundanceReallocator) {
+    public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
         this.abundanceReallocator = abundanceReallocator;
     }
 }
