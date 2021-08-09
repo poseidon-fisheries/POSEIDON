@@ -23,9 +23,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.model.FishState;
@@ -48,6 +50,12 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 @SuppressWarnings("unused")
 public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<PurseSeinerFishingStrategy> {
 
+    private static final ActiveOpportunitiesFactory activeOpportunitiesFactory = new ActiveOpportunitiesFactory();
+    private static final CacheByFishState<ActiveOpportunities> activeDolphinSetOpportunitiesCache =
+        new CacheByFishState<>(activeOpportunitiesFactory);
+    private static final CacheByFishState<ActiveOpportunities> activeNonAssociatedSetOpportunitiesCache =
+        new CacheByFishState<>(activeOpportunitiesFactory);
+    private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
     private double nonAssociatedSetGeneratorLogisticSteepness = 1;
@@ -57,7 +65,6 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
     private double nonAssociatedSetDetectionProbability = 0.1;
     private double dolphinSetDetectionProbability = 0.1;
     private double opportunisticFadSetDetectionProbability = 0.1;
-
     private double searchActionLogisticMidpoint = 0.1;
     private double searchActionLogisticSteepness = 1;
     private double searchActionDecayConstant = 1;
@@ -260,15 +267,18 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
 
     private SetOpportunityDetector makeSetOpportunityLocator(final Fisher fisher) {
 
+        FishState fishState = fisher.grabState();
+
         final ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
-            setCompositionWeights = loadSetCompositionWeights(fisher.grabState());
+            setCompositionWeights = loadSetCompositionWeights(fishState);
 
         final SetOpportunityGenerator nonAssociatedSetOpportunityGenerator =
             new SetOpportunityGenerator(
                 nonAssociatedSetGeneratorLogisticMidpoint,
                 nonAssociatedSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(NonAssociatedSetAction.class),
-                NonAssociatedSetAction::new
+                NonAssociatedSetAction::new,
+                activeNonAssociatedSetOpportunitiesCache.get(fishState)
             );
 
         final SetOpportunityGenerator dolphinSetOpportunityGenerator =
@@ -276,7 +286,8 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
                 dolphinSetGeneratorLogisticMidpoint,
                 dolphinSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(DolphinSetAction.class),
-                DolphinSetAction::new
+                DolphinSetAction::new,
+                activeDolphinSetOpportunitiesCache.get(fishState)
             );
 
         return new SetOpportunityDetector(
@@ -327,7 +338,7 @@ public class PurseSeinerFishingStrategyFactory implements AlgorithmFactory<Purse
             records.stream().collect(toImmutableMap(
                 r -> {
                     final String speciesCode = r.getString("species_code").toUpperCase();
-                    final String speciesName = TunaScenario.speciesNames.get(speciesCode);
+                    final String speciesName = speciesCodes.getSpeciesName(speciesCode);
                     return fishState.getBiology().getSpecie(speciesName);
                 },
                 r -> r.getDouble("weight")

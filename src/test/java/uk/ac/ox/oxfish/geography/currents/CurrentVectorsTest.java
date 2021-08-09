@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import sim.util.Int2D;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.Main.STEPS_PER_DAY;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectors.getInterpolatedVector;
 
@@ -20,23 +19,22 @@ public class CurrentVectorsTest {
 
     @Test
     public void positiveDaysOffset() {
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY);
-        assertEquals(0, currentVectors.positiveDaysOffset(1, 1));
-        assertEquals(1, currentVectors.positiveDaysOffset(1, 2));
-        assertEquals(364, currentVectors.positiveDaysOffset(1, 365));
-        assertEquals(1, currentVectors.positiveDaysOffset(365, 1));
+        assertEquals(0, CurrentVectors.positiveDaysOffset(1, 1));
+        assertEquals(1, CurrentVectors.positiveDaysOffset(1, 2));
+        assertEquals(364, CurrentVectors.positiveDaysOffset(1, 365));
+        assertEquals(1, CurrentVectors.positiveDaysOffset(365, 1));
     }
 
     @Test
     public void negativeDaysOffset() {
-        final CurrentVectors currentVectors = new CurrentVectors(new TreeMap<>(), null, STEPS_PER_DAY);
-        assertEquals(0, currentVectors.negativeDaysOffset(1, 1));
-        assertEquals(-1, currentVectors.negativeDaysOffset(2, 1));
-        assertEquals(-364, currentVectors.negativeDaysOffset(365, 1));
-        assertEquals(-1, currentVectors.negativeDaysOffset(1, 365));
+        assertEquals(0, CurrentVectors.negativeDaysOffset(1, 1));
+        assertEquals(-1, CurrentVectors.negativeDaysOffset(2, 1));
+        assertEquals(-364, CurrentVectors.negativeDaysOffset(365, 1));
+        assertEquals(-1, CurrentVectors.negativeDaysOffset(1, 365));
     }
 
-    @Test public void getInterpolatedVectorTest() {
+    @Test
+    public void getInterpolatedVectorTest() {
         final Double2D vectorBefore = new Double2D(0, 1);
         final Double2D vectorAfter = new Double2D(1, 0);
         assertEquals(
@@ -61,12 +59,13 @@ public class CurrentVectorsTest {
         );
     }
 
-    @Test public void testGetVector() {
-        final SeaTile seaTile = new SeaTile(0, 0, 0, null);
-        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
-        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, ImmutableMap.of(seaTile, new Double2D(0, 0)))));
-        vectorMaps.put(5, new EnumMap<>(ImmutableMap.of(NEUTRAL, ImmutableMap.of(seaTile, new Double2D(1, 0)))));
-        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 1);
+    @Test
+    public void testGetVector() {
+        final Int2D gridLocation = new Int2D(0, 0);
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps = new TreeMap<>();
+        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, ImmutableMap.of(gridLocation, new Double2D(0, 0)))));
+        vectorMaps.put(5, new EnumMap<>(ImmutableMap.of(NEUTRAL, ImmutableMap.of(gridLocation, new Double2D(1, 0)))));
+        final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, __ -> NEUTRAL, 0, 0, 1);
         final ImmutableList<Double2D> expectedVectors = ImmutableList.of(
             new Double2D(0.0, 0.0),
             new Double2D(0.25, 0.0),
@@ -74,8 +73,8 @@ public class CurrentVectorsTest {
             new Double2D(0.75, 0.0),
             new Double2D(1.0, 0.0)
         );
-        range(0, expectedVectors.size()).forEach(i -> {
-            assertEquals(expectedVectors.get(i), currentVectors.getVector(i, seaTile));
-        });
+        range(0, expectedVectors.size()).forEach(i ->
+            assertEquals(expectedVectors.get(i), currentVectors.getVector(i, gridLocation))
+        );
     }
 }

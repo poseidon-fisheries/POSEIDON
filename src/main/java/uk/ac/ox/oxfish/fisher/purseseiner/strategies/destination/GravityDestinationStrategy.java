@@ -82,7 +82,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         return destination;
     }
 
-    private boolean readyToMoveOn(Fisher fisher) {
+    private boolean readyToMoveOn(final Fisher fisher) {
         return fisher.getLocation() == destination && !fisher.shouldIFish(fisher.grabState());
     }
 
@@ -102,8 +102,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() > 0)
-            .map(entry -> entry.getKey().netAttractionHere().multiply(entry.getValue())
-            )
+            .map(entry -> entry.getKey().netAttractionHere().multiply(entry.getValue()))
             .reduce(Double2D::add)
             .filter(v -> !v.equals(new Double2D(0.0, 0.0)))
             .map(v -> new Double2D(here.x + 0.5, here.y + 0.5).add(v.normalize()))
@@ -116,8 +115,8 @@ public class GravityDestinationStrategy implements DestinationStrategy {
             .orElse(seaTile);
     }
 
-    private Optional<SeaTile> closestNeighbor(NauticalMap map, SeaTile origin, SeaTile target) {
-        Stream<SeaTile> neighbors = bagToStream(map.getMooreNeighbors(origin, 1));
+    private Optional<SeaTile> closestNeighbor(final NauticalMap map, final SeaTile origin, final SeaTile target) {
+        final Stream<SeaTile> neighbors = bagToStream(map.getMooreNeighbors(origin, 1));
         return neighbors
             .filter(SeaTile::isWater)
             .filter(isValidDestination)

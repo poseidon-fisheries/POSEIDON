@@ -28,6 +28,7 @@ public class CsvParserUtil {
     static {
         defaultParserSettings.setLineSeparatorDetectionEnabled(true);
         defaultParserSettings.setHeaderExtractionEnabled(true);
+        defaultParserSettings.setReadInputOnSeparateThread(false);
     }
 
     public static List<Record> parseAllRecords(Path inputFilePath) {
@@ -61,6 +62,10 @@ public class CsvParserUtil {
 
     public static LocalDate getLocalDate(Record record, String headerName) {
         return getLocalDate(record, headerName, defaultDtmFormat, defaultZoneId);
+    }
+
+    public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat) {
+        return getLocalDate(record, headerName, dtmFormat, defaultZoneId);
     }
 
     public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat, ZoneId zoneId) {

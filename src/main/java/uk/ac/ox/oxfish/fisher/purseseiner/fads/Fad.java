@@ -19,13 +19,10 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -33,12 +30,17 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
+import static java.util.Comparator.comparingInt;
 import static java.util.function.Function.identity;
 
 public class Fad implements Locatable {
@@ -46,55 +48,51 @@ public class Fad implements Locatable {
     private final FadManager owner;
     private final TripRecord tripDeployed;
     private final BiomassLocalBiology biology;
-    private final double[] attractionRates; // proportion of underlying biomass attracted per day
+    private final Map<Species, FadBiomassAttractor> fadBiomassAttractors;
+
     private final double fishReleaseProbability; // daily probability of releasing fish from the FAD
     private final int stepDeployed;
     private final Int2D locationDeployed;
 
     public Fad(
-        FadManager owner,
-        BiomassLocalBiology biology,
-        Map<Species, Double> attractionRates,
-        double fishReleaseProbability,
+        final FadManager owner,
+        final BiomassLocalBiology biology,
+        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed
     ) {
         this.owner = owner;
         this.tripDeployed = owner.getFisher().getCurrentTrip();
         this.biology = biology;
-        this.attractionRates = new double[biology.getCurrentBiomass().length];
+        this.fadBiomassAttractors = ImmutableMap.copyOf(fadBiomassAttractors);
         this.stepDeployed = stepDeployed;
         this.locationDeployed = locationDeployed;
-        attractionRates.forEach((species, rate) ->
-            this.attractionRates[species.getIndex()] = rate
-        );
         this.fishReleaseProbability = fishReleaseProbability;
     }
 
     public TripRecord getTripDeployed() { return tripDeployed; }
 
-    /* For now, just aggregate fish in fixed proportion of the underlying biomass.
-       We'll probably need different types of FADs in the future when we start
-       complexifying the model.
-    */
-    public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
+    public void aggregateFish(final VariableBiomassBasedBiology seaTileBiology, final GlobalBiology globalBiology) {
         // Calculate the catches and add them to the FAD biology:
         final double[] tileBiomass = seaTileBiology.getCurrentBiomass();
         final double[] fadBiomass = this.biology.getCurrentBiomass();
         final double[] catches = new double[tileBiomass.length];
-        for (int i = 0; i < catches.length; i++) {
-            final double maxFadBiomass = this.biology.getCarryingCapacity(i);
-            final double maxCatch = max(0, maxFadBiomass - fadBiomass[i]);
-            final double caught = min(tileBiomass[i] * attractionRates[i], maxCatch);
-            fadBiomass[i] = min(fadBiomass[i] + caught, maxFadBiomass);
-            catches[i] = caught;
-        }
+        final double totalFadBiomass = Arrays.stream(fadBiomass).sum();
+
+        fadBiomassAttractors.forEach((species, fadBiomassAttractor) -> {
+            final int i = species.getIndex();
+            if (fadBiomassAttractor.shouldAttract(tileBiomass[i], totalFadBiomass)) {
+                catches[i] = fadBiomassAttractor.biomassAttracted(tileBiomass[i], fadBiomass[i], totalFadBiomass);
+                fadBiomass[i] = min(fadBiomass[i] + catches[i], fadBiomassAttractor.getCarryingCapacity());
+            }
+        });
         // Remove the catches from the underlying biology:
         final Catch catchObject = new Catch(catches);
         seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
     }
 
-    public void maybeReleaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology, MersenneTwisterFast rng) {
+    public void maybeReleaseFish(final Iterable<Species> allSpecies, final LocalBiology seaTileBiology, final MersenneTwisterFast rng) {
         if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies, seaTileBiology);
     }
 
@@ -102,7 +100,7 @@ public class Fad implements Locatable {
      * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
      * biomass based (most likely because we're outside the habitable zone), the fish is lost.
      */
-    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
+    public void releaseFish(final Iterable<Species> allSpecies, final LocalBiology seaTileBiology) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology)
             releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
         else
@@ -113,7 +111,7 @@ public class Fad implements Locatable {
      * Remove biomass from the FAD and send the biomass down to the sea tile's biology.
      * In the unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
      */
-    private void releaseFish(Iterable<Species> allSpecies, VariableBiomassBasedBiology seaTileBiology) {
+    private void releaseFish(final Iterable<Species> allSpecies, final VariableBiomassBasedBiology seaTileBiology) {
         allSpecies.forEach(species -> {
             final double seaTileBiomass = seaTileBiology.getBiomass(species);
             final double fadBiomass = biology.getBiomass(species);
@@ -127,14 +125,14 @@ public class Fad implements Locatable {
         releaseFish(allSpecies);
     }
 
-    public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
+    public void maybeReleaseFish(final Iterable<Species> allSpecies, final MersenneTwisterFast rng) {
         if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
     }
 
     /**
      * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
      */
-    public void releaseFish(Iterable<Species> allSpecies) {
+    public void releaseFish(final Iterable<Species> allSpecies) {
         final Map<Species, Double> biomassLost =
             stream(allSpecies).collect(toImmutableMap(identity(), biology::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
@@ -143,13 +141,14 @@ public class Fad implements Locatable {
 
     public FadManager getOwner() { return owner; }
 
-    public double valueOfFishFor(Fisher fisher) {
+    public double valueOfFishFor(final Fisher fisher) {
         return new FishValueCalculator(fisher).valueOf(getBiology());
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
 
-    @Override public SeaTile getLocation() {
+    @Override
+    public SeaTile getLocation() {
         return owner.getFadMap().getFadTile(this).orElseThrow(() -> new RuntimeException(this + " not on map!"));
     }
 

@@ -24,10 +24,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -49,7 +46,10 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         "lat",
         "step",
         "trip_start",
-        "trip_end"
+        "trip_end",
+        "bet",
+        "skj",
+        "yft"
     );
     private final Collection<ActionObserver<? extends PurseSeinerAction>> observers = ImmutableList.of(
         new ActionObserver<>(FadDeploymentAction.class),
@@ -63,13 +63,16 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         this.fishState = fishState;
     }
 
-    @Override public List<String> getHeaders() { return HEADERS; }
+    @Override
+    public List<String> getHeaders() { return HEADERS; }
 
-    @Override public Iterable<? extends Collection<?>> getRows() {
+    @Override
+    public Iterable<? extends Collection<?>> getRows() {
         return actionRecords.build().stream().map(ActionRecord::asRow).collect(toImmutableList());
     }
 
-    @Override public void start(final FishState fishState) {
+    @Override
+    public void start(final FishState fishState) {
         assert this.fishState == fishState;
         observers.forEach(observer -> observer.start(fishState));
     }
@@ -83,8 +86,11 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final int actionStep;
         private final int tripStartStep;
         private Integer tripEndStep;
+        private Double bet;
+        private Double skj;
+        private Double yft;
 
-        private ActionRecord(PurseSeinerAction action) {
+        private ActionRecord(final PurseSeinerAction action) {
             this.boatId = action.getFisher().getTags().get(0);
             this.actionType = actionType(action);
             final Coordinate coordinates = fishState.getMap().getCoordinates(action.getLocation());
@@ -93,13 +99,20 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.actionStep = action.getStep();
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripStartStep = currentTrip.getTripDate() * fishState.getStepsPerDay();
+            if (action instanceof AbstractSetAction)
+                ((AbstractSetAction) action).getCatchesKept().ifPresent(catchesKept -> {
+                    this.bet = catchesKept.getWeightCaught(fishState.getSpecies("Bigeye tuna"));
+                    this.skj = catchesKept.getWeightCaught(fishState.getSpecies("Skipjack tuna"));
+                    this.yft = catchesKept.getWeightCaught(fishState.getSpecies("Yellowfin tuna"));
+                });
             action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
         }
 
-        private String actionType(PurseSeinerAction action) {
-            if (action instanceof FadDeploymentAction) return "DEPLOY";
-            else if (action instanceof AbstractFadSetAction) return "FADSET";
-            else if (action instanceof NonAssociatedSetAction) return "UNASET";
+        private String actionType(final PurseSeinerAction action) {
+            if (action instanceof FadDeploymentAction) return "DPL";
+            else if (action instanceof FadSetAction) return "FAD";
+            else if (action instanceof OpportunisticFadSetAction) return "OFS";
+            else if (action instanceof NonAssociatedSetAction) return "NOA";
             else throw new IllegalArgumentException("Unknown action type.");
         }
 
@@ -111,7 +124,10 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 lat,
                 actionStep,
                 tripStartStep,
-                tripEndStep
+                tripEndStep,
+                bet,
+                skj,
+                yft
             ));
         }
 
@@ -123,7 +139,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 this.currentTrip = currentTrip;
             }
 
-            @Override public void reactToFinishedTrip(final TripRecord trip, final Fisher fisher) {
+            @Override
+            public void reactToFinishedTrip(final TripRecord trip, final Fisher fisher) {
                 if (trip == currentTrip) {
                     tripEndStep = fishState.getStep();
                     // removal needs to be scheduled to avoid ConcurrentModificationException
@@ -139,7 +156,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
 
         ActionObserver(final Class<A> observedClass) { super(observedClass); }
 
-        @Override public void observe(final A action) { actionRecords.add(new ActionRecord(action)); }
+        @Override
+        public void observe(final A action) { actionRecords.add(new ActionRecord(action)); }
 
     }
 

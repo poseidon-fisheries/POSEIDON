@@ -22,8 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 @FunctionalInterface
-public
-interface LocalAttractionModulator {
+public interface LocalAttractionModulator {
 
     default boolean canFishThere(final int x, final int y, final int t, final Fisher fisher) {
         return fisher.getRegulation().canFishHere(

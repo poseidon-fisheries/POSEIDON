@@ -30,14 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 public abstract class MutableLocationValues<A>
     extends PurseSeinerActionObserver<A>
     implements LocationValues, Steppable {
+
+    private static final int MAXIMUM_NUMBER_OF_VALUES = 50;
 
     private final Function<Fisher, Map<Int2D, Double>> valueLoader;
     private final double decayRate;
@@ -53,20 +55,24 @@ public abstract class MutableLocationValues<A>
         this.decayRate = decayRate;
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         this.values = new HashMap<>(valueLoader.apply(fisher));
         model.scheduleEveryYear(this, POLICY_UPDATE);
     }
 
-    @Override public Stream<Entry<Int2D, Double>> getValues() {
-        return values.entrySet().stream();
-    }
-
-    @Override public double getValueAt(final Int2D location) {
+    @Override
+    public double getValueAt(final Int2D location) {
         return values.getOrDefault(location, 0.0);
     }
 
-    @Override public void observe(final A observable) {
+    @Override
+    public Set<Entry<Int2D, Double>> getValues() {
+        return values.entrySet();
+    }
+
+    @Override
+    public void observe(final A observable) {
         observeValue(observable).ifPresent(entry ->
             values.merge(entry.getKey(), entry.getValue(), Double::sum)
         );
@@ -74,7 +80,16 @@ public abstract class MutableLocationValues<A>
 
     abstract Optional<Entry<Int2D, Double>> observeValue(final A observable);
 
-    @Override public void step(final SimState simState) {
+    @Override
+    public void step(final SimState simState) {
+
+        if (values.size() > MAXIMUM_NUMBER_OF_VALUES) {
+            // when reaching the limit, forget all the values that are below average
+            values.values().stream().mapToDouble(Double::doubleValue).average().ifPresent(average ->
+                values.entrySet().removeIf(entry -> entry.getValue() < average)
+            );
+        }
+
         // apply exponential decay
         values.replaceAll((location, value) -> value * (1 - decayRate));
     }

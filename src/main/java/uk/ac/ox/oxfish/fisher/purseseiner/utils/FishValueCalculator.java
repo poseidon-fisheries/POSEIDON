@@ -19,43 +19,36 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.model.market.Market;
-
-import java.util.List;
-import java.util.function.ToDoubleBiFunction;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 public class FishValueCalculator {
 
-    private final List<Market> markets;
+    private final MarketMap marketMap;
 
-    public FishValueCalculator(Fisher fisher) {
-        this(fisher.getHomePort().getMarketMap(fisher).getMarkets());
+    public FishValueCalculator(final Fisher fisher) {
+        this(fisher.getHomePort().getMarketMap(fisher));
     }
 
-    public FishValueCalculator(final Iterable<Market> markets) {
-        this.markets = ImmutableList.copyOf(markets);
+    private FishValueCalculator(final MarketMap marketMap) {
+        this.marketMap = marketMap;
     }
 
-    public double valueOf(Catch catchesKept) {
-        return valueOf(catchesKept, Catch::getWeightCaught);
+    public double valueOf(final Catch catchesKept) {
+        return valueOf(catchesKept.getBiomassArray());
     }
 
-    <T> double valueOf(
-        T biomassContainer,
-        ToDoubleBiFunction<T, Species> biomassExtractor
-    ) {
-        return markets.stream().mapToDouble(market ->
-            biomassExtractor.applyAsDouble(biomassContainer, market.getSpecies()) * market.getMarginalPrice()
-        ).sum();
+    public double valueOf(final double[] biomass) {
+        double sum = 0.0;
+        for (int i = 0; i < biomass.length; i++)
+            sum += biomass[i] * marketMap.getMarket(i).getMarginalPrice();
+        return sum;
     }
 
-    public double valueOf(LocalBiology biology) {
-        return valueOf(biology, LocalBiology::getBiomass);
+    public double valueOf(final VariableBiomassBasedBiology biology) {
+        return valueOf(biology.getCurrentBiomass());
     }
 
 }

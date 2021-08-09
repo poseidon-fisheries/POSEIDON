@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.event;
 
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -9,14 +10,7 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.function.BiFunction;
+import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 import static si.uom.NonSI.TONNE;
@@ -30,30 +24,39 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
 
     private int startingYear = 2000;
     private Path catchesFile = Paths.get("inputs", "tuna", "exogenous_catches.csv");
-    private BiFunction<FishState, String, Species> speciesFromCode =
-        (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesCode);
-
+    private SpeciesCodes speciesCodes;
     private boolean fadMortality = false;
 
-    @SuppressWarnings("unused") public BiomassDrivenTimeSeriesExogenousCatchesFactory() {}
+    @SuppressWarnings("unused")
+    public BiomassDrivenTimeSeriesExogenousCatchesFactory() {}
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
         Path catchesFile,
         int startingYear,
-        BiFunction<FishState, String, Species> speciesFromCode,
         boolean fadMortalityIncluded
     ) {
         this.catchesFile = catchesFile;
         this.startingYear = startingYear;
-        this.speciesFromCode = speciesFromCode;
         this.fadMortality = fadMortalityIncluded;
     }
 
-    @SuppressWarnings("unused") public int getStartingYear() { return startingYear; }
+    @SuppressWarnings("unused")
+    public SpeciesCodes getSpeciesCodes() {
+        return speciesCodes;
+    }
 
-    @SuppressWarnings("unused") public void setStartingYear(int startingYear) { this.startingYear = startingYear; }
+    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
+    }
 
-    @SuppressWarnings("unused") public Path getCatchesFile() { return catchesFile; }
+    @SuppressWarnings("unused")
+    public int getStartingYear() { return startingYear; }
+
+    @SuppressWarnings("unused")
+    public void setStartingYear(int startingYear) { this.startingYear = startingYear; }
+
+    @SuppressWarnings("unused")
+    public Path getCatchesFile() { return catchesFile; }
 
     public void setCatchesFile(Path catchesFile) { this.catchesFile = catchesFile; }
 
@@ -63,12 +66,14 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
      * having the years in the right order, we first use sorted maps from year to catches as values in the
      * main map and then convert the properly ordered values of these inner maps to linked lists of catches.
      */
-    @Override public BiomassDrivenTimeSeriesExogenousCatches apply(FishState fishState) {
+    @Override
+    public BiomassDrivenTimeSeriesExogenousCatches apply(FishState fishState) {
         Map<Species, SortedMap<Integer, Quantity<Mass>>> catchesBySpecies = new HashMap<>();
         for (Record record : parseAllRecords(catchesFile)) {
             final Integer year = record.getInt("year");
             if (year >= startingYear) {
-                final Species species = speciesFromCode.apply(fishState, record.getString("species_code"));
+                String speciesName = speciesCodes.getSpeciesName(record.getString("species_code"));
+                Species species = fishState.getSpecies(speciesName);
                 catchesBySpecies
                     .computeIfAbsent(species, __ -> new TreeMap<>())
                     .put(year, getQuantity(record.getDouble("catches_in_tonnes"), TONNE));
@@ -88,6 +93,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
      *
      * @return Value for property 'fadMortality'.
      */
+    @SuppressWarnings("unused")
     public boolean isFadMortality() {
         return fadMortality;
     }
@@ -97,6 +103,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
      *
      * @param fadMortality Value to set for property 'fadMortality'.
      */
+    @SuppressWarnings("unused")
     public void setFadMortality(boolean fadMortality) {
         this.fadMortality = fadMortality;
     }

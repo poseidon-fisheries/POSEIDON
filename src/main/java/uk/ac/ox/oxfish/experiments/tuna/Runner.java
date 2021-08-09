@@ -35,19 +35,16 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -60,28 +57,63 @@ public final class Runner<S extends Scenario> {
 
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
-    private final Class<S> scenarioClass;
-    private final Path scenarioPath;
+
+    private final AtomicBoolean overwriteFiles = new AtomicBoolean(true);
+
+    private final Supplier<S> scenarioSupplier;
     private final Path outputPath;
     private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>> rowProviderFactories =
         HashMultimap.create();
+    private boolean parallel = true;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
-    private Collection<Policy<? super S>> policies = ImmutableList.of(new Policy<>("Default", "", __ -> {}));
+    private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
     private Consumer<State> beforeStartConsumer = __ -> {};
     private Consumer<State> afterStartConsumer = __ -> {};
     private Consumer<State> afterStepConsumer = __ -> {};
     private Consumer<State> afterRunConsumer = __ -> {};
-    private State state;
+
+    public Runner(
+        final Supplier<S> scenarioSupplier,
+        final Path outputPath
+    ) {
+        this.scenarioSupplier = scenarioSupplier;
+        this.outputPath = outputPath;
+    }
 
     Runner(
         final Class<S> scenarioClass,
         final Path scenarioPath,
         final Path outputPath
     ) {
-        this.scenarioClass = scenarioClass;
-        this.scenarioPath = scenarioPath;
+        this.scenarioSupplier = makeScenarioSupplier(scenarioPath, scenarioClass);
         this.outputPath = outputPath;
-        rowProviderFactories.put(outputPath.resolve(RUNS_FILENAME), __ -> ImmutableList.of(state));
+    }
+
+    private static <S extends Scenario> Supplier<S> makeScenarioSupplier(
+        final Path scenarioPath,
+        final Class<S> scenarioClass
+    ) {
+        return () -> {
+            try (final FileReader fileReader = new FileReader(scenarioPath.toFile())) {
+                final FishYAML fishYAML = new FishYAML();
+                return fishYAML.loadAs(fileReader, scenarioClass);
+            } catch (final FileNotFoundException e) {
+                throw new IllegalArgumentException("Can't find scenario file: " + scenarioPath, e);
+            } catch (final IOException e) {
+                throw new IllegalStateException("Error while reading file: " + scenarioPath, e);
+            }
+        };
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isParallel() {
+        return parallel;
+    }
+
+    @SuppressWarnings("unused")
+    public Runner<S> setParallel(final boolean parallel) {
+        this.parallel = parallel;
+        return this;
     }
 
     @SuppressWarnings("unused")
@@ -90,12 +122,13 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     public Runner<S> setBeforeStartConsumer(final Consumer<State> beforeStartConsumer) {
         this.beforeStartConsumer = beforeStartConsumer;
         return this;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Runner<S> setAfterStartConsumer(final Consumer<State> afterStartConsumer) {
         this.afterStartConsumer = afterStartConsumer;
         return this;
@@ -114,26 +147,28 @@ public final class Runner<S extends Scenario> {
     }
 
     @SuppressWarnings("SameParameterValue")
-    void run(int numYearsToRun) { run(numYearsToRun, 1); }
+    void run(final int numYearsToRun) { run(numYearsToRun, 1); }
 
-    void run(int numYearsToRun, int numberOfRunsPerPolicy) {
-        int numRuns = policies.size() * numberOfRunsPerPolicy;
-        final AtomicInteger runNumber = new AtomicInteger(1);
-        range(0, numberOfRunsPerPolicy).forEach(i ->
-            policies.forEach(policy -> {
-                System.out.printf("===\nRun %d / %s\n===\n", runNumber.get(), numRuns);
-                state = startRun(policy, runNumber.get(), numRuns, numYearsToRun);
+    public void run(final int numYearsToRun, final int numberOfRunsPerPolicy) {
+        final int numRuns = policies.size() * numberOfRunsPerPolicy;
+        final AtomicInteger runCounter = new AtomicInteger(1);
+        final IntStream range = range(0, numberOfRunsPerPolicy);
+        (parallel ? range.parallel() : range).forEach(i ->
+            (parallel ? policies.parallelStream() : policies.stream()).forEach(policy -> {
+                final int runNumber = runCounter.getAndIncrement();
+                System.out.printf("=== Starting run %d / %s ===\n", runNumber, numRuns);
+                final State state = startRun(policy, runNumber, numRuns, numYearsToRun);
                 beforeStartConsumer.accept(state);
                 state.model.start();
                 afterStartConsumer.accept(state);
-                final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state.model);
+                final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
                 do {
                     state.printStep();
                     state.model.schedule.step(state.model);
                     afterStepConsumer.accept(state);
                 } while (state.model.getYear() < numYearsToRun);
                 afterRunConsumer.accept(state);
-                writeOutputs(runNumber.getAndIncrement(), rowProviders);
+                writeOutputs(runNumber, rowProviders);
             })
         );
     }
@@ -146,57 +181,49 @@ public final class Runner<S extends Scenario> {
         final int numYearsToRun
     ) {
         final LocalDateTime startTime = LocalDateTime.now();
-        final S scenario = readScenario(scenarioPath, scenarioClass);
+        final S scenario = scenarioSupplier.get();
         policy.getScenarioConsumer().accept(scenario);
-        FishState fishState = new FishState();
+        final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         return new State(scenario, policy, fishState, runNumber, numRuns, numYearsToRun, startTime);
     }
 
-    private Multimap<Path, RowProvider> makeRowProviders(FishState fishState) {
-        ImmutableMultimap.Builder<Path, RowProvider> rowProviders = ImmutableMultimap.builder();
+    private Multimap<Path, RowProvider> makeRowProviders(final State state) {
+        final ImmutableMultimap.Builder<Path, RowProvider> rowProviders = ImmutableMultimap.builder();
+        rowProviders.put(outputPath.resolve(RUNS_FILENAME), state);
         rowProviderFactories.forEach((path, factory) ->
-            factory.apply(fishState).forEach(rowProvider -> {
+            factory.apply(state.model).forEach(rowProvider -> {
                 if (rowProvider instanceof Startable)
-                    fishState.registerStartable((Startable) rowProvider);
+                    state.model.registerStartable((Startable) rowProvider);
                 rowProviders.put(path, rowProvider);
             })
         );
         return rowProviders.build();
     }
 
-    private void writeOutputs(final int runNumber, Multimap<Path, RowProvider> rowProviders) {
-        rowProviders.asMap().forEach((outputPath, providers) -> {
-            try (Writer fileWriter = new FileWriter(outputPath.toFile(), runNumber > 1)) {
-                final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
-                writeRows(csvWriter, providers, runNumber, runNumber == 1);
-            } catch (IOException e) {
-                throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
-            }
-        });
-    }
-
-    private S readScenario(final Path scenarioPath, Class<S> scenarioClass) {
-        try (FileReader fileReader = new FileReader(scenarioPath.toFile())) {
-            final FishYAML fishYAML = new FishYAML();
-            final S scenario = fishYAML.loadAs(fileReader, scenarioClass);
-            writeScenarioToOutputFolder(fishYAML, scenario);
-            return scenario;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Can't find scenario file: " + scenarioPath, e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Error while reading file: " + scenarioPath, e);
+    private void writeOutputs(
+        final int runNumber,
+        final Multimap<Path, RowProvider> rowProviders
+    ) {
+        synchronized (overwriteFiles) {
+            final boolean b = overwriteFiles.getAndSet(false);
+            rowProviders.asMap().forEach((outputPath, providers) -> {
+                try (final Writer fileWriter = new FileWriter(outputPath.toFile(), !b)) {
+                    final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
+                    writeRows(csvWriter, providers, runNumber, b);
+                } catch (final IOException e) {
+                    throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
+                }
+            });
         }
     }
 
-    private void writeScenarioToOutputFolder(FishYAML fishYAML, S scenario) {
-        final File outputFile = outputPath.resolve("scenario.yaml").toFile();
-        if (!outputFile.isFile()) {
-            try (Writer writer = new FileWriter(outputFile)) {
-                fishYAML.dump(scenario, writer);
-            } catch (IOException e) {
-                throw new IllegalStateException("Error while writing file: " + outputFile, e);
-            }
+    public void writeScenarioToFile(final String outputFileName) {
+        final File outputFile = outputPath.resolve(outputFileName).toFile();
+        try (final Writer writer = new FileWriter(outputFile)) {
+            new FishYAML().dump(scenarioSupplier.get(), writer);
+        } catch (final IOException e) {
+            throw new IllegalStateException("Error while writing file: " + outputFile, e);
         }
     }
 
@@ -208,9 +235,10 @@ public final class Runner<S extends Scenario> {
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
     Runner<S> registerRowProviders(
-        String fileName,
-        AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
+        final String fileName,
+        final AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
     ) {
         rowProviderFactories.put(outputPath.resolve(fileName), rowProvidersFactory);
         return this;
@@ -222,9 +250,9 @@ public final class Runner<S extends Scenario> {
         );
     }
 
-    Runner<S> registerRowProvider(
-        @SuppressWarnings("SameParameterValue") String fileName,
-        AlgorithmFactory<? extends RowProvider> rowProviderFactory
+    public Runner<S> registerRowProvider(
+        @SuppressWarnings("SameParameterValue") final String fileName,
+        final AlgorithmFactory<? extends RowProvider> rowProviderFactory
     ) {
         registerRowProviders(
             fileName,
@@ -274,12 +302,16 @@ public final class Runner<S extends Scenario> {
 
         public FishState getModel() { return model; }
 
+        @SuppressWarnings("unused")
         public int getRunNumber() { return runNumber; }
 
+        @SuppressWarnings("unused")
         public int getNumRuns() { return numRuns; }
 
+        @SuppressWarnings("unused")
         public int getNumYearsToRun() { return numYearsToRun; }
 
+        @SuppressWarnings("unused")
         public LocalDateTime getStartTime() { return startTime; }
 
         void printStep() {
@@ -297,9 +329,11 @@ public final class Runner<S extends Scenario> {
             );
         }
 
-        @Override public List<String> getHeaders() { return ImmutableList.of("policy", "run_start", "run_end"); }
+        @Override
+        public List<String> getHeaders() { return ImmutableList.of("policy", "run_start", "run_end"); }
 
-        @Override public Iterable<? extends Collection<?>> getRows() {
+        @Override
+        public Iterable<? extends Collection<?>> getRows() {
             return ImmutableList.of(ImmutableList.of(policy.getName(), startTime, LocalDateTime.now()));
         }
 

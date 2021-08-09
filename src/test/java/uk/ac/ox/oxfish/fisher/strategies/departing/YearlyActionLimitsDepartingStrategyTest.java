@@ -78,7 +78,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
-        FadManager fadManager = new FadManager(null, fadInitializer, 0);
+        FadManager fadManager = new FadManager(null, fadInitializer);
         fadManager.setActionSpecificRegulations(Stream.of(setLimits));
         fadManager.setFisher(fisher);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

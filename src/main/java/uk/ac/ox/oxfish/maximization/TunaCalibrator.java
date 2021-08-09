@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.google.common.primitives.ImmutableIntArray;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
@@ -15,6 +16,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,9 +26,10 @@ import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
-import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.stream;
 
+@SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator implements Runnable {
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
@@ -34,32 +37,25 @@ public class TunaCalibrator implements Runnable {
 
     private Path originalCalibrationFilePath =
         Paths
-            .get(System.getProperty("user.home"), "workspace", "tuna", "np", "calibrations")
+            .get(System.getProperty("user.home"), "tuna", "calibration")
             .resolve("calibration.yaml");
 
     private boolean verbose = false;
-    private int populationSize = 200;
-    private int maxFitnessCalls = 5000;
+    private int populationSize = 100;
+    private int maxFitnessCalls = 500;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
-        TunaCalibrator tunaCalibrator = new TunaCalibrator();
+        final TunaCalibrator tunaCalibrator = new TunaCalibrator();
 
-        // Lots of code for not much, but this parse all integer numbers out from the
-        // arguments and (if present) uses the max one to set the number of fitness calls
-        // and the min one to set the population size. If there is only one, it's
+        // Parse all given numeric arguments and use the max one to set the number of fitness
+        // calls and the min one to set the population size. If there is only one, it's
         // assumed to be the number of fitness calls.
-        int[] numericArgs = stream(args).flatMapToInt(arg -> {
-            try {
-                return IntStream.of(parseInt(arg));
-            } catch (NumberFormatException e) {
-                return IntStream.empty();
-            }
-        }).toArray();
-        if (numericArgs.length > 0) {
-            tunaCalibrator.setMaxFitnessCalls(stream(numericArgs).max().getAsInt());
-            if (numericArgs.length > 1) {
-                tunaCalibrator.setPopulationSize(stream(numericArgs).min().getAsInt());
+        final ImmutableIntArray numericArgs = getNumericArgs(args);
+        if (numericArgs.length() > 0) {
+            numericArgs.stream().max().ifPresent(tunaCalibrator::setMaxFitnessCalls);
+            if (numericArgs.length() > 1) {
+                numericArgs.stream().min().ifPresent(tunaCalibrator::setPopulationSize);
             }
         }
 
@@ -73,6 +69,56 @@ public class TunaCalibrator implements Runnable {
         tunaCalibrator.run();
     }
 
+    private static ImmutableIntArray getNumericArgs(final String[] args) {
+        return ImmutableIntArray.copyOf(stream(args).flatMapToInt(arg -> {
+            try {
+                return IntStream.of(parseInt(arg));
+            } catch (final NumberFormatException e) {
+                return IntStream.empty();
+            }
+        }));
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    @SuppressWarnings("unused")
+    public void setVerbose(final boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getOriginalCalibrationFilePath() {
+        return originalCalibrationFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    public int getPopulationSize() {
+        return populationSize;
+    }
+
+    @SuppressWarnings("unused")
+    public int getMaxFitnessCalls() {
+        return maxFitnessCalls;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setMaxFitnessCalls(final int maxFitnessCalls) {
+        this.maxFitnessCalls = maxFitnessCalls;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setPopulationSize(final int populationSize) {
+        this.populationSize = populationSize;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public void setOriginalCalibrationFilePath(final Path originalCalibrationFilePath) {
+        this.originalCalibrationFilePath = originalCalibrationFilePath;
+    }
+
     @Override
     public void run() {
         final Path calibrationFilePath = copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
@@ -81,21 +127,26 @@ public class TunaCalibrator implements Runnable {
         new TunaEvaluator(calibrationFilePath, solution).run();
     }
 
-    private Path copyToFolder(Path sourceFile, Path targetFolder) {
+    private static Path copyToFolder(final Path sourceFile, final Path targetFolder) {
         try {
             return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @NotNull
     private Path makeOutputFolder() {
-        String outputFolderName = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
-        Path outputFolderPath = originalCalibrationFilePath.getParent().resolve(outputFolderName);
+        final String outputFolderName = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
+        final Path outputFolderPath = originalCalibrationFilePath
+            .getParent()
+            .resolve(System.getProperty("user.name"))
+            .resolve(outputFolderName);
         try {
-            createDirectory(outputFolderPath);
-        } catch (IOException e) {
+            createDirectories(outputFolderPath);
+            final String hostName = InetAddress.getLocalHost().getHostName() + "\n";
+            Files.write(outputFolderPath.resolve("hostname.txt"), hostName.getBytes());
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
         return outputFolderPath;
@@ -119,11 +170,11 @@ public class TunaCalibrator implements Runnable {
 
         System.out.println("Requesting " + numThreads + " threads");
 
-        SimpleProblemWrapper problemWrapper = new SimpleProblemWrapper();
+        final SimpleProblemWrapper problemWrapper = new SimpleProblemWrapper();
         problemWrapper.setSimpleProblem(optimizationProblem);
         problemWrapper.setParallelThreads(numThreads);
 
-        ClusterBasedNichingEA optimizer = new ClusterBasedNichingEA();
+        final ClusterBasedNichingEA optimizer = new ClusterBasedNichingEA();
         optimizer.setPopulationSize(populationSize);
 
         final OptimizationParameters optimizationParameters =
@@ -135,7 +186,7 @@ public class TunaCalibrator implements Runnable {
                 new EvaluationTerminator(maxFitnessCalls)
             );
 
-        OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
+        final OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
         runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
@@ -145,7 +196,7 @@ public class TunaCalibrator implements Runnable {
         ) {
             runnable.setTextListener(fileAndScreenWriter);
             runnable.run();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
 
@@ -153,49 +204,20 @@ public class TunaCalibrator implements Runnable {
 
     }
 
-    public void saveCalibratedScenario(double[] optimalParameters, Path calibrationFilePath) {
+    private static void saveCalibratedScenario(final double[] optimalParameters, final Path calibrationFilePath) {
 
         final Path calibratedScenarioPath = calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-        GenericOptimization.saveCalibratedScenario(optimalParameters,calibrationFilePath,calibratedScenarioPath);
-    }
 
-    @SuppressWarnings("unused")
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    @SuppressWarnings("unused")
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getOriginalCalibrationFilePath() {
-        return originalCalibrationFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setOriginalCalibrationFilePath(Path originalCalibrationFilePath) {
-        this.originalCalibrationFilePath = originalCalibrationFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public int getPopulationSize() {
-        return populationSize;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPopulationSize(int populationSize) {
-        this.populationSize = populationSize;
-    }
-
-    @SuppressWarnings("unused")
-    public int getMaxFitnessCalls() {
-        return maxFitnessCalls;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMaxFitnessCalls(int maxFitnessCalls) {
-        this.maxFitnessCalls = maxFitnessCalls;
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }
