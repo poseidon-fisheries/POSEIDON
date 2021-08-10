@@ -25,6 +25,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -60,17 +61,20 @@ public class ScheduledAbundanceProcessesFactory
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
     }
 
-    public void setRecruitmentProcesses(final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses) {
-        this.recruitmentProcesses = recruitmentProcesses;
+    public void setRecruitmentProcesses(
+        final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses
+    ) {
+        this.recruitmentProcesses = ImmutableMap.copyOf(recruitmentProcesses);
     }
 
     @SuppressWarnings("unused")
     public List<String> getBiologicalProcessesDates() {
-        return biologicalProcessesDates;
+        return ImmutableList.copyOf(biologicalProcessesDates);
     }
 
     @SuppressWarnings("unused")
     public void setBiologicalProcessesDates(final List<String> biologicalProcessesDates) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.biologicalProcessesDates = biologicalProcessesDates;
     }
 
@@ -86,14 +90,17 @@ public class ScheduledAbundanceProcessesFactory
             "setAbundanceReallocator must be called before using."
         );
 
+        final AbundanceAggregator aggregator = new AbundanceAggregator();
         return new ScheduledAbundanceProcesses(
-            new AbundanceAggregator(),
+            aggregator,
             abundanceReallocator.getAllocationGrids().getStepMapper(),
-            buildSchedule()
+            buildSchedule(aggregator)
         );
     }
 
-    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule() {
+    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule(
+        final AbundanceAggregator aggregator
+    ) {
         final LocalDate startDate = LocalDate.parse(biologicalProcessesDates.get(0));
         final ImmutableList<Integer> processSteps =
             biologicalProcessesDates.stream()
@@ -115,7 +122,8 @@ public class ScheduledAbundanceProcessesFactory
         final List<BiologicalProcess<AbundanceLocalBiology>> periodicalProcesses =
             ImmutableList.of(
                 new MortalityProcess(),
-                new AgingAndRecruitmentProcess(recruitmentProcesses)
+                new AgingAndRecruitmentProcess(recruitmentProcesses),
+                new FadAbundanceExcluder(aggregator)
             );
 
         processSteps.forEach(step ->

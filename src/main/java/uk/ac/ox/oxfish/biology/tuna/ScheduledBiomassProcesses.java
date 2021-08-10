@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.IntUnaryOperator;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * TODO.
@@ -35,5 +36,17 @@ public class ScheduledBiomassProcesses extends
         final Map<Integer, Collection<BiologicalProcess<BiomassLocalBiology>>> schedule
     ) {
         super(aggregator, stepMapper, schedule);
+    }
+
+    @Override
+    BiomassLocalBiology aggregate(final FishState fishState) {
+        // Since the only scheduled biomass process is reallocation, we leave the FADs alone.
+        // If that were to change, we'd need to aggregate everything and then exclude the FAD
+        // biomass before reallocation like we're doing for the abundance processes.
+        return getAggregator().aggregate(
+            fishState.getBiology(),
+            fishState.getMap(),
+            null
+        );
     }
 }

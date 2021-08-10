@@ -32,7 +32,19 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 
-public class ScheduledBiologicalProcesses<B extends LocalBiology, A extends Aggregator<B>>
+/**
+ * Objects of this class keep a schedule of biological processes to execute at specific time
+ * indices. The actual time step of the simulation is mapped to a schedule index using the
+ * stepMapper. Typically, the indices will be days of the year and the step mapper just a {@link
+ * PeriodicStepMapper}.
+ * <p>
+ * If there are processes to be executed for the given time step, the
+ * TODO
+ *
+ * @param <B> The type of local biology to operate upon.
+ * @param <A> The type of aggregator to use for the biology.
+ */
+abstract class ScheduledBiologicalProcesses<B extends LocalBiology, A extends Aggregator<B>>
     implements Steppable, AdditionalStartable {
 
     private final A aggregator;
@@ -68,12 +80,14 @@ public class ScheduledBiologicalProcesses<B extends LocalBiology, A extends Aggr
             schedule.get(stepMapper.applyAsInt(fishState.getStep()));
 
         if (biologicalProcesses != null) {
-            B biology = aggregator.aggregate(fishState.getBiology(), fishState.getMap(), null);
+            B biology = aggregate(fishState);
             for (final BiologicalProcess<B> process : biologicalProcesses) {
                 biology = process.process(fishState, biology).orElse(biology);
             }
         }
     }
+
+    abstract B aggregate(final FishState fishState);
 
     @Override
     public void start(final FishState fishState) {

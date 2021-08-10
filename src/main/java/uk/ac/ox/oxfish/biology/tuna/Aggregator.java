@@ -33,7 +33,13 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
 /**
- * TODO.
+ * Objects of this class can take a collection of local biologies and "aggregate" then (i.e., sum
+ * them) into a single local biology object.
+ *
+ * <p>In most cases, the collection of local biologies will be all the {@link SeaTile} biologies
+ * plus all the {@link uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad} biologies.</p>
+ *
+ * @param <B> The type of local biology to aggregate.
  */
 public abstract class Aggregator<B extends LocalBiology> {
 

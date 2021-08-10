@@ -25,7 +25,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * TODO.
+ * The factory in charge of creating an {@link AbundanceRestorer}. The {@link
+ * #setAbundanceReallocator(AbundanceReallocator)} method needs to be called before {@link
+ * #apply(FishState)}.
  */
 public class AbundanceRestorerFactory implements AlgorithmFactory<AbundanceRestorer> {
 

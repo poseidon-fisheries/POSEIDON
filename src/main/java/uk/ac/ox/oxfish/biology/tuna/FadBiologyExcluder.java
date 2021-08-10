@@ -18,32 +18,32 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
+
 import java.util.Collection;
-import java.util.Map;
-import java.util.function.IntUnaryOperator;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import java.util.Optional;
+import java.util.stream.Stream;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-/**
- * TODO.
- */
-public class ScheduledAbundanceProcesses
-    extends ScheduledBiologicalProcesses<AbundanceLocalBiology, AbundanceAggregator> {
+abstract class FadBiologyExcluder<B extends LocalBiology> extends Excluder<B> {
 
-    ScheduledAbundanceProcesses(
-        final AbundanceAggregator aggregator,
-        final IntUnaryOperator stepMapper,
-        final Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> schedule
-    ) {
-        super(aggregator, stepMapper, schedule);
+    FadBiologyExcluder(final Aggregator<B> aggregator) {
+        super(aggregator);
     }
 
     @Override
-    AbundanceLocalBiology aggregate(final FishState fishState) {
-        return getAggregator().aggregate(
-            fishState.getBiology(),
-            fishState.getMap(),
-            fishState.getFadMap()
-        );
+    Collection<B> getBiologiesToExclude(final FishState fishState) {
+        //noinspection UnstableApiUsage
+        return stream(Optional.ofNullable(fishState.getFadMap()))
+            .flatMap(this::getFads)
+            .map(Fad::getBiology)
+            .collect(toImmutableList());
     }
+
+    abstract Stream<? extends Fad<B>> getFads(FadMap fadMap);
+
 }

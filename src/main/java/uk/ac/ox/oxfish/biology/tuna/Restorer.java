@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
@@ -26,26 +25,44 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateSteppable;
 
+/**
+ * The job of this class is to take an aggregated "snapshot" of the biology at some point in time
+ * and restore it at a later point in time.
+ *
+ * <p>It is similar to the various {@link uk.ac.ox.oxfish.biology.complicated.BiologyResetter}
+ * implementations, but there are a few key differences:
+ * <ul>
+ *  <li>It takes FADs into account.</li>
+ *  <li>It's generic: subclasses can work with different types of local biologies.</li>
+ *  <li>It relies on a {@link Reallocator} to redistribute the biology on the map
+ *      when restoring it.</li>
+ * </ul>
+ *
+ * @param <K> the type of key needed to identify which allocation map to use.
+ * @param <B> the type of local biology to work with.
+ */
 abstract class Restorer<K, B extends LocalBiology>
     implements AdditionalStartable {
 
     private final Map<Integer, Integer> schedule;
     private final Reallocator<K, B> reallocator;
     private final Aggregator<B> aggregator;
+    private final Excluder<B> excluder;
 
     Restorer(
         final Reallocator<K, B> reallocator,
         final Aggregator<B> aggregator,
+        final Excluder<B> excluder,
         final Map<Integer, Integer> schedule
     ) {
         this.reallocator = reallocator;
         this.aggregator = aggregator;
+        this.excluder = excluder;
         this.schedule = ImmutableMap.copyOf(schedule);
     }
 
@@ -87,30 +104,18 @@ abstract class Restorer<K, B extends LocalBiology>
         final B aggregatedBiology,
         final FishState fishState
     ) {
-
-        final GlobalBiology globalBiology = fishState.getBiology();
-        final FadMap fadMap = checkNotNull(fishState.getFadMap());
-
         // we need to subtract the biomass that's currently under FADs
         // in order to avoid reallocating it
-        final B aggregatedFadsBiology =
-            aggregator.aggregate(globalBiology, null, fadMap);
-
-        final B aggregationToReallocate =
-            subtract(globalBiology, aggregatedBiology, aggregatedFadsBiology);
+        final B aggregationToReallocate = excluder
+            .process(fishState, aggregatedBiology)
+            .orElse(aggregatedBiology); // keep original biology if excluder returns empty.
 
         reallocator.reallocate(
             fishState.getStep(),
-            globalBiology,
+            fishState.getBiology(),
             fishState.getMap().getAllSeaTilesExcludingLandAsList(),
             aggregationToReallocate
         );
     }
-
-    abstract B subtract(
-        GlobalBiology globalBiology,
-        final B aggregatedBiology,
-        final B biologyToSubtract
-    );
 
 }

@@ -24,7 +24,7 @@ class PeriodicStepMapper implements IntUnaryOperator {
 
     private final int period;
 
-    public PeriodicStepMapper(final int period) {
+    PeriodicStepMapper(final int period) {
         this.period = period;
     }
 

@@ -19,31 +19,28 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.function.IntUnaryOperator;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import java.util.Optional;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 
-/**
- * TODO.
- */
-public class ScheduledAbundanceProcesses
-    extends ScheduledBiologicalProcesses<AbundanceLocalBiology, AbundanceAggregator> {
+abstract class Excluder<B extends LocalBiology> implements BiologicalProcess<B> {
 
-    ScheduledAbundanceProcesses(
-        final AbundanceAggregator aggregator,
-        final IntUnaryOperator stepMapper,
-        final Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> schedule
-    ) {
-        super(aggregator, stepMapper, schedule);
+    private final Aggregator<B> aggregator;
+
+    public Excluder(final Aggregator<B> aggregator) {
+        this.aggregator = aggregator;
     }
+
+    abstract Collection<B> getBiologiesToExclude(final FishState fishState);
 
     @Override
-    AbundanceLocalBiology aggregate(final FishState fishState) {
-        return getAggregator().aggregate(
-            fishState.getBiology(),
-            fishState.getMap(),
-            fishState.getFadMap()
-        );
+    public Optional<B> process(final FishState fishState, final B aggregatedBiology) {
+        return Optional.of(exclude(
+            aggregatedBiology,
+            aggregator.aggregate(fishState.getBiology(), getBiologiesToExclude(fishState))
+        ));
     }
+
+    abstract B exclude(B aggregatedBiology, B biologyToExclude);
+
 }

@@ -23,9 +23,9 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 
 /**
- * TODO.
+ * An {@link Aggregator} that works with {@link BiomassLocalBiology} biologies.
  */
-public class BiomassAggregator extends Aggregator<BiomassLocalBiology> {
+class BiomassAggregator extends Aggregator<BiomassLocalBiology> {
 
     BiomassAggregator() {
         super(BiomassLocalBiology.class);

@@ -18,37 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static java.util.stream.IntStream.range;
-
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 
 /**
- * TODO.
+ * This is a {@link Restorer} that works with {@link BiomassLocalBiology}.
  */
-public class BiomassRestorer extends Restorer<String, BiomassLocalBiology> {
+class BiomassRestorer extends Restorer<String, BiomassLocalBiology> {
 
     BiomassRestorer(
         final BiomassReallocator reallocator,
         final Aggregator<BiomassLocalBiology> aggregator,
         final Map<Integer, Integer> schedule
     ) {
-        super(reallocator, aggregator, schedule);
+        super(reallocator, aggregator, new FadBiomassExcluder(aggregator), schedule);
     }
 
-    @Override
-    public BiomassLocalBiology subtract(
-        final GlobalBiology globalBiology,
-        final BiomassLocalBiology aggregatedBiology,
-        final BiomassLocalBiology biologyToSubtract
-    ) {
-        final double[] currentBiomass = aggregatedBiology.getCurrentBiomass();
-        final double[] biomassToSubtract = biologyToSubtract.getCurrentBiomass();
-        return new BiomassLocalBiology(
-            range(0, currentBiomass.length)
-            .mapToDouble(i -> currentBiomass[i] - biomassToSubtract[i])
-            .toArray()
-        );
-    }
 }

@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -204,10 +205,14 @@ public class AbundanceLocalBiology implements LocalBiology
 
     }
 
-
-
-
-
+    /**
+     * Returns an unmodifiable view of the abundance map, i.e., a map from each {@link Species} to
+     * the corresponding abundance matrix. Note that the map itself is unmodifiable but the exposed
+     * arrays are not. Mutating those should be done responsibly.
+     */
+    public Map<Species, double[][]> getAbundance() {
+        return Collections.unmodifiableMap(abundance);
+    }
 
     @Override
     public String toString() {

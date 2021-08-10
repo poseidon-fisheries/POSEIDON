@@ -28,6 +28,9 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
+/**
+ * An {@link Aggregator} that works with {@link AbundanceLocalBiology} biologies.
+ */
 class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
 
     AbundanceAggregator() {

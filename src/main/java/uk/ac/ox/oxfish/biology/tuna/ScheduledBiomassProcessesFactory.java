@@ -24,6 +24,7 @@ import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
+import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -44,20 +45,23 @@ public class ScheduledBiomassProcessesFactory
             "setBiomassReallocator must be called before using."
         );
 
+        final BiomassAggregator aggregator = new BiomassAggregator();
         final Collection<BiologicalProcess<BiomassLocalBiology>> biologicalProcesses =
-            ImmutableList.of(getBiomassReallocator());
+            ImmutableList.of(
+                new FadBiomassExcluder(aggregator),
+                getBiomassReallocator()
+            );
 
         final AllocationGrids<String> grids =
             getBiomassReallocator().getAllocationGrids();
 
-        return new ScheduledBiomassProcesses(
-            new BiomassAggregator(),
-            grids.getStepMapper(),
+        final Map<Integer, Collection<BiologicalProcess<BiomassLocalBiology>>> schedule =
             grids.getGrids()
                 .keySet()
                 .stream()
-                .collect(toImmutableMap(identity(), step -> biologicalProcesses))
-        );
+                .collect(toImmutableMap(identity(), step -> biologicalProcesses));
+
+        return new ScheduledBiomassProcesses(aggregator, grids.getStepMapper(), schedule);
     }
 
     private BiomassReallocator getBiomassReallocator() {

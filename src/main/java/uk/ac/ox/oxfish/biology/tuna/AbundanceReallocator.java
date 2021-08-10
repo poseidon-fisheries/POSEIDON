@@ -35,7 +35,11 @@ import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
- * TODO.
+ * A {@link Reallocator} class where the local biology is abundance based. The type of key used to
+ * identify the right allocation map is a combination of species name and size group. In the case of
+ * tuna in the EPO, for example, we have different map for "small" and "large" tunas of each
+ * species. To know which map to use for each age bin, objects of this class must be pass a function
+ * that associates each bin to the right map.
  */
 public class AbundanceReallocator
     extends Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology> {
