@@ -28,10 +28,12 @@ public class ActionAttractionField extends AttractionField {
     public ActionAttractionField(
         final LocationValues locationValues,
         final LocalAttractionModulator modulator,
-        GlobalAttractionModulator globalModulator,
-        final Class<? extends PurseSeinerAction> actionClass
+        final GlobalAttractionModulator globalModulator,
+        final Class<? extends PurseSeinerAction> actionClass,
+        final double actionDistanceExponent,
+        final double destinationDistanceExponent
     ) {
-        super(locationValues, modulator, globalModulator);
+        super(locationValues, modulator, globalModulator, actionDistanceExponent, destinationDistanceExponent);
         this.actionClass = actionClass;
     }
 

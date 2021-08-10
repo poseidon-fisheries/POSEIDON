@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -36,6 +37,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 public class SetOpportunityGenerator {
 
     private final LogisticFunction probabilityFunction;
+    private final ActiveOpportunities activeOpportunities;
     private final Function<Fisher, AbstractSetAction> actionConstructor;
     private final Map<Species, Double> weights;
 
@@ -43,21 +45,25 @@ public class SetOpportunityGenerator {
         final double logisticMidpoint,
         final double logisticSteepness,
         final Map<Species, Double> weights,
-        final Function<Fisher, AbstractSetAction> actionConstructor
+        final Function<Fisher, AbstractSetAction> actionConstructor,
+        final ActiveOpportunities activeOpportunities
     ) {
         this(
             new LogisticFunction(logisticMidpoint, logisticSteepness),
             weights,
-            actionConstructor
+            actionConstructor,
+            activeOpportunities
         );
     }
 
-    public SetOpportunityGenerator(
+    private SetOpportunityGenerator(
         final LogisticFunction probabilityFunction,
         final Map<Species, Double> weights,
-        final Function<Fisher, AbstractSetAction> actionConstructor
+        final Function<Fisher, AbstractSetAction> actionConstructor,
+        final ActiveOpportunities activeOpportunities
     ) {
         this.probabilityFunction = probabilityFunction;
+        this.activeOpportunities = activeOpportunities;
 
         // make sure all weights are >= 0 and at least one is > 0
         checkArgument(weights.values().stream().allMatch(w -> w >= 0));
@@ -71,9 +77,24 @@ public class SetOpportunityGenerator {
         this.actionConstructor = actionConstructor;
     }
 
-    Optional<AbstractSetAction> get(Fisher fisher, final LocalBiology biology) {
-        final double p = probabilityOfOpportunity(biology);
-        return fisher.grabRandomizer().nextBoolean(p)
+    Optional<AbstractSetAction> get(
+        final Fisher fisher,
+        final LocalBiology biology,
+        final Int2D gridLocation,
+        final int step
+    ) {
+        final boolean opportunity;
+        if (activeOpportunities.hasOpportunity(gridLocation, step)) {
+            opportunity = true;
+        } else {
+            final double p = probabilityOfOpportunity(biology);
+            opportunity = fisher.grabRandomizer().nextBoolean(p);
+            if (opportunity) {
+                final int duration = 1;
+                activeOpportunities.addOpportunity(gridLocation, step, duration);
+            }
+        }
+        return opportunity
             ? Optional.of(actionConstructor.apply(fisher))
             : Optional.empty();
     }

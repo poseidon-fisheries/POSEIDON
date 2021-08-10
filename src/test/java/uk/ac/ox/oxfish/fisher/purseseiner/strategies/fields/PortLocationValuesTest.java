@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -47,8 +48,8 @@ public class PortLocationValuesTest {
         final PortLocationValues portLocationValues = new PortLocationValues();
         portLocationValues.start(null, fisher);
         assertEquals(
-            portLocationValues.getValues().collect(toList()),
-            ImmutableList.of(entry(portLocation, 1.0))
+            portLocationValues.getValues(),
+            ImmutableSet.of(entry(portLocation, 1.0))
         );
         assertEquals(1.0, portLocationValues.getValueAt(portLocation));
         range(1, 9).forEach(i ->

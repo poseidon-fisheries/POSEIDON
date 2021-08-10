@@ -19,12 +19,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import com.google.common.collect.ImmutableSet;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map.Entry;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
@@ -32,17 +33,20 @@ public class PortLocationValues implements LocationValues {
 
     private Entry<Int2D, Double> portLocationValue;
 
-    @Override public Stream<Entry<Int2D, Double>> getValues() {
-        return Stream.of(portLocationValue);
-    }
-
-    @Override public double getValueAt(final Int2D location) {
+    @Override
+    public double getValueAt(final Int2D location) {
         return location.equals(portLocationValue.getKey())
             ? portLocationValue.getValue()
             : 0;
     }
 
-    @Override public void start(final FishState model, final Fisher fisher) {
+    @Override
+    public Set<Entry<Int2D, Double>> getValues() {
+        return ImmutableSet.of(portLocationValue);
+    }
+
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         final Int2D portLocation = fisher.getHomePort().getLocation().getGridLocation();
         portLocationValue = entry(portLocation, 1.0);
     }

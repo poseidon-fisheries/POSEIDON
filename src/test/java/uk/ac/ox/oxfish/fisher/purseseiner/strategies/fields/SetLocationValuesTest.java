@@ -41,11 +41,11 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -66,7 +66,7 @@ public class SetLocationValuesTest {
         final Species specie = globalBiology.getSpecie(0);
         when(market.getSpecies()).thenReturn(specie);
         when(market.getMarginalPrice()).thenReturn(1.0);
-        when(marketMap.getMarkets()).thenReturn(ImmutableList.of(market));
+        when(marketMap.getMarket(anyInt())).thenReturn(market);
         when(port.getMarketMap(any())).thenReturn(marketMap);
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getLocation()).thenReturn(map.getSeaTile(3, 3));
@@ -92,7 +92,7 @@ public class SetLocationValuesTest {
             values.start(fishState, fisher);
             assertEquals(
                 initialValues.entrySet(),
-                values.getValues().collect(toImmutableSet())
+                values.getValues()
             );
             range(0, 3).forEach(i -> assertEquals((double) i, values.getValueAt(i, i)));
             assertEquals(0.0, values.getValueAt(3, 3));
@@ -107,7 +107,7 @@ public class SetLocationValuesTest {
                 entry(new Int2D(1, 1), 1.0),
                 entry(new Int2D(2, 2), 2.0)
             ),
-            locationValues.get(0).getValues().collect(toImmutableSet())
+            locationValues.get(0).getValues()
         );
         rangeClosed(1, 2).forEach(i ->
             assertEquals(
@@ -116,7 +116,7 @@ public class SetLocationValuesTest {
                     entry(new Int2D(1, 1), 0.5),
                     entry(new Int2D(2, 2), 1.0)
                 ),
-                locationValues.get(i).getValues().collect(toImmutableSet())
+                locationValues.get(i).getValues()
             ));
         assertEquals(
             ImmutableSet.of( // decay rate: 1.0
@@ -124,7 +124,7 @@ public class SetLocationValuesTest {
                 entry(new Int2D(1, 1), 0.0),
                 entry(new Int2D(2, 2), 0.0)
             ),
-            locationValues.get(3).getValues().collect(toImmutableSet())
+            locationValues.get(3).getValues()
         );
 
         final Catch caught = new Catch(specie, 1000, globalBiology);

@@ -18,17 +18,12 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -39,7 +34,7 @@ public class FadMapTest {
     public void fadBeaching() {
 
         // Make a 3x3 map, with a one tile island in the middle
-        NauticalMap nauticalMap = makeMap(new int[][]{
+        final NauticalMap nauticalMap = makeMap(new int[][]{
             {-1, -1, -1},
             {-1, 10, -1},
             {-1, -1, -1}
@@ -48,11 +43,11 @@ public class FadMapTest {
         final Species speciesA = new Species("A");
         final Species speciesB = new Species("B");
         final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
-        final Quantity<Mass> k = getQuantity(1, TONNE);
-        final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
+        final DoubleSupplier k = () -> 1000;
+        final ImmutableMap<Species, DoubleSupplier> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
 
-        for (SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
-            tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
+        for (final SeaTile tile : nauticalMap.getAllSeaTilesAsList()) {
+            tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k.getAsDouble()) : new EmptyLocalBiology());
         }
 
         // Make a current map that moves FADs west
@@ -63,8 +58,6 @@ public class FadMapTest {
             globalBiology,
             fadCarryingCapacities,
             ImmutableMap.of(),
-            rng,
-            0,
             0,
             () -> 0
         );
@@ -75,14 +68,15 @@ public class FadMapTest {
         when(fishState.getRandom()).thenReturn(rng);
         fishState.schedule = schedule;
 
-        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer);
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         fadManager.setFisher(fisher);
+        fadManager.setNumFadsInStock(1);
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final Fad fad = fadManager.deployFad(startTile, 0);
+        final Fad fad = fadManager.deployFad(startTile);
         fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology = (VariableBiomassBasedBiology) startTile.getBiology();

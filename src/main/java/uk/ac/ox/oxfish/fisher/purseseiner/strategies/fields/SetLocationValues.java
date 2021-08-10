@@ -23,7 +23,6 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,7 +33,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class SetLocationValues<A extends AbstractSetAction> extends MutableLocationValues<A> {
 
-    public SetLocationValues(
+    SetLocationValues(
         final Class<A> observedClass,
         final Function<Fisher, Map<Int2D, Double>> loadValues,
         final double decayRate
@@ -42,15 +41,14 @@ public abstract class SetLocationValues<A extends AbstractSetAction> extends Mut
         super(observedClass, loadValues, decayRate);
     }
 
-    @Override Optional<Entry<Int2D, Double>> observeValue(final A setAction) {
+    @Override
+    Optional<Entry<Int2D, Double>> observeValue(final A setAction) {
         final Fisher fisher = setAction.getFisher();
-        final FishValueCalculator fishValueCalculator = new FishValueCalculator(fisher);
-        return setAction.getCatchesKept()
-            .map(catchesKept -> {
-                final SeaTile seaTile = fisher.getLocation();
-                final Int2D location = new Int2D(seaTile.getGridX(), seaTile.getGridY());
-                return entry(location, fishValueCalculator.valueOf(catchesKept));
-            });
+        final Int2D gridLocation = fisher.getLocation().getGridLocation();
+        return setAction
+            .getCatchesKept()
+            .map(new FishValueCalculator(fisher)::valueOf)
+            .map(valueOfCatch -> entry(gridLocation, valueOfCatch));
     }
 
 }

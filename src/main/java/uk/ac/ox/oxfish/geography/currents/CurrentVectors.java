@@ -1,13 +1,15 @@
 package uk.ac.ox.oxfish.geography.currents;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import sim.util.Int2D;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,34 +20,47 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectors {
 
-    private final Map<Integer, HashMap<SeaTile, Double2D>> vectorCache = new HashMap<>();
-    private final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
-    private final Function<Integer, CurrentPattern> currentPatternAtStep;
+    private static final Double2D ZERO_VECTOR = new Double2D();
 
+    // Even caching just 50 vectors per time step gives a hit rate of about 80%!
+    private static final int MAX_CACHE_ENTRIES = 50;
+    private final CacheBuilder<Object, Object> cacheBuilder =
+        CacheBuilder.newBuilder().maximumSize(MAX_CACHE_ENTRIES).recordStats();
+
+    private final Map<Integer, Cache<Int2D, Optional<Double2D>>> vectorCache = new ConcurrentHashMap<>();
+    private final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps;
+    private final Function<? super Integer, CurrentPattern> currentPatternAtStep;
+    private final int gridHeight;
+    private final int gridWidth;
     private final int stepsPerDay;
-    private final int initialHashMapsCapacity;
 
     public CurrentVectors(
-        TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
-        int stepsPerDay
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
+        final int stepsPerDay,
+        final int gridWidth,
+        final int gridHeight
     ) {
-        this(vectorMaps, __ -> Y2017, stepsPerDay);
+        this(vectorMaps, __ -> Y2017, gridWidth, gridHeight, stepsPerDay);
     }
 
     public CurrentVectors(
-        TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
-        Function<Integer, CurrentPattern> currentPatternAtStep,
-        int stepsPerDay
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps,
+        final Function<? super Integer, CurrentPattern> currentPatternAtStep,
+        final int gridWidth,
+        final int gridHeight,
+        final int stepsPerDay
     ) {
-        this.initialHashMapsCapacity = initialHashMapsCapacity(vectorMaps);
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
+        this.gridHeight = gridHeight;
+        this.gridWidth = gridWidth;
         this.stepsPerDay = stepsPerDay;
     }
 
-    @NotNull public static Double2D getInterpolatedVector(
-        Double2D vectorBefore, int offsetBefore,
-        Double2D vectorAfter, int offsetAfter
+    @NotNull
+    public static Double2D getInterpolatedVector(
+        final Double2D vectorBefore, final int offsetBefore,
+        final Double2D vectorAfter, final int offsetAfter
     ) {
         final double totalOffset = (double) offsetBefore + offsetAfter;
         final Double2D v1 = vectorBefore.multiply((totalOffset - offsetBefore) / totalOffset);
@@ -53,20 +68,7 @@ public class CurrentVectors {
         return v1.add(v2);
     }
 
-    private int initialHashMapsCapacity(Map<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps) {
-        // use half the size of the largest vector map (though they should all be the same size) as initial capacity.
-        // This should lead to *at most* two rehashings (given the default load factor of .75), but avoids all
-        // rehashings most of the time, as the cached vectors rarely exceed one quarter of the map.
-        return vectorMaps.values().stream()
-            .flatMap(map -> map.values().stream()).mapToInt(Map::size)
-            .max()
-            .orElse(0)
-            / 2;
-    }
-
-    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
-
-    int positiveDaysOffset(int sourceDay, int targetDay) {
+    static int positiveDaysOffset(final int sourceDay, final int targetDay) {
         checkArgument(sourceDay >= 1 && sourceDay <= 365);
         checkArgument(targetDay >= 1 && targetDay <= 365);
         return sourceDay <= targetDay ?
@@ -74,94 +76,134 @@ public class CurrentVectors {
             (365 - sourceDay) + targetDay;
     }
 
-    int negativeDaysOffset(int sourceDay, int targetDay) {
+    static int negativeDaysOffset(final int sourceDay, final int targetDay) {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    Double2D getVector(int step, SeaTile seaTile) {
-        return vectorCache
-            .computeIfAbsent(step, __ -> new HashMap<>(initialHashMapsCapacity))
-            .computeIfAbsent(seaTile, __ -> computeVector(step, seaTile));
+    public Map<Integer, Cache<Int2D, Optional<Double2D>>> getVectorCache() {
+        return Collections.unmodifiableMap(vectorCache);
+    }
+
+    public int getGridHeight() {
+        return gridHeight;
+    }
+
+    public int getGridWidth() {
+        return gridWidth;
+    }
+
+    private int getDayOfTheYear(final int timeStep) {
+        return ((timeStep / stepsPerDay) % 365) + 1;
+    }
+
+    public Double2D getVector(final int step, final Int2D location) {
+        try {
+            return vectorMaps.isEmpty() ?
+                ZERO_VECTOR :
+                vectorCache
+                    .computeIfAbsent(step, __ -> cacheBuilder.build())
+                    .get(location, () -> computeVector(step, location))
+                    .orElse(ZERO_VECTOR);
+        } catch (final ExecutionException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
-     * Returns the current vector for seaTile at step. Returns null if we have no currents for that sea tile.
+     * Returns the current vector for seaTile at step. Returns an empty optional if we have no currents for that location.
      */
-    private Double2D computeVector(int step, SeaTile seaTile) {
+    private Optional<Double2D> computeVector(final int step, final Int2D location) {
         final int dayOfTheYear = getDayOfTheYear(step);
         if (vectorMaps.containsKey(dayOfTheYear)) {
-            final Map<CurrentPattern, Map<SeaTile, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
+            final Map<CurrentPattern, Map<Int2D, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
             final CurrentPattern currentPattern = currentPatternAtStep.apply(step);
             if (mapsAtStep.containsKey(currentPattern)) {
-                return mapsAtStep.get(currentPattern).get(seaTile);
+                return Optional.ofNullable(mapsAtStep.get(currentPattern).get(location));
             }
         }
-        return getInterpolatedVector(seaTile, step);
+        return getInterpolatedVector(location, step);
     }
 
-    private VectorMapAtStep lookupVectorMap(
-        int step,
-        Function<Integer, Integer> keyLookup,
-        Supplier<Integer> keyFallback,
-        BiFunction<Integer, Integer, Integer> offsetFunction,
-        int stepDirection // +1 or -1
+    private Optional<VectorMapAtStep> lookupVectorMap(
+        final int step,
+        final Function<? super Integer, Integer> keyLookup,
+        final Supplier<Integer> keyFallback,
+        final BiFunction<? super Integer, ? super Integer, Integer> offsetFunction,
+        final int stepDirection // +1 or -1
     ) {
         final int oldDay = getDayOfTheYear(step);
-        final Integer newKey = keyLookup.apply(oldDay);
-        final int newDay = newKey != null ? newKey : keyFallback.get();
-        final int offsetInDays = offsetFunction.apply(oldDay, newDay);
-        final int newStep = step + (offsetInDays * stepsPerDay);
-        final Map<CurrentPattern, Map<SeaTile, Double2D>> mapsOnNewDay = vectorMaps.get(newDay);
-        final CurrentPattern patternAtNewStep = currentPatternAtStep.apply(newStep);
-        return mapsOnNewDay.containsKey(patternAtNewStep) ?
-            new VectorMapAtStep(newStep, mapsOnNewDay.get(patternAtNewStep)) :
-            lookupVectorMap(newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
+        return Optional
+            .ofNullable(keyLookup.apply(oldDay))
+            .map(Optional::of) // wrap it because `orElse` unwraps; wouldn't need that with `Optional::or` in Java 9+
+            .orElseGet(() -> Optional.ofNullable(keyFallback.get()))
+            .flatMap(newDay -> {
+                final int offsetInDays = offsetFunction.apply(oldDay, newDay);
+                final int newStep = step + (offsetInDays * stepsPerDay);
+                final Map<CurrentPattern, Map<Int2D, Double2D>> mapsOnNewDay = vectorMaps.get(newDay);
+                final CurrentPattern patternAtNewStep = currentPatternAtStep.apply(newStep);
+                return Optional
+                    .ofNullable(mapsOnNewDay.get(patternAtNewStep))
+                    .map(vectorMap -> Optional.of(new VectorMapAtStep(newStep, vectorMap)))
+                    .orElseGet(() -> lookupVectorMap(
+                        newStep + stepDirection,
+                        keyLookup,
+                        keyFallback,
+                        offsetFunction,
+                        stepDirection
+                    ));
+            });
     }
 
-    private VectorMapAtStep getVectorMapBefore(int step) {
+    private Optional<VectorMapAtStep> getVectorMapBefore(final int step) {
         return lookupVectorMap(
             step,
             vectorMaps::floorKey,
-            vectorMaps::lastKey,
-            this::negativeDaysOffset,
+            () -> Optional.ofNullable(vectorMaps.lastEntry()).map(Entry::getKey).orElse(null),
+            CurrentVectors::negativeDaysOffset,
             -1
         );
     }
 
-    private VectorMapAtStep getVectorMapAfter(int step) {
+    private Optional<VectorMapAtStep> getVectorMapAfter(final int step) {
         return lookupVectorMap(
             step,
             vectorMaps::ceilingKey,
-            vectorMaps::firstKey,
-            this::positiveDaysOffset,
+            () -> Optional.ofNullable(vectorMaps.firstEntry()).map(Entry::getKey).orElse(null),
+            CurrentVectors::positiveDaysOffset,
             +1
         );
     }
 
     /**
      * Return the interpolated vector between the currents we have before and after step.
-     * Returns null if we don't have currents for the desired sea tile.
+     * Returns Optional.empty() if we don't have currents for the desired sea tile.
      */
-    private Double2D getInterpolatedVector(SeaTile seaTile, int step) {
-        final VectorMapAtStep vectorMapBefore = getVectorMapBefore(step - 1);
-        final Double2D vectorBefore = vectorMapBefore.vectorMap.get(seaTile);
-        if (vectorBefore == null) return null;
-        final int offsetBefore = abs(step - vectorMapBefore.step);
-        final VectorMapAtStep vectorMapAfter = getVectorMapAfter(step + 1);
-        final Double2D vectorAfter = vectorMapAfter.vectorMap.get(seaTile);
-        if (vectorAfter == null) return null;
-        final int offsetAfter = abs(step - vectorMapAfter.step);
-        return getInterpolatedVector(vectorBefore, offsetBefore, vectorAfter, offsetAfter);
+    private Optional<Double2D> getInterpolatedVector(final Int2D location, final int step) {
+        // I'm sorry, I know how dreadful that looks in Java but this really
+        // is just simple monad chaining and I don't know how else
+        // to do it without checking for null every other line. -- Nicolas
+        return getVectorMapBefore(step - 1).flatMap(vectorMapBefore ->
+            Optional.ofNullable(vectorMapBefore.vectorMap.get(location)).flatMap(vectorBefore ->
+                getVectorMapAfter(step + 1).flatMap(vectorMapAfter ->
+                    Optional.ofNullable(vectorMapAfter.vectorMap.get(location)).map(vectorAfter ->
+                        getInterpolatedVector(
+                            vectorBefore,
+                            abs(step - vectorMapBefore.step),
+                            vectorAfter,
+                            abs(step - vectorMapAfter.step)
+                        )
+                    )
+                )
+            )
+        );
     }
-
-    public void removeCachedVectors(int timeStep) { vectorCache.remove(timeStep); }
 
     static class VectorMapAtStep {
 
         final int step;
-        final Map<SeaTile, Double2D> vectorMap;
+        final Map<Int2D, Double2D> vectorMap;
 
-        VectorMapAtStep(int step, Map<SeaTile, Double2D> vectorMap) {
+        VectorMapAtStep(final int step, final Map<Int2D, Double2D> vectorMap) {
             this.step = step;
             this.vectorMap = vectorMap;
         }

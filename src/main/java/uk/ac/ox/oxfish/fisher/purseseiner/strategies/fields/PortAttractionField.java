@@ -21,8 +21,18 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 public class PortAttractionField extends AttractionField {
 
-    public PortAttractionField(final GlobalAttractionModulator globalModulator) {
-        super(new PortLocationValues(), ConstantLocalAttractionModulator.INSTANCE, globalModulator);
+    public PortAttractionField(
+        final GlobalAttractionModulator globalModulator,
+        final double valueExponent,
+        final double distanceExponent
+    ) {
+        super(
+            new PortLocationValues(),
+            ConstantLocalAttractionModulator.INSTANCE,
+            globalModulator,
+            valueExponent,
+            distanceExponent
+        );
     }
 
 }

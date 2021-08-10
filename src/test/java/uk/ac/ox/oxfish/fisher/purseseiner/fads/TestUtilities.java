@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
 import sim.util.Double2D;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
@@ -36,9 +37,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.junit.Assert.assertEquals;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -77,11 +76,16 @@ public class TestUtilities {
         Double2D currentVector,
         int stepsPerDay
     ) {
-        final Map<SeaTile, Double2D> vectors = nauticalMap
+        final Map<Int2D, Double2D> vectors = nauticalMap
             .getAllSeaTilesExcludingLandAsList().stream()
-            .collect(toMap(identity(), __ -> currentVector));
-        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
+            .collect(toMap(SeaTile::getGridLocation, __ -> currentVector));
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps = new TreeMap<>();
         vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, vectors)));
-        return new CurrentVectors(vectorMaps, __ -> NEUTRAL, stepsPerDay);
+        return new CurrentVectors(
+            vectorMaps,
+            __ -> NEUTRAL,
+            nauticalMap.getWidth(), nauticalMap.getHeight(),
+            stepsPerDay
+        );
     }
 }

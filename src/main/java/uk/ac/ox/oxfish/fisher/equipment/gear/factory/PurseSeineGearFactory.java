@@ -70,15 +70,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
-    private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = input("location_values.csv");
-
     private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
     private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
-
     private double pctTravelTimeLeftLogisticMidpoint = 0.9;
     private double pctTravelTimeLeftLogisticSteepness = MAX_VALUE;
     private double pctSetsRemainingLogisticMidpoint = 0.5; // not calibrated for now
@@ -91,12 +88,48 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
     private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
     private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
+    private double actionDistanceExponent = 1;
+    private double destinationDistanceExponent = 1;
+    private double numFadsInStockLogisticMidpoint = 5;
+    private double numFadsInStockLogisticSteepness = 1;
+
+    public double getNumFadsInStockLogisticMidpoint() {
+        return numFadsInStockLogisticMidpoint;
+    }
+
+    public void setNumFadsInStockLogisticMidpoint(final double numFadsInStockLogisticMidpoint) {
+        this.numFadsInStockLogisticMidpoint = numFadsInStockLogisticMidpoint;
+    }
+
+    public double getNumFadsInStockLogisticSteepness() {
+        return numFadsInStockLogisticSteepness;
+    }
+
+    public void setNumFadsInStockLogisticSteepness(final double numFadsInStockLogisticSteepness) {
+        this.numFadsInStockLogisticSteepness = numFadsInStockLogisticSteepness;
+    }
+
+    public double getActionDistanceExponent() {
+        return actionDistanceExponent;
+    }
+
+    public void setActionDistanceExponent(final double actionDistanceExponent) {
+        this.actionDistanceExponent = actionDistanceExponent;
+    }
+
+    public double getDestinationDistanceExponent() {
+        return destinationDistanceExponent;
+    }
+
+    public void setDestinationDistanceExponent(final double destinationDistanceExponent) {
+        this.destinationDistanceExponent = destinationDistanceExponent;
+    }
 
     public double getPctSetsRemainingLogisticMidpoint() {
         return pctSetsRemainingLogisticMidpoint;
     }
 
-    public void setPctSetsRemainingLogisticMidpoint(double pctSetsRemainingLogisticMidpoint) {
+    public void setPctSetsRemainingLogisticMidpoint(final double pctSetsRemainingLogisticMidpoint) {
         this.pctSetsRemainingLogisticMidpoint = pctSetsRemainingLogisticMidpoint;
     }
 
@@ -104,7 +137,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         return pctSetsRemainingLogisticSteepness;
     }
 
-    public void setPctSetsRemainingLogisticSteepness(double pctSetsRemainingLogisticSteepness) {
+    public void setPctSetsRemainingLogisticSteepness(final double pctSetsRemainingLogisticSteepness) {
         this.pctSetsRemainingLogisticSteepness = pctSetsRemainingLogisticSteepness;
     }
 
@@ -112,7 +145,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         return dolphinSetObservers;
     }
 
-    public void setDolphinSetObservers(Set<Observer<DolphinSetAction>> dolphinSetObservers) {
+    public void setDolphinSetObservers(final Set<Observer<DolphinSetAction>> dolphinSetObservers) {
         this.dolphinSetObservers = dolphinSetObservers;
     }
 
@@ -204,7 +237,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
 
-    public void setBiomassLostMonitor(GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor) {
+    public void setBiomassLostMonitor(final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor) {
         this.biomassLostMonitor = biomassLostMonitor;
     }
 
@@ -213,7 +246,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         return actionSpecificRegulations;
     }
 
-    public void setActionSpecificRegulations(List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations) {
+    public void setActionSpecificRegulations(final List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations) {
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
@@ -221,7 +254,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
 
     @SuppressWarnings("unused")
-    public void setSuccessfulSetProbability(DoubleParameter successfulSetProbability) {
+    public void setSuccessfulSetProbability(final DoubleParameter successfulSetProbability) {
         this.successfulSetProbability = successfulSetProbability;
     }
 
@@ -230,22 +263,14 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     @SuppressWarnings("unused")
     public void setFadInitializerFactory(
-        FadInitializerFactory fadInitializerFactory
+        final FadInitializerFactory fadInitializerFactory
     ) { this.fadInitializerFactory = fadInitializerFactory; }
-
-    @SuppressWarnings("unused")
-    public int getInitialNumberOfFads() { return initialNumberOfFads; }
-
-    @SuppressWarnings("unused")
-    public void setInitialNumberOfFads(int initialNumberOfFads) {
-        this.initialNumberOfFads = initialNumberOfFads;
-    }
 
     @SuppressWarnings("unused")
     public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() { return fadDeploymentObservers; }
 
     @SuppressWarnings("unused")
-    public void setFadDeploymentObservers(Set<Observer<FadDeploymentAction>> fadDeploymentObservers) {
+    public void setFadDeploymentObservers(final Set<Observer<FadDeploymentAction>> fadDeploymentObservers) {
         this.fadDeploymentObservers = fadDeploymentObservers;
     }
 
@@ -253,7 +278,7 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     public Set<Observer<AbstractFadSetAction>> getFadSetObservers() { return fadSetObservers; }
 
     @SuppressWarnings("unused")
-    public void setFadSetObservers(Set<Observer<AbstractFadSetAction>> fadSetObservers) {
+    public void setFadSetObservers(final Set<Observer<AbstractFadSetAction>> fadSetObservers) {
         this.fadSetObservers = fadSetObservers;
     }
 
@@ -261,12 +286,12 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() { return nonAssociatedSetObservers; }
 
     @SuppressWarnings("unused")
-    public void setNonAssociatedSetObservers(Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers) {
+    public void setNonAssociatedSetObservers(final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers) {
         this.nonAssociatedSetObservers = nonAssociatedSetObservers;
     }
 
     @Override
-    public PurseSeineGear apply(FishState fishState) {
+    public PurseSeineGear apply(final FishState fishState) {
 
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
@@ -277,7 +302,6 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
-            initialNumberOfFads,
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
@@ -309,7 +333,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 new FadLocationValues(),
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 globalSetAttractionModulator,
-                FadSetAction.class
+                FadSetAction.class,
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new OpportunisticFadSetLocationValues(
@@ -321,7 +347,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     opportunisticFadSetTimeSinceLastVisitLogisticSteepness
                 ),
                 globalSetAttractionModulator,
-                OpportunisticFadSetAction.class
+                OpportunisticFadSetAction.class,
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new NonAssociatedSetLocationValues(
@@ -333,7 +361,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     nonAssociatedSetTimeSinceLastVisitLogisticSteepness
                 ),
                 globalSetAttractionModulator,
-                NonAssociatedSetAction.class
+                NonAssociatedSetAction.class,
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new DolphinSetLocationValues(
@@ -345,7 +375,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                     dolphinSetTimeSinceLastVisitLogisticSteepness
                 ),
                 globalSetAttractionModulator,
-                DolphinSetAction.class
+                DolphinSetAction.class,
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
             new ActionAttractionField(
                 new DeploymentLocationValues(
@@ -355,20 +387,28 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 new GlobalDeploymentAttractionModulator(
                     fadDeploymentPctActiveFadsLimitLogisticMidpoint,
-                    fadDeploymentPctActiveFadsLimitLogisticSteepness
+                    fadDeploymentPctActiveFadsLimitLogisticSteepness,
+                    numFadsInStockLogisticMidpoint,
+                    numFadsInStockLogisticSteepness
                 ),
-                FadDeploymentAction.class
+                FadDeploymentAction.class,
+                actionDistanceExponent,
+                destinationDistanceExponent
             ),
-            new PortAttractionField(new PortAttractionModulator(
-                pctHoldSpaceLeftLogisticMidpoint,
-                pctHoldSpaceLeftLogisticSteepness,
-                pctTravelTimeLeftLogisticMidpoint,
-                pctTravelTimeLeftLogisticSteepness
-            ))
+            new PortAttractionField(
+                new PortAttractionModulator(
+                    pctHoldSpaceLeftLogisticMidpoint,
+                    pctHoldSpaceLeftLogisticSteepness,
+                    pctTravelTimeLeftLogisticMidpoint,
+                    pctTravelTimeLeftLogisticSteepness
+                ),
+                actionDistanceExponent,
+                destinationDistanceExponent
+            )
         );
     }
 
-    private Map<Int2D, Double> loadLocationValues(Fisher fisher, Class<? extends PurseSeinerAction> actionClass) {
+    private Map<Int2D, Double> loadLocationValues(final Fisher fisher, final Class<? extends PurseSeinerAction> actionClass) {
         return locationValuesCache.getLocationValues(locationValuesFile, TARGET_YEAR, fisher, actionClass);
     }
 
@@ -380,18 +420,21 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public double getDecayRateOfNonAssociatedSetLocationValues() { return decayRateOfNonAssociatedSetLocationValues; }
 
     public void setDecayRateOfNonAssociatedSetLocationValues(final double decayRateOfNonAssociatedSetLocationValues) {
         this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public double getDecayRateOfDolphinSetLocationValues() { return decayRateOfDolphinSetLocationValues; }
 
     public void setDecayRateOfDolphinSetLocationValues(final double decayRateOfDolphinSetLocationValues) {
         this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public double getDecayRateOfDeploymentLocationValues() { return decayRateOfDeploymentLocationValues; }
 
     public void setDecayRateOfDeploymentLocationValues(final double decayRateOfDeploymentLocationValues) {

@@ -56,7 +56,7 @@ public abstract class FisherValuesByActionFromFileCache<T>
         final Path valuesFile,
         final int targetYear,
         final Fisher fisher,
-        Class<? extends PurseSeinerAction> actionClass
+        final Class<? extends PurseSeinerAction> actionClass
     ) {
         return super.get(valuesFile, targetYear, fisher)
             .orElse(emptyMap())
@@ -85,7 +85,7 @@ public abstract class FisherValuesByActionFromFileCache<T>
 
         ActionClasses(final Class<? extends PurseSeinerAction> actionClass) {this.actionClass = actionClass;}
 
-        public static Class<? extends AbstractSetAction> getSetActionClass(String setActionCode) {
+        public static Class<? extends AbstractSetAction> getSetActionClass(final String setActionCode) {
             //noinspection unchecked
             return Optional
                 .of(ActionClasses.valueOf(setActionCode.toUpperCase()).getActionClass())
