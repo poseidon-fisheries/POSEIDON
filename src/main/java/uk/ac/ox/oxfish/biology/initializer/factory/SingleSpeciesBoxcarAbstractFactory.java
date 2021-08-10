@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundanceFromListFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.NoDiffuserFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
+import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturityWithProcessError;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
@@ -18,6 +19,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
 /**
  * a factory for box car that keeps track of most parameters in one place and then feeds them to independent natural process factories.
@@ -57,6 +59,15 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
 
 
     /**
+     * lognormal std for yearly recruits. Set this to null or <=0 to not have any recruitment noise
+     */
+    private DoubleParameter recruitmentProcessStandardDeviation = new NullParameter();
+    /**
+     * you can have years without recruitment noise. If so, this tells you when. Set this to null to again avoid any recruitment noise
+     */
+    private DoubleParameter recruitmentNoiseStartingYear = new NullParameter();
+
+    /**
      * Applies this function to the given argument.
      *
      * @param state the function argument
@@ -83,12 +94,23 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
         recruitment.setSteepness(steepness);
         Double virginRecruits = this.virginRecruits.apply(state.getRandom());
         recruitment.setVirginRecruits(new FixedDoubleParameter(virginRecruits));
+        //add noise if necessary
+        RecruitmentBySpawningJackKnifeMaturityWithProcessError optionalRecruitment = null;
+        if(!(recruitmentProcessStandardDeviation instanceof NullParameter ) && !(recruitmentNoiseStartingYear instanceof NullParameter)){
 
-        RecruitmentBySpawningBiomass recruitmentInstance = recruitment.apply(state);
+                optionalRecruitment = new RecruitmentBySpawningJackKnifeMaturityWithProcessError();
+                optionalRecruitment.setDelegate(recruitment);
+                optionalRecruitment.setLognormalStandardDeviation(recruitmentProcessStandardDeviation);
+                optionalRecruitment.setFirstYearRecruitmentBecomesNoisy(recruitmentNoiseStartingYear);
+        }
+
+
+        final RecruitmentBySpawningBiomass noiselessRecruitment = recruitment.apply(state);
+        RecruitmentBySpawningBiomass recruitmentInstance = optionalRecruitment == null ? noiselessRecruitment : optionalRecruitment.apply(state);
         BoxCarSimulator simulator = new BoxCarSimulator(
                 virginRecruits,
                 aging,
-                recruitmentInstance,
+                noiselessRecruitment, //always provide noiseless recruitment to avoid noise affecting your guessed K
                 meristicsInstance,
                 mortality);
         StructuredAbundance structuredAbundance = simulator.virginCondition(state, 100);
@@ -442,5 +464,21 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
 
     public void setAbundanceSimulator(BoxCarSimulator abundanceSimulator) {
         this.abundanceSimulator = abundanceSimulator;
+    }
+
+    public DoubleParameter getRecruitmentProcessStandardDeviation() {
+        return recruitmentProcessStandardDeviation;
+    }
+
+    public void setRecruitmentProcessStandardDeviation(DoubleParameter recruitmentProcessStandardDeviation) {
+        this.recruitmentProcessStandardDeviation = recruitmentProcessStandardDeviation;
+    }
+
+    public DoubleParameter getRecruitmentNoiseStartingYear() {
+        return recruitmentNoiseStartingYear;
+    }
+
+    public void setRecruitmentNoiseStartingYear(DoubleParameter recruitmentNoiseStartingYear) {
+        this.recruitmentNoiseStartingYear = recruitmentNoiseStartingYear;
     }
 }

@@ -27,6 +27,9 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgent;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesRegularBoxcarFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticSimpleFilter;
@@ -37,6 +40,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -45,6 +49,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -100,7 +106,7 @@ public class NoData718Slice7Policy {
 
             );
         }
-        majorPolicies.put("BAU",addSPRAgents());
+        majorPolicies.put("BAU",addSPRAgents(true));
 
 
         majorPolicies.put(
@@ -139,6 +145,27 @@ public class NoData718Slice7Policy {
         final LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> lbsprs =
                 NoData718Utilities.buildLBSPRPolicies(false, true);
         majorPolicies.putAll(lbsprs);
+
+    }
+
+    private static LinkedHashMap<String, Function<Integer,Consumer<Scenario>>> majorPoliciesWithRecruitmentNoise = new LinkedHashMap<>();
+    static {
+        for (Map.Entry<String, Function<Integer, Consumer<Scenario>>> majorPolicy : majorPolicies.entrySet()) {
+
+            majorPoliciesWithRecruitmentNoise.put(
+                    majorPolicy.getKey() + "_with_recruitment_noise",
+                    new Function<Integer, Consumer<Scenario>>() {
+                        @Override
+                        public Consumer<Scenario> apply(Integer integer) {
+                            return majorPolicy.getValue().apply(integer).andThen(
+                                    addRecruitmentNoise.apply(integer)
+                            );
+                        }
+                    }
+            );
+
+        }
+
 
     }
 
@@ -331,7 +358,7 @@ public class NoData718Slice7Policy {
     private static final int[] SPR_AGENT_NUMBERS = new int[]{1,2,3,5,10,20,50,100,9999};
 
     @NotNull
-    private static Function<Integer, Consumer<Scenario>> addSPRAgents() {
+    private static Function<Integer, Consumer<Scenario>> addSPRAgents(boolean monitorGillnetters) {
 
 
         return yearOfShock -> scenario -> {
@@ -351,8 +378,8 @@ public class NoData718Slice7Policy {
                                     hadrian,
                                     numberOfAgents,
                                     "spr_agent_agent",
-                                    "Lutjanus malabaricus"
-                            );
+                                    "Lutjanus malabaricus",
+                                    monitorGillnetters);
                     cast.getPlugins().add(yaml.loadAs(sprAgent,
                             AlgorithmFactory.class));
                 }
@@ -367,8 +394,8 @@ public class NoData718Slice7Policy {
                                 false,
                                 numberOfAgents,
                                 "spr_laticaudis_agent",
-                                "Lethrinus laticaudis"
-                        );
+                                "Lethrinus laticaudis",
+                                true);
                 cast.getPlugins().add(yaml.loadAs(sprAgent,
                         AlgorithmFactory.class));
                 sprAgent =
@@ -382,8 +409,8 @@ public class NoData718Slice7Policy {
                                 false,
                                 numberOfAgents,
                                 "spr_brevis_agent",
-                                "Atrobucca brevis"
-                        );
+                                "Atrobucca brevis",
+                                true);
                 cast.getPlugins().add(yaml.loadAs(sprAgent,
                         AlgorithmFactory.class));
                 sprAgent =
@@ -397,8 +424,85 @@ public class NoData718Slice7Policy {
                                 false,
                                 numberOfAgents,
                                 "spr_multi_agent",
-                                "Pristipomoides multidens"
-                        );
+                                "Pristipomoides multidens",
+                                true);
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
+            }
+
+
+
+
+        };
+    }
+
+    private static final double[] SPR_AGENT_PERCENTAGE = new double[]{.01,0.025,.05,.1,.25,.5,1};
+
+    @NotNull
+    private static Function<Integer, Consumer<Scenario>> addSPRAgentsPercentage() {
+
+
+        return yearOfShock -> scenario -> {
+            final FlexibleScenario cast = ((FlexibleScenario) scenario);
+            for (double percentageSampled : SPR_AGENT_PERCENTAGE) {
+                FishYAML yaml = new FishYAML();
+
+                for (boolean hadrian : new boolean[]{false}) {
+                    String sprAgent =
+                            buildSPRAgentHelperPercentage(
+                                    50,
+                                    0.4438437,
+                                    86,
+                                    0.3775984,
+                                    0.00853,
+                                    3.137,
+                                    hadrian,
+                                    percentageSampled,
+                                    "spr_agent_agent",
+                                    "Lutjanus malabaricus");
+                    cast.getPlugins().add(yaml.loadAs(sprAgent,
+                            AlgorithmFactory.class));
+                }
+                String sprAgent =
+                        buildSPRAgentHelperPercentage(
+                                29,
+                                0.322,
+                                59,
+                                0.495,
+                                0.0197,
+                                2.99,
+                                false,
+                                percentageSampled,
+                                "spr_laticaudis_agent",
+                                "Lethrinus laticaudis");
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
+                sprAgent =
+                        buildSPRAgentHelperPercentage(
+                                34,
+                                0.291,
+                                68,
+                                0.447,
+                                0.0128,
+                                2.94,
+                                false,
+                                percentageSampled,
+                                "spr_brevis_agent",
+                                "Atrobucca brevis");
+                cast.getPlugins().add(yaml.loadAs(sprAgent,
+                        AlgorithmFactory.class));
+                sprAgent =
+                        buildSPRAgentHelperPercentage(
+                                50,
+                                0.4438437,
+                                86,
+                                0.3775984,
+                                0.02,
+                                2.94,
+                                false,
+                                percentageSampled,
+                                "spr_multi_agent",
+                                "Pristipomoides multidens");
                 cast.getPlugins().add(yaml.loadAs(sprAgent,
                         AlgorithmFactory.class));
             }
@@ -412,13 +516,32 @@ public class NoData718Slice7Policy {
     private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> checkSPRDifferentials = new LinkedHashMap<>();
     static {
 
-        checkSPRDifferentials.put("BAU_observed",addSPRAgents());
+        checkSPRDifferentials.put("BAU_observed",addSPRAgents(true));
         checkSPRDifferentials.put("8cmshifted_observed", new Function<Integer, Consumer<Scenario>>() {
             @Override
             public Consumer<Scenario> apply(Integer integer) {
-                return selectivityShiftSimulations(8,2, 1.0).apply(integer).andThen(addSPRAgents().apply(0));
+                return selectivityShiftSimulations(8,2, 1.0).apply(integer).andThen(addSPRAgents(true).apply(0));
             }
         });
+
+
+
+    }
+
+    private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> checkSPRDifferentialsNoGillnetters = new LinkedHashMap<>();
+    static {
+
+        checkSPRDifferentialsNoGillnetters.put("BAU_observed",addSPRAgents(false));
+
+
+
+    }
+
+
+    private static LinkedHashMap<String, Function<Integer, Consumer<Scenario>>> getCheckSPRDifferentialsPercentage = new LinkedHashMap<>();
+    static {
+
+        getCheckSPRDifferentialsPercentage.put("BAU_observed",addSPRAgentsPercentage());
 
 
 
@@ -435,6 +558,23 @@ public class NoData718Slice7Policy {
 
 
     }
+
+    //switch recruitment process with one that has a lognormal noisemaker!
+    private static Function<Integer, Consumer<Scenario>> addRecruitmentNoise =
+
+            yearOfShock -> (Consumer<Scenario>) scenario -> {
+
+                final FlexibleScenario castScenario = (FlexibleScenario) scenario;
+                final MultipleIndependentSpeciesAbundanceFactory biology = 
+                        (MultipleIndependentSpeciesAbundanceFactory) castScenario.getBiologyInitializer();
+
+                for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : biology.getFactories()) {
+                    final SingleSpeciesRegularBoxcarFactory castFactory = (SingleSpeciesRegularBoxcarFactory) factory;
+                    castFactory.setRecruitmentNoiseStartingYear(new FixedDoubleParameter(yearOfShock));
+                    castFactory.setRecruitmentProcessStandardDeviation(new FixedDoubleParameter(0.6));
+                }
+
+            };
 
 
 
@@ -570,6 +710,75 @@ public class NoData718Slice7Policy {
                     columns,
                     additionalPlugins, null);
         }
+        else if(args[0].equals("sprnumbers_nogillnetters")){
+
+            final String[] variablesToTrack =
+                    new String[]{"SPR","Mean Length Caught","CPUE",
+                            "Percentage Mature Catches",
+                            "Percentage Lopt Catches"};
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            HashMap<String,String> speciesToAgentNameMap = new HashMap<>();
+            speciesToAgentNameMap.put("Lutjanus malabaricus","spr_agent_agent");
+            speciesToAgentNameMap.put("Lethrinus laticaudis","spr_laticaudis_agent");
+            speciesToAgentNameMap.put("Atrobucca brevis","spr_brevis_agent");
+            speciesToAgentNameMap.put("Pristipomoides multidens","spr_multi_agent");
+            for (Map.Entry<String, String> speciesToAgent : speciesToAgentNameMap.entrySet()) {
+                for (int numberOfAgents : SPR_AGENT_NUMBERS)
+                {
+                    for (String variable : variablesToTrack)
+                    {
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue()  + numberOfAgents);
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" hadrian_" + speciesToAgent.getValue()  + numberOfAgents);
+
+                    }
+
+                }
+            }
+
+
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers_nogillnetters"),
+                    checkSPRDifferentialsNoGillnetters,
+                    columns,
+                    additionalPlugins, null);
+        }
+        else if(args[0].equals("sprnumbers_percentage")){
+            NumberFormat formatter = new DecimalFormat("#0.00");
+            final String[] variablesToTrack =
+                    new String[]{"SPR","Mean Length Caught","CPUE",
+                            "Percentage Mature Catches",
+                            "Percentage Lopt Catches"};
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            HashMap<String,String> speciesToAgentNameMap = new HashMap<>();
+            speciesToAgentNameMap.put("Lutjanus malabaricus","spr_agent_agent");
+            speciesToAgentNameMap.put("Lethrinus laticaudis","spr_laticaudis_agent");
+            speciesToAgentNameMap.put("Atrobucca brevis","spr_brevis_agent");
+            speciesToAgentNameMap.put("Pristipomoides multidens","spr_multi_agent");
+            for (Map.Entry<String, String> speciesToAgent : speciesToAgentNameMap.entrySet()) {
+                for (double samplingRate : SPR_AGENT_PERCENTAGE)
+                {
+                    for (String variable : variablesToTrack)
+                    {
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" " + speciesToAgent.getValue()  + formatter.format(samplingRate));
+                        columns.add( variable + " "+ speciesToAgent.getKey()  +" hadrian_" + speciesToAgent.getValue()  + formatter.format(samplingRate));
+
+                    }
+
+                }
+            }
+
+
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers_percentage").toFile().mkdir();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("sprnumbers_percentage"),
+                    getCheckSPRDifferentialsPercentage,
+                    columns,
+                    additionalPlugins, null);
+        }
         else if(args[0].equals("season_simple")){
 
             final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
@@ -603,6 +812,17 @@ public class NoData718Slice7Policy {
                     columns,
                     additionalPlugins, dailyColumnsToPrint);
         }
+        else if(args[0].equals("major_policies_with_recruitment_noise")){
+
+            final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
+            NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies_with_recruitment_noise").toFile().mkdirs();
+            runPolicyDirectory(
+                    CANDIDATES_CSV_FILE.toFile(),
+                    NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies_with_recruitment_noise"),
+                    majorPoliciesWithRecruitmentNoise,
+                    columns,
+                    additionalPlugins, dailyColumnsToPrint);
+        }
         else if(args[0].equals("days_at_sea")){
 
             final LinkedList<String> columns = new LinkedList<>(ADDITIONAL_COLUMNS);
@@ -626,9 +846,9 @@ public class NoData718Slice7Policy {
                                               double variableB,
                                               boolean hadrian,
                                               int numberOfAgents,
-                                              String baseTag, final String speciesName){
+                                              String baseTag, final String speciesName, boolean monitorGillnetters){
         String tag =  hadrian? "hadrian_" + baseTag : baseTag;
-
+        int numberOfGillnetterAgents = monitorGillnetters ? numberOfAgents : 0;
         return
                 "SPR Fixed Sample Agent:\n" +
                         "      assumedKParameter: '" + KParameter + "'\n" +
@@ -646,7 +866,38 @@ public class NoData718Slice7Policy {
                         "      tagsToSample:\n" +
                         "        population0: " + numberOfAgents + "\n" +
                         "        population1: " + numberOfAgents + "\n" +
-                        "        population2: " + numberOfAgents;
+                        "        population2: " + numberOfGillnetterAgents;
+    }
+
+
+
+    private static String buildSPRAgentHelperPercentage(double lengthAtMaturity,
+                                                        double KParameter,
+                                                        double lInf,
+                                                        double naturalMortality,
+                                                        double variableA,
+                                                        double variableB,
+                                                        boolean hadrian,
+                                                        double samplingRate,
+                                                        String baseTag, final String speciesName){
+        String tag =  hadrian? "hadrian_" + baseTag : baseTag;
+        NumberFormat formatter = new DecimalFormat("#0.00");
+
+        return
+                "SPR Agent:\n" +
+                        "      assumedKParameter: '" + KParameter + "'\n" +
+                        "      assumedLengthAtMaturity: '" + lengthAtMaturity + "'\n" +
+                        "      assumedLengthBinCm: '5.0'\n" +
+                        "      assumedLinf: '" + lInf + "'\n" +
+                        "      assumedNaturalMortality: '" + naturalMortality + "'\n" +
+                        "      assumedVarA: '" + variableA + "'\n" +
+                        "      assumedVarB: '" + variableB + "'\n" +
+                        "      simulatedMaxAge: '100.0'\n" +
+                        "      simulatedVirginRecruits: '1000.0'\n" +
+                        "      speciesName: " + speciesName + "\n" +
+                        "      surveyTag: "+tag + formatter.format(samplingRate) + "\n" +
+                        "      useTNCFormula: " + !hadrian + "\n" +
+                        "      probabilityOfSamplingEachBoat: " + formatter.format(samplingRate);
     }
 
 }

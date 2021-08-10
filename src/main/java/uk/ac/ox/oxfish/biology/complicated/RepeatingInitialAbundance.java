@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
@@ -64,5 +65,10 @@ public class RepeatingInitialAbundance  implements InitialAbundance{
     @Override
     public double[][] getInitialAbundance() {
         return abundance;
+    }
+
+    @VisibleForTesting
+    public double[] peekCohort() {
+        return cohort;
     }
 }
