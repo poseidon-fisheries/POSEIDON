@@ -101,7 +101,7 @@ dependencies {
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    implementation "com.google.guava:guava:28.2-jre"
+    implementation "com.google.guava:guava:30.1.1-jre"
 
     //json test
     testImplementation "com.google.code.gson:gson:2.8.5"
