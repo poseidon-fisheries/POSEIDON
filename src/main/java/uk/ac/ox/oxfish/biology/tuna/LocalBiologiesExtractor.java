@@ -31,6 +31,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
+/**
+ * Basically a way to extract some or all of the local biologies (i.e., both sea tile biologies and
+ * FAD biologies from the {@link FishState}. It does the nice job of filtering on the given type of
+ * local biology, which makes it typesafe and automatically filter out, say the {@link
+ * uk.ac.ox.oxfish.biology.EmptyLocalBiology} objects.
+ *
+ * @param <B> The type of local biology to extract.
+ */
 public class LocalBiologiesExtractor<B extends LocalBiology>
     implements Function<FishState, Collection<B>> {
 
@@ -40,7 +48,14 @@ public class LocalBiologiesExtractor<B extends LocalBiology>
     private final CacheByFishState<Collection<B>> cache =
         new CacheByFishState<>(this::extractLocalBiologies);
 
-    public LocalBiologiesExtractor(
+    /**
+     * Creates a {@link LocalBiologiesExtractor}.
+     *
+     * @param localBiologyClass The class object for the type of biology we want to extract.
+     * @param includeFads       Whether or not to include FAD biologies.
+     * @param includeSeaTiles   Whether or not to include sea tile biologies.
+     */
+    LocalBiologiesExtractor(
         final Class<B> localBiologyClass,
         final boolean includeFads,
         final boolean includeSeaTiles

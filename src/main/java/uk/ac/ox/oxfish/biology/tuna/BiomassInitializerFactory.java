@@ -46,7 +46,7 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * A factory for a {@link BiomassInitializer} that reads the Scheafer parameters from a CSV file.
+ * A factory for a {@link BiomassInitializer} that reads the Schaefer parameters from a CSV file.
  */
 public class BiomassInitializerFactory
     implements AlgorithmFactory<BiomassInitializer> {
@@ -55,6 +55,7 @@ public class BiomassInitializerFactory
     private SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
     private Path schaeferParamsFile = input("schaefer_params.csv");
 
+    @SuppressWarnings("unused")
     public BiomassReallocator getBiomassReallocator() {
         return biomassReallocator;
     }
@@ -63,6 +64,7 @@ public class BiomassInitializerFactory
         this.biomassReallocator = biomassReallocator;
     }
 
+    @SuppressWarnings("unused")
     public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
         this.speciesCodes = speciesCodes;
     }

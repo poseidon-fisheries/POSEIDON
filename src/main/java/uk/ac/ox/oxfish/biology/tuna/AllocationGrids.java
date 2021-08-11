@@ -34,9 +34,20 @@ import java.util.Map.Entry;
 import java.util.function.IntUnaryOperator;
 import sim.field.grid.DoubleGrid2D;
 
+/**
+ * An allocation grid is basically just a DoubleGrid2D, normalized to sum up to one. This class does
+ * a bit more, however: it puts the grids in a schedule (just a map from ints) and, for each
+ * scheduled entry, associate grids with a key. That key can be, e.g., the species name (as used in
+ * the {@link BiomassReallocator} or a combination of the species name and the size group (as in
+ * {@link AbundanceReallocator}). We use species names instead of {@link
+ * uk.ac.ox.oxfish.biology.Species} objects so that a single set of grids can be shared between
+ * parallel simulation runs.
+ *
+ * @param <K> The type of key to use to identify which grid to use.
+ */
 public class AllocationGrids<K> {
 
-    // map from step to species name to grid
+    // map from step to key to grid
     private final ImmutableSortedMap<Integer, Map<K, DoubleGrid2D>> grids;
     private final IntUnaryOperator stepMapper;
 
@@ -55,6 +66,16 @@ public class AllocationGrids<K> {
         this.stepMapper = new PeriodicStepMapper(period);
     }
 
+    /**
+     * Creates a new {@link AllocationGrids} object.
+     *
+     * @param grids  The grids to use. The method will copy them in a sorted map.
+     * @param period The period to use (likely 365) to map simulation step to grid schedule
+     *               entries.
+     * @param <K>    The type of key to use to identify grids (likely species names or species name
+     *               plus size category).
+     * @return A new {@link AllocationGrids} object.
+     */
     public static <K> AllocationGrids<K> from(
         final Map<Integer, ? extends Map<K, DoubleGrid2D>> grids,
         final int period

@@ -36,6 +36,10 @@ import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+/**
+ * This will create the {@link RecruitmentProcess} objects to be used by the {@link
+ * ScheduledAbundanceProcessesFactory}. It will read the parameters from the provided CSV file.
+ */
 public class RecruitmentProcessesFactory
     implements AlgorithmFactory<Map<Species, ? extends RecruitmentProcess>> {
 

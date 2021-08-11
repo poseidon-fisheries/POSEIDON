@@ -23,11 +23,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.nio.file.Path;
 import uk.ac.ox.oxfish.model.FishState;
 
+/**
+ * This will create a {@link BiomassReallocator}. It will use allocation grids based on the biomass
+ * distribution files that are passed to it.
+ */
 public class BiomassReallocatorFactory extends ReallocatorFactory<BiomassReallocator> {
 
     /**
-     * Empty constructor needed for YAML
+     * Empty constructor needed for YAML.
      */
+    @SuppressWarnings("unused")
     public BiomassReallocatorFactory() {
     }
 

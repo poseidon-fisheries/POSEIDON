@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
-public class SmallLargeAllocationGridsSupplier
+class SmallLargeAllocationGridsSupplier
     extends AbstractAllocationGridsSupplier<Entry<String, SizeGroup>> {
 
     private static final Map<String, SizeGroup> groups = Arrays

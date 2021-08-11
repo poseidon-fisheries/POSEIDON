@@ -34,6 +34,7 @@ public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer>
     private BiomassReallocator biomassReallocator;
     private ImmutableMap<Integer, Integer> schedule = ImmutableMap.of(0, 364);
 
+    @SuppressWarnings("unused")
     public BiomassReallocator getBiomassReallocator() {
         return biomassReallocator;
     }
@@ -42,10 +43,12 @@ public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer>
         this.biomassReallocator = biomassReallocator;
     }
 
+    @SuppressWarnings("unused")
     public Map<Integer, Integer> getSchedule() {
         return schedule;
     }
 
+    @SuppressWarnings("unused")
     public void setSchedule(final Map<Integer, Integer> schedule) {
         this.schedule = ImmutableMap.copyOf(schedule);
     }

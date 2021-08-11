@@ -57,6 +57,7 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
         return period;
     }
 
+    @SuppressWarnings("unused")
     public void setPeriod(final Integer period) {
         this.period = period;
     }

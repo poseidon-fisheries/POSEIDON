@@ -31,6 +31,13 @@ import java.util.function.IntFunction;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
 
+/**
+ * Creates an {@link AbundanceReallocator}. The mildly peculiar thing here is the {@code
+ * firstLargeBinPerSpecies} map, which is used to create the "bin to size category" mapping. It's
+ * just a way to tell the factory where the cutoff between "mall" and "large" is and let the factory
+ * build the relevant function. Note that this is very tuna specific. We'd need to make this class a
+ * bit more general if it was to be used with different groupings.
+ */
 public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceReallocator> {
 
     private Map<String, Integer> firstLargeBinPerSpecies;
@@ -38,6 +45,7 @@ public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceRea
     /**
      * Empty constructor needed for YAML.
      */
+    @SuppressWarnings("unused")
     public AbundanceReallocatorFactory() {
     }
 
