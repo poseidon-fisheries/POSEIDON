@@ -113,8 +113,8 @@ dependencies {
     testImplementation "com.google.code.gson:gson:2.8.7"
 
     // Reference implementation of JSR-385 for units of measure
-    implementation 'si.uom:si-quantity:2.0.1'
-    implementation 'si.uom:si-units:2.0.1'
+    implementation 'si.uom:si-quantity:2.1'
+    implementation 'si.uom:si-units:2.1'
 }
 
 processTestResources.doFirst {
