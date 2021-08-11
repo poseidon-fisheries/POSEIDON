@@ -39,10 +39,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * TODO.
+ * Factory that builds a {@link ScheduledBiologicalProcesses} for {@link AbundanceLocalBiology} by
+ * scheduling a chain of processes that handle mortality, aging, recruitment and reallocation.
  */
 public class ScheduledAbundanceProcessesFactory
-    implements AlgorithmFactory<ScheduledAbundanceProcesses> {
+    implements AlgorithmFactory<ScheduledBiologicalProcesses<AbundanceLocalBiology>> {
 
     private List<String> biologicalProcessesDates;
     private AbundanceReallocator abundanceReallocator;
@@ -83,14 +84,14 @@ public class ScheduledAbundanceProcessesFactory
     }
 
     @Override
-    public ScheduledAbundanceProcesses apply(final FishState fishState) {
+    public ScheduledBiologicalProcesses<AbundanceLocalBiology> apply(final FishState fishState) {
 
         checkNotNull(
             abundanceReallocator,
             "setAbundanceReallocator must be called before using."
         );
 
-        return new ScheduledAbundanceProcesses(
+        return new ScheduledBiologicalProcesses<>(
             abundanceReallocator.getAllocationGrids().getStepMapper(),
             buildSchedule()
         );

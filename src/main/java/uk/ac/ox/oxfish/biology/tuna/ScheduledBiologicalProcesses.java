@@ -37,14 +37,18 @@ import uk.ac.ox.oxfish.model.FishState;
  * indices. The actual time step of the simulation is mapped to a schedule index using the
  * stepMapper. Typically, the indices will be days of the year and the step mapper just a {@link
  * PeriodicStepMapper}.
- * <p>
- * If there are processes to be executed for the given time step, the
- * TODO
+ *
+ * <p>If there are processes to be executed for the given time step, the processes are executed in
+ * order. We maintain a {@code biology} variable (initially {@code null}) that is optionally updated
+ * if the process returns a biology and passed to the next process. Some processes operate directly
+ * on the {@link FishState} and ignore the provided biology. Other processes are called only for
+ * their side effects and do not return a biology.
+ *
+ * <p>See the {@link ScheduledAbundanceProcessesFactory} for a good example use of this class.
  *
  * @param <B> The type of local biology to operate upon.
- * @param <A> The type of aggregator to use for the biology.
  */
-abstract class ScheduledBiologicalProcesses<B extends LocalBiology>
+class ScheduledBiologicalProcesses<B extends LocalBiology>
     implements Steppable, AdditionalStartable {
 
     private final IntUnaryOperator stepMapper;

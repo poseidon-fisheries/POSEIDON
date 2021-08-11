@@ -30,15 +30,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * TODO.
+ * Factory that builds a {@link ScheduledBiologicalProcesses} for {@link BiomassLocalBiology}.
+ * Aggregation and reallocation of the biomass (excluding FADs) are the only processes handled
+ * here.
  */
 public class ScheduledBiomassProcessesFactory
-    implements AlgorithmFactory<ScheduledBiomassProcesses> {
+    implements AlgorithmFactory<ScheduledBiologicalProcesses<BiomassLocalBiology>> {
 
     private BiomassReallocator biomassReallocator;
 
     @Override
-    public ScheduledBiomassProcesses apply(final FishState fishState) {
+    public ScheduledBiologicalProcesses<BiomassLocalBiology> apply(final FishState fishState) {
 
         checkNotNull(
             biomassReallocator,
@@ -63,7 +65,7 @@ public class ScheduledBiomassProcessesFactory
                 .stream()
                 .collect(toImmutableMap(identity(), step -> biologicalProcesses));
 
-        return new ScheduledBiomassProcesses(grids.getStepMapper(), schedule);
+        return new ScheduledBiologicalProcesses<>(grids.getStepMapper(), schedule);
     }
 
     private BiomassReallocator getBiomassReallocator() {
