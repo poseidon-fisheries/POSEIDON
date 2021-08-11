@@ -77,8 +77,8 @@ dependencies {
 
     //yaml parser, useful for reading configuration files
     implementation 'org.yaml:snakeyaml:1.29'
-    //jcommander, useful to parse command line
-    implementation "com.beust:jcommander:1.48"
+    //jcommander, useful to parse command line arguments
+    implementation "com.beust:jcommander:1.81"
 
     //commons math
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
