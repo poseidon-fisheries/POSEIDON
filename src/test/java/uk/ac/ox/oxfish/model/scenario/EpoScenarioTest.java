@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
 import java.util.List;
@@ -33,6 +34,7 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
 import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -48,7 +50,10 @@ public class EpoScenarioTest extends TestCase {
     public void testAllNonZeroGridCellsMapRightBiologySeaTiles() {
 
         final FishState fishState = new FishState();
-        fishState.setScenario(new EpoScenario());
+        final EpoScenario scenario = new EpoScenario();
+        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+
+        fishState.setScenario(scenario);
         fishState.start();
 
         final List<Startable> startables = fishState.viewStartables();
