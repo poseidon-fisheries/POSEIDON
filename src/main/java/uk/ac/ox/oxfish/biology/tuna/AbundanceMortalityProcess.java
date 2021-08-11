@@ -22,8 +22,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.primitives.ImmutableDoubleArray;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
@@ -36,7 +38,7 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
-    private final LocalBiologiesExtractor<AbundanceLocalBiology> localBiologiesExtractor =
+    private final Function<FishState, Collection<AbundanceLocalBiology>> localBiologiesExtractor =
         new LocalBiologiesExtractor<>(AbundanceLocalBiology.class, true, true);
 
     @SuppressWarnings("UnstableApiUsage")

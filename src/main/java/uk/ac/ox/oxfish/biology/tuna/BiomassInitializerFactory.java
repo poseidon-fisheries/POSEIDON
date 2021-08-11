@@ -46,7 +46,7 @@ import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * TODO.
+ * A factory for a {@link BiomassInitializer} that reads the Scheafer parameters from a CSV file.
  */
 public class BiomassInitializerFactory
     implements AlgorithmFactory<BiomassInitializer> {

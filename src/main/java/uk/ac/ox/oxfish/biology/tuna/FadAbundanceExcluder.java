@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
-public class FadAbundanceExcluder extends Excluder<AbundanceLocalBiology> {
+class FadAbundanceExcluder extends Excluder<AbundanceLocalBiology> {
 
     FadAbundanceExcluder() {
         super(new AbundanceAggregator(true, false));

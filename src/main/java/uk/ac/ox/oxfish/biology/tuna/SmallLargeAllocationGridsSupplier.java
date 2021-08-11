@@ -42,6 +42,7 @@ public class SmallLargeAllocationGridsSupplier
             identity()
         ));
 
+    @SuppressWarnings("SameParameterValue")
     SmallLargeAllocationGridsSupplier(
         final SpeciesCodes speciesCodes,
         final Path gridsFilePath,

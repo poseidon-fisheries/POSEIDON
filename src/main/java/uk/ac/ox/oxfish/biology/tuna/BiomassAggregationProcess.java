@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 class BiomassAggregationProcess extends AggregationProcess<BiomassLocalBiology> {
 
     BiomassAggregationProcess(
-        final boolean includeFads
+        @SuppressWarnings("SameParameterValue") final boolean includeFads
     ) {
         super(new BiomassAggregator(includeFads, true));
     }

@@ -69,7 +69,7 @@ public class EpoScenario implements Scenario {
         new ScheduledAbundanceProcessesFactory(
             ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
         );
-    private AbundanceReallocatorFactory abundanceReallocatorFactory =
+    private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
             INPUT_PATH.resolve("grids.csv"),
             ImmutableMap.of(
@@ -79,7 +79,7 @@ public class EpoScenario implements Scenario {
             ),
             365
         );
-    private AbundanceInitializerFactory abundanceInitializerFactory =
+    private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(INPUT_PATH.resolve("bins.csv"));
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 364));
@@ -113,13 +113,13 @@ public class EpoScenario implements Scenario {
 
 
     @SuppressWarnings("unused")
-    public AbundanceInitializerFactory getAbundanceInitializerFactory() {
+    public AlgorithmFactory<? extends AbundanceInitializer> getAbundanceInitializerFactory() {
         return abundanceInitializerFactory;
     }
 
     @SuppressWarnings("unused")
     public void setAbundanceInitializerFactory(
-        final AbundanceInitializerFactory abundanceInitializerFactory
+        final AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory
     ) {
         this.abundanceInitializerFactory = abundanceInitializerFactory;
     }
@@ -147,13 +147,13 @@ public class EpoScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public AbundanceReallocatorFactory getAbundanceReallocatorFactory() {
+    public AlgorithmFactory<? extends AbundanceReallocator> getAbundanceReallocatorFactory() {
         return abundanceReallocatorFactory;
     }
 
     @SuppressWarnings("unused")
     public void setAbundanceReallocatorFactory(
-        final AbundanceReallocatorFactory abundanceReallocatorFactory
+        final AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory
     ) {
         this.abundanceReallocatorFactory = abundanceReallocatorFactory;
     }
@@ -193,17 +193,21 @@ public class EpoScenario implements Scenario {
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
+        final AbundanceReallocatorFactory abundanceReallocatorFactory =
+            (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
         abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
         final AbundanceReallocator reallocator =
-            abundanceReallocatorFactory.apply(fishState);
+            this.abundanceReallocatorFactory.apply(fishState);
 
         abundanceRestorerFactory.setAbundanceReallocator(reallocator);
 
+        final AbundanceInitializerFactory abundanceInitializerFactory =
+            (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
         final AbundanceInitializer abundanceInitializer =
-            abundanceInitializerFactory.apply(fishState);
+            this.abundanceInitializerFactory.apply(fishState);
 
         final GlobalBiology globalBiology =
             abundanceInitializer.generateGlobal(rng, fishState);

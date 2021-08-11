@@ -26,7 +26,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * TODO.
+ * A factory for a {@link BiomassRestorer}. The {@link BiomassReallocator} to use must be provided
+ * by calling {@link #setBiomassReallocator(BiomassReallocator)}.
  */
 public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer> {
 
