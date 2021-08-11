@@ -55,7 +55,7 @@ dependencies {
 
     //csv helper
     implementation "com.opencsv:opencsv:3.8"
-    implementation "com.univocity:univocity-parsers:2.8.4"
+    implementation "com.univocity:univocity-parsers:2.9.1"
 
     // Google's JSON library
     implementation 'com.google.code.gson:gson:2.8.5'
