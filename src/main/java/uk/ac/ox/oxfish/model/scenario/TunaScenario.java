@@ -96,6 +96,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -392,7 +393,6 @@ public class TunaScenario implements Scenario {
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(model);
         scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);
 
-        plugins.add(fadMapFactory);
         plugins.add(scheduledBiomassProcessesFactory);
 
         biomassRestorerFactory.setBiomassReallocator(biomassReallocator);
@@ -421,6 +421,10 @@ public class TunaScenario implements Scenario {
     public ScenarioPopulation populateModel(final FishState model) {
 
         System.out.println("Populating model...");
+
+        final FadMap fadMap = fadMapFactory.apply(model);
+        model.setFadMap(fadMap);
+        model.registerStartable(fadMap);
 
         final Double gasPrice = gasPricePerLiter.apply(model.random);
         final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
