@@ -44,28 +44,21 @@ import uk.ac.ox.oxfish.model.FishState;
  * @param <B> The type of local biology to operate upon.
  * @param <A> The type of aggregator to use for the biology.
  */
-abstract class ScheduledBiologicalProcesses<B extends LocalBiology, A extends Aggregator<B>>
+abstract class ScheduledBiologicalProcesses<B extends LocalBiology>
     implements Steppable, AdditionalStartable {
 
-    private final A aggregator;
     private final IntUnaryOperator stepMapper;
     private final Map<Integer, Collection<BiologicalProcess<B>>> schedule;
 
     ScheduledBiologicalProcesses(
-        final A aggregator,
         final IntUnaryOperator stepMapper,
         final Map<Integer, Collection<BiologicalProcess<B>>> schedule
     ) {
-        this.aggregator = aggregator;
         this.stepMapper = stepMapper;
         this.schedule = schedule.entrySet().stream().collect(toImmutableMap(
             Entry::getKey,
             entry -> ImmutableList.copyOf(entry.getValue())
         ));
-    }
-
-    public A getAggregator() {
-        return aggregator;
     }
 
     /**
@@ -80,14 +73,12 @@ abstract class ScheduledBiologicalProcesses<B extends LocalBiology, A extends Ag
             schedule.get(stepMapper.applyAsInt(fishState.getStep()));
 
         if (biologicalProcesses != null) {
-            B biology = aggregate(fishState);
+            B biology = null;
             for (final BiologicalProcess<B> process : biologicalProcesses) {
                 biology = process.process(fishState, biology).orElse(biology);
             }
         }
     }
-
-    abstract B aggregate(final FishState fishState);
 
     @Override
     public void start(final FishState fishState) {

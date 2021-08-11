@@ -18,19 +18,11 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
-
-import com.google.common.collect.Streams;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Stream;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Objects of this class can take a collection of local biologies and "aggregate" then (i.e., sum
@@ -43,22 +35,26 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
  */
 public abstract class Aggregator<B extends LocalBiology> {
 
-    private final Class<B> localBiologyClass;
+    private final LocalBiologiesExtractor<B> localBiologiesExtractor;
 
-    Aggregator(final Class<B> localBiologyClass) {
-        this.localBiologyClass = localBiologyClass;
-    }
-
-    public Class<B> getLocalBiologyClass() {
-        return localBiologyClass;
-    }
-
-    public B aggregate(
-        final GlobalBiology globalBiology,
-        @Nullable final NauticalMap nauticalMap,
-        @Nullable final FadMap fadMap
+    Aggregator(
+        final Class<B> localBiologyClass,
+        final boolean includeFads,
+        final boolean includeSeaTiles
     ) {
-        return aggregate(globalBiology, getLocalBiologies(nauticalMap, fadMap));
+        this.localBiologiesExtractor =
+            new LocalBiologiesExtractor<>(localBiologyClass, includeFads, includeSeaTiles);
+    }
+
+    public LocalBiologiesExtractor<B> getLocalBiologiesExtractor() {
+        return localBiologiesExtractor;
+    }
+
+    B aggregate(final FishState fishState) {
+        return aggregate(
+            fishState.getBiology(),
+            localBiologiesExtractor.apply(fishState)
+        );
     }
 
     abstract B aggregate(
@@ -66,26 +62,5 @@ public abstract class Aggregator<B extends LocalBiology> {
         final Collection<B> localBiologies
     );
 
-    @SuppressWarnings("UnstableApiUsage")
-    private Collection<B> getLocalBiologies(
-        @Nullable final NauticalMap nauticalMap,
-        @Nullable final FadMap fadMap
-    ) {
-        final Stream<LocalBiology> seaTileBiologies =
-            stream(Optional.ofNullable(nauticalMap))
-                .flatMap(map -> map.getAllSeaTilesExcludingLandAsList().stream())
-                .map(SeaTile::getBiology);
-
-        final Stream<LocalBiology> fadBiologies =
-            stream(Optional.ofNullable(fadMap))
-                .flatMap(FadMap::allFads)
-                .filter(localBiologyClass::isInstance)
-                .map(localBiologyClass::cast);
-
-        return Streams.concat(seaTileBiologies, fadBiologies)
-            .filter(localBiologyClass::isInstance)
-            .map(localBiologyClass::cast)
-            .collect(toImmutableList());
-    }
 
 }

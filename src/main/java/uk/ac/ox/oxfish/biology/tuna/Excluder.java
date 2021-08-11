@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Collection;
 import java.util.Optional;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
@@ -27,17 +26,15 @@ abstract class Excluder<B extends LocalBiology> implements BiologicalProcess<B> 
 
     private final Aggregator<B> aggregator;
 
-    public Excluder(final Aggregator<B> aggregator) {
+    Excluder(final Aggregator<B> aggregator) {
         this.aggregator = aggregator;
     }
-
-    abstract Collection<B> getBiologiesToExclude(final FishState fishState);
 
     @Override
     public Optional<B> process(final FishState fishState, final B aggregatedBiology) {
         return Optional.of(exclude(
             aggregatedBiology,
-            aggregator.aggregate(fishState.getBiology(), getBiologiesToExclude(fishState))
+            aggregator.aggregate(fishState)
         ));
     }
 

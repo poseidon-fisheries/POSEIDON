@@ -31,7 +31,7 @@ class BiomassRestorer extends Restorer<String, BiomassLocalBiology> {
         final Aggregator<BiomassLocalBiology> aggregator,
         final Map<Integer, Integer> schedule
     ) {
-        super(reallocator, aggregator, new FadBiomassExcluder(aggregator), schedule);
+        super(reallocator, aggregator, new FadBiomassExcluder(), schedule);
     }
 
 }

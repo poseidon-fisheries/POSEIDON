@@ -33,8 +33,11 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
  */
 class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
 
-    AbundanceAggregator() {
-        super(AbundanceLocalBiology.class);
+    AbundanceAggregator(
+        final boolean includeFads,
+        final boolean includeSeaTiles
+    ) {
+        super(AbundanceLocalBiology.class, includeFads, includeSeaTiles);
     }
 
     @Override

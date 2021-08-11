@@ -21,16 +21,13 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 
-public class FadAbundanceExcluder extends FadBiologyExcluder<AbundanceLocalBiology> {
+public class FadAbundanceExcluder extends Excluder<AbundanceLocalBiology> {
 
-    FadAbundanceExcluder(final Aggregator<AbundanceLocalBiology> aggregator) {
-        super(aggregator);
+    FadAbundanceExcluder() {
+        super(new AbundanceAggregator(true, false));
     }
 
     @Override
@@ -69,11 +66,4 @@ public class FadAbundanceExcluder extends FadBiologyExcluder<AbundanceLocalBiolo
             .getField();
     }
 
-
-    @Override
-    Stream<? extends Fad<AbundanceLocalBiology>> getFads(
-        final FadMap fadMap
-    ) {
-        return fadMap.allAbundanceFads();
-    }
 }

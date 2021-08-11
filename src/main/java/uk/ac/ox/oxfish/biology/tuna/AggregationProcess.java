@@ -18,32 +18,29 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-abstract class FadBiologyExcluder<B extends LocalBiology> extends Excluder<B> {
+class AggregationProcess<B extends LocalBiology> implements BiologicalProcess<B> {
 
-    FadBiologyExcluder(final Aggregator<B> aggregator) {
-        super(aggregator);
+    private final Aggregator<B> aggregator;
+
+    AggregationProcess(final Aggregator<B> aggregator) {
+        this.aggregator = aggregator;
     }
 
     @Override
-    Collection<B> getBiologiesToExclude(final FishState fishState) {
-        //noinspection UnstableApiUsage
-        return stream(Optional.ofNullable(fishState.getFadMap()))
-            .flatMap(this::getFads)
-            .map(Fad::getBiology)
-            .collect(toImmutableList());
+    public Optional<B> process(
+        final FishState fishState,
+        final B ignoredBiology
+    ) {
+        checkArgument(
+            ignoredBiology == null,
+            "Aggregation processes expect null biology."
+        );
+        return Optional.of(aggregator.aggregate(fishState));
     }
-
-    abstract Stream<? extends Fad<B>> getFads(FadMap fadMap);
-
 }

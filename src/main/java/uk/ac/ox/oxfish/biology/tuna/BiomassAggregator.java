@@ -27,8 +27,11 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
  */
 class BiomassAggregator extends Aggregator<BiomassLocalBiology> {
 
-    BiomassAggregator() {
-        super(BiomassLocalBiology.class);
+    BiomassAggregator(
+        final boolean includeFads,
+        final boolean includeSeaTiles
+    ) {
+        super(BiomassLocalBiology.class, includeFads, includeSeaTiles);
     }
 
     @Override

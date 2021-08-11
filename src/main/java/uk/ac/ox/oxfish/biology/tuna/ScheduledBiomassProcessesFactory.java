@@ -45,10 +45,12 @@ public class ScheduledBiomassProcessesFactory
             "setBiomassReallocator must be called before using."
         );
 
-        final BiomassAggregator aggregator = new BiomassAggregator();
+        // The biomass scheduled processes are pretty straightforward:
+        // we aggregate the biomass from the ocean (not the FADs) and
+        // we redistribute it across the map.
         final Collection<BiologicalProcess<BiomassLocalBiology>> biologicalProcesses =
             ImmutableList.of(
-                new FadBiomassExcluder(aggregator),
+                new BiomassAggregationProcess(false),
                 getBiomassReallocator()
             );
 
@@ -61,7 +63,7 @@ public class ScheduledBiomassProcessesFactory
                 .stream()
                 .collect(toImmutableMap(identity(), step -> biologicalProcesses));
 
-        return new ScheduledBiomassProcesses(aggregator, grids.getStepMapper(), schedule);
+        return new ScheduledBiomassProcesses(grids.getStepMapper(), schedule);
     }
 
     private BiomassReallocator getBiomassReallocator() {

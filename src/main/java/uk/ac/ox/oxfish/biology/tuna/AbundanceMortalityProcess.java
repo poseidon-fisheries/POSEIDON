@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.primitives.ImmutableDoubleArray;
@@ -33,26 +34,35 @@ import uk.ac.ox.oxfish.model.FishState;
  * {@link uk.ac.ox.oxfish.biology.complicated.ProportionalMortalityProcess} that does
  * exponentiation.
  */
-public class MortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
+public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
+
+    private final LocalBiologiesExtractor<AbundanceLocalBiology> localBiologiesExtractor =
+        new LocalBiologiesExtractor<>(AbundanceLocalBiology.class, true, true);
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public Optional<AbundanceLocalBiology> process(
         final FishState fishState,
-        final AbundanceLocalBiology aggregatedBiology
+        final AbundanceLocalBiology ignoredBiology
     ) {
-        // Make a copy of the abundance that we are going to mutate directly
-        final AbundanceLocalBiology biology = new AbundanceLocalBiology(aggregatedBiology);
-        fishState.getSpecies().forEach(species -> {
-            final double[][] matrix = biology.getAbundance(species).asMatrix();
-            final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
-            final List<ImmutableDoubleArray> mortalities = meristics.getProportionalMortalities();
-            range(0, meristics.getNumberOfSubdivisions()).forEach(subdivision ->
-                range(0, matrix[subdivision].length).forEach(bin ->
-                    matrix[subdivision][bin] *= (1 - mortalities.get(subdivision).get(bin))
-                )
-            );
-        });
-        return Optional.of(biology);
+        checkArgument(
+            ignoredBiology == null,
+            "The abundance mortality process expects null biology."
+        );
+        // Here we go through all the local biologies (ocean cells and FADs)
+        // and we mutate the abundance matrices directly.
+        localBiologiesExtractor.apply(fishState).forEach(biology ->
+            biology.getAbundance().forEach((species, matrix) -> {
+                final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
+                final List<ImmutableDoubleArray> mortalities =
+                    meristics.getProportionalMortalities();
+                range(0, meristics.getNumberOfSubdivisions()).forEach(subdivision ->
+                    range(0, matrix[subdivision].length).forEach(bin ->
+                        matrix[subdivision][bin] *= (1 - mortalities.get(subdivision).get(bin))
+                    )
+                );
+            })
+        );
+        return Optional.empty(); // this process should only be called for side-effects
     }
 }

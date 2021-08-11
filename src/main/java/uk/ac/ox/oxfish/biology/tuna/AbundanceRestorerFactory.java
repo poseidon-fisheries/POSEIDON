@@ -56,7 +56,7 @@ public class AbundanceRestorerFactory implements AlgorithmFactory<AbundanceResto
         checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator before using");
         return new AbundanceRestorer(
             abundanceReallocator,
-            new AbundanceAggregator(),
+            new AbundanceAggregator(false, true),
             schedule
         );
     }

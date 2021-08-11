@@ -18,22 +18,14 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.IntUnaryOperator;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-/**
- * TODO.
- */
-public class ScheduledAbundanceProcesses
-    extends ScheduledBiologicalProcesses<AbundanceLocalBiology> {
+class BiomassAggregationProcess extends AggregationProcess<BiomassLocalBiology> {
 
-    ScheduledAbundanceProcesses(
-        final IntUnaryOperator stepMapper,
-        final Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> schedule
+    BiomassAggregationProcess(
+        final boolean includeFads
     ) {
-        super(stepMapper, schedule);
+        super(new BiomassAggregator(includeFads, true));
     }
 
 }

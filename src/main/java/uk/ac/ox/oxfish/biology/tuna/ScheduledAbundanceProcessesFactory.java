@@ -90,17 +90,13 @@ public class ScheduledAbundanceProcessesFactory
             "setAbundanceReallocator must be called before using."
         );
 
-        final AbundanceAggregator aggregator = new AbundanceAggregator();
         return new ScheduledAbundanceProcesses(
-            aggregator,
             abundanceReallocator.getAllocationGrids().getStepMapper(),
-            buildSchedule(aggregator)
+            buildSchedule()
         );
     }
 
-    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule(
-        final AbundanceAggregator aggregator
-    ) {
+    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule() {
         final LocalDate startDate = LocalDate.parse(biologicalProcessesDates.get(0));
         final ImmutableList<Integer> processSteps =
             biologicalProcessesDates.stream()
@@ -121,9 +117,10 @@ public class ScheduledAbundanceProcessesFactory
         // Add all our periodical biological processes to the schedule
         final List<BiologicalProcess<AbundanceLocalBiology>> periodicalProcesses =
             ImmutableList.of(
-                new MortalityProcess(),
+                new AbundanceMortalityProcess(),
+                new AbundanceAggregationProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
-                new FadAbundanceExcluder(aggregator)
+                new FadAbundanceExcluder()
             );
 
         processSteps.forEach(step ->

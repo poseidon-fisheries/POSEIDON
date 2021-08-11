@@ -21,15 +21,12 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static java.lang.Math.max;
 import static java.util.stream.IntStream.range;
 
-import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 
-public class FadBiomassExcluder extends FadBiologyExcluder<BiomassLocalBiology> {
+class FadBiomassExcluder extends Excluder<BiomassLocalBiology> {
 
-    public FadBiomassExcluder(final Aggregator<BiomassLocalBiology> aggregator) {
-        super(aggregator);
+    FadBiomassExcluder() {
+        super(new BiomassAggregator(true, false));
     }
 
     @Override
@@ -44,10 +41,5 @@ public class FadBiomassExcluder extends FadBiologyExcluder<BiomassLocalBiology> 
                 .mapToDouble(i -> max(0, currentBiomass[i] - biomassToSubtract[i]))
                 .toArray()
         );
-    }
-
-    @Override
-    Stream<BiomassFad> getFads(final FadMap fadMap) {
-        return fadMap.allBiomassFads();
     }
 }

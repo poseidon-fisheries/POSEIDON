@@ -23,7 +23,6 @@ import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -79,8 +78,7 @@ abstract class Restorer<K, B extends LocalBiology>
         schedule.forEach((recordingStep, restoringStep) ->
             // take our snapshots at dawn, before anything else happens
             schedule(fishState, recordingStep, DAWN, fishState1 -> {
-                final B aggregatedBiology = aggregator
-                    .aggregate(fishState1.getBiology(), fishState.getMap(), null);
+                final B aggregatedBiology = aggregator.aggregate(fishState1);
                 // Schedule the restoration at POLICY_UPDATE step order so it runs after the
                 // grower at BIOLOGY_PHASE step order, but before the data gatherers at later orders
                 schedule(fishState1, restoringStep, POLICY_UPDATE, fishState2 ->

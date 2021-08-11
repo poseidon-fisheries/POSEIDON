@@ -53,12 +53,12 @@ public class EpoScenarioTest extends TestCase {
 
         final List<Startable> startables = fishState.viewStartables();
 
-        @SuppressWarnings("OptionalGetWithoutIsPresent")
-        final AbundanceRestorer abundanceRestorer = startables.stream()
-            .filter(startable -> startable instanceof AbundanceRestorer)
-            .map(startable -> (AbundanceRestorer) startable)
-            .findAny()
-            .get();
+        @SuppressWarnings("OptionalGetWithoutIsPresent") final AbundanceRestorer abundanceRestorer =
+            startables.stream()
+                .filter(startable -> startable instanceof AbundanceRestorer)
+                .map(startable -> (AbundanceRestorer) startable)
+                .findAny()
+                .get();
 
         final Reallocator<?, ?> reallocator = abundanceRestorer.getReallocator();
         final Aggregator<?> aggregator = abundanceRestorer.getAggregator();
@@ -68,10 +68,12 @@ public class EpoScenarioTest extends TestCase {
             nauticalMap.getAllSeaTilesExcludingLandAsList()
                 .stream()
                 .filter(seaTile ->
-                    aggregator.getLocalBiologyClass().isInstance(seaTile.getBiology())
+                    aggregator.getLocalBiologiesExtractor()
+                        .getLocalBiologyClass()
+                        .isInstance(seaTile.getBiology())
                 )
                 .map(seaTile -> new Int2D(seaTile.getGridX(), seaTile.getGridY()))
-                .collect(toImmutableSet());
+            .collect(toImmutableSet());
 
         final ImmutableSortedMap<Integer, ? extends Map<?, DoubleGrid2D>> grids =
             reallocator.getAllocationGrids().getGrids();
