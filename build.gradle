@@ -122,6 +122,11 @@ processTestResources.doFirst {
     duplicatesStrategy = "include"
 }
 
+// Duplicate handling strategy need to be explicitly specified as of Gradle 6
+processResources { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distTar { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distZip { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+
 //this makes tests multi-threaded when called from gradle. Useful!
 test {
     minHeapSize = "1024m"
