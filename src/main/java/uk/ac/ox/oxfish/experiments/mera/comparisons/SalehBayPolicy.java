@@ -16,7 +16,10 @@ import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.model.market.ThresholdWeightPrice;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfitFactory;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
+import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
@@ -36,67 +39,123 @@ public class SalehBayPolicy {
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
 
+    public static final AdditionalStartable PRICE_CHANGE = new AdditionalStartable() {
+        @Override
+        public void start(FishState model) {
+
+            for (Port port : model.getPorts()) {
+                for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                    final FlexibleAbundanceMarket castMarket = (FlexibleAbundanceMarket) ((MarketProxy) market).getDelegate();
+
+                    castMarket.setPricingStrategy(
+                            new ThresholdWeightPrice(
+                                    castMarket.getMarginalPrice(),
+                                    0,
+                                    0.5
+                            )
+                    );
+                }
+            }
+        }
+    };
+
+
+    public static final AdditionalStartable MPA_CHANGE = new AdditionalStartable() {
+        @Override
+        public void start(FishState model) {
+            {
+                int[][] coordinatesForMPA = new int[][]{
+                        {16,28},
+                        {15,20},
+                        {16,20},
+                        {16,19},
+                        {15,19},
+                        {9,21},
+                        {8,16},
+                        {9,17},
+                        {10,17},
+                        {9,18},
+                        {10,18}
+                };
+                for (int[] coordinate : coordinatesForMPA) {
+                    StartingMPA.quicklyAddMPAToSeaTile(model.getMap().getSeaTile(coordinate[0], coordinate[1]));
+
+                }
+
+                for (Fisher fisher : model.getFishers())
+                    fisher.setRegulation(new ProtectedAreasOnly());
+                for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                    fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
+                }
+
+            }
+        }
+    };
+
+    //single TAC for every species and across all boats
+    public static final AdditionalStartable GLOBAL_TAC = new AdditionalStartable() {
+        @Override
+        public void start(FishState model) {
+            {
+
+                TACMonoFactory tacMonoFactory = new TACMonoFactory();
+                tacMonoFactory.setQuota(new FixedDoubleParameter(7464000));
+
+                for (Fisher fisher : model.getFishers())
+                    fisher.setRegulation(tacMonoFactory.apply(model));
+                for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                    fisherFactory.getValue().setRegulations(tacMonoFactory);
+                }
+
+            }
+        }
+    };
+    //single TAC for every species and across all boats
+    public static final AdditionalStartable GLOBAL_IQ = new AdditionalStartable() {
+        @Override
+        public void start(FishState model) {
+            {
+
+                IQMonoFactory iqMonoFactory = new IQMonoFactory();
+                iqMonoFactory.setIndividualQuota(new FixedDoubleParameter(7464000d/448d));
+
+                for (Fisher fisher : model.getFishers())
+                    fisher.setRegulation(iqMonoFactory.apply(model));
+                //new entrants get nothing!
+                FishingSeasonFactory seasonFactory = new FishingSeasonFactory(0,true);
+                for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+                    fisherFactory.getValue().setRegulations(seasonFactory);
+                }
+
+            }
+        }
+    };
+
+
     static {
 
 
+        selectedPolicies.put(
+                "global_tac",
+                fishState -> GLOBAL_TAC
+        );
+
+
+        selectedPolicies.put(
+                "global_iq",
+                fishState -> GLOBAL_IQ
+        );
+
+
         selectedPolicies.put("price_change",
-                new AlgorithmFactory<AdditionalStartable>() {
-                    @Override
-                    public AdditionalStartable apply(FishState fishState) {
-                        return new AdditionalStartable() {
-                            @Override
-                            public void start(FishState model) {
+                fishState -> PRICE_CHANGE);
 
-                                for (Port port : model.getPorts()) {
-                                    for (Market market : port.getDefaultMarketMap().getMarkets()) {
-                                        final FlexibleAbundanceMarket castMarket = (FlexibleAbundanceMarket) ((MarketProxy) market).getDelegate();
 
-                                        castMarket.setPricingStrategy(
-                                                new ThresholdWeightPrice(
-                                                        castMarket.getMarginalPrice(),
-                                                        0,
-                                                        0.5
-                                                )
-                                        );
-                                    }
-                                }
-                            }
-                        };
-                    }
-                });
-
-        int[][] coordinatesForMPA = new int[][]{
-                {16,28},
-                {15,20},
-                {16,20},
-                {16,19},
-                {15,19},
-                {9,21},
-                {8,16},
-                {9,17},
-                {10,17},
-                {9,18},
-                {10,18}
-        };
         selectedPolicies.put(
                 "mpa_estimate",
-                fishState -> model -> {
-                    {
-
-                        for (int[] coordinate : coordinatesForMPA) {
-                            StartingMPA.quicklyAddMPAToSeaTile(model.getMap().getSeaTile(coordinate[0],coordinate[1]));
-
-                        }
-
-                        for (Fisher fisher : model.getFishers())
-                            fisher.setRegulation(new ProtectedAreasOnly());
-                        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
-                            fisherFactory.getValue().setRegulations(new ProtectedAreasOnlyFactory());
-                        }
-
-                    }
-                }
+                fishState -> MPA_CHANGE
         );
+
 
 
         selectedPolicies.put(
@@ -258,8 +317,8 @@ public class SalehBayPolicy {
 
 
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
-        Path pathToOutput = mainDirectory.resolve("policy");
-
+        Path pathToOutput = mainDirectory.resolve("non-hybrid");
+        pathToOutput.toFile().mkdir();
 
         //what we do is that we intercept policies from the original slice 1 and before we let them start we also apply
         //our prepareScenarioForPolicy consumer ahead of time

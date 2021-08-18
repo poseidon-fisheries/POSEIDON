@@ -66,7 +66,7 @@ public class MeraFakeOMHotstartsPolicy {
         //  generateScenarioFiles();
 
 
-        Path mainDirectory = MeraFakeOMHotstarts.MAIN_DIRECTORY.resolve("results");
+        Path mainDirectory = MeraOMHotstartsCalibration.MAIN_DIRECTORY.resolve("results");
 
 
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");

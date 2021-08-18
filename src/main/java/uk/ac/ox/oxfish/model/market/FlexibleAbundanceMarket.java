@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 /**
@@ -57,8 +58,15 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
             double soldThisBin = hold.getWeightOfBin(species, age);
             //reweight because you might be not allowed to sell more than x
             soldThisBin *= proportionActuallySellable;
+            //if there is nothing to sell here...
+            if(soldThisBin<=0)
+            {
+                //sometimes this becomes -1e-35
+                assert soldThisBin>=-FishStateUtilities.EPSILON;
+                continue;
+            }
 
-            //look for the correct bin
+            //look for the correct price bin
             double priceForThisBin = pricingStrategy.getPricePerKg(
                     species,
                     fisher,
@@ -72,6 +80,7 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
 
             sold += soldThisBin;
         }
+
         //give fisher the money
         fisher.earn(earnings);
 

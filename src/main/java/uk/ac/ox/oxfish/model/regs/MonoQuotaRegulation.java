@@ -136,7 +136,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
 
         quotaRemaining -= biomass;
-        Preconditions.checkState(quotaRemaining >= 0, quotaRemaining);
+        Preconditions.checkState(quotaRemaining >= -FishStateUtilities.EPSILON, quotaRemaining);
     }
 
     public double getYearlyQuota() {

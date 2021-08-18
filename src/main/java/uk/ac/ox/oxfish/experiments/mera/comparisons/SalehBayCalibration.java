@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static uk.ac.ox.oxfish.experiments.mera.comparisons.MeraFakeOMHotstarts.checkError;
+import static uk.ac.ox.oxfish.experiments.mera.comparisons.MeraOMHotstartsCalibration.checkError;
 
 public class SalehBayCalibration {
 
@@ -53,7 +53,7 @@ public class SalehBayCalibration {
         }
         //calibration
         for (int hotstart = startingScenario; hotstart < scenariosToRun; hotstart++) {
-            MeraFakeOMHotstarts.calibrate(MAIN_DIRECTORY.resolve(CALIBRATION_DIRECTORY_NAME).
+            MeraOMHotstartsCalibration.calibrate(MAIN_DIRECTORY.resolve(CALIBRATION_DIRECTORY_NAME).
                     resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 50, 20, 3);
         }
     }

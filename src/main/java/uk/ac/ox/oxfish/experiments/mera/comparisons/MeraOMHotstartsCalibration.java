@@ -22,19 +22,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class MeraFakeOMHotstarts {
+public class MeraOMHotstartsCalibration {
 
 
     public static final int MAX_EVALUATIONS = 1000;
-    public static final int SCENARIOS_TO_RUN = 48;
+    public static final int SCENARIOS_TO_RUN = 64; // 48;
+    public static final String DIRECTORY_OF_HOTSTARTS = "hotstarts";
 
-    static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/fakeom/");
+    static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/slice2_nogeography_onespecies/");// Paths.get("docs/mera_hub/fakeom/");
 
     public static void main(String[] args) throws IOException {
 
         //calibration
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++) {
-            calibrate(MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30, 20, 1);
+            if(
+                //the folder may have not been created if the R script thought that particular simulation was absolutely batshit crazy
+
+                    MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).
+                    resolve(String.valueOf(hotstart)).toFile().exists() &&
+                            //also don't re-optimize a directory you have already done!
+                    !(MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).
+                            resolve(String.valueOf(hotstart)).resolve("optimization_log.log").
+                            toFile().exists())
+            ) {
+                System.out.println(MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).resolve(String.valueOf(hotstart)));
+
+                calibrate(MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).resolve(String.valueOf(hotstart)).resolve("optimization.yaml"), 30, 20, 1);
+            }
         }
 
         //create list of scenario runs
@@ -43,7 +57,9 @@ public class MeraFakeOMHotstarts {
         writer.write("scenario,year");
         writer.flush();
         for (int hotstart = 1; hotstart < SCENARIOS_TO_RUN; hotstart++){
-            final Path optimized = MAIN_DIRECTORY.resolve("hotstarts_again").resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
+            if(!MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).resolve(String.valueOf(hotstart)).toFile().exists())
+                continue;
+            final Path optimized = MAIN_DIRECTORY.resolve(DIRECTORY_OF_HOTSTARTS).resolve(String.valueOf(hotstart)).resolve("optimized.yaml");
             if(checkError(optimized)<10) {
                 System.out.println("Accepted!");
                 writer.write("\n");
