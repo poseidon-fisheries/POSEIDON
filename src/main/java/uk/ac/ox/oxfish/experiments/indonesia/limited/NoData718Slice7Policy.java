@@ -92,6 +92,7 @@ public class NoData718Slice7Policy {
             ADDITIONAL_COLUMNS.add("CPUE " + species + " " + agent);
             ADDITIONAL_COLUMNS.add(species + " Earnings");
             ADDITIONAL_COLUMNS.add(species + " Landings");
+            ADDITIONAL_COLUMNS.add(species + " Recruits");
             ADDITIONAL_COLUMNS.add("Average Daily Fishing Mortality " + species);
             ADDITIONAL_COLUMNS.add("Yearly Fishing Mortality " + species);
         }
@@ -810,7 +811,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies"),
                     majorPolicies,
                     columns,
-                    additionalPlugins, dailyColumnsToPrint);
+                    additionalPlugins, null);
         }
         else if(args[0].equals("major_policies_with_recruitment_noise")){
 
@@ -821,7 +822,7 @@ public class NoData718Slice7Policy {
                     NoData718Slice7Calibration.MAIN_DIRECTORY.resolve("ga_lowmk_scenarios").resolve("major_policies_with_recruitment_noise"),
                     majorPoliciesWithRecruitmentNoise,
                     columns,
-                    additionalPlugins, dailyColumnsToPrint);
+                    additionalPlugins, null);
         }
         else if(args[0].equals("days_at_sea")){
 

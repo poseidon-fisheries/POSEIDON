@@ -96,12 +96,5 @@ public class MeraFakeOMHotstartsPolicy {
     }
 
 
-    /**
-     * you want to get the numbers for SPR and Maturity etc about right...
-     * @param scenario
-     */
-    private static void adjustSPR(FlexibleScenario scenario){
-
-    }
 
 }

@@ -99,9 +99,10 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements A
         @Override
         public Double get() {
 
-            if(state.getYear()>=yearToStart)
-                return -1 + (logNormalDistribution.sample(1)[0] - adjustment  );
-            else
+            if(state.getYear()>=yearToStart) {
+                this.logNormalDistribution.reseedRandomGenerator(state.getRandom().nextLong());
+                return -1 + (logNormalDistribution.sample(1)[0] - adjustment);
+            }else
                 return 0d;
         }
 
