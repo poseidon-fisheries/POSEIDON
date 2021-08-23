@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -17,6 +18,7 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessErrorTest {
 
 
         final FishState mocked = mock(FishState.class);
+        when(mocked.getRandom()).thenReturn(new MersenneTwisterFast());
         RecruitmentBySpawningJackKnifeMaturityWithProcessError.YearAwareLogNormalNoiseMaker maker =
                 new RecruitmentBySpawningJackKnifeMaturityWithProcessError.YearAwareLogNormalNoiseMaker(
                         5,
