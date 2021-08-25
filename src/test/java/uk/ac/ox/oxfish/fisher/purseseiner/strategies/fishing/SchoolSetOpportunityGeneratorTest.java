@@ -19,21 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import com.google.common.collect.ImmutableMap;
-import ec.util.MersenneTwisterFast;
-import org.junit.Test;
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-
-import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.DoubleStream;
-
 import static java.lang.Double.MAX_VALUE;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -44,7 +29,26 @@ import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public class SetOpportunityGeneratorTest {
+import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.stream.DoubleStream;
+import org.junit.Test;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+
+public class SchoolSetOpportunityGeneratorTest {
 
     private static final double logisticSteepness = 100;
     private static final double logisticMidpoint = 1;
@@ -66,7 +70,8 @@ public class SetOpportunityGeneratorTest {
 
     }
 
-    private static Entry<Double, Optional<AbstractSetAction>> getP(
+    @SuppressWarnings("unchecked")
+    private static Entry<Double, Optional<NonAssociatedSetAction<BiomassLocalBiology>>> getP(
         final double biomass0,
         final double weight0,
         final double biomass1,
@@ -79,21 +84,35 @@ public class SetOpportunityGeneratorTest {
             Arrays.copyOf(biomasses, biomasses.length),
             Arrays.copyOf(biomasses, biomasses.length)
         );
-        final SetOpportunityGenerator setOpportunityGenerator = new SetOpportunityGenerator(
+        final NonAssociatedSetAction nonAssociatedSetAction = mock(NonAssociatedSetAction.class);
+        when(nonAssociatedSetAction.checkIfPermitted()).thenReturn(true);
+        final SchoolSetOpportunityGenerator<BiomassLocalBiology,
+            NonAssociatedSetAction<BiomassLocalBiology>>
+            setOpportunityGenerator = new SchoolSetOpportunityGenerator(
             logisticMidpoint,
             logisticSteepness,
             ImmutableMap.of(
                 globalBiology.getSpecie(0), weight0,
                 globalBiology.getSpecie(1), weight1
             ),
-            __ -> mock(AbstractSetAction.class),
-            new ActiveOpportunities()
+            BiomassLocalBiology.class,
+            UnaryOperator.identity(),
+            (__, ___, ____) -> nonAssociatedSetAction,
+            new ActiveOpportunities(),
+            () -> 1.0
         );
+        final FishState fishState = mock(FishState.class);
         final Fisher fisher = mock(Fisher.class);
+        final SeaTile seaTile = mock(SeaTile.class);
+        when(seaTile.getBiology()).thenReturn(biology);
+        when(seaTile.getGridLocation()).thenReturn(new Int2D(0, 0));
+        when(fisher.getLocation()).thenReturn(seaTile);
         when(fisher.grabRandomizer()).thenReturn(rng);
+        when(fisher.grabState()).thenReturn(fishState);
+        when(fishState.getStep()).thenReturn(0);
         return entry(
             setOpportunityGenerator.probabilityOfOpportunity(biology),
-            setOpportunityGenerator.get(fisher, biology, new Int2D(), 0)
+            setOpportunityGenerator.apply(fisher).stream().findAny()
         );
     }
 

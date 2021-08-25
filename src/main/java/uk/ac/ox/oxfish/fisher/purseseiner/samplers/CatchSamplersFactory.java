@@ -19,38 +19,51 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
 import com.google.common.collect.Ordering;
 import com.univocity.parsers.common.record.Record;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.getSetActionClass;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
-public class CatchSamplersFactory
-    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler>> {
+public class CatchSamplersFactory<B extends LocalBiology>
+    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
     private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
+    private final BiFunction<Collection<Collection<Double>>, MersenneTwisterFast, CatchSampler<B>>
+        catchSamplerMaker;
     private Path catchSamplesFile = input("set_samples.csv");
+
+    public CatchSamplersFactory(
+        final BiFunction<
+            Collection<Collection<Double>>,
+            MersenneTwisterFast,
+            CatchSampler<B>
+            > catchSamplerMaker
+    ) {
+        this.catchSamplerMaker = catchSamplerMaker;
+    }
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -63,7 +76,7 @@ public class CatchSamplersFactory
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction>, CatchSampler> apply(final FishState fishState) {
+    public Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
         return parseAllRecords(catchSamplesFile)
             .stream()
@@ -76,15 +89,18 @@ public class CatchSamplersFactory
             .stream()
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> new CatchSampler(entry.getValue(), rng)
+                entry -> catchSamplerMaker.apply(entry.getValue(), rng)
             ));
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private Collection<Double> getBiomasses(final Record record, final GlobalBiology globalBiology) {
+    private Collection<Double> getBiomasses(
+        final Record record,
+        final GlobalBiology globalBiology
+    ) {
         final String[] columnNames = record.getMetaData().headers();
         return Arrays.stream(columnNames)
-            .filter(columnName -> !columnName.equals("set_type"))
+            .filter(columnName -> !"set_type".equals(columnName))
             .flatMap(columnName -> stream(
                 Optional
                     .of(speciesCodes.getSpeciesName(columnName.toUpperCase()))

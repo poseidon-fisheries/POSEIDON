@@ -19,31 +19,50 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.monitors.*;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
-import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
-import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
-
-import javax.measure.quantity.Dimensionless;
-import javax.measure.quantity.Mass;
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import static com.google.common.collect.Iterables.concat;
 import static java.util.function.Function.identity;
 import static tech.units.indriya.AbstractUnit.ONE;
 import static tech.units.indriya.unit.Units.DAY;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicGroupingMonitor;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerRegionMonitor;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerSpeciesMonitor;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesMonitor;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesPerRegionMonitor;
 
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.measure.quantity.Dimensionless;
+import javax.measure.quantity.Mass;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.BasicMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.Monitor;
+import uk.ac.ox.oxfish.model.data.monitors.ObservingAtIntervalMonitor;
+import uk.ac.ox.oxfish.model.data.monitors.ProportionalGatherer;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.IncrementingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.IterativeAveragingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.ProportionAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.SummingAccumulator;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
+import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
+
+@SuppressWarnings("rawtypes")
 public class Monitors {
 
     private final RegionalDivision regionalDivision;
@@ -63,10 +82,12 @@ public class Monitors {
             makeActionCounter("FAD deployments")
         );
 
-        final Function<RegionalDivision.Region, ProportionalGatherer<Boolean, AbstractFadSetAction, AbstractFadSetAction, Dimensionless>>
+        final Function<RegionalDivision.Region, ProportionalGatherer<Boolean,
+            AbstractFadSetAction, AbstractFadSetAction, Dimensionless>>
             makeProportionOfSetsOnOwnFadsMonitor =
             region -> new ProportionalGatherer<>(basicGroupingMonitor(
-                null, // we already have the total number of sets and don't want to gather it from here
+                null,
+                // we already have the total number of sets and don't want to gather it from here
                 EVERY_YEAR,
                 IncrementingAccumulator::new,
                 ONE,
@@ -80,7 +101,9 @@ public class Monitors {
                 fadSet -> ImmutableList.of(fadSet.isOwnFad()),
                 __ -> identity()
             ));
-        final GroupingMonitor<Species, AbstractFadSetAction, Double, Mass> catchFromFadSetsMonitor = perSpeciesMonitor(
+        //noinspection unchecked
+        final GroupingMonitor<Species, AbstractFadSetAction, Double, Mass>
+            catchFromFadSetsMonitor = perSpeciesMonitor(
             "catches from FAD sets",
             EVERY_YEAR,
             SummingAccumulator::new,
@@ -94,20 +117,25 @@ public class Monitors {
                 KILOGRAM,
                 "Biomass",
                 ImmutableList.of(true, false),
-                isOnOwnFad -> String.format("%s catches from sets on %s FADs", species, isOnOwnFad ? "own" : "others'"),
+                isOnOwnFad -> String.format(
+                    "%s catches from sets on %s FADs",
+                    species,
+                    isOnOwnFad ? "own" : "others'"
+                ),
                 fadSet -> ImmutableList.of(fadSet.isOwnFad()),
-                __ -> action -> action.getCatchesKept()
+                __ -> action -> ((Optional<Catch>) action.getCatchesKept())
                     .map(catchesKept -> catchesKept.getWeightCaught(species))
                     .orElse(0.0)
             )
         );
+
         fadSetMonitors = ImmutableList.of(
-            makeActionCounter("FAD sets"),
+            this.makeActionCounter("FAD sets"),
             catchFromFadSetsMonitor,
-            makeCatchFromSetAccumulator(
+            this.makeCatchFromSetAccumulator(
                 fishState, "catches by FAD sets", IterativeAveragingAccumulator::new),
             makeProportionOfSetsOnOwnFadsMonitor.apply(null),
-            perRegionMonitor(
+            GroupingMonitor.perRegionMonitor(
                 null,
                 EVERY_YEAR,
                 regionalDivision,
@@ -124,11 +152,12 @@ public class Monitors {
                 "Soak time",
                 fadSet -> fadSet.getStep() - fadSet.getFad().getStepDeployed()
             ),
-            basicPerRegionMonitor(
+            GroupingMonitor.basicPerRegionMonitor(
                 "sets on FADs deployed during current trip",
                 EVERY_YEAR,
                 regionalDivision,
-                region -> fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getFad().getTripDeployed(),
+                region -> fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getFad()
+                    .getTripDeployed(),
                 ProportionAccumulator::new,
                 ONE,
                 "Proportion of sets"
@@ -164,7 +193,7 @@ public class Monitors {
         otherMonitors = ImmutableList.of(
             new ObservingAtIntervalMonitor<>(
                 EVERY_YEAR,
-                model -> model.getFadMap().allBiomassFads()::iterator,
+                model -> model.getFadMap().allFads()::iterator,
                 basicPerRegionMonitor(
                     "active FADs",
                     EVERY_YEAR,
@@ -177,7 +206,7 @@ public class Monitors {
             ),
             new ObservingAtIntervalMonitor<>(
                 EVERY_YEAR,
-                model -> model.getFadMap().allBiomassFads()::iterator,
+                model -> model.getFadMap().allFads()::iterator,
                 perSpeciesPerRegionMonitor(
                     "biomass under FADs",
                     EVERY_YEAR,
@@ -195,7 +224,8 @@ public class Monitors {
 
     }
 
-    private <E extends PurseSeinerAction> ProportionalGatherer<RegionalDivision.Region, E, E, Dimensionless> makeActionCounter(
+    private <E extends PurseSeinerAction> ProportionalGatherer<RegionalDivision.Region, E, E,
+        Dimensionless> makeActionCounter(
         final String actionName
     ) {
         return new ProportionalGatherer<>(basicPerRegionMonitor(
@@ -209,11 +239,13 @@ public class Monitors {
         ));
     }
 
-    private <A extends AbstractSetAction> GroupingMonitor<Species, A, Double, Mass> makeCatchFromSetAccumulator(
+    private <A extends AbstractSetAction> GroupingMonitor<Species, A, Double, Mass>
+    makeCatchFromSetAccumulator(
         final FishState fishState,
         final String baseName,
         final Supplier<Accumulator<Double>> accumulatorSupplier
     ) {
+        //noinspection unchecked
         return perSpeciesPerRegionMonitor(
             baseName,
             EVERY_YEAR,
@@ -221,9 +253,10 @@ public class Monitors {
             KILOGRAM,
             "Biomass",
             fishState.getSpecies(),
-            species -> region -> action -> action.getCatchesKept()
-                .map(catchesKept -> catchesKept.getWeightCaught(species))
-                .orElse(0.0),
+            species -> region -> action ->
+                ((Optional<Catch>) action.getCatchesKept())
+                    .map(catchesKept -> catchesKept.getWeightCaught(species))
+                    .orElse(0.0),
             regionalDivision
         );
     }
@@ -239,14 +272,24 @@ public class Monitors {
         );
     }
 
-    public Collection<Monitor<FadDeploymentAction, ?, ?>> getFadDeploymentMonitors() { return fadDeploymentMonitors; }
+    public Collection<Monitor<FadDeploymentAction, ?, ?>> getFadDeploymentMonitors() {
+        return fadDeploymentMonitors;
+    }
 
-    public Collection<Monitor<AbstractFadSetAction, ?, ?>> getFadSetMonitors() { return fadSetMonitors; }
+    public Collection<Monitor<AbstractFadSetAction, ?, ?>> getFadSetMonitors() {
+        return fadSetMonitors;
+    }
 
-    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> getNonAssociatedSetMonitors() { return nonAssociatedSetMonitors; }
+    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> getNonAssociatedSetMonitors() {
+        return nonAssociatedSetMonitors;
+    }
 
-    public Collection<Monitor<DolphinSetAction, ?, ?>> getDolphinSetMonitors() { return dolphinSetMonitors; }
+    public Collection<Monitor<DolphinSetAction, ?, ?>> getDolphinSetMonitors() {
+        return dolphinSetMonitors;
+    }
 
-    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
+        return biomassLostMonitor;
+    }
 
 }

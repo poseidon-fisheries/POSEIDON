@@ -19,15 +19,33 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+import javax.measure.quantity.Mass;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -38,38 +56,29 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import javax.measure.quantity.Mass;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.*;
-import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
-import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class FadManager {
+public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
 
-    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
-        FadDeploymentAction.class,
-        AbstractFadSetAction.class,
-        DolphinSetAction.class,
-        NonAssociatedSetAction.class
-    );
-    private final FadMap fadMap;
+    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
+        ImmutableList.of(
+            FadDeploymentAction.class,
+            AbstractFadSetAction.class,
+            DolphinSetAction.class,
+            NonAssociatedSetAction.class
+        );
+    private final FadMap<B, F> fadMap;
     private final Observers observers = new Observers();
-    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor;
-    private final ListOrderedSet<BiomassFad> deployedFads = new ListOrderedSet<>();
-    private final FadInitializer fadInitializer;
+    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
+        biomassLostMonitor;
+    private final ListOrderedSet<F> deployedFads = new ListOrderedSet<>();
+    private final FadInitializer<B, F> fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
     private int numFadsInStock;
 
     public FadManager(
-        final FadMap fadMap,
-        final FadInitializer fadInitializer
+        final FadMap<B, F> fadMap,
+        final FadInitializer<B, F> fadInitializer
     ) {
         this(
             fadMap,
@@ -83,9 +92,15 @@ public class FadManager {
         );
     }
 
+    /**
+     * Technical note: we're using raw types for the observer type parameters because those need to
+     * be supertypes of whatever class object we register the observers with, and because of type
+     * erasure, Java is unable to infer that relationship when generics come into play.
+     */
+    @SuppressWarnings("rawtypes")
     public FadManager(
-        final FadMap fadMap,
-        final FadInitializer fadInitializer,
+        final FadMap<B, F> fadMap,
+        final FadInitializer<B, F> fadInitializer,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
         final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
@@ -98,29 +113,50 @@ public class FadManager {
         this.biomassLostMonitor = biomassLostMonitor;
         this.actionSpecificRegulations = actionSpecificRegulations;
 
-        fadDeploymentObservers.forEach(observer -> registerObserver(FadDeploymentAction.class, observer));
+        fadDeploymentObservers.forEach(observer -> registerObserver(
+            FadDeploymentAction.class,
+            observer
+        ));
         fadSetObservers.forEach(observer -> {
             registerObserver(FadSetAction.class, observer);
             registerObserver(OpportunisticFadSetAction.class, observer);
         });
-        nonAssociatedSetObservers.forEach(observer -> registerObserver(NonAssociatedSetAction.class, observer));
-        dolphinSetObservers.forEach(observer -> registerObserver(DolphinSetAction.class, observer));
-        biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
+        nonAssociatedSetObservers.forEach(observer -> registerObserver(
+            NonAssociatedSetAction.class,
+            observer
+        ));
+        dolphinSetObservers.forEach(observer -> registerObserver(
+            DolphinSetAction.class,
+            observer
+        ));
+        biomassLostMonitor.ifPresent(observer -> registerObserver(
+            BiomassLostEvent.class,
+            observer
+        ));
         setActionSpecificRegulations(actionSpecificRegulations);
     }
 
-    public <T> void registerObserver(final Class<T> observedClass, final Observer<? super T> observer) {
+    public <T> void registerObserver(
+        final Class<T> observedClass,
+        final Observer<? super T> observer
+    ) {
         observers.register(observedClass, observer);
     }
 
-    public static FadManager getFadManager(final Fisher fisher) {
+    public static FadManager<? extends LocalBiology, ? extends Fad<?, ?>> getFadManager(
+        final Fisher fisher
+    ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
-            "PurseSeineGear required to get FadManager instance. Fisher " +
-                fisher + " is using " + fisher.getGear().getClass() + "."
+            "PurseSeineGear required to get FadManager instance. Fisher "
+                + fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
-    public static Optional<FadManager> maybeGetFadManager(final Fisher fisher) {
+    public static Optional<
+        FadManager<? extends LocalBiology, ? extends Fad<?, ?>>
+        > maybeGetFadManager(
+        final Fisher fisher
+    ) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
@@ -132,41 +168,47 @@ public class FadManager {
         this.numFadsInStock = numFadsInStock;
     }
 
-    public int getNumDeployedFads() { return deployedFads.size(); }
+    public int getNumDeployedFads() {
+        return deployedFads.size();
+    }
 
-    public Set<BiomassFad> getDeployedFads() { return Collections.unmodifiableSet(deployedFads); }
+    public Set<F> getDeployedFads() {
+        return Collections.unmodifiableSet(deployedFads);
+    }
 
-    public Fisher getFisher() { return fisher; }
+    public Fisher getFisher() {
+        return fisher;
+    }
 
     public void setFisher(final Fisher fisher) {
         this.fisher = fisher;
     }
 
-    public Stream<BiomassFad> getFadsAt(final SeaTile location) {
+    public Stream<F> getFadsAt(final SeaTile location) {
         return bagToStream(fadMap.fadsAt(location));
     }
 
-    public void loseFad(final BiomassFad fad) {
+    public void loseFad(final F fad) {
         checkArgument(deployedFads.contains(fad));
         deployedFads.remove(fad);
     }
 
-    public BiomassFad deployFad(final SeaTile seaTile) {
-        final BiomassFad newFad = initFad();
+    public F deployFad(final SeaTile seaTile) {
+        final F newFad = initFad();
         fadMap.deployFad(newFad, seaTile);
         return newFad;
     }
 
-    private BiomassFad initFad() {
+    private F initFad() {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
-        final BiomassFad newFad = fadInitializer.apply(this);
+        final F newFad = fadInitializer.apply(this);
         deployedFads.add(newFad);
         return newFad;
     }
 
     /**
-     * Deploys a FAD at a random position in the given sea tile
+     * Deploys a FAD at a random position in the given sea tile.
      */
     public void deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
         deployFad(new Double2D(
@@ -176,7 +218,7 @@ public class FadManager {
     }
 
     private void deployFad(final Double2D location) {
-        final BiomassFad newFad = initFad();
+        final F newFad = initFad();
         fadMap.deployFad(newFad, location);
     }
 
@@ -184,26 +226,39 @@ public class FadManager {
         return actionSpecificRegulations;
     }
 
-    public void setActionSpecificRegulations(final Stream<ActionSpecificRegulation> actionSpecificRegulations) {
+    public void setActionSpecificRegulations(
+        final Stream<ActionSpecificRegulation> actionSpecificRegulations
+    ) {
         setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
     }
 
-    private void setActionSpecificRegulations(final ActiveActionRegulations actionSpecificRegulations) {
+    private void setActionSpecificRegulations(
+        final ActiveActionRegulations actionSpecificRegulations
+    ) {
         observers.unregister(this.actionSpecificRegulations);
         this.actionSpecificRegulations = actionSpecificRegulations;
-        POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(actionClass, actionSpecificRegulations));
+        POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(
+            actionClass,
+            actionSpecificRegulations
+        ));
     }
 
     public <O> void reactTo(final O observable) {
         this.observers.reactTo(observable);
     }
 
-    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public Optional<
+        GroupingMonitor<Species, BiomassLostEvent, Double, Mass>
+        > getBiomassLostMonitor() {
+        return biomassLostMonitor;
+    }
 
     public Bag fadsAt(final SeaTile seaTile) {
         return getFadMap().fadsAt(seaTile);
     }
 
-    public FadMap getFadMap() { return fadMap; }
+    public FadMap<B, F> getFadMap() {
+        return fadMap;
+    }
 
 }

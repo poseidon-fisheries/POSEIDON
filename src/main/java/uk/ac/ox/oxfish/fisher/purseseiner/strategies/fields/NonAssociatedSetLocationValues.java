@@ -21,10 +21,10 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 
 import java.util.Map;
 import java.util.function.Function;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 
 public class NonAssociatedSetLocationValues extends SetLocationValues<NonAssociatedSetAction> {
 

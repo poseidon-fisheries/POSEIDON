@@ -16,18 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.actions;
+package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
 
-    public DolphinSetAction(
-        final B targetBiology,
-        final Fisher fisher,
-        final double setDuration
-    ) {
-        super(targetBiology, fisher, setDuration);
+    public BiomassCatchSamplersFactory() {
+        super(BiomassCatchSampler::new);
     }
 }

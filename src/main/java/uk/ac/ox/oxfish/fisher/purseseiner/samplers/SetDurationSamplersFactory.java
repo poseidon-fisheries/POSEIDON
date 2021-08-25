@@ -9,16 +9,16 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.getSetActionClass;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class SetDurationSamplersFactory
-    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, DurationSampler>> {
+    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, DurationSampler>> {
 
     private Path setDurationsFile = TunaScenario.input("set_durations.csv");
 
     @Override
-    public Map<Class<? extends AbstractSetAction>, DurationSampler> apply(FishState fishState) {
+    public Map<Class<? extends AbstractSetAction<?>>, DurationSampler> apply(FishState fishState) {
         return parseAllRecords(setDurationsFile)
             .stream()
             .collect(toImmutableMap(

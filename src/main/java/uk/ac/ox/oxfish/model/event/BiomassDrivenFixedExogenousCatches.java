@@ -20,19 +20,15 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.tuna.LocalBiologiesExtractor;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created by carrknight on 5/25/17.
@@ -51,30 +47,9 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
 
 
     @Override
-    protected List<? extends LocalBiology> getAllCatchableBiologies(FishState model) {
-        List<? extends LocalBiology> seaTiles = super.getAllCatchableBiologies(model);
-
-        if(!allowMortalityOnFads) {
-
-            return seaTiles;
-        } else{
-            //
-            List<LocalBiology> locals = new LinkedList<>(seaTiles);
-            model.getFadMap().allBiomassFads().map(new Function<BiomassFad, LocalBiology>() {
-                @Override
-                public LocalBiology apply(BiomassFad fad) {
-                    return fad.getBiology();
-                }
-            }).forEach(new Consumer<LocalBiology>() {
-                @Override
-                public void accept(LocalBiology localBiology) {
-                    locals.add(localBiology);
-                }
-            });
-            return locals;
-
-        }
-
+    protected List<? extends LocalBiology> getAllCatchableBiologies(final FishState model) {
+        return new LocalBiologiesExtractor<>(LocalBiology.class, allowMortalityOnFads, true)
+            .apply(model);
     }
 
     /**

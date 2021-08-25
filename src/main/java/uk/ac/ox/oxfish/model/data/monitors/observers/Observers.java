@@ -27,21 +27,21 @@ public class Observers {
 
     private final Multimap<Class<?>, Observer<?>> observers = HashMultimap.create();
 
-    public <T> void register(Class<T> observedClass, Observer<? super T> observer) {
+    public <T> void register(final Class<T> observedClass, final Observer<? super T> observer) {
         this.observers.put(observedClass, observer);
     }
 
-    public void unregister(Observer<?> observer) {
+    public void unregister(final Observer<?> observer) {
         // copy the keys to avoid ConcurrentModificationException
         final ImmutableList<Class<?>> observedClasses = ImmutableList.copyOf(observers.keySet());
         observedClasses.forEach(observedClass -> unregister(observedClass, observer));
     }
 
-    public void unregister(Class<?> observedClass, Observer<?> observer) {
+    public void unregister(final Class<?> observedClass, final Observer<?> observer) {
         this.observers.remove(observedClass, observer);
     }
 
-    public <O> void reactTo(O observable) {
+    public <O> void reactTo(final O observable) {
         //noinspection unchecked
         this.observers
             .get(observable.getClass())

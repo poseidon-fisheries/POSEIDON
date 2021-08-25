@@ -18,11 +18,40 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
-public class AbundanceFad extends Fad<AbundanceLocalBiology> {
+public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
-    public AbundanceFad(final AbundanceLocalBiology biology) {
-        super(biology);
+    public AbundanceFad(
+        final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
+        final AbundanceLocalBiology biology,
+        final double fishReleaseProbability,
+        final int stepDeployed,
+        final Int2D locationDeployed
+    ) {
+        super(owner, biology, fishReleaseProbability, stepDeployed, locationDeployed);
+    }
+
+    @Override
+    public void releaseFish(
+        final Iterable<Species> allSpecies, final LocalBiology seaTileBiology
+    ) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public void releaseFish(final Iterable<Species> allSpecies) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public void aggregateFish(
+        final AbundanceLocalBiology seaTileBiology, final GlobalBiology globalBiology
+    ) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 }

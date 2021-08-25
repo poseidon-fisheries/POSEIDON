@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -60,7 +60,8 @@ public class TunaScenarioTest {
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
         ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
             .setMaxTripDurationFile(input("dummy_boats.csv"));
-        ((PurseSeineGearFactory) fisherDefinition.getGear())
+        //noinspection OverlyStrongTypeCast
+        ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
             .setLocationValuesFile(input("dummy_location_values.csv"));
         ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
             .setMaxFadDeploymentsFile(input("dummy_max_deployments.csv"));

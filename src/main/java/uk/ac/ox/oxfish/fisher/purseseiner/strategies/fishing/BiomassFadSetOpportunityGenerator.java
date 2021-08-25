@@ -18,23 +18,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import java.util.Collection;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
-import uk.ac.ox.oxfish.biology.LocalBiology;
+import java.util.function.BiPredicate;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetActionMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 
-public abstract class SetOpportunityGenerator<B extends LocalBiology, A extends AbstractSetAction<B>>
-    implements Function<Fisher, Collection<A>> {
+public class BiomassFadSetOpportunityGenerator<
+    A extends FadSetAction<BiomassLocalBiology, BiomassFad>
+    > extends FadSetOpportunityGenerator<BiomassLocalBiology, BiomassFad, A> {
 
-    private final DoubleSupplier durationSampler;
-
-    SetOpportunityGenerator(final DoubleSupplier durationSampler) {
-        this.durationSampler = durationSampler;
-    }
-
-    DoubleSupplier getDurationSampler() {
-        return durationSampler;
+    public BiomassFadSetOpportunityGenerator(
+        final BiPredicate<Fisher, BiomassFad> fadPredicate,
+        final FadSetActionMaker<BiomassLocalBiology, BiomassFad, A> actionMaker,
+        final DurationSampler durationSampler
+    ) {
+        super(BiomassFad.class, fadPredicate, actionMaker, durationSampler);
     }
 }

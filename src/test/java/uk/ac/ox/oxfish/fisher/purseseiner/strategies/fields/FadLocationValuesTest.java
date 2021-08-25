@@ -19,9 +19,21 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
 import com.google.common.collect.ImmutableSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.Test;
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
@@ -31,18 +43,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.IntStream.range;
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 public class FadLocationValuesTest {
 
     @Test
@@ -51,9 +51,12 @@ public class FadLocationValuesTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(3, 3);
         final Fisher fisher = mock(Fisher.class);
-        final PurseSeineGear gear = mock(PurseSeineGear.class);
-        final FadManager fadManager = mock(FadManager.class);
-        final FadMap fadMap = mock(FadMap.class);
+        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
+            mock(PurseSeineGear.class);
+        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
+            fadManager = mock(FadManager.class);
+        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
+            mock(FadMap.class);
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(gear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(gear);

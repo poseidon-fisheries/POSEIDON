@@ -44,12 +44,7 @@ public class FishValueCalculatorTest {
         marketMap.addMarket(biology.getSpecie(0), new FixedPriceMarket(1));
         marketMap.addMarket(biology.getSpecie(1), new FixedPriceMarket(2));
 
-        final Fisher fisher = mock(Fisher.class);
-        final Port port = mock(Port.class);
-        when(fisher.getHomePort()).thenReturn(port);
-        when(port.getMarketMap(any())).thenReturn(marketMap);
-
-        final FishValueCalculator fishValueCalculator = new FishValueCalculator(fisher);
+        final FishValueCalculator fishValueCalculator = new FishValueCalculator(marketMap, biology);
 
         assertEquals(
             5.0,

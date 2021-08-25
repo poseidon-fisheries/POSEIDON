@@ -19,100 +19,63 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.lang.Math.min;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import sim.util.Bag;
-import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.List;
-import java.util.Map;
+public class SetOpportunityDetector<B extends LocalBiology> {
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-
-public class SetOpportunityDetector {
+    private final Map<SetOpportunityGenerator<B, ? extends AbstractSetAction<B>>, Double>
+        detectionProbabilities;
+    private final double searchBonus;
 
     private final Fisher fisher;
-    private final FadManager fadManager;
     private final MersenneTwisterFast rng;
 
-    private final List<SetOpportunityGenerator> setOpportunityGenerators;
-    private final Map<Class<? extends AbstractSetAction>, Double> basicDetectionProbabilities;
-    private final double searchBonus;
     private boolean hasSearched = false;
 
     public SetOpportunityDetector(
         final Fisher fisher,
-        final Iterable<SetOpportunityGenerator> setOpportunityGenerators,
-        final Map<Class<? extends AbstractSetAction>, Double> basicDetectionProbabilities,
+        final Map<
+            SetOpportunityGenerator<B, ? extends AbstractSetAction<B>>,
+            Double> detectionProbabilities,
         final double searchBonus
     ) {
-        checkArgument(basicDetectionProbabilities.values().stream().allMatch(v -> v >= 0 && v <= 1));
+        checkArgument(
+            detectionProbabilities.values().stream().allMatch(v -> v >= 0 && v <= 1)
+        );
         checkArgument(searchBonus >= 0 && searchBonus <= 1);
         this.fisher = fisher;
-        this.fadManager = getFadManager(fisher);
         this.rng = fisher.grabRandomizer();
-        this.setOpportunityGenerators = ImmutableList.copyOf(setOpportunityGenerators);
-        this.basicDetectionProbabilities = ImmutableMap.copyOf(basicDetectionProbabilities);
+        this.detectionProbabilities = ImmutableMap.copyOf(detectionProbabilities);
         this.searchBonus = searchBonus;
     }
 
     @NotNull
-    List<AbstractSetAction> possibleSetActions() {
-        final List<AbstractSetAction> actions;
-        if (fisher.getHold().getPercentageFilled() >= 1) {
-            actions = ImmutableList.of(); // no possible sets when hold is full
-        } else {
-            final ImmutableList.Builder<AbstractSetAction> builder = ImmutableList.builder();
-            addFadSetOpportunities(builder);
-            final SeaTile seaTile = fisher.getLocation();
-            addOtherSetOpportunities(builder, seaTile.getBiology(), seaTile.getGridLocation(), fisher.grabState().getStep());
-            actions = builder.build();
-        }
+    List<AbstractSetAction<B>> possibleSetActions() {
+        final double bonus = hasSearched ? searchBonus : 0;
         hasSearched = false;
-        return actions;
-    }
-
-    private void addFadSetOpportunities(final ImmutableList.Builder<AbstractSetAction> builder) {
-        final Bag fadsHere = fadManager.fadsAt(fisher.getLocation());
-        final double p = getDetectionProbability(OpportunisticFadSetAction.class);
-        // using the bag directly for speed, here
-        for (int i = 0; i < fadsHere.numObjs; i++) {
-            final BiomassFad fad = (BiomassFad) fadsHere.objs[i];
-            if (fad.getOwner() == fadManager)
-                builder.add(new FadSetAction(fisher, fad));
-            else if (rng.nextBoolean(p))
-                builder.add(new OpportunisticFadSetAction(fisher, fad));
-        }
-    }
-
-    private void addOtherSetOpportunities(
-        final ImmutableList.Builder<AbstractSetAction> builder,
-        final LocalBiology biology,
-        final Int2D gridLocation,
-        final int step
-    ) {
-        for (final SetOpportunityGenerator generator : setOpportunityGenerators) {
-            generator.get(fisher, biology, gridLocation, step)
-                .filter(action -> rng.nextBoolean(getDetectionProbability(action.getClass())))
-                .ifPresent(builder::add);
-        }
-    }
-
-    private double getDetectionProbability(final Class<? extends AbstractSetAction> actionClass) {
-        double p = basicDetectionProbabilities.get(actionClass) + (hasSearched ? searchBonus : 0);
-        if (p > 1) p = 1; // even the search bonus can't push us above 1!
-        return p;
+        return fisher.getHold().getPercentageFilled() >= 1
+            ? ImmutableList.of() // no possible sets when hold is full
+            : detectionProbabilities
+                .entrySet()
+                .stream()
+                .flatMap(entry -> {
+                    final double p = min(1.0, entry.getValue() + bonus);
+                    return entry.getKey().apply(fisher).stream()
+                        .filter(__ -> rng.nextBoolean(p));
+                })
+                .collect(toImmutableList());
     }
 
     public void notifyOfSearch() {

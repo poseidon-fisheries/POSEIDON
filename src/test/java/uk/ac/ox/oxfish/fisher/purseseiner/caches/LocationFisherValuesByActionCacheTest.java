@@ -35,8 +35,8 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.DPL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.OFS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.utils.TempFileMaker.makeTempFile;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
 

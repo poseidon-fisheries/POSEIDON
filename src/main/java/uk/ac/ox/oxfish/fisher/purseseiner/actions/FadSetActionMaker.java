@@ -18,16 +18,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
-public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+@FunctionalInterface
+public interface FadSetActionMaker<
+    B extends LocalBiology,
+    F extends Fad<B, F>,
+    A extends AbstractFadSetAction<B, F>>
+    extends SetActionMaker<B, F, A> {
 
-    public DolphinSetAction(
-        final B targetBiology,
-        final Fisher fisher,
-        final double setDuration
-    ) {
-        super(targetBiology, fisher, setDuration);
-    }
 }

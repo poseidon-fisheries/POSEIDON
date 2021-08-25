@@ -16,18 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.actions;
+package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 
-public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+public class BiomassPurseSeineGearFactory
+    extends AbstractPurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
 
-    public DolphinSetAction(
-        final B targetBiology,
-        final Fisher fisher,
-        final double setDuration
-    ) {
-        super(targetBiology, fisher, setDuration);
+    public BiomassPurseSeineGearFactory() {
+        super(new BiomassFadInitializerFactory());
     }
 }

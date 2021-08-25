@@ -45,7 +45,7 @@ import uk.ac.ox.oxfish.biology.tuna.ScheduledAbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -89,7 +89,7 @@ public class EpoScenario implements Scenario {
             101,
             0.5
         );
-    private FadMapFactory fadMapFactory = new FadMapFactory(
+    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
         ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents_2017.csv"))
     );
 
@@ -137,12 +137,12 @@ public class EpoScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
-    public FadMapFactory getFadMapFactory() {
+    public AbundanceFadMapFactory getFadMapFactory() {
         return fadMapFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
+    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
     }
 

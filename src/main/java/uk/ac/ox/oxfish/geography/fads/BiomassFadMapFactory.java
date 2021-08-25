@@ -16,18 +16,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.actions;
+package uk.ac.ox.oxfish.geography.fads;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import java.nio.file.Path;
+import java.util.Map;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 
-public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+public class BiomassFadMapFactory extends FadMapFactory<BiomassLocalBiology, BiomassFad> {
 
-    public DolphinSetAction(
-        final B targetBiology,
-        final Fisher fisher,
-        final double setDuration
+    @SuppressWarnings("unused")
+    public BiomassFadMapFactory() {
+        super(BiomassLocalBiology.class, BiomassFad.class);
+    }
+
+    public BiomassFadMapFactory(
+        final Map<CurrentPattern, Path> currentFiles
     ) {
-        super(targetBiology, fisher, setDuration);
+        super(BiomassLocalBiology.class, BiomassFad.class, currentFiles);
     }
 }

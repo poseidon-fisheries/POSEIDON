@@ -20,7 +20,7 @@ import java.util.function.DoubleSupplier;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
-public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
+public class BiomassFadInitializerFactory implements AlgorithmFactory<BiomassFadInitializer> {
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private Path fadCarryingCapacitiesFilePath = TunaScenario.input("fad_carrying_capacities.csv");
@@ -99,7 +99,7 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
     }
 
     @Override
-    public FadInitializer apply(final FishState fishState) {
+    public BiomassFadInitializer apply(final FishState fishState) {
         final MersenneTwisterFast rng = fishState.getRandom();
         final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
         final Map<Species, DoubleSupplier> carryingCapacitySuppliers =
@@ -137,7 +137,7 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
                     }
                 ));
 
-        return new FadInitializer(
+        return new BiomassFadInitializer(
             fishState.getBiology(),
             carryingCapacitySuppliers,
             fadBiomassAttractors,

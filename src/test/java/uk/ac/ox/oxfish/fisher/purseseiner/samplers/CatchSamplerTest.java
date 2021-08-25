@@ -19,24 +19,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.ImmutableDoubleArray;
-import ec.util.MersenneTwisterFast;
-import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-
-import java.util.Map;
-
 import static com.google.common.primitives.ImmutableDoubleArray.of;
 import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.ImmutableDoubleArray;
+import ec.util.MersenneTwisterFast;
+import java.util.Map;
+import org.junit.Test;
+
 public class CatchSamplerTest {
 
-    @SuppressWarnings("UnstableApiUsage") @Test
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
     public void test() {
         final MersenneTwisterFast rng = new MersenneTwisterFast();
-        final CatchSampler catchSampler = new CatchSampler(ImmutableList.of(
+        final BiomassCatchSampler catchSampler = new BiomassCatchSampler(ImmutableList.of(
             ImmutableList.of(0.0, 0.0),
             ImmutableList.of(1.0, 1.0),
             ImmutableList.of(2.0, 2.0)

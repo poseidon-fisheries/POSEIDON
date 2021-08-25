@@ -19,29 +19,37 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import com.google.common.primitives.ImmutableDoubleArray;
-import ec.util.MersenneTwisterFast;
-
-import java.util.Collection;
-
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.primitives.ImmutableDoubleArray;
+import ec.util.MersenneTwisterFast;
+import java.util.Collection;
+import java.util.function.UnaryOperator;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+
 @SuppressWarnings("UnstableApiUsage")
-public class CatchSampler {
+public abstract class CatchSampler<B extends LocalBiology> implements UnaryOperator<B> {
 
     private final ConditionalSampler<ImmutableDoubleArray> sampler;
 
-    public CatchSampler(final Collection<Collection<Double>> sample, MersenneTwisterFast rng) {
+    public CatchSampler(
+        final Collection<Collection<Double>> sample,
+        final MersenneTwisterFast rng
+    ) {
         this.sampler = new ConditionalSampler<>(
             sample.stream().map(ImmutableDoubleArray::copyOf).collect(toImmutableList()),
             rng
         );
     }
 
-    public ImmutableDoubleArray next(double[] availableBiomass) {
+    public ImmutableDoubleArray next(final double[] availableBiomass) {
         return sampler.next(catchArray -> {
-            for (int i = 0; i < catchArray.length(); i++)
-                if (catchArray.get(i) > availableBiomass[i]) return false;
+            // Make sure that there is enough biomass for all species
+            for (int i = 0; i < catchArray.length(); i++) {
+                if (catchArray.get(i) > availableBiomass[i]) {
+                    return false;
+                }
+            }
             return true;
         });
     }

@@ -19,15 +19,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
 
-public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+public interface SchoolSetActionMaker<
+    B extends LocalBiology,
+    A extends SchoolSetAction<B>>
+    extends SetActionMaker<B, B, A> {
 
-    public DolphinSetAction(
-        final B targetBiology,
-        final Fisher fisher,
-        final double setDuration
-    ) {
-        super(targetBiology, fisher, setDuration);
-    }
 }

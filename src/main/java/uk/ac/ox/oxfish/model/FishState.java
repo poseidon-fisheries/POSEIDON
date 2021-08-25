@@ -48,11 +48,13 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -109,7 +111,7 @@ public class FishState  extends SimState{
     /**
      * may contain the fad map, if fads are used in the scenario (null otherwise)
      */
-    private FadMap fadMap = null;
+    private FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap = null;
 
     /**
      * Dataset of all the columns that are updated daily
@@ -944,9 +946,13 @@ public class FishState  extends SimState{
 
     }
 
-    public FadMap getFadMap() { return fadMap; }
+    public FadMap<? extends LocalBiology, ? extends Fad<?, ?>> getFadMap() {
+        return fadMap;
+    }
 
-    public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
+    public void setFadMap(final FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap) {
+        this.fadMap = fadMap;
+    }
 
     public List<Startable> viewStartables(){
         return ImmutableList.copyOf(toStart);

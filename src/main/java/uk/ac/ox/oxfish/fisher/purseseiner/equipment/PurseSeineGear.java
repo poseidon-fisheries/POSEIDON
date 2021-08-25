@@ -19,8 +19,12 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -29,127 +33,123 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Time;
-import java.util.*;
+public class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> implements Gear {
 
-public class PurseSeineGear implements Gear {
-
-    private final FadManager fadManager;
+    private final FadManager<B, F> fadManager;
     private final double successfulFadSetProbability;
-    private final Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers;
-    private final Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers;
     private final Set<AttractionField> attractionFields;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
-        FadManager fadManager,
-        Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers,
-        Map<Class<? extends AbstractSetAction>, CatchSampler> catchSamplers,
+        final FadManager<B, F> fadManager,
         final Iterable<AttractionField> attractionFields,
-        double successfulFadSetProbability
+        final double successfulFadSetProbability
     ) {
         this.fadManager = fadManager;
-        this.durationSamplers = durationSamplers;
         this.successfulFadSetProbability = successfulFadSetProbability;
-        this.catchSamplers = catchSamplers;
         this.attractionFields = ImmutableSet.copyOf(attractionFields);
 
     }
 
-    public static PurseSeineGear getPurseSeineGear(Fisher fisher) {
+    public static PurseSeineGear<?, ?> getPurseSeineGear(final Fisher fisher) {
         return maybeGetPurseSeineGear(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear not available. Fisher " +
                 fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
-    public static Optional<PurseSeineGear> maybeGetPurseSeineGear(Fisher fisher) {
+    public static Optional<PurseSeineGear<?, ?>> maybeGetPurseSeineGear(final Fisher fisher) {
         return Optional
             .of(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> (PurseSeineGear) gear);
+            .map(gear -> (PurseSeineGear<?, ?>) gear);
     }
 
-    public Set<AttractionField> getAttractionFields() { return attractionFields; }
-
-    public Map<Class<? extends AbstractSetAction>, CatchSampler> getCatchSamplers() { return catchSamplers; }
+    public Set<AttractionField> getAttractionFields() {
+        return attractionFields;
+    }
 
     public double getSuccessfulFadSetProbability() {
         return successfulFadSetProbability;
     }
 
-    public FadManager getFadManager() { return fadManager; }
+    public FadManager<B, F> getFadManager() {
+        return fadManager;
+    }
 
     @Override
     public Catch fish(
-        Fisher fisher,
-        LocalBiology localBiology,
-        SeaTile context,
-        int hoursSpentFishing,
-        GlobalBiology globalBiology
+        final Fisher fisher,
+        final LocalBiology localBiology,
+        final SeaTile context,
+        final int hoursSpentFishing,
+        final GlobalBiology globalBiology
     ) {
         // Assume we catch *all* the biomass from the FAD
         final double[] catches = globalBiology.getSpecies().stream()
             .mapToDouble(localBiology::getBiomass).toArray();
-        return HoldLimitingDecoratorGear.limitToHoldCapacity(new Catch(catches), fisher.getHold(), globalBiology);
+        return HoldLimitingDecoratorGear.limitToHoldCapacity(
+            new Catch(catches),
+            fisher.getHold(),
+            globalBiology
+        );
     }
 
     @Override
-    public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
+    public double getFuelConsumptionPerHourOfFishing(
+        final Fisher fisher,
+        final Boat boat,
+        final SeaTile where
+    ) {
         // TODO: see if making a set should consume fuel
         return 0;
     }
 
     @Override
     public double[] expectedHourlyCatch(
-        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+        final Fisher fisher,
+        final SeaTile where,
+        final int hoursSpentFishing,
+        final GlobalBiology modelBiology
     ) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Gear makeCopy() {
-        return new PurseSeineGear(
+        return new PurseSeineGear<>(
             fadManager,
-            ImmutableMap.copyOf(durationSamplers),
-            ImmutableMap.copyOf(catchSamplers),
             ImmutableSet.copyOf(attractionFields),
             successfulFadSetProbability
         );
     }
 
     @Override
-    public boolean isSame(Gear o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final PurseSeineGear that = (PurseSeineGear) o;
-        return Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0 &&
-            Objects.equals(fadManager, that.fadManager) &&
-            Objects.equals(durationSamplers, that.durationSamplers) &&
-            Objects.equals(catchSamplers, that.catchSamplers) &&
-            Objects.equals(attractionFields, that.attractionFields) &&
-            Objects.equals(lastVisits, that.lastVisits);
+    public boolean isSame(final Gear o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final PurseSeineGear<?, ?> that = (PurseSeineGear<?, ?>) o;
+        return
+            Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0
+                && Objects.equals(fadManager, that.fadManager)
+                && Objects.equals(attractionFields, that.attractionFields)
+                && Objects.equals(lastVisits, that.lastVisits);
     }
 
-    public Quantity<Time> nextSetDuration(
-        Class<? extends AbstractSetAction> actionClass
-    ) {
-        return durationSamplers.get(actionClass).nextDuration();
-    }
-
-    public void recordVisit(Int2D gridLocation, int timeStep) {
+    public void recordVisit(final Int2D gridLocation, final int timeStep) {
         lastVisits.put(gridLocation, timeStep);
     }
 
-    public Optional<Integer> getLastVisit(Int2D gridLocation) {
+    public Optional<Integer> getLastVisit(final Int2D gridLocation) {
         return Optional.ofNullable(lastVisits.get(gridLocation));
     }
 
