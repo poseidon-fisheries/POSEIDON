@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.QuotaLimitDecorator;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.QuotaLimitDecoratorFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
@@ -248,7 +250,32 @@ public class MeraOneSpeciesSlice1 {
                                     regulation.setStartingYear(0);
                                     regulation.setProportionAverageToTarget(
                                             new FixedDoubleParameter(1.05));
-                                    regulation.setPolicyPeriodInYears(new FixedDoubleParameter(5));
+                                    regulation.setYearsBackToAverage(new FixedDoubleParameter(5));
+                                    regulation.setUpdateEffortPeriodInYears(new FixedDoubleParameter(5));
+                                    model.registerStartable(regulation.apply(model));
+
+                                }
+                            };
+                        }
+                    }
+            );
+            LTARGETE.put("YEARLY_LTARGETE_"+ 1 +"_"+actuator,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    LTargetEffortPolicyFactory regulation =
+                                            new LTargetEffortPolicyFactory();
+                                    regulation.setEffortDefinition(actuator);
+                                    regulation.setBlockEntryWhenSeasonIsNotFull(true);
+                                    regulation.setMeanLengthColumnName("Mean Length Caught Lutjanus malabaricus spr_agent2");
+                                    regulation.setStartingYear(0);
+                                    regulation.setProportionAverageToTarget(
+                                            new FixedDoubleParameter(1.05));
+                                    regulation.setYearsBackToAverage(new FixedDoubleParameter(5));
+                                    regulation.setUpdateEffortPeriodInYears(new FixedDoubleParameter(1));
                                     model.registerStartable(regulation.apply(model));
 
                                 }
@@ -271,8 +298,36 @@ public class MeraOneSpeciesSlice1 {
                                     regulation.setStartingYear(0);
                                     regulation.setProportionAverageToTarget(
                                             new FixedDoubleParameter(1.15));
-                                    regulation.setPolicyPeriodInYears(
+                                    regulation.setYearsBackToAverage(
                                             new FixedDoubleParameter(5));
+                                    regulation.setUpdateEffortPeriodInYears(new FixedDoubleParameter(5));
+
+                                    model.registerStartable(regulation.apply(model));
+
+                                }
+                            };
+                        }
+                    }
+            );
+            LTARGETE.put("YEARLY_LTARGETE_"+ 4 +"_"+actuator,
+                    new AlgorithmFactory<AdditionalStartable>() {
+                        @Override
+                        public AdditionalStartable apply(FishState fishState) {
+                            return new AdditionalStartable() {
+                                @Override
+                                public void start(FishState model) {
+                                    LTargetEffortPolicyFactory regulation =
+                                            new LTargetEffortPolicyFactory();
+                                    regulation.setEffortDefinition(actuator);
+                                    regulation.setBlockEntryWhenSeasonIsNotFull(true);
+                                    regulation.setMeanLengthColumnName("Mean Length Caught Lutjanus malabaricus spr_agent2");
+                                    regulation.setStartingYear(0);
+                                    regulation.setProportionAverageToTarget(
+                                            new FixedDoubleParameter(1.15));
+                                    regulation.setYearsBackToAverage(
+                                            new FixedDoubleParameter(5));
+                                    regulation.setUpdateEffortPeriodInYears(new FixedDoubleParameter(1));
+
                                     model.registerStartable(regulation.apply(model));
 
                                 }
@@ -295,7 +350,7 @@ public class MeraOneSpeciesSlice1 {
                                     regulation.setStartingYear(0);
                                     regulation.setProportionAverageToTarget(
                                             new FixedDoubleParameter(1.30));
-                                    regulation.setPolicyPeriodInYears(
+                                    regulation.setYearsBackToAverage(
                                             new FixedDoubleParameter(5));
                                     model.registerStartable(regulation.apply(model));
 
@@ -585,18 +640,22 @@ public class MeraOneSpeciesSlice1 {
 
 
 
-            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch", new AlgorithmFactory<AdditionalStartable>() {
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_qb", new AlgorithmFactory<AdditionalStartable>() {
                 @Override
                 public AdditionalStartable apply(FishState fishState) {
                     LastCatchToTACController controller = new LastCatchToTACController();
                     controller.setCatchColumnName("Lutjanus malabaricus Landings");
                     controller.setStartingYear(0);
                     controller.setTargetedSpecies("Lutjanus malabaricus");
+
+
+                    makeQuotaAware(fishState);
+
                     return controller.apply(fishState);
 
                 }
             });
-            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_70", new AlgorithmFactory<AdditionalStartable>() {
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_70_qb", new AlgorithmFactory<AdditionalStartable>() {
                 @Override
                 public AdditionalStartable apply(FishState fishState) {
                     LastCatchToTACController controller = new LastCatchToTACController();
@@ -604,6 +663,22 @@ public class MeraOneSpeciesSlice1 {
                     controller.setCatchColumnName("Lutjanus malabaricus Landings");
                     controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.7));
                     controller.setTargetedSpecies("Lutjanus malabaricus");
+
+                    makeQuotaAware(fishState);
+                    return controller.apply(fishState);
+
+                }
+            });
+            TAC_ADAPTIVE_ONESPECIES.put("multi_lastcatch_50_qb", new AlgorithmFactory<AdditionalStartable>() {
+                @Override
+                public AdditionalStartable apply(FishState fishState) {
+                    LastCatchToTACController controller = new LastCatchToTACController();
+                    controller.setStartingYear(0);
+                    controller.setCatchColumnName("Lutjanus malabaricus Landings");
+                    controller.setCatchesToTargetMultiplier(new FixedDoubleParameter(.5));
+                    controller.setTargetedSpecies("Lutjanus malabaricus");
+
+                    makeQuotaAware(fishState);
 
                     return controller.apply(fishState);
 
@@ -773,6 +848,19 @@ public class MeraOneSpeciesSlice1 {
 
 
 
+        }
+    }
+
+    private static void makeQuotaAware(FishState fishState) {
+        for (Fisher fisher : fishState.getFishers()) {
+            fisher.setFishingStrategy(new QuotaLimitDecorator(fisher.getFishingStrategy()));
+        }
+        for (Map.Entry<String, FisherFactory> fisherFactory : fishState.getFisherFactories()) {
+            fisherFactory.getValue().setFishingStrategy(
+                    new QuotaLimitDecoratorFactory(
+                            fisherFactory.getValue().getFishingStrategy()
+                    )
+            );
         }
     }
 

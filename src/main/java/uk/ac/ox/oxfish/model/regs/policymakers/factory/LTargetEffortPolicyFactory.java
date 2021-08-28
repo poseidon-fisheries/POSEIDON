@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.LTargetEffortPolicy;
-import uk.ac.ox.oxfish.model.regs.policymakers.LoptEffortPolicy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -25,7 +24,11 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
     private DoubleParameter proportionAverageToTarget = new FixedDoubleParameter(60);
 
 
-    private DoubleParameter policyPeriodInYears = new FixedDoubleParameter(5);
+    private DoubleParameter yearsBackToAverage = new FixedDoubleParameter(5);
+
+
+    private DoubleParameter updateEffortPeriodInYears = new FixedDoubleParameter(5);
+
 
     private String effortDefinition = "season";
 
@@ -53,9 +56,10 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
                                 LTargetEffortPolicy ltargetE = new LTargetEffortPolicy(
                                         meanLengthColumnName,
                                         proportionAverageToTarget.apply(model.getRandom()),
-                                        policyPeriodInYears.apply(fishState.getRandom()).intValue(),
+                                        yearsBackToAverage.apply(fishState.getRandom()).intValue(),
                                         effortActuators.get(effortDefinition),
-                                        blockEntryWhenSeasonIsNotFull);
+                                        blockEntryWhenSeasonIsNotFull,
+                                        updateEffortPeriodInYears.apply(fishState.getRandom()).intValue());
                                 ltargetE.start(model);
                                 ltargetE.step(model);
 
@@ -97,12 +101,12 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
         this.proportionAverageToTarget = proportionAverageToTarget;
     }
 
-    public DoubleParameter getPolicyPeriodInYears() {
-        return policyPeriodInYears;
+    public DoubleParameter getYearsBackToAverage() {
+        return yearsBackToAverage;
     }
 
-    public void setPolicyPeriodInYears(DoubleParameter policyPeriodInYears) {
-        this.policyPeriodInYears = policyPeriodInYears;
+    public void setYearsBackToAverage(DoubleParameter yearsBackToAverage) {
+        this.yearsBackToAverage = yearsBackToAverage;
     }
 
     public String getEffortDefinition() {
@@ -127,5 +131,13 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
+    }
+
+    public DoubleParameter getUpdateEffortPeriodInYears() {
+        return updateEffortPeriodInYears;
+    }
+
+    public void setUpdateEffortPeriodInYears(DoubleParameter updateEffortPeriodInYears) {
+        this.updateEffortPeriodInYears = updateEffortPeriodInYears;
     }
 }

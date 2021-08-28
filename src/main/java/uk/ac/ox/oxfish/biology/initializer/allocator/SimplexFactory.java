@@ -43,11 +43,13 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      */
     @Override
     public SimplexAllocator apply(FishState fishState) {
+        final long randomSeed = fishState.getRandom().nextLong();
+        System.out.println("simplex random seed: " + randomSeed);
         return new SimplexAllocator(
                 maximum.apply(fishState.getRandom()),
                 minimum.apply(fishState.getRandom()),
                 bandwidth.apply(fishState.getRandom()),
-                fishState.getRandom().nextLong()
+                randomSeed
         );
     }
 

@@ -26,6 +26,7 @@ public class Mera718Slice1Policy {
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
     static {
+        /*
         selectedPolicies.put(
                 "currentEffort",
                 fishState -> {
@@ -38,22 +39,30 @@ public class Mera718Slice1Policy {
                     return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(187, true);
                 }
         );
-//        selectedPolicies.put(
-//                "0_days",
-//                fishState -> {
-//                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(0, true);
-//                }
-//        );
+        selectedPolicies.put(
+                "0_days",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(0, true);
+                }
+        );
+         */
         String[] otherPolicies = {
-                //"BAU",
-                "multi_lastcatch",
-                "multi_lastcatch_70"//,
-                /*        "closed_multi_itarget1cpue",
-                        "LBSPR_season",
-                        "LTARGETE_1_fleet",
-                        "LTARGETE_1_season",
-                        "LTARGETE_4_fleet",
-                        "LTARGETE_4_season" */
+          //      "BAU",
+                "multi_lastcatch_qb",
+                "multi_lastcatch_70_qb",
+                "multi_lastcatch_50_qb" /*,
+//                "lastcatch",
+//                "lastcatch_70",
+
+                "closed_multi_itarget1cpue",
+                "LBSPR_season",
+                "LTARGETE_1_fleet",
+                "LTARGETE_1_season",
+                "LTARGETE_4_fleet",
+                "LTARGETE_4_season",
+                "YEARLY_LTARGETE_1_season",
+                "YEARLY_LTARGETE_4_season", */
+
         };
 
         for(String policy : otherPolicies){
@@ -79,7 +88,7 @@ public class Mera718Slice1Policy {
 
 
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
-        Path pathToOutput = mainDirectory.resolve("policy_additional");
+        Path pathToOutput = mainDirectory.resolve("policy_qb");
 
 
         final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = new LinkedHashMap<>();

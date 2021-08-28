@@ -29,7 +29,10 @@ public class MeraOMHotstartsCalibration {
     public static final int SCENARIOS_TO_RUN = 64; // 48;
     public static final String DIRECTORY_OF_HOTSTARTS = "hotstarts";
 
-    static Path MAIN_DIRECTORY = Paths.get("docs/mera_hub/slice2_nogeography_onespecies/");// Paths.get("docs/mera_hub/fakeom/");
+    static Path MAIN_DIRECTORY =
+            Paths.get("docs/mera_hub/slice3_yesgeography_onespecies/");
+            //Paths.get("docs/mera_hub/slice2_nogeography_onespecies/");
+    //      Paths.get("docs/mera_hub/fakeom/");
 
     public static void main(String[] args) throws IOException {
 

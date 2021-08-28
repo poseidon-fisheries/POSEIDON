@@ -34,6 +34,13 @@ public class QuotaLimitDecoratorFactory implements AlgorithmFactory<QuotaLimitDe
             new TowLimitFactory();
 
 
+    public QuotaLimitDecoratorFactory() {
+    }
+
+    public QuotaLimitDecoratorFactory(AlgorithmFactory<? extends FishingStrategy> decorated) {
+        this.decorated = decorated;
+    }
+
     /**
      * Applies this function to the given argument.
      *

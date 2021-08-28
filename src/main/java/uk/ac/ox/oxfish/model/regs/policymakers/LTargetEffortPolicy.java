@@ -14,17 +14,17 @@ public class LTargetEffortPolicy extends Controller {
 
     public LTargetEffortPolicy(String meanLengthColumnName,
                                double proportionAverageToTarget,
-                               int periodTimeInYears,
-                               Actuator<FishState,Double> effortActuator,
-                               boolean closeEntryWhenNeeded){
+                               int yearsBackToAverage,
+                               Actuator<FishState, Double> effortActuator,
+                               boolean closeEntryWhenNeeded, int updateEffortPeriodInYears){
 
         super(
-                new PastAverageSensor(meanLengthColumnName,periodTimeInYears),
+                new PastAverageSensor(meanLengthColumnName, yearsBackToAverage),
                 new UnchangingPastSensor(meanLengthColumnName,1.0,
-                        periodTimeInYears*2),
+                        yearsBackToAverage *2),
                 closeEntryWhenNeeded ? new CloseReopenOnEffortDecorator(effortActuator):
                         effortActuator,
-                periodTimeInYears*365
+                updateEffortPeriodInYears *365
 
         );
 
