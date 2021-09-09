@@ -777,6 +777,30 @@ public class MeraOneSpeciesSlice1 {
                             }
                         }
                 );
+                policyName = "multi_itarget2" + nickNameIndex.getKey();
+                if(closeToo)
+                    policyName = "closed_" + policyName;
+                TAC_ADAPTIVE_ITARGET.put(policyName,
+                        new AlgorithmFactory<AdditionalStartable>() {
+                            @Override
+                            public AdditionalStartable apply(FishState fishState) {
+                                ITargetTACFactory itarget = new ITargetTACFactory();
+                                itarget.setCatchColumnName("Lutjanus malabaricus Landings");
+                                itarget.setIndicatorColumnName(nickNameIndex.getValue());
+                                itarget.setPrecautionaryScaling(new FixedDoubleParameter(0));
+                                itarget.setIndicatorMultiplier(new FixedDoubleParameter(2));
+                                itarget.setInterval(5);
+                                itarget.setStartingYear(0);
+                                itarget.setTargetedSpecies("Lutjanus malabaricus");
+
+                                if(closeToo)
+                                    for (EntryPlugin entryPlugin : fishState.getEntryPlugins()) {
+                                        entryPlugin.setEntryPaused(true);
+                                    }
+                                return itarget.apply(fishState);
+                            }
+                        }
+                );
                 policyName = "multi_itarget1_70" + nickNameIndex.getKey();
                 if(closeToo)
                     policyName = "closed_" + policyName;

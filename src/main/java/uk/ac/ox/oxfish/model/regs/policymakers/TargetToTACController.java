@@ -62,6 +62,7 @@ public class TargetToTACController extends Controller {
             }
         };
     }
+
     public TargetToTACController(
                                  Sensor<FishState, Double> target,
                                  int intervalInDays) {

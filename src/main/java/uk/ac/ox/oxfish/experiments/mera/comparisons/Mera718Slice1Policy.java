@@ -26,7 +26,7 @@ public class Mera718Slice1Policy {
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
     static {
-        /*
+
         selectedPolicies.put(
                 "currentEffort",
                 fishState -> {
@@ -45,15 +45,14 @@ public class Mera718Slice1Policy {
                     return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(0, true);
                 }
         );
-         */
+
         String[] otherPolicies = {
-          //      "BAU",
+                "BAU",
                 "multi_lastcatch_qb",
                 "multi_lastcatch_70_qb",
-                "multi_lastcatch_50_qb" /*,
-//                "lastcatch",
-//                "lastcatch_70",
-
+                "multi_lastcatch_50_qb" ,
+                "lastcatch",
+                "lastcatch_70",
                 "closed_multi_itarget1cpue",
                 "LBSPR_season",
                 "LTARGETE_1_fleet",
@@ -61,7 +60,8 @@ public class Mera718Slice1Policy {
                 "LTARGETE_4_fleet",
                 "LTARGETE_4_season",
                 "YEARLY_LTARGETE_1_season",
-                "YEARLY_LTARGETE_4_season", */
+                "YEARLY_LTARGETE_4_season",
+        "closed_multi_itarget2cpue"
 
         };
 
@@ -84,11 +84,11 @@ public class Mera718Slice1Policy {
         //  generateScenarioFiles();
 
 
-        Path mainDirectory = Paths.get("docs","mera_hub","slice2_nogeography_onespecies").resolve("results");
+        Path mainDirectory = Paths.get("docs","mera_hub","slice3_yesgeography_onespecies").resolve("results");
 
 
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
-        Path pathToOutput = mainDirectory.resolve("policy_qb");
+        Path pathToOutput = mainDirectory.resolve("policy");
 
 
         final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = new LinkedHashMap<>();
