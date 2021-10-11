@@ -27,26 +27,22 @@ import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
-import ec.util.MersenneTwisterFast;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -57,13 +53,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import javax.measure.quantity.Speed;
-import javax.measure.quantity.Volume;
 import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
@@ -76,17 +68,14 @@ import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -243,8 +232,9 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setGearStrategy(new FadRefillGearStrategyFactory());
-        final AlgorithmFactory<PurseSeinerFishingStrategy<BiomassLocalBiology, BiomassFad>>
+        final PurseSeinerBiomassFishingStrategyFactory
             fishingStrategy = new PurseSeinerBiomassFishingStrategyFactory();
+        fishingStrategy.setCatchSamplersFactory(new BiomassCatchSamplersFactory());
         fisherDefinition.setFishingStrategy(fishingStrategy);
         fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
         fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
@@ -255,55 +245,10 @@ public class TunaScenario implements Scenario {
         return INPUT_DIRECTORY.resolve(filename);
     }
 
-    public static int dayOfYear(final Month month, final int dayOfMonth) {
-        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
-            .getDayOfYear();
-    }
-
     public static String getBoatId(final Fisher fisher) {
         return fisher.getTags().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
-    }
-
-    /**
-     * Recursively find fixed rest time departing strategies and set minimumHoursToWait
-     */
-    private static void setFixedRestTime(
-        final DepartingStrategy departingStrategy,
-        final double minimumHoursToWait
-    ) {
-        if (departingStrategy instanceof FixedRestTimeDepartingStrategy) {
-            ((FixedRestTimeDepartingStrategy) departingStrategy).setMinimumHoursToWait(
-                minimumHoursToWait);
-        } else if (departingStrategy instanceof CompositeDepartingStrategy) {
-            ((CompositeDepartingStrategy) departingStrategy).getStrategies()
-                .forEach(s -> setFixedRestTime(s, minimumHoursToWait));
-        }
-    }
-
-    private static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher) {
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure
-        // period they will observe.
-        final int daysFromNow = 1 + dayOfYear(JULY, 15);
-        final Steppable assignClosurePeriod = simState -> {
-            if (fisher.getRegulation() instanceof MultipleRegulations) {
-                chooseClosurePeriod(fisher, model.getRandom());
-                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
-            }
-        };
-        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
-        model.scheduleOnceInXDays(
-            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-            StepOrder.DAWN,
-            daysFromNow
-        );
-    }
-
-    private static void chooseClosurePeriod(final Fisher fisher, final MersenneTwisterFast rng) {
-        final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
-        fisher.getTags().removeIf(periods::contains);
-        fisher.getTags().add(oneOf(periods, rng));
     }
 
     @SuppressWarnings("unused")
@@ -522,52 +467,8 @@ public class TunaScenario implements Scenario {
             "Profits"
         );
 
-        final Map<String, Fisher> fishersByBoatId = parseAllRecords(boatsFile).stream()
-            .filter(record -> record.getInt("year") == TARGET_YEAR)
-            .collect(toMap(
-                record -> record.getString("boat_id"),
-                record -> {
-                    final String portName = record.getString("port_name");
-                    final Double length = record.getDouble("length_in_m");
-                    final Quantity<Mass> carryingCapacity =
-                        getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
-                    final double carryingCapacityInKg = asDouble(carryingCapacity, KILOGRAM);
-                    final Quantity<Volume> holdVolume =
-                        getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
-                    final Quantity<Speed> speed =
-                        getQuantity(record.getDouble("speed_in_knots"), KNOT);
-                    final Engine engine = new Engine(
-                        Double.NaN, // Unused
-                        1.0, // This is not realistic, but fuel costs are wrapped into daily costs
-                        asDouble(speed, KILOMETRE_PER_HOUR)
-                    );
-                    fisherFactory.setPortSupplier(() -> portsByName.get(portName));
-                    // we don't have beam width in the data file, but it isn't used anyway
-                    final double beam = 1.0;
-                    fisherFactory.setBoatSupplier(() -> new Boat(
-                        length,
-                        beam,
-                        engine,
-                        fuelTankSupplier.get()
-                    ));
-                    fisherFactory.setHoldSupplier(() -> new Hold(
-                        carryingCapacityInKg,
-                        holdVolume,
-                        model.getBiology()
-                    ));
-                    final String boatId = record.getString("boat_id");
-                    final Fisher fisher = fisherFactory.buildFisher(model);
-                    fisher.getTags().add(boatId);
-                    setFixedRestTime(
-                        fisher.getDepartingStrategy(),
-                        record.getDouble("mean_time_at_port_in_hours")
-                    );
-                    chooseClosurePeriod(fisher, model.getRandom());
-                    // TODO: setMaxTravelTime(fisher, record.getDouble
-                    //  ("max_trip_duration_in_hours"));
-                    return fisher;
-                }
-            ));
+        final List<Fisher> fishers =
+            new PurseSeineVesselReader(boatsFile, TARGET_YEAR, fisherFactory, ports).apply(model);
 
         // Mutate the fisher factory back into a random boat generator
         // TODO: we don't have boat entry in the tuna model for now, but when we do, this
@@ -591,11 +492,34 @@ public class TunaScenario implements Scenario {
         plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
 
         return new ScenarioPopulation(
-            new ArrayList<>(fishersByBoatId.values()),
+            fishers,
             network,
             fisherFactories
         );
 
+    }
+
+    private static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher) {
+        // Every year, on July 15th, purse seine vessels must choose which temporal closure
+        // period they will observe.
+        final int daysFromNow = 1 + dayOfYear(JULY, 15);
+        final Steppable assignClosurePeriod = simState -> {
+            if (fisher.getRegulation() instanceof MultipleRegulations) {
+                chooseClosurePeriod(fisher, model.getRandom());
+                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
+            }
+        };
+        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
+        model.scheduleOnceInXDays(
+            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
+            StepOrder.DAWN,
+            daysFromNow
+        );
+    }
+
+    public static int dayOfYear(final Month month, final int dayOfMonth) {
+        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
+            .getDayOfYear();
     }
 
     private Consumer<Fisher> addHourlyCosts() {

@@ -18,13 +18,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 
-public class PurseSeinerBiomassFishingStrategyFactory
-    extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology, BiomassFad> {
+public class PurseSeinerAbundanceFishingStrategyFactory
+    extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    public PurseSeinerBiomassFishingStrategyFactory() {
-        super(BiomassLocalBiology.class, BiomassFad.class);
+    public PurseSeinerAbundanceFishingStrategyFactory() {
+        super(AbundanceLocalBiology.class, AbundanceFad.class);
     }
 }

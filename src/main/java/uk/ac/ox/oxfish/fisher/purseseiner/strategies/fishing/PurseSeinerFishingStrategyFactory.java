@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
@@ -50,7 +51,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
@@ -72,14 +72,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private final SetDurationSamplersFactory setDurationSamplers = new SetDurationSamplersFactory();
     private final CacheByFishState<Map<Class<? extends AbstractSetAction<?>>, DurationSampler>>
         setDurationSamplersCache = new CacheByFishState<>(setDurationSamplers);
-
-    private final CacheByFishState<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>>
-        catchSamplersCache;
-
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
-
     private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
+    private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
     private double nonAssociatedSetGeneratorLogisticSteepness = 1;
@@ -105,14 +101,20 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
 
-    public PurseSeinerFishingStrategyFactory(
+    PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
-        final Class<F> fadClass,
-        final CatchSamplersFactory<B> catchSamplersFactory
+        final Class<F> fadClass
     ) {
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
-        this.catchSamplersCache = new CacheByFishState<>(catchSamplersFactory);
+    }
+
+    public CatchSamplersFactory<B> getCatchSamplersFactory() {
+        return catchSamplersFactory;
+    }
+
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
+        this.catchSamplersFactory = catchSamplersFactory;
     }
 
     public double getFadSetActionLogisticSteepness() {
@@ -328,6 +330,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
 
     @Override
     public PurseSeinerFishingStrategy<B, F> apply(final FishState fishState) {
+        checkNotNull(catchSamplersFactory);
         return new PurseSeinerFishingStrategy<>(
             PurseSeinerFishingStrategyFactory::loadAttractionWeights,
             this::makeSetOpportunityDetector,
@@ -391,7 +394,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 nonAssociatedSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 biologyClass,
-                catchSamplersCache.get(fishState).get(NonAssociatedSetAction.class),
+                catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
                 NonAssociatedSetAction<B>::new,
                 activeNonAssociatedSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(NonAssociatedSetAction.class)
@@ -404,7 +407,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 dolphinSetGeneratorLogisticSteepness,
                 setCompositionWeights.get(DolphinSetAction.class),
                 biologyClass,
-                catchSamplersCache.get(fishState).get(DolphinSetAction.class),
+                catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
                 DolphinSetAction<B>::new,
                 activeDolphinSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(DolphinSetAction.class)

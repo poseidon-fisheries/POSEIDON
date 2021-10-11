@@ -18,11 +18,19 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
+import ec.util.MersenneTwisterFast;
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
 public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
 
-    public BiomassCatchSamplersFactory() {
-        super(BiomassCatchSampler::new);
+    @Override
+    CatchSampler<BiomassLocalBiology> makeCatchSampler(
+        Class<? extends AbstractSetAction<?>> actionClass,
+        final Collection<Collection<Double>> sample,
+        final MersenneTwisterFast rng
+    ) {
+        return new BiomassCatchSampler(sample, rng);
     }
 }

@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
+import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
 import java.util.Collection;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -25,18 +26,34 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 public class BiomassCatchSampler extends CatchSampler<BiomassLocalBiology> {
 
     public BiomassCatchSampler(
-        Collection<Collection<Double>> sample,
-        MersenneTwisterFast rng
+        final Collection<Collection<Double>> sample,
+        final MersenneTwisterFast rng
     ) {
         super(sample, rng);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
-    public BiomassLocalBiology apply(final BiomassLocalBiology biology) {
-        @SuppressWarnings("UnstableApiUsage") final double[] biomassCaught =
-            next(biology.getCurrentBiomass()).toArray();
+    boolean test(
+        final BiomassLocalBiology sourceBiology,
+        final ImmutableDoubleArray catchArray
+    ) {
+        final double[] availableBiomass = sourceBiology.getCurrentBiomass();
+        // Make sure that there is enough biomass for all species
+        for (int i = 0; i < catchArray.length(); i++) {
+            if (catchArray.get(i) > availableBiomass[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public BiomassLocalBiology apply(final BiomassLocalBiology sourceBiology) {
         // reuse the biomassCaught array for carrying capacity, since it doesn't
         // make sense to have "extra" carrying capacity for a school of fish
+        final double[] biomassCaught = next(sourceBiology).toArray();
         return new BiomassLocalBiology(biomassCaught, biomassCaught);
     }
 

@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -47,23 +46,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class CatchSamplersFactory<B extends LocalBiology>
+public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
     private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
-    private final BiFunction<Collection<Collection<Double>>, MersenneTwisterFast, CatchSampler<B>>
-        catchSamplerMaker;
     private Path catchSamplesFile = input("set_samples.csv");
-
-    public CatchSamplersFactory(
-        final BiFunction<
-            Collection<Collection<Double>>,
-            MersenneTwisterFast,
-            CatchSampler<B>
-            > catchSamplerMaker
-    ) {
-        this.catchSamplerMaker = catchSamplerMaker;
-    }
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -71,8 +58,8 @@ public class CatchSamplersFactory<B extends LocalBiology>
     }
 
     @SuppressWarnings("unused")
-    public void setCatchSamplesFile(final Path catchSamplesFile) {
-        this.catchSamplesFile = catchSamplesFile;
+    public void setCatchSamplesFile(final Path selectivityFilePath) {
+        this.catchSamplesFile = selectivityFilePath;
     }
 
     @Override
@@ -89,9 +76,15 @@ public class CatchSamplersFactory<B extends LocalBiology>
             .stream()
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> catchSamplerMaker.apply(entry.getValue(), rng)
+                entry -> makeCatchSampler(entry.getKey(), entry.getValue(), rng)
             ));
     }
+
+    abstract CatchSampler<B> makeCatchSampler(
+        final Class<? extends AbstractSetAction<?>> actionClass,
+        final Collection<Collection<Double>> sample,
+        final MersenneTwisterFast rng
+    );
 
     @SuppressWarnings("UnstableApiUsage")
     private Collection<Double> getBiomasses(

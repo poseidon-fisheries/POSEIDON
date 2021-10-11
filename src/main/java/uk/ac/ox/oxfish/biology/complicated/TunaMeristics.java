@@ -47,8 +47,8 @@ public class TunaMeristics implements Meristics {
      *
      * @param weights An iterable of arrays of weights, where the first array is the weights of the
      *                females and the second array is the weights of the males.
-     * @param lengths An iterable of arrays of weights, where the first array is the weights of the
-     *                females and the second array is the weights of the males.
+     * @param lengths An iterable of arrays of lengths, where the first array is the lengths of the
+     *                females and the second array is the lengths of the males.
      */
     public TunaMeristics(
         final Iterable<double[]> weights,

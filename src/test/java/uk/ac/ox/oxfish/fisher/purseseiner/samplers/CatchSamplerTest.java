@@ -28,6 +28,7 @@ import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
 public class CatchSamplerTest {
 
@@ -51,8 +52,9 @@ public class CatchSamplerTest {
             .build()
             .forEach(entry -> {
                 final ImmutableDoubleArray expectedCatch = entry.getValue();
-                final double[] availableBiomass = entry.getKey().toArray();
-                assertEquals(expectedCatch, catchSampler.next(availableBiomass));
+                final BiomassLocalBiology localBiology =
+                    new BiomassLocalBiology(entry.getKey().toArray());
+                assertEquals(expectedCatch, catchSampler.next(localBiology));
             });
 
     }

@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.google.common.collect.ImmutableList;
@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
@@ -99,11 +100,11 @@ public class ScheduledAbundanceProcessesFactory
 
     private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule() {
         final LocalDate startDate = LocalDate.parse(biologicalProcessesDates.get(0));
-        final ImmutableList<Integer> processSteps =
+        final Set<Integer> processSteps =
             biologicalProcessesDates.stream()
                 .map(LocalDate::parse)
                 .map(date -> Math.toIntExact(DAYS.between(startDate, date)))
-                .collect(toImmutableList());
+                .collect(toImmutableSet());
 
         final AllocationGrids<Entry<String, SizeGroup>> grids =
             abundanceReallocator.getAllocationGrids();
@@ -116,23 +117,28 @@ public class ScheduledAbundanceProcessesFactory
             scheduleBuilder = ImmutableListMultimap.builder();
 
         // Add all our periodical biological processes to the schedule
-        final List<BiologicalProcess<AbundanceLocalBiology>> periodicalProcesses =
+        final BiologicalProcess<AbundanceLocalBiology> aggregationProcess =
+            new AbundanceAggregationProcess();
+        final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceMortalityProcess(),
-                new AbundanceAggregationProcess(),
+                aggregationProcess,
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
-                new FadAbundanceExcluder()
+                new FadAbundanceExcluder(),
+                abundanceReallocator
             );
 
-        processSteps.forEach(step ->
-            scheduleBuilder.putAll(step, periodicalProcesses)
-        );
-
-        // Schedule a reallocator for each time step we have a grid.
-        // It should always be the last process for that time step.
+        final List<BiologicalProcess<AbundanceLocalBiology>> reallocationProcesses =
+            ImmutableList.of(
+                aggregationProcess,
+                abundanceReallocator
+            );
 
         grids.getGrids().keySet().forEach(step ->
-            scheduleBuilder.put(step, abundanceReallocator)
+            scheduleBuilder.putAll(
+                step,
+                processSteps.contains(step) ? allProcesses : reallocationProcesses
+            )
         );
 
         return scheduleBuilder.build().asMap();

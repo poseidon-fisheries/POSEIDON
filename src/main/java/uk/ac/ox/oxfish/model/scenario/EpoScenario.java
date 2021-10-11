@@ -43,13 +43,23 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorerFactory;
 import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.ScheduledAbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
+import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
+import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -61,8 +71,14 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class EpoScenario implements Scenario {
 
     private static final Path INPUT_PATH = Paths.get("inputs", "epo");
+    private static final int TARGET_YEAR = 2017;
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+    private final PortInitializer portInitializer =
+        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
+    private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
+        new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
+    private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(INPUT_PATH.resolve("recruitment_parameters.csv"));
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
@@ -92,6 +108,12 @@ public class EpoScenario implements Scenario {
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
         ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents_2017.csv"))
     );
+    private AbundanceFiltersFactory abundanceFiltersFactory =
+        new AbundanceFiltersFactory(INPUT_PATH.resolve("selectivity.csv"));
+    private AbundanceCatchSamplersFactory abundanceCatchSamplersFactory =
+        new AbundanceCatchSamplersFactory();
+    private PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory =
+        new PurseSeinerAbundanceFishingStrategyFactory();
 
     /**
      * Just runs the scenario for a year.
@@ -111,6 +133,39 @@ public class EpoScenario implements Scenario {
         }
     }
 
+    @SuppressWarnings("unused")
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public AbundanceCatchSamplersFactory getAbundanceCatchSamplersFactory() {
+        return abundanceCatchSamplersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceCatchSamplersFactory(
+        final AbundanceCatchSamplersFactory abundanceCatchSamplersFactory
+    ) {
+        this.abundanceCatchSamplersFactory = abundanceCatchSamplersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public PurseSeinerAbundanceFishingStrategyFactory getFishingStrategyFactory() {
+        return fishingStrategyFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFishingStrategyFactory(
+        final PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory
+    ) {
+        this.fishingStrategyFactory = fishingStrategyFactory;
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AbundanceInitializer> getAbundanceInitializerFactory() {
@@ -231,23 +286,44 @@ public class EpoScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
-        final List<Fisher> population = ImmutableList.of();
-        final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
-        final Map<String, FisherFactory> fisherFactories =
-            ImmutableMap.of(DEFAULT_POPULATION_NAME, new FisherFactory(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0
-            ));
+        abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
+        abundanceCatchSamplersFactory.setAbundanceFilters(abundanceFiltersFactory.apply(fishState));
+        fishingStrategyFactory.setCatchSamplersFactory(abundanceCatchSamplersFactory);
+
+        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
+        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
+
+        portInitializer.buildPorts(
+            fishState.getMap(),
+            fishState.random,
+            seaTile -> marketMap,
+            fishState,
+            new FixedGasPrice(0)
+        );
+        final List<Port> ports = fishState.getMap().getPorts();
+
+        final FisherFactory fisherFactory = new FisherFactory(
+            null,
+            null,
+            null,
+            null,
+            fishingStrategyFactory,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            0
+        );
+
+        final List<Fisher> fishers =
+            new PurseSeineVesselReader(
+                vesselsFilePath,
+                TARGET_YEAR,
+                fisherFactory,
+                ports
+            ).apply(fishState);
 
         ImmutableList.of(
             abundanceRestorerFactory,
@@ -256,7 +332,11 @@ public class EpoScenario implements Scenario {
             fishState.registerStartable(startableFactory.apply(fishState))
         );
 
-        return new ScenarioPopulation(population, network, fisherFactories);
+        return new ScenarioPopulation(
+            fishers,
+            new SocialNetwork(new EmptyNetworkBuilder()),
+            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
+        );
     }
 
     @SuppressWarnings("unused")
@@ -271,5 +351,13 @@ public class EpoScenario implements Scenario {
         this.mapInitializerFactory = mapInitializerFactory;
     }
 
+    @SuppressWarnings("unused")
+    public Path getVesselsFilePath() {
+        return vesselsFilePath;
+    }
 
+    @SuppressWarnings("unused")
+    public void setVesselsFilePath(final Path vesselsFilePath) {
+        this.vesselsFilePath = vesselsFilePath;
+    }
 }

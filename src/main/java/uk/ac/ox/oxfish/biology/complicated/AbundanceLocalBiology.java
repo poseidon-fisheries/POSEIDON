@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static java.util.Comparator.comparingInt;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -124,7 +127,21 @@ public class AbundanceLocalBiology implements LocalBiology
 
     }
 
-
+    /**
+     * Returns a copied array of the last computed biomass. This method shares name and
+     * specification with {@link VariableBiomassBasedBiology#getCurrentBiomass()}
+     * even if the current class doesn't implement that interface.
+     */
+    public double[] getCurrentBiomass() {
+        // This is a bit awkward, as we don't have access to the global biology
+        // to map indices to species, but should work just fine as long as
+        // the abundance map contains all the species (a safe assumption, I think).
+        return abundance.keySet()
+            .stream()
+            .sorted(comparingInt(Species::getIndex))
+            .mapToDouble(this::getBiomass)
+            .toArray();
+    }
 
     /**
      * ignored
