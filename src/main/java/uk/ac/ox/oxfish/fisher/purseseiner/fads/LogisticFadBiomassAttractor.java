@@ -18,16 +18,18 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import ec.util.MersenneTwisterFast;
+import static java.lang.Math.exp;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
-import static java.lang.Math.*;
+import ec.util.MersenneTwisterFast;
 
 public class LogisticFadBiomassAttractor implements FadBiomassAttractor {
 
     private final MersenneTwisterFast rng;
     private final double intercept;
     private final double tileBiomassCoefficient;
-    private final double fadBiomassCoefficient;
+    private final double biomassInteractionCoefficient;
     private final double growthRate;
     private final double carryingCapacity;
 
@@ -35,14 +37,14 @@ public class LogisticFadBiomassAttractor implements FadBiomassAttractor {
         final MersenneTwisterFast rng,
         final double intercept,
         final double tileBiomassCoefficient,
-        final double fadBiomassCoefficient,
+        final double biomassInteractionCoefficient,
         final double growthRate,
         final double carryingCapacity
     ) {
         this.rng = rng;
         this.intercept = intercept;
         this.tileBiomassCoefficient = tileBiomassCoefficient;
-        this.fadBiomassCoefficient = fadBiomassCoefficient;
+        this.biomassInteractionCoefficient = biomassInteractionCoefficient;
         this.growthRate = growthRate;
         this.carryingCapacity = carryingCapacity;
     }
@@ -58,11 +60,18 @@ public class LogisticFadBiomassAttractor implements FadBiomassAttractor {
     }
 
     private double probabilityOfAttraction(final double cellBiomass, final double totalFadBiomass) {
-        return 1 / (1 + exp(-(intercept + tileBiomassCoefficient * cellBiomass + fadBiomassCoefficient * totalFadBiomass)));
+        return 1 / (1 + exp(-(intercept
+            + tileBiomassCoefficient * cellBiomass
+            + biomassInteractionCoefficient * cellBiomass * totalFadBiomass))
+        );
     }
 
     @Override
-    public double biomassAttracted(final double tileBiomass, final double fadBiomass, final double totalFadBiomass) {
+    public double biomassAttracted(
+        final double tileBiomass,
+        final double fadBiomass,
+        final double totalFadBiomass
+    ) {
         return min(
             tileBiomass,
             max(1, growthRate * tileBiomass * fadBiomass * (1 - totalFadBiomass / carryingCapacity))

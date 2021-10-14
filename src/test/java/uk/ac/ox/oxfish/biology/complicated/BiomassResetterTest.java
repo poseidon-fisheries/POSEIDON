@@ -40,7 +40,6 @@ import ec.util.MersenneTwisterFast;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.function.DoubleSupplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import org.junit.Test;
@@ -52,9 +51,9 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFadBiomassAttractor;
@@ -62,7 +61,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -84,11 +82,11 @@ public class BiomassResetterTest {
         final GlobalBiology biology = new GlobalBiology(species);
 
         //fill 1x1 at top
-        final BiomassLocalBiology zerozero = new BiomassLocalBiology(
+        final VariableBiomassBasedBiology zerozero = new BiomassLocalBiology(
             1000000, biology.getSize(), new MersenneTwisterFast()
         );
         zerozero.setCurrentBiomass(species, 100);
-        final BiomassLocalBiology oneone = new BiomassLocalBiology(
+        final VariableBiomassBasedBiology oneone = new BiomassLocalBiology(
             1000000, biology.getSize(), new MersenneTwisterFast()
         );
         oneone.setCurrentBiomass(species, 100);
@@ -115,24 +113,11 @@ public class BiomassResetterTest {
         fishState.getMap().getSeaTile(1, 1).setBiology(oneone);
 
         //biomass allocator wants to reallocate everythin to 0,1 (and triple it too)
-        final BiomassAllocator biomassAllocator = new BiomassAllocator() {
-            @Override
-            public double allocate(
-                final SeaTile tile,
-                final NauticalMap map,
-                final MersenneTwisterFast random
-            ) {
-                if (tile == fishState.getMap().getSeaTile(0, 1)) {
-                    return 3d;
-                } else {
-                    return 0;
-                }
-
-            }
-        };
+        final BiomassAllocator biomassAllocator = (tile, map, random) ->
+            tile == fishState.getMap().getSeaTile(0, 1) ? 3d : 0;
 
         //record the abundance as it is
-        final BiomassResetter resetter = new BiomassResetter(biomassAllocator, species);
+        final BiologyResetter resetter = new BiomassResetter(biomassAllocator, species);
         resetter.recordHowMuchBiomassThereIs(fishState);
 
         //reallocate!
@@ -195,35 +180,41 @@ public class BiomassResetterTest {
             BiomassLocalBiology.class,
             BiomassFad.class
         );
-        when(fishState.getFadMap()).thenReturn((FadMap)fadMap);
+        when(fishState.getFadMap()).thenReturn((FadMap) fadMap);
 
         // deploy one FAD in the center of each tile
-        final ImmutableMap<Species, DoubleSupplier> carryingCapacities =
-            species.stream().collect(toImmutableMap(identity(), __ -> () -> 1000));
+        final double carryingCapacity = 1000;
         final double fadAttractionRate = 0.5;
         final ImmutableMap<Species, FadBiomassAttractor> fadAttractionRates =
             species.stream().collect(toImmutableMap(
                 identity(),
                 s -> new LinearFadBiomassAttractor(
                     fadAttractionRate,
-                    carryingCapacities.get(s).getAsDouble()
+                    carryingCapacity
                 )
                 )
             );
 
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
-            carryingCapacities,
+            carryingCapacity,
             fadAttractionRates,
             0,
             () -> 0
         );
-        seaTiles.forEach(seaTile ->
+
+        when(fishState.getBiology()).thenReturn(globalBiology);
+        final Fisher fisher = mock(Fisher.class);
+        when(fisher.grabState()).thenReturn(fishState);
+        final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
+        when(fadManager.getFisher()).thenReturn(fisher);
+        seaTiles.forEach(seaTile -> {
+            when(fisher.getLocation()).thenReturn(seaTile);
             fadMap.deployFad(
-                fadInitializer.apply(mock(FadManager.class, RETURNS_DEEP_STUBS)),
+                fadInitializer.apply(fadManager),
                 seaTile
-            )
-        );
+            );
+        });
 
         // record total biomass
         final ImmutableList<LocalBiology> seaTileBiologies =
@@ -286,7 +277,7 @@ public class BiomassResetterTest {
 
     }
 
-    private ImmutableMap<Species, Double> totalBiomasses(
+    private static ImmutableMap<Species, Double> totalBiomasses(
         final GlobalBiology globalBiology,
         final Collection<LocalBiology> localBiologies
     ) {

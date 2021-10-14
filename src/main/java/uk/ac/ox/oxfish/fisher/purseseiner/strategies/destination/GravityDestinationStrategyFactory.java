@@ -19,6 +19,19 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.function.Predicate;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
@@ -29,60 +42,60 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.function.Predicate;
+public class GravityDestinationStrategyFactory
+    implements AlgorithmFactory<GravityDestinationStrategy> {
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Streams.stream;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
-public class GravityDestinationStrategyFactory implements AlgorithmFactory<GravityDestinationStrategy> {
-
-    // TODO: This is currently EPO specific, as it excludes tiles from the Atlantic, but should be made configurable.
+    private static final FisherValuesFromFileCache<Double> maxTripDurationCache =
+        new FisherValuesFromFileCache<Double>() {
+            protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
+                return parseAllRecords(valuesFile).stream().collect(
+                    groupingBy(
+                        record -> record.getInt("year"),
+                        toMap(
+                            record -> record.getString("boat_id"),
+                            record -> record.getDouble("max_trip_duration_in_hours")
+                        )
+                    ));
+            }
+        };
+    // TODO: This is currently EPO specific, as it excludes tiles from the Atlantic, but should
+    //  be made configurable.
     private final Predicate<SeaTile> isValidDestination =
         seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
-
-    private static final FisherValuesFromFileCache<Double> maxTripDurationCache = new FisherValuesFromFileCache<Double>() {
-        protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
-            return parseAllRecords(valuesFile).stream().collect(
-                groupingBy(
-                    record -> record.getInt("year"),
-                    toMap(
-                        record -> record.getString("boat_id"),
-                        record -> record.getDouble("max_trip_duration_in_hours")
-                    )
-                ));
-        }
-    };
-
+    Path attractionWeightsFile;
     private Path maxTripDurationFile = input("boats.csv");
 
+    public Path getAttractionWeightsFile() {
+        return attractionWeightsFile;
+    }
+
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+        this.attractionWeightsFile = attractionWeightsFile;
+    }
+
     @SuppressWarnings("unused")
-    public Path getMaxTripDurationFile() { return maxTripDurationFile; }
+    public Path getMaxTripDurationFile() {
+        return maxTripDurationFile;
+    }
 
     public void setMaxTripDurationFile(final Path maxTripDurationFile) {
         this.maxTripDurationFile = maxTripDurationFile;
     }
 
-    @Override public GravityDestinationStrategy apply(final FishState fishState) {
+    @Override
+    public GravityDestinationStrategy apply(final FishState fishState) {
+        checkNotNull(attractionWeightsFile);
         return new GravityDestinationStrategy(
-            GravityDestinationStrategyFactory::loadAttractionWeights,
+            this::loadAttractionWeights,
             this::loadMaxTripDuration,
             this.isValidDestination
         );
     }
 
-    private static Map<ActionAttractionField, Double> loadAttractionWeights(
+    private Map<ActionAttractionField, Double> loadAttractionWeights(
         final Iterable<ActionAttractionField> fields,
         final Fisher fisher
     ) {
-        final Path attractionWeightsFile = ((TunaScenario) fisher.grabState().getScenario()).getAttractionWeightsFile();
         return stream(fields).collect(toImmutableMap(
             identity(),
             field -> ActionWeightsCache.INSTANCE.get(
@@ -97,7 +110,8 @@ public class GravityDestinationStrategyFactory implements AlgorithmFactory<Gravi
     private double loadMaxTripDuration(final Fisher fisher) {
         return maxTripDurationCache
             .get(maxTripDurationFile, TARGET_YEAR, fisher)
-            .orElseThrow(() -> new IllegalStateException("No max trip duration known for " + fisher));
+            .orElseThrow(() -> new IllegalStateException(
+                "No max trip duration known for " + fisher));
     }
 
 }

@@ -18,26 +18,29 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.function.IntSupplier;
-import java.util.stream.DoubleStream;
-import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
-public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, BiomassFad> {
+class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, AbundanceFad> {
 
-    public BiomassFadInitializer(
+    private final Map<Species, AbundanceFilter> selectivityFilters;
+
+    AbundanceFadInitializer(
         final GlobalBiology globalBiology,
         final double totalCarryingCapacity,
         final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
+        final IntSupplier timeStepSupplier,
+        final Map<Species, AbundanceFilter> selectivityFilters
     ) {
         super(
             globalBiology,
@@ -46,36 +49,32 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
             fishReleaseProbability,
             timeStepSupplier
         );
+        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
 
-    @NotNull
-    BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {
-        final double[] carryingCapacities = DoubleStream
-            .generate(() -> Double.POSITIVE_INFINITY)
-            .limit(globalBiology.getSize())
-            .toArray();
-        return new BiomassLocalBiology(emptyBiomasses, carryingCapacities);
+    @Override
+    AbundanceLocalBiology makeBiology(final GlobalBiology globalBiology) {
+        return new AbundanceLocalBiology(globalBiology);
     }
 
-    @NotNull
-    BiomassFad makeFad(
-        final FadManager<BiomassLocalBiology, BiomassFad> owner,
-        final BiomassLocalBiology biology,
+    @Override
+    AbundanceFad makeFad(
+        final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
+        final AbundanceLocalBiology biology,
         final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed
     ) {
-        return new BiomassFad(
+        return new AbundanceFad(
             owner,
             biology,
             fadBiomassAttractors,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
+            selectivityFilters,
             getTotalCarryingCapacity()
         );
     }
-
-
 }

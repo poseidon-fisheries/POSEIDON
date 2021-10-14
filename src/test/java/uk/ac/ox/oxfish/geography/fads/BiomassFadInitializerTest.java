@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassFadInitializerTest {
 
@@ -24,13 +25,9 @@ public class BiomassFadInitializerTest {
         final Species speciesA = new Species("A");
         final Species speciesB = new Species("B");
         final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
-        final ImmutableMap<Species, DoubleSupplier> carryingCapacities = ImmutableMap.of(
-            speciesA, () -> 1000.0,
-            speciesB, () -> 2000.0
-        );
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
-            carryingCapacities,
+            Double.POSITIVE_INFINITY,
             ImmutableMap.of(),
             0,
             () -> 0
@@ -48,8 +45,11 @@ public class BiomassFadInitializerTest {
         final SeaTile seaTile = mock(SeaTile.class);
         when(seaTile.getGridX()).thenReturn(0);
         when(seaTile.getGridY()).thenReturn(0);
+        final FishState fishState = mock(FishState.class);
+        when(fishState.getBiology()).thenReturn(globalBiology);
         final Fisher fisher = mock(Fisher.class);
         when(fisher.getLocation()).thenReturn(seaTile);
+        when(fisher.grabState()).thenReturn(fishState);
         fadManager.setFisher(fisher);
 
         final BiomassFad fad = fadInitializer.apply(fadManager);

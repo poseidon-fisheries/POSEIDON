@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -99,9 +100,9 @@ public final class WebVizExporter {
             "When removing El Corralito closure, results do not differ significantly from business as usual scenario.",
             ImmutableList.of(currentFadLimits),
             scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                TunaScenario.galapagosEezReg, TAG_FOR_ALL,
-                TunaScenario.closureAReg, "closure A",
-                TunaScenario.closureBReg, "closure B"
+                StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                StandardIattcRegulationsFactory.closureAReg, "closure A",
+                StandardIattcRegulationsFactory.closureBReg, "closure B"
             ))
         ),
         makePolicy(
@@ -121,8 +122,8 @@ public final class WebVizExporter {
             "Length of closure periods A and B increased by 40% (100 days instead of 72).",
             ImmutableList.of(currentFadLimits),
             scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                TunaScenario.galapagosEezReg, TAG_FOR_ALL,
-                TunaScenario.elCorralitoReg, TAG_FOR_ALL,
+                StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                 new TemporaryRegulationFactory(
                     TunaScenario.dayOfYear(JULY, 1),
                     TunaScenario.dayOfYear(OCTOBER, 8),

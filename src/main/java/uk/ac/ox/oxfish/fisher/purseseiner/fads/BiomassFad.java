@@ -25,9 +25,9 @@ import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -35,11 +35,8 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
 public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
-
-    private final Map<Species, FadBiomassAttractor> fadBiomassAttractors;
 
     public BiomassFad(
         final FadManager<BiomassLocalBiology, BiomassFad> owner,
@@ -47,16 +44,18 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
         final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
         final int stepDeployed,
-        final Int2D locationDeployed
+        final Int2D locationDeployed,
+        final double totalCarryingCapacity
     ) {
         super(
             owner,
             biology,
+            fadBiomassAttractors,
             fishReleaseProbability,
             stepDeployed,
-            locationDeployed
+            locationDeployed,
+            totalCarryingCapacity
         );
-        this.fadBiomassAttractors = ImmutableMap.copyOf(fadBiomassAttractors);
     }
 
     /**
@@ -110,35 +109,32 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     }
 
     @Override
-    public void aggregateFish(
-        final BiomassLocalBiology seaTileBiology,
-        final GlobalBiology globalBiology
-    ) {
-        // Calculate the catches and add them to the FAD biology:
-        final double[] tileBiomass = seaTileBiology.getCurrentBiomass();
-        final double[] fadBiomass = this.getBiology().getCurrentBiomass();
-        final double[] catches = new double[tileBiomass.length];
-        final double totalFadBiomass = Arrays.stream(fadBiomass).sum();
+    double[] getBiomass(final BiomassLocalBiology biology) {
+        return biology.getCurrentBiomass();
+    }
 
-        fadBiomassAttractors.forEach((species, fadBiomassAttractor) -> {
-            final int i = species.getIndex();
-            if (fadBiomassAttractor.shouldAttract(tileBiomass[i], totalFadBiomass)) {
-                catches[i] = fadBiomassAttractor.biomassAttracted(
-                    tileBiomass[i],
-                    fadBiomass[i],
-                    totalFadBiomass
-                );
-                fadBiomass[i] =
-                    min(fadBiomass[i] + catches[i], fadBiomassAttractor.getCarryingCapacity());
-            }
-        });
-        // Remove the catches from the underlying biology:
-        final Catch catchObject = new Catch(catches);
-        seaTileBiology.reactToThisAmountOfBiomassBeingFished(
-            catchObject,
-            catchObject,
-            globalBiology
-        );
+    @NotNull
+    @Override
+    public Catch addCatchesToFad(
+        final BiomassLocalBiology seaTileBiology,
+        final GlobalBiology globalBiology,
+        final double[] catches
+    ) {
+        final double[] fadBiomass = this.getBiology().getCurrentBiomass();
+        for (int i = 0; i < catches.length; i++) {
+            // this mutates the FAD's biomass array directly
+            fadBiomass[i] += catches[i];
+        }
+        return new Catch(catches);
+    }
+
+    /**
+     * This should be used instead of {@code getBiology().isFull()} since FADs use a global carrying
+     * capacity instead of a per-species carrying capacity.
+     */
+    public boolean isFull() {
+        final double totalBiomass = Arrays.stream(getBiology().getCurrentBiomass()).sum();
+        return totalBiomass >= getTotalCarryingCapacity();
     }
 
 }

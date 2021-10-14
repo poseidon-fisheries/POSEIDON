@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -69,14 +70,19 @@ public class AbundanceLocalBiology implements LocalBiology
 
         //for each species create cohorts
         for(Species species : biology.getSpecies()) {
-            double[][] fish = new double[species.getNumberOfSubdivisions()][];
-            for(int i=0; i<fish.length; i++)
-                fish[i] = new double[species.getNumberOfBins()];
-            abundance.put(species, fish);
+            abundance.put(species, makeAbundanceArray(species));
         }
         //done!
         lastComputedBiomass = new double[biology.getSpecies().size()];
         Arrays.fill(lastComputedBiomass,Double.NaN);
+    }
+
+    public static double[][] makeAbundanceArray(final Species species) {
+        final double[][] abundanceArray = new double[species.getNumberOfSubdivisions()][];
+        for (int i = 0; i < abundanceArray.length; i++) {
+            abundanceArray[i] = new double[species.getNumberOfBins()];
+        }
+        return abundanceArray;
     }
 
     /**

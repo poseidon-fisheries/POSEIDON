@@ -21,20 +21,13 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static java.time.Month.JANUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
+import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
@@ -52,9 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javax.measure.quantity.Mass;
-import sim.engine.Steppable;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -68,7 +59,6 @@ import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
@@ -79,9 +69,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassF
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
-import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -95,7 +82,6 @@ import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -104,15 +90,9 @@ import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
-import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
-import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
 import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -124,21 +104,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class TunaScenario implements Scenario {
 
     public static final int TARGET_YEAR = 2017;
-    public static final AlgorithmFactory<TemporaryRegulation> closureAReg =
-        new TemporaryRegulationFactory(
-            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
-            new NoFishingFactory()
-        );
-    public static final AlgorithmFactory<TemporaryRegulation> closureBReg =
-        new TemporaryRegulationFactory(
-            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
-            new NoFishingFactory()
-        );
-    public static final AlgorithmFactory<TemporaryRegulation> elCorralitoReg =
-        new TemporaryRegulationFactory(
-            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
-            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
-        );
+
     private static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final ImmutableMap<CurrentPattern, Path> currentFiles =
         new ImmutableMap.Builder<CurrentPattern, Path>()
@@ -210,7 +176,7 @@ public class TunaScenario implements Scenario {
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
-        fadInitializerFactory.setFadBiomassCoefficients(ImmutableMap.of(
+        fadInitializerFactory.setBiomassInteractionsCoefficients(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.0),
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)
@@ -221,22 +187,22 @@ public class TunaScenario implements Scenario {
             "Skipjack tuna", new FixedDoubleParameter(0.1)
         ));
 
-        final AlgorithmFactory<? extends Regulation> standardRegulations =
-            new MultipleRegulationsFactory(ImmutableMap.of(
-                galapagosEezReg, TAG_FOR_ALL,
-                elCorralitoReg, TAG_FOR_ALL,
-                closureAReg, "closure A",
-                closureBReg, "closure B"
-            ));
+        final AlgorithmFactory<? extends Regulation> standardRegulations = new StandardIattcRegulationsFactory();
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setGearStrategy(new FadRefillGearStrategyFactory());
+
         final PurseSeinerBiomassFishingStrategyFactory
             fishingStrategy = new PurseSeinerBiomassFishingStrategyFactory();
         fishingStrategy.setCatchSamplersFactory(new BiomassCatchSamplersFactory());
         fisherDefinition.setFishingStrategy(fishingStrategy);
-        fisherDefinition.setDestinationStrategy(new GravityDestinationStrategyFactory());
+
+        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+            new GravityDestinationStrategyFactory();
+        gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
+        fisherDefinition.setDestinationStrategy(gravityDestinationStrategyFactory);
+
         fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
 
     }
@@ -249,6 +215,11 @@ public class TunaScenario implements Scenario {
         return fisher.getTags().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
+    }
+
+    public static int dayOfYear(final Month month, final int dayOfMonth) {
+        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
+            .getDayOfYear();
     }
 
     @SuppressWarnings("unused")
@@ -432,10 +403,6 @@ public class TunaScenario implements Scenario {
         purseSeineGearFactory.getDolphinSetObservers().addAll(monitors.getDolphinSetMonitors());
         purseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
 
-        final Map<String, Port> portsByName =
-            ports.stream().collect(toMap(Port::getName, identity()));
-        final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
-
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
             addHourlyCosts(),
             fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),
@@ -497,29 +464,6 @@ public class TunaScenario implements Scenario {
             fisherFactories
         );
 
-    }
-
-    private static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher) {
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure
-        // period they will observe.
-        final int daysFromNow = 1 + dayOfYear(JULY, 15);
-        final Steppable assignClosurePeriod = simState -> {
-            if (fisher.getRegulation() instanceof MultipleRegulations) {
-                chooseClosurePeriod(fisher, model.getRandom());
-                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
-            }
-        };
-        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
-        model.scheduleOnceInXDays(
-            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-            StepOrder.DAWN,
-            daysFromNow
-        );
-    }
-
-    public static int dayOfYear(final Month month, final int dayOfMonth) {
-        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
-            .getDayOfYear();
     }
 
     private Consumer<Fisher> addHourlyCosts() {

@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 
 public class MakeFadSetTest {
@@ -70,15 +70,16 @@ public class MakeFadSetTest {
         // Make a full FAD and an empty tile biology
         final double carryingCapacity = 0.0;
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, carryingCapacity);
-        fillBiology(fadBiology);
         final BiomassFad fad = new BiomassFad(
             fadManager,
             fadBiology,
             ImmutableMap.of(),
             0,
             0,
-            new Int2D(1, 1)
+            new Int2D(1, 1),
+            carryingCapacity
         );
+        fillBiomassFad(fad);
         final VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...
@@ -99,7 +100,7 @@ public class MakeFadSetTest {
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
         // Before the set, FAD biology should be full and tile biology should be empty
-        assertTrue(fadBiology.isFull());
+        assertTrue(fad.isFull());
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
@@ -110,7 +111,7 @@ public class MakeFadSetTest {
         assertTrue(tileBiology.isEmpty());
 
         // Now we refill the FAD biology and make an unsuccessful set
-        fillBiology(fadBiology);
+        fillBiomassFad(fad);
         when(random.nextDouble()).thenReturn(0.0);
         fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
 

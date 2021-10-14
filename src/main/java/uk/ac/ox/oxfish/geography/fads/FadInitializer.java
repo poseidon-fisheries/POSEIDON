@@ -19,13 +19,71 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
+import org.jetbrains.annotations.NotNull;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 public abstract class FadInitializer<B extends LocalBiology, F extends Fad<B, F>>
     implements Function<FadManager<B, F>, F> {
 
+    final double[] emptyBiomasses;
+    private final double totalCarryingCapacity;
+    private final double fishReleaseProbability;
+    private final Map<Species, FadBiomassAttractor> fadBiomassAttractors;
+    private final IntSupplier timeStepSupplier;
 
+
+    FadInitializer(
+        final GlobalBiology globalBiology,
+        final double totalCarryingCapacity,
+        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final double fishReleaseProbability,
+        final IntSupplier timeStepSupplier
+    ) {
+        this.emptyBiomasses = new double[globalBiology.getSize()];
+        this.totalCarryingCapacity = totalCarryingCapacity;
+        this.timeStepSupplier = timeStepSupplier;
+        this.fadBiomassAttractors = ImmutableMap.copyOf(fadBiomassAttractors);
+        this.fishReleaseProbability = fishReleaseProbability;
+    }
+
+    @Override
+    public F apply(@NotNull final FadManager<B, F> fadManager) {
+        final Fisher fisher = fadManager.getFisher();
+        final SeaTile seaTile = fisher.getLocation();
+        return makeFad(
+            fadManager,
+            makeBiology(fisher.grabState().getBiology()),
+            fadBiomassAttractors,
+            fishReleaseProbability,
+            timeStepSupplier.getAsInt(),
+            new Int2D(seaTile.getGridX(), seaTile.getGridY())
+        );
+    }
+
+    abstract B makeBiology(GlobalBiology globalBiology);
+
+    abstract F makeFad(
+        final FadManager<B, F> owner,
+        final B biology,
+        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final double fishReleaseProbability,
+        final int stepDeployed,
+        final Int2D locationDeployed
+    );
+
+    public double getTotalCarryingCapacity() {
+        return totalCarryingCapacity;
+    }
 }

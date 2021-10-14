@@ -30,6 +30,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
@@ -52,8 +53,17 @@ public class FadAwareLogisticGrowerTest {
         scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
-        ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
+        final GravityDestinationStrategyFactory destinationStrategy =
+            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
+        destinationStrategy
             .setMaxTripDurationFile(input("dummy_boats.csv"));
+        destinationStrategy
+            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+
+        //noinspection OverlyStrongTypeCast
+        ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
+            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+
         //noinspection OverlyStrongTypeCast
         ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
             .setLocationValuesFile(input("dummy_location_values.csv"));

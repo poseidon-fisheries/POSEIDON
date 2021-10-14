@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -113,8 +114,8 @@ public class NinePolicies {
                 "86-day closures",
                 ImmutableList.of(currentFadLimits),
                 scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    scenario.galapagosEezReg, TAG_FOR_ALL,
-                    scenario.elCorralitoReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(JULY, 15),
                         scenario.dayOfYear(OCTOBER, 8),
@@ -131,8 +132,8 @@ public class NinePolicies {
                 "100-day closures",
                 ImmutableList.of(currentFadLimits),
                 scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    scenario.galapagosEezReg, TAG_FOR_ALL,
-                    scenario.elCorralitoReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(JULY, 1),
                         scenario.dayOfYear(OCTOBER, 8),

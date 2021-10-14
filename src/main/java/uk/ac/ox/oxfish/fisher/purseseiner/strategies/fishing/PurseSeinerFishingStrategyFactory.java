@@ -75,6 +75,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
     private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
+    private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = input("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
@@ -100,13 +101,20 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private double dolphinSetActionLogisticSteepness = 1;
     private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
-
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass
     ) {
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
+    }
+
+    public Path getAttractionWeightsFile() {
+        return attractionWeightsFile;
+    }
+
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+        this.attractionWeightsFile = attractionWeightsFile;
     }
 
     public CatchSamplersFactory<B> getCatchSamplersFactory() {
@@ -331,8 +339,9 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     @Override
     public PurseSeinerFishingStrategy<B, F> apply(final FishState fishState) {
         checkNotNull(catchSamplersFactory);
+        checkNotNull(attractionWeightsFile);
         return new PurseSeinerFishingStrategy<>(
-            PurseSeinerFishingStrategyFactory::loadAttractionWeights,
+            this::loadAttractionWeights,
             this::makeSetOpportunityDetector,
             makeActionValueFunctions(),
             searchActionDecayConstant,
@@ -341,11 +350,9 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
         );
     }
 
-    private static Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
+    private Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
         final Fisher fisher
     ) {
-        final Path attractionWeightsFile =
-            ((TunaScenario) fisher.grabState().getScenario()).getAttractionWeightsFile();
         return stream(ActionClass.values())
             .map(ActionClass::getActionClass)
             .collect(toImmutableMap(

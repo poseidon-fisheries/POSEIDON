@@ -19,10 +19,16 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -30,11 +36,6 @@ import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class TunaScenarioTest {
 
@@ -54,12 +55,19 @@ public class TunaScenarioTest {
         final TunaScenario scenario = new TunaScenario();
         scenario.setCostsFile(input("no_costs.csv"));
         scenario.setBoatsFile(input("dummy_boats.csv"));
-        scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
 
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
-        ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
+        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
+        gravityDestinationStrategyFactory
             .setMaxTripDurationFile(input("dummy_boats.csv"));
+        gravityDestinationStrategyFactory
+            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+
+        ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
+            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+
         //noinspection OverlyStrongTypeCast
         ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
             .setLocationValuesFile(input("dummy_location_values.csv"));
@@ -70,9 +78,12 @@ public class TunaScenarioTest {
         scenario.addPlugin(state -> model -> {
                 model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
                 state.scheduleEveryYear(simState -> {
-                    final FishStateYearlyTimeSeries yearlyDataSet = ((FishState) simState).getYearlyDataSet();
-                    final double catches = yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
-                    final double landings = yearlyDataSet.getColumn("Skipjack tuna Landings").getLatest();
+                    final FishStateYearlyTimeSeries yearlyDataSet =
+                        ((FishState) simState).getYearlyDataSet();
+                    final double catches =
+                        yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
+                    final double landings =
+                        yearlyDataSet.getColumn("Skipjack tuna Landings").getLatest();
                     System.out.printf("Catches:    %.2f%n", catches);
                     System.out.printf("Landings:   %.2f%n", landings);
                     System.out.printf("Difference: %.2f%n", Math.abs(catches - landings));
@@ -87,7 +98,9 @@ public class TunaScenarioTest {
         state.setScenario(scenario);
 
         state.start();
-        while (state.getYear() < 5) state.schedule.step(state);
+        while (state.getYear() < 5) {
+            state.schedule.step(state);
+        }
         state.schedule.step(state);
     }
 
