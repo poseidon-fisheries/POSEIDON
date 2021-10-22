@@ -81,7 +81,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
  */
 public class EpoScenario implements Scenario {
 
-    private static final Path INPUT_PATH = Paths.get("inputs", "epo");
+    public static final Path INPUT_PATH = Paths.get("inputs", "epo");
     private static final int TARGET_YEAR = 2017;
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
@@ -341,6 +341,7 @@ public class EpoScenario implements Scenario {
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             new GravityDestinationStrategyFactory();
         gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
+        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFilePath());
 
         final FisherFactory fisherFactory = new FisherFactory(
             null,

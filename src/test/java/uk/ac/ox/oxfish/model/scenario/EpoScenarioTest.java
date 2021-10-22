@@ -52,6 +52,7 @@ public class EpoScenarioTest extends TestCase {
         final FishState fishState = new FishState();
         final EpoScenario scenario = new EpoScenario();
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+        scenario.setVesselsFilePath(EpoScenario.INPUT_PATH.resolve("dummy_boats.csv"));
 
         fishState.setScenario(scenario);
         fishState.start();
