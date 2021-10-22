@@ -91,6 +91,7 @@ public class EpoScenario implements Scenario {
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
+    private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(INPUT_PATH.resolve("recruitment_parameters.csv"));
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
@@ -143,6 +144,14 @@ public class EpoScenario implements Scenario {
         while (fishState.getStep() < 365) {
             fishState.schedule.step(fishState);
         }
+    }
+
+    public Path getLocationValuesFilePath() {
+        return locationValuesFilePath;
+    }
+
+    public void setLocationValuesFilePath(final Path locationValuesFilePath) {
+        this.locationValuesFilePath = locationValuesFilePath;
     }
 
     @SuppressWarnings("unused")
@@ -331,6 +340,7 @@ public class EpoScenario implements Scenario {
         abundancePurseSeineGearFactory.getDolphinSetObservers()
             .addAll(monitors.getDolphinSetMonitors());
         abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
+        abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
         final AbundanceFadInitializerFactory fadInitializerFactory =
             (AbundanceFadInitializerFactory) abundancePurseSeineGearFactory
@@ -419,6 +429,16 @@ public class EpoScenario implements Scenario {
     }
 
     @SuppressWarnings("unused")
+    public Path getVesselsFilePath() {
+        return vesselsFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    public void setVesselsFilePath(final Path vesselsFilePath) {
+        this.vesselsFilePath = vesselsFilePath;
+    }
+
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;
     }
@@ -428,15 +448,5 @@ public class EpoScenario implements Scenario {
         final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getVesselsFilePath() {
-        return vesselsFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setVesselsFilePath(final Path vesselsFilePath) {
-        this.vesselsFilePath = vesselsFilePath;
     }
 }

@@ -20,6 +20,8 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
@@ -33,8 +35,8 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
 import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -52,7 +54,9 @@ public class EpoScenarioTest extends TestCase {
         final FishState fishState = new FishState();
         final EpoScenario scenario = new EpoScenario();
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-        scenario.setVesselsFilePath(EpoScenario.INPUT_PATH.resolve("dummy_boats.csv"));
+        scenario.setVesselsFilePath(INPUT_PATH.resolve("dummy_boats.csv"));
+        scenario.setAttractionWeightsFile(INPUT_PATH.resolve("dummy_action_weights.csv"));
+        scenario.setLocationValuesFilePath(INPUT_PATH.resolve("dummy_location_values.csv"));
 
         fishState.setScenario(scenario);
         fishState.start();
@@ -79,7 +83,7 @@ public class EpoScenarioTest extends TestCase {
                         .isInstance(seaTile.getBiology())
                 )
                 .map(seaTile -> new Int2D(seaTile.getGridX(), seaTile.getGridY()))
-            .collect(toImmutableSet());
+                .collect(toImmutableSet());
 
         final ImmutableSortedMap<Integer, ? extends Map<?, DoubleGrid2D>> grids =
             reallocator.getAllocationGrids().getGrids();
