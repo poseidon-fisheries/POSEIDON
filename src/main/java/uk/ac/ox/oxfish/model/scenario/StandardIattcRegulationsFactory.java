@@ -24,8 +24,7 @@ import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.dayOfYear;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Path;
@@ -62,10 +61,8 @@ public class StandardIattcRegulationsFactory extends MultipleRegulationsFactory 
             dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
             new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
         );
-
     private static final Path GALAPAGOS_EEZ_SHAPE_FILE =
-        input("galapagos_eez").resolve("eez.shp");
-
+        EpoScenario.INPUT_PATH.resolve("galapagos_eez").resolve("eez.shp");
     public static final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
         new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
 

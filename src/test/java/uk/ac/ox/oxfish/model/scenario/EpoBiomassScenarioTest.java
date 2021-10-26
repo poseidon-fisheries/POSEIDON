@@ -21,10 +21,10 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import com.google.common.collect.ImmutableMap;
+import java.nio.file.Path;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -37,42 +37,43 @@ import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-public class TunaScenarioTest {
+public class EpoBiomassScenarioTest {
 
     @Test
     public void canSaveToAndLoadFromYamlWithoutCrashing() {
-        final TunaScenario scenario = new TunaScenario();
+        final EpoBiomassScenario scenario = new EpoBiomassScenario();
         final FishYAML yaml = new FishYAML();
         final String output = yaml.dump(scenario);
         System.out.println(output);
-        final TunaScenario scenario2 = yaml.loadAs(output, TunaScenario.class);
+        final EpoBiomassScenario scenario2 = yaml.loadAs(output, EpoBiomassScenario.class);
         assertNotNull(scenario2);
     }
 
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
-        final TunaScenario scenario = new TunaScenario();
-        scenario.setCostsFile(input("no_costs.csv"));
-        scenario.setBoatsFile(input("dummy_boats.csv"));
+        final EpoBiomassScenario scenario = new EpoBiomassScenario();
+        final Path testInputsPath = EpoScenario.INPUT_PATH.resolve("test");
+        scenario.setCostsFile(testInputsPath.resolve("no_costs.csv"));
+        scenario.setBoatsFile(testInputsPath.resolve("dummy_boats.csv"));
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
 
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
         gravityDestinationStrategyFactory
-            .setMaxTripDurationFile(input("dummy_boats.csv"));
+            .setMaxTripDurationFile(testInputsPath.resolve("dummy_boats.csv"));
         gravityDestinationStrategyFactory
-            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
 
         ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
-            .setAttractionWeightsFile(input("dummy_action_weights.csv"));
+            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
 
         //noinspection OverlyStrongTypeCast
         ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
-            .setLocationValuesFile(input("dummy_location_values.csv"));
+            .setLocationValuesFile(testInputsPath.resolve("dummy_location_values.csv"));
         ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
-            .setMaxFadDeploymentsFile(input("dummy_max_deployments.csv"));
+            .setMaxFadDeploymentsFile(testInputsPath.resolve("dummy_max_deployments.csv"));
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.addPlugin(state -> model -> {

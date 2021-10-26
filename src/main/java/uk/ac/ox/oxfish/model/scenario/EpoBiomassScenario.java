@@ -24,7 +24,6 @@ import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
@@ -37,7 +36,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -49,7 +47,6 @@ import javax.measure.quantity.Mass;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassInitializer;
 import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassReallocator;
@@ -72,7 +69,6 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -91,8 +87,6 @@ import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -101,38 +95,19 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The biomass-based IATTC tuna simulation scenario.
  */
 @SuppressWarnings("UnstableApiUsage")
-public class TunaScenario implements Scenario {
+public class EpoBiomassScenario extends EpoScenario {
 
-    public static final int TARGET_YEAR = 2017;
-
-    private static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    public static final ImmutableMap<CurrentPattern, Path> currentFiles =
-        new ImmutableMap.Builder<CurrentPattern, Path>()
-            //.put(Y2015, input("currents_2015.csv"))
-            //.put(Y2016, input("currents_2016.csv"))
-            .put(Y2017, input("currents_2017.csv"))
-            //.put(Y2018, input("currents_2018.csv"))
-            //.put(NEUTRAL, input("currents_neutral.csv"))
-            //.put(EL_NINO, input("currents_el_nino.csv"))
-            //.put(LA_NINA, input("currents_la_nina.csv"))
-            .build();
-    public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
-        new SpeciesCodesFromFileFactory(input("species_codes.csv"));
-
-    private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
-    public static final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
-        new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
     private final FromSimpleFilePortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, input("ports.csv"));
+        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
-    private Path attractionWeightsFile = input("action_weights.csv");
-    private Path mapFile = input("depth.csv");
-    private Path boatsFile = input("boats.csv");
-    private Path costsFile = input("costs.csv");
+    private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
+    private Path mapFile = INPUT_PATH.resolve("depth.csv");
+    private Path boatsFile = INPUT_PATH.resolve("boats.csv");
+    private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
-            input("exogenous_catches.csv"),
+            INPUT_PATH.resolve("biomass").resolve("exogenous_catches.csv"),
             TARGET_YEAR,
             fadMortalityIncludedInExogenousCatches
         );
@@ -143,11 +118,11 @@ public class TunaScenario implements Scenario {
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
-        new MarketMapFromPriceFileFactory(input("prices.csv"), TARGET_YEAR);
+        new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
 
     private BiomassReallocatorFactory biomassReallocatorFactory =
         new BiomassReallocatorFactory(
-            input("biomass_distributions.csv"),
+            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
             365
         );
 
@@ -157,7 +132,7 @@ public class TunaScenario implements Scenario {
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
 
-    public TunaScenario() {
+    public EpoBiomassScenario() {
 
         final BiomassPurseSeineGearFactory
             purseSeineGearFactory = new BiomassPurseSeineGearFactory();
@@ -205,10 +180,6 @@ public class TunaScenario implements Scenario {
 
         fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
 
-    }
-
-    public static Path input(final String filename) {
-        return INPUT_DIRECTORY.resolve(filename);
     }
 
     public static String getBoatId(final Fisher fisher) {

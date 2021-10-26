@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toList;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
@@ -42,7 +42,7 @@ import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
@@ -52,8 +52,8 @@ public class BiomassInitializerFactory
     implements AlgorithmFactory<BiomassInitializer> {
 
     private BiomassReallocator biomassReallocator;
-    private SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
-    private Path schaeferParamsFile = input("schaefer_params.csv");
+    private SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
+    private Path schaeferParamsFile = INPUT_PATH.resolve("biomass").resolve("schaefer_params.csv");
 
     @SuppressWarnings("unused")
     public BiomassReallocator getBiomassReallocator() {

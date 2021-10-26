@@ -25,8 +25,7 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import java.nio.file.Path;
@@ -39,7 +38,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class GravityDestinationStrategyFactory
@@ -63,7 +62,7 @@ public class GravityDestinationStrategyFactory
     private final Predicate<SeaTile> isValidDestination =
         seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
     Path attractionWeightsFile;
-    private Path maxTripDurationFile = input("boats.csv");
+    private Path maxTripDurationFile = EpoScenario.INPUT_PATH.resolve("boats.csv");
 
     public Path getAttractionWeightsFile() {
         return attractionWeightsFile;

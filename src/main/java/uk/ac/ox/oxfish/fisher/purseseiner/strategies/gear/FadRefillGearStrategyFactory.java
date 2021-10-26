@@ -18,24 +18,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy> {
 
-    private Path maxFadDeploymentsFile = input("max_deployments.csv");
+    private Path maxFadDeploymentsFile = EpoScenario.INPUT_PATH.resolve("max_deployments.csv");
     private final LoadingCache<Path, Map<String, Integer>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));
 

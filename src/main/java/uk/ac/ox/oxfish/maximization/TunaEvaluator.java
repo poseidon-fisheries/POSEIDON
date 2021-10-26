@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 
 public class TunaEvaluator implements Runnable {
 
@@ -66,9 +66,9 @@ public class TunaEvaluator implements Runnable {
 
         final double[] solution = solutionBuilder.build().toArray();
         final Consumer<Scenario> scenarioConsumer = scenario -> {
-            final TunaScenario tunaScenario = (TunaScenario) scenario;
+            final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
             final PurseSeinerBiomassFishingStrategyFactory fishingStrategy =
-                (PurseSeinerBiomassFishingStrategyFactory) tunaScenario.getFisherDefinition()
+                (PurseSeinerBiomassFishingStrategyFactory) epoBiomassScenario.getFisherDefinition()
                     .getFishingStrategy();
             //fishingStrategy.setFadDeploymentActionLogisticMidpoint(1);
 //            ((PurseSeineGearFactory) tunaScenario

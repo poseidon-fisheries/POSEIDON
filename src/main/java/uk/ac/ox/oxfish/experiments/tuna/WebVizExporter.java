@@ -44,7 +44,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -80,7 +80,7 @@ public final class WebVizExporter {
     private final Path csvOutputPath =
         basePath.resolve(Paths.get("tuna", "np", "runs", "webviz"));
     private final SpeciesCodes speciesCodes =
-        new SpeciesCodesFromFileFactory(TunaScenario.input("species_codes.csv")).get();
+        new SpeciesCodesFromFileFactory(EpoBiomassScenario.INPUT_PATH.resolve("species_codes.csv")).get();
 
     private final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
         new ActiveFadLimitsFactory();
@@ -88,7 +88,7 @@ public final class WebVizExporter {
     private final AlgorithmFactory<? extends ActionSpecificRegulation> smallerFadLimits =
         new ActiveFadLimitsFactory(0, 0, 75, 115);
 
-    private final ImmutableList<Policy<TunaScenario>> policies = ImmutableList.of(
+    private final ImmutableList<Policy<EpoBiomassScenario>> policies = ImmutableList.of(
         makePolicy(
             "Tuna - Business as usual",
             "Current IATTC regulations: limits on active FAD (300 FADs for class 6A vessels and 450 for class 6B), El Corralito and seasonal closures.",
@@ -125,13 +125,13 @@ public final class WebVizExporter {
                 StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
                 StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                 new TemporaryRegulationFactory(
-                    TunaScenario.dayOfYear(JULY, 1),
-                    TunaScenario.dayOfYear(OCTOBER, 8),
+                    EpoBiomassScenario.dayOfYear(JULY, 1),
+                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
                     new NoFishingFactory()
                 ), "closure A",
                 new TemporaryRegulationFactory(
-                    TunaScenario.dayOfYear(NOVEMBER, 9),
-                    TunaScenario.dayOfYear(FEBRUARY, 16),
+                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
+                    EpoBiomassScenario.dayOfYear(FEBRUARY, 16),
                     new NoFishingFactory()
                 ), "closure B"
             ))
@@ -142,8 +142,8 @@ public final class WebVizExporter {
         new WebVizExporter().makeRunner().run(NUM_YEARS_TO_RUN);
     }
 
-    private Runner<TunaScenario> makeRunner() {
-        return new Runner<>(TunaScenario.class, scenarioPath, csvOutputPath)
+    private Runner<EpoBiomassScenario> makeRunner() {
+        return new Runner<>(EpoBiomassScenario.class, scenarioPath, csvOutputPath)
             .setPolicies(policies)
             .requestYearlyData()
             .setAfterStartConsumer(runnerState ->
@@ -157,7 +157,7 @@ public final class WebVizExporter {
     }
 
     @NotNull
-    private JsonOutputManagerFactory makeJsonOutputManagerFactory(Runner<TunaScenario>.State runnerState) {
+    private JsonOutputManagerFactory makeJsonOutputManagerFactory(Runner<EpoBiomassScenario>.State runnerState) {
 
         final Set<String> speciesNames = speciesCodes.getSpeciesNames();
 
@@ -352,13 +352,13 @@ public final class WebVizExporter {
         return jsonOutputManagerFactory;
     }
 
-    private Policy<TunaScenario> makePolicy(
+    private Policy<EpoBiomassScenario> makePolicy(
         String policyName,
         String policyDescription,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<TunaScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<TunaScenario> scenarioConsumer = scenario -> {
+        Consumer<EpoBiomassScenario> scenarioConsumer = scenario -> {
             final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
                 Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
             Steppable setRegulations = simState -> {

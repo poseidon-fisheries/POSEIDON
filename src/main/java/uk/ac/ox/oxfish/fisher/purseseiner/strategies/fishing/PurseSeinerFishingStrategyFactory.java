@@ -25,8 +25,8 @@ import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.collect.ImmutableMap;
@@ -56,7 +56,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
@@ -74,10 +74,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
         setDurationSamplersCache = new CacheByFishState<>(setDurationSamplers);
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
-    private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
+    private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
     private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
-    private Path setCompositionWeightsPath = input("set_compositions.csv");
+    private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
     private double nonAssociatedSetGeneratorLogisticMidpoint = 100_000;
     private double nonAssociatedSetGeneratorLogisticSteepness = 1;
     private double dolphinSetGeneratorLogisticMidpoint = 100_000;
@@ -101,6 +101,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private double dolphinSetActionLogisticSteepness = 1;
     private double dolphinSetActionLogisticMidpoint = 0.1;
     private double movingThreshold = 0.1;
+
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass

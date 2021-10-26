@@ -24,28 +24,27 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import java.nio.file.Path;
 import java.util.Arrays;
 import junit.framework.TestCase;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 
 public class ScheduledBiomassProcessesFactoryTest extends TestCase {
 
     public void testBuildBiomassGrids() {
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
-            TunaScenario.input("biomass_distributions.csv"),
+            EpoBiomassScenario.INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
             365
         );
 
         biomassReallocatorFactory.setSpeciesCodes(
-            new SpeciesCodesFromFileFactory(TunaScenario.input("species_codes.csv")).get()
+            new SpeciesCodesFromFileFactory(EpoBiomassScenario.INPUT_PATH.resolve("species_codes.csv")).get()
         );
 
-        final Path depthFile = TunaScenario.input("depth.csv");
+        final Path depthFile = EpoBiomassScenario.INPUT_PATH.resolve("depth.csv");
         final MapInitializer mapInitializer =
             new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);

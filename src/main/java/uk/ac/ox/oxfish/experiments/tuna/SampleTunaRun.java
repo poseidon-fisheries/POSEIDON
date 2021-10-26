@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.NonAssociatedSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +50,7 @@ public class SampleTunaRun {
     private static final Path outputPath = scenarioPath.getParent();
 
     public static void main(final String[] args) {
-        new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
             .setAfterStartConsumer(state -> System.out.println(state.getModel().getMap().asASCII()))
             .requestYearlyData()
             .requestFisherYearlyData()

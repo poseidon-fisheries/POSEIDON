@@ -39,13 +39,14 @@ import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1SweepsWithAltExoCatches {
 
-    private static final Path exoCatchesPath = TunaScenario.input("exogenous_catches.csv");
+    private static final Path exoCatchesPath = EpoScenario.INPUT_PATH.resolve("biomass").resolve("exogenous_catches.csv");
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath =
@@ -141,12 +142,12 @@ public class Slice1SweepsWithAltExoCatches {
         String policyName
     ) {
         batchRunner.setScenarioSetup(scenario -> {
-            final TunaScenario tunaScenario = (TunaScenario) scenario;
+            final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
             final AlgorithmFactory<? extends Gear> gearFactory =
-                tunaScenario.getFisherDefinition().getGear();
+                epoBiomassScenario.getFisherDefinition().getGear();
             ((BiomassPurseSeineGearFactory) gearFactory).setActionSpecificRegulations(
                 regulationFactories);
-            tunaScenario.getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
+            epoBiomassScenario.getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")

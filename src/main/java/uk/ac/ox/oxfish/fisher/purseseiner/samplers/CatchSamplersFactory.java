@@ -25,7 +25,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
@@ -43,14 +43,14 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
-    private final SpeciesCodes speciesCodes = TunaScenario.speciesCodesSupplier.get();
-    private Path catchSamplesFile = input("set_samples.csv");
+    private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
+    private Path catchSamplesFile = INPUT_PATH.resolve("set_samples.csv");
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {

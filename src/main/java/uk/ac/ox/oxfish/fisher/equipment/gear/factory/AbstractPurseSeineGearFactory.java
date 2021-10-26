@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import static java.lang.Double.MAX_VALUE;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -102,7 +102,7 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
     private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-    private Path locationValuesFile = input("location_values.csv");
+    private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
     private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
     private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
     private double pctTravelTimeLeftLogisticMidpoint = 0.9;
