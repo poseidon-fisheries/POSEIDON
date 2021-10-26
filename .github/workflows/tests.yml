@@ -22,7 +22,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
-        run: ./gradlew build --scan
+        run: ./gradlew build --scan --no-daemon
       - name: Generate coverage report
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov
