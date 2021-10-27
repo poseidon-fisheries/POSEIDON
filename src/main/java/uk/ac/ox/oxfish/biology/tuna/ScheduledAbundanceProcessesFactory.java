@@ -63,6 +63,12 @@ public class ScheduledAbundanceProcessesFactory
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
     }
 
+    @SuppressWarnings("unused")
+    public Map<Species, ? extends RecruitmentProcess> getRecruitmentProcesses() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return recruitmentProcesses;
+    }
+
     public void setRecruitmentProcesses(
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses
     ) {
