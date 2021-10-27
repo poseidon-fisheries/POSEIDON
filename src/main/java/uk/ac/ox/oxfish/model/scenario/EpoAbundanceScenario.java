@@ -118,7 +118,7 @@ public class EpoAbundanceScenario extends EpoScenario {
             0.5
         );
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents_2017.csv"))
+        ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
