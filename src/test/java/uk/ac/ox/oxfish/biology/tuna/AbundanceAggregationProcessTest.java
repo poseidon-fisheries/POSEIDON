@@ -23,16 +23,15 @@ public class AbundanceAggregationProcessTest {
         Species species1 = new Species("Piano Tuna");
         GlobalBiology globalBiology = new GlobalBiology(species1);
 
-        HashMap<Species, double[][]> abundance = new HashMap<>();
-        double[][] abundValues = {{4, 1, 1}, {1, 1, 1}, {1, 1, 1}};
-//        double[][] abundValues = {{1}};
-        abundance.put(species1, abundValues);
-
         List<AbundanceLocalBiology> localBiologies;
         localBiologies = new ArrayList<>();
-        //Collections.EMPTY_LIST;
+
+        HashMap<Species, double[][]> abundance = new HashMap<>();
+        abundance.put(species1, new double[][]{{10, 5, 1}, {1, 2, 3}});
         localBiologies.add(new AbundanceLocalBiology(abundance));
 
+        abundance.put(species1, new double[][]{{20, 30, 40}, {0, 0, 1}});
+        localBiologies.add(new AbundanceLocalBiology(abundance));
 
 
       //  final FishState fishState = mock(FishState.class);
@@ -40,8 +39,13 @@ public class AbundanceAggregationProcessTest {
 
 
         assertEquals(
-                9,
+                30,
                 aggregator.aggregate(globalBiology, localBiologies).getAbundance(species1).asMatrix()[0][0],
+                0
+        );
+        assertEquals(
+                1,
+                aggregator.aggregate(globalBiology, localBiologies).getAbundance(species1).asMatrix()[1][0],
                 0
         );
     }
