@@ -20,23 +20,22 @@
 
 package uk.ac.ox.oxfish.gui.widget;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.util.HashMap;
+import java.util.Map;
 import org.metawidget.inspector.impl.BaseObjectInspector;
 import org.metawidget.inspector.impl.propertystyle.Property;
-import org.metawidget.util.CollectionUtils;
+import org.metawidget.inspector.impl.propertystyle.javabean.JavaBeanPropertyStyle.JavaBeanProperty;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.Map;
 
 /**
- * The "MetaInspector" (in the metawidget sense, not the mason sense) that looks for AlgorithmFactories.
- * If it finds one it adds a "factory" attribute to the element
- * Created by carrknight on 5/29/15.
+ * The "MetaInspector" (in the metawidget sense, not the mason sense) that looks for
+ * AlgorithmFactories. If it finds one it adds a "factory" attribute to the element Created by
+ * carrknight on 5/29/15.
  */
-public class StrategyFactoryInspector  extends BaseObjectInspector
-{
-
+public class StrategyFactoryInspector extends BaseObjectInspector {
 
     /**
      * Inspect the given property and return a Map of attributes.
@@ -50,43 +49,36 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
      * @param property the property to inspect
      */
     @Override
-    protected Map<String, String> inspectProperty(Property property) throws Exception {
-
-        Map<String, String> attributes = CollectionUtils.newHashMap();
-
-
-
-        //turn String into Class object, if possible
-        if(property.isWritable()) {
-            try {
-                final Class<?> propertyClass = Class.forName(property.getType());
-                if (AlgorithmFactory.class.isAssignableFrom(propertyClass)) {
-
-                    //it is a strategy factory!
-                    //now most of the time it should be something like factory<? extends x>
-                    //with getGenericType() we get ? extends x, but we want only x
-                    //so we split and take last
-                    String[] splitType;
-                    if(property.getGenericType()!=null)
-                    {
-                        splitType = FishStateUtilities.removeParentheses(
-                                property.getGenericType()).split(" ");
+    protected Map<String, String> inspectProperty(final Property property) {
+        final Map<String, String> attributes = new HashMap<>();
+        if (property.isWritable()) {
+            Type type = ((JavaBeanProperty) property)
+                .getWriteMethod()
+                .getGenericParameterTypes()[0];
+            if (isAlgorithmFactory(type)) {
+                if (type instanceof ParameterizedType) {
+                    type = ((ParameterizedType) type).getActualTypeArguments()[0];
+                    if (type instanceof WildcardType) {
+                        type = ((WildcardType) type).getUpperBounds()[0];
                     }
-                    else{
-                        ParameterizedType type = (ParameterizedType)(propertyClass.getGenericInterfaces()[0]);
-                        splitType = FishStateUtilities.removeParentheses(type.getActualTypeArguments()[0].toString()).split(" ");
-                    }
-                 //   if(Log.TRACE)
-               //         Log.trace("analyzed a strategy factory and put : '" + splitType[splitType.length - 1] + "' in" );
-                    //store it as attribute factory_strategy="x" which we will use to build widgets on
-                    attributes.put("factory_strategy", splitType[splitType.length - 1]);
-
                 }
-            } catch (ClassNotFoundException e) {
-                //this can happen (think primitives)
+                type = rawType(type);
+                attributes.put("factory_strategy", type.getTypeName());
             }
         }
         return attributes;
-
     }
+
+    private static boolean isAlgorithmFactory(final Type type) {
+        final Type rawType = rawType(type);
+        return rawType instanceof Class<?>
+            && AlgorithmFactory.class.isAssignableFrom((Class<?>) rawType);
+    }
+
+    private static Type rawType(final Type type) {
+        return type instanceof ParameterizedType
+            ? ((ParameterizedType) type).getRawType()
+            : type;
+    }
+
 }
