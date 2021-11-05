@@ -19,13 +19,25 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class AbundancePurseSeineGearFactory
-    extends AbstractPurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
+    extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
 
     public AbundancePurseSeineGearFactory() {
         super(new AbundanceFadInitializerFactory());
+    }
+
+    @Override
+    public PurseSeineGear<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+        return new AbundancePurseSeineGear(
+            makeFadManager(fishState),
+            attractionFields()::iterator,
+            getSuccessfulSetProbability().apply(fishState.getRandom())
+        );
     }
 }

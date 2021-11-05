@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
@@ -46,6 +48,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFact
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
@@ -78,7 +81,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class EpoAbundanceScenario extends EpoScenario {
+public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
@@ -298,6 +301,8 @@ public class EpoAbundanceScenario extends EpoScenario {
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
+        initModel(fishState);
+
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>>
             abundanceFilters =
@@ -344,19 +349,11 @@ public class EpoAbundanceScenario extends EpoScenario {
         gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
         gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFilePath());
 
-        final FisherFactory fisherFactory = new FisherFactory(
-            null,
-            new StandardIattcRegulationsFactory(),
-            new PurseSeinerDepartingStrategyFactory(),
-            gravityDestinationStrategyFactory,
-            fishingStrategyFactory,
-            new NoDiscardingFactory(),
-            new FadRefillGearStrategyFactory(),
-            new IgnoreWeatherFactory(),
-            null,
-            null,
+        final FisherFactory fisherFactory = makeFisherFactory(
+            fishState,
             abundancePurseSeineGearFactory,
-            0
+            gravityDestinationStrategyFactory,
+            fishingStrategyFactory
         );
 
         final List<Fisher> fishers =

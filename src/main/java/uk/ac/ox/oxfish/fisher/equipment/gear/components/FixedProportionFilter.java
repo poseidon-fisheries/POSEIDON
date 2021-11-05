@@ -51,6 +51,8 @@ public class FixedProportionFilter implements AbundanceFilter
     /**
      * returns a int[2][age+1] array with male and female fish that are not filtered out
      *
+     * WARNING: this mutates the original array.
+     *
      * @param species the species of fish
      * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on

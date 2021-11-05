@@ -38,7 +38,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-public class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> implements Gear {
+public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> implements Gear {
 
     private final FadManager<B, F> fadManager;
     private final double successfulFadSetProbability;
@@ -90,15 +90,14 @@ public class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> impleme
         final int hoursSpentFishing,
         final GlobalBiology globalBiology
     ) {
-        // Assume we catch *all* the biomass from the FAD
-        final double[] catches = globalBiology.getSpecies().stream()
-            .mapToDouble(localBiology::getBiomass).toArray();
         return HoldLimitingDecoratorGear.limitToHoldCapacity(
-            new Catch(catches),
+            makeCatch(globalBiology, localBiology),
             fisher.getHold(),
             globalBiology
         );
     }
+
+    abstract Catch makeCatch(GlobalBiology globalBiology, LocalBiology caughtBiology);
 
     @Override
     public double getFuelConsumptionPerHourOfFishing(
@@ -118,15 +117,6 @@ public class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> impleme
         final GlobalBiology modelBiology
     ) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Gear makeCopy() {
-        return new PurseSeineGear<>(
-            fadManager,
-            ImmutableSet.copyOf(attractionFields),
-            successfulFadSetProbability
-        );
     }
 
     @Override

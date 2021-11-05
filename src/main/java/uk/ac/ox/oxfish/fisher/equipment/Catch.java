@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -204,8 +205,17 @@ public class Catch {
         this(biology.getCurrentBiomass());
     }
 
-    public Catch(final AbundanceLocalBiology biology) {
-        throw new UnsupportedOperationException("not implemented yet");
+    public Catch(
+        final GlobalBiology globalBiology, final AbundanceLocalBiology caughtBiology
+    ) {
+        this(
+            globalBiology
+                .getSpecies()
+                .stream()
+                .map(caughtBiology::getAbundance)
+                .toArray(StructuredAbundance[]::new),
+            globalBiology
+        );
     }
 
     public double getWeightCaught(Species species)

@@ -19,13 +19,25 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassPurseSeineGearFactory
-    extends AbstractPurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
+    extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
 
     public BiomassPurseSeineGearFactory() {
         super(new BiomassFadInitializerFactory());
+    }
+
+    @Override
+    public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {
+        return new BiomassPurseSeineGear(
+            makeFadManager(fishState),
+            attractionFields()::iterator,
+            getSuccessfulSetProbability().apply(fishState.getRandom())
+        );
     }
 }

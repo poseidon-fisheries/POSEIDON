@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingProportionFilter;
 
 public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
 
@@ -99,9 +99,8 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
         return new AbundanceLocalBiology(
             species().collect(toImmutableMap(
                 Function.identity(),
-                species -> new FixedProportionFilter(
-                    desiredCatch.get(species.getIndex()) / catchableAbundance.getBiomass(species),
-                    false
+                species -> new NonMutatingProportionFilter(
+                    desiredCatch.get(species.getIndex()) / catchableAbundance.getBiomass(species)
                 ).filter(species, catchableAbundance.getAbundance(species).asMatrix())
             ))
         );

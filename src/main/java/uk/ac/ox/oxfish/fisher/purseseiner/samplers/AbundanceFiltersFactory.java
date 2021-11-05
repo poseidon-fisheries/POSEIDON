@@ -19,21 +19,23 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
+import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.common.record.Record;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.ArrayFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -43,15 +45,17 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
     > {
 
     private SpeciesCodes speciesCodes;
+    private Path selectivityFilePath;
 
-    /** Empty constructor for YAML loading */
-    public AbundanceFiltersFactory() {}
+    /**
+     * Empty constructor for YAML loading
+     */
+    public AbundanceFiltersFactory() {
+    }
 
     public AbundanceFiltersFactory(final Path selectivityFilePath) {
         this.selectivityFilePath = selectivityFilePath;
     }
-
-    private Path selectivityFilePath;
 
     public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
         this.speciesCodes = speciesCodes;
@@ -94,15 +98,11 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
             ));
     }
 
-    private static ArrayFilter makeFilter(final Collection<Record> records) {
-        final double[] selectivities = records
+    private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {
+        final List<Double> selectivities = records
             .stream()
-            .mapToDouble(r -> r.getDouble("selectivity"))
-            .toArray();
-        return new ArrayFilter(
-            false,
-            selectivities,
-            Arrays.copyOf(selectivities, selectivities.length)
-        );
+            .map(r -> r.getDouble("selectivity"))
+            .collect(toImmutableList());
+        return new NonMutatingArrayFilter(ImmutableList.of(selectivities, selectivities));
     }
 }

@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -59,7 +60,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 @SuppressWarnings("unused")
-abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeineGear<B, F>> {
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
@@ -122,7 +123,7 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
 
-    AbstractPurseSeineGearFactory(
+    PurseSeineGearFactory(
         final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
@@ -417,9 +418,8 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
         this.nonAssociatedSetObservers = nonAssociatedSetObservers;
     }
 
-    @Override
-    public PurseSeineGear<B, F> apply(final FishState fishState) {
-
+    @NotNull
+    FadManager<B, F> makeFadManager(final FishState fishState) {
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
                 .map(factory -> factory.apply(fishState))
@@ -436,17 +436,10 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations
         );
-
-        final MersenneTwisterFast rng = fishState.getRandom();
-
-        return new PurseSeineGear<>(
-            fadManager,
-            attractionFields()::iterator,
-            successfulSetProbability.apply(rng)
-        );
+        return fadManager;
     }
 
-    private Stream<AttractionField> attractionFields() {
+    Stream<AttractionField> attractionFields() {
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
                 pctHoldSpaceLeftLogisticMidpoint,

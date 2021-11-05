@@ -55,7 +55,7 @@ public class PurseSeineGearTest {
     public void setUp() {
         final FishState fishState = mock(FishState.class);
         when(fishState.getBiology()).thenReturn(new GlobalBiology());
-        purseSeineGear = new PurseSeineGear(
+        purseSeineGear = new BiomassPurseSeineGear(
             mock(FadManager.class),
             ImmutableList.of(),
             1
