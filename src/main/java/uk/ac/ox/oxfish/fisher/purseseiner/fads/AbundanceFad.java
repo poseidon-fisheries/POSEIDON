@@ -18,9 +18,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology.makeAbundanceArray;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
 import java.util.Map;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -59,14 +63,33 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
     @Override
     public void releaseFish(
-        final Iterable<Species> allSpecies, final LocalBiology seaTileBiology
+        final Iterable<Species> allSpecies,
+        final LocalBiology seaTileBiology
     ) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        if (seaTileBiology instanceof AbundanceLocalBiology) {
+            allSpecies.forEach(species -> {
+                final double[][] fadAbundance = getBiology().getAbundance(species).asMatrix();
+                final double[][] tileAbundance = seaTileBiology.getAbundance(species).asMatrix();
+                for (int div = 0; div < fadAbundance.length; div++) {
+                    for (int bin = 0; bin < fadAbundance[div].length; bin++) {
+                        tileAbundance[div][bin] += fadAbundance[div][bin];
+                        fadAbundance[div][bin] = 0;
+                    }
+                }
+            });
+        } else {
+            releaseFish(allSpecies);
+        }
     }
 
     @Override
     public void releaseFish(final Iterable<Species> allSpecies) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        final Map<Species, Double> biomassLost = stream(allSpecies)
+            .collect(toImmutableMap(identity(), getBiology()::getBiomass));
+        getOwner().reactTo(new BiomassLostEvent(biomassLost));
+        // directly reset the biology's abundance arrays to zero
+        getBiology().getAbundance().values().stream().flatMap(Arrays::stream)
+            .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));
     }
 
     @Override
@@ -93,20 +116,21 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
         final Map<Species, double[][]> fadAbundanceArrays = getBiology().getAbundance();
         for (int i = 0; i < n; i++) {
             final Species species = globalBiology.getSpecie(i);
-            final double[][] tileAbundance =
-                seaTileBiology.getAbundance(species).asMatrix();
-            final double[][] catchableAbundance =
-                selectivityFilters.get(species).filter(species, tileAbundance);
-            final double[][] caughtAbundance =
-                makeAbundanceArray(species);
-            final double ratio =
-                catches[species.getIndex()] / seaTileBiology.getBiomass(species);
-            final double[][] fadAbundanceArray =
-                fadAbundanceArrays.get(globalBiology.getSpecie(i));
-            for (int div = 0; div < species.getNumberOfSubdivisions(); div++) {
-                for (int bin = 0; bin < caughtAbundance[div].length; bin++) {
-                    caughtAbundance[div][bin] = ratio * catchableAbundance[div][bin];
-                    fadAbundanceArray[div][bin] += caughtAbundance[div][bin];
+            final double[][] caughtAbundance = makeAbundanceArray(species);
+            if (seaTileBiology.getBiomass(species) > 0) {
+                final double[][] tileAbundance =
+                    seaTileBiology.getAbundance(species).asMatrix();
+                final double[][] catchableAbundance =
+                    selectivityFilters.get(species).filter(species, tileAbundance);
+                final double ratio =
+                    catches[species.getIndex()] / seaTileBiology.getBiomass(species);
+                final double[][] fadAbundanceArray =
+                    fadAbundanceArrays.get(globalBiology.getSpecie(i));
+                for (int div = 0; div < species.getNumberOfSubdivisions(); div++) {
+                    for (int bin = 0; bin < caughtAbundance[div].length; bin++) {
+                        caughtAbundance[div][bin] = ratio * catchableAbundance[div][bin];
+                        fadAbundanceArray[div][bin] += caughtAbundance[div][bin];
+                    }
                 }
             }
             caughtAbundances[i] = new StructuredAbundance(caughtAbundance);
