@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -31,11 +32,18 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  */
 public class AbundanceRestorerFactory implements AlgorithmFactory<AbundanceRestorer> {
 
-    private ImmutableMap<Integer, Integer> schedule;
+    private Map<Integer, Integer> schedule;
     private AbundanceReallocator abundanceReallocator;
 
-    public AbundanceRestorerFactory(final ImmutableMap<Integer, Integer> schedule) {
-        this.schedule = schedule;
+    /**
+     * Empty constructor for YAML instantiation
+     */
+    @SuppressWarnings("unused")
+    public AbundanceRestorerFactory() {
+    }
+
+    public AbundanceRestorerFactory(final Map<Integer, Integer> schedule) {
+        this.schedule = ImmutableMap.copyOf(schedule);
     }
 
     public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
@@ -43,12 +51,13 @@ public class AbundanceRestorerFactory implements AlgorithmFactory<AbundanceResto
     }
 
     @SuppressWarnings("unused")
-    public ImmutableMap<Integer, Integer> getSchedule() {
+    public Map<Integer, Integer> getSchedule() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         return schedule;
     }
 
-    public void setSchedule(final ImmutableMap<Integer, Integer> schedule) {
-        this.schedule = schedule;
+    public void setSchedule(final Map<Integer, Integer> schedule) {
+        this.schedule = ImmutableMap.copyOf(schedule);
     }
 
     @Override

@@ -35,6 +35,7 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     private final GlobalBiology globalBiology;
     private final Class<B> localBiologyClass;
     private final Class<F> fadClass;
+    private final AbundanceLostObserver abundanceLostObserver = new AbundanceLostObserver();
     private Stoppable stoppable;
 
     public FadMap(
@@ -144,18 +145,19 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
             final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
             if (newSeaTile.isPresent()) {
                 if (newSeaTile.get().isLand()) {
-                    // When the FAD hits land, we need to release the aggregated fish in the sea tile it
-                    // previously occupied and then tell the drifting object map that the FAD should be removed
-                    // (which will in turn trigger another call back to this function).
+                    // When the FAD hits land, we need to release the aggregated fish in the sea
+                    // tile it previously occupied and then tell the drifting object map that the
+                    // FAD should be removed (which will in turn trigger another call back to
+                    // this function).
                     getSeaTile(oldLoc).ifPresent(seaTile ->
                         fad.releaseFish(globalBiology.getSpecies(), seaTile.getBiology())
                     );
                     remove(fad);
                 }
             } else {
-                // The FAD does not have a location anymore, either because is has drifted off the map
-                // or because it was explicitly removed. In that case, all that's left to do is to
-                // release the fish into the void and tell the FAD's owner about it.
+                // The FAD does not have a location anymore, either because is has drifted off
+                // the map or because it was explicitly removed. In that case, all that's left to
+                // do is to release the fish into the void and tell the FAD's owner about it.
                 fad.releaseFish(globalBiology.getSpecies());
                 fad.getOwner().loseFad(fad);
             }
@@ -189,5 +191,9 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
 
     public double getTotalBiomass(final Species species) {
         return allFads().mapToDouble(fad -> fad.getBiology().getBiomass(species)).sum();
+    }
+
+    public AbundanceLostObserver getAbundanceLostObserver() {
+        return abundanceLostObserver;
     }
 }

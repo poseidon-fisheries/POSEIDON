@@ -44,7 +44,7 @@ public class FadTest {
     @Test
     public void releaseFish() {
 
-        // Make a full FAD, with a carrying capacity of 0.75...
+        // Make a full FAD
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
         final BiomassFad fad = new BiomassFad(

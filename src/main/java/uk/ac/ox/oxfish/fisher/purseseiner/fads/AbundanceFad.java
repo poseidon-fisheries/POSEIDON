@@ -26,11 +26,13 @@ import static uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology.makeAbun
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
@@ -87,6 +89,9 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
         final Map<Species, Double> biomassLost = stream(allSpecies)
             .collect(toImmutableMap(identity(), getBiology()::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
+        getOwner().getFadMap().getAbundanceLostObserver().observe(
+            new AbundanceLostEvent(ImmutableAbundance.extractFrom(getBiology()))
+        );
         // directly reset the biology's abundance arrays to zero
         getBiology().getAbundance().values().stream().flatMap(Arrays::stream)
             .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));

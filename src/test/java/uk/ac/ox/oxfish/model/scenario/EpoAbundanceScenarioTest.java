@@ -25,6 +25,12 @@ import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario.INPUT_PATH;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +43,37 @@ import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
+
+    public void testSaveAndLoadYaml() {
+
+        // Dump the scenario to YAML
+        final File scenarioFile = Paths.get("inputs", "tests", "epo.yaml").toFile();
+        try {
+            final Scenario scenario = new EpoAbundanceScenario();
+            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        // Try to read it back and start it
+        try (final FileReader fileReader = new FileReader(scenarioFile)) {
+            final FishYAML fishYAML = new FishYAML();
+            final EpoAbundanceScenario epoAbundanceScenario =
+                fishYAML.loadAs(fileReader, EpoAbundanceScenario.class);
+            final FishState fishState = new FishState();
+            fishState.setScenario(epoAbundanceScenario);
+            fishState.start();
+        } catch (final FileNotFoundException e) {
+            throw new IllegalArgumentException("Can't find scenario file: " + scenarioFile, e);
+        } catch (final IOException e) {
+            throw new IllegalStateException("Error while reading file: " + scenarioFile, e);
+        }
+
+    }
 
     /**
      * We need to make sure that all non-zero biomass grid cells in all our allocation grids match
@@ -53,8 +87,10 @@ public class EpoAbundanceScenarioTest extends TestCase {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         scenario.setVesselsFilePath(INPUT_PATH.resolve("test").resolve("dummy_boats.csv"));
-        scenario.setAttractionWeightsFile(INPUT_PATH.resolve("test").resolve("dummy_action_weights.csv"));
-        scenario.setLocationValuesFilePath(INPUT_PATH.resolve("test").resolve("dummy_location_values.csv"));
+        scenario.setAttractionWeightsFile(INPUT_PATH.resolve("test")
+            .resolve("dummy_action_weights.csv"));
+        scenario.setLocationValuesFilePath(INPUT_PATH.resolve("test")
+            .resolve("dummy_location_values.csv"));
 
         fishState.setScenario(scenario);
         fishState.start();

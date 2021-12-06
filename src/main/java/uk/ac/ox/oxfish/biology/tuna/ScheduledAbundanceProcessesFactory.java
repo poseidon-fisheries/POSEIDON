@@ -25,7 +25,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +71,8 @@ public class ScheduledAbundanceProcessesFactory
     public void setRecruitmentProcesses(
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses
     ) {
-        this.recruitmentProcesses = ImmutableMap.copyOf(recruitmentProcesses);
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.recruitmentProcesses = recruitmentProcesses;
     }
 
     @SuppressWarnings("unused")
@@ -129,6 +129,7 @@ public class ScheduledAbundanceProcessesFactory
             ImmutableList.of(
                 new AbundanceMortalityProcess(),
                 aggregationProcess,
+                new AbundanceLostRecoveryProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
                 new FadAbundanceExcluder(),
                 abundanceReallocator

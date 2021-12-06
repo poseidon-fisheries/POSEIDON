@@ -72,6 +72,7 @@ public class AdditionalStartables {
 
         NAMES.put(ScheduledBiomassProcessesFactory.class, "Scheduled Biomass Processes");
         NAMES.put(BiomassRestorerFactory.class, "Biomass Restorer");
+        NAMES.put(AbundanceReallocatorFactory.class, "Abundance Reallocator");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

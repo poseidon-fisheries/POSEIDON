@@ -168,7 +168,10 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
 
         // Make sure that the catches don't exceed total FAD capacity
         final double totalCaughtBiomass = Arrays.stream(catches).sum();
-        final double fadCapacity = getTotalCarryingCapacity() - Arrays.stream(fadBiomass).sum();
+        final double fadCapacity = Math.max(
+            0, // to account for floating point errors where biomass on the FAD is a iota too high
+            getTotalCarryingCapacity() - Arrays.stream(fadBiomass).sum()
+        );
         if (totalCaughtBiomass > fadCapacity) {
             final double catchRatio = fadCapacity / totalCaughtBiomass;
             for (int i = 0; i < catches.length; i++) {
