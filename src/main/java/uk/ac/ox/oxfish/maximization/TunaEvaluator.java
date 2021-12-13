@@ -25,7 +25,8 @@ import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-24_16.37.09"
+        System.getProperty("user.home"),
+        "workspace", "tuna", "abundance", "calibration", "outputs", "nicolas", "2021-12-07_19.00.35"
     );
 
     private final Path calibrationFilePath;
