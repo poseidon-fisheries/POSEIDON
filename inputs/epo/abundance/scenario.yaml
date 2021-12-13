@@ -7,12 +7,13 @@ EPO Abundance:
   abundanceInitializerFactory:
     Abundance Initializer Factory:
       binsFilePath: inputs/epo/abundance/bins.csv
-  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
-    biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
-    firstLargeBinPerSpecies:
-      Skipjack tuna: 14
-      Bigeye tuna: 8
-      Yellowfin tuna: 9
+  abundanceReallocatorFactory:
+    Abundance Reallocator:
+      biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
+      firstLargeBinPerSpecies:
+        Skipjack tuna: 14
+        Bigeye tuna: 8
+        Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
       0: 364

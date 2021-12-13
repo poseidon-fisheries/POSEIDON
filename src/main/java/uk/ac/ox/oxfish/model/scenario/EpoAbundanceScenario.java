@@ -126,6 +126,21 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory =
         new PurseSeinerAbundanceFishingStrategyFactory();
 
+    @SuppressWarnings("unused")
+    public AbundancePurseSeineGearFactory getAbundancePurseSeineGearFactory() {
+        return abundancePurseSeineGearFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundancePurseSeineGearFactory(
+        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
+    ) {
+        this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
+    }
+
+    private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
+        new AbundancePurseSeineGearFactory();
+
     /**
      * Just runs the scenario for a year.
      */
@@ -320,9 +335,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             new FixedGasPrice(0)
         );
         final List<Port> ports = fishState.getMap().getPorts();
-
-        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
-            new AbundancePurseSeineGearFactory();
 
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);

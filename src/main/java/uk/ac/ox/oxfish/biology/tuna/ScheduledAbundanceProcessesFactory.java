@@ -128,6 +128,7 @@ public class ScheduledAbundanceProcessesFactory
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceMortalityProcess(),
+                // TODO: add exogenous mortality
                 aggregationProcess,
                 new AbundanceLostRecoveryProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),

@@ -7,7 +7,6 @@ import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import ec.util.MersenneTwisterFast;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -100,7 +99,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
-    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
@@ -122,12 +120,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double destinationDistanceExponent = 1;
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
-
-    PurseSeineGearFactory(
-        final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
 
     public double getNumFadsInStockLogisticMidpoint() {
         return numFadsInStockLogisticMidpoint;
@@ -364,18 +356,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
     public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return fadDeploymentObservers;
@@ -428,7 +408,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
         @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
             (FadMap<B, F>) fishState.getFadMap(),
-            fadInitializerFactory.apply(fishState),
+            getFadInitializer(fishState),
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
@@ -438,6 +418,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         );
         return fadManager;
     }
+
+    abstract FadInitializer<B, F> getFadInitializer(FishState fishState);
 
     Stream<AttractionField> attractionFields() {
         final GlobalSetAttractionModulator globalSetAttractionModulator =

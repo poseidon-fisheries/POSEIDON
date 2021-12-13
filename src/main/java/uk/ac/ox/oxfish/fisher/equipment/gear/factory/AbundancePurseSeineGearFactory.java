@@ -23,13 +23,27 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class AbundancePurseSeineGearFactory
     extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    public AbundancePurseSeineGearFactory() {
-        super(new AbundanceFadInitializerFactory());
+    public AbundanceFadInitializerFactory getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    public void setFadInitializerFactory(final AbundanceFadInitializerFactory fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
+
+    private AbundanceFadInitializerFactory fadInitializerFactory = new AbundanceFadInitializerFactory();
+
+    @Override
+    FadInitializer<AbundanceLocalBiology, AbundanceFad> getFadInitializer(
+        FishState fishState
+    ) {
+        return fadInitializerFactory.apply(fishState);
     }
 
     @Override

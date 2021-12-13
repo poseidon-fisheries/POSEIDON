@@ -7,6 +7,60 @@ EPO Abundance:
   abundanceInitializerFactory:
     Abundance Initializer Factory:
       binsFilePath: inputs/epo/abundance/bins.csv
+  abundancePurseSeineGearFactory:
+    actionDistanceExponent: 1.0
+    actionSpecificRegulations:
+    - Active FAD limits:
+        limitClass1: 70
+        limitClass2: 70
+        limitClass3: 70
+        limitClass4: 120
+        limitClass5: 120
+        limitClass6a: 300
+        limitClass6b: 450
+    biomassLostMonitor: null
+    decayRateOfDeploymentLocationValues: 0.01
+    decayRateOfDolphinSetLocationValues: 0.01
+    decayRateOfNonAssociatedSetLocationValues: 0.01
+    decayRateOfOpportunisticFadSetLocationValues: 0.01
+    destinationDistanceExponent: 1.0
+    dolphinSetObservers: !!set {
+      }
+    dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
+    fadDeploymentObservers: !!set {
+      }
+    fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
+    fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
+    fadInitializerFactory:
+      attractionIntercepts: {
+        }
+      biomassInteractionsCoefficients: {
+        }
+      fishReleaseProbabilityInPercent: '0.0'
+      growthRates: {
+        }
+      tileBiomassCoefficients: {
+        }
+      totalCarryingCapacity: '445000.0'
+    fadSetObservers: !!set {
+      }
+    locationValuesFile: inputs/epo/location_values.csv
+    nonAssociatedSetObservers: !!set {
+      }
+    nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
+    numFadsInStockLogisticMidpoint: 5.0
+    numFadsInStockLogisticSteepness: 1.0
+    opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
+    pctHoldSpaceLeftLogisticMidpoint: 0.9
+    pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
+    pctSetsRemainingLogisticMidpoint: 0.5
+    pctSetsRemainingLogisticSteepness: 1.0
+    pctTravelTimeLeftLogisticMidpoint: 0.9
+    pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
+    successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory:
     Abundance Reallocator:
       biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
