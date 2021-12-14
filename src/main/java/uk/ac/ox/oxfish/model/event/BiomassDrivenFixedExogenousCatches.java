@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.tuna.LocalBiologiesExtractor;
+import uk.ac.ox.oxfish.biology.tuna.Extractor;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.model.FishState;
@@ -48,7 +48,7 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
 
     @Override
     protected List<? extends LocalBiology> getAllCatchableBiologies(final FishState model) {
-        return new LocalBiologiesExtractor<>(LocalBiology.class, allowMortalityOnFads, true)
+        return new Extractor<>(LocalBiology.class, allowMortalityOnFads, true)
             .apply(model);
     }
 

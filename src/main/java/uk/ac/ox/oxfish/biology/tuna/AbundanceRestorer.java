@@ -34,7 +34,13 @@ public class AbundanceRestorer
         final AbundanceAggregator aggregator,
         final Map<Integer, Integer> schedule
     ) {
-        super(reallocator, aggregator, new FadAbundanceExcluder(), schedule);
+        super(
+            reallocator,
+            aggregator,
+            new AbundanceExtractor(false, true),
+            new FadAbundanceExcluder(),
+            schedule
+        );
     }
 
 }

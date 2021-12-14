@@ -51,18 +51,24 @@ abstract class Restorer<K, B extends LocalBiology>
     private final Map<Integer, Integer> schedule;
     private final Reallocator<K, B> reallocator;
     private final Aggregator<B> aggregator;
+    private final Extractor<B> extractor;
     private final Excluder<B> excluder;
-
     Restorer(
         final Reallocator<K, B> reallocator,
         final Aggregator<B> aggregator,
+        final Extractor<B> extractor,
         final Excluder<B> excluder,
         final Map<Integer, Integer> schedule
     ) {
         this.reallocator = reallocator;
         this.aggregator = aggregator;
+        this.extractor = extractor;
         this.excluder = excluder;
         this.schedule = ImmutableMap.copyOf(schedule);
+    }
+
+    public Extractor<B> getExtractor() {
+        return extractor;
     }
 
     public Reallocator<K, B> getReallocator() {
@@ -78,7 +84,8 @@ abstract class Restorer<K, B extends LocalBiology>
         schedule.forEach((recordingStep, restoringStep) ->
             // take our snapshots at dawn, before anything else happens
             schedule(fishState, recordingStep, DAWN, fishState1 -> {
-                final B aggregatedBiology = aggregator.aggregate(fishState1);
+                final B aggregatedBiology =
+                    aggregator.apply(fishState1.getBiology(), extractor.apply(fishState1));
                 // Schedule the restoration at POLICY_UPDATE step order so it runs after the
                 // grower at BIOLOGY_PHASE step order, but before the data gatherers at later orders
                 schedule(fishState1, restoringStep, POLICY_UPDATE, fishState2 ->
@@ -102,17 +109,13 @@ abstract class Restorer<K, B extends LocalBiology>
         final B aggregatedBiology,
         final FishState fishState
     ) {
-        // we need to subtract the biomass that's currently under FADs
-        // in order to avoid reallocating it
-        final B aggregationToReallocate = excluder
-            .process(fishState, aggregatedBiology)
-            .orElse(aggregatedBiology); // keep original biology if excluder returns empty.
-
         reallocator.reallocate(
             fishState.getStep(),
             fishState.getBiology(),
             fishState.getMap().getAllSeaTilesExcludingLandAsList(),
-            aggregationToReallocate
+            // we need to subtract the biomass that's currently under FADs
+            // in order to avoid reallocating it
+            excluder.exclude(aggregatedBiology, fishState)
         );
     }
 

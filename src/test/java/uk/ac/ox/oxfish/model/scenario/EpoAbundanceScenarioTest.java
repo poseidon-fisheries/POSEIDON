@@ -38,7 +38,6 @@ import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
-import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -105,14 +104,13 @@ public class EpoAbundanceScenarioTest extends TestCase {
                 .get();
 
         final Reallocator<?, ?> reallocator = abundanceRestorer.getReallocator();
-        final Aggregator<?> aggregator = abundanceRestorer.getAggregator();
         final NauticalMap nauticalMap = fishState.getMap();
 
         final Set<Int2D> rightBiologySeaTiles =
             nauticalMap.getAllSeaTilesExcludingLandAsList()
                 .stream()
                 .filter(seaTile ->
-                    aggregator.getLocalBiologiesExtractor()
+                    abundanceRestorer.getExtractor()
                         .getLocalBiologyClass()
                         .isInstance(seaTile.getBiology())
                 )

@@ -63,7 +63,7 @@ public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer>
         );
         return new BiomassRestorer(
             biomassReallocator,
-            new BiomassAggregator(false, true),
+            new BiomassAggregator(),
             schedule
         );
     }

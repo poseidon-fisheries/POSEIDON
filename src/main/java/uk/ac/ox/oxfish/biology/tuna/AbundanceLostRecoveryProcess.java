@@ -20,6 +20,8 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -33,26 +35,18 @@ import uk.ac.ox.oxfish.model.FishState;
 public class AbundanceLostRecoveryProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
     @Override
-    public Optional<AbundanceLocalBiology> process(
+    public Collection<AbundanceLocalBiology> process(
         final FishState fishState,
-        final AbundanceLocalBiology aggregatedBiology
+        final Collection<AbundanceLocalBiology> biologies
     ) {
         final AbundanceLostObserver abundanceLostObserver =
             fishState.getFadMap().getAbundanceLostObserver();
-        final AbundanceLocalBiology newAggregatedAbundance = new AbundanceLocalBiology(
-            aggregatedBiology
-                .getAbundance()
-                .entrySet()
-                .stream()
-                .collect(toImmutableMap(
-                    Entry::getKey,
-                    entry -> abundanceLostObserver
-                        .get(entry.getKey())
-                        .add(entry.getValue())
-                        .asMatrix()
-                ))
-        );
+        final AbundanceLocalBiology lostBiology = abundanceLostObserver.asBiology();
         abundanceLostObserver.clear();
-        return Optional.of(newAggregatedAbundance);
+
+        return ImmutableList.<AbundanceLocalBiology>builder()
+            .addAll(biologies)
+            .add(lostBiology)
+            .build();
     }
 }

@@ -18,9 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -36,9 +37,14 @@ import uk.ac.ox.oxfish.model.FishState;
 public abstract class Reallocator<K, B extends LocalBiology> implements BiologicalProcess<B> {
 
     private final AllocationGrids<K> allocationGrids;
+    private final Aggregator<B> aggregator;
 
-    Reallocator(final AllocationGrids<K> allocationGrids) {
+    Reallocator(
+        final AllocationGrids<K> allocationGrids,
+        final Aggregator<B> aggregator
+    ) {
         this.allocationGrids = allocationGrids;
+        this.aggregator = aggregator;
     }
 
     public AllocationGrids<K> getAllocationGrids() {
@@ -46,17 +52,17 @@ public abstract class Reallocator<K, B extends LocalBiology> implements Biologic
     }
 
     @Override
-    public Optional<B> process(final FishState fishState, final B aggregatedBiology) {
+    public Collection<B> process(final FishState fishState, final Collection<B> biologies) {
         reallocate(
             fishState.getStep(),
             fishState.getBiology(),
             fishState.getMap().getAllSeaTilesExcludingLandAsList(),
-            aggregatedBiology
+            aggregator.apply(fishState.getBiology(), biologies)
         );
-        // Reallocation doesn't return a new biology, since the given one
+        // Reallocation doesn't return new biologies, since the given one
         // has been redistributed throughout the map. It should always be
         // the last operation in the biological process chain anyway.
-        return Optional.empty();
+        return ImmutableList.of();
     }
 
     /**

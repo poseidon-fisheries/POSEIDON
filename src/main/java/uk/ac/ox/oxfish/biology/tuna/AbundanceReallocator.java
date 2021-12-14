@@ -57,7 +57,7 @@ public class AbundanceReallocator
         final AllocationGrids<Entry<String, SizeGroup>> allocationGrids,
         final Map<String, ? extends IntFunction<SizeGroup>> binToSizeGroupMappings
     ) {
-        super(allocationGrids);
+        super(allocationGrids, new AbundanceAggregator());
         this.binToSizeGroupMappings = ImmutableMap.copyOf(binToSizeGroupMappings);
     }
 

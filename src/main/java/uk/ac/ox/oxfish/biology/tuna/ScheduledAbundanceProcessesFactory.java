@@ -100,7 +100,8 @@ public class ScheduledAbundanceProcessesFactory
 
         return new ScheduledBiologicalProcesses<>(
             abundanceReallocator.getAllocationGrids().getStepMapper(),
-            buildSchedule()
+            buildSchedule(),
+            new Extractor<>(AbundanceLocalBiology.class, true, true)
         );
     }
 
@@ -123,22 +124,18 @@ public class ScheduledAbundanceProcessesFactory
             scheduleBuilder = ImmutableListMultimap.builder();
 
         // Add all our periodical biological processes to the schedule
-        final BiologicalProcess<AbundanceLocalBiology> aggregationProcess =
-            new AbundanceAggregationProcess();
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceMortalityProcess(),
                 // TODO: add exogenous mortality
-                aggregationProcess,
                 new AbundanceLostRecoveryProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
-                new FadAbundanceExcluder(),
                 abundanceReallocator
             );
 
         final List<BiologicalProcess<AbundanceLocalBiology>> reallocationProcesses =
             ImmutableList.of(
-                aggregationProcess,
+                new AbundanceExtractor(false, true),
                 abundanceReallocator
             );
 

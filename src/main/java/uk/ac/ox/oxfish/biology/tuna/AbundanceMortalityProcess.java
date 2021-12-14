@@ -22,8 +22,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.primitives.ImmutableDoubleArray;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
@@ -38,21 +38,17 @@ import uk.ac.ox.oxfish.model.FishState;
 public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
     private final Function<FishState, List<AbundanceLocalBiology>> localBiologiesExtractor =
-        new LocalBiologiesExtractor<>(AbundanceLocalBiology.class, true, true);
+        new Extractor<>(AbundanceLocalBiology.class, true, true);
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public Optional<AbundanceLocalBiology> process(
+    public Collection<AbundanceLocalBiology> process(
         final FishState fishState,
-        final AbundanceLocalBiology ignoredBiology
+        final Collection<AbundanceLocalBiology> biologies
     ) {
-        checkArgument(
-            ignoredBiology == null,
-            "The abundance mortality process expects null biology."
-        );
         // Here we go through all the local biologies (ocean cells and FADs)
         // and we mutate the abundance matrices directly.
-        localBiologiesExtractor.apply(fishState).forEach(biology ->
+        biologies.forEach(biology ->
             biology.getAbundance().forEach((species, matrix) -> {
                 final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
                 final List<ImmutableDoubleArray> mortalities =
@@ -64,6 +60,6 @@ public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLoc
                 );
             })
         );
-        return Optional.empty(); // this process should only be called for side-effects
+        return biologies;
     }
 }

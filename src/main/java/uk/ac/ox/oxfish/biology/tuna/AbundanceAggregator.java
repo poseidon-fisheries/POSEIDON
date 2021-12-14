@@ -33,17 +33,10 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
  */
 class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
 
-    AbundanceAggregator(
-        final boolean includeFads,
-        final boolean includeSeaTiles
-    ) {
-        super(AbundanceLocalBiology.class, includeFads, includeSeaTiles);
-    }
-
     @Override
-    AbundanceLocalBiology aggregate(
+    public AbundanceLocalBiology apply(
         final GlobalBiology globalBiology,
-        final Collection<AbundanceLocalBiology> localBiologies
+        final Collection<AbundanceLocalBiology> abundanceLocalBiologies
     ) {
         // Create a map from species to empty abundance arrays which we
         // are going to mutate directly when summing up global abundance
@@ -53,7 +46,7 @@ class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
                 identity(),
                 species -> new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]
             ));
-        localBiologies.forEach(localBiology ->
+        abundanceLocalBiologies.forEach(localBiology ->
             abundances.forEach((species, abundance) ->
                 range(0, abundance.length).forEach(subdivision ->
                     range(0, abundance[subdivision].length).forEach(bin ->

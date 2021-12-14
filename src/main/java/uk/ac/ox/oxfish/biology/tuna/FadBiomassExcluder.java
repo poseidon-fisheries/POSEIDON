@@ -26,7 +26,9 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 class FadBiomassExcluder extends Excluder<BiomassLocalBiology> {
 
     FadBiomassExcluder() {
-        super(new BiomassAggregator(true, false));
+        super(
+            new BiomassExtractor(true, false), new BiomassAggregator()
+        );
     }
 
     @Override
