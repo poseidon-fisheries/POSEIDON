@@ -125,19 +125,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new AbundanceCatchSamplersFactory();
     private PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory =
         new PurseSeinerAbundanceFishingStrategyFactory();
-
-    @SuppressWarnings("unused")
-    public AbundancePurseSeineGearFactory getAbundancePurseSeineGearFactory() {
-        return abundancePurseSeineGearFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundancePurseSeineGearFactory(
-        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
-    ) {
-        this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
-    }
-
     private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
         new AbundancePurseSeineGearFactory();
 
@@ -160,6 +147,18 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             System.out.println("Step: " + fishState.getStep());
             fishState.schedule.step(fishState);
         }
+    }
+
+    @SuppressWarnings("unused")
+    public AbundancePurseSeineGearFactory getAbundancePurseSeineGearFactory() {
+        return abundancePurseSeineGearFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundancePurseSeineGearFactory(
+        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
+    ) {
+        this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
     }
 
     @SuppressWarnings("unused")
@@ -350,8 +349,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
         final AbundanceFadInitializerFactory fadInitializerFactory =
-            (AbundanceFadInitializerFactory) abundancePurseSeineGearFactory
-                .getFadInitializerFactory();
+            abundancePurseSeineGearFactory.getFadInitializerFactory();
+        fadInitializerFactory.setSpeciesCodes(speciesCodesFactory.get());
 
         initFadInitializerFactory(abundanceFilters, fadInitializerFactory);
 
@@ -413,12 +412,12 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             .setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
-        fadInitializerFactory.setAttractionIntercepts(ImmutableMap.of(
+        fadInitializerFactory.setCompressionExponents(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.0),
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
-        fadInitializerFactory.setTileBiomassCoefficients(ImmutableMap.of(
+        fadInitializerFactory.setAttractableBiomassCoefficients(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.0),
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)

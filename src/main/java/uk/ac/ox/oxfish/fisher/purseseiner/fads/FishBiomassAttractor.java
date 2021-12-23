@@ -18,10 +18,21 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-public interface FadBiomassAttractor {
-    double getCarryingCapacity();
+import static java.util.Arrays.stream;
 
-    boolean shouldAttract(double cellBiomass, double totalFadBiomass);
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-    double biomassAttracted(double tileBiomass, double fadBiomass, double totalFadBiomass);
+interface FishBiomassAttractor extends FishAttractor<BiomassLocalBiology, BiomassFad> {
+
+    default double[] scaleAttractedBiomass(final double[] attractedBiomass, final BiomassFad fad) {
+
+        final double scalingFactor = biomassScalingFactor(
+            stream(attractedBiomass).sum(),
+            fad.getBiology().getTotalBiomass(),
+            fad.getTotalCarryingCapacity()
+        );
+
+        return stream(attractedBiomass).map(b -> b * scalingFactor).toArray();
+    }
+
 }

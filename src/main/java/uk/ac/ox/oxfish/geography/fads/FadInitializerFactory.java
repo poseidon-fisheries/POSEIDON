@@ -25,10 +25,10 @@ import ec.util.MersenneTwisterFast;
 import java.util.HashMap;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFadBiomassAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishBiomassAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -39,10 +39,19 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private DoubleParameter totalCarryingCapacity = new FixedDoubleParameter(445_000); // TODO
-    private Map<String, DoubleParameter> attractionIntercepts = new HashMap<>();
-    private Map<String, DoubleParameter> tileBiomassCoefficients = new HashMap<>();
+    private Map<String, DoubleParameter> compressionExponents = new HashMap<>();
+    private Map<String, DoubleParameter> attractableBiomassCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> biomassInteractionsCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
+    private SpeciesCodes speciesCodes;
+
+    public SpeciesCodes getSpeciesCodes() {
+        return speciesCodes;
+    }
+
+    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
+    }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public DoubleParameter getFishReleaseProbabilityInPercent() {
@@ -64,7 +73,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         this.totalCarryingCapacity = totalCarryingCapacity;
     }
 
-    Map<Species, FadBiomassAttractor> makeBiomassAttractors(
+    FishAttractor<B, F> makeFishAttractor(
         final FishState fishState,
         final MersenneTwisterFast rng,
         final double totalCarryingCapacity
@@ -75,10 +84,10 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
                 identity(),
                 species -> {
                     final String speciesName = species.getName();
-                    return new LogisticFadBiomassAttractor(
+                    return new LogisticFishBiomassAttractor(
                         fishState.getRandom(),
-                        getAttractionIntercepts().get(speciesName).apply(rng),
-                        getTileBiomassCoefficients().get(speciesName).apply(rng),
+                        getCompressionExponents().get(speciesName).apply(rng),
+                        getAttractableBiomassCoefficients().get(speciesName).apply(rng),
                         getBiomassInteractionsCoefficients().get(speciesName).apply(rng),
                         getGrowthRates().get(speciesName).apply(rng),
                         totalCarryingCapacity
@@ -88,29 +97,29 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
-    public Map<String, DoubleParameter> getAttractionIntercepts() {
+    public Map<String, DoubleParameter> getCompressionExponents() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return attractionIntercepts;
+        return compressionExponents;
     }
 
     @SuppressWarnings("unused")
-    public void setAttractionIntercepts(final Map<String, DoubleParameter> attractionIntercepts) {
+    public void setCompressionExponents(final Map<String, DoubleParameter> compressionExponents) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.attractionIntercepts = attractionIntercepts;
+        this.compressionExponents = compressionExponents;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
-    public Map<String, DoubleParameter> getTileBiomassCoefficients() {
+    public Map<String, DoubleParameter> getAttractableBiomassCoefficients() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return tileBiomassCoefficients;
+        return attractableBiomassCoefficients;
     }
 
     @SuppressWarnings("unused")
-    public void setTileBiomassCoefficients(
-        final Map<String, DoubleParameter> tileBiomassCoefficients
+    public void setAttractableBiomassCoefficients(
+        final Map<String, DoubleParameter> attractableBiomassCoefficients
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.tileBiomassCoefficients = tileBiomassCoefficients;
+        this.attractableBiomassCoefficients = attractableBiomassCoefficients;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})

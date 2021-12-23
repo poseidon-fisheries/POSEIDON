@@ -29,6 +29,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 
 class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, AbundanceFad> {
 
@@ -37,7 +39,7 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
     AbundanceFadInitializer(
         final GlobalBiology globalBiology,
         final double totalCarryingCapacity,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
         final Map<Species, AbundanceFilter> selectivityFilters
@@ -45,7 +47,7 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
         super(
             globalBiology,
             totalCarryingCapacity,
-            fadBiomassAttractors,
+            fishAttractor,
             fishReleaseProbability,
             timeStepSupplier
         );

@@ -47,7 +47,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     private final FadManager<B, F> owner;
     private final TripRecord tripDeployed;
     private final B biology;
-    private final Map<Species, FadBiomassAttractor> fadBiomassAttractors;
+    private final Map<Species, FishBiomassAttractor> fadBiomassAttractors;
     private final double fishReleaseProbability;
     private final int stepDeployed;
     private final Int2D locationDeployed;
@@ -56,7 +56,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     public Fad(
         final FadManager<B, F> owner,
         final B biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final Map<Species, FishBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
@@ -182,7 +182,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         return catches;
     }
 
-    public Map<Species, FadBiomassAttractor> getFadBiomassAttractors() {
+    public Map<Species, FishBiomassAttractor> getFadBiomassAttractors() {
         return fadBiomassAttractors;
     }
 

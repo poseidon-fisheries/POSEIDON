@@ -21,14 +21,12 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.primitives.ImmutableDoubleArray;
 import java.util.Collection;
 import java.util.List;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 @SuppressWarnings("UnstableApiUsage")
 public class NonMutatingArrayFilter implements AbundanceFilter {
@@ -39,6 +37,10 @@ public class NonMutatingArrayFilter implements AbundanceFilter {
         this.filters = filters.stream()
             .map(ImmutableDoubleArray::copyOf)
             .collect(toImmutableList());
+    }
+
+    public List<ImmutableDoubleArray> getFilters() {
+        return filters;
     }
 
     @Override

@@ -41,7 +41,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     public BiomassFad(
         final FadManager<BiomassLocalBiology, BiomassFad> owner,
         final BiomassLocalBiology biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final Map<Species, FishBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,

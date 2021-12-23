@@ -15,7 +15,7 @@ public class BiomassFadInitializerFactory
         return new BiomassFadInitializer(
             fishState.getBiology(),
             totalCarryingCapacity,
-            makeBiomassAttractors(fishState, rng, totalCarryingCapacity),
+            makeFishAttractor(fishState, rng, totalCarryingCapacity),
             getFishReleaseProbabilityInPercent().apply(rng) / 100d,
             fishState::getStep
         );

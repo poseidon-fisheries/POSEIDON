@@ -56,8 +56,7 @@ import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFadBiomassAttractor;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
@@ -188,8 +187,8 @@ public class BiomassResetterTest {
         final ImmutableMap<Species, FadBiomassAttractor> fadAttractionRates =
             species.stream().collect(toImmutableMap(
                 identity(),
-                s -> new LinearFadBiomassAttractor(
-                    fadAttractionRate,
+                s -> new LinearFishBiomassAttractor(
+                    species, fadAttractionRate,
                     carryingCapacity
                 )
                 )

@@ -26,7 +26,6 @@ import static uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology.makeAbun
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -44,7 +43,7 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     public AbundanceFad(
         final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
         final AbundanceLocalBiology biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final Map<Species, FishBiomassAttractor> fadBiomassAttractors,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,

@@ -124,12 +124,12 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             (BiomassFadInitializerFactory) purseSeineGearFactory.getFadInitializerFactory();
 
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
-        fadInitializerFactory.setAttractionIntercepts(ImmutableMap.of(
+        fadInitializerFactory.setCompressionExponents(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.0),
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)
         ));
-        fadInitializerFactory.setTileBiomassCoefficients(ImmutableMap.of(
+        fadInitializerFactory.setAttractableBiomassCoefficients(ImmutableMap.of(
             "Bigeye tuna", new FixedDoubleParameter(0.0),
             "Yellowfin tuna", new FixedDoubleParameter(0.0),
             "Skipjack tuna", new FixedDoubleParameter(0.0)

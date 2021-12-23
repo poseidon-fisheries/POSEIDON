@@ -20,29 +20,20 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import static java.lang.Math.min;
 
-public class LinearFadBiomassAttractor implements FadBiomassAttractor {
+import uk.ac.ox.oxfish.biology.LocalBiology;
 
-    private final double attractionRate;
-    private final double carryingCapacity;
+@FunctionalInterface
+public
+interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
 
-    public LinearFadBiomassAttractor(final double attractionRate, final double carryingCapacity) {
-        this.attractionRate = attractionRate;
-        this.carryingCapacity = carryingCapacity;
-    }
+    B attract(B cellBiology, F fad);
 
-    @Override
-    public double getCarryingCapacity() {
-        return carryingCapacity;
-    }
-
-    @Override
-    public boolean shouldAttract(final double cellBiomass, final double totalFadBiomass) {
-        return true;
-    }
-
-    @Override
-    public double biomassAttracted(final double tileBiomass, final double fadBiomass, final double totalFadBiomass) {
-        return min(attractionRate * tileBiomass, carryingCapacity - fadBiomass);
+    default double biomassScalingFactor(
+        final double attractedBiomass,
+        final double totalFadBiomass,
+        final double fadCarryingCapacity
+    ) {
+        return min(1, (fadCarryingCapacity - totalFadBiomass) / attractedBiomass);
     }
 
 }

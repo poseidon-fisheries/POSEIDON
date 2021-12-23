@@ -34,14 +34,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class AbundanceFiltersFactory implements AlgorithmFactory<
-    Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>>
+    Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
     > {
 
     private SpeciesCodes speciesCodes;
@@ -70,7 +69,9 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>> apply(final FishState fishState) {
+    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> apply(
+        final FishState fishState
+    ) {
         checkNotNull(speciesCodes);
         return parseAllRecords(selectivityFilePath)
             .stream()

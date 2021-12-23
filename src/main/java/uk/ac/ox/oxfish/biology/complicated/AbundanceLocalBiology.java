@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingInt;
 
 import com.google.common.base.MoreObjects;
@@ -94,7 +95,7 @@ public class AbundanceLocalBiology implements LocalBiology
         abundance.forEach((species, matrix) ->
             this.abundance.put(
                 species,
-                Arrays.stream(matrix)
+                stream(matrix)
                     .map(a -> Arrays.copyOf(a, a.length))
                     .toArray(double[][]::new)
             )
@@ -147,6 +148,10 @@ public class AbundanceLocalBiology implements LocalBiology
             .sorted(comparingInt(Species::getIndex))
             .mapToDouble(this::getBiomass)
             .toArray();
+    }
+
+    public double getTotalBiomass() {
+        return stream(getCurrentBiomass()).sum();
     }
 
     /**
