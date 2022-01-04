@@ -18,31 +18,22 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import java.util.function.IntSupplier;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 
 class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, AbundanceFad> {
-
-    private final Map<Species, AbundanceFilter> selectivityFilters;
 
     AbundanceFadInitializer(
         final GlobalBiology globalBiology,
         final double totalCarryingCapacity,
         final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
         final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier,
-        final Map<Species, AbundanceFilter> selectivityFilters
+        final IntSupplier timeStepSupplier
     ) {
         super(
             globalBiology,
@@ -51,7 +42,6 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
             fishReleaseProbability,
             timeStepSupplier
         );
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
 
     @Override
@@ -63,7 +53,7 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
     AbundanceFad makeFad(
         final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
         final AbundanceLocalBiology biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed
@@ -71,11 +61,10 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
         return new AbundanceFad(
             owner,
             biology,
-            fadBiomassAttractors,
+            fishAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            selectivityFilters,
             getTotalCarryingCapacity()
         );
     }

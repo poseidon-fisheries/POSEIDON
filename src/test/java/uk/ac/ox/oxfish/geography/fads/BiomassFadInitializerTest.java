@@ -4,14 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.function.DoubleSupplier;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -28,7 +27,7 @@ public class BiomassFadInitializerTest {
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
             Double.POSITIVE_INFINITY,
-            ImmutableMap.of(),
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
             () -> 0
         );

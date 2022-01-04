@@ -54,7 +54,6 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -184,20 +183,20 @@ public class BiomassResetterTest {
         // deploy one FAD in the center of each tile
         final double carryingCapacity = 1000;
         final double fadAttractionRate = 0.5;
-        final ImmutableMap<Species, FadBiomassAttractor> fadAttractionRates =
-            species.stream().collect(toImmutableMap(
-                identity(),
-                s -> new LinearFishBiomassAttractor(
-                    species, fadAttractionRate,
-                    carryingCapacity
-                )
+
+        final LinearFishBiomassAttractor fishBiomassAttractor =
+            new LinearFishBiomassAttractor(
+                species.stream().collect(toImmutableMap(
+                    identity(),
+                    s -> fadAttractionRate
+                    )
                 )
             );
 
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
             carryingCapacity,
-            fadAttractionRates,
+            fishBiomassAttractor,
             0,
             () -> 0
         );

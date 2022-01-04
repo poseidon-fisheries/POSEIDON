@@ -18,31 +18,29 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.util.Map;
 import java.util.function.IntSupplier;
 import java.util.stream.DoubleStream;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
 
 public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, BiomassFad> {
 
     public BiomassFadInitializer(
         final GlobalBiology globalBiology,
         final double totalCarryingCapacity,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<BiomassLocalBiology, BiomassFad> fishBiomassAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier
     ) {
         super(
             globalBiology,
             totalCarryingCapacity,
-            fadBiomassAttractors,
+            fishBiomassAttractor,
             fishReleaseProbability,
             timeStepSupplier
         );
@@ -61,7 +59,7 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
     BiomassFad makeFad(
         final FadManager<BiomassLocalBiology, BiomassFad> owner,
         final BiomassLocalBiology biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<BiomassLocalBiology, BiomassFad> fishBiomassAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed
@@ -69,7 +67,7 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
         return new BiomassFad(
             owner,
             biology,
-            fadBiomassAttractors,
+            fishBiomassAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,

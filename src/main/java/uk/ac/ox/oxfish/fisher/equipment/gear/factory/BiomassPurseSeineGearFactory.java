@@ -22,19 +22,10 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassPurseSeineGearFactory
     extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
-
-    private BiomassFadInitializerFactory fadInitializerFactory = new BiomassFadInitializerFactory();
-
-    @Override
-    FadInitializer<BiomassLocalBiology, BiomassFad> getFadInitializer(FishState fishState) {
-        return fadInitializerFactory.apply(fishState);
-    }
 
     @Override
     public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {
@@ -45,11 +36,4 @@ public class BiomassPurseSeineGearFactory
         );
     }
 
-    public BiomassFadInitializerFactory getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    public void setFadInitializerFactory(BiomassFadInitializerFactory fadInitializerFactory) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
 }

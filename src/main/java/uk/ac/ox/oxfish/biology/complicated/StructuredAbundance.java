@@ -26,6 +26,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.util.function.BiConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ToDoubleBiFunction;
 import uk.ac.ox.oxfish.biology.Species;
@@ -184,13 +185,21 @@ public class StructuredAbundance {
      * @param mapper a mapper function that takes the subdivision and the bin as parameters.
      * @return a new StructuredAbundance.
      */
-    public StructuredAbundance mapIndices(ToDoubleBiFunction<Integer, Integer> mapper) {
+    public StructuredAbundance mapIndices(final ToDoubleBiFunction<Integer, Integer> mapper) {
         return new StructuredAbundance(
             range(0, getSubdivisions()).mapToObj(subDivision ->
                 range(0, getBins()).mapToDouble(bin ->
                     mapper.applyAsDouble(subDivision, bin)
                 ).toArray()
             ).toArray(double[][]::new)
+        );
+    }
+
+    public void forEachIndex(final BiConsumer<Integer, Integer> consumer) {
+        range(0, getSubdivisions()).forEach(subDivision ->
+            range(0, getBins()).forEach(bin ->
+                consumer.accept(subDivision, bin)
+            )
         );
     }
 

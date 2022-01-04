@@ -19,8 +19,16 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import com.google.common.collect.ImmutableMap;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
+
 import ec.util.MersenneTwisterFast;
+import java.util.Optional;
 import org.junit.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -31,6 +39,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -38,19 +47,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
-import java.util.Optional;
-
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
-
 public class MakeFadSetTest {
 
-    private final GlobalBiology globalBiology = new GlobalBiology(new Species("A"), new Species("B"));
+    private final GlobalBiology globalBiology =
+        new GlobalBiology(new Species("A"), new Species("B"));
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
@@ -73,14 +73,15 @@ public class MakeFadSetTest {
         final BiomassFad fad = new BiomassFad(
             fadManager,
             fadBiology,
-            ImmutableMap.of(),
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
             0,
             new Int2D(1, 1),
             carryingCapacity
         );
         fillBiomassFad(fad);
-        final VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, carryingCapacity);
+        final VariableBiomassBasedBiology tileBiology =
+            makeBiology(globalBiology, carryingCapacity);
 
         // wire everything together...
         when(seaTile.getBiology()).thenReturn(tileBiology);

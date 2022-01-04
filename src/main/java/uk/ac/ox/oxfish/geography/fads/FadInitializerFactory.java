@@ -22,14 +22,16 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishBiomassAttractor;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -45,12 +47,19 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
     private SpeciesCodes speciesCodes;
 
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
-    }
+    public FadInitializerFactory(final String... speciesNames) {
 
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+        final Supplier<Map<String, DoubleParameter>> zeros = () ->
+            Arrays.stream(speciesNames).collect(toImmutableMap(
+                identity(),
+                __ -> new FixedDoubleParameter(0.0)
+            ));
+
+        // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
+        setCompressionExponents(zeros.get());
+        setAttractableBiomassCoefficients(zeros.get());
+        setBiomassInteractionsCoefficients(zeros.get());
+        setGrowthRates(zeros.get());
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
@@ -69,31 +78,9 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         return totalCarryingCapacity;
     }
 
+    @SuppressWarnings("unused")
     public void setTotalCarryingCapacity(final DoubleParameter totalCarryingCapacity) {
         this.totalCarryingCapacity = totalCarryingCapacity;
-    }
-
-    FishAttractor<B, F> makeFishAttractor(
-        final FishState fishState,
-        final MersenneTwisterFast rng,
-        final double totalCarryingCapacity
-    ) {
-        return fishState.getSpecies()
-            .stream()
-            .collect(toImmutableMap(
-                identity(),
-                species -> {
-                    final String speciesName = species.getName();
-                    return new LogisticFishBiomassAttractor(
-                        fishState.getRandom(),
-                        getCompressionExponents().get(speciesName).apply(rng),
-                        getAttractableBiomassCoefficients().get(speciesName).apply(rng),
-                        getBiomassInteractionsCoefficients().get(speciesName).apply(rng),
-                        getGrowthRates().get(speciesName).apply(rng),
-                        totalCarryingCapacity
-                    );
-                }
-            ));
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
@@ -147,4 +134,36 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.growthRates = growthRates;
     }
+
+    Map<Species, Double> processParameterMap(
+        final Map<String, DoubleParameter> map,
+        final GlobalBiology globalBiology,
+        final MersenneTwisterFast rng
+    ) {
+        return processParameterMap(map, globalBiology, value -> value.apply(rng));
+    }
+
+    /**
+     * Turns a map from species names to some that to a map from Species objects to some mapping of
+     * the original type.
+     */
+    private <T, U> Map<Species, U> processParameterMap(
+        final Map<String, T> map,
+        final GlobalBiology globalBiology,
+        final Function<T, U> valueMapper
+    ) {
+        return map.entrySet().stream().collect(toImmutableMap(
+            entry -> getSpeciesCodes().getSpeciesFromCode(globalBiology, entry.getKey()),
+            entry -> valueMapper.apply(entry.getValue())
+        ));
+    }
+
+    public SpeciesCodes getSpeciesCodes() {
+        return speciesCodes;
+    }
+
+    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
+        this.speciesCodes = speciesCodes;
+    }
+
 }

@@ -59,7 +59,7 @@ abstract class LogisticFishAttractor<A, B extends LocalBiology, F extends Fad<B,
 
     @Override
     public B attract(
-        final B cellBiology,
+        final B seaTileBiology,
         final F fad
     ) {
         final double fadBiomass = fad.getBiology().getTotalBiomass(species);
@@ -67,9 +67,9 @@ abstract class LogisticFishAttractor<A, B extends LocalBiology, F extends Fad<B,
             .stream()
             .collect(toImmutableMap(identity(), s -> {
                 final double p =
-                    probabilityOfAttraction(s, cellBiology.getBiomass(s), fadBiomass);
+                    probabilityOfAttraction(s, seaTileBiology.getBiomass(s), fadBiomass);
                 return getRng().nextDouble() < p
-                    ? attractForSpecies(s, cellBiology, fad)
+                    ? attractForSpecies(s, seaTileBiology, fad)
                     : attractNothing(s, fad);
             }));
 

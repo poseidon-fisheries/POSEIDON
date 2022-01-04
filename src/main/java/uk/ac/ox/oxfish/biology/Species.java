@@ -20,8 +20,12 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.complicated.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Map.Entry;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 /**
  * A collection of all information regarding a species (for now just a name)
@@ -157,4 +161,18 @@ public class Species {
     public double getLengthAtAge(int ageInYears, int subdivision) {
         return meristics.getLengthAtAge(ageInYears, subdivision);
     }
+
+    /**
+     * Converts a map of Species to any type to an array of that type, ordered by species index.
+     */
+    public static <T> T[] mapToArray(final Map<Species, T> map) {
+        //noinspection unchecked
+        return map
+            .entrySet()
+            .stream()
+            .sorted(Comparator.comparingInt(entry -> entry.getKey().getIndex()))
+            .map(Entry::getValue)
+            .toArray(size -> (T[]) new Object[size]);
+    }
+
 }

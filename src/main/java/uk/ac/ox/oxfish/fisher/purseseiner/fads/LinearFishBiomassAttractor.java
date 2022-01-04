@@ -39,7 +39,8 @@ public class LinearFishBiomassAttractor implements FishBiomassAttractor {
 
     @Override
     public BiomassLocalBiology attract(
-        final BiomassLocalBiology cellBiology, final BiomassFad fad
+        final BiomassLocalBiology seaTileBiology,
+        final BiomassFad fad
     ) {
         final double[] attractedBiomass = attractionRates.entrySet()
             .stream()
@@ -47,7 +48,7 @@ public class LinearFishBiomassAttractor implements FishBiomassAttractor {
             .mapToDouble(entry -> {
                 final Species species = entry.getKey();
                 final Double attractionRate = entry.getValue();
-                return attractionRate * cellBiology.getBiomass(species);
+                return attractionRate * seaTileBiology.getBiomass(species);
             })
             .toArray();
 

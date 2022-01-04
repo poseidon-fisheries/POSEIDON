@@ -24,22 +24,32 @@ import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
+import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceFadInitializerFactory
     extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    private Map<String, NonMutatingArrayFilter> selectivityFilters;
+    private Map<Species, NonMutatingArrayFilter> selectivityFilters;
+
+    /**
+     * Empty constructor for YAML
+     */
+    public AbundanceFadInitializerFactory() {
+    }
+
+    public AbundanceFadInitializerFactory(final String... speciesNames) {
+        super(speciesNames);
+    }
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
@@ -50,59 +60,33 @@ public class AbundanceFadInitializerFactory
         return new AbundanceFadInitializer(
             fishState.getBiology(),
             totalCarryingCapacity,
-            makeFishAttractor(fishState, rng, totalCarryingCapacity),
+            makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().apply(rng) / 100d,
             fishState::getStep
         );
     }
 
-    LogisticFishAbundanceAttractor makeFishAttractor(
+    private LogisticFishAbundanceAttractor makeFishAttractor(
         final FishState fishState,
-        final MersenneTwisterFast rng,
-        final double totalCarryingCapacity
+        final MersenneTwisterFast rng
     ) {
-
         return new LogisticFishAbundanceAttractor(
             fishState.getRandom(),
             processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
             processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
             processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
             processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
-            processParameterMap(getSelectivityFilters(), fishState.getBiology())
+            getSelectivityFilters()
         );
     }
 
-    private <T> Map<Species, T> processParameterMap(
-        final Map<String, T> map,
-        final GlobalBiology globalBiology
-    ) {
-        return processParameterMap(map, globalBiology, identity());
-    }
-
-    private <T, U> Map<Species, U> processParameterMap(
-        final Map<String, T> map,
-        final GlobalBiology globalBiology,
-        final Function<T, U> valueMapper
-    ) {
-        return map.entrySet().stream().collect(toImmutableMap(
-            entry -> getSpeciesCodes().getSpeciesFromCode(globalBiology, entry.getKey()),
-            entry -> valueMapper.apply(entry.getValue())
-        ));
-    }
-
-    private Map<Species, Double> processParameterMap(
-        final Map<String, DoubleParameter> map,
-        final GlobalBiology globalBiology,
-        final MersenneTwisterFast rng
-    ) {
-        return processParameterMap(map, globalBiology, value -> value.apply(rng));
-    }
-
-    public Map<String, NonMutatingArrayFilter> getSelectivityFilters() {
+    @SuppressWarnings("WeakerAccess")
+    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         return selectivityFilters;
     }
 
-    public void setSelectivityFilters(final Map<String, NonMutatingArrayFilter> selectivityFilters) {
+    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
         this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
 }

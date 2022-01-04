@@ -21,9 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology.makeAbundanceArray;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Map;
 import sim.util.Int2D;
@@ -32,34 +30,28 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
-import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 
 public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
-
-    private final Map<Species, AbundanceFilter> selectivityFilters;
 
     public AbundanceFad(
         final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
         final AbundanceLocalBiology biology,
-        final Map<Species, FishBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final Map<Species, AbundanceFilter> selectivityFilters,
         final double totalCarryingCapacity
     ) {
         super(
             owner,
             biology,
-            fadBiomassAttractors,
+            fishAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
             totalCarryingCapacity
         );
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
 
     @Override
@@ -112,33 +104,22 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     @Override
     public Catch addCatchesToFad(
         final AbundanceLocalBiology seaTileBiology,
-        final GlobalBiology globalBiology,
-        final double[] catches
+        final GlobalBiology globalBiology
     ) {
-        final int n = globalBiology.getSize();
-        final StructuredAbundance[] caughtAbundances = new StructuredAbundance[n];
-        final Map<Species, double[][]> fadAbundanceArrays = getBiology().getAbundance();
-        for (int i = 0; i < n; i++) {
-            final Species species = globalBiology.getSpecie(i);
-            final double[][] caughtAbundance = makeAbundanceArray(species);
-            if (seaTileBiology.getBiomass(species) > 0) {
-                final double[][] tileAbundance =
-                    seaTileBiology.getAbundance(species).asMatrix();
-                final double[][] catchableAbundance =
-                    selectivityFilters.get(species).filter(species, tileAbundance);
-                final double ratio =
-                    catches[species.getIndex()] / seaTileBiology.getBiomass(species);
-                final double[][] fadAbundanceArray =
-                    fadAbundanceArrays.get(globalBiology.getSpecie(i));
-                for (int div = 0; div < species.getNumberOfSubdivisions(); div++) {
-                    for (int bin = 0; bin < caughtAbundance[div].length; bin++) {
-                        caughtAbundance[div][bin] = ratio * catchableAbundance[div][bin];
-                        fadAbundanceArray[div][bin] += caughtAbundance[div][bin];
-                    }
-                }
-            }
-            caughtAbundances[i] = new StructuredAbundance(caughtAbundance);
-        }
-        return new Catch(caughtAbundances, globalBiology);
+
+        final AbundanceLocalBiology attractedFish =
+            getFishAttractor().attract(seaTileBiology, this);
+
+        getBiology().getStructuredAbundance().forEach((species, fadAbundance) -> {
+            final double[][] attractedAbundance = attractedFish.getAbundance(species).asMatrix();
+            fadAbundance.forEachIndex((sub, bin) ->
+                fadAbundance.asMatrix()[sub][bin] += attractedAbundance[sub][bin]
+            );
+        });
+
+        return new Catch(
+            Species.mapToArray(attractedFish.getStructuredAbundance()),
+            globalBiology
+        );
     }
 }

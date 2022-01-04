@@ -31,17 +31,17 @@ import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingProportionFilter;
 
 public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
 
-    private final Map<Species, AbundanceFilter> selectivityFilters;
+    private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
 
     public AbundanceCatchSampler(
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng,
-        final Map<Species, AbundanceFilter> selectivityFilters
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters
     ) {
         super(sample, rng);
         this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
@@ -71,7 +71,7 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
 
     private static AbundanceLocalBiology filterAbundance(
         final LocalBiology biology,
-        final Map<Species, AbundanceFilter> filters
+        final Map<Species, NonMutatingArrayFilter> filters
     ) {
         return new AbundanceLocalBiology(
             filters

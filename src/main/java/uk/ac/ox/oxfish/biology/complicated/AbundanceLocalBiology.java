@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingInt;
 
@@ -29,7 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.jetbrains.annotations.NotNull;
+import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -231,6 +232,14 @@ public class AbundanceLocalBiology implements LocalBiology
         return new StructuredAbundance(abundance.get(species)
         );
 
+    }
+
+    public Map<Species, StructuredAbundance> getStructuredAbundance() {
+        Arrays.fill(lastComputedBiomass, Double.NaN); // force a recount after calling this
+        return abundance.entrySet().stream().collect(toImmutableMap(
+            Entry::getKey,
+            entry -> new StructuredAbundance(entry.getValue())
+        ));
     }
 
     /**

@@ -57,6 +57,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
@@ -84,6 +85,11 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private final FromSimpleFilePortInitializer portInitializer =
         new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
+    private final BiomassReallocatorFactory biomassReallocatorFactory =
+        new BiomassReallocatorFactory(
+            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
+            365
+        );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path mapFile = INPUT_PATH.resolve("depth.csv");
     private Path boatsFile = INPUT_PATH.resolve("boats.csv");
@@ -102,48 +108,22 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private FisherDefinition fisherDefinition = new FisherDefinition();
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
-
-    private final BiomassReallocatorFactory biomassReallocatorFactory =
-        new BiomassReallocatorFactory(
-            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
-            365
-        );
-
     private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
+    private FadInitializerFactory<BiomassLocalBiology, BiomassFad> fadInitializerFactory =
+        new BiomassFadInitializerFactory(
+            "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+        );
 
     public EpoBiomassScenario() {
 
         final BiomassPurseSeineGearFactory
             purseSeineGearFactory = new BiomassPurseSeineGearFactory();
 
-        final BiomassFadInitializerFactory fadInitializerFactory =
-            (BiomassFadInitializerFactory) purseSeineGearFactory.getFadInitializerFactory();
-
-        // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
-        fadInitializerFactory.setCompressionExponents(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setAttractableBiomassCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setBiomassInteractionsCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setGrowthRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.1),
-            "Yellowfin tuna", new FixedDoubleParameter(0.1),
-            "Skipjack tuna", new FixedDoubleParameter(0.1)
-        ));
+        purseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
 
         final AlgorithmFactory<? extends Regulation> standardRegulations =
             new StandardIattcRegulationsFactory();
@@ -185,6 +165,17 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public static int dayOfYear(final Month month, final int dayOfMonth) {
         return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
+    }
+
+    @SuppressWarnings("unused")
+    public FadInitializerFactory<BiomassLocalBiology, BiomassFad> getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadInitializerFactory(final FadInitializerFactory<BiomassLocalBiology,
+        BiomassFad> fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")

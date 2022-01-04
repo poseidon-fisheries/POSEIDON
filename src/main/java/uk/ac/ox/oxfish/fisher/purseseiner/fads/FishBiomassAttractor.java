@@ -22,7 +22,8 @@ import static java.util.Arrays.stream;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-interface FishBiomassAttractor extends FishAttractor<BiomassLocalBiology, BiomassFad> {
+@FunctionalInterface
+public interface FishBiomassAttractor extends FishAttractor<BiomassLocalBiology, BiomassFad> {
 
     default double[] scaleAttractedBiomass(final double[] attractedBiomass, final BiomassFad fad) {
 

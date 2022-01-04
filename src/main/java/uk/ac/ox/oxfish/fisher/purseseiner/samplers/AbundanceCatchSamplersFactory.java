@@ -23,21 +23,21 @@ import java.util.Collection;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
 public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<AbundanceLocalBiology> {
 
-    private Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>>
+    private Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
         abundanceFilters;
 
-    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>> getAbundanceFilters() {
+    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> getAbundanceFilters() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return abundanceFilters;
     }
 
     public void setAbundanceFilters(
-        final Map<Class<? extends AbstractSetAction<?>>, Map<Species, AbundanceFilter>> abundanceFilters
+        final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> abundanceFilters
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.abundanceFilters = abundanceFilters;

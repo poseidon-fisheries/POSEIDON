@@ -9,7 +9,6 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassF
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.Optional;
 import org.junit.Test;
@@ -22,6 +21,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -60,7 +60,7 @@ public class FadMapTest {
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
             2.0,
-            ImmutableMap.of(),
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
             () -> 0
         );

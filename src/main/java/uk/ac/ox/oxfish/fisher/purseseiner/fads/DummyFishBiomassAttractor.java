@@ -18,22 +18,21 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.lang.Math.min;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
+public class DummyFishBiomassAttractor
+    implements FishAttractor<BiomassLocalBiology, BiomassFad> {
 
-@FunctionalInterface
-public
-interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
+    private final int size;
 
-    B attract(B seaTileBiology, F fad);
-
-    default double biomassScalingFactor(
-        final double attractedBiomass,
-        final double totalFadBiomass,
-        final double fadCarryingCapacity
-    ) {
-        return min(1, (fadCarryingCapacity - totalFadBiomass) / attractedBiomass);
+    public DummyFishBiomassAttractor(final int size) {
+        this.size = size;
     }
 
+    @Override
+    public BiomassLocalBiology attract(
+        final BiomassLocalBiology seaTileBiology, final BiomassFad fad
+    ) {
+        return new BiomassLocalBiology(new double[size]);
+    }
 }

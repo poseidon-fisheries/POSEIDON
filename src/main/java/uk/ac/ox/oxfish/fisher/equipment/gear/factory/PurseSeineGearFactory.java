@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Double.MAX_VALUE;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
@@ -46,7 +47,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLoca
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -120,6 +121,15 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double destinationDistanceExponent = 1;
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
+    private FadInitializerFactory<B, F> fadInitializerFactory;
+
+    public FadInitializerFactory<B, F> getFadInitializer() {
+        return fadInitializerFactory;
+    }
+
+    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
 
     public double getNumFadsInStockLogisticMidpoint() {
         return numFadsInStockLogisticMidpoint;
@@ -400,6 +410,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
     @NotNull
     FadManager<B, F> makeFadManager(final FishState fishState) {
+        checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
                 .map(factory -> factory.apply(fishState))
@@ -408,7 +419,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
         @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
             (FadMap<B, F>) fishState.getFadMap(),
-            getFadInitializer(fishState),
+            fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
@@ -418,8 +429,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         );
         return fadManager;
     }
-
-    abstract FadInitializer<B, F> getFadInitializer(FishState fishState);
 
     Stream<AttractionField> attractionFields() {
         final GlobalSetAttractionModulator globalSetAttractionModulator =
