@@ -135,7 +135,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         this.growthRates = growthRates;
     }
 
-    Map<Species, Double> processParameterMap(
+    static Map<Species, Double> processParameterMap(
         final Map<String, DoubleParameter> map,
         final GlobalBiology globalBiology,
         final MersenneTwisterFast rng
@@ -147,13 +147,13 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
      * Turns a map from species names to some that to a map from Species objects to some mapping of
      * the original type.
      */
-    private <T, U> Map<Species, U> processParameterMap(
+    private static <T, U> Map<Species, U> processParameterMap(
         final Map<String, T> map,
         final GlobalBiology globalBiology,
         final Function<T, U> valueMapper
     ) {
         return map.entrySet().stream().collect(toImmutableMap(
-            entry -> getSpeciesCodes().getSpeciesFromCode(globalBiology, entry.getKey()),
+            entry -> globalBiology.getSpecie(entry.getKey()),
             entry -> valueMapper.apply(entry.getValue())
         ));
     }

@@ -19,27 +19,21 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceFadInitializerFactory
     extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters;
+    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
     /**
      * Empty constructor for YAML

@@ -1,18 +1,11 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishBiomassAttractor;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class BiomassFadInitializerFactory
     extends FadInitializerFactory<BiomassLocalBiology, BiomassFad> {

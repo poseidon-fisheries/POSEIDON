@@ -63,26 +63,28 @@ EPO Abundance:
   attractionWeightsFile: inputs/epo/action_weights.csv
   costsFile: inputs/epo/costs.csv
   fadInitializerFactory:
-    attractableBiomassCoefficients:
-      Bigeye tuna: '0.0'
-      Yellowfin tuna: '0.0'
-      Skipjack tuna: '0.0'
-    biomassInteractionsCoefficients:
-      Bigeye tuna: '0.0'
-      Yellowfin tuna: '0.0'
-      Skipjack tuna: '0.0'
-    compressionExponents:
-      Bigeye tuna: '0.0'
-      Yellowfin tuna: '0.0'
-      Skipjack tuna: '0.0'
-    fishReleaseProbabilityInPercent: '0.0'
-    growthRates:
-      Bigeye tuna: '0.0'
-      Yellowfin tuna: '0.0'
-      Skipjack tuna: '0.0'
-    selectivityFilters: null
-    speciesCodes: null
-    totalCarryingCapacity: '445000.0'
+    Abundance FAD Initializer:
+      attractableBiomassCoefficients:
+        Bigeye tuna: 0.0
+        Yellowfin tuna: 0.0
+        Skipjack tuna: 0.0
+      biomassInteractionsCoefficients:
+        Bigeye tuna: 0.0
+        Yellowfin tuna: 0.0
+        Skipjack tuna: 0.0
+      compressionExponents:
+        Bigeye tuna: 0.0
+        Yellowfin tuna: 0.0
+        Skipjack tuna: 0.0
+      fishReleaseProbabilityInPercent: '0.0'
+      growthRates:
+        Bigeye tuna: 0.0
+        Yellowfin tuna: 0.0
+        Skipjack tuna: 0.0
+      selectivityFilters: {
+        }
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
   fadMapFactory:
     currentFiles:
       Y2017: inputs/epo/currents/currents_2017.csv

@@ -83,6 +83,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizers;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactories;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -234,6 +236,9 @@ public class AlgorithmFactories {
             ActionSpecificRegulations.CONSTRUCTORS
         );
         NAMES_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.NAMES);
+
+        CONSTRUCTOR_MAP.put(FadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
+        NAMES_MAP.put(FadInitializerFactory.class, FadInitializerFactories.NAMES);
 
     }
 

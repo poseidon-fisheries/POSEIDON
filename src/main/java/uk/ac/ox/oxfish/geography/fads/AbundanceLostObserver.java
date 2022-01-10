@@ -19,10 +19,11 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
@@ -46,11 +47,11 @@ public class AbundanceLostObserver implements Observer<AbundanceLostEvent> {
         return abundanceLost.computeIfAbsent(species, ImmutableAbundance::empty);
     }
 
-    public AbundanceLocalBiology asBiology() {
+    public AbundanceLocalBiology asBiology(final GlobalBiology globalBiology) {
         return new AbundanceLocalBiology(
-            abundanceLost.entrySet().stream().collect(toImmutableMap(
-                Entry::getKey,
-                entry -> entry.getValue().asMatrix()
+            globalBiology.getSpecies().stream().collect(toImmutableMap(
+                identity(),
+                species -> get(species).asMatrix()
             ))
         );
     }

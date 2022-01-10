@@ -212,7 +212,7 @@ public class Catch {
             globalBiology
                 .getSpecies()
                 .stream()
-                .map(caughtBiology::getAbundance)
+                .map(species -> new StructuredAbundance(caughtBiology.getAbundance(species)))
                 .toArray(StructuredAbundance[]::new),
             globalBiology
         );

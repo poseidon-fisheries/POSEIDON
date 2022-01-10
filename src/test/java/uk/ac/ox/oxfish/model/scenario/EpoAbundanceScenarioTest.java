@@ -24,12 +24,14 @@ import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario.INPUT_PATH;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +44,24 @@ import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
+
+    public void testRunOneYearWithoutCrashing() {
+        final Scenario scenario = new EpoAbundanceScenario();
+        final FishState fishState = new FishState();
+        fishState.setScenario(scenario);
+
+        fishState.start();
+        do {
+            System.out.println(fishState.getStep());
+            fishState.schedule.step(fishState);
+        } while (fishState.getYear() < 1);
+
+    }
 
     public void testSaveAndLoadYaml() {
 

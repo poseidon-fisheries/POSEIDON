@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
@@ -117,8 +118,11 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
             );
         });
 
+        final StructuredAbundance[] structuredAbundances = Species
+            .mapToList(attractedFish.getStructuredAbundance())
+            .toArray(new StructuredAbundance[globalBiology.getSize()]);
         return new Catch(
-            Species.mapToArray(attractedFish.getStructuredAbundance()),
+            structuredAbundances,
             globalBiology
         );
     }

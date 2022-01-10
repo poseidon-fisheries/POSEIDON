@@ -41,7 +41,8 @@ public class AbundanceLostRecoveryProcess implements BiologicalProcess<Abundance
     ) {
         final AbundanceLostObserver abundanceLostObserver =
             fishState.getFadMap().getAbundanceLostObserver();
-        final AbundanceLocalBiology lostBiology = abundanceLostObserver.asBiology();
+        final AbundanceLocalBiology lostBiology =
+            abundanceLostObserver.asBiology(fishState.getBiology());
         abundanceLostObserver.clear();
 
         return ImmutableList.<AbundanceLocalBiology>builder()

@@ -121,7 +121,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double destinationDistanceExponent = 1;
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
-    private FadInitializerFactory<B, F> fadInitializerFactory;
+
+    FadInitializerFactory<B, F> fadInitializerFactory;
 
     public FadInitializerFactory<B, F> getFadInitializer() {
         return fadInitializerFactory;
