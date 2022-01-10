@@ -65,15 +65,14 @@ public class AbundanceReallocatorTest {
 
         Path INPUT_PATH = Paths.get("inputs", "epo");
 
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy");
-    /*    AbundanceReallocator reallocator = new AbundanceReallocator(
+        AbundanceReallocator reallocator = new AbundanceReallocator(
                 new SmallLargeAllocationGridsSupplier(
                         speciesCodes,
-                        INPUT_PATH.resolve("test").resolve("mock_biomass_distributions.csv")   ,
+                        INPUT_PATH.resolve("test").resolve("mock_grids.csv")   ,
                         new MapExtent(nauticalMap),
                         365).get(),
                 binToSizeGroupMappings
-        );*/
+        );
 
     }
 
