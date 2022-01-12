@@ -19,7 +19,20 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Comparator.comparingDouble;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
+
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -32,19 +45,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.Comparator.comparingDouble;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 public class GravityDestinationStrategy implements DestinationStrategy {
 
@@ -66,7 +66,9 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         this.isValidDestination = isValidDestination;
     }
 
-    public double getMaxTravelTime() { return maxTravelTime; }
+    public double getMaxTravelTime() {
+        return maxTravelTime;
+    }
 
     @Override
     public SeaTile chooseDestination(
@@ -75,10 +77,11 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         final FishState fishState,
         final Action currentAction
     ) {
-        if (destination == null || readyToMoveOn(fisher))
+        if (destination == null || readyToMoveOn(fisher)) {
             destination = needsToGoBackToPort(fisher)
                 ? fisher.getHomePort().getLocation()
                 : nextDestination(fisher);
+        }
         return destination;
     }
 
@@ -115,7 +118,11 @@ public class GravityDestinationStrategy implements DestinationStrategy {
             .orElse(seaTile);
     }
 
-    private Optional<SeaTile> closestNeighbor(final NauticalMap map, final SeaTile origin, final SeaTile target) {
+    private Optional<SeaTile> closestNeighbor(
+        final NauticalMap map,
+        final SeaTile origin,
+        final SeaTile target
+    ) {
         final Stream<SeaTile> neighbors = bagToStream(map.getMooreNeighbors(origin, 1));
         return neighbors
             .filter(SeaTile::isWater)
@@ -147,7 +154,9 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         // Give a value of 1.0 to port, and normalize all other fields so that they sum up to 1.0
         attractionWeights = Stream
             .concat(
-                rawWeights.entrySet().stream().map(entry -> entry(entry.getKey(), entry.getValue() / sum)),
+                rawWeights.entrySet()
+                    .stream()
+                    .map(entry -> entry(entry.getKey(), entry.getValue() / sum)),
                 Stream.of(entry(portAttractionField, 1.0))
             )
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -155,6 +164,8 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     @FunctionalInterface
     interface AttractionWeightLoader
-        extends BiFunction<Iterable<ActionAttractionField>, Fisher, Map<ActionAttractionField, Double>> {}
+        extends BiFunction<Iterable<ActionAttractionField>, Fisher, Map<ActionAttractionField, Double>> {
+
+    }
 
 }

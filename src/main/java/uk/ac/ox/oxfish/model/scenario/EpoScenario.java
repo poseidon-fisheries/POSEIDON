@@ -44,10 +44,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
@@ -106,6 +108,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
         );
 
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
+            fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
+                .getStrategies()
+                .stream()
+                .filter(strategy -> strategy instanceof DestinationBasedDepartingStrategy)
+                .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
+                .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
             addHourlyCosts(),
             fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
             fisher -> scheduleClosurePeriodChoice(fishState, fisher),

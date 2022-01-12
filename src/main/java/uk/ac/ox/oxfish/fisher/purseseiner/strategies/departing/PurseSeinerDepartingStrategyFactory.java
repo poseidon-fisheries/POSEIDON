@@ -25,12 +25,16 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.YearlyActionLimitsDepartingSt
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class PurseSeinerDepartingStrategyFactory implements AlgorithmFactory<CompositeDepartingStrategy> {
+public class PurseSeinerDepartingStrategyFactory
+    implements AlgorithmFactory<CompositeDepartingStrategy> {
 
-    @Override public CompositeDepartingStrategy apply(FishState state) {
+    @Override
+    public CompositeDepartingStrategy apply(final FishState state) {
         return new CompositeDepartingStrategy(
-            new FixedRestTimeDepartingStrategy(0), // rest times assigned in TunaScenario.populateModel
-            new YearlyActionLimitsDepartingStrategy()
+            new FixedRestTimeDepartingStrategy(0),
+            // rest times assigned in TunaScenario.populateModel
+            new YearlyActionLimitsDepartingStrategy(),
+            new DestinationBasedDepartingStrategy()
         );
     }
 
