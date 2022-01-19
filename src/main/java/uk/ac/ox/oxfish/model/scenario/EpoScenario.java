@@ -75,7 +75,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
             //.put(EL_NINO, input("currents_el_nino.csv"))
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
+    private final FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
+
+    public FadRefillGearStrategyFactory getGearStrategy() {
+        return gearStrategy;
+    }
 
     void initModel(final FishState fishState) {
         final FadMap<B, F> fadMap = getFadMapFactory().apply(fishState);
@@ -99,7 +104,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
             gravityDestinationStrategyFactory,
             fishingStrategyFactory,
             new NoDiscardingFactory(),
-            new FadRefillGearStrategyFactory(),
+            gearStrategy,
             new IgnoreWeatherFactory(),
             null,
             null,
