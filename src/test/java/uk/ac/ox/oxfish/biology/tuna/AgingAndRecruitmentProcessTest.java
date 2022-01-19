@@ -40,7 +40,7 @@ public class AgingAndRecruitmentProcessTest {
         proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
         proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
 
-        TunaMeristics meristics = new TunaMeristics(weights, lengths, proportionalMortalities, new double[]{.5,.5,.5,.5,.5});
+        TunaMeristics meristics = new TunaMeristics(weights, lengths, proportionalMortalities, new double[]{.01,.05,.1,.5,.5});
 
         Species species1 = new Species("Piano Tuna", meristics);
 
@@ -53,27 +53,30 @@ public class AgingAndRecruitmentProcessTest {
 
         final GlobalBiology globalBiology= new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();
-        abundance.put(species1, new double[][]{{100000, 5000,4000,3000,1000}, {100000,5000, 4000,3000,100}});
+        abundance.put(species1, new double[][]{{10000, 500,400,300,100}, {10000,500, 400,300,100}});
 
-        final NauticalMap nauticalMap = makeMap(1, 1);
-        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
-                seaTile.setBiology(new AbundanceLocalBiology(abundance)
-                )
-        );
+//        final NauticalMap nauticalMap = makeMap(1, 1);
+//        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
+//                seaTile.setBiology(new AbundanceLocalBiology(abundance)
+//                )
+//        );
 
-        List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
+ //       List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
 
         Collection<AbundanceLocalBiology> localBiologies = new ArrayList<>();
-        for (SeaTile allSeaTile : allSeaTiles) {
-            localBiologies.add((AbundanceLocalBiology) allSeaTile.getBiology());
-            double dumbiomass = allSeaTile.getBiology().getBiomass(species1);
-        }
+        AbundanceLocalBiology localBio = new AbundanceLocalBiology(abundance);
+        localBiologies.add(localBio);
+        double dumbiomass = localBio.getBiomass(species1);
+//        for (SeaTile allSeaTile : allSeaTiles) {
+//            localBiologies.add((AbundanceLocalBiology) allSeaTile.getBiology());
+//            double dumbiomass = allSeaTile.getBiology().getBiomass(species1);
+//        }
 
         HashMap<Species, RecruitmentProcess> recruitmentProcesses = new HashMap<>();
         recruitmentProcesses.put(species1, new RecruitmentBySpawningBiomass(
-                50000,
+                20000,
                 .5,
-                2.2,
+                .1,
                 false,
                 ((TunaMeristics) species1.getMeristics()).getMaturity().toArray() ,
                 null,
@@ -86,12 +89,12 @@ public class AgingAndRecruitmentProcessTest {
         when(fishState.getDayOfTheYear()).thenReturn(90);
 
         agingProcess.process(fishState, localBiologies);
-        for (SeaTile allSeaTile : allSeaTiles) {
-            double dumbiomass = allSeaTile.getBiology().getBiomass(species1);
-        }
+//        for (SeaTile allSeaTile : allSeaTiles) {
+        dumbiomass = localBio.getBiomass(species1);
+        //        }
 
 
-//        System.out.println("break");
+        System.out.println("break");
 
     }
 }
