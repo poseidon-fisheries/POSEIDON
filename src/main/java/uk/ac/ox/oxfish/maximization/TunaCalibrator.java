@@ -38,7 +38,7 @@ public class TunaCalibrator implements Runnable {
         Paths
             .get(
                 System.getProperty("user.home"),
-                "workspace", "tuna", "abundance", "calibration", "outputs"
+                "workspace", "tuna", "calibration", "results"
             )
             .resolve("calibration.yaml");
 

@@ -51,7 +51,7 @@ public class FadAwareLogisticGrowerTest {
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
         final Path testInputsPath = EpoScenario.INPUT_PATH.resolve("test");
         scenario.setCostsFile(testInputsPath.resolve("no_costs.csv"));
-        scenario.setBoatsFile(testInputsPath.resolve("dummy_boats.csv"));
+        scenario.setVesselsFilePath(testInputsPath.resolve("dummy_boats.csv"));
         scenario.setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         final FisherDefinition fisherDefinition = scenario.getFisherDefinition();

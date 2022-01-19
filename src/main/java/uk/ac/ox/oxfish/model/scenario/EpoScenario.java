@@ -76,6 +76,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
     private final FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
+    private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
 
     public FadRefillGearStrategyFactory getGearStrategy() {
@@ -90,8 +91,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
 
     abstract FadMapFactory<B, F> getFadMapFactory();
 
-    @NotNull
-    FisherFactory makeFisherFactory(
+    @NotNull    FisherFactory makeFisherFactory(
         final FishState fishState,
         final PurseSeineGearFactory<B, F> purseSeineGearFactory,
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory,
@@ -169,5 +169,23 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
         this.costsFile = costsFile;
     }
 
+    @SuppressWarnings("unused")
+    public Path getVesselsFilePath() {
+        return vesselsFilePath;
+    }
+
+    public void setVesselsFilePath(final Path vesselsFilePath) {
+        this.vesselsFilePath = vesselsFilePath;
+    }
+
+    public void useDummyData(final Path testPath) {
+        getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+        setVesselsFilePath(
+            testPath.resolve("dummy_boats.csv")
+        );
+        getGearStrategy().setMaxFadDeploymentsFile(
+            testPath.resolve("dummy_max_deployments.csv")
+        );
+    }
 
 }

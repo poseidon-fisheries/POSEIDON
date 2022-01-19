@@ -53,27 +53,7 @@ public class EpoBiomassScenarioTest {
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        final Path testInputsPath = EpoScenario.INPUT_PATH.resolve("test");
-        scenario.setCostsFile(testInputsPath.resolve("no_costs.csv"));
-        scenario.setBoatsFile(testInputsPath.resolve("dummy_boats.csv"));
-        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-
-        final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
-        gravityDestinationStrategyFactory
-            .setMaxTripDurationFile(testInputsPath.resolve("dummy_boats.csv"));
-        gravityDestinationStrategyFactory
-            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
-
-        ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
-            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
-
-        //noinspection OverlyStrongTypeCast
-        ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
-            .setLocationValuesFile(testInputsPath.resolve("dummy_location_values.csv"));
-        ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
-            .setMaxFadDeploymentsFile(testInputsPath.resolve("dummy_max_deployments.csv"));
+        scenario.useDummyData(EpoScenario.INPUT_PATH.resolve("test"));
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.addPlugin(state -> model -> {

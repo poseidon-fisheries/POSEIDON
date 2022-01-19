@@ -84,7 +84,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
-    private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
@@ -378,7 +377,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final List<Fisher> fishers =
             new PurseSeineVesselReader(
-                vesselsFilePath,
+                getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
                 ports
@@ -415,16 +414,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     }
 
     @SuppressWarnings("unused")
-    public Path getVesselsFilePath() {
-        return vesselsFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setVesselsFilePath(final Path vesselsFilePath) {
-        this.vesselsFilePath = vesselsFilePath;
-    }
-
-    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;
     }
@@ -434,5 +423,17 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
+    }
+
+    @Override
+    public void useDummyData(final Path testPath) {
+
+        super.useDummyData(testPath);
+        setAttractionWeightsFile(
+            testPath.resolve("dummy_action_weights.csv")
+        );
+        setLocationValuesFilePath(
+            testPath.resolve("dummy_location_values.csv")
+        );
     }
 }

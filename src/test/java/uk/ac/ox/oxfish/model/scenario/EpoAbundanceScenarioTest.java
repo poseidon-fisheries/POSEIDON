@@ -22,7 +22,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario.INPUT_PATH;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -30,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +48,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
     public void testRunOneYearWithoutCrashing() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        useDummyData(scenario);
+        scenario.useDummyData(INPUT_PATH.resolve("test"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
 
@@ -59,23 +57,6 @@ public class EpoAbundanceScenarioTest extends TestCase {
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
 
-    }
-
-    private void useDummyData(EpoAbundanceScenario scenario) {
-        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-        final Path testPath = INPUT_PATH.resolve("test");
-        scenario.setVesselsFilePath(
-            testPath.resolve("dummy_boats.csv")
-        );
-        scenario.setAttractionWeightsFile(
-            testPath.resolve("dummy_action_weights.csv")
-        );
-        scenario.setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
-        );
-        scenario.getGearStrategy().setMaxFadDeploymentsFile(
-            testPath.resolve("dummy_max_deployments.csv")
-        );
     }
 
     public void testSaveAndLoadYaml() {
@@ -115,7 +96,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
         final FishState fishState = new FishState();
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        useDummyData(scenario);
+        scenario.useDummyData(INPUT_PATH.resolve("test"));
 
         fishState.setScenario(scenario);
         fishState.start();

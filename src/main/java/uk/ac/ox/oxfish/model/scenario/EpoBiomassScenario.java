@@ -92,7 +92,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path mapFile = INPUT_PATH.resolve("depth.csv");
-    private Path boatsFile = INPUT_PATH.resolve("boats.csv");
+    private FisherDefinition fisherDefinition = new FisherDefinition();
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -105,7 +105,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    private FisherDefinition fisherDefinition = new FisherDefinition();
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
@@ -173,8 +172,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     }
 
     @SuppressWarnings("unused")
-    public void setFadInitializerFactory(final FadInitializerFactory<BiomassLocalBiology,
-        BiomassFad> fadInitializerFactory) {
+    public void setFadInitializerFactory(
+        final FadInitializerFactory<BiomassLocalBiology,
+            BiomassFad> fadInitializerFactory
+    ) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -216,15 +217,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     @SuppressWarnings("unused")
     public void setMapFile(final Path mapFile) {
         this.mapFile = mapFile;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getBoatsFile() {
-        return boatsFile;
-    }
-
-    public void setBoatsFile(final Path boatsFile) {
-        this.boatsFile = boatsFile;
     }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
@@ -363,7 +355,12 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
 
         final List<Fisher> fishers =
-            new PurseSeineVesselReader(boatsFile, TARGET_YEAR, fisherFactory, ports).apply(model);
+            new PurseSeineVesselReader(
+                getVesselsFilePath(),
+                TARGET_YEAR,
+                fisherFactory,
+                ports
+            ).apply(model);
 
         // Mutate the fisher factory back into a random boat generator
         // TODO: we don't have boat entry in the tuna model for now, but when we do, this
@@ -431,6 +428,32 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     @SuppressWarnings("unused")
     public void setFadMapFactory(final BiomassFadMapFactory fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
+    }
+
+    public void useDummyData(final Path testInputsPath) {
+
+        super.useDummyData(testInputsPath);
+
+        setCostsFile(testInputsPath.resolve("no_costs.csv"));
+        setVesselsFilePath(testInputsPath.resolve("dummy_boats.csv"));
+        getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+
+        final FisherDefinition fisherDefinition = getFisherDefinition();
+        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
+        gravityDestinationStrategyFactory
+            .setMaxTripDurationFile(testInputsPath.resolve("dummy_boats.csv"));
+        gravityDestinationStrategyFactory
+            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
+
+        ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
+            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
+
+        //noinspection OverlyStrongTypeCast
+        ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
+            .setLocationValuesFile(testInputsPath.resolve("dummy_location_values.csv"));
+        ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
+            .setMaxFadDeploymentsFile(testInputsPath.resolve("dummy_max_deployments.csv"));
     }
 
 }
