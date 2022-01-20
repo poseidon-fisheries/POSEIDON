@@ -85,11 +85,11 @@ abstract class LogisticFishAttractor<A, B extends LocalBiology, F extends Fad<B,
         final double attractableBiomass,
         final double totalFadBiomass
     ) {
-        return 1 - pow(exp(
+        return 1 - pow(exp(-(
             attractableBiomassCoefficients.get(species) * attractableBiomass +
                 biomassInteractionCoefficients.get(species) * attractableBiomass
                     * totalFadBiomass
-        ), compressionExponents.get(species));
+        )), compressionExponents.get(species));
     }
 
     public MersenneTwisterFast getRng() {
