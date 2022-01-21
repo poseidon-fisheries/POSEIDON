@@ -75,6 +75,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
             final FishYAML fishYAML = new FishYAML();
             final EpoAbundanceScenario epoAbundanceScenario =
                 fishYAML.loadAs(fileReader, EpoAbundanceScenario.class);
+            epoAbundanceScenario.useDummyData(Paths.get("inputs", "epo", "test"));
             final FishState fishState = new FishState();
             fishState.setScenario(epoAbundanceScenario);
             fishState.start();
