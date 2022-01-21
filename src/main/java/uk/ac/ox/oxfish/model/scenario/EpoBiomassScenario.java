@@ -327,6 +327,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             (BiomassPurseSeineGearFactory) fisherDefinition.getGear();
         final FisherFactory fisherFactory = makeFisherFactory(
             model,
+            fisherDefinition.getRegulation(),
             purseSeineGearFactory,
             (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy(),
             fisherDefinition.getFishingStrategy()

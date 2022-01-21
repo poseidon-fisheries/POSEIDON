@@ -70,6 +70,7 @@ import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -129,6 +130,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
+    private AlgorithmFactory<? extends Regulation> regulationsFactory =
+        new StandardIattcRegulationsFactory();
 
     /**
      * Just runs the scenario for a year.
@@ -151,10 +154,22 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         }
     }
 
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
+        return regulationsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
+        this.regulationsFactory = regulationsFactory;
+    }
+
+    @SuppressWarnings("unused")
     public AbundanceFadInitializerFactory getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setFadInitializerFactory(final AbundanceFadInitializerFactory fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
@@ -237,6 +252,18 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @SuppressWarnings("unused")
     public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
+    }
+
+    @Override
+    public void useDummyData(final Path testPath) {
+
+        super.useDummyData(testPath);
+        setAttractionWeightsFile(
+            testPath.resolve("dummy_action_weights.csv")
+        );
+        setLocationValuesFilePath(
+            testPath.resolve("dummy_location_values.csv")
+        );
     }
 
     @SuppressWarnings("unused")
@@ -370,6 +397,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
+            regulationsFactory,
             abundancePurseSeineGearFactory,
             gravityDestinationStrategyFactory,
             fishingStrategyFactory
@@ -397,18 +425,22 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Path getLocationValuesFilePath() {
         return locationValuesFilePath;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setLocationValuesFilePath(final Path locationValuesFilePath) {
         this.locationValuesFilePath = locationValuesFilePath;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Path getAttractionWeightsFile() {
         return attractionWeightsFile;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setAttractionWeightsFile(final Path attractionWeightsFile) {
         this.attractionWeightsFile = attractionWeightsFile;
     }
@@ -423,17 +455,5 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
-    }
-
-    @Override
-    public void useDummyData(final Path testPath) {
-
-        super.useDummyData(testPath);
-        setAttractionWeightsFile(
-            testPath.resolve("dummy_action_weights.csv")
-        );
-        setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
-        );
     }
 }

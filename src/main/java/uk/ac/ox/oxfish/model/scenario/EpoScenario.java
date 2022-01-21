@@ -57,6 +57,7 @@ import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> implements Scenario {
@@ -93,13 +94,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
 
     @NotNull    FisherFactory makeFisherFactory(
         final FishState fishState,
+        final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final PurseSeineGearFactory<B, F> purseSeineGearFactory,
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {
         final FisherFactory fisherFactory = new FisherFactory(
             null,
-            new StandardIattcRegulationsFactory(),
+            regulationsFactory,
             new PurseSeinerDepartingStrategyFactory(),
             gravityDestinationStrategyFactory,
             fishingStrategyFactory,
