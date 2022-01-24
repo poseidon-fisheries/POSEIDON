@@ -1,15 +1,14 @@
 package uk.ac.ox.oxfish.biology;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-import java.util.function.Supplier;
-
 import static com.google.common.cache.CacheLoader.from;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import java.nio.file.Path;
+import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Builds a SpeciesCodes map from a CSV file. The CSV file columns must be:
@@ -24,12 +23,12 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
         CacheBuilder.newBuilder().build(from(SpeciesCodesFromFileFactory::getSpeciesCodes));
     private Path speciesCodeFilePath;
 
-    public SpeciesCodesFromFileFactory(Path speciesCodeFilePath) {
+    public SpeciesCodesFromFileFactory(final Path speciesCodeFilePath) {
         this.speciesCodeFilePath = speciesCodeFilePath;
     }
 
     @NotNull
-    private static SpeciesCodes getSpeciesCodes(Path path) {
+    private static SpeciesCodes getSpeciesCodes(final Path path) {
         return new SpeciesCodes(
             parseAllRecords(path).stream().collect(toImmutableBiMap(
                 r -> r.getString("species_code"),
@@ -44,7 +43,7 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
     }
 
     @SuppressWarnings("unused")
-    public void setSpeciesCodeFilePath(Path speciesCodeFilePath) {
+    public void setSpeciesCodeFilePath(final Path speciesCodeFilePath) {
         this.speciesCodeFilePath = speciesCodeFilePath;
     }
 

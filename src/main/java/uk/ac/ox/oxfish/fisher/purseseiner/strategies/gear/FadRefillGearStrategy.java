@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Map;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.getBoatId;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.getBoatId;
 
 public class FadRefillGearStrategy implements GearStrategy {
 

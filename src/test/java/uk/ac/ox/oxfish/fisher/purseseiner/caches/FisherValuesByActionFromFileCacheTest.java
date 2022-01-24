@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 
 import java.nio.file.Path;
@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.DPL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClasses.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DEL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.FAD;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.NOA;
+import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.OFS;
 
 public class FisherValuesByActionFromFileCacheTest {
 
@@ -80,7 +80,7 @@ public class FisherValuesByActionFromFileCacheTest {
         check("", 1, NOA);
     }
 
-    private void check(String result, int fisherId, ActionClasses actionClass) {
+    private void check(String result, int fisherId, ActionClass actionClass) {
         assertEquals(
             result,
             cache.get(path, 2017, fishers.get(fisherId), actionClass.getActionClass())

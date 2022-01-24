@@ -1,13 +1,12 @@
 package uk.ac.ox.oxfish.maximization;
 
+import static com.google.common.collect.Streams.findLast;
+import static java.lang.Runtime.getRuntime;
+import static java.util.Arrays.stream;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
-import uk.ac.ox.oxfish.experiments.tuna.Policy;
-import uk.ac.ox.oxfish.experiments.tuna.Runner;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,16 +16,17 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static com.google.common.collect.Streams.findLast;
-import static java.lang.Runtime.getRuntime;
-import static java.util.Arrays.stream;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import uk.ac.ox.oxfish.experiments.tuna.Policy;
+import uk.ac.ox.oxfish.experiments.tuna.Runner;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"), "tuna", "calibration", "cenv0729", "2021-06-24_16.37.09"
+        System.getProperty("user.home"),
+        "workspace", "tuna", "abundance", "calibration", "outputs", "nicolas", "2021-12-07_19.00.35"
     );
 
     private final Path calibrationFilePath;
@@ -56,7 +56,9 @@ public class TunaEvaluator implements Runnable {
             findLast(lines).ifPresent(lastLine -> {
                 final String solutionString = substringBetween(lastLine, "{", "}").trim();
                 try (final Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
-                    while (scanner.hasNextDouble()) solutionBuilder.add(scanner.nextDouble());
+                    while (scanner.hasNextDouble()) {
+                        solutionBuilder.add(scanner.nextDouble());
+                    }
                 }
             });
         } catch (final IOException e) {
@@ -65,8 +67,10 @@ public class TunaEvaluator implements Runnable {
 
         final double[] solution = solutionBuilder.build().toArray();
         final Consumer<Scenario> scenarioConsumer = scenario -> {
-            final TunaScenario tunaScenario = (TunaScenario) scenario;
-            final PurseSeinerFishingStrategyFactory fishingStrategy = (PurseSeinerFishingStrategyFactory) tunaScenario.getFisherDefinition().getFishingStrategy();
+            final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
+            final PurseSeinerBiomassFishingStrategyFactory fishingStrategy =
+                (PurseSeinerBiomassFishingStrategyFactory) epoBiomassScenario.getFisherDefinition()
+                    .getFishingStrategy();
             //fishingStrategy.setFadDeploymentActionLogisticMidpoint(1);
 //            ((PurseSeineGearFactory) tunaScenario
 //                .getFisherDefinition()
@@ -104,7 +108,10 @@ public class TunaEvaluator implements Runnable {
         final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
 
         final Runner<Scenario> runner =
-            new Runner<>(() -> makeScenario(optimization, solution), calibrationFilePath.getParent())
+            new Runner<>(
+                () -> makeScenario(optimization, solution),
+                calibrationFilePath.getParent()
+            )
                 .registerRowProvider(
                     "evaluation_results.csv",
                     fishState -> new EvaluationResultsRowProvider(fishState, optimization)

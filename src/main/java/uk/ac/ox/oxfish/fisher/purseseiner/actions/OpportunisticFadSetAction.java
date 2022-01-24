@@ -19,22 +19,28 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public class OpportunisticFadSetAction extends AbstractFadSetAction {
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+
+public class OpportunisticFadSetAction<B extends LocalBiology, F extends Fad<B, F>>
+    extends AbstractFadSetAction<B, F> {
 
     public OpportunisticFadSetAction(
+        final F fad,
         final Fisher fisher,
-        final Fad fad
+        final double duration
     ) {
-        super(fisher, fad);
+        super(fad, fisher, duration);
         checkArgument(getFadManager(getFisher()) != fad.getOwner());
     }
 
-    @Override public boolean isOwnFad() { return false; }
+    @Override
+    public boolean isOwnFad() {
+        return false;
+    }
 
 }

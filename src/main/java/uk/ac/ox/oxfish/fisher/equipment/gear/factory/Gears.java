@@ -63,7 +63,7 @@ public class Gears {
         NAMES.put(HoldLimitingDecoratorFactory.class, "Hold Upper Limit");
         NAMES.put(DelayGearDecoratorFactory.class, "Hour Delay Gear");
         NAMES.put(MaxThroughputDecoratorFactory.class, "Max Throughput Limit");
-        NAMES.put(PurseSeineGearFactory.class, "Purse Seine Gear");
+        NAMES.put(BiomassPurseSeineGearFactory.class, "Biomass Purse Seine Gear");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

@@ -78,8 +78,11 @@ public class Scenarios {
         SCENARIOS.put("Indonesia",IndonesiaScenario::new);
         DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
 
-        SCENARIOS.put("Tuna", TunaScenario::new);
-        DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
+        SCENARIOS.put("EPO Biomass", EpoBiomassScenario::new);
+        DESCRIPTIONS.put("EPO Biomass", "A biomass-based scenario for purse-seine fishing in the Eastern Pacific Ocean.");
+
+        SCENARIOS.put("EPO Abundance", EpoAbundanceScenario::new);
+        DESCRIPTIONS.put("EPO Abundance", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
 
     }
 }

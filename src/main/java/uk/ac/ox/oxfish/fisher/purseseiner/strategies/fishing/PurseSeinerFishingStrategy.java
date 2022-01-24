@@ -19,30 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import com.google.common.collect.*;
-import ec.util.MersenneTwisterFast;
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.ActionResult;
-import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -54,30 +30,71 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPur
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public class PurseSeinerFishingStrategy implements FishingStrategy {
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Streams;
+import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.ActionResult;
+import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+
+public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B, F>>
+    implements FishingStrategy {
 
     private final double movingThreshold;
-    private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader;
-    private final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider;
+    private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>>
+        actionWeightsLoader;
+    private final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider;
     private final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
     private final double searchActionDecayConstant;
     private final double fadDeploymentActionDecayConstant;
-    private ImmutableMap<? extends Class<? extends PurseSeinerAction>, ActionAttractionField> attractionFields;
-    private SetOpportunityDetector setOpportunityDetector;
+    private ImmutableMap<? extends Class<? extends PurseSeinerAction>, ActionAttractionField>
+        attractionFields;
+    private SetOpportunityDetector<B> setOpportunityDetector;
     private Map<Class<? extends PurseSeinerAction>, Double> actionWeights;
     private List<Entry<PurseSeinerAction, Double>> potentialActions = ImmutableList.of();
 
     PurseSeinerFishingStrategy(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
-        final Function<Fisher, SetOpportunityDetector> setOpportunityLocatorProvider,
+        final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold
     ) {
         this.actionWeightsLoader = actionWeightsLoader;
-        this.setOpportunityLocatorProvider = setOpportunityLocatorProvider;
+        this.setOpportunityDetectorProvider = setOpportunityDetectorProvider;
         this.actionValueFunctions = ImmutableMap.copyOf(actionValueFunctions);
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
@@ -87,7 +104,7 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     @Override
     public void start(final FishState model, final Fisher fisher) {
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
-        setOpportunityDetector = setOpportunityLocatorProvider.apply(fisher);
+        setOpportunityDetector = setOpportunityDetectorProvider.apply(fisher);
         attractionFields =
             getPurseSeineGear(fisher)
                 .getAttractionFields()
@@ -114,23 +131,32 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final FishState fishState,
         final TripRecord currentTrip
     ) {
-        if (potentialActions.isEmpty()) potentialActions = findPotentialActions(fisher);
-        if (potentialActions.isEmpty()) actionCounts.clear();
+        if (potentialActions.isEmpty()) {
+            potentialActions = findPotentialActions(fisher, fishState.getSpecies());
+        }
+        if (potentialActions.isEmpty()) {
+            actionCounts.clear();
+        }
         return !potentialActions.isEmpty();
     }
 
-    private List<Entry<PurseSeinerAction, Double>> findPotentialActions(final Fisher fisher) {
+    private List<Entry<PurseSeinerAction, Double>> findPotentialActions(
+        final Fisher fisher,
+        final Collection<Species> species
+    ) {
 
-        if (fisher.getLocation().isLand()) return ImmutableList.of();
+        if (fisher.getLocation().isLand()) {
+            return ImmutableList.of();
+        }
 
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        final List<AbstractSetAction> possibleSetActions =
+        final List<AbstractSetAction<B>> possibleSetActions =
             setOpportunityDetector.possibleSetActions();
 
         final Stream<Entry<PurseSeinerAction, Double>> weightedSetActions =
             possibleSetActions.stream().map(action -> weightedAction(
                 action,
-                valueOfSetAction(action, actionValueFunctions.get(action.getClass()))
+                valueOfSetAction(action, actionValueFunctions.get(action.getClass()), species)
             ));
 
         // Generate a search action for each of the set classes with no opportunities,
@@ -161,7 +187,8 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
                     new FadDeploymentAction(fisher),
                     valueOfLocationBasedAction(
                         actionCounts.count(FadDeploymentAction.class),
-                        attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
+                        attractionFields.get(FadDeploymentAction.class)
+                            .getActionValueAt(gridLocation),
                         actionValueFunctions.get(FadDeploymentAction.class),
                         fadDeploymentActionDecayConstant
                     )
@@ -188,10 +215,11 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
     }
 
     private static double valueOfSetAction(
-        final AbstractSetAction action,
-        final DoubleUnaryOperator actionValueFunction
+        final AbstractSetAction<? extends LocalBiology> action,
+        final DoubleUnaryOperator actionValueFunction,
+        final Collection<Species> species
     ) {
-        final double totalBiomass = action.getTargetBiology().getTotalBiomass();
+        final double totalBiomass = action.getTargetBiology().getTotalBiomass(species);
         assert totalBiomass >= 0;
         if (totalBiomass == 0) {
             return 0; // avoids div by 0 when calculating catchableProportion
@@ -199,10 +227,13 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
             final Hold hold = action.getFisher().getHold();
             final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
             final double catchableProportion = min(1, capacity / totalBiomass);
-            final double[] biomass = action.getTargetBiology().getCurrentBiomass();
+            final double[] biomass = species.stream()
+                .mapToDouble(s -> action.getTargetBiology().getBiomass(s))
+                .toArray();
             final double[] potentialCatch = Arrays.copyOf(biomass, biomass.length);
-            for (int i = 0; i < potentialCatch.length; i++)
+            for (int i = 0; i < potentialCatch.length; i++) {
                 potentialCatch[i] *= catchableProportion;
+            }
             final double valueOfPotentialCatch =
                 new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
             return actionValueFunction.applyAsDouble(valueOfPotentialCatch);
@@ -228,7 +259,10 @@ public class PurseSeinerFishingStrategy implements FishingStrategy {
         final double hoursLeft
     ) {
         // record our visit to that tile
-        getPurseSeineGear(fisher).recordVisit(fisher.getLocation().getGridLocation(), fishState.getStep());
+        getPurseSeineGear(fisher).recordVisit(
+            fisher.getLocation().getGridLocation(),
+            fishState.getStep()
+        );
 
         // Pick the potential action with the highest value or
         // get moving if there aren't any possible actions.

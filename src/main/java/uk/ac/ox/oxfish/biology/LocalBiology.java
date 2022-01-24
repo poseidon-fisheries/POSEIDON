@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.biology;
 
+import static com.google.common.collect.Streams.stream;
+
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.Startable;
@@ -43,6 +45,15 @@ public interface LocalBiology extends Startable
      * @return the biomass of this species
      */
     double getBiomass(Species species);
+
+    /**
+     * The biomass at this location for the specified species.
+     * @param species an iterable of the species we are interested in.
+     * @return the sum of biomass for the specified species.
+     */
+    default double getTotalBiomass(final Iterable<? extends Species> species) {
+        return stream(species).mapToDouble(this::getBiomass).sum();
+    }
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location

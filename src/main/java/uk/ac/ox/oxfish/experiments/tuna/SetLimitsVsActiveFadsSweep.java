@@ -32,7 +32,8 @@ import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -67,13 +68,13 @@ public class SetLimitsVsActiveFadsSweep {
     private static final int POLICY_KICK_IN_YEAR = 3;
 
     public static void main(final String[] args) {
-        new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
             .setPolicies(new SetLimitsVsActiveFadsSweep().makePolicies())
             .requestYearlyData()
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<TunaScenario>> makePolicies() {
+    private ImmutableList<Policy<EpoBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();
@@ -84,12 +85,12 @@ public class SetLimitsVsActiveFadsSweep {
                 i -> new SetLimitsFactory(i * 25)
             ));
 
-        final Map<Integer, Function<TunaScenario, AlgorithmFactory<? extends Regulation>>> closureFactories =
+        final Map<Integer, Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>>> closureFactories =
             rangeClosed(0, 4).boxed().collect(toImmutableMap(
                 i -> i * 14,
                 i -> scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    scenario.galapagosEezReg, TAG_FOR_ALL,
-                    scenario.elCorralitoReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(JULY, 29) - (i * 14),
                         scenario.dayOfYear(OCTOBER, 8),
@@ -103,7 +104,7 @@ public class SetLimitsVsActiveFadsSweep {
                 ))
             ));
 
-        final ImmutableList.Builder<Policy<TunaScenario>> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Policy<EpoBiomassScenario>> builder = ImmutableList.builder();
 
         setLimitsFactories.forEach((i, setLimitsFactory) ->
             closureFactories.forEach((j, closureFactory) ->
@@ -118,12 +119,12 @@ public class SetLimitsVsActiveFadsSweep {
         return builder.build();
     }
 
-    private Policy<TunaScenario> makePolicy(
+    private Policy<EpoBiomassScenario> makePolicy(
         String policyName,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<TunaScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<TunaScenario> scenarioConsumer = scenario -> {
+        Consumer<EpoBiomassScenario> scenarioConsumer = scenario -> {
             final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
                 Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
             Steppable setRegulations = simState -> {

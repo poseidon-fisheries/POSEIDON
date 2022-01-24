@@ -20,7 +20,12 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
+
 import com.google.common.base.Preconditions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jfree.util.Log;
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -39,8 +44,9 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExogenousCatches {
 
-    protected final LinkedHashMap<Species,Double> exogenousYearlyCatchesInKg;
+    private static final Logger logger = LogManager.getLogger("biomass_events");
 
+    protected final LinkedHashMap<Species,Double> exogenousYearlyCatchesInKg;
 
     private static int MAX_STEPS = 10000;
 
@@ -69,7 +75,7 @@ public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExoge
             List<? extends LocalBiology> tiles =  allTiles.stream().filter(
                     seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
 
-
+            final double biomassBefore = ((FishState) simState).getTotalBiomass(catches.getKey());
 
             int steps = 0;
             //as long as there is fish to catch and places with fish
@@ -103,9 +109,16 @@ public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExoge
 
             lastExogenousCatchesMade.put(target,totalBiomassCaught);
 
+            final double biomassAfter = ((FishState) simState).getTotalBiomass(catches.getKey());
 
-
-
+            logger.debug(() -> new ObjectArrayMessage(
+                ((FishState) simState).getStep(),
+                BIOLOGY_PHASE,
+                "CATCH_EXOGENOUSLY",
+                catches.getKey(),
+                biomassBefore,
+                biomassAfter
+            ));
 
         }
 

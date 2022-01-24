@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -26,41 +27,52 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-public abstract class AbstractFadSetAction extends AbstractSetAction {
+public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Fad<B, F>>
+    extends AbstractSetAction<B> {
 
-    private final Fad fad;
+    private final F fad;
 
     public AbstractFadSetAction(
+        final F fad,
         final Fisher fisher,
-        final Fad fad
+        final double duration
     ) {
         super(
+            fad.getBiology(),
             fisher,
-            1.0, // TODO
-            fad.getBiology()
+            duration
         );
         this.fad = fad;
     }
 
-    public Fad getFad() { return fad; }
-
-    @Override boolean checkSuccess() {
-        final PurseSeineGear purseSeineGear = (PurseSeineGear) getFisher().getGear();
-        return getFisher().grabRandomizer().nextDouble() < purseSeineGear.getSuccessfulFadSetProbability();
+    public F getFad() {
+        return fad;
     }
 
-    @Override public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
+    @Override
+    boolean checkSuccess() {
+        final PurseSeineGear<?, ?> purseSeineGear = (PurseSeineGear<?, ?>) getFisher().getGear();
+        return getFisher().grabRandomizer().nextDouble()
+            < purseSeineGear.getSuccessfulFadSetProbability();
+    }
+
+    @Override
+    public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
         // Nothing to do here since the biomass has already been removed from the ocean
     }
 
     /**
      * When a FAD set fails, the fish is returned to the underlying sea tile biology.
      */
-    @Override public void reactToFailedSet(FishState fishState, SeaTile locationOfSet) {
+    @Override
+    public void reactToFailedSet(final FishState fishState, final SeaTile locationOfSet) {
         fad.releaseFish(fishState.getBiology().getSpecies(), locationOfSet.getBiology());
     }
 
-    @Override void notify(FadManager fadManager) { fadManager.reactTo(this); }
+    @Override
+    void notify(final FadManager<?, ?> fadManager) {
+        fadManager.reactTo(this);
+    }
 
     // TODO: get rid of that and check on subclass instead
     public abstract boolean isOwnFad();

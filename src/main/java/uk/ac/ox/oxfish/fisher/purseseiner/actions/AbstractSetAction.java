@@ -19,8 +19,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+
+import java.util.Optional;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -31,26 +36,24 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import java.util.Optional;
+public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSeinerAction {
 
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-
-public abstract class AbstractSetAction extends PurseSeinerAction {
-
-    private final VariableBiomassBasedBiology targetBiology;
+    private final B targetBiology;
     private Catch catchesKept;
 
     AbstractSetAction(
+        final B targetBiology,
         final Fisher fisher,
-        final double duration,
-        final VariableBiomassBasedBiology targetBiology
+        final double duration
     ) {
-        super(fisher, duration);
+        // fisher.fishHere weirdly wants an int duration, so we have to round it
+        super(fisher, max(1.0, round(duration)));
         this.targetBiology = targetBiology;
     }
 
-    public Optional<Catch> getCatchesKept() { return Optional.ofNullable(catchesKept); }
+    public Optional<Catch> getCatchesKept() {
+        return Optional.ofNullable(catchesKept);
+    }
 
     @Override
     public ActionResult act(
@@ -62,21 +65,21 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
 
-        final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-
-        // fisher.fishHere weirdly wants an int duration, so we have to round it
-        final int duration = (int) max(1.0, round(getDuration()));
+        final PurseSeineGear<?, ?> purseSeineGear = getPurseSeineGear(fisher);
 
         if (checkSuccess()) {
             final GlobalBiology globalBiology = fishState.getBiology();
-            catchesKept = fisher.fishHere(globalBiology, duration, fishState, targetBiology).getSecond();
+            // the action duration is rounded at construction but we still have to cast it
+            catchesKept = fisher
+                .fishHere(globalBiology, (int) getDuration(), fishState, targetBiology)
+                .getSecond();
             fishState.recordFishing(getLocation()); // TODO: make listener
             reactToSuccessfulSet(fishState, getLocation());
         } else {
             reactToFailedSet(fishState, getLocation());
         }
         notify(purseSeineGear.getFadManager());
-        return new ActionResult(new Arriving(), hoursLeft - duration);
+        return new ActionResult(new Arriving(), hoursLeft - getDuration());
     }
 
     abstract boolean checkSuccess();
@@ -85,18 +88,19 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
 
     abstract void reactToFailedSet(FishState model, SeaTile locationOfSet);
 
-    abstract void notify(FadManager fadManager);
+    abstract void notify(FadManager<?, ?> fadManager);
 
-    public VariableBiomassBasedBiology getTargetBiology() { return targetBiology; }
+    public B getTargetBiology() {
+        return targetBiology;
+    }
 
     @Override
     public boolean checkIfPermitted() {
-        return super.checkIfPermitted() &&
-            getFisher().getRegulation().canFishHere(
-                getFisher(),
-                getLocation(),
-                getFisher().grabState(),
-                getStep()
-            );
+        return super.checkIfPermitted() && getFisher().getRegulation().canFishHere(
+            getFisher(),
+            getLocation(),
+            getFisher().grabState(),
+            getStep()
+        );
     }
 }

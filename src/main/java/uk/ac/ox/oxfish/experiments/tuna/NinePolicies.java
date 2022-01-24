@@ -32,7 +32,8 @@ import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -64,13 +65,13 @@ public class NinePolicies {
     private static final int POLICY_KICK_IN_YEAR = 2;
 
     public static void main(final String[] args) {
-        new Runner<>(TunaScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
             .setPolicies(new NinePolicies().makePolicies())
             .requestYearlyData()
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<TunaScenario>> makePolicies() {
+    private ImmutableList<Policy<EpoBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();
@@ -113,8 +114,8 @@ public class NinePolicies {
                 "86-day closures",
                 ImmutableList.of(currentFadLimits),
                 scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    scenario.galapagosEezReg, TAG_FOR_ALL,
-                    scenario.elCorralitoReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(JULY, 15),
                         scenario.dayOfYear(OCTOBER, 8),
@@ -131,8 +132,8 @@ public class NinePolicies {
                 "100-day closures",
                 ImmutableList.of(currentFadLimits),
                 scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    scenario.galapagosEezReg, TAG_FOR_ALL,
-                    scenario.elCorralitoReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
+                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
                     new TemporaryRegulationFactory(
                         scenario.dayOfYear(JULY, 1),
                         scenario.dayOfYear(OCTOBER, 8),
@@ -153,12 +154,12 @@ public class NinePolicies {
         );
     }
 
-    private Policy<TunaScenario> makePolicy(
+    private Policy<EpoBiomassScenario> makePolicy(
         String policyName,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<TunaScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<TunaScenario> scenarioConsumer = scenario -> {
+        Consumer<EpoBiomassScenario> scenarioConsumer = scenario -> {
             final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
                 Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
             Steppable setRegulations = simState -> {

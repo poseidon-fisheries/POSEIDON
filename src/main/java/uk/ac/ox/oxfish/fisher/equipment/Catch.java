@@ -21,13 +21,15 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
 import com.google.common.base.Preconditions;
+import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Arrays;
 
 /**
  * Right now this is just a map specie--->pounds caught. It might in the future deal with age and other factors which is
@@ -194,6 +196,27 @@ public class Catch {
 
     }
 
+    /**
+     * Constructs a catch object capturing the whole biomass of the target biology.
+     *
+     * @param biology The target biology.
+     */
+    public Catch(final VariableBiomassBasedBiology biology) {
+        this(biology.getCurrentBiomass());
+    }
+
+    public Catch(
+        final GlobalBiology globalBiology, final AbundanceLocalBiology caughtBiology
+    ) {
+        this(
+            globalBiology
+                .getSpecies()
+                .stream()
+                .map(species -> new StructuredAbundance(caughtBiology.getAbundance(species)))
+                .toArray(StructuredAbundance[]::new),
+            globalBiology
+        );
+    }
 
     public double getWeightCaught(Species species)
     {

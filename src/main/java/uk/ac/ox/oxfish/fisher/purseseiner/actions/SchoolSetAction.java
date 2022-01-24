@@ -19,69 +19,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
-
-public class SchoolSetAction extends AbstractSetAction {
+public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSetAction<B> {
 
     SchoolSetAction(
+        final B targetBiology,
         final Fisher fisher,
-        final CatchSampler catchSampler,
         final double setDuration
     ) {
-        this(
-            fisher,
-            makeSchoolBiology(fisher, catchSampler),
-            setDuration
-        );
-    }
-
-    SchoolSetAction(
-        final Fisher fisher,
-        final VariableBiomassBasedBiology targetBiology,
-        final double setDuration
-    ) {
-        super(
-            fisher,
-            setDuration,
-            targetBiology
-        );
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private static VariableBiomassBasedBiology makeSchoolBiology(
-        final Fisher fisher,
-        final CatchSampler catchSampler
-    ) {
-        GlobalBiology globalBiology = fisher.grabState().getBiology();
-        LocalBiology seaTileBiology = fisher.getLocation().getBiology();
-
-        final double[] availableBiomass =
-            range(0, globalBiology.getSize())
-                .mapToDouble(i -> seaTileBiology.getBiomass(globalBiology.getSpecie(i)))
-                .toArray();
-
-        final double[] biomassCaught =
-            catchSampler.next(availableBiomass).toArray();
-
-        return new BiomassLocalBiology(biomassCaught, biomassCaught);
-    }
-
-    static double setDuration(final Fisher fisher, Class<? extends AbstractSetAction> actionClass) {
-        final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-        return toHours(purseSeineGear.nextSetDuration(actionClass));
+        super(targetBiology, fisher, setDuration);
     }
 
     @Override
@@ -92,9 +46,11 @@ public class SchoolSetAction extends AbstractSetAction {
     }
 
     @Override
-    public void reactToSuccessfulSet(FishState fishState, SeaTile locationOfSet) {
+    public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
         // Remove the catches from the underlying biology:
-        final Catch catchObject = new Catch(getTargetBiology().getCurrentBiomass());
+        final Catch catchObject = makeCatch(getTargetBiology());
+        // Note that, despite "biomass" in the name, the following method
+        // can react to abundance-based catches:
         locationOfSet.reactToThisAmountOfBiomassBeingFished(
             catchObject,
             catchObject,
@@ -103,11 +59,26 @@ public class SchoolSetAction extends AbstractSetAction {
     }
 
     @Override
-    public void reactToFailedSet(FishState fishState, SeaTile locationOfSet) {
+    public void reactToFailedSet(final FishState fishState, final SeaTile locationOfSet) {
         throw new IllegalStateException("School sets shouldn't 'fail'.");
     }
 
     @Override
-    void notify(FadManager fadManager) { fadManager.reactTo(this); }
+    void notify(final FadManager<?, ?> fadManager) {
+        fadManager.reactTo(this);
+    }
+
+    private Catch makeCatch(final B biology) {
+        if (biology instanceof VariableBiomassBasedBiology) {
+            return new Catch((VariableBiomassBasedBiology) biology);
+        } else if (biology instanceof AbundanceLocalBiology) {
+            return new Catch(
+                getFisher().grabState().getBiology(),
+                (AbundanceLocalBiology) biology
+            );
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
 }

@@ -20,16 +20,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
+import java.util.function.DoubleSupplier;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import uk.ac.ox.oxfish.utility.MTFApache;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Time;
-
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.HOUR;
-
-public class DurationSampler {
+public class DurationSampler implements DoubleSupplier {
 
     private final LogNormalDistribution logNormalDistribution;
 
@@ -45,8 +40,11 @@ public class DurationSampler {
         );
     }
 
-    public Quantity<Time> nextDuration() {
-        return getQuantity(logNormalDistribution.sample(), HOUR);
+    /**
+     * Returns the next duration in hours.     *
+     */
+    @Override
+    public double getAsDouble() {
+        return logNormalDistribution.sample();
     }
-
 }

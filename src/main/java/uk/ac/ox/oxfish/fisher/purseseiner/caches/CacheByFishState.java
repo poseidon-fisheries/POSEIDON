@@ -26,26 +26,28 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
- * This class makes it easy to cache objects that should be reused within the same simulation.
- * It's an alternative to {@code uk.ac.ox.oxfish.utility.Locker}, with the added benefit that
- * the cache can potentially be queried in parallel by multiple simulations.
+ * This class makes it easy to cache objects that should be reused within the same simulation. It's
+ * an alternative to {@code uk.ac.ox.oxfish.utility.Locker}, with the added benefit that the cache
+ * can potentially be queried in parallel by multiple simulations.
  * <p>
  * Great care should be taken however, to avoid caching objects that hold a reference back to the
- * {@code FishState}, otherwise the entries will never be collected. One possible gotcha: don't
- * hold on to a stoppable that's created from an {@code AggregateSteppable}, as those might include
+ * {@code FishState}, otherwise the entries will never be collected. One possible gotcha: don't hold
+ * on to a stoppable that's created from an {@code AggregateSteppable}, as those might include
  * references to all sorts of stuff you don't expect (true story).
  */
 public class CacheByFishState<T> {
 
     private final LoadingCache<FishState, T> cache;
 
-    public CacheByFishState(AlgorithmFactory<T> factory) {
+    public CacheByFishState(final AlgorithmFactory<T> factory) {
         this.cache = CacheBuilder
             .newBuilder()
             .weakKeys()
             .build(CacheLoader.from(factory::apply));
     }
 
-    public T get(FishState fishState) { return cache.getUnchecked(fishState); }
+    public T get(final FishState fishState) {
+        return cache.getUnchecked(fishState);
+    }
 
 }

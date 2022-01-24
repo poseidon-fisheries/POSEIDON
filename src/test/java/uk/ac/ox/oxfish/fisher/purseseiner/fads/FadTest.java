@@ -19,7 +19,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import com.google.common.collect.ImmutableMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
+
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Int2D;
@@ -28,44 +36,37 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
-
 public class FadTest {
 
-    private final GlobalBiology globalBiology = new GlobalBiology(new Species("A"), new Species("B"));
+    private final GlobalBiology globalBiology =
+        new GlobalBiology(new Species("A"), new Species("B"));
 
     @Test
     public void releaseFish() {
 
-        // Make a full FAD, with a carrying capacity of 0.75...
-        final BiomassLocalBiology fadBiology = makeBiology(globalBiology, 0.75);
-        fillBiology(fadBiology);
+        // Make a full FAD
+        final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final Fad fad = new Fad(
+        final BiomassFad fad = new BiomassFad(
             fadManager,
             fadBiology,
-            ImmutableMap.of(),
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
             0.5,
             0,
-            new Int2D()
+            new Int2D(),
+            1.5
         );
+        fillBiomassFad(fad);
 
         // ...and an empty tile biology, with a carrying capacity of 1.0:
-        VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);
+        final VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);
 
         // generate failed attempt to release the FAD's fish into the tile biology
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
         when(rng.nextDouble()).thenReturn(1.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // check that the FAD is still full and the tile biology is still empty
-        assertTrue(fad.getBiology().isFull());
+        assertTrue(fad.isFull());
         assertTrue(tileBiology.isEmpty());
 
         // release the FAD's fish into the tile biology
@@ -73,11 +74,10 @@ public class FadTest {
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // Check that the FAD is now empty and the tile has received the fish
         assertTrue(fadBiology.isEmpty());
-        for (Species species : globalBiology.getSpecies())
-            assertEquals(tileBiology.getBiomass(species), fadBiology.getCarryingCapacity(species), 0d);
+        assertEquals(tileBiology.getTotalBiomass(), fad.getTotalCarryingCapacity(), 0);
 
         // Refill the FAD and release another batch of FAD fish into the tile biology
-        fillBiology(fadBiology);
+        fillBiomassFad(fad);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
 
         // Check that the FAD is now empty and the tile is now at full carrying capacity
@@ -85,7 +85,7 @@ public class FadTest {
         assertTrue(tileBiology.isFull());
 
         // Fill the FAD one last time and release the fish to nowhere
-        fillBiology(fadBiology);
+        fillBiomassFad(fad);
         when(rng.nextDouble()).thenReturn(1.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
         assertFalse(fadBiology.isEmpty());

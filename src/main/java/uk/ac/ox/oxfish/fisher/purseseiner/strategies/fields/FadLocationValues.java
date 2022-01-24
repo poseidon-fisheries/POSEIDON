@@ -19,21 +19,22 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
-import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.Map.Entry;
-import java.util.Set;
-
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingDouble;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
+import java.util.Map.Entry;
+import java.util.Set;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class FadLocationValues implements LocationValues {
 
@@ -51,17 +52,22 @@ public class FadLocationValues implements LocationValues {
     @Override
     public Set<Entry<Int2D, Double>> getValues() {
 
-        FadManager fadManager = getFadManager(fisher);
-        FadMap fadMap = fadManager.getFadMap();
+        final FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager =
+            getFadManager(fisher);
+        final FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap =
+            fadManager.getFadMap();
 
         //noinspection UnstableApiUsage
-        return fadManager
+        return getFadManager(fisher)
             .getDeployedFads()
             .stream()
-            .flatMap(fad -> stream(fadMap.getFadTile(fad).map(tile -> entry(
-                new Int2D(tile.getGridX(), tile.getGridY()),
-                fad.valueOfFishFor(fisher)
-            ))))
+            .flatMap(fad ->
+                stream(fadMap.getFadTile(fad))
+                    .map(tile -> entry(
+                        new Int2D(tile.getGridX(), tile.getGridY()),
+                        fad.valueOfFishFor(fisher)
+                    ))
+            )
             .collect(groupingBy(Entry::getKey, summingDouble(Entry::getValue)))
             .entrySet();
     }

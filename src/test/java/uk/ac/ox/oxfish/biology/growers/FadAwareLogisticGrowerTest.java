@@ -19,40 +19,34 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
-import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
-import uk.ac.ox.oxfish.model.scenario.TunaScenario;
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.junit.Assert.assertEquals;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 import java.nio.file.Paths;
-import java.util.function.Supplier;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
+import org.junit.Test;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 public class FadAwareLogisticGrowerTest {
 
     @Test
     public void jonLandings() {
 
-        final TunaScenario scenario = new TunaScenario();
-        scenario.setCostsFile(input("no_costs.csv"));
-        scenario.setBoatsFile(input("dummy_boats.csv"));
-        scenario.setAttractionWeightsFile(input("dummy_action_weights.csv"));
-        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-        final FisherDefinition fisherDefinition = scenario.getFisherDefinition();
-        ((GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy())
-            .setMaxTripDurationFile(input("dummy_boats.csv"));
-        ((PurseSeineGearFactory) fisherDefinition.getGear())
-            .setLocationValuesFile(input("dummy_location_values.csv"));
+        addCsvLogger(
+            DEBUG,
+            "biomass_events",
+            "step,stepOrder,process,species,biomassBefore,biomassAfter"
+        );
 
-        scenario.getExogenousCatchesFactory().setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
+        final EpoBiomassScenario scenario = new EpoBiomassScenario();
+        scenario.useDummyData(EpoScenario.INPUT_PATH.resolve("test"));
+
+        scenario.getExogenousCatchesFactory()
+            .setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
         scenario.getFisherDefinition().setRegulation(new NoFishingFactory());
 
         final FishState state = new FishState();
@@ -67,6 +61,8 @@ public class FadAwareLogisticGrowerTest {
         final Species yft = state.getBiology().getSpecie("Yellowfin tuna");
         assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
+
     }
+
 
 }

@@ -1,5 +1,5 @@
 name: Tests
-on: [push]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --scan --no-daemon
       - name: Generate coverage report
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov

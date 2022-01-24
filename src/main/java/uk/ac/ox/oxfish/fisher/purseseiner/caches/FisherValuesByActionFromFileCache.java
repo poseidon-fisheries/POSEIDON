@@ -19,15 +19,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import static java.util.Collections.emptyMap;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 /**
  * Caches based on this class store values loaded from a file and uniquely identified by:
@@ -64,16 +72,15 @@ public abstract class FisherValuesByActionFromFileCache<T>
     }
 
     /**
-     * These enums are mostly used to convert strings to action classes
-     * when loading data from CSV files, e.g:
+     * These enums are mostly used to convert strings to action classes when loading data from CSV
+     * files, e.g:
      * <p>
      * {@code ActionClasses.valueOf(record.getString("event")).getActionClass()}
      * <p>
-     * They could also be used to get the action class directly,
-     * e.g. {@code OFS.getActionClass()} instead of writing
-     * {@code OpportunisticFadSetAction.class}.
+     * They could also be used to get the action class directly, e.g. {@code OFS.getActionClass()}
+     * instead of writing {@code OpportunisticFadSetAction.class}.
      */
-    public enum ActionClasses {
+    public enum ActionClass {
 
         FAD(FadSetAction.class),
         DEL(DolphinSetAction.class),
@@ -83,18 +90,29 @@ public abstract class FisherValuesByActionFromFileCache<T>
 
         private final Class<? extends PurseSeinerAction> actionClass;
 
-        ActionClasses(final Class<? extends PurseSeinerAction> actionClass) {this.actionClass = actionClass;}
-
-        public static Class<? extends AbstractSetAction> getSetActionClass(final String setActionCode) {
-            //noinspection unchecked
-            return Optional
-                .of(ActionClasses.valueOf(setActionCode.toUpperCase()).getActionClass())
-                .filter(AbstractSetAction.class::isAssignableFrom)
-                .map(clazz -> (Class<? extends AbstractSetAction>) clazz)
-                .orElseThrow(() -> new IllegalStateException("Unknown set action code: " + setActionCode));
+        ActionClass(final Class<? extends PurseSeinerAction> actionClass) {
+            this.actionClass = actionClass;
         }
 
-        public Class<? extends PurseSeinerAction> getActionClass() { return actionClass; }
+        public static Class<? extends AbstractSetAction<?>> getSetActionClass(final String setActionCode) {
+            //noinspection unchecked
+            return Optional
+                .of(ActionClass.valueOf(setActionCode.toUpperCase()).getActionClass())
+                .filter(AbstractSetAction.class::isAssignableFrom)
+                .map(clazz -> (Class<? extends AbstractSetAction<?>>) clazz)
+                .orElseThrow(() -> new IllegalStateException(
+                    "Unknown set action code: " + setActionCode));
+        }
+
+        public Class<? extends PurseSeinerAction> getActionClass() {
+            return actionClass;
+        }
+
+        public static final Map<Class<? extends PurseSeinerAction>, ActionClass> classMap =
+            Arrays.stream(values()).collect(toImmutableMap(
+                ActionClass::getActionClass,
+                identity()
+            ));
 
     }
 

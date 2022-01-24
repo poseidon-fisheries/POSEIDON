@@ -20,17 +20,24 @@
 
 package uk.ac.ox.oxfish.model;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Doubles;
-
 import ec.util.MersenneTwisterFast;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -41,11 +48,13 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -102,7 +111,7 @@ public class FishState  extends SimState{
     /**
      * may contain the fad map, if fads are used in the scenario (null otherwise)
      */
-    private FadMap fadMap = null;
+    private FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap = null;
 
     /**
      * Dataset of all the columns that are updated daily
@@ -501,6 +510,14 @@ public class FishState  extends SimState{
     {
         final double fadBiomass = fadMap == null ? 0 : fadMap.getTotalBiomass(species);
         return fadBiomass + map.getTotalBiomass(species);
+    }
+
+    /**
+     * Returns a map from species to their total biomass (including FAD biomass).
+     */
+    public Map<Species, Double> getTotalBiomasses() {
+        return biology.getSpecies().stream()
+            .collect(toImmutableMap(identity(), this::getTotalBiomass));
     }
 
     public double getTotalAbundance(Species species,int bin)
@@ -929,9 +946,13 @@ public class FishState  extends SimState{
 
     }
 
-    public FadMap getFadMap() { return fadMap; }
+    public FadMap<? extends LocalBiology, ? extends Fad<?, ?>> getFadMap() {
+        return fadMap;
+    }
 
-    public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
+    public void setFadMap(final FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap) {
+        this.fadMap = fadMap;
+    }
 
     public List<Startable> viewStartables(){
         return ImmutableList.copyOf(toStart);

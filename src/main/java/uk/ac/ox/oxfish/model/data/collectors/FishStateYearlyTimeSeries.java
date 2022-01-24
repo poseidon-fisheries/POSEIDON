@@ -20,6 +20,20 @@
 
 package uk.ac.ox.oxfish.model.data.collectors;
 
+import static tech.units.indriya.AbstractUnit.ONE;
+import static tech.units.indriya.unit.Units.HOUR;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.model.FishStateDailyTimeSeries.getAllMarketColumns;
+import static uk.ac.ox.oxfish.utility.Measures.KILOMETRE;
+
+import java.util.DoubleSummaryStatistics;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.DoublePredicate;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -29,20 +43,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.DoubleSummaryStatistics;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.DoublePredicate;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Collectors;
-
-import static tech.units.indriya.AbstractUnit.ONE;
-import static tech.units.indriya.unit.Units.HOUR;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.model.FishStateDailyTimeSeries.getAllMarketColumns;
-import static uk.ac.ox.oxfish.utility.Measures.KILOMETRE;
 
 /**
  * Aggregate data, yearly. Mostly just sums up what the daily data-set discovered
@@ -156,37 +156,41 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                     },Double.NaN);
 
             final String price = species + " Average Sale Price";
-            registerGatherer(price,
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState fishState) {
-                                     final String earnings =  species + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
-                                     final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
-
-                                     DataColumn numerator = originalGatherer.getColumn(earnings);
-                                     DataColumn denominator = originalGatherer.getColumn(landings);
-                                     final Iterator<Double> numeratorIterator = numerator.descendingIterator();
-                                     final Iterator<Double>  denominatorIterator = denominator.descendingIterator();
-                                     if(!numeratorIterator.hasNext()) //not ready/year 1
-                                         return Double.NaN;
-                                     double sumNumerator = 0;
-                                     double sumDenominator = 0;
-                                     for(int i=0; i<365; i++) {
-                                         //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                                         //and only has a partially filled collection
-                                         if(numeratorIterator.hasNext()) {
-                                             sumNumerator += numeratorIterator.next();
-                                             sumDenominator += denominatorIterator.next();
-                                         }
-                                     }
-                                     return  sumNumerator/sumDenominator;
-
-                                 }
-                             },Double.NaN, currency, "Price");
-
-
-
-
+            final String earnings = species + " " + AbstractMarket.EARNINGS_COLUMN_NAME;
+            final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+            // Only add average sales price gatherers if we have columns for earnings and landings,
+            // avoiding NPE when running a minimal scenario with no markets.
+            Optional.ofNullable(originalGatherer.getColumn(earnings)).ifPresent(numerator ->
+                Optional.ofNullable(originalGatherer.getColumn(landings)).ifPresent(denominator ->
+                    registerGatherer(
+                        price,
+                        fishState -> {
+                            final Iterator<Double> numeratorIterator =
+                                numerator.descendingIterator();
+                            final Iterator<Double> denominatorIterator =
+                                denominator.descendingIterator();
+                            if (!numeratorIterator.hasNext()) { //not ready/year 1
+                                return Double.NaN;
+                            }
+                            double sumNumerator = 0;
+                            double sumDenominator = 0;
+                            for (int i = 0; i < 365; i++) {
+                                // it should be step 365 times at most, but it's possible
+                                // that this agent was added halfway through and only has
+                                // a partially filled collection
+                                if (numeratorIterator.hasNext()) {
+                                    sumNumerator += numeratorIterator.next();
+                                    sumDenominator += denominatorIterator.next();
+                                }
+                            }
+                            return sumNumerator / sumDenominator;
+                        },
+                        Double.NaN,
+                        currency,
+                        "Price"
+                    )
+                )
+            );
         }
 
         for (Species species : observed.getSpecies()) {

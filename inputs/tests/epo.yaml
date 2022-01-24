@@ -1,0 +1,135 @@
+EPO Abundance:
+  abundanceCatchSamplersFactory:
+    abundanceFilters: null
+    catchSamplesFile: inputs/epo/set_samples.csv
+  abundanceFiltersFactory:
+    selectivityFilePath: inputs/epo/abundance/selectivity.csv
+  abundanceInitializerFactory:
+    Abundance Initializer Factory:
+      binsFilePath: inputs/epo/abundance/bins.csv
+  abundancePurseSeineGearFactory:
+    actionDistanceExponent: 1.0
+    actionSpecificRegulations:
+    - Active FAD limits:
+        limitClass1: 70
+        limitClass2: 70
+        limitClass3: 70
+        limitClass4: 120
+        limitClass5: 120
+        limitClass6a: 300
+        limitClass6b: 450
+    biomassLostMonitor: null
+    decayRateOfDeploymentLocationValues: 0.01
+    decayRateOfDolphinSetLocationValues: 0.01
+    decayRateOfNonAssociatedSetLocationValues: 0.01
+    decayRateOfOpportunisticFadSetLocationValues: 0.01
+    destinationDistanceExponent: 1.0
+    dolphinSetObservers: !!set {
+      }
+    dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
+    fadDeploymentObservers: !!set {
+      }
+    fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
+    fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
+    fadSetObservers: !!set {
+      }
+    locationValuesFile: inputs/epo/location_values.csv
+    nonAssociatedSetObservers: !!set {
+      }
+    nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
+    numFadsInStockLogisticMidpoint: 5.0
+    numFadsInStockLogisticSteepness: 1.0
+    opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
+    opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
+    pctHoldSpaceLeftLogisticMidpoint: 0.9
+    pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
+    pctSetsRemainingLogisticMidpoint: 0.5
+    pctSetsRemainingLogisticSteepness: 1.0
+    pctTravelTimeLeftLogisticMidpoint: 0.9
+    pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
+    successfulSetProbability: '0.9231701'
+  abundanceReallocatorFactory:
+    Abundance Reallocator:
+      biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
+      firstLargeBinPerSpecies:
+        Skipjack tuna: 14
+        Bigeye tuna: 8
+        Yellowfin tuna: 9
+  abundanceRestorerFactory:
+    schedule:
+      0: 364
+  attractionWeightsFile: inputs/epo/action_weights.csv
+  costsFile: inputs/epo/costs.csv
+  fadInitializerFactory:
+    Abundance FAD Initializer:
+      attractableBiomassCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      biomassInteractionsCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      compressionExponents:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      fishReleaseProbabilityInPercent: '0.0'
+      growthRates:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      selectivityFilters: {
+        }
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  fadMapFactory:
+    currentFiles:
+      Y2017: inputs/epo/currents/currents_2017.csv
+  fishingStrategyFactory:
+    attractionWeightsFile: null
+    catchSamplersFactory: null
+    dolphinSetActionLogisticMidpoint: 0.1
+    dolphinSetActionLogisticSteepness: 1.0
+    dolphinSetDetectionProbability: 0.1
+    dolphinSetGeneratorLogisticMidpoint: 100000.0
+    dolphinSetGeneratorLogisticSteepness: 1.0
+    fadDeploymentActionDecayConstant: 1.0
+    fadDeploymentActionLogisticMidpoint: 0.1
+    fadDeploymentActionLogisticSteepness: 1.0
+    fadSetActionLogisticMidpoint: 0.1
+    fadSetActionLogisticSteepness: 1.0
+    movingThreshold: 0.1
+    nonAssociatedSetActionLogisticMidpoint: 0.1
+    nonAssociatedSetActionLogisticSteepness: 1.0
+    nonAssociatedSetDetectionProbability: 0.1
+    nonAssociatedSetGeneratorLogisticMidpoint: 100000.0
+    nonAssociatedSetGeneratorLogisticSteepness: 1.0
+    opportunisticFadSetActionLogisticMidpoint: 0.1
+    opportunisticFadSetActionLogisticSteepness: 1.0
+    opportunisticFadSetDetectionProbability: 0.1
+    searchActionDecayConstant: 1.0
+    searchActionLogisticMidpoint: 0.1
+    searchActionLogisticSteepness: 1.0
+    searchBonus: 0.1
+    setCompositionWeightsPath: inputs/epo/set_compositions.csv
+  locationValuesFilePath: inputs/epo/location_values.csv
+  mapInitializerFactory:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo/depth.csv
+      mapPaddingInDegrees: '0.5'
+  recruitmentProcessesFactory:
+    recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
+  scheduledAbundanceProcessesFactory:
+    biologicalProcessesDates:
+    - '2017-01-01'
+    - '2017-04-01'
+    - '2017-07-01'
+    - '2017-10-01'
+    recruitmentProcesses: null
+  vesselsFilePath: inputs/epo/boats.csv

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassReallocatorInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
@@ -74,7 +74,8 @@ public class BiologyInitializers {
         NAMES.put(SingleSpeciesBoxcarFromListFactory.class, "Boxcar Biology from List");
         NAMES.put(SingleSpeciesIrregularBoxcarFactory.class, "Irregular Boxcar Biology");
         NAMES.put(SingleSpeciesBoxcarPulseRecruitmentFactory.class, "Boxcar Biology with pulses");
-        NAMES.put(BiomassReallocatorInitializerFactory.class, "Biomass Reallocator Factory");
+        NAMES.put(BiomassInitializerFactory.class, "Biomass Initializer Factory");
+        NAMES.put(AbundanceInitializerFactory.class, "Abundance Initializer Factory");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

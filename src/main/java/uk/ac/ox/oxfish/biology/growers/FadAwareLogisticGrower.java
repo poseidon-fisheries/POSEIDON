@@ -25,6 +25,7 @@ import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower.logisticRecruitment;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -32,14 +33,16 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.biology.tuna.Extractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -56,6 +59,8 @@ import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadAwareLogisticGrower implements Startable, Steppable {
+
+    private static final Logger logger = LogManager.getLogger("biomass_events");
 
     private final Species species;
     private final double carryingCapacity;
@@ -146,6 +151,15 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
             final String columnName = fishState.getSpecies().get(species.getIndex()) + " Recruitment";
             fishState.getYearlyCounter().count(columnName, biomassToAllocate);
         }
+
+        logger.debug(() -> new ObjectArrayMessage(
+            fishState.getStep(),
+            BIOLOGY_PHASE,
+            "GROW",
+            species,
+            currentBiomass,
+            allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum()
+        ));
     }
 
     private Stream<BiomassLocalBiology> allBiologies(final FishState fishState) {
@@ -153,11 +167,10 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
     }
 
     @NotNull
-    @SuppressWarnings("UnstableApiUsage")
     private static Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
-        return stream(Optional.ofNullable(fishState.getFadMap()))
-            .flatMap(FadMap::allFads)
-            .map(Fad::getBiology);
+        return new Extractor<>(BiomassLocalBiology.class, true, false)
+            .apply(fishState)
+            .stream();
     }
 
     private class Memorizer implements Steppable, Startable {
@@ -186,6 +199,14 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
                 allBiologies(fishState)
                     .mapToDouble(biology -> biology.getBiomass(species))
                     .sum();
+            logger.debug(() -> new ObjectArrayMessage(
+                fishState.getStep(),
+                DATA_RESET,
+                "MEMORIZE_FOR_GROWTH",
+                species,
+                memorizedBiomass,
+                memorizedBiomass
+            ));
             System.out.printf(
                 "Memorized %s biomass at step %d: %,.0f t\n",
                 species.getName(),

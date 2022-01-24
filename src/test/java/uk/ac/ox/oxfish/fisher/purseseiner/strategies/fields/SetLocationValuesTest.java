@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -70,6 +70,8 @@ public class SetLocationValuesTest {
         when(port.getMarketMap(any())).thenReturn(marketMap);
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getLocation()).thenReturn(map.getSeaTile(3, 3));
+        when(fisher.grabState()).thenReturn(fishState);
+        when(fishState.getBiology()).thenReturn(globalBiology);
 
         final ImmutableMap<Int2D, Double> initialValues = ImmutableMap.of(
             new Int2D(0, 0), 0.0,
@@ -129,18 +131,18 @@ public class SetLocationValuesTest {
 
         final Catch caught = new Catch(specie, 1000, globalBiology);
 
-        final DolphinSetAction dolphinSetAction = mock(DolphinSetAction.class);
+        final DolphinSetAction biomassDolphinSetAction = mock(DolphinSetAction.class);
         final FadSetAction fadSetAction = mock(FadSetAction.class);
 
-        Stream.of(dolphinSetAction, fadSetAction).forEach(action -> {
+        Stream.of(biomassDolphinSetAction, fadSetAction).forEach(action -> {
             when(action.getFisher()).thenReturn(fisher);
             when(action.getCatchesKept()).thenReturn(Optional.of(caught));
         });
 
-        delValues.observe(dolphinSetAction);
+        delValues.observe(biomassDolphinSetAction);
         assertEquals(1000.0, delValues.getValueAt(3, 3));
 
-        final Fad fad = mock(Fad.class);
+        final BiomassFad fad = mock(BiomassFad.class);
         when(fadSetAction.getFad()).thenReturn(fad);
         when(fad.getLocationDeployed()).thenReturn(new Int2D(3, 3));
         dplValues.observe(fadSetAction);

@@ -19,30 +19,41 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-
-public class FadSetAction extends AbstractFadSetAction {
+public class FadSetAction<B extends LocalBiology, F extends Fad<B, F>>
+    extends AbstractFadSetAction<B, F> {
 
     public FadSetAction(
+        final F fad,
         final Fisher fisher,
-        final Fad fad
+        final double duration
     ) {
-        super(fisher, fad);
+        super(fad, fisher, duration);
         checkArgument(getFadManager(getFisher()) == fad.getOwner());
     }
 
     @Override
-    public ActionResult act(FishState fishState, Fisher fisher, Regulation regulation, double hoursLeft) {
+    public ActionResult act(
+        final FishState fishState,
+        final Fisher fisher,
+        final Regulation regulation,
+        final double hoursLeft
+    ) {
         return super.act(fishState, fisher, regulation, hoursLeft);
     }
 
-    @Override public boolean isOwnFad() { return true; }
+    @Override
+    public boolean isOwnFad() {
+        return true;
+    }
 
 }

@@ -1,23 +1,54 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Double.MAX_VALUE;
+import static java.util.stream.Collectors.toList;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import ec.util.MersenneTwisterFast;
+import java.nio.file.Path;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+import javax.measure.quantity.Mass;
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.FadLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.GlobalDeploymentAttractionModulator;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.GlobalSetAttractionModulator;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocalCanFishThereAttractionModulator;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocalSetAttractionModulator;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
@@ -28,41 +59,40 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import javax.measure.quantity.Mass;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Stream;
-
-import static java.lang.Double.MAX_VALUE;
-import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.input;
-
 @SuppressWarnings("unused")
-public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
+public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
+    implements AlgorithmFactory<PurseSeineGear<B, F>> {
 
-    private static final LocationFisherValuesByActionCache locationValuesCache = new LocationFisherValuesByActionCache();
-
-    private final SetDurationSamplersFactory setDurationSamplers = new SetDurationSamplersFactory();
-    private final CacheByFishState<Map<Class<? extends AbstractSetAction>, DurationSampler>> setDurationSamplersCache =
-        new CacheByFishState<>(setDurationSamplers);
-
-    private final CatchSamplersFactory catchSamplers = new CatchSamplersFactory();
-    private final CacheByFishState<Map<Class<? extends AbstractSetAction>, CatchSampler>> catchSamplersCache =
-        new CacheByFishState<>(catchSamplers);
+    private static final LocationFisherValuesByActionCache locationValuesCache =
+        new LocationFisherValuesByActionCache();
 
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
+
+    @SuppressWarnings("rawtypes")
     private Set<Observer<AbstractFadSetAction>> fadSetObservers = new LinkedHashSet<>();
-    private final CacheByFishState<Set<Observer<AbstractFadSetAction>>> fadSetObserversCache =
-        new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
-    private Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers = new LinkedHashSet<>();
-    private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>> nonAssociatedSetObserversCache =
+
+    @SuppressWarnings("rawtypes")
+    private final CacheByFishState<Set<Observer<AbstractFadSetAction>>>
+        fadSetObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
+
+    @SuppressWarnings("rawtypes")
+    private Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers =
+        new LinkedHashSet<>();
+
+    @SuppressWarnings("rawtypes")
+    private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>>
+        nonAssociatedSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(nonAssociatedSetObservers));
+
+    @SuppressWarnings("rawtypes")
     private Set<Observer<DolphinSetAction>> dolphinSetObservers = new LinkedHashSet<>();
+
+    @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
+
     private double decayRateOfOpportunisticFadSetLocationValues = 0.01;
     private double decayRateOfNonAssociatedSetLocationValues = 0.01;
     private double decayRateOfDolphinSetLocationValues = 0.01;
@@ -70,10 +100,9 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
-    private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-    private Path locationValuesFile = input("location_values.csv");
+    private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
     private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
     private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
     private double pctTravelTimeLeftLogisticMidpoint = 0.9;
@@ -92,6 +121,16 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     private double destinationDistanceExponent = 1;
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
+
+    FadInitializerFactory<B, F> fadInitializerFactory;
+
+    public FadInitializerFactory<B, F> getFadInitializer() {
+        return fadInitializerFactory;
+    }
+
+    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
 
     public double getNumFadsInStockLogisticMidpoint() {
         return numFadsInStockLogisticMidpoint;
@@ -137,121 +176,190 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         return pctSetsRemainingLogisticSteepness;
     }
 
-    public void setPctSetsRemainingLogisticSteepness(final double pctSetsRemainingLogisticSteepness) {
+    public void setPctSetsRemainingLogisticSteepness(
+        final double pctSetsRemainingLogisticSteepness
+    ) {
         this.pctSetsRemainingLogisticSteepness = pctSetsRemainingLogisticSteepness;
     }
 
+    @SuppressWarnings("rawtypes")
     public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         return dolphinSetObservers;
     }
 
-    public void setDolphinSetObservers(final Set<Observer<DolphinSetAction>> dolphinSetObservers) {
+    public void setDolphinSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<DolphinSetAction>> dolphinSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.dolphinSetObservers = dolphinSetObservers;
     }
 
-    public CatchSamplersFactory getCatchSamplers() {
-        return catchSamplers;
-    }
-
     @SuppressWarnings("unused")
-    public double getPctHoldSpaceLeftLogisticMidpoint() { return pctHoldSpaceLeftLogisticMidpoint; }
+    public double getPctHoldSpaceLeftLogisticMidpoint() {
+        return pctHoldSpaceLeftLogisticMidpoint;
+    }
 
     @SuppressWarnings("unused")
     public void setPctHoldSpaceLeftLogisticMidpoint(final double pctHoldSpaceLeftLogisticMidpoint) {
         this.pctHoldSpaceLeftLogisticMidpoint = pctHoldSpaceLeftLogisticMidpoint;
     }
 
-    public double getPctHoldSpaceLeftLogisticSteepness() { return pctHoldSpaceLeftLogisticSteepness; }
+    public double getPctHoldSpaceLeftLogisticSteepness() {
+        return pctHoldSpaceLeftLogisticSteepness;
+    }
 
-    public void setPctHoldSpaceLeftLogisticSteepness(final double pctHoldSpaceLeftLogisticSteepness) {
+    public void setPctHoldSpaceLeftLogisticSteepness(
+        final double pctHoldSpaceLeftLogisticSteepness
+    ) {
         this.pctHoldSpaceLeftLogisticSteepness = pctHoldSpaceLeftLogisticSteepness;
     }
 
-    public double getPctTravelTimeLeftLogisticMidpoint() { return pctTravelTimeLeftLogisticMidpoint; }
+    public double getPctTravelTimeLeftLogisticMidpoint() {
+        return pctTravelTimeLeftLogisticMidpoint;
+    }
 
     @SuppressWarnings("unused")
-    public void setPctTravelTimeLeftLogisticMidpoint(final double pctTravelTimeLeftLogisticMidpoint) {
+    public void setPctTravelTimeLeftLogisticMidpoint(
+        final double pctTravelTimeLeftLogisticMidpoint
+    ) {
         this.pctTravelTimeLeftLogisticMidpoint = pctTravelTimeLeftLogisticMidpoint;
     }
 
-    public double getPctTravelTimeLeftLogisticSteepness() { return pctTravelTimeLeftLogisticSteepness; }
+    public double getPctTravelTimeLeftLogisticSteepness() {
+        return pctTravelTimeLeftLogisticSteepness;
+    }
 
-    public void setPctTravelTimeLeftLogisticSteepness(final double pctTravelTimeLeftLogisticSteepness) {
+    public void setPctTravelTimeLeftLogisticSteepness(
+        final double pctTravelTimeLeftLogisticSteepness
+    ) {
         this.pctTravelTimeLeftLogisticSteepness = pctTravelTimeLeftLogisticSteepness;
     }
 
-    public double getFadDeploymentPctActiveFadsLimitLogisticMidpoint() { return fadDeploymentPctActiveFadsLimitLogisticMidpoint; }
-
-    public void setFadDeploymentPctActiveFadsLimitLogisticMidpoint(final double fadDeploymentPctActiveFadsLimitLogisticMidpoint) {
-        this.fadDeploymentPctActiveFadsLimitLogisticMidpoint = fadDeploymentPctActiveFadsLimitLogisticMidpoint;
+    public double getFadDeploymentPctActiveFadsLimitLogisticMidpoint() {
+        return fadDeploymentPctActiveFadsLimitLogisticMidpoint;
     }
 
-    public double getFadDeploymentPctActiveFadsLimitLogisticSteepness() { return fadDeploymentPctActiveFadsLimitLogisticSteepness; }
+    public void setFadDeploymentPctActiveFadsLimitLogisticMidpoint(
+        final double fadDeploymentPctActiveFadsLimitLogisticMidpoint
+    ) {
+        this.fadDeploymentPctActiveFadsLimitLogisticMidpoint =
+            fadDeploymentPctActiveFadsLimitLogisticMidpoint;
+    }
 
-    public void setFadDeploymentPctActiveFadsLimitLogisticSteepness(final double fadDeploymentPctActiveFadsLimitLogisticSteepness) {
-        this.fadDeploymentPctActiveFadsLimitLogisticSteepness = fadDeploymentPctActiveFadsLimitLogisticSteepness;
+    public double getFadDeploymentPctActiveFadsLimitLogisticSteepness() {
+        return fadDeploymentPctActiveFadsLimitLogisticSteepness;
+    }
+
+    public void setFadDeploymentPctActiveFadsLimitLogisticSteepness(
+        final double fadDeploymentPctActiveFadsLimitLogisticSteepness
+    ) {
+        this.fadDeploymentPctActiveFadsLimitLogisticSteepness =
+            fadDeploymentPctActiveFadsLimitLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
-    public double getOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint() { return opportunisticFadSetTimeSinceLastVisitLogisticMidpoint; }
+    public double getOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint() {
+        return opportunisticFadSetTimeSinceLastVisitLogisticMidpoint;
+    }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint(final double opportunisticFadSetTimeSinceLastVisitLogisticMidpoint) {
+    public void setOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint(
+        final double opportunisticFadSetTimeSinceLastVisitLogisticMidpoint
+    ) {
         this.opportunisticFadSetTimeSinceLastVisitLogisticMidpoint =
             opportunisticFadSetTimeSinceLastVisitLogisticMidpoint;
     }
 
-    public double getOpportunisticFadSetTimeSinceLastVisitLogisticSteepness() { return opportunisticFadSetTimeSinceLastVisitLogisticSteepness; }
+    public double getOpportunisticFadSetTimeSinceLastVisitLogisticSteepness() {
+        return opportunisticFadSetTimeSinceLastVisitLogisticSteepness;
+    }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitLogisticSteepness(final double opportunisticFadSetTimeSinceLastVisitLogisticSteepness) {
+    public void setOpportunisticFadSetTimeSinceLastVisitLogisticSteepness(
+        final double opportunisticFadSetTimeSinceLastVisitLogisticSteepness
+    ) {
         this.opportunisticFadSetTimeSinceLastVisitLogisticSteepness =
             opportunisticFadSetTimeSinceLastVisitLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
-    public double getNonAssociatedSetTimeSinceLastVisitLogisticMidpoint() { return nonAssociatedSetTimeSinceLastVisitLogisticMidpoint; }
-
-    public void setNonAssociatedSetTimeSinceLastVisitLogisticMidpoint(final double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint) {
-        this.nonAssociatedSetTimeSinceLastVisitLogisticMidpoint = nonAssociatedSetTimeSinceLastVisitLogisticMidpoint;
+    public double getNonAssociatedSetTimeSinceLastVisitLogisticMidpoint() {
+        return nonAssociatedSetTimeSinceLastVisitLogisticMidpoint;
     }
 
-    public double getNonAssociatedSetTimeSinceLastVisitLogisticSteepness() { return nonAssociatedSetTimeSinceLastVisitLogisticSteepness; }
-
-    public void setNonAssociatedSetTimeSinceLastVisitLogisticSteepness(final double nonAssociatedSetTimeSinceLastVisitLogisticSteepness) {
-        this.nonAssociatedSetTimeSinceLastVisitLogisticSteepness = nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
+    public void setNonAssociatedSetTimeSinceLastVisitLogisticMidpoint(
+        final double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint
+    ) {
+        this.nonAssociatedSetTimeSinceLastVisitLogisticMidpoint =
+            nonAssociatedSetTimeSinceLastVisitLogisticMidpoint;
     }
 
-    @SuppressWarnings("unused")
-    public double getDolphinSetTimeSinceLastVisitLogisticMidpoint() { return dolphinSetTimeSinceLastVisitLogisticMidpoint; }
-
-    @SuppressWarnings("unused")
-    public void setDolphinSetTimeSinceLastVisitLogisticMidpoint(final double dolphinSetTimeSinceLastVisitLogisticMidpoint) {
-        this.dolphinSetTimeSinceLastVisitLogisticMidpoint = dolphinSetTimeSinceLastVisitLogisticMidpoint;
+    public double getNonAssociatedSetTimeSinceLastVisitLogisticSteepness() {
+        return nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
     }
 
-    public double getDolphinSetTimeSinceLastVisitLogisticSteepness() { return dolphinSetTimeSinceLastVisitLogisticSteepness; }
-
-    public void setDolphinSetTimeSinceLastVisitLogisticSteepness(final double dolphinSetTimeSinceLastVisitLogisticSteepness) {
-        this.dolphinSetTimeSinceLastVisitLogisticSteepness = dolphinSetTimeSinceLastVisitLogisticSteepness;
+    public void setNonAssociatedSetTimeSinceLastVisitLogisticSteepness(
+        final double nonAssociatedSetTimeSinceLastVisitLogisticSteepness
+    ) {
+        this.nonAssociatedSetTimeSinceLastVisitLogisticSteepness =
+            nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
     }
 
     @SuppressWarnings("unused")
-    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() { return biomassLostMonitor; }
+    public double getDolphinSetTimeSinceLastVisitLogisticMidpoint() {
+        return dolphinSetTimeSinceLastVisitLogisticMidpoint;
+    }
 
-    public void setBiomassLostMonitor(final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor) {
+    @SuppressWarnings("unused")
+    public void setDolphinSetTimeSinceLastVisitLogisticMidpoint(
+        final double dolphinSetTimeSinceLastVisitLogisticMidpoint
+    ) {
+        this.dolphinSetTimeSinceLastVisitLogisticMidpoint =
+            dolphinSetTimeSinceLastVisitLogisticMidpoint;
+    }
+
+    public double getDolphinSetTimeSinceLastVisitLogisticSteepness() {
+        return dolphinSetTimeSinceLastVisitLogisticSteepness;
+    }
+
+    public void setDolphinSetTimeSinceLastVisitLogisticSteepness(
+        final double dolphinSetTimeSinceLastVisitLogisticSteepness
+    ) {
+        this.dolphinSetTimeSinceLastVisitLogisticSteepness =
+            dolphinSetTimeSinceLastVisitLogisticSteepness;
+    }
+
+    @SuppressWarnings("unused")
+    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
+        return biomassLostMonitor;
+    }
+
+    public void setBiomassLostMonitor(
+        final GroupingMonitor<Species, BiomassLostEvent, Double,
+            Mass> biomassLostMonitor
+    ) {
         this.biomassLostMonitor = biomassLostMonitor;
     }
 
     @SuppressWarnings("unused")
-    public List<AlgorithmFactory<? extends ActionSpecificRegulation>> getActionSpecificRegulations() {
+    public List<
+        AlgorithmFactory<? extends ActionSpecificRegulation>
+        > getActionSpecificRegulations() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         return actionSpecificRegulations;
     }
 
-    public void setActionSpecificRegulations(final List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations) {
+    public void setActionSpecificRegulations(
+        final List<AlgorithmFactory<?
+            extends ActionSpecificRegulation>> actionSpecificRegulations
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
     @SuppressWarnings("unused")
-    public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
+    public DoubleParameter getSuccessfulSetProbability() {
+        return successfulSetProbability;
+    }
 
     @SuppressWarnings("unused")
     public void setSuccessfulSetProbability(final DoubleParameter successfulSetProbability) {
@@ -259,48 +367,59 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
     }
 
     @SuppressWarnings("unused")
-    public FadInitializerFactory getFadInitializerFactory() { return fadInitializerFactory; }
+    public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadDeploymentObservers;
+    }
 
     @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final FadInitializerFactory fadInitializerFactory
-    ) { this.fadInitializerFactory = fadInitializerFactory; }
-
-    @SuppressWarnings("unused")
-    public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() { return fadDeploymentObservers; }
-
-    @SuppressWarnings("unused")
-    public void setFadDeploymentObservers(final Set<Observer<FadDeploymentAction>> fadDeploymentObservers) {
+    public void setFadDeploymentObservers(
+        final Set<Observer<FadDeploymentAction>> fadDeploymentObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.fadDeploymentObservers = fadDeploymentObservers;
     }
 
-    @SuppressWarnings("unused")
-    public Set<Observer<AbstractFadSetAction>> getFadSetObservers() { return fadSetObservers; }
+    @SuppressWarnings({"unused", "rawtypes"})
+    public Set<Observer<AbstractFadSetAction>> getFadSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadSetObservers;
+    }
 
     @SuppressWarnings("unused")
-    public void setFadSetObservers(final Set<Observer<AbstractFadSetAction>> fadSetObservers) {
+    public void setFadSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<AbstractFadSetAction>> fadSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.fadSetObservers = fadSetObservers;
     }
 
-    @SuppressWarnings("unused")
-    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() { return nonAssociatedSetObservers; }
+    @SuppressWarnings({"unused", "rawtypes"})
+    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return nonAssociatedSetObservers;
+    }
 
     @SuppressWarnings("unused")
-    public void setNonAssociatedSetObservers(final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers) {
+    public void setNonAssociatedSetObservers(
+        @SuppressWarnings("rawtypes")
+        final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.nonAssociatedSetObservers = nonAssociatedSetObservers;
     }
 
-    @Override
-    public PurseSeineGear apply(final FishState fishState) {
-
+    @NotNull
+    FadManager<B, F> makeFadManager(final FishState fishState) {
+        checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
                 .map(factory -> factory.apply(fishState))
                 .collect(toList())
         );
 
-        final FadManager fadManager = new FadManager(
-            fishState.getFadMap(),
+        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
+            (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
@@ -309,25 +428,17 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations
         );
-
-        final MersenneTwisterFast rng = fishState.getRandom();
-
-        return new PurseSeineGear(
-            fadManager,
-            setDurationSamplersCache.get(fishState),
-            catchSamplersCache.get(fishState),
-            attractionFields()::iterator,
-            successfulSetProbability.apply(rng)
-        );
+        return fadManager;
     }
 
-    private Stream<AttractionField> attractionFields() {
-        final GlobalSetAttractionModulator globalSetAttractionModulator = new GlobalSetAttractionModulator(
-            pctHoldSpaceLeftLogisticMidpoint,
-            pctHoldSpaceLeftLogisticSteepness,
-            pctSetsRemainingLogisticMidpoint,
-            pctSetsRemainingLogisticSteepness
-        );
+    Stream<AttractionField> attractionFields() {
+        final GlobalSetAttractionModulator globalSetAttractionModulator =
+            new GlobalSetAttractionModulator(
+                pctHoldSpaceLeftLogisticMidpoint,
+                pctHoldSpaceLeftLogisticSteepness,
+                pctSetsRemainingLogisticMidpoint,
+                pctSetsRemainingLogisticSteepness
+            );
         return Stream.of(
             new ActionAttractionField(
                 new FadLocationValues(),
@@ -408,40 +519,67 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
         );
     }
 
-    private Map<Int2D, Double> loadLocationValues(final Fisher fisher, final Class<? extends PurseSeinerAction> actionClass) {
-        return locationValuesCache.getLocationValues(locationValuesFile, TARGET_YEAR, fisher, actionClass);
+    private Map<Int2D, Double> loadLocationValues(
+        final Fisher fisher,
+        final Class<? extends PurseSeinerAction> actionClass
+    ) {
+        return locationValuesCache.getLocationValues(
+            locationValuesFile,
+            TARGET_YEAR,
+            fisher,
+            actionClass
+        );
     }
 
     @SuppressWarnings("WeakerAccess")
-    public double getDecayRateOfOpportunisticFadSetLocationValues() { return decayRateOfOpportunisticFadSetLocationValues; }
+    public double getDecayRateOfOpportunisticFadSetLocationValues() {
+        return decayRateOfOpportunisticFadSetLocationValues;
+    }
 
     @SuppressWarnings("unused")
-    public void setDecayRateOfOpportunisticFadSetLocationValues(final double decayRateOfOpportunisticFadSetLocationValues) {
-        this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
+    public void setDecayRateOfOpportunisticFadSetLocationValues(
+        final double decayRateOfOpportunisticFadSetLocationValues
+    ) {
+        this.decayRateOfOpportunisticFadSetLocationValues =
+            decayRateOfOpportunisticFadSetLocationValues;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public double getDecayRateOfNonAssociatedSetLocationValues() { return decayRateOfNonAssociatedSetLocationValues; }
+    public double getDecayRateOfNonAssociatedSetLocationValues() {
+        return decayRateOfNonAssociatedSetLocationValues;
+    }
 
-    public void setDecayRateOfNonAssociatedSetLocationValues(final double decayRateOfNonAssociatedSetLocationValues) {
+    public void setDecayRateOfNonAssociatedSetLocationValues(
+        final double decayRateOfNonAssociatedSetLocationValues
+    ) {
         this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public double getDecayRateOfDolphinSetLocationValues() { return decayRateOfDolphinSetLocationValues; }
+    public double getDecayRateOfDolphinSetLocationValues() {
+        return decayRateOfDolphinSetLocationValues;
+    }
 
-    public void setDecayRateOfDolphinSetLocationValues(final double decayRateOfDolphinSetLocationValues) {
+    public void setDecayRateOfDolphinSetLocationValues(
+        final double decayRateOfDolphinSetLocationValues
+    ) {
         this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public double getDecayRateOfDeploymentLocationValues() { return decayRateOfDeploymentLocationValues; }
+    public double getDecayRateOfDeploymentLocationValues() {
+        return decayRateOfDeploymentLocationValues;
+    }
 
-    public void setDecayRateOfDeploymentLocationValues(final double decayRateOfDeploymentLocationValues) {
+    public void setDecayRateOfDeploymentLocationValues(
+        final double decayRateOfDeploymentLocationValues
+    ) {
         this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
     }
 
-    public Path getLocationValuesFile() { return locationValuesFile; }
+    public Path getLocationValuesFile() {
+        return locationValuesFile;
+    }
 
     public void setLocationValuesFile(final Path locationValuesFile) {
         this.locationValuesFile = locationValuesFile;

@@ -20,17 +20,24 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Arrays.stream;
+import static java.util.Comparator.comparingInt;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * A local biology object based on abundance.
@@ -65,16 +72,48 @@ public class AbundanceLocalBiology implements LocalBiology
 
         //for each species create cohorts
         for(Species species : biology.getSpecies()) {
-            double[][] fish = new double[species.getNumberOfSubdivisions()][];
-            for(int i=0; i<fish.length; i++)
-                fish[i] = new double[species.getNumberOfBins()];
-            abundance.put(species, fish);
+            abundance.put(species, makeAbundanceArray(species));
         }
         //done!
         lastComputedBiomass = new double[biology.getSpecies().size()];
         Arrays.fill(lastComputedBiomass,Double.NaN);
     }
 
+    public static double[][] makeAbundanceArray(final Species species) {
+        final double[][] abundanceArray = new double[species.getNumberOfSubdivisions()][];
+        for (int i = 0; i < abundanceArray.length; i++) {
+            abundanceArray[i] = new double[species.getNumberOfBins()];
+        }
+        return abundanceArray;
+    }
+
+    /**
+     * Creates a new abundance object using the provided abundance map.
+     *
+     * @param abundance A map from species to abundance matrices. The matrices are copied.
+     */
+    public AbundanceLocalBiology(final Map<Species, double[][]> abundance) {
+        abundance.forEach((species, matrix) ->
+            this.abundance.put(
+                species,
+                stream(matrix)
+                    .map(a -> Arrays.copyOf(a, a.length))
+                    .toArray(double[][]::new)
+            )
+        );
+        lastComputedBiomass = new double[abundance.size()];
+        Arrays.fill(lastComputedBiomass, Double.NaN);
+    }
+
+    /**
+     * Constructs a new AbundanceLocalBiology by making a copy of another.
+     *
+     * @param other the other AbundanceLocalBiology object to make a copy of.
+     */
+    @SuppressWarnings("CopyConstructorMissesField") // the call to `this` takes care of that
+    public AbundanceLocalBiology(final AbundanceLocalBiology other) {
+        this(other.abundance);
+    }
 
     /**
      * the biomass at this location for a single species.
@@ -96,7 +135,25 @@ public class AbundanceLocalBiology implements LocalBiology
 
     }
 
+    /**
+     * Returns a copied array of the last computed biomass. This method shares name and
+     * specification with {@link VariableBiomassBasedBiology#getCurrentBiomass()}
+     * even if the current class doesn't implement that interface.
+     */
+    public double[] getCurrentBiomass() {
+        // This is a bit awkward, as we don't have access to the global biology
+        // to map indices to species, but should work just fine as long as
+        // the abundance map contains all the species (a safe assumption, I think).
+        return abundance.keySet()
+            .stream()
+            .sorted(comparingInt(Species::getIndex))
+            .mapToDouble(this::getBiomass)
+            .toArray();
+    }
 
+    public double getTotalBiomass() {
+        return stream(getCurrentBiomass()).sum();
+    }
 
     /**
      * ignored
@@ -177,10 +234,22 @@ public class AbundanceLocalBiology implements LocalBiology
 
     }
 
+    public Map<Species, StructuredAbundance> getStructuredAbundance() {
+        Arrays.fill(lastComputedBiomass, Double.NaN); // force a recount after calling this
+        return abundance.entrySet().stream().collect(toImmutableMap(
+            Entry::getKey,
+            entry -> new StructuredAbundance(entry.getValue())
+        ));
+    }
 
-
-
-
+    /**
+     * Returns an unmodifiable view of the abundance map, i.e., a map from each {@link Species} to
+     * the corresponding abundance matrix. Note that the map itself is unmodifiable but the exposed
+     * arrays are not. Mutating those should be done responsibly.
+     */
+    public Map<Species, double[][]> getAbundance() {
+        return Collections.unmodifiableMap(abundance);
+    }
 
     @Override
     public String toString() {

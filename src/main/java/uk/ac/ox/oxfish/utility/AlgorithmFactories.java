@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.utility;
 
+import edu.uci.ics.jung.graph.DirectedGraph;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
@@ -84,6 +83,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizers;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactories;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -115,18 +116,19 @@ import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
 /**
- * Just a way to link a class to its constructor map
- * Created by carrknight on 5/29/15.
+ * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
  */
 public class AlgorithmFactories {
 
 
     //notice the <? extends AlgorithmFactory>. It's the need for hacks like these that explains why so many engineers
     //join terrorist organizations
-    public static final Map<Class,Map<String,? extends Supplier<? extends AlgorithmFactory<?>>>> CONSTRUCTOR_MAP = new HashMap<>();
-    public static final Map<Class,Map<Class<? extends AlgorithmFactory>,String>> NAMES_MAP = new HashMap<>();
-    static
-    {
+    public static final Map<Class, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>>
+        CONSTRUCTOR_MAP = new HashMap<>();
+    public static final Map<Class, Map<Class<? extends AlgorithmFactory>, String>> NAMES_MAP =
+        new HashMap<>();
+
+    static {
         CONSTRUCTOR_MAP.put(DepartingStrategy.class, DepartingStrategies.CONSTRUCTORS);
         NAMES_MAP.put(DepartingStrategy.class, DepartingStrategies.NAMES);
         CONSTRUCTOR_MAP.put(DestinationStrategy.class, DestinationStrategies.CONSTRUCTORS);
@@ -157,17 +159,29 @@ public class AlgorithmFactories {
         NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
         CONSTRUCTOR_MAP.put(GearStrategy.class, GearStrategies.CONSTRUCTORS);
         NAMES_MAP.put(GearStrategy.class, GearStrategies.NAMES);
-        CONSTRUCTOR_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.CONSTRUCTORS);
+        CONSTRUCTOR_MAP.put(
+            ProfitThresholdExtractor.class,
+            ProfitThresholdsExtractors.CONSTRUCTORS
+        );
         NAMES_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.NAMES);
-        CONSTRUCTOR_MAP.put(SocialAcceptabilityFeatureExtractor.class, SocialAcceptabilityFeatureExtractors.CONSTRUCTORS);
-        NAMES_MAP.put(SocialAcceptabilityFeatureExtractor.class, SocialAcceptabilityFeatureExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(
+            SocialAcceptabilityFeatureExtractor.class,
+            SocialAcceptabilityFeatureExtractors.CONSTRUCTORS
+        );
+        NAMES_MAP.put(
+            SocialAcceptabilityFeatureExtractor.class,
+            SocialAcceptabilityFeatureExtractors.NAMES
+        );
         CONSTRUCTOR_MAP.put(SafetyFeatureExtractor.class, SafetyFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(SafetyFeatureExtractor.class, SafetyFeatureExtractors.NAMES);
         CONSTRUCTOR_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.NAMES);
         CONSTRUCTOR_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.NAMES);
-        CONSTRUCTOR_MAP.put(GeographicalRegression.class, NumericalGeographicalRegressions.CONSTRUCTORS);
+        CONSTRUCTOR_MAP.put(
+            GeographicalRegression.class,
+            NumericalGeographicalRegressions.CONSTRUCTORS
+        );
         NAMES_MAP.put(GeographicalRegression.class, NumericalGeographicalRegressions.NAMES);
         CONSTRUCTOR_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.CONSTRUCTORS);
         NAMES_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.NAMES);
@@ -217,24 +231,30 @@ public class AlgorithmFactories {
         CONSTRUCTOR_MAP.put(NetworkPredicate.class, NetworkPredicates.CONSTRUCTORS);
         NAMES_MAP.put(NetworkPredicate.class, NetworkPredicates.NAMES);
 
-        CONSTRUCTOR_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.CONSTRUCTORS);
+        CONSTRUCTOR_MAP.put(
+            ActionSpecificRegulations.class,
+            ActionSpecificRegulations.CONSTRUCTORS
+        );
         NAMES_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.NAMES);
+
+        CONSTRUCTOR_MAP.put(FadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
+        NAMES_MAP.put(FadInitializerFactory.class, FadInitializerFactories.NAMES);
 
     }
 
 
     /**
      * look up for any algorithm factory with a specific name, returning the first it finds
+     *
      * @param name the name
-     * @return  the factory or null if there isn't any!
+     * @return the factory or null if there isn't any!
      */
-    public static AlgorithmFactory constructorLookup(String name)
-    {
-        for(Map<String,? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values())
-        {
+    public static AlgorithmFactory constructorLookup(String name) {
+        for (Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values()) {
             final Supplier<? extends AlgorithmFactory<?>> supplier = map.get(name);
-            if(supplier != null)
+            if (supplier != null) {
                 return supplier.get();
+            }
         }
         System.err.println("failed to find constructor named: " + name);
         return null;
@@ -242,16 +262,16 @@ public class AlgorithmFactories {
 
     /**
      * look up the name of the algorithm factory that has this class
+     *
      * @param factory the name
-     * @return  the factory or null if there isn't any!
+     * @return the factory or null if there isn't any!
      */
-    public static String nameLookup(Class<? extends AlgorithmFactory> factory)
-    {
-        for(Map<Class<? extends AlgorithmFactory>,String> map : NAMES_MAP.values())
-        {
+    public static String nameLookup(Class<? extends AlgorithmFactory> factory) {
+        for (Map<Class<? extends AlgorithmFactory>, String> map : NAMES_MAP.values()) {
             final String name = map.get(factory);
-            if(name != null)
+            if (name != null) {
                 return name;
+            }
         }
         System.err.println("failed to find constructor: " + factory);
         return null;
@@ -260,11 +280,11 @@ public class AlgorithmFactories {
     /**
      * returns a list with all the factories available in the constructor Maps
      */
-    public static List<Class<? extends AlgorithmFactory>> getAllAlgorithmFactories()
-    {
+    public static List<Class<? extends AlgorithmFactory>> getAllAlgorithmFactories() {
         List<Class<? extends AlgorithmFactory>> classes = new LinkedList<>();
-        for(Map<Class<? extends AlgorithmFactory>,String> names : NAMES_MAP.values())
+        for (Map<Class<? extends AlgorithmFactory>, String> names : NAMES_MAP.values()) {
             classes.addAll(names.keySet());
+        }
         return classes;
     }
 }

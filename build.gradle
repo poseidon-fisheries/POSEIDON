@@ -5,12 +5,12 @@ plugins {
     id 'idea'
     id 'application'
     id 'jacoco'
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id "com.github.johnrengelman.shadow" version "7.1.0"
     id "com.github.spotbugs" version "4.7.2"
 }
 
 application {
-    mainClassName = 'uk.ac.ox.oxfish.Main'
+    mainClass = 'uk.ac.ox.oxfish.Main'
     applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx2048m"]
 }
 
@@ -55,13 +55,19 @@ dependencies {
 
     //csv helper
     implementation "com.opencsv:opencsv:3.8"
-    implementation "com.univocity:univocity-parsers:2.8.4"
+    implementation "com.univocity:univocity-parsers:2.9.1"
 
     // Google's JSON library
     implementation 'com.google.code.gson:gson:2.8.5'
 
     //logger:
     implementation "com.esotericsoftware:minlog:1.3.0"
+
+    // Dependencies for log4j2. commons-csv is needed for CSV logs
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+
     //serializer
     implementation fileTree(dir: 'libs/xstream/lib', include: '*.jar')
     implementation "org.ogce:xpp3:1.1.6"
@@ -76,12 +82,12 @@ dependencies {
     implementation 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files
-    implementation 'org.yaml:snakeyaml:1.15'
-    //jcommander, useful to parse command line
-    implementation "com.beust:jcommander:1.48"
+    implementation 'org.yaml:snakeyaml:1.29'
+    //jcommander, useful to parse command line arguments
+    implementation "com.beust:jcommander:1.81"
 
     //commons math
-    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
     //burlap : Reinforcement Learning helper
     implementation group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
@@ -96,25 +102,30 @@ dependencies {
     implementation group: 'com.intellij', name: 'annotations', version: '12.0'
 
     //testing:
-    testImplementation "junit:junit:4.13"
-    testImplementation 'org.mockito:mockito-core:3.3.0'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.12'
+    testImplementation "junit:junit:4.13.2"
+    testImplementation 'org.mockito:mockito-core:3.11.2'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    implementation "com.google.guava:guava:28.2-jre"
+    implementation "com.google.guava:guava:30.1.1-jre"
 
     //json test
-    testImplementation "com.google.code.gson:gson:2.8.5"
+    testImplementation "com.google.code.gson:gson:2.8.7"
 
     // Reference implementation of JSR-385 for units of measure
-    implementation 'si.uom:si-quantity:2.0.1'
-    implementation 'si.uom:si-units:2.0.1'
+    implementation 'si.uom:si-quantity:2.1'
+    implementation 'si.uom:si-units:2.1'
 }
 
 processTestResources.doFirst {
     // explicitly allow overriding files when copying resources
     duplicatesStrategy = "include"
 }
+
+// Duplicate handling strategy need to be explicitly specified as of Gradle 6
+processResources { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distTar { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distZip { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test {

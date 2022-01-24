@@ -19,23 +19,28 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.unmodifiableList;
+
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Collection;
+import java.util.List;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
-
-import java.util.Collection;
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.unmodifiableList;
 
 public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider {
 
@@ -51,11 +56,13 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         "skj",
         "yft"
     );
-    private final Collection<ActionObserver<? extends PurseSeinerAction>> observers = ImmutableList.of(
-        new ActionObserver<>(FadDeploymentAction.class),
-        new ActionObserver<>(AbstractFadSetAction.class),
-        new ActionObserver<>(NonAssociatedSetAction.class)
-    );
+    private final Collection<ActionObserver<? extends PurseSeinerAction>> observers =
+        ImmutableList.of(
+            new ActionObserver<>(FadDeploymentAction.class),
+            new ActionObserver<>(AbstractFadSetAction.class),
+            new ActionObserver<>(NonAssociatedSetAction.class),
+            new ActionObserver<>(DolphinSetAction.class)
+        );
     private final ImmutableList.Builder<ActionRecord> actionRecords = new ImmutableList.Builder<>();
     private final FishState fishState;
 
@@ -64,7 +71,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     }
 
     @Override
-    public List<String> getHeaders() { return HEADERS; }
+    public List<String> getHeaders() {
+        return HEADERS;
+    }
 
     @Override
     public Iterable<? extends Collection<?>> getRows() {
@@ -92,28 +101,21 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
 
         private ActionRecord(final PurseSeinerAction action) {
             this.boatId = action.getFisher().getTags().get(0);
-            this.actionType = actionType(action);
+            this.actionType = ActionClass.classMap.get(action.getClass()).toString();
             final Coordinate coordinates = fishState.getMap().getCoordinates(action.getLocation());
             this.lon = coordinates.x;
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripStartStep = currentTrip.getTripDate() * fishState.getStepsPerDay();
-            if (action instanceof AbstractSetAction)
-                ((AbstractSetAction) action).getCatchesKept().ifPresent(catchesKept -> {
+            if (action instanceof AbstractSetAction) {
+                ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
                     this.bet = catchesKept.getWeightCaught(fishState.getSpecies("Bigeye tuna"));
                     this.skj = catchesKept.getWeightCaught(fishState.getSpecies("Skipjack tuna"));
                     this.yft = catchesKept.getWeightCaught(fishState.getSpecies("Yellowfin tuna"));
                 });
+            }
             action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
-        }
-
-        private String actionType(final PurseSeinerAction action) {
-            if (action instanceof FadDeploymentAction) return "DPL";
-            else if (action instanceof FadSetAction) return "FAD";
-            else if (action instanceof OpportunisticFadSetAction) return "OFS";
-            else if (action instanceof NonAssociatedSetAction) return "NOA";
-            else throw new IllegalArgumentException("Unknown action type.");
         }
 
         private List<?> asRow() {
@@ -154,10 +156,14 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
 
     private class ActionObserver<A extends PurseSeinerAction> extends PurseSeinerActionObserver<A> {
 
-        ActionObserver(final Class<A> observedClass) { super(observedClass); }
+        ActionObserver(final Class<A> observedClass) {
+            super(observedClass);
+        }
 
         @Override
-        public void observe(final A action) { actionRecords.add(new ActionRecord(action)); }
+        public void observe(final A action) {
+            actionRecords.add(new ActionRecord(action));
+        }
 
     }
 
