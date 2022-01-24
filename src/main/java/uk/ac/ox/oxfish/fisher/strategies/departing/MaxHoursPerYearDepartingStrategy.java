@@ -65,4 +65,9 @@ public class MaxHoursPerYearDepartingStrategy implements DepartingStrategy {
 
     }
 
+    @Override
+    public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+        return  Math.min(365-model.getDayOfTheYear(),
+                (int)maxHoursOut/24);
+    }
 }

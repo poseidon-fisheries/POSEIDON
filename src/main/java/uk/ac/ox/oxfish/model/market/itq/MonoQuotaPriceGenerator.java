@@ -134,8 +134,10 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
             return Double.NaN;
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
+        int amountOfDaysLeftFishing = fisher.getDepartingStrategy().predictedDaysLeftFishingThisYear(fisher,state,state.getRandom());
+
         double probability = 1 - fisher.probabilitySumDailyCatchesBelow(specieIndex,quotas.getQuotaRemaining(specieIndex),
-                                                                        365-state.getDayOfTheYear());
+                amountOfDaysLeftFishing);
 
         if(!includeDailyProfits)
             return  (probability * fisher.predictUnitProfit(specieIndex));

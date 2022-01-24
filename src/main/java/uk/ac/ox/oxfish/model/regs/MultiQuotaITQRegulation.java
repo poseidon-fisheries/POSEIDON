@@ -68,8 +68,6 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
 
     /**
      * add yourself as an opportunity cost!
-     * @param model
-     * @param fisher
      */
     @Override
     public void start(FishState model, Fisher fisher) {

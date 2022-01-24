@@ -1,9 +1,15 @@
 package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketProxy;
+import uk.ac.ox.oxfish.model.market.ThresholdWeightPrice;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.OffSwitchDecorator;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -20,31 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class Mera718Slice1Policy {
+public class Mera718Policy {
 
 
+    public static final Path COLUMNS_TO_PRINT = MeraOMHotstartsCalibration.MAIN_DIRECTORY.resolve("full_columns_to_print.yaml");
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
     static {
 
-        selectedPolicies.put(
-                "currentEffort",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
-                }
-        );
-        selectedPolicies.put(
-                "effort75",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(187, true);
-                }
-        );
-        selectedPolicies.put(
-                "0_days",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(0, true);
-                }
-        );
+
 
         String[] otherPolicies = {
                 "BAU",
@@ -65,7 +55,9 @@ public class Mera718Slice1Policy {
 
         };
 
-        for(String policy : otherPolicies){
+
+        for(String
+                policy : otherPolicies){
             final AlgorithmFactory<? extends AdditionalStartable> factory = MeraOneSpeciesSlice1.ALL_OF_THEM.get(policy);
             Preconditions.checkArgument(factory!=null,policy);
             selectedPolicies.put(
@@ -74,24 +66,65 @@ public class Mera718Slice1Policy {
             );
         }
 
+        selectedPolicies.put(
+                "currentEffort",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
+                }
+        );
+        selectedPolicies.put(
+                "effort75",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(187, true);
+                }
+        );
+        selectedPolicies.put(
+                "0_days",
+                fishState -> {
+                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(0, true);
+                }
+        );
+
+
+
 
     }
 
+    public static final AdditionalStartable PRICE_CHANGE = new AdditionalStartable() {
+        @Override
+        public void start(FishState model) {
+
+            for (Port port : model.getPorts()) {
+                for (Market market : port.getDefaultMarketMap().getMarkets()) {
+                    final FlexibleAbundanceMarket castMarket = (FlexibleAbundanceMarket) ((MarketProxy) market).getDelegate();
+
+                    castMarket.setPricingStrategy(
+                            new ThresholdWeightPrice(
+                                    castMarket.getMarginalPrice(),
+                                    0,
+                                    0.5
+                            )
+                    );
+                }
+            }
+        }
+    };
 
     public static void main(String[] args) throws IOException {
 
 
-        //  generateScenarioFiles();
 
 
-        Path mainDirectory = Paths.get("docs","mera_hub","slice3_yesgeography_onespecies").resolve("results");
+        Path mainDirectory = Paths.get("docs","mera_hub","slice4_nogeography_twospecies").resolve("results");
+       // Path mainDirectory = Paths.get("docs","mera_hub","slice5_yesgeography_twospecies").resolve("results");
 
 
-        Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
-        Path pathToOutput = mainDirectory.resolve("policy");
+        Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list_faster.csv");
+        Path pathToOutput = mainDirectory.resolve("policy_monitored");
 
 
         final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = new LinkedHashMap<>();
+        //adding additional startables!
         for (Map.Entry<String, AlgorithmFactory<? extends AdditionalStartable>> policyFactory : selectedPolicies.entrySet()) {
             adjustedPolicies.put(
                     policyFactory.getKey(),
@@ -106,6 +139,11 @@ public class Mera718Slice1Policy {
                             //need to change the factory too...
                             final AlgorithmFactory<? extends Regulation> newReg =
                                     new AnarchyFactory();
+                            fishState.getFisherFactory("population0").setRegulations(newReg);
+
+                            AbundanceGathererBuilder builder = new AbundanceGathererBuilder();
+                            builder.setObservationDay(364);
+                            builder.apply(fishState);
 
                             return policyFactory.getValue().apply(fishState);
 
@@ -116,7 +154,7 @@ public class Mera718Slice1Policy {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT, null);
+                adjustedPolicies, 50, COLUMNS_TO_PRINT, null);
 
 
 

@@ -119,6 +119,8 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
             return Double.NaN;
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
+        if( !fisher.isAllowedAtSea())
+            return 0d;
 
         //if you have infinite quotas (unprotected species), you have no value for them
         Double quotasLeft = numberOfQuotasLeftGetter.scan(fisher);
@@ -139,9 +141,11 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
 
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
+        //365 - state.getDayOfTheYear();
+        int amountOfDaysLeftFishing = fisher.getDepartingStrategy().predictedDaysLeftFishingThisYear(fisher,state,state.getRandom());
         double probability = quotasLeft < FishStateUtilities.EPSILON ? 1 : 1 -
                 fisher.probabilitySumDailyCatchesBelow(specieIndex, quotasLeft,
-                                                       365 - state.getDayOfTheYear());
+                        amountOfDaysLeftFishing);
 
 
         if(probability < FishStateUtilities.EPSILON) //if the probability is very low, skip computations, you value it nothing

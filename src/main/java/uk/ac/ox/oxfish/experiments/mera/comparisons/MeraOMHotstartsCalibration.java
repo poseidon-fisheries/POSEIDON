@@ -26,11 +26,14 @@ public class MeraOMHotstartsCalibration {
 
 
     public static final int MAX_EVALUATIONS = 1000;
-    public static final int SCENARIOS_TO_RUN = 64; // 48;
-    public static final String DIRECTORY_OF_HOTSTARTS = "hotstarts";
+    public static final int SCENARIOS_TO_RUN = 100;// 64; // 48;
+    public static final String DIRECTORY_OF_HOTSTARTS = "calibration";
+    public static final int PARALLEL_THREADS = 4;
 
     static Path MAIN_DIRECTORY =
-            Paths.get("docs/mera_hub/slice3_yesgeography_onespecies/");
+            Paths.get("docs/mera_hub/slice5_yesgeography_twospecies/");
+            //Paths.get("docs/mera_hub/slice4_nogeography_twospecies/");
+         //   Paths.get("docs/mera_hub/slice3_yesgeography_onespecies/");
             //Paths.get("docs/mera_hub/slice2_nogeography_onespecies/");
     //      Paths.get("docs/mera_hub/fakeom/");
 
@@ -103,13 +106,13 @@ public class MeraOMHotstartsCalibration {
 
         SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(optimization);
-        problem.setParallelThreads(1);
+        problem.setParallelThreads(PARALLEL_THREADS);
         problem.setDefaultRange(defaultRange);
         //set up the nelder mead
 //        ClusterBasedNichingEA opt = new ClusterBasedNichingEA();
 //        opt.setPopulationSize(populationSize);
         NelderMeadSimplex opt = new NelderMeadSimplex(populationSize);
-
+        opt.setCheckRange(false);
         OptimizationParameters params = OptimizerFactory.makeParams(
                 opt,
                 populationSize,problem

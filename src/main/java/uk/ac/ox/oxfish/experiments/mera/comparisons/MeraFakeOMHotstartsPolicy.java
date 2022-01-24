@@ -13,8 +13,7 @@ import java.util.Map;
 public class MeraFakeOMHotstartsPolicy {
 
 
-
-
+    public static final Path COLUMNS_TO_PRINT = MeraOMHotstartsCalibration.MAIN_DIRECTORY.resolve("full_columns_to_print.yaml");
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
     static {
@@ -90,7 +89,7 @@ public class MeraFakeOMHotstartsPolicy {
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
-                adjustedPolicies, 50, MeraOneSpeciesSlice1.DEFAULT_PATH_TO_COLUMNS_TO_PRINT, null);
+                adjustedPolicies, 50, COLUMNS_TO_PRINT, null);
 
 
     }

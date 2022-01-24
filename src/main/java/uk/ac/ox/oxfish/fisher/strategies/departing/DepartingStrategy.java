@@ -38,6 +38,13 @@ public interface DepartingStrategy extends FisherStartable{
     boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random);
 
 
+    /**
+     * The fisher asks himself how many more days out at sea they can go out this year
+     * @return number of days the fisher thinks it can still go out
+     */
+    default int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random){
+        return 365-model.getDayOfTheYear();
+    }
 
 
 }

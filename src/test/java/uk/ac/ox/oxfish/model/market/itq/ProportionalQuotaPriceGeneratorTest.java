@@ -31,8 +31,8 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 public class ProportionalQuotaPriceGeneratorTest {
@@ -52,7 +52,11 @@ public class ProportionalQuotaPriceGeneratorTest {
 
 
 
-        Fisher fisher = mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        when(fisher.getDepartingStrategy().
+                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-364);
+
+        when(fisher.isAllowedAtSea()).thenReturn(true);
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         when(fisher.predictDailyCatches(0)).thenReturn(100d);
         when(fisher.predictDailyCatches(1)).thenReturn(100d);

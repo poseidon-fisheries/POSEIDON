@@ -24,7 +24,10 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -70,4 +73,9 @@ public class CompositeDepartingStrategy implements DepartingStrategy {
         return true;
     }
 
+    @Override
+    public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+        return Arrays.stream(strategies).mapToInt(value -> value.predictedDaysLeftFishingThisYear(fisher, model, random)).min().
+                orElseThrow();
+    }
 }

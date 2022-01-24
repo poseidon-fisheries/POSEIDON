@@ -39,9 +39,10 @@ public class SalehBayPolicy {
     static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPolicies =
             new LinkedHashMap<>();
 
-    public static final AdditionalStartable PRICE_CHANGE = new AdditionalStartable() {
-        @Override
-        public void start(FishState model) {
+    public static final AdditionalStartable PRICE_CHANGE = NO_MONEY_FOR_CATCHES_BELOW_THIS_WEIGHT(0.5);
+
+    public static AdditionalStartable NO_MONEY_FOR_CATCHES_BELOW_THIS_WEIGHT(double weightThresholdInKG) {
+        return model -> {
 
             for (Port port : model.getPorts()) {
                 for (Market market : port.getDefaultMarketMap().getMarkets()) {
@@ -51,13 +52,14 @@ public class SalehBayPolicy {
                             new ThresholdWeightPrice(
                                     castMarket.getMarginalPrice(),
                                     0,
-                                    0.5
+                                    weightThresholdInKG
                             )
                     );
                 }
             }
-        }
-    };
+        };
+    }
+
 
 
     public static final AdditionalStartable MPA_CHANGE = new AdditionalStartable() {
@@ -131,6 +133,8 @@ public class SalehBayPolicy {
         }
     };
 
+    static private LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> selectedPoliciesAdditional =
+            new LinkedHashMap<>();
 
     static {
 
@@ -234,6 +238,25 @@ public class SalehBayPolicy {
                 }
         );
 
+
+
+        double[] otherEfforts = new double[]{.1,.2,.33,.5};
+        for(double otherEffort : otherEfforts) {
+            selectedPoliciesAdditional.put(
+                    otherEffort+"pc_effort",
+                    fishState -> {
+                        return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy((int) ((3456 * otherEffort) / 24), true);
+                    }
+            );
+        }
+
+        selectedPoliciesAdditional.put("price_change_1kg",
+                fishState -> NO_MONEY_FOR_CATCHES_BELOW_THIS_WEIGHT(1));
+
+        selectedPoliciesAdditional.put("price_change_2kg",
+                fishState -> NO_MONEY_FOR_CATCHES_BELOW_THIS_WEIGHT(1));
+
+
 //        selectedPolicies.put(
 //                "mpa_10",
 //                fishState -> model -> {
@@ -317,14 +340,15 @@ public class SalehBayPolicy {
 
 
         Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list.csv");
-        Path pathToOutput = mainDirectory.resolve("non-hybrid");
+        Path pathToOutput = mainDirectory.resolve("additional");
         pathToOutput.toFile().mkdir();
 
         //what we do is that we intercept policies from the original slice 1 and before we let them start we also apply
         //our prepareScenarioForPolicy consumer ahead of time
 
         final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies =
-                selectedPolicies;
+                selectedPoliciesAdditional;
+              //  selectedPolicies;
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
                 pathToOutput,
                 adjustedPolicies, 30, SalehBayCalibration.MAIN_DIRECTORY.resolve("columnsToPrint.yaml"),

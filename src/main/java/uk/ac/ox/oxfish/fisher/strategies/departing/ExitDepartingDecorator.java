@@ -119,4 +119,11 @@ public class ExitDepartingDecorator implements DepartingStrategy {
         }
     }
 
+    @Override
+    public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+        if(hasQuit)
+            return 0;
+        else
+            return decorated.predictedDaysLeftFishingThisYear(fisher, model, random);
+    }
 }

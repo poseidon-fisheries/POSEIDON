@@ -82,28 +82,7 @@ public class SpeciesMarketMappedFactory implements AlgorithmFactory<MarketProxy>
     }
 
 
-    public static void main(String[] args){
-        SpeciesMarketMappedFactory factory = new SpeciesMarketMappedFactory();
-        factory.getMarkets().put(
-                "Lutjanus malabaricus",
-                new ThreePricesMarketFactory(7,9,42900,66000,52800)
-        );
-        factory.getMarkets().put(
-                "Pristipomoides multidens",
-                new ThreePricesMarketFactory(6,7,26325,40500,42500)
-        );
-        factory.getMarkets().put(
-                "Lutjanus erythropterus",
-                new ThreePricesMarketFactory(6,9,42900,66000,52800)
-        );
-        factory.getMarkets().put(
-                "Epinephelus areolatus",
-                new ThreePricesMarketFactory(8,20,35100,54000,43200)
-        );
 
-        FishYAML yaml = new FishYAML();
-        System.out.println(yaml.dump(factory));
-    }
 
 
 

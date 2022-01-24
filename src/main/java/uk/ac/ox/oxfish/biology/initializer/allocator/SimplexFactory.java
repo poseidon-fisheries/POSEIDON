@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
 public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
 
@@ -34,6 +35,8 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
 
     private DoubleParameter bandwidth = new FixedDoubleParameter(5);
 
+    private DoubleParameter randomSeed = new NullParameter();
+
 
     /**
      * Applies this function to the given argument.
@@ -43,7 +46,13 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      */
     @Override
     public SimplexAllocator apply(FishState fishState) {
-        final long randomSeed = fishState.getRandom().nextLong();
+        final double drawnRandomSeed = randomSeed.apply(fishState.getRandom());
+        long randomSeed;
+        //it might not have been set up, if so just pick at random!
+        if(!Double.isFinite(drawnRandomSeed) || Double.isNaN(drawnRandomSeed))
+            randomSeed = fishState.getRandom().nextLong();
+        else
+            randomSeed = (long) drawnRandomSeed;
         System.out.println("simplex random seed: " + randomSeed);
         return new SimplexAllocator(
                 maximum.apply(fishState.getRandom()),
@@ -105,5 +114,14 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      */
     public void setBandwidth(DoubleParameter bandwidth) {
         this.bandwidth = bandwidth;
+    }
+
+
+    public DoubleParameter getRandomSeed() {
+        return randomSeed;
+    }
+
+    public void setRandomSeed(DoubleParameter randomSeed) {
+        this.randomSeed = randomSeed;
     }
 }

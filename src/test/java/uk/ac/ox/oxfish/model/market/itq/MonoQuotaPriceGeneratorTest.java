@@ -31,8 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class MonoQuotaPriceGeneratorTest {
@@ -42,10 +41,13 @@ public class MonoQuotaPriceGeneratorTest {
     public void testQuotaPrice() throws Exception {
 
 
-        Fisher fisher = mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getDayOfTheYear()).thenReturn(364);
+        when(fisher.getDepartingStrategy().
+                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-model.getDayOfTheYear());
         when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
                                                           new Species("c"), new Species("d")));
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(100);
@@ -79,7 +81,7 @@ public class MonoQuotaPriceGeneratorTest {
     @Test
     public void countingDailyProfits() throws Exception {
 
-        Fisher fisher = mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Collections.singletonList(new Species("a")));
@@ -96,6 +98,8 @@ public class MonoQuotaPriceGeneratorTest {
         gen.start(model,fisher);
 
         // .5 * (10+10*2) = 15
+        when(fisher.getDepartingStrategy().
+                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-363);
         assertEquals(15d,gen.computeLambda(),.001d );
 
     }

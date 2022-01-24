@@ -338,6 +338,21 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
     public boolean isCanReturnFromRetirement() {
         return canReturnFromRetirement;
     }
+
+    @Override
+    public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+
+        switch (status){
+            case FULLTIME:
+                return delegate.predictedDaysLeftFishingThisYear(fisher, model, random);
+            case SEASONAL:
+                return seasonalDelegate.predictedDaysLeftFishingThisYear(fisher, model, random);
+            default:
+                assert false;
+            case RETIRED:
+                return 0;
+        }
+    }
 }
 
 

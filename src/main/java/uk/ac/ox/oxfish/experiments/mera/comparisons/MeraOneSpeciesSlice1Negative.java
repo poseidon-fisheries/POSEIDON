@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
+import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -44,6 +45,7 @@ public class MeraOneSpeciesSlice1Negative {
             public void accept(FishState fishState) {
                 //1. remove exogenous effort
                 OnOffSwitchRegulator.turnOffAllSwitchRegulators(fishState);
+                NoDataPolicy.REMOVE_ENTRY_EVENT.step(fishState);
                 //2. pull up delegate regulation for active agents (keep inactive agents off)
                 List<Fisher> toRemove = new LinkedList<>();
                 for (Fisher fisher : fishState.getFishers()) {
@@ -61,11 +63,11 @@ public class MeraOneSpeciesSlice1Negative {
 
                 //3. set cost structure assuming 0 profits....
                 DoubleSummaryStatistics currentProfitsPerHour = new DoubleSummaryStatistics();
-                System.out.println("Current profits per hour " + currentProfitsPerHour);
                 fishState.getFishers().stream().filter(fisher -> fisher.hasBeenActiveThisYear()).
                         mapToDouble(fisher -> fisher.getLatestYearlyObservation("TRIP_PROFITS_PER_HOUR")).
                         filter(v -> Double.isFinite(v)).
                         forEach(currentProfitsPerHour);
+                System.out.println("Current profits per hour " + currentProfitsPerHour);
 
                 //departing strategy (this is where the "exit" takes place
                 FullSeasonalRetiredDecoratorFactory departingFactory = new FullSeasonalRetiredDecoratorFactory();

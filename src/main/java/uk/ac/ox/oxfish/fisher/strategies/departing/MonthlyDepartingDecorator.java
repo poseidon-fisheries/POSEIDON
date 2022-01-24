@@ -88,4 +88,6 @@ public class MonthlyDepartingDecorator implements  DepartingStrategy {
     public boolean[] getAllowedAtSea() {
         return allowedAtSea;
     }
+
+
 }
