@@ -31,11 +31,11 @@ public class AgingAndRecruitmentProcessTest {
     @Test
     public void AgingAndRecruitmentProcessTester(){
         List<double[]> weights = new ArrayList<>();
-        weights.add(new double[] {10,15,20,25,30});
-        weights.add(new double[] {15,20,25,30,35});
+        weights.add(new double[] {10,15,20,25,30}); //male
+        weights.add(new double[] {15,20,25,30,35}); //female
         List<double[]> lengths = new ArrayList<>();
-        lengths.add(new double[] {5,6,7,8,9});
-        lengths.add(new double[] {10,11,12,13,14});
+        lengths.add(new double[] {5,6,7,8,9});  //male
+        lengths.add(new double[] {10,11,12,13,14}); //female
         List<double[]> proportionalMortalities = new ArrayList<>();
         proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
         proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
@@ -74,14 +74,14 @@ public class AgingAndRecruitmentProcessTest {
 
         HashMap<Species, RecruitmentProcess> recruitmentProcesses = new HashMap<>();
         recruitmentProcesses.put(species1, new RecruitmentBySpawningBiomass(
-                20000,
-                .5,
+                2000000,
+                        .95,
                 .1,
                 false,
                 ((TunaMeristics) species1.getMeristics()).getMaturity().toArray() ,
                 null,
                 FEMALE,
-                true));
+                false));
         AgingAndRecruitmentProcess agingProcess = new AgingAndRecruitmentProcess(recruitmentProcesses);
 
         FishState fishState = mock(FishState.class);
@@ -90,11 +90,13 @@ public class AgingAndRecruitmentProcessTest {
 
         agingProcess.process(fishState, localBiologies);
 //        for (SeaTile allSeaTile : allSeaTiles) {
-        dumbiomass = localBio.getBiomass(species1);
+//        dumbiomass = localBio.getBiomass(species1);
         //        }
 
-
-        System.out.println("break");
+        assertEquals(localBio.getAbundance(species1).getAbundance(0,0), 786573.430
+                , 0.01);
+        assertEquals(localBio.getAbundance(species1).getAbundance(0,1), 10000
+                , 0.01);
 
     }
 }
