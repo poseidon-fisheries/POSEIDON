@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
@@ -38,9 +39,30 @@ public class AllocationGridsTest {
 
         assertEquals(1,allocationGrids.size());
 
-//        DoubleGrid2D daGrid = allocationGrids.getGrids().get(0).get(entry(species1, ));
 
-//        assertEquals(3, allocationGrids.getGrids().get(0).get(entry(species1, "LARGE")).get(0,0),.01);
+ //       allocationGrids.getGrids();
+        Map<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D> grid = allocationGrids.getGrids().get(0);
+        Object[] objects = grid.keySet().toArray();
+
+//        Set<Map.Entry<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D>> entries = grid.entrySet();
+
+ //       Set<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> gridkeys = grid.keySet();
+
+        // DoubleGrid2D temp = grid.get(entry("Piano Tuna": "LARGE"));
+ //       System.out.println("breakpoint");
+
+        assertEquals(0.117031221
+                , grid.get( objects[0] ).get(0,0), .01);
+        assertEquals(0.117031221
+                , grid.get(objects[0]).get(0,0), .01);
+        assertEquals(0.099199173
+                , grid.get(objects[1]).get(0,0), .01);
+        assertEquals(0.137690519
+                , grid.get(objects[1]).get(2,0), .01);
+
+   //     System.out.println("break");
+
+
     }
 
 }
