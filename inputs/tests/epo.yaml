@@ -125,6 +125,35 @@ EPO Abundance:
       mapPaddingInDegrees: '0.5'
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
+  regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
+    factories:
+    - Specific MPA from Shape File:
+        shapeFilePath: inputs/epo/galapagos_eez/eez.shp
+    - Temporary Regulation:
+        delegate:
+          Specific MPA from Coordinates:
+            eastLongitude: '-96.0'
+            northLatitude: '4.0'
+            southLatitude: '-3.0'
+            westLongitude: '-110.0'
+        endDay: '312.0'
+        inactiveDelegate: Anarchy
+        startDay: '282.0'
+    - Temporary Regulation:
+        delegate: No Fishing
+        endDay: '281.0'
+        inactiveDelegate: Anarchy
+        startDay: '210.0'
+    - Temporary Regulation:
+        delegate: No Fishing
+        endDay: '19.0'
+        inactiveDelegate: Anarchy
+        startDay: '313.0'
+    tags:
+    - all
+    - all
+    - closure A
+    - closure B
   scheduledAbundanceProcessesFactory:
     biologicalProcessesDates:
     - '2017-01-01'

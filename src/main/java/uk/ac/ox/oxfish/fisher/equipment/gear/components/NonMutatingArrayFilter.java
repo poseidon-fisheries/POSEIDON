@@ -23,33 +23,35 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 @SuppressWarnings("UnstableApiUsage")
-public class NonMutatingArrayFilter implements AbundanceFilter {
 
-    private final List<ImmutableDoubleArray> filters;
+public class NonMutatingArrayFilter extends ArrayFilter {
 
     public NonMutatingArrayFilter(final Collection<Collection<Double>> filters) {
-        this.filters = filters.stream()
-            .map(ImmutableDoubleArray::copyOf)
-            .collect(toImmutableList());
+        super(false,
+                convertCollectionToPOJOArray(filters));
     }
 
-    public List<ImmutableDoubleArray> getFilters() {
-        return filters;
-    }
 
+    /**
+     * the way I think we are using NonMutatingArrayFilter is basically as a fixed selectivity grid but with the additional
+     * assumption
+     * tht the abundance matrix passed here is not modified as a side effect (which is different from what happens in ArrayFilter!)
+     * @param species the species of fish
+     * @param abundance
+     * @return
+     */
     @Override
-    public double[][] filter(final Species species, final double[][] abundance) {
-        return range(0, abundance.length).mapToObj(subdivision ->
-            range(0, abundance[subdivision].length).mapToDouble(age ->
-                abundance[subdivision][age] * filters.get(subdivision).get(age)
-            ).toArray()
-        ).toArray(double[][]::new);
+    public double[][] filter(Species species, double[][] abundance) {
+        return super.filter(species, Arrays.stream(abundance).map(double[]::clone).toArray(double[][]::new));
     }
-
 }

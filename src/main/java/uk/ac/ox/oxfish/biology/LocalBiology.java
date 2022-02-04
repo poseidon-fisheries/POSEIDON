@@ -52,7 +52,13 @@ public interface LocalBiology extends Startable
      * @return the sum of biomass for the specified species.
      */
     default double getTotalBiomass(final Iterable<? extends Species> species) {
-        return stream(species).mapToDouble(this::getBiomass).sum();
+        double totalBiomass = 0;
+        for (Species currentSpecies : species) {
+            totalBiomass += getBiomass(currentSpecies);
+        }
+
+
+        return totalBiomass;
     }
 
     /**

@@ -84,7 +84,7 @@ public class Catch {
         double weight = 0;
         for(double biomass : biomassCaught)
         {
-            Preconditions.checkArgument(biomass>=0, "can't fish negative weight!");
+            Preconditions.checkArgument(biomass>=0, "can't fish negative weight!, caught: ");
             weight += biomass;
         }
         return weight;

@@ -186,13 +186,16 @@ public class StructuredAbundance {
      * @return a new StructuredAbundance.
      */
     public StructuredAbundance mapIndices(final ToDoubleBiFunction<Integer, Integer> mapper) {
-        return new StructuredAbundance(
-            range(0, getSubdivisions()).mapToObj(subDivision ->
-                range(0, getBins()).mapToDouble(bin ->
-                    mapper.applyAsDouble(subDivision, bin)
-                ).toArray()
-            ).toArray(double[][]::new)
-        );
+
+
+        double[][] abundance = new double[getSubdivisions()][getBins()];
+        for (int subdivision = 0; subdivision < abundance.length; subdivision++) {
+            for (int bin = 0; bin < abundance[subdivision].length; bin++) {
+                abundance[subdivision][bin] = mapper.applyAsDouble(subdivision,bin);
+            }
+        }
+        return new StructuredAbundance(abundance);
+
     }
 
     public void forEachIndex(final BiConsumer<Integer, Integer> consumer) {

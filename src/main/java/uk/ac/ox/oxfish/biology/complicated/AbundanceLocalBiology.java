@@ -126,7 +126,7 @@ public class AbundanceLocalBiology implements LocalBiology
 
         if(Double.isNaN(lastComputedBiomass[species.getIndex()] )) {
             lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
-                    getAbundance(species),
+                    abundance.get(species),
                     species.getMeristics()
             );
             assert !Double.isNaN(lastComputedBiomass[species.getIndex()] );
@@ -141,6 +141,7 @@ public class AbundanceLocalBiology implements LocalBiology
      * even if the current class doesn't implement that interface.
      */
     public double[] getCurrentBiomass() {
+
         // This is a bit awkward, as we don't have access to the global biology
         // to map indices to species, but should work just fine as long as
         // the abundance map contains all the species (a safe assumption, I think).

@@ -37,7 +37,7 @@ public class TunaMeristics implements Meristics {
 
     private static final int NUMBER_OF_SUBDIVISIONS = 2; // MALE and FEMALE
     private final int numberOfBins;
-    private final List<ImmutableDoubleArray> weights;
+    private final double[][] weights;
     private final List<ImmutableDoubleArray> lengths;
     private final List<ImmutableDoubleArray> proportionalMortalities;
     private final ImmutableDoubleArray maturity;
@@ -78,7 +78,7 @@ public class TunaMeristics implements Meristics {
      *                males.
      */
     public TunaMeristics(
-        final Collection<ImmutableDoubleArray> weights,
+        final List<ImmutableDoubleArray> weights,
         final Collection<ImmutableDoubleArray> lengths,
         final Collection<ImmutableDoubleArray> proportionalMortalities,
         final ImmutableDoubleArray maturity
@@ -108,7 +108,10 @@ public class TunaMeristics implements Meristics {
         checkArgument(arraySizes.length == 1);
 
         this.numberOfBins = arraySizes[0];
-        this.weights = ImmutableList.copyOf(weights);
+        this.weights = new double[NUMBER_OF_SUBDIVISIONS][];
+        for (int subdivisions = 0; subdivisions < weights.size(); subdivisions++) {
+            this.weights[subdivisions] = weights.get(subdivisions).toArray();
+        }
         this.lengths = ImmutableList.copyOf(lengths);
         this.proportionalMortalities = ImmutableList.copyOf(proportionalMortalities);
         this.maturity = maturity;
@@ -129,7 +132,7 @@ public class TunaMeristics implements Meristics {
 
     @Override
     public double getWeight(final int subdivision, final int bin) {
-        return weights.get(subdivision).get(bin);
+        return weights[subdivision][bin];
     }
 
     @Override

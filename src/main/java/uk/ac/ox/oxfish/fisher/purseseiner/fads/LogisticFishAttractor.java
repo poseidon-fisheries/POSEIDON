@@ -25,71 +25,106 @@ import static java.util.function.UnaryOperator.identity;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
+
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
-abstract class LogisticFishAttractor<A, B extends LocalBiology, F extends Fad<B, F>>
-    implements FishAttractor<B, F> {
+abstract class LogisticFishAttractor<WEIGHTED_CATCH extends Number, B extends LocalBiology, F extends Fad<B, F>>
+        implements FishAttractor<B, F> {
 
     private final MersenneTwisterFast rng;
-    private final Map<Species, Double> compressionExponents;
-    private final Map<Species, Double> attractableBiomassCoefficients;
-    private final Map<Species, Double> biomassInteractionCoefficients;
-    private final Map<Species, Double> attractionRates;
-    private final Set<Species> species;
+    private final double[] compressionExponents;
+    private final double[] attractableBiomassCoefficients;
+    private final double[] biomassInteractionCoefficients;
+    private final double[] attractionRates;
+    private final Species[] species;
 
     public LogisticFishAttractor(
-        final MersenneTwisterFast rng,
-        final Map<Species, Double> compressionExponents,
-        final Map<Species, Double> attractableBiomassCoefficients,
-        final Map<Species, Double> biomassInteractionCoefficients,
-        final Map<Species, Double> attractionRates
+            final MersenneTwisterFast rng,
+            final Map<Species, Double> compressionExponents,
+            final Map<Species, Double> attractableBiomassCoefficients,
+            final Map<Species, Double> biomassInteractionCoefficients,
+            final Map<Species, Double> attractionRates
     ) {
         this.rng = rng;
-        this.compressionExponents = ImmutableMap.copyOf(compressionExponents);
-        this.attractableBiomassCoefficients = ImmutableMap.copyOf(attractableBiomassCoefficients);
-        this.biomassInteractionCoefficients = ImmutableMap.copyOf(biomassInteractionCoefficients);
-        this.attractionRates = ImmutableMap.copyOf(attractionRates);
-
         // Store and arbitrary key set as our set of species
-        this.species = this.attractionRates.keySet();
+        this.species = attractionRates.keySet().toArray(new Species[0]);
+        int maxIndex = Arrays.stream(this.species).mapToInt(value -> value.getIndex()).max().
+                orElseThrow(() -> new RuntimeException("Fad Attractor with no species was provided!"));
+        maxIndex++;
+        this.attractionRates = new double[maxIndex];
+        this.biomassInteractionCoefficients = new double[maxIndex];
+        this.attractableBiomassCoefficients = new double[maxIndex];
+        this.compressionExponents = new double[maxIndex];
+
+        for (Species species : this.species) {
+            this.attractionRates[species.getIndex()] = attractionRates.get(species);
+            this.biomassInteractionCoefficients[species.getIndex()] = biomassInteractionCoefficients.get(species);
+            this.attractableBiomassCoefficients[species.getIndex()] = attractableBiomassCoefficients.get(species);
+            this.compressionExponents[species.getIndex()] = compressionExponents.get(species);
+        }
+
+
     }
 
     @Override
-    public B attract(
-        final B seaTileBiology,
-        final F fad
+    public WeightedObject<B> attract(
+            final B seaTileBiology,
+            final F fad
     ) {
-        final double fadBiomass = fad.getBiology().getTotalBiomass(species);
-        final Map<Species, A> attractedFish = species
-            .stream()
-            .collect(toImmutableMap(identity(), s -> {
-                final double p =
-                    probabilityOfAttraction(s, seaTileBiology.getBiomass(s), fadBiomass);
-                return getRng().nextDouble() < p
-                    ? attractForSpecies(s, seaTileBiology, fad)
-                    : attractNothing(s, fad);
-            }));
 
-        return scale(attractedFish, fad);
+        boolean attractedNothing = true;
+        double fadBiomass = 0;
+        for (Species currentSpecies : species) {
+            fadBiomass+= fad.getBiology().getBiomass(currentSpecies);
+        }
+
+        HashMap<Species, WEIGHTED_CATCH> attractedFish = new HashMap<>(species.length);
+        for (Species currentSpecies : species) {
+            final double p =
+                    probabilityOfAttraction(currentSpecies,
+                            seaTileBiology.getBiomass(currentSpecies),
+                            fadBiomass);
+            if(p>0 && getRng().nextDouble() < p) {
+                WEIGHTED_CATCH attracted = attractForSpecies(currentSpecies, seaTileBiology, fad);
+                if(attracted.doubleValue()>0)
+                    attractedNothing = false;
+                attractedFish.put(currentSpecies,
+                        attracted);
+            } else {
+
+                attractedFish.put(currentSpecies,
+                        attractNothing(currentSpecies, fad));
+            }
+
+        }
+        if(!attractedNothing)
+            return scale(attractedFish, fad);
+        else
+            return null;
     }
 
-    abstract A attractForSpecies(Species s, B cellBiology, F fad);
+    abstract WEIGHTED_CATCH attractForSpecies(Species s, B cellBiology, F fad);
 
-    abstract A attractNothing(Species s, F fad);
+    abstract WEIGHTED_CATCH attractNothing(Species s, F fad);
 
     double probabilityOfAttraction(
-        final Species species,
-        final double attractableBiomass,
-        final double totalFadBiomass
+            final Species species,
+            final double attractableBiomass,
+            final double totalFadBiomass
     ) {
         return 1 - exp(-pow(
-            attractableBiomassCoefficients.get(species) * attractableBiomass +
-                biomassInteractionCoefficients.get(species) * attractableBiomass
-                    * totalFadBiomass
-            , compressionExponents.get(species)
+                attractableBiomassCoefficients[species.getIndex()] * attractableBiomass +
+                        biomassInteractionCoefficients[species.getIndex()] * attractableBiomass
+                                * totalFadBiomass
+                , compressionExponents[species.getIndex()]
         ));
     }
 
@@ -97,10 +132,10 @@ abstract class LogisticFishAttractor<A, B extends LocalBiology, F extends Fad<B,
         return rng;
     }
 
-    abstract B scale(Map<Species, A> attractedFish, F fad);
+    abstract WeightedObject<B> scale(Map<Species, WEIGHTED_CATCH> attractedFish, F fad);
 
-    Map<Species, Double> getAttractionRates() {
-        return attractionRates;
+    public double getAttractionRates(Species species) {
+        return attractionRates[species.getIndex()];
     }
 
 }

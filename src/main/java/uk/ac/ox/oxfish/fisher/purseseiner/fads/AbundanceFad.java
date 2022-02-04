@@ -24,6 +24,8 @@ import static java.util.function.Function.identity;
 
 import java.util.Arrays;
 import java.util.Map;
+
+import com.google.common.base.Preconditions;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -32,6 +34,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
@@ -108,8 +111,18 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
         final GlobalBiology globalBiology
     ) {
 
+        WeightedObject<AbundanceLocalBiology> attracted = getFishAttractor().attract(seaTileBiology, this);
+        if(attracted==null)
+            return null;
+        if(attracted.getTotalWeight()<0){
+            //sometimes it is effectively 0
+            assert attracted.getTotalWeight()>-FishStateUtilities.EPSILON;
+            Preconditions.checkArgument(attracted.getTotalWeight()>-FishStateUtilities.EPSILON);
+            return null;
+        }
         final AbundanceLocalBiology attractedFish =
-            getFishAttractor().attract(seaTileBiology, this);
+            attracted.getObjectBeingWeighted();
+
 
         getBiology().getStructuredAbundance().forEach((species, fadAbundance) -> {
             final double[][] attractedAbundance = attractedFish.getAbundance(species).asMatrix();

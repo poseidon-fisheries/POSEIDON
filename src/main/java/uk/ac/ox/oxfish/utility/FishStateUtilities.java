@@ -695,18 +695,30 @@ public class FishStateUtilities {
      */
     public static double weigh(StructuredAbundance abundance, Meristics meristics)
     {
+       return weigh(abundance.asMatrix(),meristics);
+
+
+    }
+
+    /**
+     * weights this number of fish  assuming they are all male
+     * @param abundance number of fish per size
+     * @param meristics species object containig the details
+     * @return the weight of hte fish
+     */
+    public static double weigh(double[][] abundance, Meristics meristics)
+    {
         //no female-male split
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
         for(int subdivision =0; subdivision< meristics.getNumberOfSubdivisions(); subdivision++)
             for(int bin=0; bin<meristics.getNumberOfBins(); bin++)
-                totalWeight += abundance.getAbundance(subdivision, bin) * meristics.getWeight(subdivision, bin);
+                totalWeight += abundance[subdivision][bin] * meristics.getWeight(subdivision, bin);
 
         return totalWeight;
 
 
     }
-
 
     /**
      * used to weigh only one bin of the structured abundance catch

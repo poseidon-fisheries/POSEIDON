@@ -23,6 +23,8 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Map.Entry.comparingByKey;
 
 import com.google.common.collect.ImmutableMap;
+
+import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -38,21 +40,27 @@ public class LinearFishBiomassAttractor implements FishBiomassAttractor {
     }
 
     @Override
-    public BiomassLocalBiology attract(
+    public WeightedObject<BiomassLocalBiology> attract(
         final BiomassLocalBiology seaTileBiology,
         final BiomassFad fad
     ) {
+        DoubleSummaryStatistics totalAttraction = new DoubleSummaryStatistics();
         final double[] attractedBiomass = attractionRates.entrySet()
             .stream()
             .sorted(comparingByKey(comparingInt(Species::getIndex)))
             .mapToDouble(entry -> {
                 final Species species = entry.getKey();
                 final Double attractionRate = entry.getValue();
-                return attractionRate * seaTileBiology.getBiomass(species);
+                double attracted = attractionRate * seaTileBiology.getBiomass(species);
+                totalAttraction.accept(attracted);
+                return attracted;
             })
             .toArray();
 
-        return new BiomassLocalBiology(scaleAttractedBiomass(attractedBiomass, fad));
+        return new WeightedObject<>(
+                new BiomassLocalBiology(scaleAttractedBiomass(attractedBiomass, fad)),
+                totalAttraction.getSum()
+        );
     }
 
 }

@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 public
 interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
 
-    B attract(B seaTileBiology, F fad);
+    WeightedObject<B> attract(B seaTileBiology, F fad);
 
     default double biomassScalingFactor(
         final double attractedBiomass,

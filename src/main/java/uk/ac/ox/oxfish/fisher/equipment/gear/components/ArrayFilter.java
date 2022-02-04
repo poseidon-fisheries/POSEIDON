@@ -22,10 +22,16 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.ImmutableDoubleArray;
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
+import java.util.Collection;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Simply provide arrays (one for each subdivision), each representing the age structure
@@ -50,6 +56,28 @@ public class ArrayFilter  implements AbundanceFilter{
         this.round = round;
     }
 
+
+    public static ArrayFilter nonMutatingArrayFilter(final Collection<Collection<Double>> filters) {
+        double[][] filterArray = convertCollectionToPOJOArray(filters);
+        return new ArrayFilter(false,filterArray);
+    }
+
+    @NotNull
+    protected static double[][] convertCollectionToPOJOArray(Collection<Collection<Double>> filters) {
+        ImmutableList<ImmutableDoubleArray> collected = filters.stream()
+                .map(ImmutableDoubleArray::copyOf)
+                .collect(toImmutableList());
+        double[][] filterArray = new double[collected.size()][collected.get(0).length()];
+        for (int row = 0; row < collected.size(); row++) {
+            for(int bin =0; bin< collected.get(0).length(); bin++)
+            {
+                filterArray[row][bin]=collected.get(row).get(bin);
+            }
+        }
+        return filterArray;
+    }
+
+
     /**
      * returns a int[subdivisions][age+1] array with male and female fish that are not filtered out
      *
@@ -73,6 +101,9 @@ public class ArrayFilter  implements AbundanceFilter{
         return abundance;
     }
 
+    public double getFilterValue(int subdivision, int bin) {
+        return filters[subdivision][bin];
+    }
 
     @Override
     public boolean equals(Object o) {

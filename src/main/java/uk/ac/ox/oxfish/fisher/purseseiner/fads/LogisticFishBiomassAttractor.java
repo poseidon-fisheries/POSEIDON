@@ -54,7 +54,7 @@ public class LogisticFishBiomassAttractor
     ) {
         final double fadBiomass = fad.getBiology().getBiomass(s);
         final double cellBiomass = cellBiology.getBiomass(s);
-        final double attractionRate = getAttractionRates().get(s);
+        final double attractionRate = getAttractionRates(s);
         final double fadCarryingCapacity = fad.getTotalCarryingCapacity();
         return min(
             cellBiomass,
@@ -70,12 +70,18 @@ public class LogisticFishBiomassAttractor
     }
 
     @Override
-    BiomassLocalBiology scale(final Map<Species, Double> attractedFish, final BiomassFad fad) {
-        final double[] biomassArray = attractedFish.entrySet().stream()
-            .sorted(comparingByKey(comparingInt(Species::getIndex)))
-            .mapToDouble(Entry::getValue)
-            .toArray();
-        return new BiomassLocalBiology(scaleAttractedBiomass(biomassArray, fad));
+    WeightedObject<BiomassLocalBiology> scale(final Map<Species, Double> attractedFish, final BiomassFad fad) {
+        final double[] biomassArray = new double[attractedFish.size()];
+        double totalBiomass = 0;
+        for (Entry<Species, Double> attracted : attractedFish.entrySet()) {
+            totalBiomass += attracted.getValue();
+            biomassArray[attracted.getKey().getIndex()] = attracted.getValue();
+        }
+        return
+                new WeightedObject<>(
+                new BiomassLocalBiology(scaleAttractedBiomass(biomassArray, fad)),
+                        totalBiomass
+                );
     }
 
 }
