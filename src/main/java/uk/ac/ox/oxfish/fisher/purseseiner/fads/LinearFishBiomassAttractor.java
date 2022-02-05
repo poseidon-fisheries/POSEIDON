@@ -40,7 +40,7 @@ public class LinearFishBiomassAttractor implements FishBiomassAttractor {
     }
 
     @Override
-    public WeightedObject<BiomassLocalBiology> attract(
+    public WeightedObject<BiomassLocalBiology> attractImplementation(
         final BiomassLocalBiology seaTileBiology,
         final BiomassFad fad
     ) {

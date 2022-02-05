@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -26,31 +27,23 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
 
-class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, AbundanceFad> {
+class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLocalBiology, AbundanceFad> {
 
-    AbundanceFadInitializer(
-        final GlobalBiology globalBiology,
-        final double totalCarryingCapacity,
-        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
-        final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
-    ) {
-        super(
-            globalBiology,
-            totalCarryingCapacity,
-            fishAttractor,
-            fishReleaseProbability,
-            timeStepSupplier
-        );
+
+    public AbundanceFadInitializer(GlobalBiology globalBiology, DoubleSupplier carryingCapacityGenerator,
+                                   FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
+                                   double fishReleaseProbability,
+                                   IntSupplier timeStepSupplier) {
+        super(globalBiology, carryingCapacityGenerator, fishAttractor, fishReleaseProbability, timeStepSupplier);
     }
 
     @Override
-    AbundanceLocalBiology makeBiology(final GlobalBiology globalBiology) {
+    public AbundanceLocalBiology makeBiology(final GlobalBiology globalBiology) {
         return new AbundanceLocalBiology(globalBiology);
     }
 
     @Override
-    AbundanceFad makeFad(
+    public AbundanceFad makeFad(
         final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
         final AbundanceLocalBiology biology,
         final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
@@ -65,7 +58,7 @@ class AbundanceFadInitializer extends FadInitializer<AbundanceLocalBiology, Abun
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            getTotalCarryingCapacity()
+            generateCarryingCapacity()
         );
     }
 }

@@ -29,7 +29,7 @@ public class NonMutatingProportionFilter
     private final double proportion;
 
     public NonMutatingProportionFilter(final double proportion) {
-        checkArgument(proportion >= 0 && proportion <= 1);
+        checkArgument(proportion >= 0 && proportion <= 1, proportion);
         this.proportion = proportion;
     }
 

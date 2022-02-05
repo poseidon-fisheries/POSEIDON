@@ -22,11 +22,23 @@ import static java.lang.Math.min;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 
+import javax.annotation.Nullable;
+
 @FunctionalInterface
 public
 interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
 
-    WeightedObject<B> attract(B seaTileBiology, F fad);
+
+    @Nullable
+    default WeightedObject<B> attract(B seaTileBiology, F fad){
+        if(fad.getTotalCarryingCapacity()<=0)
+            return null;
+        else
+            return attractImplementation(seaTileBiology, fad);
+    }
+
+    @Nullable
+    WeightedObject<B> attractImplementation(B seaTileBiology, F fad);
 
     default double biomassScalingFactor(
         final double attractedBiomass,

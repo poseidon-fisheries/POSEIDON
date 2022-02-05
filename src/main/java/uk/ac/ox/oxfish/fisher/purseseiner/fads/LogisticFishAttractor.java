@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
@@ -75,7 +76,7 @@ abstract class LogisticFishAttractor<WEIGHTED_CATCH extends Number, B extends Lo
     }
 
     @Override
-    public WeightedObject<B> attract(
+    public WeightedObject<B> attractImplementation(
             final B seaTileBiology,
             final F fad
     ) {
@@ -116,7 +117,7 @@ abstract class LogisticFishAttractor<WEIGHTED_CATCH extends Number, B extends Lo
     abstract WEIGHTED_CATCH attractNothing(Species s, F fad);
 
     double probabilityOfAttraction(
-            final Species species,
+            @NotNull final Species species,
             final double attractableBiomass,
             final double totalFadBiomass
     ) {

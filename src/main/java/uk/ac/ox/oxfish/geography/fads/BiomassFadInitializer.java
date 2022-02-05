@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
 
-public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, BiomassFad> {
+public class BiomassFadInitializer extends AbstractFadInitializer<BiomassLocalBiology, BiomassFad> {
 
     public BiomassFadInitializer(
         final GlobalBiology globalBiology,
@@ -47,7 +47,7 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
     }
 
     @NotNull
-    BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {
+    public BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {
         final double[] carryingCapacities = DoubleStream
             .generate(() -> Double.POSITIVE_INFINITY)
             .limit(globalBiology.getSize())
@@ -56,7 +56,7 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
     }
 
     @NotNull
-    BiomassFad makeFad(
+    public BiomassFad makeFad(
         final FadManager<BiomassLocalBiology, BiomassFad> owner,
         final BiomassLocalBiology biology,
         final FishAttractor<BiomassLocalBiology, BiomassFad> fishBiomassAttractor,
@@ -71,7 +71,7 @@ public class BiomassFadInitializer extends FadInitializer<BiomassLocalBiology, B
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            getTotalCarryingCapacity()
+            generateCarryingCapacity()
         );
     }
 

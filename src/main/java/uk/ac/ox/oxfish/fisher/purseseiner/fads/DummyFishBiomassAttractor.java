@@ -30,7 +30,7 @@ public class DummyFishBiomassAttractor
     }
 
     @Override
-    public WeightedObject<BiomassLocalBiology> attract(
+    public WeightedObject<BiomassLocalBiology> attractImplementation(
         final BiomassLocalBiology seaTileBiology, final BiomassFad fad
     ) {
         return new WeightedObject<>(

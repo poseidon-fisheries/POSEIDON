@@ -23,17 +23,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
+
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceFadInitializerFactory
-    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
+        extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+
+    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
 
     /**
      * Empty constructor for YAML
@@ -51,26 +57,38 @@ public class AbundanceFadInitializerFactory
         checkNotNull(getSpeciesCodes());
         final MersenneTwisterFast rng = fishState.getRandom();
         final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
+        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+        DoubleSupplier capacityGenerator;
+        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
+            capacityGenerator = () -> totalCarryingCapacity;
+        else
+            capacityGenerator = () -> {
+                if(rng.nextFloat()<=probabilityOfFadBeingDud)
+                    return 0;
+                else
+                    return totalCarryingCapacity;
+            };
+
         return new AbundanceFadInitializer(
-            fishState.getBiology(),
-            totalCarryingCapacity,
-            makeFishAttractor(fishState, rng),
-            getFishReleaseProbabilityInPercent().apply(rng) / 100d,
-            fishState::getStep
+                fishState.getBiology(),
+                capacityGenerator,
+                makeFishAttractor(fishState, rng),
+                getFishReleaseProbabilityInPercent().apply(rng) / 100d,
+                fishState::getStep
         );
     }
 
     private LogisticFishAbundanceAttractor makeFishAttractor(
-        final FishState fishState,
-        final MersenneTwisterFast rng
+            final FishState fishState,
+            final MersenneTwisterFast rng
     ) {
         return new LogisticFishAbundanceAttractor(
-            fishState.getRandom(),
-            processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
-            processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
-            processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
-            processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
-            getSelectivityFilters()
+                fishState.getRandom(),
+                processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
+                processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
+                processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
+                processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
+                getSelectivityFilters()
         );
     }
 
@@ -82,5 +100,13 @@ public class AbundanceFadInitializerFactory
 
     public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
         this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
+    }
+
+    public DoubleParameter getFadDudRate() {
+        return fadDudRate;
+    }
+
+    public void setFadDudRate(DoubleParameter fadDudRate) {
+        this.fadDudRate = fadDudRate;
     }
 }
