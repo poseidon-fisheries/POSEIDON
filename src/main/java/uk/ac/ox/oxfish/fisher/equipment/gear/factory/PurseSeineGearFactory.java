@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Double.MAX_VALUE;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
@@ -7,7 +8,6 @@ import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import ec.util.MersenneTwisterFast;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -46,7 +47,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLoca
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -59,7 +60,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 @SuppressWarnings("unused")
-abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeineGear<B, F>> {
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
@@ -99,7 +100,6 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
-    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
@@ -122,9 +122,13 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
 
-    AbstractPurseSeineGearFactory(
-        final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory
-    ) {
+    FadInitializerFactory<B, F> fadInitializerFactory;
+
+    public FadInitializerFactory<B, F> getFadInitializer() {
+        return fadInitializerFactory;
+    }
+
+    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -363,18 +367,6 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
     public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return fadDeploymentObservers;
@@ -417,9 +409,9 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
         this.nonAssociatedSetObservers = nonAssociatedSetObservers;
     }
 
-    @Override
-    public PurseSeineGear<B, F> apply(final FishState fishState) {
-
+    @NotNull
+    FadManager<B, F> makeFadManager(final FishState fishState) {
+        checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
                 .map(factory -> factory.apply(fishState))
@@ -436,17 +428,10 @@ abstract class AbstractPurseSeineGearFactory<B extends LocalBiology, F extends F
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations
         );
-
-        final MersenneTwisterFast rng = fishState.getRandom();
-
-        return new PurseSeineGear<>(
-            fadManager,
-            attractionFields()::iterator,
-            successfulSetProbability.apply(rng)
-        );
+        return fadManager;
     }
 
-    private Stream<AttractionField> attractionFields() {
+    Stream<AttractionField> attractionFields() {
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
                 pctHoldSpaceLeftLogisticMidpoint,

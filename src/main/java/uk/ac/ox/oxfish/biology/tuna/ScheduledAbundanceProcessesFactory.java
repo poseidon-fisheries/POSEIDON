@@ -25,7 +25,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -63,10 +62,17 @@ public class ScheduledAbundanceProcessesFactory
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
     }
 
+    @SuppressWarnings("unused")
+    public Map<Species, ? extends RecruitmentProcess> getRecruitmentProcesses() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return recruitmentProcesses;
+    }
+
     public void setRecruitmentProcesses(
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses
     ) {
-        this.recruitmentProcesses = ImmutableMap.copyOf(recruitmentProcesses);
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.recruitmentProcesses = recruitmentProcesses;
     }
 
     @SuppressWarnings("unused")
@@ -94,7 +100,8 @@ public class ScheduledAbundanceProcessesFactory
 
         return new ScheduledBiologicalProcesses<>(
             abundanceReallocator.getAllocationGrids().getStepMapper(),
-            buildSchedule()
+            buildSchedule(),
+            new Extractor<>(AbundanceLocalBiology.class, true, true)
         );
     }
 
@@ -117,20 +124,18 @@ public class ScheduledAbundanceProcessesFactory
             scheduleBuilder = ImmutableListMultimap.builder();
 
         // Add all our periodical biological processes to the schedule
-        final BiologicalProcess<AbundanceLocalBiology> aggregationProcess =
-            new AbundanceAggregationProcess();
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceMortalityProcess(),
-                aggregationProcess,
+                // TODO: add exogenous mortality
+                new AbundanceLostRecoveryProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
-                new FadAbundanceExcluder(),
                 abundanceReallocator
             );
 
         final List<BiologicalProcess<AbundanceLocalBiology>> reallocationProcesses =
             ImmutableList.of(
-                aggregationProcess,
+                new AbundanceExtractor(false, true),
                 abundanceReallocator
             );
 

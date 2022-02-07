@@ -52,7 +52,7 @@ public class ScheduledBiomassProcessesFactory
         // we redistribute it across the map.
         final Collection<BiologicalProcess<BiomassLocalBiology>> biologicalProcesses =
             ImmutableList.of(
-                new BiomassAggregationProcess(false),
+                new BiomassExtractor(false, true),
                 getBiomassReallocator()
             );
 
@@ -65,7 +65,11 @@ public class ScheduledBiomassProcessesFactory
                 .stream()
                 .collect(toImmutableMap(identity(), step -> biologicalProcesses));
 
-        return new ScheduledBiologicalProcesses<>(grids.getStepMapper(), schedule);
+        return new ScheduledBiologicalProcesses<>(
+            grids.getStepMapper(),
+            schedule,
+            new Extractor<>(BiomassLocalBiology.class, true, true)
+        );
     }
 
     private BiomassReallocator getBiomassReallocator() {

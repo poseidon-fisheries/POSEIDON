@@ -16,14 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.biology.tuna;
+package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 
-class AbundanceAggregationProcess extends AggregationProcess<AbundanceLocalBiology> {
+public class AbundanceLostEvent {
 
-    AbundanceAggregationProcess() {
-        super(new AbundanceAggregator(true, true));
+    private final Map<Species, ImmutableAbundance> abundanceLost;
+
+    public AbundanceLostEvent(final Map<Species, ImmutableAbundance> abundanceLost) {
+        this.abundanceLost = ImmutableMap.copyOf(abundanceLost);
     }
 
+    public Map<Species, ImmutableAbundance> getAbundanceLost() {
+        return abundanceLost;
+    }
 }

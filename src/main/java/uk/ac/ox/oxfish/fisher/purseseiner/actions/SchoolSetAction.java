@@ -72,7 +72,10 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
         if (biology instanceof VariableBiomassBasedBiology) {
             return new Catch((VariableBiomassBasedBiology) biology);
         } else if (biology instanceof AbundanceLocalBiology) {
-            return new Catch((AbundanceLocalBiology) biology);
+            return new Catch(
+                getFisher().grabState().getBiology(),
+                (AbundanceLocalBiology) biology
+            );
         } else {
             throw new IllegalArgumentException();
         }

@@ -42,9 +42,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.tuna.LocalBiologiesExtractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.biology.tuna.Extractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -170,7 +168,7 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     @NotNull
     private static Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
-        return new LocalBiologiesExtractor<>(BiomassLocalBiology.class, true, false)
+        return new Extractor<>(BiomassLocalBiology.class, true, false)
             .apply(fishState)
             .stream();
     }

@@ -44,8 +44,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  */
 public class BiomassReallocator extends Reallocator<String, BiomassLocalBiology> {
 
-    BiomassReallocator(final AllocationGrids<String> allocationGrids) {
-        super(allocationGrids);
+    BiomassReallocator(
+        final AllocationGrids<String> allocationGrids
+    ) {
+        super(allocationGrids, new BiomassAggregator());
     }
 
     @Override

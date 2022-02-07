@@ -18,29 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
-import java.util.Optional;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.model.FishState;
+public class AbundanceExtractor extends Extractor<AbundanceLocalBiology> {
 
-class AggregationProcess<B extends LocalBiology> implements BiologicalProcess<B> {
-
-    private final Aggregator<B> aggregator;
-
-    AggregationProcess(final Aggregator<B> aggregator) {
-        this.aggregator = aggregator;
-    }
-
-    @Override
-    public Optional<B> process(
-        final FishState fishState,
-        final B ignoredBiology
+    /**
+     * Creates a {@link Extractor}.
+     *
+     * @param includeFads     Whether or not to include FAD biologies.
+     * @param includeSeaTiles Whether or not to include sea tile biologies.
+     */
+    public AbundanceExtractor(
+        final boolean includeFads,
+        final boolean includeSeaTiles
     ) {
-        checkArgument(
-            ignoredBiology == null,
-            "Aggregation processes expect null biology."
-        );
-        return Optional.of(aggregator.aggregate(fishState));
+        super(AbundanceLocalBiology.class, includeFads, includeSeaTiles);
     }
 }

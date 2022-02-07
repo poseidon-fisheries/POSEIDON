@@ -27,22 +27,15 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
  */
 class BiomassAggregator extends Aggregator<BiomassLocalBiology> {
 
-    BiomassAggregator(
-        final boolean includeFads,
-        final boolean includeSeaTiles
-    ) {
-        super(BiomassLocalBiology.class, includeFads, includeSeaTiles);
-    }
-
     @Override
-    BiomassLocalBiology aggregate(
+    public BiomassLocalBiology apply(
         final GlobalBiology globalBiology,
-        final Collection<BiomassLocalBiology> localBiologies
+        final Collection<BiomassLocalBiology> biomassLocalBiologies
     ) {
         final double[] biomass = globalBiology
             .getSpecies()
             .stream()
-            .mapToDouble(species -> localBiologies
+            .mapToDouble(species -> biomassLocalBiologies
                 .stream()
                 .mapToDouble(biology -> biology.getBiomass(species))
                 .sum()

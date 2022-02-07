@@ -21,11 +21,11 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.Streams;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -39,23 +39,21 @@ import uk.ac.ox.oxfish.model.FishState;
  *
  * @param <B> The type of local biology to extract.
  */
-public class LocalBiologiesExtractor<B extends LocalBiology>
-    implements Function<FishState, List<B>> {
+public class Extractor<B extends LocalBiology>
+    implements Function<FishState, List<B>>, BiologicalProcess<B> {
 
     private final Class<B> localBiologyClass;
     private final boolean includeFads;
     private final boolean includeSeaTiles;
-    private final CacheByFishState<List<B>> cache =
-        new CacheByFishState<>(this::extractLocalBiologies);
 
     /**
-     * Creates a {@link LocalBiologiesExtractor}.
+     * Creates a {@link Extractor}.
      *
      * @param localBiologyClass The class object for the type of biology we want to extract.
      * @param includeFads       Whether or not to include FAD biologies.
      * @param includeSeaTiles   Whether or not to include sea tile biologies.
      */
-    public LocalBiologiesExtractor(
+    public Extractor(
         final Class<B> localBiologyClass,
         final boolean includeFads,
         final boolean includeSeaTiles
@@ -71,10 +69,6 @@ public class LocalBiologiesExtractor<B extends LocalBiology>
 
     @Override
     public List<B> apply(final FishState fishState) {
-        return cache.get(fishState);
-    }
-
-    private List<B> extractLocalBiologies(final FishState fishState) {
 
         final Stream<LocalBiology> seaTileBiologies =
             (includeSeaTiles ? Stream.of(fishState.getMap()) : Stream.<NauticalMap>empty())
@@ -96,4 +90,8 @@ public class LocalBiologiesExtractor<B extends LocalBiology>
             .collect(toImmutableList());
     }
 
+    @Override
+    public Collection<B> process(final FishState fishState, final Collection<B> biologies) {
+        return apply(fishState);
+    }
 }

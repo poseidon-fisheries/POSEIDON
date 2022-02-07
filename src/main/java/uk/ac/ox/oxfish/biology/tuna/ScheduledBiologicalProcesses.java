@@ -53,16 +53,19 @@ class ScheduledBiologicalProcesses<B extends LocalBiology>
 
     private final IntUnaryOperator stepMapper;
     private final Map<Integer, Collection<BiologicalProcess<B>>> schedule;
+    private final Extractor<B> extractor;
 
     ScheduledBiologicalProcesses(
         final IntUnaryOperator stepMapper,
-        final Map<Integer, Collection<BiologicalProcess<B>>> schedule
+        final Map<Integer, Collection<BiologicalProcess<B>>> schedule,
+        final Extractor<B> extractor
     ) {
         this.stepMapper = stepMapper;
         this.schedule = schedule.entrySet().stream().collect(toImmutableMap(
             Entry::getKey,
             entry -> ImmutableList.copyOf(entry.getValue())
         ));
+        this.extractor = extractor;
     }
 
     /**
@@ -77,9 +80,9 @@ class ScheduledBiologicalProcesses<B extends LocalBiology>
             schedule.get(stepMapper.applyAsInt(fishState.getStep()));
 
         if (biologicalProcesses != null) {
-            B biology = null;
+            Collection<B> biologies = extractor.apply(fishState);
             for (final BiologicalProcess<B> process : biologicalProcesses) {
-                biology = process.process(fishState, biology).orElse(biology);
+                biologies = process.process(fishState, biologies);
             }
         }
     }

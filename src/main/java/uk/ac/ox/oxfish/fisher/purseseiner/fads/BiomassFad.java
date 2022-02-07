@@ -41,7 +41,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     public BiomassFad(
         final FadManager<BiomassLocalBiology, BiomassFad> owner,
         final BiomassLocalBiology biology,
-        final Map<Species, FadBiomassAttractor> fadBiomassAttractors,
+        final FishAttractor<BiomassLocalBiology, BiomassFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
@@ -50,7 +50,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
         super(
             owner,
             biology,
-            fadBiomassAttractors,
+            fishAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
@@ -117,11 +117,14 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     @Override
     public Catch addCatchesToFad(
         final BiomassLocalBiology seaTileBiology,
-        final GlobalBiology globalBiology,
-        final double[] catches
+        final GlobalBiology globalBiology
     ) {
-        final double[] fadBiomass = this.getBiology().getCurrentBiomass();
-        for (int i = 0; i < catches.length; i++) {
+        final double[] catches =
+            getFishAttractor().attract(seaTileBiology, this).getCurrentBiomass();
+        final double[] fadBiomass =
+            this.getBiology().getCurrentBiomass();
+
+        for (int i = 0; i < fadBiomass.length; i++) {
             // this mutates the FAD's biomass array directly
             fadBiomass[i] += catches[i];
         }

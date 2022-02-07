@@ -18,10 +18,21 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-public interface FadBiomassAttractor {
-    double getCarryingCapacity();
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-    boolean shouldAttract(double cellBiomass, double totalFadBiomass);
+public class DummyFishBiomassAttractor
+    implements FishAttractor<BiomassLocalBiology, BiomassFad> {
 
-    double biomassAttracted(double tileBiomass, double fadBiomass, double totalFadBiomass);
+    private final int size;
+
+    public DummyFishBiomassAttractor(final int size) {
+        this.size = size;
+    }
+
+    @Override
+    public BiomassLocalBiology attract(
+        final BiomassLocalBiology seaTileBiology, final BiomassFad fad
+    ) {
+        return new BiomassLocalBiology(new double[size]);
+    }
 }

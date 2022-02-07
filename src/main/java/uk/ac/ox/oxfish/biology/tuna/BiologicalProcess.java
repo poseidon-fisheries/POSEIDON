@@ -18,7 +18,7 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Optional;
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -31,6 +31,6 @@ import uk.ac.ox.oxfish.model.FishState;
 @FunctionalInterface
 interface BiologicalProcess<B extends LocalBiology> {
 
-    Optional<B> process(FishState fishState, B aggregatedBiology);
+    Collection<B> process(FishState fishState, Collection<B> biologies);
 
 }

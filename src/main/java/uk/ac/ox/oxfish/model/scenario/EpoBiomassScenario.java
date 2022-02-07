@@ -20,21 +20,10 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
@@ -42,9 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import javax.measure.quantity.Mass;
-import tech.units.indriya.ComparableQuantity;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.tuna.BiomassInitializer;
@@ -58,20 +45,19 @@ import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactor
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
-import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
@@ -94,16 +80,19 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * The biomass-based IATTC tuna simulation scenario.
  */
-@SuppressWarnings("UnstableApiUsage")
-public class EpoBiomassScenario extends EpoScenario {
+public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
     private final FromSimpleFilePortInitializer portInitializer =
         new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
+    private final BiomassReallocatorFactory biomassReallocatorFactory =
+        new BiomassReallocatorFactory(
+            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
+            365
+        );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path mapFile = INPUT_PATH.resolve("depth.csv");
     private Path boatsFile = INPUT_PATH.resolve("boats.csv");
-    private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -119,50 +108,25 @@ public class EpoBiomassScenario extends EpoScenario {
     private FisherDefinition fisherDefinition = new FisherDefinition();
     private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
-
-    private BiomassReallocatorFactory biomassReallocatorFactory =
-        new BiomassReallocatorFactory(
-            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
-            365
-        );
-
     private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
+    private FadInitializerFactory<BiomassLocalBiology, BiomassFad> fadInitializerFactory =
+        new BiomassFadInitializerFactory(
+            "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+        );
 
     public EpoBiomassScenario() {
 
         final BiomassPurseSeineGearFactory
             purseSeineGearFactory = new BiomassPurseSeineGearFactory();
 
-        final BiomassFadInitializerFactory fadInitializerFactory =
-            (BiomassFadInitializerFactory) purseSeineGearFactory.getFadInitializerFactory();
+        purseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
 
-        // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
-        fadInitializerFactory.setAttractionIntercepts(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setTileBiomassCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setBiomassInteractionsCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.0),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        fadInitializerFactory.setGrowthRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.1),
-            "Yellowfin tuna", new FixedDoubleParameter(0.1),
-            "Skipjack tuna", new FixedDoubleParameter(0.1)
-        ));
-
-        final AlgorithmFactory<? extends Regulation> standardRegulations = new StandardIattcRegulationsFactory();
+        final AlgorithmFactory<? extends Regulation> standardRegulations =
+            new StandardIattcRegulationsFactory();
 
         fisherDefinition.setRegulation(standardRegulations);
         fisherDefinition.setGear(purseSeineGearFactory);
@@ -182,6 +146,16 @@ public class EpoBiomassScenario extends EpoScenario {
 
     }
 
+    @SuppressWarnings("WeakerAccess")
+    public Path getAttractionWeightsFile() {
+        return attractionWeightsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+        this.attractionWeightsFile = attractionWeightsFile;
+    }
+
     public static String getBoatId(final Fisher fisher) {
         return fisher.getTags().stream()
             .findFirst()
@@ -191,6 +165,17 @@ public class EpoBiomassScenario extends EpoScenario {
     public static int dayOfYear(final Month month, final int dayOfMonth) {
         return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
+    }
+
+    @SuppressWarnings("unused")
+    public FadInitializerFactory<BiomassLocalBiology, BiomassFad> getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadInitializerFactory(final FadInitializerFactory<BiomassLocalBiology,
+        BiomassFad> fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
@@ -221,15 +206,6 @@ public class EpoBiomassScenario extends EpoScenario {
     @SuppressWarnings("unused")
     public void setMarketMapFromPriceFileFactory(final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory) {
         this.marketMapFromPriceFileFactory = marketMapFromPriceFileFactory;
-    }
-
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
     }
 
     @SuppressWarnings("unused")
@@ -341,11 +317,7 @@ public class EpoBiomassScenario extends EpoScenario {
     @Override
     public ScenarioPopulation populateModel(final FishState model) {
 
-        System.out.println("Populating model...");
-
-        final FadMap fadMap = fadMapFactory.apply(model);
-        model.setFadMap(fadMap);
-        model.registerStartable(fadMap);
+        initModel(model);
 
         final Double gasPrice = gasPricePerLiter.apply(model.random);
         final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
@@ -359,9 +331,14 @@ public class EpoBiomassScenario extends EpoScenario {
         final List<Port> ports = model.getMap().getPorts();
         checkState(!ports.isEmpty());
 
-        final FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         final BiomassPurseSeineGearFactory purseSeineGearFactory =
             (BiomassPurseSeineGearFactory) fisherDefinition.getGear();
+        final FisherFactory fisherFactory = makeFisherFactory(
+            model,
+            purseSeineGearFactory,
+            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy(),
+            fisherDefinition.getFishingStrategy()
+        );
 
         final Monitors monitors = new Monitors(model);
         monitors.getMonitors().forEach(model::registerStartable);
@@ -373,26 +350,6 @@ public class EpoBiomassScenario extends EpoScenario {
             .addAll(monitors.getNonAssociatedSetMonitors());
         purseSeineGearFactory.getDolphinSetObservers().addAll(monitors.getDolphinSetMonitors());
         purseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-
-        fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
-            addHourlyCosts(),
-            fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> scheduleClosurePeriodChoice(model, fisher),
-            fisher -> fisher.getYearlyData().registerGatherer(
-                "Profits",
-                fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
-                    - fisher1.getYearlyCounterColumn(VARIABLE_COSTS),
-                Double.NaN
-            ),
-            fisher -> fisher.getYearlyCounter().addColumn("Distance travelled"),
-            fisher -> fisher.getYearlyData().registerGatherer("Distance travelled", fisher1 ->
-                fisher1.getYearlyCounterColumn("Distance travelled"), Double.NaN
-            ),
-            fisher -> fisher.addTripListener((tripRecord, fisher1) ->
-                fisher1.getYearlyCounter()
-                    .count("Distance travelled", tripRecord.getDistanceTravelled())
-            )
-        ));
 
         model.getYearlyDataSet().registerGatherer(
             "Total profits",
@@ -437,23 +394,6 @@ public class EpoBiomassScenario extends EpoScenario {
 
     }
 
-    private Consumer<Fisher> addHourlyCosts() {
-        final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
-                r -> Range.openClosed(
-                    getQuantity(r.getInt("lower_capacity"), TONNE),
-                    getQuantity(r.getInt("upper_capacity"), TONNE)
-                ),
-                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
-            ));
-        // Setup hourly costs as a function of capacity
-        return fisher -> {
-            final ComparableQuantity<Mass> capacity =
-                getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
-            final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
-            fisher.getAdditionalTripCosts().add(hourlyCost);
-        };
-    }
 
     @SuppressWarnings("unused")
     public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() {
@@ -462,15 +402,6 @@ public class EpoBiomassScenario extends EpoScenario {
 
     public void addPlugin(final AlgorithmFactory<? extends AdditionalStartable> plugin) {
         plugins.add(plugin);
-    }
-
-    @SuppressWarnings("unused")
-    public Path getCostsFile() {
-        return costsFile;
-    }
-
-    public void setCostsFile(final Path costsFile) {
-        this.costsFile = costsFile;
     }
 
     @SuppressWarnings("unused")

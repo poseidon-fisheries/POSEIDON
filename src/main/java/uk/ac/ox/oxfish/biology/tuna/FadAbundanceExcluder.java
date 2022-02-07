@@ -27,7 +27,10 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 class FadAbundanceExcluder extends Excluder<AbundanceLocalBiology> {
 
     FadAbundanceExcluder() {
-        super(new AbundanceAggregator(true, false));
+        super(
+            new AbundanceExtractor(true, false),
+            new AbundanceAggregator()
+        );
     }
 
     @Override

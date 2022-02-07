@@ -19,10 +19,10 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import java.util.Collection;
+import java.util.function.BiFunction;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Objects of this class can take a collection of local biologies and "aggregate" then (i.e., sum
@@ -33,34 +33,7 @@ import uk.ac.ox.oxfish.model.FishState;
  *
  * @param <B> The type of local biology to aggregate.
  */
-public abstract class Aggregator<B extends LocalBiology> {
-
-    private final LocalBiologiesExtractor<B> localBiologiesExtractor;
-
-    Aggregator(
-        final Class<B> localBiologyClass,
-        final boolean includeFads,
-        final boolean includeSeaTiles
-    ) {
-        this.localBiologiesExtractor =
-            new LocalBiologiesExtractor<>(localBiologyClass, includeFads, includeSeaTiles);
-    }
-
-    public LocalBiologiesExtractor<B> getLocalBiologiesExtractor() {
-        return localBiologiesExtractor;
-    }
-
-    B aggregate(final FishState fishState) {
-        return aggregate(
-            fishState.getBiology(),
-            localBiologiesExtractor.apply(fishState)
-        );
-    }
-
-    abstract B aggregate(
-        final GlobalBiology globalBiology,
-        final Collection<B> localBiologies
-    );
-
+public abstract class Aggregator<B extends LocalBiology>
+    implements BiFunction<GlobalBiology, Collection<B>, B> {
 
 }

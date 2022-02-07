@@ -21,8 +21,8 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
@@ -48,43 +48,39 @@ public class AgingAndRecruitmentProcess implements BiologicalProcess<AbundanceLo
     }
 
     @Override
-    public Optional<AbundanceLocalBiology> process(
+    public Collection<AbundanceLocalBiology> process(
         final FishState fishState,
-        final AbundanceLocalBiology aggregatedBiology
+        final Collection<AbundanceLocalBiology> biologies
     ) {
-        // Make a copy of the abundance that will be mutated by the standardAgingProcess
-        final AbundanceLocalBiology biology = new AbundanceLocalBiology(aggregatedBiology);
+        biologies.forEach(biology ->
+            fishState.getSpecies().forEach(species -> {
 
-        fishState.getSpecies().forEach(species -> {
+                final StructuredAbundance abundance = biology.getAbundance(species);
 
-            final StructuredAbundance abundance = biology.getAbundance(species);
+                // Compute the new recruits
+                final double recruits =
+                    recruitmentProcesses.get(species).recruit(
+                        species,
+                        species.getMeristics(),
+                        abundance,
+                        fishState.getDayOfTheYear(),
+                        365 // this isn't true, but gives the "yearly" recruitment we need
+                    );
 
-            // Compute the new recruits
-            final double recruits =
-                recruitmentProcesses.get(species).recruit(
+                // Let the aging process mutate the biology
+                standardAgingProcess.ageLocally(
+                    biology,
                     species,
-                    species.getMeristics(),
-                    abundance,
-                    fishState.getDayOfTheYear(),
-                    365 // this isn't true, but gives the "yearly" recruitment we need
+                    fishState,
+                    false,
+                    365 // needs to be 365 but isn't actually used by StandardAgingProcess
                 );
 
-            // Let the aging process mutate the biology
-            standardAgingProcess.ageLocally(
-                biology,
-                species,
-                fishState,
-                false,
-                365 // needs to be 365 but isn't actually used by StandardAgingProcess
-            );
-
-            // Add the new recruits directly to the abundance matrix
-            final int n = abundance.getSubdivisions();
-            range(0, n).forEach(i ->
-                abundance.asMatrix()[i][0] = recruits / n
-            );
-
-        });
-        return Optional.of(biology);
+                // Add the new recruits directly to the abundance matrix
+                final int n = abundance.getSubdivisions();
+                final double[][] m = abundance.asMatrix();
+                range(0, n).forEach(i -> m[i][0] = recruits / n);
+            }));
+        return biologies;
     }
 }

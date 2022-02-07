@@ -47,6 +47,9 @@ public class RecruitmentProcessesFactory
     private GlobalBiology globalBiology;
     private Path recruitmentParametersFilePath;
 
+    /** Empty constructor for YAML construction */
+    public RecruitmentProcessesFactory() {}
+
     public RecruitmentProcessesFactory(final Path recruitmentParametersFilePath) {
         this.recruitmentParametersFilePath = checkNotNull(recruitmentParametersFilePath);
     }

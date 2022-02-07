@@ -84,13 +84,14 @@ public class BiomassReallocatorTest extends TestCase {
         when(fishState.getMap()).thenReturn(nauticalMap);
         when(fishState.getFadMap()).thenReturn(null);
         when(fishState.getBiology()).thenReturn(globalBiology);
-        final BiomassAggregator biomassAggregator = new BiomassAggregator(false, true);
+        final BiomassAggregator biomassAggregator = new BiomassAggregator();
+        final BiomassExtractor biomassExtractor = new BiomassExtractor(false, true);
 
         biomassReallocator.reallocate(
             0,
             globalBiology,
             nauticalMap.getAllSeaTilesAsList(),
-            biomassAggregator.aggregate(fishState)
+            biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
         assertEquals(
@@ -112,7 +113,7 @@ public class BiomassReallocatorTest extends TestCase {
             1,
             globalBiology,
             nauticalMap.getAllSeaTilesAsList(),
-            biomassAggregator.aggregate(fishState)
+            biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
         assertArrayEquals(
@@ -137,7 +138,7 @@ public class BiomassReallocatorTest extends TestCase {
             2,
             globalBiology,
             nauticalMap.getAllSeaTilesAsList(),
-            biomassAggregator.aggregate(fishState)
+            biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
         assertArrayEquals(

@@ -20,12 +20,20 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.complicated.*;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 /**
- * A collection of all information regarding a species (for now just a name)
- * Created by carrknight on 4/11/15.
+ * A collection of all information regarding a species (for now just a name) Created by carrknight
+ * on 4/11/15.
  */
 public class Species {
 
@@ -35,31 +43,23 @@ public class Species {
      * a collection of parameters about the fish including its size and such
      */
     private final Meristics meristics;
-
-
-
+    /**
+     * a flag used to signify that this species is not really part of the model but some accounting
+     * column used to simulate fish that isn't simulated but occurs in reality
+     */
+    private final boolean imaginary;
     /**
      * the specie index, basically its order in the species array.
      */
     private int index;
 
     /**
-     * a flag used to signify that this species is not really part of the model but some accounting column used
-     * to simulate fish that isn't simulated but occurs in reality
-     */
-    private final boolean imaginary;
-
-    /**
      * creates a species with fake default meristics
+     *
      * @param name the name of the specie
      */
     public Species(String name) {
         this(name, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, false);
-
-    }
-
-    public Species(String name, Meristics meristics) {
-        this(name,meristics,false);
 
     }
 
@@ -69,21 +69,35 @@ public class Species {
         this.imaginary = imaginary;
     }
 
-    public Species(String name, MeristicsInput input)
-    {
+    public Species(String name, Meristics meristics) {
+        this(name, meristics, false);
+
+    }
+
+    public Species(String name, MeristicsInput input) {
         this.name = name;
         this.meristics = new StockAssessmentCaliforniaMeristics(input);
         this.imaginary = false;
     }
 
-
-    public String getName()
-    {
-        return name;
+    /**
+     * Converts a map of Species to any type to an list of that type, ordered by species index.
+     */
+    public static <T> List<T> mapToList(final Map<Species, T> map) {
+        return map
+            .entrySet()
+            .stream()
+            .sorted(Comparator.comparingInt(entry -> entry.getKey().getIndex()))
+            .map(Entry::getValue)
+            .collect(toImmutableList());
     }
 
     public int getIndex() {
         return index;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void resetIndexTo(int index) {
@@ -92,7 +106,7 @@ public class Species {
 
     @Override
     public String toString() {
-       return name;
+        return name;
     }
 
     /**
@@ -104,10 +118,6 @@ public class Species {
         return meristics;
     }
 
-
-
-
-
     public double getLength(int subdivision, int bin) {
         return meristics.getLength(subdivision, bin);
     }
@@ -118,6 +128,7 @@ public class Species {
 
     /**
      * subdivision are groups like male-female or age cohorts
+     *
      * @return
      */
     public int getNumberOfSubdivisions() {
@@ -125,15 +136,15 @@ public class Species {
     }
 
     /**
-     * number of bins for each subdivision. All subdivisions are assumed to have these number of bins
-     * and all bins with the same index refer to the same weight and length; <br>
-     *     Bins can be length-bins or age-bins, it depends on the use case
+     * number of bins for each subdivision. All subdivisions are assumed to have these number of
+     * bins and all bins with the same index refer to the same weight and length; <br> Bins can be
+     * length-bins or age-bins, it depends on the use case
+     *
      * @return
      */
     public int getNumberOfBins() {
         return meristics.getNumberOfBins();
     }
-
 
     /**
      * Getter for property 'imaginary'.
@@ -146,15 +157,16 @@ public class Species {
         return imaginary;
     }
 
-
     /**
-     * function mapping time to length; the growth function.
-     * It doesn't have to be consistent with the subdivisions but it should
-     * @param ageInYears age in terms of years
+     * function mapping time to length; the growth function. It doesn't have to be consistent with
+     * the subdivisions but it should
+     *
+     * @param ageInYears  age in terms of years
      * @param subdivision the subdivision we are study (male/female is different for example)
      * @return the length of the fish
      */
     public double getLengthAtAge(int ageInYears, int subdivision) {
         return meristics.getLengthAtAge(ageInYears, subdivision);
     }
+
 }

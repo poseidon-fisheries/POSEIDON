@@ -25,31 +25,62 @@ import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class AbundanceFadInitializerFactory
     extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    private Map<Species, AbundanceFilter> selectivityFilters;
+    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
-    public void setSelectivityFilters(final Map<Species, AbundanceFilter> selectivityFilters) {
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
+    /**
+     * Empty constructor for YAML
+     */
+    public AbundanceFadInitializerFactory() {
+    }
+
+    public AbundanceFadInitializerFactory(final String... speciesNames) {
+        super(speciesNames);
     }
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         checkNotNull(selectivityFilters);
+        checkNotNull(getSpeciesCodes());
         final MersenneTwisterFast rng = fishState.getRandom();
         final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
         return new AbundanceFadInitializer(
             fishState.getBiology(),
             totalCarryingCapacity,
-            makeBiomassAttractors(fishState, rng, totalCarryingCapacity),
+            makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().apply(rng) / 100d,
-            fishState::getStep,
-            selectivityFilters
+            fishState::getStep
         );
+    }
+
+    private LogisticFishAbundanceAttractor makeFishAttractor(
+        final FishState fishState,
+        final MersenneTwisterFast rng
+    ) {
+        return new LogisticFishAbundanceAttractor(
+            fishState.getRandom(),
+            processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
+            processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
+            processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
+            processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
+            getSelectivityFilters()
+        );
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return selectivityFilters;
+    }
+
+    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
+        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
 }

@@ -20,12 +20,18 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
-class BiomassAggregationProcess extends AggregationProcess<BiomassLocalBiology> {
+public class BiomassExtractor extends Extractor<BiomassLocalBiology> {
 
-    BiomassAggregationProcess(
-        @SuppressWarnings("SameParameterValue") final boolean includeFads
+    /**
+     * Creates a {@link Extractor}.
+     *
+     * @param includeFads     Whether or not to include FAD biologies.
+     * @param includeSeaTiles Whether or not to include sea tile biologies.
+     */
+    public BiomassExtractor(
+        boolean includeFads,
+        boolean includeSeaTiles
     ) {
-        super(new BiomassAggregator(includeFads, true));
+        super(BiomassLocalBiology.class, includeFads, includeSeaTiles);
     }
-
 }
