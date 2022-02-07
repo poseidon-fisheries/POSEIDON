@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 public abstract class MutableLocationValues<A>
@@ -58,6 +59,7 @@ public abstract class MutableLocationValues<A>
     @Override
     public void start(final FishState model, final Fisher fisher) {
         this.values = new HashMap<>(valueLoader.apply(fisher));
+        getFadManager(fisher).registerObserver(getObservedClass(), this);
         model.scheduleEveryYear(this, POLICY_UPDATE);
     }
 
