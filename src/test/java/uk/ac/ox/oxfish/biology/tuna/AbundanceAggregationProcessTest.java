@@ -19,7 +19,7 @@ public class AbundanceAggregationProcessTest {
     @Test
     public void AbundanceAggregationProcessTester(){
         //final BiologicalProcess<AbundanceLocalBiology> aggregationProcess = new AbundanceAggregationProcess();
-        AbundanceAggregator aggregator = new AbundanceAggregator(false, true);
+        AbundanceAggregator aggregator = new AbundanceAggregator();
         Species species1 = new Species("Piano Tuna");
         GlobalBiology globalBiology = new GlobalBiology(species1);
 
@@ -40,12 +40,12 @@ public class AbundanceAggregationProcessTest {
 
         assertEquals(
                 30,
-                aggregator.aggregate(globalBiology, localBiologies).getAbundance(species1).asMatrix()[0][0],
+                aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[0][0],
                 0
         );
         assertEquals(
                 1,
-                aggregator.aggregate(globalBiology, localBiologies).getAbundance(species1).asMatrix()[1][0],
+                aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[1][0],
                 0
         );
     }

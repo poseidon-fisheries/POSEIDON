@@ -17,6 +17,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 
 public class AllocationGridsTest {
 
@@ -42,23 +44,22 @@ public class AllocationGridsTest {
 
  //       allocationGrids.getGrids();
         Map<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D> grid = allocationGrids.getGrids().get(0);
-        Object[] objects = grid.keySet().toArray();
+//        Object[] objects = grid.keySet().toArray();
 
 //        Set<Map.Entry<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D>> entries = grid.entrySet();
 
  //       Set<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> gridkeys = grid.keySet();
 
-        // DoubleGrid2D temp = grid.get(entry("Piano Tuna": "LARGE"));
+         DoubleGrid2D gridLARGE = grid.get(entry("Piano Tuna", LARGE));
+        DoubleGrid2D gridSMALL = grid.get(entry("Piano Tuna", SMALL));
  //       System.out.println("breakpoint");
 
         assertEquals(0.117031221
-                , grid.get( objects[0] ).get(0,0), .01);
-        assertEquals(0.117031221
-                , grid.get(objects[0]).get(0,0), .01);
+                , gridLARGE.get(0,0), .01);
         assertEquals(0.099199173
-                , grid.get(objects[1]).get(0,0), .01);
+                , gridSMALL.get(0,0), .01);
         assertEquals(0.137690519
-                , grid.get(objects[1]).get(2,0), .01);
+                , gridSMALL.get(2,0), .01);
 
    //     System.out.println("break");
 
