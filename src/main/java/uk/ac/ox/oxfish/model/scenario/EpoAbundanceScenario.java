@@ -412,8 +412,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             ).apply(fishState);
 
         ImmutableList.of(
-            abundanceRestorerFactory,
-            fadMapFactory
+            abundanceRestorerFactory
         ).forEach(startableFactory ->
             fishState.registerStartable(startableFactory.apply(fishState))
         );
