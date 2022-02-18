@@ -6,7 +6,7 @@ Common Logistic Grower:
   steepness: '0.7'
 -------
 FAD-Aware Logistic Grower:
-  distributionalWeight: '-1.0'
+  carryingCapacity: '0.0'
   steepness: '0.7'
   useLastYearBiomass: true
 -------

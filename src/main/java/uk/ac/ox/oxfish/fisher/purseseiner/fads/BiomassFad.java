@@ -119,8 +119,9 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
         final BiomassLocalBiology seaTileBiology,
         final GlobalBiology globalBiology
     ) {
-        double[] catches =
-            getFishAttractor().attract(seaTileBiology, this).getObjectBeingWeighted().getCurrentBiomass();
+        WeightedObject<BiomassLocalBiology> attracted = getFishAttractor().attract(seaTileBiology, this);
+        double[] catches = attracted != null ?
+            attracted.getObjectBeingWeighted().getCurrentBiomass() : null;
         if(catches == null)
             catches = new double[globalBiology.getSize()];
         final double[] fadBiomass =

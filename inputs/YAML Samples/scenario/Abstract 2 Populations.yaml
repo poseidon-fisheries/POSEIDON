@@ -64,9 +64,15 @@ Abstract 2 Populations:
   fishingStrategyLarge:
     Until Full With Day Limit:
       daysAtSea: '5.0'
+      delegate:
+        Fish Until Full:
+          minimumPercentageFull: '1.0'
   fishingStrategySmall:
     Until Full With Day Limit:
       daysAtSea: '5.0'
+      delegate:
+        Fish Until Full:
+          minimumPercentageFull: '1.0'
   gasPricePerLiter: '0.01'
   gearLarge:
     Random Catchability:

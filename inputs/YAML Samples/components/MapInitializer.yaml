@@ -43,3 +43,12 @@ From File Map:
   mapFile: inputs/indonesia/indonesia_latlong.csv
   mapPaddingInDegrees: '1.0E-6'
 -------
+From File Map With Overrides:
+  depthOverrides:
+  - 0,0,100
+  gridWidthInCell: '100.0'
+  header: true
+  latLong: true
+  mapFile: inputs/indonesia/indonesia_latlong.csv
+  mapPaddingInDegrees: '1.0E-6'
+-------

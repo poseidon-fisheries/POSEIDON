@@ -338,5 +338,6 @@ Generalized Cognitive Strategy:
   weightReputation: '1.0'
 -------
 Gravity Destination Strategy:
-  maxTripDurationFile: inputs/tuna/boats.csv
+  attractionWeightsFile: null
+  maxTripDurationFile: inputs/epo/boats.csv
 -------

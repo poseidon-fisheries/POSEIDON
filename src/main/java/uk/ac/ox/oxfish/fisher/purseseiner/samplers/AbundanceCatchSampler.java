@@ -99,9 +99,14 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
         return new AbundanceLocalBiology(
             species().collect(toImmutableMap(
                 Function.identity(),
-                species -> new NonMutatingProportionFilter(
-                    desiredCatch.get(species.getIndex()) / catchableAbundance.getBiomass(species)
-                ).filter(species, catchableAbundance.getAbundance(species).asMatrix())
+                species -> {
+                    double proportion = desiredCatch.get(species.getIndex()) / catchableAbundance.getBiomass(species);
+                    if(Double.isNaN(proportion))
+                        proportion = 0;
+                    return new NonMutatingProportionFilter(
+                            proportion
+                    ).filter(species, catchableAbundance.getAbundance(species).asMatrix());
+                }
             ))
         );
     }

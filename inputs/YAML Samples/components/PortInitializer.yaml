@@ -15,8 +15,8 @@ Two Ports:
 -------
 List of Ports:
   ports:
-    Top Port: 'x:40,y:0'
-    Middle Port: 'x:40,y:24'
-    Bottom Port: 'x:40,y:49'
+    Top Port: x:40,y:0
+    Middle Port: x:40,y:24
+    Bottom Port: x:40,y:49
   usingGridCoordinates: true
 -------

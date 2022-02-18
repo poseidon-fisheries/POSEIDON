@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
@@ -40,6 +39,7 @@ public abstract class AbstractFadInitializer<B extends LocalBiology, F extends F
     private final FishAttractor<B, F> fishAttractor;
     private final IntSupplier timeStepSupplier;
     private final DoubleSupplier carryingCapacityGenerator;
+    private final GlobalBiology biology;
 
 
     /**
@@ -52,11 +52,13 @@ public abstract class AbstractFadInitializer<B extends LocalBiology, F extends F
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier
     ) {
-        this.emptyBiomasses = new double[globalBiology.getSize()];
-        this.timeStepSupplier = timeStepSupplier;
-        this.fishAttractor = fishAttractor;
-        this.fishReleaseProbability = fishReleaseProbability;
-        this.carryingCapacityGenerator = () -> totalCarryingCapacity;
+        this(
+                globalBiology,
+                () -> totalCarryingCapacity,
+                fishAttractor,
+                fishReleaseProbability,
+                timeStepSupplier
+        );
     }
 
     /**
@@ -74,24 +76,38 @@ public abstract class AbstractFadInitializer<B extends LocalBiology, F extends F
         this.fishAttractor = fishAttractor;
         this.fishReleaseProbability = fishReleaseProbability;
         this.carryingCapacityGenerator = carryingCapacityGenerator;
+        this.biology = globalBiology;
+
     }
 
 
     @Override
-    public F apply(@NotNull final FadManager<B, F> fadManager) {
-        final Fisher fisher = fadManager.getFisher();
-        final SeaTile seaTile = fisher.getLocation();
+    public F makeFad(@NotNull final FadManager<B, F> fadManager,
+                     Fisher owner,
+                     SeaTile initialLocation) {
         return makeFad(
             fadManager,
-            makeBiology(fisher.grabState().getBiology()),
+            makeBiology(biology),
             fishAttractor,
             fishReleaseProbability,
             timeStepSupplier.getAsInt(),
-            new Int2D(seaTile.getGridX(), seaTile.getGridY())
+            new Int2D(initialLocation.getGridX(), initialLocation.getGridY())
         );
     }
 
-    @Override
+
+    protected abstract F makeFad(
+            FadManager<B, F> owner,
+            B biology,
+            FishAttractor<B, F> fishAttractor,
+            double fishReleaseProbability,
+            int stepDeployed,
+            Int2D locationDeployed
+    );
+
+
+    protected abstract B makeBiology(GlobalBiology globalBiology);
+
     public double generateCarryingCapacity() {
         return carryingCapacityGenerator.getAsDouble();
     }

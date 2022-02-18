@@ -53,10 +53,7 @@ Selectivity from List Gear:
   averageCatchability: '1.0E-4'
   litersOfGasConsumedPerHour: '0.0'
   numberOfSubdivisions: 1
-  selectivityPerBin:
-  - 0.0
-  - 0.0
-  - 0.0
+  selectivityPerBin: 0,0.5,1
 -------
 Simple Dome Shaped Selectivity Gear:
   averageCatchability: '0.0'
@@ -126,7 +123,8 @@ Max Throughput Limit:
       catchabilityPerHour: '0.01'
   maxThroughput: '400.0'
 -------
-Purse Seine Gear:
+Biomass Purse Seine Gear:
+  actionDistanceExponent: 1.0
   actionSpecificRegulations:
   - Active FAD limits:
       limitClass1: 70
@@ -141,6 +139,7 @@ Purse Seine Gear:
   decayRateOfDolphinSetLocationValues: 0.01
   decayRateOfNonAssociatedSetLocationValues: 0.01
   decayRateOfOpportunisticFadSetLocationValues: 0.01
+  destinationDistanceExponent: 1.0
   dolphinSetObservers: !!set {
     }
   dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
@@ -149,21 +148,15 @@ Purse Seine Gear:
     }
   fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
   fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
-  fadInitializerFactory:
-    attractionRates: {
-      }
-    carryingCapacities: {
-      }
-    dudProbability: '0.0'
-    fishReleaseProbabilityInPercent: '0.0'
   fadSetObservers: !!set {
     }
-  initialNumberOfFads: 999999
-  locationValuesFile: inputs/tuna/location_values.csv
+  locationValuesFile: inputs/epo/location_values.csv
   nonAssociatedSetObservers: !!set {
     }
   nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
   nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
+  numFadsInStockLogisticMidpoint: 5.0
+  numFadsInStockLogisticSteepness: 1.0
   opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
   opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
   pctHoldSpaceLeftLogisticMidpoint: 0.9

@@ -20,9 +20,11 @@
 
 package uk.ac.ox.oxfish.model.market.itq;
 
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
@@ -46,8 +48,20 @@ public class MonoQuotaPriceGeneratorTest {
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getDayOfTheYear()).thenReturn(364);
-        when(fisher.getDepartingStrategy().
-                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-model.getDayOfTheYear());
+        DepartingStrategy departing = new DepartingStrategy() {
+            @Override
+            public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
+                return true;
+            }
+
+            @Override
+            public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+                return 365-model.getDayOfTheYear();
+            }
+        };
+        when(fisher.getDepartingStrategy()).thenReturn(departing);
+//        when(departing.
+//                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-model.getDayOfTheYear());
         when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
                                                           new Species("c"), new Species("d")));
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(100);

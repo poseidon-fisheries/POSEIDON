@@ -1,6 +1,9 @@
 Fixed Price Market:
   marketPrice: '10.0'
 -------
+Abundance Aware Fixed Price Market:
+  marketPrice: '10.0'
+-------
 Fixed Price Market Array:
   prices: 10,10
 -------
@@ -40,4 +43,9 @@ Three Prices Market with premium:
   premiumSecondBin: false
   premiumThirdBin: false
   tagNeededToAccessToPremium: PERIODIC_UPDATE_GEAR_1
+-------
+Weight Limit Market:
+  priceAboveWeight: '100.0'
+  priceBelowWeight: '0.0'
+  weightThreshold: '0.5'
 -------

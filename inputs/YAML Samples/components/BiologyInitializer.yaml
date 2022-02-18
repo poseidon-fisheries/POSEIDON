@@ -423,6 +423,8 @@ Boxcar Biology:
   recruitAllocator:
     Equal Allocation:
       constantValue: '1.0'
+  recruitmentNoiseStartingYear: nullparameter
+  recruitmentProcessStandardDeviation: nullparameter
   speciesName: Red Fish
   steepness: '0.6'
   virginRecruits: '4.0741397E7'
@@ -481,6 +483,8 @@ Irregular Boxcar Biology:
   recruitAllocator:
     Equal Allocation:
       constantValue: '1.0'
+  recruitmentNoiseStartingYear: nullparameter
+  recruitmentProcessStandardDeviation: nullparameter
   speciesName: Red Fish
   steepness: '0.6'
   virginRecruits: '4.0741397E7'
@@ -512,4 +516,11 @@ Boxcar Biology with pulses:
   steepness: '0.6'
   virginRecruits: '4.0741397E7'
   yearlyMortality: '0.1'
+-------
+Biomass Initializer Factory:
+  biomassReallocator: null
+  schaeferParamsFile: inputs/epo/biomass/schaefer_params.csv
+-------
+Abundance Initializer Factory:
+  binsFilePath: null
 -------

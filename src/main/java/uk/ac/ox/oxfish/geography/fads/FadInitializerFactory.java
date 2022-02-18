@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     public FadInitializerFactory(final String... speciesNames) {
 
         final Supplier<Map<String, DoubleParameter>> zeros = () ->
-            Arrays.stream(speciesNames).collect(toImmutableMap(
+            Arrays.stream(speciesNames).collect(toMap(
                 identity(),
                 __ -> new FixedDoubleParameter(0.0)
             ));

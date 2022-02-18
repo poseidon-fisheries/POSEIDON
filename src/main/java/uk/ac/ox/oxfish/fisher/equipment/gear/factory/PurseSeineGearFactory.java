@@ -418,7 +418,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                 .collect(toList())
         );
 
-        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
+        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new  FadManager<>(
             (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),

@@ -39,6 +39,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 
 /**
  * Just a bunch of statics to make testing stuff around FADs easier
@@ -85,7 +86,7 @@ public class TestUtilities {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps =
             new TreeMap<>();
         vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(NEUTRAL, vectors)));
-        return new CurrentVectors(
+        return new CurrentVectorsEPO(
             vectorMaps,
             __ -> NEUTRAL,
             nauticalMap.getWidth(), nauticalMap.getHeight(),

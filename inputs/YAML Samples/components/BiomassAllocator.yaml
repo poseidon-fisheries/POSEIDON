@@ -52,6 +52,7 @@ Simplex Allocator:
   bandwidth: '5.0'
   maximum: '1.0'
   minimum: '0.0'
+  randomSeed: nullparameter
 -------
 Pyramids Allocator:
   maxSpread: 6

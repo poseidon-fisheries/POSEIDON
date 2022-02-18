@@ -194,15 +194,18 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     }
 
     public F deployFad(final SeaTile seaTile) {
-        final F newFad = initFad();
+        final F newFad = initFad(seaTile);
         fadMap.deployFad(newFad, seaTile);
         return newFad;
     }
 
-    private F initFad() {
+    private F initFad(SeaTile tile) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
-        final F newFad = fadInitializer.apply(this);
+        final F newFad = fadInitializer.makeFad(this,
+                fisher,
+                tile
+                );
         deployedFads.add(newFad);
         return newFad;
     }
@@ -211,16 +214,15 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
      * Deploys a FAD at a random position in the given sea tile.
      */
     public void deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
-        deployFad(new Double2D(
-            seaTile.getGridX() + random.nextDouble(),
-            seaTile.getGridY() + random.nextDouble()
-        ));
-    }
-
-    private void deployFad(final Double2D location) {
-        final F newFad = initFad();
+        Double2D location = new Double2D(
+                seaTile.getGridX() + random.nextDouble(),
+                seaTile.getGridY() + random.nextDouble()
+        );
+        final F newFad = initFad(seaTile);
         fadMap.deployFad(newFad, location);
     }
+
+
 
     public ActiveActionRegulations getActionSpecificRegulations() {
         return actionSpecificRegulations;

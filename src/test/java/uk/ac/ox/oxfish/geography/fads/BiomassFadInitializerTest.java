@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassFadInitializerTest {
@@ -34,7 +34,7 @@ public class BiomassFadInitializerTest {
         final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
             new FadMap<>(
                 mock(NauticalMap.class),
-                mock(CurrentVectors.class),
+                mock(CurrentVectorsEPO.class),
                 globalBiology,
                 BiomassLocalBiology.class,
                 BiomassFad.class
@@ -51,7 +51,7 @@ public class BiomassFadInitializerTest {
         when(fisher.grabState()).thenReturn(fishState);
         fadManager.setFisher(fisher);
 
-        final BiomassFad fad = fadInitializer.apply(fadManager);
+        final BiomassFad fad = fadInitializer.makeFad(fadManager,null ,seaTile);
         for (final Species species : globalBiology.getSpecies()) {
             assertEquals(fad.getBiology().getBiomass(species), 0, 0);
         }

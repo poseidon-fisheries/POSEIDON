@@ -36,7 +36,7 @@ public enum CurrentVectorsFactory {
             .build(CacheLoader.from(entry -> {
                 MapExtent mapExtent = entry.getKey();
                 Map<CurrentPattern, Path> currentFiles = entry.getValue();
-                return new CurrentVectors(
+                return new CurrentVectorsEPO(
                     makeVectorMaps(mapExtent, currentFiles),
                     STEPS_PER_DAY,
                     mapExtent.getGridWidth(),

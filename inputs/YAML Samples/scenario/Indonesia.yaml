@@ -39,6 +39,9 @@ Indonesia:
     fishingStrategy:
       Until Full With Day Limit:
         daysAtSea: '5.0'
+        delegate:
+          Fish Until Full:
+            minimumPercentageFull: '1.0'
     fuelTankSize: '100000.0'
     gear:
       Random Catchability:
@@ -88,6 +91,9 @@ Indonesia:
     fishingStrategy:
       Until Full With Day Limit:
         daysAtSea: '5.0'
+        delegate:
+          Fish Until Full:
+            minimumPercentageFull: '1.0'
     fuelTankSize: '100000.0'
     gear:
       Random Catchability:

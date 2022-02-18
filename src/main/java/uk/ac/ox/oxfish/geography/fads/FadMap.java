@@ -196,4 +196,8 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     public AbundanceLostObserver getAbundanceLostObserver() {
         return abundanceLostObserver;
     }
+
+    public boolean isStarted(){
+        return stoppable !=null;
+    }
 }

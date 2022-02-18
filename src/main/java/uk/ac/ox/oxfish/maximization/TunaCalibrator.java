@@ -13,6 +13,7 @@ import eva2.optimization.individuals.ESIndividualDoubleData;
 import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.population.Population;
 import eva2.optimization.statistics.InterfaceStatisticsParameters;
+import eva2.optimization.strategies.AbstractOptimizer;
 import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.problems.SimpleProblemWrapper;
@@ -24,7 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
@@ -36,21 +39,54 @@ public class TunaCalibrator implements Runnable {
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
+    public static final int MAX_PROCESSORS_TO_USE = 4;
+
+    public static final int DEFAULT_POPULATION_SIZE = 20;
+    public final static int MAX_FITNESS_CALLS = 5000;
+    public static final int DEFAULT_RANGE = 20;
+
+
+    private boolean localSearch = true;
+    private String runNickName = "local_dudforced_filtering_search";
+    private int populationSize = DEFAULT_POPULATION_SIZE;
+    private int maxFitnessCalls = MAX_FITNESS_CALLS;
+    private int parameterRange=  DEFAULT_RANGE;
+    private int maxProcessorsToUse = MAX_PROCESSORS_TO_USE;
+    /**
+     * if this is positive then ignore the number of runs per setting in the original YAML and use this number instead
+     */
+    private int numberOfRunsPerSettingOverride = -1;
+
+
 
     private Path originalCalibrationFilePath =
             Paths
                     .get(
                             System.getProperty("user.home"),
-                            "code", "tuna", "tuna", "calibration", "results", "oneboat_duds"
+                            "code",
+                            "tuna", "tuna", "calibration", "results", "oneboat_duds"
                     )
                     .resolve("calibration.yaml");
 
     private boolean verbose = false;
-    private int populationSize = 60;
-    private int maxFitnessCalls = 10000;
 
 
-    static private double[][] bestGuess;
+    /**
+     * list of individuals we want to force in the original population; usually these are just the output of some previous optimizations
+     */
+    private List<double[]> bestGuess  = new ArrayList<>(4);
+    //forced duds; filtering
+ //   {
+//        bestGuess.add(new double[]{
+//                -1.982,-9.249, 14.665,-13.440,-15.000, 1.022,-15.000, 3.496, 14.045, 9.262, 11.620, 11.551, 6.147,-10.565, 15.000,-8.245, 10.190,-5.456,-10.479, 1.814, 15.000, 14.331,-8.282, 8.342,-2.793,-12.431, 9.839,-3.951,-13.400,-0.992,-2.770, 14.173, 14.795,-3.100,-14.987, 10.118, 1.073,-3.369,-6.806, 12.946, 2.435, 1.185,-9.740, 11.325, 15.000, 12.128,-8.939, 6.358,-1.267,-11.960,-9.464, 6.893, 4.923, 5.746,-3.280,-14.538
+//        });
+//        bestGuess.add(new double[]{-0.617,-8.523, 12.948,-15.000,-15.000,-1.502,-15.000, 3.863, 12.148, 9.055, 11.074, 15.000, 6.740,-6.835, 15.000,-9.936, 11.209,-4.624,-7.300, 1.649, 15.000, 12.085,-8.179, 6.289,-3.113,-13.581, 9.276,-5.510,-14.517,-3.305,-0.995, 11.067, 13.422,-2.614,-15.000, 7.042,-0.345,-3.886,-6.832, 10.020, 3.301, 2.136,-9.391, 9.618, 15.000, 12.175,-12.053, 5.545, 0.488,-9.537,-13.935, 7.048, 9.642, 5.510,-3.365,-14.224});
+//        bestGuess.add( new double[]{0.553,-10.818, 14.293,-11.859,-15.000,-1.487,-15.000, 3.559, 11.121, 11.066, 10.642, 15.000, 6.412,-6.849, 14.321,-9.899, 14.543,-8.111,-8.040,-0.531, 13.805, 11.180,-5.156, 6.761,-1.564,-12.541, 8.566,-7.962,-14.595,-2.603, 0.166, 11.448, 15.000,-2.518,-15.000, 5.787,-2.800,-3.863,-5.927, 9.234, 6.525, 1.959,-8.743, 12.831, 14.433, 11.488,-9.476, 6.298,-1.886,-11.007,-15.000, 7.495, 9.952, 9.905,-3.865,-15.000});
+//        bestGuess.add(new double[]{-0.320,-8.585, 15.000,-12.264,-13.940,-6.502,-12.581,-1.863, 12.207, 11.524, 8.673, 13.843, 6.056,-0.536, 11.525,-12.147, 15.000,-11.956,-10.755,-1.420, 15.000, 10.680,-2.555, 7.761, 2.552,-11.163, 12.952,-13.072,-15.000,-1.102, 2.754, 12.640, 15.000, 0.814,-13.745, 7.776,-1.013, 0.392,-2.983, 11.270, 7.449, 4.072,-6.468, 11.190, 12.435, 7.938,-8.898, 4.050,-7.759,-4.993,-12.661, 8.204, 5.425, 6.029,-4.887,-12.802});
+
+ //   }
+
+    //pre duds:
 //    static {
 //        bestGuess = new double[6][];
 //
@@ -109,6 +145,10 @@ public class TunaCalibrator implements Runnable {
         final Path calibrationFilePath =
                 copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
         final double[] solution = calibrate(calibrationFilePath);
+        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+    }
+
+    public static void evaluateSolutionAndPrintOutErrors(Path calibrationFilePath, double[] solution) {
         saveCalibratedScenario(solution, calibrationFilePath);
         new TunaEvaluator(calibrationFilePath, solution).run();
     }
@@ -123,8 +163,10 @@ public class TunaCalibrator implements Runnable {
 
     @NotNull
     private Path makeOutputFolder() {
-        final String outputFolderName =
+        String outputFolderName =
                 new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
+        if(runNickName != null && !runNickName.trim().isEmpty())
+            outputFolderName= outputFolderName + "_" + runNickName;
         final Path outputFolderPath = originalCalibrationFilePath
                 .getParent()
                 .resolve(System.getProperty("user.name"))
@@ -145,6 +187,9 @@ public class TunaCalibrator implements Runnable {
         final GenericOptimization optimizationProblem =
                 GenericOptimization.fromFile(calibrationFilePath);
 
+        if(numberOfRunsPerSettingOverride>0)
+            optimizationProblem.setRunsPerSetting(numberOfRunsPerSettingOverride);
+
         System.out.println("Running calibration for: " + calibrationFilePath);
         System.out.println("Logging to: " + logFilePath);
         System.out.println("Population size: " + populationSize);
@@ -154,8 +199,7 @@ public class TunaCalibrator implements Runnable {
                 .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
                 .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(verbose));
 
-        //final int numThreads = Math.min(getRuntime().availableProcessors(), 32);
-        final int numThreads = Math.min(getRuntime().availableProcessors(), 32);
+        final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
 
         System.out.println("Requesting " + numThreads + " threads");
         final SimpleProblemWrapper problemWrapper;
@@ -168,28 +212,35 @@ public class TunaCalibrator implements Runnable {
 
                     super.initializePopulation(population);
 
-                    for (int scenario = 0; scenario < bestGuess.length; scenario++) {
+                    for (int scenario = 0; scenario < bestGuess.size(); scenario++) {
                         final ESIndividualDoubleData individual = new ESIndividualDoubleData(
                                 (ESIndividualDoubleData) population.get(0));
-                        individual.setDoubleGenotype(bestGuess[scenario]);
-                        individual.setDoublePhenotype(bestGuess[scenario]);
+                        individual.setDoubleGenotype(bestGuess.get(scenario));
+                        individual.setDoublePhenotype(bestGuess.get(scenario));
 
                         population.replaceIndividualAt(scenario,
                                 individual);
                     }
 
-
                 }
+
+
+
             };
 
         problemWrapper.setSimpleProblem(optimizationProblem);
         problemWrapper.setParallelThreads(numThreads);
 
-        final ClusterBasedNichingEA optimizer = new ClusterBasedNichingEA();
-        optimizer.setPopulationSize(populationSize);
-//        final NelderMeadSimplex optimizer = new NelderMeadSimplex();
-//        optimizer.setPopulationSize(20);
-        problemWrapper.setDefaultRange(15);
+        final AbstractOptimizer optimizer;
+        if(localSearch){
+            optimizer = new NelderMeadSimplex();
+            ((NelderMeadSimplex) optimizer).setPopulationSize(populationSize);
+        }
+        else {
+            optimizer = new ClusterBasedNichingEA();
+            ((ClusterBasedNichingEA) optimizer).setPopulationSize(populationSize);
+        }
+        problemWrapper.setDefaultRange(parameterRange);
 
         final OptimizationParameters optimizationParameters =
                 OptimizerFactory.makeParams(
@@ -278,5 +329,53 @@ public class TunaCalibrator implements Runnable {
     @SuppressWarnings({"unused", "WeakerAccess"})
     public void setMaxFitnessCalls(final int maxFitnessCalls) {
         this.maxFitnessCalls = maxFitnessCalls;
+    }
+
+    public String getRunNickName() {
+        return runNickName;
+    }
+
+    public void setRunNickName(String runNickName) {
+        this.runNickName = runNickName;
+    }
+
+    public int getParameterRange() {
+        return parameterRange;
+    }
+
+    public void setParameterRange(int parameterRange) {
+        this.parameterRange = parameterRange;
+    }
+
+    public int getMaxProcessorsToUse() {
+        return maxProcessorsToUse;
+    }
+
+    public void setMaxProcessorsToUse(int maxProcessorsToUse) {
+        this.maxProcessorsToUse = maxProcessorsToUse;
+    }
+
+    public boolean isLocalSearch() {
+        return localSearch;
+    }
+
+    public void setLocalSearch(boolean localSearch) {
+        this.localSearch = localSearch;
+    }
+
+    public List<double[]> getBestGuess() {
+        return bestGuess;
+    }
+
+    public void setBestGuess(List<double[]> bestGuess) {
+        this.bestGuess = bestGuess;
+    }
+
+    public int getNumberOfRunsPerSettingOverride() {
+        return numberOfRunsPerSettingOverride;
+    }
+
+    public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
+        this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
     }
 }

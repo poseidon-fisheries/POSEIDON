@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2021-06-16'
+  startDate: '2022-02-18'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -264,4 +264,46 @@ Schaefer Assessment Formula Controller:
 -------
 Simple Fisher Sampler:
   percentageSampled: '0.025'
+-------
+Scheduled Biomass Processes
+-------
+Biomass Restorer:
+  biomassReallocator: null
+  schedule:
+    0: 364
+-------
+Exogenous Fad Maker CSV:
+  fadInitializer:
+    Biomass FAD Initializer:
+      attractableBiomassCoefficients:
+        Species 0: '0.0'
+      biomassInteractionsCoefficients:
+        Species 0: '0.0'
+      compressionExponents:
+        Species 0: '0.0'
+      fishReleaseProbabilityInPercent: '0.0'
+      growthRates:
+        Species 0: '0.0'
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  pathToFile: ./inputs/tests/fad_dummy_deploy.csv
+-------
+Fad Demo:
+  biomassOnly: false
+  fadInitializer:
+    Biomass FAD Initializer:
+      attractableBiomassCoefficients:
+        Species 0: '0.0'
+      biomassInteractionsCoefficients:
+        Species 0: '0.0'
+      compressionExponents:
+        Species 0: '0.0'
+      fishReleaseProbabilityInPercent: '0.0'
+      growthRates:
+        Species 0: '0.0'
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  fixedXCurrent: '-1.0'
+  fixedYCurrent: '1.0'
+  pathToFile: ./inputs/tests/fad_dummy_deploy.csv
 -------

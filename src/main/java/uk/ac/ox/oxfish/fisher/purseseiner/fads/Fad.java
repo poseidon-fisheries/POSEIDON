@@ -20,6 +20,8 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Arrays;
+
+import org.jetbrains.annotations.Nullable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -43,7 +45,8 @@ import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implements Locatable {
 
     private final FadManager<B, F> owner;
-    private final TripRecord tripDeployed;
+    //it is possible for the FAD to be exogenously made
+    private @Nullable final TripRecord tripDeployed;
     private final B biology;
 
     public FishAttractor<B, F> getFishAttractor() {
@@ -66,7 +69,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
             final double totalCarryingCapacity
     ) {
         this.owner = owner;
-        this.tripDeployed = owner.getFisher().getCurrentTrip();
+        this.tripDeployed = owner.getFisher() != null ?  owner.getFisher().getCurrentTrip() : null;
         this.biology = biology;
         this.fishAttractor = fishAttractor;
         this.fishReleaseProbability = fishReleaseProbability;

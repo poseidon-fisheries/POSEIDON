@@ -156,8 +156,11 @@ public class Monitors {
                 "sets on FADs deployed during current trip",
                 EVERY_YEAR,
                 regionalDivision,
-                region -> fadSet -> fadSet.getFisher().getCurrentTrip() == fadSet.getFad()
-                    .getTripDeployed(),
+                region -> fadSet -> {
+                    return fadSet.getFisher() != null &&
+                            fadSet.getFisher().getCurrentTrip() == fadSet.getFad()
+                            .getTripDeployed();
+                },
                 ProportionAccumulator::new,
                 ONE,
                 "Proportion of sets"

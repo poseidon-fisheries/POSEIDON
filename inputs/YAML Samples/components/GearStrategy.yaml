@@ -38,3 +38,7 @@ Periodic Gear Update Selectivity:
       imitationProbability: '0.6'
   yearly: false
 -------
+FAD Refill:
+  fadCost: 1000.0
+  maxFadDeploymentsFile: inputs/epo/max_deployments.csv
+-------

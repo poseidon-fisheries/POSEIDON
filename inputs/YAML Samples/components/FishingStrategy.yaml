@@ -15,6 +15,9 @@ Fish Until Full:
 -------
 Until Full With Day Limit:
   daysAtSea: '5.0'
+  delegate:
+    Fish Until Full:
+      minimumPercentageFull: '1.0'
 -------
 WFS Logit Return:
   intercept: '-3.47701'
@@ -29,7 +32,9 @@ Maximum Days a Year Decorator:
       minimumPercentageFull: '1.0'
   maxNumberOfDaysOutPerYear: '240.0'
 -------
-Purse Seiner Fishing Strategy:
+Purse Seiner Biomass Fishing Strategy:
+  attractionWeightsFile: null
+  catchSamplersFactory: null
   dolphinSetActionLogisticMidpoint: 0.1
   dolphinSetActionLogisticSteepness: 1.0
   dolphinSetDetectionProbability: 0.1
@@ -53,5 +58,5 @@ Purse Seiner Fishing Strategy:
   searchActionLogisticMidpoint: 0.1
   searchActionLogisticSteepness: 1.0
   searchBonus: 0.1
-  setCompositionWeightsPath: inputs/tuna/set_compositions.csv
+  setCompositionWeightsPath: inputs/epo/set_compositions.csv
 -------

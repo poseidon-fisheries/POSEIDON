@@ -75,7 +75,11 @@ public class CompositeDepartingStrategy implements DepartingStrategy {
 
     @Override
     public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        return Arrays.stream(strategies).mapToInt(value -> value.predictedDaysLeftFishingThisYear(fisher, model, random)).min().
-                orElseThrow();
+        int minimum =  365-model.getDayOfTheYear();
+        for (DepartingStrategy strategy : strategies) {
+            minimum = Integer.min(minimum,strategy.predictedDaysLeftFishingThisYear(fisher, model, random));
+        }
+        return minimum;
+
     }
 }

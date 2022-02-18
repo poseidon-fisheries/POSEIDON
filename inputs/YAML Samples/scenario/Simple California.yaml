@@ -28,6 +28,9 @@ Simple California:
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
+      delegate:
+        Fish Until Full:
+          minimumPercentageFull: '1.0'
   fuelTankInLiters: '45519.577'
   gasPriceMaker:
     Gas Price from File:
@@ -63,7 +66,8 @@ Simple California:
       predicates: [
         ]
   portFileName: dts_ports_2011.csv
-  priceMap: Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502,Others:1.7646181
+  priceMap: Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine
+    Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502,Others:1.7646181
   regulationPostReset:
     Multi-Quotas from Map:
       initialQuotas:

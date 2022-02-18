@@ -50,13 +50,12 @@ EPO Abundance:
     pctTravelTimeLeftLogisticMidpoint: 0.9
     pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
     successfulSetProbability: '0.9231701'
-  abundanceReallocatorFactory:
-    Abundance Reallocator:
-      biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
-      firstLargeBinPerSpecies:
-        Skipjack tuna: 14
-        Bigeye tuna: 8
-        Yellowfin tuna: 9
+  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
+    biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
+    firstLargeBinPerSpecies:
+      Skipjack tuna: 14
+      Bigeye tuna: 8
+      Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
       0: 364
@@ -76,6 +75,7 @@ EPO Abundance:
         Bigeye tuna: '0.0'
         Yellowfin tuna: '0.0'
         Skipjack tuna: '0.0'
+      fadDudRate: '0.0'
       fishReleaseProbabilityInPercent: '0.0'
       growthRates:
         Bigeye tuna: '0.0'

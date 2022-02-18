@@ -29,7 +29,7 @@ public class AbundanceFadInitializerFactoryTest {
 
         int counterOfTimesItIsZero = 0;
         for (int i = 0; i < 100; i++) {
-            if(initializer.generateCarryingCapacity()==0)
+            if(((AbstractFadInitializer) initializer).generateCarryingCapacity()==0)
                 counterOfTimesItIsZero++;
         }
         System.out.println("Times it was zero: " + counterOfTimesItIsZero);
@@ -86,7 +86,7 @@ public class AbundanceFadInitializerFactoryTest {
 
         int counterOfTimesItIsZero = 0;
         for (int i = 0; i < 100; i++) {
-            if(initializer.generateCarryingCapacity()==0)
+            if(((AbstractFadInitializer) initializer).generateCarryingCapacity()==0)
                 counterOfTimesItIsZero++;
         }
         System.out.println("Times it was zero: " + counterOfTimesItIsZero);

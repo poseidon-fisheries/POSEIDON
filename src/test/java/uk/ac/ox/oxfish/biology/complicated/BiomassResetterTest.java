@@ -58,6 +58,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
+import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -165,7 +166,7 @@ public class BiomassResetterTest {
             rng
         )));
 
-        final CurrentVectors currentVectors = new CurrentVectors(
+        final CurrentVectors currentVectors = new CurrentVectorsEPO(
             new TreeMap<>(),
             1,
             fishState.getMap().getWidth(),
@@ -209,7 +210,7 @@ public class BiomassResetterTest {
         seaTiles.forEach(seaTile -> {
             when(fisher.getLocation()).thenReturn(seaTile);
             fadMap.deployFad(
-                fadInitializer.apply(fadManager),
+                fadInitializer.makeFad(fadManager, fisher,seaTile ),
                 seaTile
             );
         });
