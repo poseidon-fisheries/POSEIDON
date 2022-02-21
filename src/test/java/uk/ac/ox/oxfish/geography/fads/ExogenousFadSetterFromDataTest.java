@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,11 +27,12 @@ public class ExogenousFadSetterFromDataTest {
     @Test
     public void choosesTheCorrectFADs() {
 
+
         //2 observed sets: the first landing 100,100 the second landing 10,10
         FadSetObservation firstObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{100,100},123);
         FadSetObservation secondObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{10,10},123);
         HashMap<Integer, List<FadSetObservation>> dataset = new HashMap<>();
-        dataset.put(123,List.of(firstObservation,secondObservation));
+        dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
 
 
@@ -66,7 +68,7 @@ public class ExogenousFadSetterFromDataTest {
         FadSetObservation firstObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{100,100},123);
         FadSetObservation secondObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{10,10},123);
         HashMap<Integer, List<FadSetObservation>> dataset = new HashMap<>();
-        dataset.put(123,List.of(firstObservation,secondObservation));
+        dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
 
 
@@ -100,7 +102,7 @@ public class ExogenousFadSetterFromDataTest {
         FadSetObservation firstObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{100,100},123);
         FadSetObservation secondObservation = new FadSetObservation(new Coordinate(0.5,0.5),new double[]{10,10},123);
         HashMap<Integer, List<FadSetObservation>> dataset = new HashMap<>();
-        dataset.put(123,List.of(firstObservation,secondObservation));
+        dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
 
 
