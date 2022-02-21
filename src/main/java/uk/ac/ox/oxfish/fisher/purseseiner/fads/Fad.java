@@ -150,7 +150,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
      * doesn't have a {@code getBiomass()} method even if both {@link BiomassLocalBiology}
      * and {@link AbundanceLocalBiology} happen to have one.
      */
-    abstract double[] getBiomass(B biology);
+    public abstract double[] getBiomass();
 
     public double getTotalCarryingCapacity() {
         return totalCarryingCapacity;

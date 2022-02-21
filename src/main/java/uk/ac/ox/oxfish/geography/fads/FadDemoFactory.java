@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  */
 public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    private final ExogenousFadMakerFactoryCSV exogenousFadMaker = new ExogenousFadMakerFactoryCSV();
+    private final ExogenousFadMakerCSVFactory exogenousFadMaker = new ExogenousFadMakerCSVFactory();
 
 
     private final FadMapDummyFactory map = new FadMapDummyFactory();

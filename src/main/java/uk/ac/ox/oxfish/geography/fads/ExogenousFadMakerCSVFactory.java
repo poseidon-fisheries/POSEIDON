@@ -16,7 +16,7 @@ import java.util.*;
  * reads csv file, with column "day" for what day each fad gets dropped
  * x,y for the coordinates (simulated coordinates, not grid coordinates)
  */
-public class ExogenousFadMakerFactoryCSV implements AlgorithmFactory<AdditionalStartable> {
+public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalStartable> {
 
     private String pathToFile = "./inputs/tests/fad_dummy_deploy.csv";
 
@@ -26,7 +26,7 @@ public class ExogenousFadMakerFactoryCSV implements AlgorithmFactory<AdditionalS
     @Override
     public AdditionalStartable apply(FishState state) {
         //read the file now (don't delay the error from not having the file ready)
-        CSVReader reader = null;
+        CSVReader reader;
         try {
             reader = new CSVReader(
                     new FileReader(

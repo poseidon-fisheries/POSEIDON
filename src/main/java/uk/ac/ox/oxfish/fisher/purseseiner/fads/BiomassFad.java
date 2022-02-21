@@ -109,8 +109,8 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     }
 
     @Override
-    double[] getBiomass(final BiomassLocalBiology biology) {
-        return biology.getCurrentBiomass();
+    public double[] getBiomass() {
+        return getBiology().getCurrentBiomass();
     }
 
     @NotNull

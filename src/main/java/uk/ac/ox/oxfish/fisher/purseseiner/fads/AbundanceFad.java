@@ -93,8 +93,8 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     }
 
     @Override
-    double[] getBiomass(final AbundanceLocalBiology biology) {
-        return biology.getCurrentBiomass();
+    public double[] getBiomass() {
+        return getBiology().getCurrentBiomass();
     }
 
     /**

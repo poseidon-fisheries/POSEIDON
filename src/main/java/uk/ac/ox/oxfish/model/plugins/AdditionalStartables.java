@@ -5,11 +5,9 @@ import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
-import uk.ac.ox.oxfish.biology.tuna.BiomassReallocatorFactory;
 import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassRestorerFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerFactoryCSV;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.FadDemoFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
@@ -76,7 +74,7 @@ public class AdditionalStartables {
         NAMES.put(BiomassRestorerFactory.class, "Biomass Restorer");
       //  NAMES.put(AbundanceReallocatorFactory.class, "Abundance Reallocator");
 
-        NAMES.put(ExogenousFadMakerFactoryCSV.class, "Exogenous Fad Maker CSV");
+        NAMES.put(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV");
         NAMES.put(FadDemoFactory.class, "Fad Demo");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
