@@ -48,6 +48,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -65,9 +66,16 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-    private AlgorithmFactory<AdditionalStartable> fadMakerFactory = new ExogenousFadMakerCSVFactory(
-        INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(), null
-    );
+    private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
+        new ExogenousFadMakerCSVFactory(
+            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(), null
+        );
+
+    private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
+        new ExogenousFadSetterCSVFactory(
+            INPUT_PATH.resolve("calibration").resolve("fad_sets.csv").toString(), true
+        );
+
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
@@ -107,12 +115,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         );
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<AdditionalStartable> getFadMakerFactory() {
+    public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
         return fadMakerFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadMakerFactory(final AlgorithmFactory<AdditionalStartable> fadMakerFactory) {
+    public void setFadMakerFactory(final AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory) {
         this.fadMakerFactory = fadMakerFactory;
     }
 
@@ -270,7 +278,8 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
         ImmutableList.of(
             abundanceRestorerFactory,
-            fadMakerFactory
+            fadMakerFactory,
+            fadSetterFactory
         ).forEach(startableFactory ->
             fishState.registerStartable(startableFactory.apply(fishState))
         );
@@ -292,5 +301,17 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends AdditionalStartable> getFadSetterFactory() {
+        return fadSetterFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadSetterFactory(
+        final AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory
+    ) {
+        this.fadSetterFactory = fadSetterFactory;
     }
 }
