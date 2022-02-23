@@ -30,6 +30,14 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     public boolean isDataInTonnes = true;
 
+    /** Empty constructor for YAML loading */
+    public ExogenousFadSetterCSVFactory() {};
+
+    public ExogenousFadSetterCSVFactory(final String pathToFile, final boolean isDataInTonnes) {
+        this.pathToFile = pathToFile;
+        this.isDataInTonnes = isDataInTonnes;
+    }
+
     private String pathToFile = "./inputs/tests/fad_dummmy_sets.csv";
 
 
