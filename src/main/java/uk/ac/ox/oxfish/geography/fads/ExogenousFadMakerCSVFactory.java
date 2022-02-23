@@ -1,22 +1,37 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.opencsv.CSVReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Locale;
 import org.metawidget.util.ArrayUtils;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.file.Paths;
-import java.util.*;
-
 /**
  * reads csv file, with column "day" for what day each fad gets dropped
  * x,y for the coordinates (simulated coordinates, not grid coordinates)
  */
 public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalStartable> {
+
+    /** Empty constructor for YAML initialization */
+    public ExogenousFadMakerCSVFactory() {};
+
+    public ExogenousFadMakerCSVFactory(
+        final String pathToFile,
+        @SuppressWarnings("rawtypes") final FadInitializerFactory fadInitializerFactory
+    ) {
+        this.pathToFile = pathToFile;
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
 
     private String pathToFile = "./inputs/tests/fad_dummy_deploy.csv";
 
