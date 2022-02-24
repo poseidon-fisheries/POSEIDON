@@ -68,7 +68,8 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
-            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(), null
+            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(),
+            new AbundanceFadInitializerFactory()
         );
 
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =

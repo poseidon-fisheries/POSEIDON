@@ -84,5 +84,8 @@ public class Scenarios {
         SCENARIOS.put("EPO Abundance", EpoAbundanceScenario::new);
         DESCRIPTIONS.put("EPO Abundance", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
 
+        SCENARIOS.put("FAD only EPO Abundance", FadsOnlyEpoAbundanceScenario::new);
+        DESCRIPTIONS.put("FAD only Abundance", "A vessel-less scenario for FAD parameter calibration purposes.");
+
     }
 }
