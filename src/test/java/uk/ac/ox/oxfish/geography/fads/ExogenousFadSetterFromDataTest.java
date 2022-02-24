@@ -70,6 +70,8 @@ public class ExogenousFadSetterFromDataTest {
         HashMap<Integer, List<FadSetObservation>> dataset = new HashMap<>();
         dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
+        //let's log this
+        setter.startRestartLogger();
 
 
         //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
@@ -93,6 +95,15 @@ public class ExogenousFadSetterFromDataTest {
         assertEquals(
                 Math.sqrt(2* Math.pow(100-40,2)) + ExogenousFadSetterFromData.MISSING_FAD_ERROR
                 ,setter.getCounter().getColumn("Error"),0.0001);
+
+        System.out.println(setter.printLog());
+
+        assertEquals("day,x,y,result,error\n" +
+                "123,0,0,MATCH,"+ Math.sqrt(2 * Math.pow(100 - 40, 2)) +"\n" +
+                "123,0,0,FAILED,NaN" +"\n",
+                setter.printLog()
+
+                );
 
     }
 

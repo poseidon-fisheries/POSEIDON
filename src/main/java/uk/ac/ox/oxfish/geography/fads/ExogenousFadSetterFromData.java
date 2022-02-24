@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -46,6 +45,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
         this.fadSetsPerDayInData = fadSetsPerDayInData;
     }
 
+    private StringBuilder setLog;
 
     @Override
     public void start(FishState model) {
@@ -132,7 +132,15 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                 if (bestMatch.isPresent()) {
                     //count the error
                     matchedFadsToFishOut.add(bestMatch.get());
-                    counter.count("Error",computeError(observedSet, bestMatch.get()));
+                    double error = computeError(observedSet, bestMatch.get());
+                    counter.count("Error", error);
+                    //log:
+                    if(setLog!=null)
+                        setLog.append(day).append(",")
+                                .append(setsPerTile.getKey().getGridX()).append(",")
+                                .append(setsPerTile.getKey().getGridY()).append(",")
+                                .append("MATCH,")
+                                .append(error).append("\n");
                     //remove from matchables
                     matchableFads.remove(bestMatch.get());
 
@@ -140,6 +148,12 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                     //otherwise count it as a miss
                     assert  matchableFads.isEmpty();
                     observationsThatCouldNotBeMatched.add(observedSet);
+                    if(setLog!=null)
+                        setLog.append(day).append(",")
+                                .append(setsPerTile.getKey().getGridX()).append(",")
+                                .append(setsPerTile.getKey().getGridY()).append(",")
+                                .append("FAILED,")
+                                .append("NaN").append("\n");
                 }
             }
 
@@ -204,5 +218,17 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
     public void setNeighborhoodSearchSize(int neighborhoodSearchSize) {
         this.neighborhoodSearchSize = neighborhoodSearchSize;
+    }
+
+    public void startRestartLogger(){
+        setLog = new StringBuilder();
+        setLog.append("day,x,y,result,error").append("\n");
+    }
+
+    public String printLog(){
+        if(setLog==null)
+            return "";
+        else
+            return setLog.toString();
     }
 }
