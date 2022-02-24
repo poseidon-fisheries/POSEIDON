@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -115,6 +116,9 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                 }
 
             }
+            //you have to remove already matched fads though
+            matchableFads.removeAll(matchedFadsToFishOut);
+            assert (matchableFads.size() == (new HashSet<>(matchableFads)).size()) : "some fads seem to appear in multiple spots";
             //sort them by size (to get consistent errors)
             Collections.sort(matchableFads, (o1, o2) -> -Double.compare(
                     Arrays.stream(o1.getBiomass()).sum(),
