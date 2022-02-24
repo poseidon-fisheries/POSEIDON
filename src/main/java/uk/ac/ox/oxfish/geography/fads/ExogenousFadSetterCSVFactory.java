@@ -8,6 +8,8 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -40,6 +42,8 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     private String pathToFile = "./inputs/tests/fad_dummmy_sets.csv";
 
+
+    private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
 
     @Override
     public ExogenousFadSetterFromData apply(FishState state) {
@@ -96,6 +100,8 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dayToCoordinatesMap);
         if(isDataInTonnes)
             setter.setSimulatedToDataScaler(DEFAULT_SIMULATED_TO_DATA_SCALER);
+        int range = neighborhoodSearchSize.apply(state.getRandom()).intValue();
+        setter.setNeighborhoodSearchSize(range);
         return setter;
 
     }
@@ -115,5 +121,13 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     public void setDataInTonnes(boolean dataInTonnes) {
         isDataInTonnes = dataInTonnes;
+    }
+
+    public DoubleParameter getNeighborhoodSearchSize() {
+        return neighborhoodSearchSize;
+    }
+
+    public void setNeighborhoodSearchSize(DoubleParameter neighborhoodSearchSize) {
+        this.neighborhoodSearchSize = neighborhoodSearchSize;
     }
 }

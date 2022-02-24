@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,10 +31,14 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
     private final Counter counter = new Counter(IntervalPolicy.EVERY_YEAR);
 
 
+    /**
+     * The size of the area (in tiles) we want to search for a matching FAD.
+     * Zero means only in the correct cell size
+     */
+    private int neighborhoodSearchSize = 0;
 
     /**
      * This is called to take simulated fad biomass and transform it to whatever is appropriate for comparison with data
-     * by defa
      */
     private Function<Double,Double> simulatedToDataScaler = simulatedBiomass -> simulatedBiomass;
 
@@ -97,6 +102,19 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
         for (Map.Entry<SeaTile, List<FadSetObservation>> setsPerTile : fadObservations.entrySet()) {
             //get all observable matches (i.e. all fads in the same tile)
             ArrayList<Fad> matchableFads = new ArrayList<>(getFadMap().fadsAt(setsPerTile.getKey()));
+            //if you are looking in the neighborhood size...
+            if(neighborhoodSearchSize>0)
+            {
+                //get all seatile neighbors and add their fads to the matchable list
+                for (Object mooreNeighbor : model.getMap().getMooreNeighbors(setsPerTile.getKey(),neighborhoodSearchSize)) {
+                    if(mooreNeighbor == setsPerTile.getKey()) //don't add yourself
+                        continue;
+                    matchableFads.addAll(
+                            getFadMap().fadsAt(((SeaTile) mooreNeighbor))
+                    );
+                }
+
+            }
             //sort them by size (to get consistent errors)
             Collections.sort(matchableFads, (o1, o2) -> -Double.compare(
                     Arrays.stream(o1.getBiomass()).sum(),
@@ -178,5 +196,13 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
     public Counter getCounter() {
         return counter;
+    }
+
+    public int getNeighborhoodSearchSize() {
+        return neighborhoodSearchSize;
+    }
+
+    public void setNeighborhoodSearchSize(int neighborhoodSearchSize) {
+        this.neighborhoodSearchSize = neighborhoodSearchSize;
     }
 }

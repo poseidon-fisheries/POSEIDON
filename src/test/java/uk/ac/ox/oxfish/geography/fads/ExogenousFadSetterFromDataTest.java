@@ -2,10 +2,10 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.util.Bag;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -60,6 +59,7 @@ public class ExogenousFadSetterFromDataTest {
                 ,setter.getCounter().getColumn("Error"),0.0001);
 
     }
+
 
     @Test
     public void twoObservationsOneFad() {
@@ -133,41 +133,9 @@ public class ExogenousFadSetterFromDataTest {
 
     @Test
     public void fadsAreDroppedAndSetInActualScenario() {
-        FlexibleScenario scenario = new FlexibleScenario();
-        //two species
-        scenario.setBiologyInitializer(new SplitInitializerFactory());
-        scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
-
-        FadDemoFactory fadDemo = new FadDemoFactory();
-        fadDemo.setBiomassOnly(true);
-        //assume a current that pushes you diagonally towards top-left
-        fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
-        fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
-        fadDemo.setPathToFile("./inputs/tests/fad_dummy_deploy2.csv");
-        //they will all be empty!
-        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put("Species 0",
-                new FixedDoubleParameter(0));
-        scenario.getPlugins().add(fadDemo);
-
-        //now add the fad setter
-        ExogenousFadSetterCSVFactory setters = new ExogenousFadSetterCSVFactory();
-        setters.setPathToFile("./inputs/tests/fad_dummy_sets.csv");
-        setters.setDataInTonnes(true);
-        scenario.getPlugins().add(setters);
-
-        FishState state = new FishState();
-        state.setScenario(scenario);
-        state.start();
-        while(state.getDay()<=10)
-            state.schedule.step(state);
-        //there ought to be 2 fads left (4 dropped, 2 landed!)
-        Assert.assertEquals(
-                state.getFadMap().allFads().collect(Collectors.toList()).size(),
+        FishState state = generateAndRunOneYearOfAbstractFadScenario("./inputs/tests/fad_dummy_sets.csv",
+                0,
                 2);
-
-        //go to the end of the year
-        while(state.getDay()<=366)
-            state.schedule.step(state);
         //should by now have beached or left the map
         Assert.assertEquals(
                 state.getFadMap().allFads().collect(Collectors.toList()).size(),
@@ -197,4 +165,118 @@ public class ExogenousFadSetterFromDataTest {
         );
 
     }
+
+
+    @Test
+    public void fadsAreDroppedButMissedInActualScenario() {
+        FishState state = generateAndRunOneYearOfAbstractFadScenario("./inputs/tests/fad_dummy_sets2.csv", 0, 4);
+        //should by now have beached or left the map
+        Assert.assertEquals(
+                state.getFadMap().allFads().collect(Collectors.toList()).size(),
+                0);
+        //there should have been 0 matches, 3 failed matches  and 1 out of bounds
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
+                3,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
+                0,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
+                1,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
+                //1 missing, 1 out of bounds, and twice they should have hit empty
+                3* ExogenousFadSetterFromData.MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
+                .001d
+        );
+
+
+
+    }
+
+    @Test
+    public void fadsAreDroppedAndNotMissedBecauseOfNeighborhoodRangeInActualScenario() {
+        FishState state = generateAndRunOneYearOfAbstractFadScenario("./inputs/tests/fad_dummy_sets2.csv", 1, 2);
+        //should by now have beached or left the map
+        Assert.assertEquals(
+                state.getFadMap().allFads().collect(Collectors.toList()).size(),
+                0);
+
+
+        //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
+                1,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
+                2,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
+                1,
+                .001d
+        );
+        assertEquals(
+                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
+                //1 missing, 1 out of bounds, and twice they should have hit empty
+                ExogenousFadSetterFromData.MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
+                        2 * Math.sqrt(2*Math.pow(10,2)),
+                .001d
+        );
+    }
+
+    @NotNull
+    private FishState generateAndRunOneYearOfAbstractFadScenario(String setterFile,
+                                                                 int neighborhoodSearchSize,
+                                                                 int expectedFadsRemainingAfter10Steps) {
+        FlexibleScenario scenario = new FlexibleScenario();
+        //two species
+        scenario.setBiologyInitializer(new SplitInitializerFactory());
+        scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
+
+        FadDemoFactory fadDemo = new FadDemoFactory();
+        fadDemo.setBiomassOnly(true);
+        //assume a current that pushes you diagonally towards top-left
+        fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
+        fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
+        fadDemo.setPathToFile("./inputs/tests/fad_dummy_deploy2.csv");
+        //they will all be empty!
+        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put("Species 0",
+                new FixedDoubleParameter(0));
+        scenario.getPlugins().add(fadDemo);
+
+        //now add the fad setter
+        ExogenousFadSetterCSVFactory setters = new ExogenousFadSetterCSVFactory();
+        setters.setNeighborhoodSearchSize(new FixedDoubleParameter(neighborhoodSearchSize));
+        setters.setPathToFile(setterFile);
+        setters.setDataInTonnes(true);
+        scenario.getPlugins().add(setters);
+
+        FishState state = new FishState();
+        state.setScenario(scenario);
+        state.start();
+        while(state.getDay()<=10)
+            state.schedule.step(state);
+        //there ought to be 2 fads left (4 dropped, 2 landed!)
+        Assert.assertEquals(
+                state.getFadMap().allFads().collect(Collectors.toList()).size(),
+                expectedFadsRemainingAfter10Steps);
+
+        //go to the end of the year
+        while(state.getDay()<=366)
+            state.schedule.step(state);
+        return state;
+    }
+
+
 }
