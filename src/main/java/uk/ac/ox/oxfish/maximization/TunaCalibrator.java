@@ -4,6 +4,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.stream;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 import com.google.common.primitives.ImmutableIntArray;
 import eva2.OptimizerFactory;
@@ -25,12 +26,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jetbrains.annotations.NotNull;
+import sim.engine.SimState;
 import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -39,15 +44,14 @@ public class TunaCalibrator implements Runnable {
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
-    public static final int MAX_PROCESSORS_TO_USE = 4;
+    public static final int MAX_PROCESSORS_TO_USE = 16;
 
     public static final int DEFAULT_POPULATION_SIZE = 20;
-    public final static int MAX_FITNESS_CALLS = 5000;
-    public static final int DEFAULT_RANGE = 20;
+    public final static int MAX_FITNESS_CALLS = 128;
+    public static final int DEFAULT_RANGE = 10;
 
-
-    private boolean localSearch = true;
-    private String runNickName = "local_dudforced_filtering_search";
+    private boolean localSearch = false;
+    private String runNickName = "global_calibration";
     private int populationSize = DEFAULT_POPULATION_SIZE;
     private int maxFitnessCalls = MAX_FITNESS_CALLS;
     private int parameterRange=  DEFAULT_RANGE;
@@ -63,8 +67,7 @@ public class TunaCalibrator implements Runnable {
             Paths
                     .get(
                             System.getProperty("user.home"),
-                            "code",
-                            "tuna", "tuna", "calibration", "results", "oneboat_duds"
+                            "workspace", "tuna", "calibration", "results"
                     )
                     .resolve("calibration.yaml");
 
@@ -74,7 +77,7 @@ public class TunaCalibrator implements Runnable {
     /**
      * list of individuals we want to force in the original population; usually these are just the output of some previous optimizations
      */
-    private List<double[]> bestGuess  = new ArrayList<>(4);
+    private List<double[]> bestGuess  = null; //new ArrayList<>(4);
     //forced duds; filtering
  //   {
 //        bestGuess.add(new double[]{
@@ -108,6 +111,11 @@ public class TunaCalibrator implements Runnable {
     public static void main(final String[] args) {
 
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
+        addCsvLogger(
+            Level.DEBUG,
+            "run_timer",
+            "thread,run,step,time"
+        );
 
         // Parse all given numeric arguments and use the max one to set the number of fitness
         // calls and the min one to set the population size. If there is only one, it's
@@ -378,4 +386,16 @@ public class TunaCalibrator implements Runnable {
     public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
     }
+
+    public static void logCurrentTime(final SimState simState) {
+        LogManager.getLogger("run_timer").debug(() ->
+            new ObjectArrayMessage(
+                Thread.currentThread().getId(),
+                ((FishState) simState).getTrulyUniqueID(),
+                ((FishState) simState).getStep(),
+                System.currentTimeMillis()
+            )
+        );
+    }
+
 }

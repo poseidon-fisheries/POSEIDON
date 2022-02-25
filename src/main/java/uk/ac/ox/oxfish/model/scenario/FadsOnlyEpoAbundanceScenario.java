@@ -19,14 +19,12 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
-import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -55,6 +53,7 @@ import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
+import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -219,22 +218,11 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.scheduledAbundanceProcessesFactory = scheduledAbundanceProcessesFactory;
     }
 
-    private static void logCurrentTime(final SimState simState) {
-        LogManager.getLogger("run_timer").debug(() ->
-            new ObjectArrayMessage(
-                Thread.currentThread().getId(),
-                ((FishState) simState).getTrulyUniqueID(),
-                ((FishState) simState).getStep(),
-                System.currentTimeMillis()
-            )
-        );
-    }
-
     @Override
     public ScenarioEssentials start(final FishState fishState) {
 
         logCurrentTime(fishState);
-        fishState.scheduleEveryDay(FadsOnlyEpoAbundanceScenario::logCurrentTime, StepOrder.DAWN);
+        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();

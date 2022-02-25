@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Arrays.stream;
@@ -262,6 +263,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     public void setOpportunisticFadSetDetectionProbability(
         final double opportunisticFadSetDetectionProbability
     ) {
+        checkArgument(opportunisticFadSetDetectionProbability >= 0 && opportunisticFadSetDetectionProbability <= 1);
         this.opportunisticFadSetDetectionProbability = opportunisticFadSetDetectionProbability;
     }
 
@@ -274,6 +276,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     public void setNonAssociatedSetDetectionProbability(
         final double nonAssociatedSetDetectionProbability
     ) {
+        checkArgument(nonAssociatedSetDetectionProbability >= 0 && nonAssociatedSetDetectionProbability <= 1);
         this.nonAssociatedSetDetectionProbability = nonAssociatedSetDetectionProbability;
     }
 
@@ -282,6 +285,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     public void setDolphinSetDetectionProbability(final double dolphinSetDetectionProbability) {
+        checkArgument(dolphinSetDetectionProbability >= 0 && dolphinSetDetectionProbability <= 1);
         this.dolphinSetDetectionProbability = dolphinSetDetectionProbability;
     }
 
