@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
@@ -119,7 +120,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             0.5
         );
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
+        ImmutableMap.of(
+            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
+            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
+        )
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));

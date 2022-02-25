@@ -68,10 +68,6 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
         fishState.start();
         do {
             fishState.schedule.step(fishState);
-            System.out.println("Step " + fishState.getStep());
-            System.out.println(
-                fishState.getFadMap().getDriftingObjectsMap().getField().allObjects.numObjs
-            );
         } while (fishState.getYear() < 2);
     }
 

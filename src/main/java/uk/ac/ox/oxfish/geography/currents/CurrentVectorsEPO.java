@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.abs;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectorsEPO implements CurrentVectors {
@@ -37,7 +38,7 @@ public class CurrentVectorsEPO implements CurrentVectors {
         final int gridWidth,
         final int gridHeight
     ) {
-        this(vectorMaps, __ -> Y2017, gridWidth, gridHeight, stepsPerDay);
+        this(vectorMaps, step -> step < 365 ? Y2016 : Y2017, gridWidth, gridHeight, stepsPerDay);
     }
 
     public CurrentVectorsEPO(
