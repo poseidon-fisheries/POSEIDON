@@ -18,6 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -25,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import junit.framework.TestCase;
+import org.apache.logging.log4j.Level;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -61,6 +65,7 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
     public void testRunTwoYearsWithoutCrashing() {
         final Scenario scenario = new FadsOnlyEpoAbundanceScenario();
         final FishState fishState = new FishState();
+        initFadRemovalLog();
         fishState.setScenario(scenario);
         fishState.start();
         do {
