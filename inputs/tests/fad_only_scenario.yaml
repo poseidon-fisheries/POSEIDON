@@ -58,12 +58,13 @@ FAD only EPO Abundance:
       pathToFile: inputs/epo/calibration/fad_deployments.csv
   fadMapFactory:
     currentFiles:
+      Y2016: inputs/epo/currents/currents_2016.csv
       Y2017: inputs/epo/currents/currents_2017.csv
   fadSetterFactory:
     Exogenous Fad Setter CSV:
       dataInTonnes: true
       isDataInTonnes: true
-      neighborhoodSearchSize: '10.0'
+      neighborhoodSearchSize: '0.0'
       pathToFile: inputs/epo/calibration/fad_sets.csv
   mapInitializerFactory:
     From File Map:
