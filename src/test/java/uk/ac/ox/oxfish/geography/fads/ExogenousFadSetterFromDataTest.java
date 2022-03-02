@@ -93,7 +93,7 @@ public class ExogenousFadSetterFromDataTest {
         assertEquals(1,setter.getCounter().getColumn("Failed Matches"),0.0001);
         assertEquals(0,setter.getCounter().getColumn("Out of Bounds"),0.0001);
         assertEquals(
-                Math.sqrt(2* Math.pow(100-40,2)) + ExogenousFadSetterFromData.MISSING_FAD_ERROR
+                Math.sqrt(2* Math.pow(100-40,2)) + ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR
                 ,setter.getCounter().getColumn("Error"),0.0001);
 
         System.out.println(setter.printLog());
@@ -170,7 +170,7 @@ public class ExogenousFadSetterFromDataTest {
         assertEquals(
                 state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
                 //1 missing, 1 out of bounds, and twice they should have hit empty
-                ExogenousFadSetterFromData.MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
+                ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
                 2 * Math.sqrt(2*Math.pow(10,2)),
                 .001d
         );
@@ -204,7 +204,7 @@ public class ExogenousFadSetterFromDataTest {
         assertEquals(
                 state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
                 //1 missing, 1 out of bounds, and twice they should have hit empty
-                3* ExogenousFadSetterFromData.MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
+                3* ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
                 .001d
         );
 
@@ -240,7 +240,7 @@ public class ExogenousFadSetterFromDataTest {
         assertEquals(
                 state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
                 //1 missing, 1 out of bounds, and twice they should have hit empty
-                ExogenousFadSetterFromData.MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
+                ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
                         2 * Math.sqrt(2*Math.pow(10,2)),
                 .001d
         );

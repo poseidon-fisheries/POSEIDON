@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -25,8 +24,13 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
      * how much should the error be when there is a fad set in the data but we didn't find any FAD
      * in the simulation to match it to
      */
-    public final static double MISSING_FAD_ERROR = 10000;
+    public final static double DEFAULT_MISSING_FAD_ERROR = 10000;
 
+    /**
+     * how much should the error be when there is a fad set in the data but we didn't find any FAD
+     * in the simulation to match it to
+     */
+    private double missingFadError = DEFAULT_MISSING_FAD_ERROR;
 
     private final Counter counter = new Counter(IntervalPolicy.EVERY_YEAR);
 
@@ -166,7 +170,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
         counter.count("Matches",matchedFadsToFishOut.size());
         counter.count("Failed Matches",observationsThatCouldNotBeMatched.size());
-        counter.count("Error",observationsThatCouldNotBeMatched.size()*MISSING_FAD_ERROR);
+        counter.count("Error",observationsThatCouldNotBeMatched.size()* missingFadError);
         counter.count("Out of Bounds",outOfBoundsObservations.size());
         counter.count("Error",outOfBoundsObservations.size()*OUT_OF_BOUNDS_FAD_ERROR);
 
@@ -234,5 +238,13 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
             return "";
         else
             return setLog.toString();
+    }
+
+    public double getMissingFadError() {
+        return missingFadError;
+    }
+
+    public void setMissingFadError(double missingFadError) {
+        this.missingFadError = missingFadError;
     }
 }

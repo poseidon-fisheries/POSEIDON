@@ -45,6 +45,8 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
 
+    private DoubleParameter missingFadError = new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
+
     @Override
     public ExogenousFadSetterFromData apply(FishState state) {
         //read the file now (don't delay the error from not having the file ready)
@@ -102,6 +104,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
             setter.setSimulatedToDataScaler(DEFAULT_SIMULATED_TO_DATA_SCALER);
         int range = neighborhoodSearchSize.apply(state.getRandom()).intValue();
         setter.setNeighborhoodSearchSize(range);
+        setter.setMissingFadError(getMissingFadError().apply(state.getRandom()));
         return setter;
 
     }
@@ -129,5 +132,13 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     public void setNeighborhoodSearchSize(DoubleParameter neighborhoodSearchSize) {
         this.neighborhoodSearchSize = neighborhoodSearchSize;
+    }
+
+    public DoubleParameter getMissingFadError() {
+        return missingFadError;
+    }
+
+    public void setMissingFadError(DoubleParameter missingFadError) {
+        this.missingFadError = missingFadError;
     }
 }
