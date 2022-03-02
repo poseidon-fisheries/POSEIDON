@@ -18,6 +18,8 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -61,14 +63,11 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
     public void testRunTwoYearsWithoutCrashing() {
         final Scenario scenario = new FadsOnlyEpoAbundanceScenario();
         final FishState fishState = new FishState();
+        initFadRemovalLog();
         fishState.setScenario(scenario);
         fishState.start();
         do {
             fishState.schedule.step(fishState);
-            System.out.println("Step " + fishState.getStep());
-            System.out.println(
-                fishState.getFadMap().getDriftingObjectsMap().getField().allObjects.numObjs
-            );
         } while (fishState.getYear() < 2);
     }
 

@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import sim.engine.SimState;
@@ -86,6 +87,7 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 public class FishState  extends SimState{
 
     private final String hopefullyUniqueID;
+    private final String trulyUniqueID;
 
     public static final String DEFAULT_POPULATION_NAME = "default_population";
     /**
@@ -221,6 +223,7 @@ public class FishState  extends SimState{
         super(seed);
         this.stepsPerDay = stepsPerDay;
         this.hopefullyUniqueID = seed + "_" + System.nanoTime() +"_" + FishStateUtilities.getComputerName();
+        this.trulyUniqueID = UUID.randomUUID().toString();
 
         toStart = new LinkedList<>();
 
@@ -962,6 +965,9 @@ public class FishState  extends SimState{
         return hopefullyUniqueID;
     }
 
+    public String getTrulyUniqueID() {
+        return trulyUniqueID;
+    }
 
     public List<EntryPlugin> getEntryPlugins() {
         return entryPlugins;

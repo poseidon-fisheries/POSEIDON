@@ -16,16 +16,14 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.abs;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectorsEPO implements CurrentVectors {
 
     private static final Double2D ZERO_VECTOR = new Double2D();
 
-    // Even caching just 50 vectors per time step gives a hit rate of about 80%!
-    private static final int MAX_CACHE_ENTRIES = 50;
-    private final CacheBuilder<Object, Object> cacheBuilder =
-        CacheBuilder.newBuilder().maximumSize(MAX_CACHE_ENTRIES).recordStats();
+    private final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder();
 
     private final Map<Integer, Cache<Int2D, Optional<Double2D>>> vectorCache = new ConcurrentHashMap<>();
     private final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> vectorMaps;
@@ -40,7 +38,7 @@ public class CurrentVectorsEPO implements CurrentVectors {
         final int gridWidth,
         final int gridHeight
     ) {
-        this(vectorMaps, __ -> Y2017, gridWidth, gridHeight, stepsPerDay);
+        this(vectorMaps, step -> step < 365 ? Y2016 : Y2017, gridWidth, gridHeight, stepsPerDay);
     }
 
     public CurrentVectorsEPO(

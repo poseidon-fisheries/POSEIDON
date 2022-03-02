@@ -18,7 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -64,7 +66,9 @@ import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
+import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
@@ -116,7 +120,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             0.5
         );
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
+        ImmutableMap.of(
+            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
+            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
+        )
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
@@ -304,6 +311,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     @Override
     public ScenarioEssentials start(final FishState fishState) {
+        logCurrentTime(fishState);
+        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();

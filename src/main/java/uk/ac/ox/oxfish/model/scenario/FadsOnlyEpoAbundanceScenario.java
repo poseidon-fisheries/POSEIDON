@@ -18,7 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,8 +54,10 @@ import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
+import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -68,7 +72,8 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
-            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(), null
+            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(),
+            new AbundanceFadInitializerFactory()
         );
 
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
@@ -105,7 +110,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             0.5
         );
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
+        ImmutableMap.of(
+            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_daily.csv"),
+            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_daily.csv")
+        )
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
@@ -216,6 +224,9 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
     @Override
     public ScenarioEssentials start(final FishState fishState) {
+
+        logCurrentTime(fishState);
+        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();

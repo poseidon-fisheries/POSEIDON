@@ -1,11 +1,18 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
+
 import com.google.common.base.Preconditions;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -51,9 +58,36 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
                 model.getDay());
         //set on them
         for (Fad fad : allFadsToSetOn) {
+            logFadRemoval(fad, model);
             setOnFad(fad);
         }
         //done!
+    }
+
+    public static void initFadRemovalLog() {
+        addCsvLogger(
+            Level.DEBUG,
+            "fad_removals",
+            "step_deployed,lon_deployed,lat_deployed,step_removed,lon_removed,lat_removed"
+        );
+    }
+
+    private static void logFadRemoval(final Fad<?, ?> fad, final FishState fishState) {
+        LogManager.getLogger("fad_removals").debug(() -> {
+            final NauticalMap map = fishState.getMap();
+            final Coordinate coordinatesDeployed =
+                map.getCoordinates(map.getSeaTile(fad.getLocationDeployed()));
+            final Coordinate coordinatesRemoved =
+                map.getCoordinates(fad.getLocation());
+            return new ObjectArrayMessage(
+                fad.getStepDeployed(),
+                coordinatesDeployed.x,
+                coordinatesDeployed.y,
+                fishState.getStep(),
+                coordinatesRemoved.x,
+                coordinatesRemoved.y
+            );
+        });
     }
 
     @Override

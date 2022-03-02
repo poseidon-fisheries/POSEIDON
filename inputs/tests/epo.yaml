@@ -87,6 +87,7 @@ EPO Abundance:
       totalCarryingCapacity: '445000.0'
   fadMapFactory:
     currentFiles:
+      Y2016: inputs/epo/currents/currents_2016.csv
       Y2017: inputs/epo/currents/currents_2017.csv
   fishingStrategyFactory:
     attractionWeightsFile: null

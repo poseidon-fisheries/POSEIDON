@@ -24,16 +24,25 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
      * how much should the error be when there is a fad set in the data but we didn't find any FAD
      * in the simulation to match it to
      */
-    public final static double MISSING_FAD_ERROR = 10000;
+    public final static double DEFAULT_MISSING_FAD_ERROR = 10000;
 
+    /**
+     * how much should the error be when there is a fad set in the data but we didn't find any FAD
+     * in the simulation to match it to
+     */
+    private double missingFadError = DEFAULT_MISSING_FAD_ERROR;
 
     private final Counter counter = new Counter(IntervalPolicy.EVERY_YEAR);
 
 
+    /**
+     * The size of the area (in tiles) we want to search for a matching FAD.
+     * Zero means only in the correct cell size
+     */
+    private int neighborhoodSearchSize = 0;
 
     /**
      * This is called to take simulated fad biomass and transform it to whatever is appropriate for comparison with data
-     * by defa
      */
     private Function<Double,Double> simulatedToDataScaler = simulatedBiomass -> simulatedBiomass;
 
@@ -41,6 +50,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
         this.fadSetsPerDayInData = fadSetsPerDayInData;
     }
 
+    private StringBuilder setLog;
 
     @Override
     public void start(FishState model) {
@@ -97,6 +107,22 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
         for (Map.Entry<SeaTile, List<FadSetObservation>> setsPerTile : fadObservations.entrySet()) {
             //get all observable matches (i.e. all fads in the same tile)
             ArrayList<Fad> matchableFads = new ArrayList<>(getFadMap().fadsAt(setsPerTile.getKey()));
+            //if you are looking in the neighborhood size...
+            if(neighborhoodSearchSize>0)
+            {
+                //get all seatile neighbors and add their fads to the matchable list
+                for (Object mooreNeighbor : model.getMap().getMooreNeighbors(setsPerTile.getKey(),neighborhoodSearchSize)) {
+                    if(mooreNeighbor == setsPerTile.getKey()) //don't add yourself
+                        continue;
+                    matchableFads.addAll(
+                            getFadMap().fadsAt(((SeaTile) mooreNeighbor))
+                    );
+                }
+
+            }
+            //you have to remove already matched fads though
+            matchableFads.removeAll(matchedFadsToFishOut);
+            assert (matchableFads.size() == (new HashSet<>(matchableFads)).size()) : "some fads seem to appear in multiple spots";
             //sort them by size (to get consistent errors)
             Collections.sort(matchableFads, (o1, o2) -> -Double.compare(
                     Arrays.stream(o1.getBiomass()).sum(),
@@ -114,7 +140,15 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                 if (bestMatch.isPresent()) {
                     //count the error
                     matchedFadsToFishOut.add(bestMatch.get());
-                    counter.count("Error",computeError(observedSet, bestMatch.get()));
+                    double error = computeError(observedSet, bestMatch.get());
+                    counter.count("Error", error);
+                    //log:
+                    if(setLog!=null)
+                        setLog.append(day).append(",")
+                                .append(setsPerTile.getKey().getGridX()).append(",")
+                                .append(setsPerTile.getKey().getGridY()).append(",")
+                                .append("MATCH,")
+                                .append(error).append("\n");
                     //remove from matchables
                     matchableFads.remove(bestMatch.get());
 
@@ -122,6 +156,12 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                     //otherwise count it as a miss
                     assert  matchableFads.isEmpty();
                     observationsThatCouldNotBeMatched.add(observedSet);
+                    if(setLog!=null)
+                        setLog.append(day).append(",")
+                                .append(setsPerTile.getKey().getGridX()).append(",")
+                                .append(setsPerTile.getKey().getGridY()).append(",")
+                                .append("FAILED,")
+                                .append("NaN").append("\n");
                 }
             }
 
@@ -130,7 +170,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
         counter.count("Matches",matchedFadsToFishOut.size());
         counter.count("Failed Matches",observationsThatCouldNotBeMatched.size());
-        counter.count("Error",observationsThatCouldNotBeMatched.size()*MISSING_FAD_ERROR);
+        counter.count("Error",observationsThatCouldNotBeMatched.size()* missingFadError);
         counter.count("Out of Bounds",outOfBoundsObservations.size());
         counter.count("Error",outOfBoundsObservations.size()*OUT_OF_BOUNDS_FAD_ERROR);
 
@@ -178,5 +218,33 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
     public Counter getCounter() {
         return counter;
+    }
+
+    public int getNeighborhoodSearchSize() {
+        return neighborhoodSearchSize;
+    }
+
+    public void setNeighborhoodSearchSize(int neighborhoodSearchSize) {
+        this.neighborhoodSearchSize = neighborhoodSearchSize;
+    }
+
+    public void startRestartLogger(){
+        setLog = new StringBuilder();
+        setLog.append("day,x,y,result,error").append("\n");
+    }
+
+    public String printLog(){
+        if(setLog==null)
+            return "";
+        else
+            return setLog.toString();
+    }
+
+    public double getMissingFadError() {
+        return missingFadError;
+    }
+
+    public void setMissingFadError(double missingFadError) {
+        this.missingFadError = missingFadError;
     }
 }

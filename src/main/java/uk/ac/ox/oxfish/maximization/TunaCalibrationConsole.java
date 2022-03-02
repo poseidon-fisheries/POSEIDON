@@ -89,7 +89,7 @@ public class TunaCalibrationConsole  {
 
         //build calibrator and feed it the arguments
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
-        tunaCalibrator.setMaxProcessorsToUse(arguments.getMaxFitnessCalls());
+        tunaCalibrator.setMaxFitnessCalls(arguments.getMaxFitnessCalls());
         tunaCalibrator.setPopulationSize(arguments.getPopulationSize());
         if(arguments.pathToCalibrationYaml != null && !arguments.pathToCalibrationYaml.trim().isEmpty())
             tunaCalibrator.setOriginalCalibrationFilePath(Paths.get(arguments.getPathToCalibrationYaml()));
@@ -102,8 +102,8 @@ public class TunaCalibrationConsole  {
 
 
         //add initial guesses if provided
-        tunaCalibrator.getBestGuess().clear();
         if(arguments.getBestGuessesTextFile() != null && !arguments.getBestGuessesTextFile().trim().isEmpty()){
+            tunaCalibrator.getBestGuess().clear();
             List<String> allLines = Files.readAllLines(Paths.get(arguments.getBestGuessesTextFile()));
             List<double[]> individuals = new LinkedList<>();
             for (String readLine : allLines) {
