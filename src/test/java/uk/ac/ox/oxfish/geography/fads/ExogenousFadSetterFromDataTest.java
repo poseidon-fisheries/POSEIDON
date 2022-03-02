@@ -8,6 +8,8 @@ import org.junit.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -214,36 +216,37 @@ public class ExogenousFadSetterFromDataTest {
 
     @Test
     public void fadsAreDroppedAndNotMissedBecauseOfNeighborhoodRangeInActualScenario() {
-        FishState state = generateAndRunOneYearOfAbstractFadScenario("./inputs/tests/fad_dummy_sets2.csv", 1, 2);
-        //should by now have beached or left the map
-        Assert.assertEquals(
-                state.getFadMap().allFads().collect(Collectors.toList()).size(),
-                0);
+            FishState state = generateAndRunOneYearOfAbstractFadScenario("./inputs/tests/fad_dummy_sets2.csv", 1, 2);
+            //should by now have beached or left the map
+            Assert.assertEquals(
+                    state.getFadMap().allFads().collect(Collectors.toList()).size(),
+                    0);
 
 
-        //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
-        assertEquals(
-                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
-                1,
-                .001d
-        );
-        assertEquals(
-                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
-                2,
-                .001d
-        );
-        assertEquals(
-                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
-                1,
-                .001d
-        );
-        assertEquals(
-                state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
-                //1 missing, 1 out of bounds, and twice they should have hit empty
-                ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
-                        2 * Math.sqrt(2*Math.pow(10,2)),
-                .001d
-        );
+            //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
+            assertEquals(
+                    state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
+                    1,
+                    .001d
+            );
+            assertEquals(
+                    state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
+                    2,
+                    .001d
+            );
+            assertEquals(
+                    state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
+                    1,
+                    .001d
+            );
+            assertEquals(
+                    state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
+                    //1 missing, 1 out of bounds, and twice they should have hit empty
+                    ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
+                            2 * Math.sqrt(2 * Math.pow(10, 2)),
+                    .001d
+            );
+
     }
 
     @NotNull
@@ -251,6 +254,8 @@ public class ExogenousFadSetterFromDataTest {
                                                                  int neighborhoodSearchSize,
                                                                  int expectedFadsRemainingAfter10Steps) {
         FlexibleScenario scenario = new FlexibleScenario();
+        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setMaxLandWidth(new FixedDoubleParameter(1));
+        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setCoastalRoughness(new FixedDoubleParameter(0));
         //two species
         scenario.setBiologyInitializer(new SplitInitializerFactory());
         scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
