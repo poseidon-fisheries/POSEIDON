@@ -8,7 +8,6 @@ import org.junit.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
@@ -73,7 +72,7 @@ public class ExogenousFadSetterFromDataTest {
         dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
         //let's log this
-        setter.startRestartLogger();
+        setter.startOrResetLogger(mock(FishState.class));
 
 
         //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass

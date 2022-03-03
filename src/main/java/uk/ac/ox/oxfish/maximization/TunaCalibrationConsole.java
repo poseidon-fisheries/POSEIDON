@@ -17,8 +17,6 @@ import static java.util.Arrays.stream;
 
 public class TunaCalibrationConsole  {
 
-
-
     @Parameter(
             names = "--nickname",
             description = "A nickname for the folder containing the outputs",

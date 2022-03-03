@@ -1,16 +1,18 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 
 import java.util.*;
 import java.util.function.Function;
 
-public class ExogenousFadSetterFromData extends ExogenousFadSetter {
+public class ExogenousFadSetterFromData extends ExogenousFadSetter implements OutputPlugin {
 
 
     private final Map<Integer,List<FadSetObservation>> fadSetsPerDayInData;
@@ -143,12 +145,21 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
                     double error = computeError(observedSet, bestMatch.get());
                     counter.count("Error", error);
                     //log:
-                    if(setLog!=null)
+                    if(setLog!=null) {
                         setLog.append(day).append(",")
                                 .append(setsPerTile.getKey().getGridX()).append(",")
                                 .append(setsPerTile.getKey().getGridY()).append(",")
                                 .append("MATCH,")
-                                .append(error).append("\n");
+                                .append(error);
+                        for (int i = 0; i < observedSet.getBiomassCaughtInData().length; i++) {
+                            setLog.append(",").append(observedSet.getBiomassCaughtInData()[i]).append(",").
+                                    append(
+                                            simulatedToDataScaler.apply(
+                                            bestMatch.get().getBiomass()[i]));
+                        }
+
+                        setLog.append("\n");
+                    }
                     //remove from matchables
                     matchableFads.remove(bestMatch.get());
 
@@ -228,9 +239,15 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
         this.neighborhoodSearchSize = neighborhoodSearchSize;
     }
 
-    public void startRestartLogger(){
+    public void startOrResetLogger(FishState state){
         setLog = new StringBuilder();
-        setLog.append("day,x,y,result,error").append("\n");
+        setLog.append("day,x,y,result,error");
+        for (Species species : state.getSpecies()) {
+            setLog.append(",").
+                    append(species).append(",").append(species).append("_simulated");
+        }
+        setLog.append("\n");
+        state.getOutputPlugins().add(this);
     }
 
     public String printLog(){
@@ -246,5 +263,20 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter {
 
     public void setMissingFadError(double missingFadError) {
         this.missingFadError = missingFadError;
+    }
+
+    @Override
+    public void reactToEndOfSimulation(FishState state) {
+        //nothing happens here
+    }
+
+    @Override
+    public String getFileName() {
+        return "exogenous_fad_setter_log";
+    }
+
+    @Override
+    public String composeFileContents() {
+        return printLog();
     }
 }

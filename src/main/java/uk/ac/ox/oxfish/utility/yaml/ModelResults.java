@@ -56,33 +56,33 @@ public class ModelResults extends HashMap<String,Object>
         this.put("FishState Daily", dailyData);
 
         //Also prints out fisher's averages
-        HashMap<String, Object> fisherData = new HashMap<>();
-        Collection<DataColumn> fisherColumns = state.getFishers().get(0).getYearlyData().getColumns();
-        int years = fisherColumns.iterator().next().size();
-        for (DataColumn column : fisherColumns)
-        {
-            HashMap<String, Object> columnData = new HashMap<>();
-            fisherData.put(column.getName(),columnData);
+        if (state.getFishers().size() > 0) {
+            HashMap<String, Object> fisherData = new HashMap<>();
+            Collection<DataColumn> fisherColumns = state.getFishers().get(0).getYearlyData().getColumns();
+            int years = fisherColumns.iterator().next().size();
+            for (DataColumn column : fisherColumns) {
+                HashMap<String, Object> columnData = new HashMap<>();
+                fisherData.put(column.getName(), columnData);
 
-            for(int year = 0; year<years; year++)
-            {
+                for (int year = 0; year < years; year++) {
 
-                DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
-                for(Fisher fisher : state.getFishers())
-                    if(fisher.getYearlyData().numberOfObservations()>year)
-                        stats.accept(fisher.getYearlyData().getColumn(column.getName()).get(year));
-                    else
-                        stats.accept(Double.NaN);
-                HashMap<String,Object> yearData = new HashMap<>();
-                columnData.put(Integer.toString(year),yearData);
-                yearData.put("Average",stats.getAverage());
-                yearData.put("Max",stats.getMax());
-                yearData.put("Min",stats.getMin());
-                yearData.put("Count",stats.getCount());
+                    DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+                    for (Fisher fisher : state.getFishers())
+                        if (fisher.getYearlyData().numberOfObservations() > year)
+                            stats.accept(fisher.getYearlyData().getColumn(column.getName()).get(year));
+                        else
+                            stats.accept(Double.NaN);
+                    HashMap<String, Object> yearData = new HashMap<>();
+                    columnData.put(Integer.toString(year), yearData);
+                    yearData.put("Average", stats.getAverage());
+                    yearData.put("Max", stats.getMax());
+                    yearData.put("Min", stats.getMin());
+                    yearData.put("Count", stats.getCount());
+                }
+
             }
-
+            this.put("Fisher", fisherData);
         }
-        this.put("Fisher",fisherData);
     }
 
 }

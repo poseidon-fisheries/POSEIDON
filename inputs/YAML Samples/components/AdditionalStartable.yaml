@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-02-18'
+  startDate: '2022-02-23'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -303,7 +303,12 @@ Fad Demo:
         Species 0: '0.0'
       speciesCodes: null
       totalCarryingCapacity: '445000.0'
-  fixedXCurrent: '-1.0'
-  fixedYCurrent: '1.0'
+  fixedXCurrent: '1.0'
+  fixedYCurrent: '-1.0'
   pathToFile: ./inputs/tests/fad_dummy_deploy.csv
+-------
+Exogenous Fad Setter CSV:
+  dataInTonnes: true
+  isDataInTonnes: true
+  pathToFile: ./inputs/tests/fad_dummmy_sets.csv
 -------
