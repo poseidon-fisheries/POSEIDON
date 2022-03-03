@@ -43,27 +43,26 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class SchoolSetOpportunityGeneratorTest {
 
-    private static final double logisticSteepness = 100;
-    private static final double logisticMidpoint = 1;
+    private static final double exponent = 10;
+    private static final double coefficient = 1;
     private static final MersenneTwisterFast rng = new MersenneTwisterFast();
 
     @Test
     public void test() {
-        assertEquals(0.5, getP(1, 1, 0, 0).getKey(), EPSILON);
-        assertEquals(0.5, getP(0, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(0.5, getP(1, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(0.5, getP(1, 1, 1, 0).getKey(), EPSILON);
-        assertEquals(0.5, getP(2, 1, 0, 1).getKey(), EPSILON);
-        assertEquals(0.5, getP(0, 1, 2, 1).getKey(), EPSILON);
-        assertTrue(0.5 > getP(0, 1, 0, 1).getKey());
-        assertTrue(0.5 < getP(2, 1, 2, 1).getKey());
+        final double expected = 0.6321205588285577;
+        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
+        assertTrue(expected > getP(0, 1, 0, 1).getKey());
+        assertTrue(expected < getP(2, 1, 2, 1).getKey());
 
         assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
         assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
@@ -89,8 +88,8 @@ public class SchoolSetOpportunityGeneratorTest {
         final SchoolSetOpportunityGenerator<BiomassLocalBiology,
             NonAssociatedSetAction<BiomassLocalBiology>>
             setOpportunityGenerator = new SchoolSetOpportunityGenerator(
-            logisticMidpoint,
-            logisticSteepness,
+            coefficient,
+            exponent,
             ImmutableMap.of(
                 globalBiology.getSpecie(0), weight0,
                 globalBiology.getSpecie(1), weight1

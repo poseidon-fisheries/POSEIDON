@@ -1,11 +1,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 import java.util.function.DoubleUnaryOperator;
-
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
 
 public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
 
@@ -13,32 +12,39 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
     private final DoubleUnaryOperator pctSetsRemainingModulationFunction;
 
     public GlobalSetAttractionModulator(
-        final double pctHoldAvailableLogisticMidpoint,
-        final double pctHoldAvailableLogisticSteepness,
-        final double pctSetsRemainingLogisticMidpoint,
-        final double pctSetsRemainingLogisticSteepness
+        final double pctHoldAvailableCoefficient,
+        final double pctHoldAvailableExponent,
+        final double pctSetsRemainingCoefficient,
+        final double pctSetsRemainingExponent
     ) {
         this(
-            new LogisticFunction(pctHoldAvailableLogisticMidpoint, pctHoldAvailableLogisticSteepness),
-            new LogisticFunction(pctSetsRemainingLogisticMidpoint, pctSetsRemainingLogisticSteepness)
+            new CompressedExponentialFunction(
+                pctHoldAvailableCoefficient,
+                pctHoldAvailableExponent
+            ),
+            new CompressedExponentialFunction(pctSetsRemainingCoefficient, pctSetsRemainingExponent)
         );
     }
 
-    public GlobalSetAttractionModulator(DoubleUnaryOperator pctHoldAvailableModulationFunction, DoubleUnaryOperator pctSetsRemainingModulationFunction) {
+    private GlobalSetAttractionModulator(
+        final DoubleUnaryOperator pctHoldAvailableModulationFunction,
+        final DoubleUnaryOperator pctSetsRemainingModulationFunction
+    ) {
         this.pctHoldAvailableModulationFunction = pctHoldAvailableModulationFunction;
         this.pctSetsRemainingModulationFunction = pctSetsRemainingModulationFunction;
     }
 
     @Override
-    public double modulate(Fisher fisher) {
+    public double modulate(final Fisher fisher) {
         final double modulatedPctHoldAvailable =
-            pctHoldAvailableModulationFunction.applyAsDouble(1 - fisher.getHold().getPercentageFilled());
+            pctHoldAvailableModulationFunction.applyAsDouble(
+                1 - fisher.getHold().getPercentageFilled());
         final double modulatedPctSetsRemaining =
             pctSetsRemainingModulationFunction.applyAsDouble(pctSetsRemaining(fisher));
         return modulatedPctHoldAvailable * modulatedPctSetsRemaining;
     }
 
-    private double pctSetsRemaining(final Fisher fisher) {
+    private static double pctSetsRemaining(final Fisher fisher) {
         return getFadManager(fisher)
             .getActionSpecificRegulations()
             .getSetLimits()

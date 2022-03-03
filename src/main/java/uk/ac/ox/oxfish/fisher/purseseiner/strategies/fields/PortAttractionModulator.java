@@ -21,26 +21,26 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
 public class PortAttractionModulator implements GlobalAttractionModulator {
 
-    private final DoubleUnaryOperator pctHoldSpaceLeftLogisticFunction;
-    private final DoubleUnaryOperator pctTravelTimeLeftLogisticFunction;
+    private final DoubleUnaryOperator pctHoldSpaceLeftCompressedExponentialFunction;
+    private final DoubleUnaryOperator pctTravelTimeLeftCompressedExponentialFunction;
 
     public PortAttractionModulator(
-        final double pctHoldSpaceLeftLogisticMidpoint,
-        final double pctHoldSpaceLeftLogisticSteepness,
-        final double pctTravelTimeLeftLogisticMidpoint,
-        final double pctTravelTimeLeftLogisticSteepness
+        final double pctHoldSpaceLeftCoefficient,
+        final double pctHoldSpaceLeftExponent,
+        final double pctTravelTimeLeftCoefficient,
+        final double pctTravelTimeLeftExponent
     ) {
-        this.pctHoldSpaceLeftLogisticFunction =
-            new LogisticFunction(pctHoldSpaceLeftLogisticMidpoint, pctHoldSpaceLeftLogisticSteepness);
+        this.pctHoldSpaceLeftCompressedExponentialFunction =
+            new CompressedExponentialFunction(pctHoldSpaceLeftCoefficient, pctHoldSpaceLeftExponent);
 
-        this.pctTravelTimeLeftLogisticFunction =
-            new LogisticFunction(pctTravelTimeLeftLogisticMidpoint, pctTravelTimeLeftLogisticSteepness);
+        this.pctTravelTimeLeftCompressedExponentialFunction =
+            new CompressedExponentialFunction(pctTravelTimeLeftCoefficient, pctTravelTimeLeftExponent);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class PortAttractionModulator implements GlobalAttractionModulator {
         final double pctHoldSpaceLeft = 1.0 - fisher.getHold().getPercentageFilled();
         final double pctTravelTimeLeft = 1.0 - (fisher.getHoursAtSea() / maxTravelTime(fisher));
         return 1.0 -
-            pctTravelTimeLeftLogisticFunction.applyAsDouble(pctTravelTimeLeft) *
-                pctHoldSpaceLeftLogisticFunction.applyAsDouble(pctHoldSpaceLeft);
+            pctTravelTimeLeftCompressedExponentialFunction.applyAsDouble(pctTravelTimeLeft) *
+                pctHoldSpaceLeftCompressedExponentialFunction.applyAsDouble(pctHoldSpaceLeft);
     }
 
     private double maxTravelTime(Fisher fisher) {

@@ -34,29 +34,29 @@ EPO Abundance:
     destinationDistanceExponent: 1.0
     dolphinSetObservers: !!set {
       }
-    dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
-    dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
+    dolphinSetTimeSinceLastVisitCoefficient: 1.0E-6
+    dolphinSetTimeSinceLastVisitExponent: 2.0
     fadDeploymentObservers: !!set {
       }
-    fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
-    fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
+    fadDeploymentPctActiveFadsLimitCoefficient: 1.0E-6
+    fadDeploymentPctActiveFadsLimitExponent: 2.0
     fadSetObservers: !!set {
       }
     locationValuesFile: inputs/epo/location_values.csv
     nonAssociatedSetObservers: !!set {
       }
-    nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
-    nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
-    numFadsInStockLogisticMidpoint: 5.0
-    numFadsInStockLogisticSteepness: 1.0
-    opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
-    opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
-    pctHoldSpaceLeftLogisticMidpoint: 0.9
-    pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
-    pctSetsRemainingLogisticMidpoint: 0.5
-    pctSetsRemainingLogisticSteepness: 1.0
-    pctTravelTimeLeftLogisticMidpoint: 0.9
-    pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
+    nonAssociatedSetTimeSinceLastVisitCoefficient: 1.0E-6
+    nonAssociatedSetTimeSinceLastVisitExponent: 2.0
+    numFadsInStockCoefficient: 1.0E-6
+    numFadsInStockExponent: 2.0
+    opportunisticFadSetTimeSinceLastVisitCoefficient: 1.0E-6
+    opportunisticFadSetTimeSinceLastVisitExponent: 2.0
+    pctHoldSpaceLeftCoefficient: 1.0E-6
+    pctHoldSpaceLeftExponent: 2.0
+    pctSetsRemainingCoefficient: 1.0
+    pctSetsRemainingExponent: 1000.0
+    pctTravelTimeLeftCoefficient: 1.0E-6
+    pctTravelTimeLeftExponent: 2.0
     successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
@@ -100,28 +100,28 @@ EPO Abundance:
   fishingStrategyFactory:
     attractionWeightsFile: null
     catchSamplersFactory: null
-    dolphinSetActionLogisticMidpoint: 0.1
-    dolphinSetActionLogisticSteepness: 1.0
+    dolphinSetActionCoefficient: 1.0E-6
+    dolphinSetActionExponent: 2.0
     dolphinSetDetectionProbability: 0.1
-    dolphinSetGeneratorLogisticMidpoint: 100000.0
-    dolphinSetGeneratorLogisticSteepness: 1.0
+    dolphinSetGeneratorCoefficient: 1.0E-6
+    dolphinSetGeneratorExponent: 2.0
+    fadDeploymentActionCoefficient: 1.0E-6
     fadDeploymentActionDecayConstant: 1.0
-    fadDeploymentActionLogisticMidpoint: 0.1
-    fadDeploymentActionLogisticSteepness: 1.0
-    fadSetActionLogisticMidpoint: 0.1
-    fadSetActionLogisticSteepness: 1.0
+    fadDeploymentActionExponent: 2.0
+    fadSetActionCoefficient: 0.1
+    fadSetActionExponent: 2.0
     movingThreshold: 0.1
-    nonAssociatedSetActionLogisticMidpoint: 0.1
-    nonAssociatedSetActionLogisticSteepness: 1.0
+    nonAssociatedSetActionCoefficient: 1.0E-6
+    nonAssociatedSetActionExponent: 2.0
     nonAssociatedSetDetectionProbability: 0.1
-    nonAssociatedSetGeneratorLogisticMidpoint: 100000.0
-    nonAssociatedSetGeneratorLogisticSteepness: 1.0
-    opportunisticFadSetActionLogisticMidpoint: 0.1
-    opportunisticFadSetActionLogisticSteepness: 1.0
+    nonAssociatedSetGeneratorCoefficient: 1.0E-6
+    nonAssociatedSetGeneratorExponent: 2.0
+    opportunisticFadSetActionCoefficient: 1.0E-6
+    opportunisticFadSetActionExponent: 2.0
     opportunisticFadSetDetectionProbability: 0.1
+    searchActionCoefficient: 1.0E-6
     searchActionDecayConstant: 1.0
-    searchActionLogisticMidpoint: 0.1
-    searchActionLogisticSteepness: 1.0
+    searchActionExponent: 2.0
     searchBonus: 0.1
     setCompositionWeightsPath: inputs/epo/set_compositions.csv
   locationValuesFilePath: inputs/epo/location_values.csv

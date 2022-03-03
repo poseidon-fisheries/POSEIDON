@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 public class SchoolSetOpportunityGenerator<
@@ -42,7 +42,7 @@ public class SchoolSetOpportunityGenerator<
     A extends SchoolSetAction<B>
     > extends SetOpportunityGenerator<B, A> {
 
-    private final LogisticFunction probabilityFunction;
+    private final CompressedExponentialFunction probabilityFunction;
     private final ActiveOpportunities activeOpportunities;
     private final UnaryOperator<B> targetBiologyMaker;
     private final SchoolSetActionMaker<B, A> actionMaker;
@@ -50,8 +50,8 @@ public class SchoolSetOpportunityGenerator<
     private final Class<B> biologyClass;
 
     public SchoolSetOpportunityGenerator(
-        final double logisticMidpoint,
-        final double logisticSteepness,
+        final double coefficient,
+        final double exponent,
         final Map<Species, Double> weights,
         final Class<B> biologyClass,
         final UnaryOperator<B> targetBiologyMaker,
@@ -60,7 +60,7 @@ public class SchoolSetOpportunityGenerator<
         final DoubleSupplier durationSampler
     ) {
         this(
-            new LogisticFunction(logisticMidpoint, logisticSteepness),
+            new CompressedExponentialFunction(coefficient, exponent),
             weights,
             biologyClass,
             targetBiologyMaker,
@@ -71,7 +71,7 @@ public class SchoolSetOpportunityGenerator<
     }
 
     private SchoolSetOpportunityGenerator(
-        final LogisticFunction probabilityFunction,
+        final CompressedExponentialFunction probabilityFunction,
         final Map<Species, Double> weights,
         final Class<B> biologyClass,
         final UnaryOperator<B> targetBiologyMaker,

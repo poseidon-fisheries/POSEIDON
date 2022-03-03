@@ -88,7 +88,6 @@ public class AttractionField implements FisherStartable {
         if (netAttraction.length() > 0) {
             netAttraction.normalize().multiplyIn(globalModulator.modulate(fisher));
         }
-
         return new Double2D(netAttraction);
 
     }

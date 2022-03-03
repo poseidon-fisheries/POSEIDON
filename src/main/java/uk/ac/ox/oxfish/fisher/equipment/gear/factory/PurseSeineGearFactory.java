@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.Double.MAX_VALUE;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
@@ -47,7 +46,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLoca
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -103,49 +102,49 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
-    private double pctHoldSpaceLeftLogisticMidpoint = 0.9;
-    private double pctHoldSpaceLeftLogisticSteepness = MAX_VALUE;
-    private double pctTravelTimeLeftLogisticMidpoint = 0.9;
-    private double pctTravelTimeLeftLogisticSteepness = MAX_VALUE;
-    private double pctSetsRemainingLogisticMidpoint = 0.5; // not calibrated for now
-    private double pctSetsRemainingLogisticSteepness = 1; // not calibrated for now
-    private double opportunisticFadSetTimeSinceLastVisitLogisticMidpoint = 5;
-    private double opportunisticFadSetTimeSinceLastVisitLogisticSteepness = 1;
-    private double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint = 5;
-    private double nonAssociatedSetTimeSinceLastVisitLogisticSteepness = 1;
-    private double dolphinSetTimeSinceLastVisitLogisticMidpoint = 5;
-    private double dolphinSetTimeSinceLastVisitLogisticSteepness = 1;
-    private double fadDeploymentPctActiveFadsLimitLogisticMidpoint = 0.5;
-    private double fadDeploymentPctActiveFadsLimitLogisticSteepness = 1;
+    private double pctHoldSpaceLeftCoefficient = 1E-6;
+    private double pctHoldSpaceLeftExponent = 2;
+    private double pctTravelTimeLeftCoefficient = 1E-6;
+    private double pctTravelTimeLeftExponent = 2;
+    private double pctSetsRemainingCoefficient = 2; // not calibrated for now
+    private double pctSetsRemainingExponent = 1000; // not calibrated for now
+    private double opportunisticFadSetTimeSinceLastVisitCoefficient = 1E-6;
+    private double opportunisticFadSetTimeSinceLastVisitExponent = 2;
+    private double nonAssociatedSetTimeSinceLastVisitCoefficient = 1E-6;
+    private double nonAssociatedSetTimeSinceLastVisitExponent = 2;
+    private double dolphinSetTimeSinceLastVisitCoefficient = 1E-6;
+    private double dolphinSetTimeSinceLastVisitExponent = 2;
+    private double fadDeploymentPctActiveFadsLimitCoefficient = 1E-6;
+    private double fadDeploymentPctActiveFadsLimitExponent = 2;
     private double actionDistanceExponent = 1;
     private double destinationDistanceExponent = 1;
-    private double numFadsInStockLogisticMidpoint = 5;
-    private double numFadsInStockLogisticSteepness = 1;
+    private double numFadsInStockCoefficient = 1E-6;
+    private double numFadsInStockExponent = 2;
 
-    AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory;
+    private FadInitializerFactory<B, F> fadInitializerFactory;
 
-    public AlgorithmFactory<FadInitializer<B, F>> getFadInitializer() {
+    public FadInitializerFactory<B, F> getFadInitializer() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(final AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory) {
+    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
-    public double getNumFadsInStockLogisticMidpoint() {
-        return numFadsInStockLogisticMidpoint;
+    public double getNumFadsInStockCoefficient() {
+        return numFadsInStockCoefficient;
     }
 
-    public void setNumFadsInStockLogisticMidpoint(final double numFadsInStockLogisticMidpoint) {
-        this.numFadsInStockLogisticMidpoint = numFadsInStockLogisticMidpoint;
+    public void setNumFadsInStockCoefficient(final double numFadsInStockCoefficient) {
+        this.numFadsInStockCoefficient = numFadsInStockCoefficient;
     }
 
-    public double getNumFadsInStockLogisticSteepness() {
-        return numFadsInStockLogisticSteepness;
+    public double getNumFadsInStockExponent() {
+        return numFadsInStockExponent;
     }
 
-    public void setNumFadsInStockLogisticSteepness(final double numFadsInStockLogisticSteepness) {
-        this.numFadsInStockLogisticSteepness = numFadsInStockLogisticSteepness;
+    public void setNumFadsInStockExponent(final double numFadsInStockExponent) {
+        this.numFadsInStockExponent = numFadsInStockExponent;
     }
 
     public double getActionDistanceExponent() {
@@ -164,22 +163,22 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.destinationDistanceExponent = destinationDistanceExponent;
     }
 
-    public double getPctSetsRemainingLogisticMidpoint() {
-        return pctSetsRemainingLogisticMidpoint;
+    public double getPctSetsRemainingCoefficient() {
+        return pctSetsRemainingCoefficient;
     }
 
-    public void setPctSetsRemainingLogisticMidpoint(final double pctSetsRemainingLogisticMidpoint) {
-        this.pctSetsRemainingLogisticMidpoint = pctSetsRemainingLogisticMidpoint;
+    public void setPctSetsRemainingCoefficient(final double pctSetsRemainingCoefficient) {
+        this.pctSetsRemainingCoefficient = pctSetsRemainingCoefficient;
     }
 
-    public double getPctSetsRemainingLogisticSteepness() {
-        return pctSetsRemainingLogisticSteepness;
+    public double getPctSetsRemainingExponent() {
+        return pctSetsRemainingExponent;
     }
 
-    public void setPctSetsRemainingLogisticSteepness(
-        final double pctSetsRemainingLogisticSteepness
+    public void setPctSetsRemainingExponent(
+        final double pctSetsRemainingExponent
     ) {
-        this.pctSetsRemainingLogisticSteepness = pctSetsRemainingLogisticSteepness;
+        this.pctSetsRemainingExponent = pctSetsRemainingExponent;
     }
 
     @SuppressWarnings("rawtypes")
@@ -196,136 +195,136 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     }
 
     @SuppressWarnings("unused")
-    public double getPctHoldSpaceLeftLogisticMidpoint() {
-        return pctHoldSpaceLeftLogisticMidpoint;
+    public double getPctHoldSpaceLeftCoefficient() {
+        return pctHoldSpaceLeftCoefficient;
     }
 
     @SuppressWarnings("unused")
-    public void setPctHoldSpaceLeftLogisticMidpoint(final double pctHoldSpaceLeftLogisticMidpoint) {
-        this.pctHoldSpaceLeftLogisticMidpoint = pctHoldSpaceLeftLogisticMidpoint;
+    public void setPctHoldSpaceLeftCoefficient(final double pctHoldSpaceLeftCoefficient) {
+        this.pctHoldSpaceLeftCoefficient = pctHoldSpaceLeftCoefficient;
     }
 
-    public double getPctHoldSpaceLeftLogisticSteepness() {
-        return pctHoldSpaceLeftLogisticSteepness;
+    public double getPctHoldSpaceLeftExponent() {
+        return pctHoldSpaceLeftExponent;
     }
 
-    public void setPctHoldSpaceLeftLogisticSteepness(
-        final double pctHoldSpaceLeftLogisticSteepness
+    public void setPctHoldSpaceLeftExponent(
+        final double pctHoldSpaceLeftExponent
     ) {
-        this.pctHoldSpaceLeftLogisticSteepness = pctHoldSpaceLeftLogisticSteepness;
+        this.pctHoldSpaceLeftExponent = pctHoldSpaceLeftExponent;
     }
 
-    public double getPctTravelTimeLeftLogisticMidpoint() {
-        return pctTravelTimeLeftLogisticMidpoint;
+    public double getPctTravelTimeLeftCoefficient() {
+        return pctTravelTimeLeftCoefficient;
     }
 
     @SuppressWarnings("unused")
-    public void setPctTravelTimeLeftLogisticMidpoint(
-        final double pctTravelTimeLeftLogisticMidpoint
+    public void setPctTravelTimeLeftCoefficient(
+        final double pctTravelTimeLeftCoefficient
     ) {
-        this.pctTravelTimeLeftLogisticMidpoint = pctTravelTimeLeftLogisticMidpoint;
+        this.pctTravelTimeLeftCoefficient = pctTravelTimeLeftCoefficient;
     }
 
-    public double getPctTravelTimeLeftLogisticSteepness() {
-        return pctTravelTimeLeftLogisticSteepness;
+    public double getPctTravelTimeLeftExponent() {
+        return pctTravelTimeLeftExponent;
     }
 
-    public void setPctTravelTimeLeftLogisticSteepness(
-        final double pctTravelTimeLeftLogisticSteepness
+    public void setPctTravelTimeLeftExponent(
+        final double pctTravelTimeLeftExponent
     ) {
-        this.pctTravelTimeLeftLogisticSteepness = pctTravelTimeLeftLogisticSteepness;
+        this.pctTravelTimeLeftExponent = pctTravelTimeLeftExponent;
     }
 
-    public double getFadDeploymentPctActiveFadsLimitLogisticMidpoint() {
-        return fadDeploymentPctActiveFadsLimitLogisticMidpoint;
+    public double getFadDeploymentPctActiveFadsLimitCoefficient() {
+        return fadDeploymentPctActiveFadsLimitCoefficient;
     }
 
-    public void setFadDeploymentPctActiveFadsLimitLogisticMidpoint(
-        final double fadDeploymentPctActiveFadsLimitLogisticMidpoint
+    public void setFadDeploymentPctActiveFadsLimitCoefficient(
+        final double fadDeploymentPctActiveFadsLimitCoefficient
     ) {
-        this.fadDeploymentPctActiveFadsLimitLogisticMidpoint =
-            fadDeploymentPctActiveFadsLimitLogisticMidpoint;
+        this.fadDeploymentPctActiveFadsLimitCoefficient =
+            fadDeploymentPctActiveFadsLimitCoefficient;
     }
 
-    public double getFadDeploymentPctActiveFadsLimitLogisticSteepness() {
-        return fadDeploymentPctActiveFadsLimitLogisticSteepness;
+    public double getFadDeploymentPctActiveFadsLimitExponent() {
+        return fadDeploymentPctActiveFadsLimitExponent;
     }
 
-    public void setFadDeploymentPctActiveFadsLimitLogisticSteepness(
-        final double fadDeploymentPctActiveFadsLimitLogisticSteepness
+    public void setFadDeploymentPctActiveFadsLimitExponent(
+        final double fadDeploymentPctActiveFadsLimitExponent
     ) {
-        this.fadDeploymentPctActiveFadsLimitLogisticSteepness =
-            fadDeploymentPctActiveFadsLimitLogisticSteepness;
+        this.fadDeploymentPctActiveFadsLimitExponent =
+            fadDeploymentPctActiveFadsLimitExponent;
     }
 
     @SuppressWarnings("unused")
-    public double getOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint() {
-        return opportunisticFadSetTimeSinceLastVisitLogisticMidpoint;
+    public double getOpportunisticFadSetTimeSinceLastVisitCoefficient() {
+        return opportunisticFadSetTimeSinceLastVisitCoefficient;
     }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitLogisticMidpoint(
-        final double opportunisticFadSetTimeSinceLastVisitLogisticMidpoint
+    public void setOpportunisticFadSetTimeSinceLastVisitCoefficient(
+        final double opportunisticFadSetTimeSinceLastVisitCoefficient
     ) {
-        this.opportunisticFadSetTimeSinceLastVisitLogisticMidpoint =
-            opportunisticFadSetTimeSinceLastVisitLogisticMidpoint;
+        this.opportunisticFadSetTimeSinceLastVisitCoefficient =
+            opportunisticFadSetTimeSinceLastVisitCoefficient;
     }
 
-    public double getOpportunisticFadSetTimeSinceLastVisitLogisticSteepness() {
-        return opportunisticFadSetTimeSinceLastVisitLogisticSteepness;
+    public double getOpportunisticFadSetTimeSinceLastVisitExponent() {
+        return opportunisticFadSetTimeSinceLastVisitExponent;
     }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitLogisticSteepness(
-        final double opportunisticFadSetTimeSinceLastVisitLogisticSteepness
+    public void setOpportunisticFadSetTimeSinceLastVisitExponent(
+        final double opportunisticFadSetTimeSinceLastVisitExponent
     ) {
-        this.opportunisticFadSetTimeSinceLastVisitLogisticSteepness =
-            opportunisticFadSetTimeSinceLastVisitLogisticSteepness;
+        this.opportunisticFadSetTimeSinceLastVisitExponent =
+            opportunisticFadSetTimeSinceLastVisitExponent;
     }
 
     @SuppressWarnings("unused")
-    public double getNonAssociatedSetTimeSinceLastVisitLogisticMidpoint() {
-        return nonAssociatedSetTimeSinceLastVisitLogisticMidpoint;
+    public double getNonAssociatedSetTimeSinceLastVisitCoefficient() {
+        return nonAssociatedSetTimeSinceLastVisitCoefficient;
     }
 
-    public void setNonAssociatedSetTimeSinceLastVisitLogisticMidpoint(
-        final double nonAssociatedSetTimeSinceLastVisitLogisticMidpoint
+    public void setNonAssociatedSetTimeSinceLastVisitCoefficient(
+        final double nonAssociatedSetTimeSinceLastVisitCoefficient
     ) {
-        this.nonAssociatedSetTimeSinceLastVisitLogisticMidpoint =
-            nonAssociatedSetTimeSinceLastVisitLogisticMidpoint;
+        this.nonAssociatedSetTimeSinceLastVisitCoefficient =
+            nonAssociatedSetTimeSinceLastVisitCoefficient;
     }
 
-    public double getNonAssociatedSetTimeSinceLastVisitLogisticSteepness() {
-        return nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
+    public double getNonAssociatedSetTimeSinceLastVisitExponent() {
+        return nonAssociatedSetTimeSinceLastVisitExponent;
     }
 
-    public void setNonAssociatedSetTimeSinceLastVisitLogisticSteepness(
-        final double nonAssociatedSetTimeSinceLastVisitLogisticSteepness
+    public void setNonAssociatedSetTimeSinceLastVisitExponent(
+        final double nonAssociatedSetTimeSinceLastVisitExponent
     ) {
-        this.nonAssociatedSetTimeSinceLastVisitLogisticSteepness =
-            nonAssociatedSetTimeSinceLastVisitLogisticSteepness;
+        this.nonAssociatedSetTimeSinceLastVisitExponent =
+            nonAssociatedSetTimeSinceLastVisitExponent;
     }
 
     @SuppressWarnings("unused")
-    public double getDolphinSetTimeSinceLastVisitLogisticMidpoint() {
-        return dolphinSetTimeSinceLastVisitLogisticMidpoint;
+    public double getDolphinSetTimeSinceLastVisitCoefficient() {
+        return dolphinSetTimeSinceLastVisitCoefficient;
     }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetTimeSinceLastVisitLogisticMidpoint(
-        final double dolphinSetTimeSinceLastVisitLogisticMidpoint
+    public void setDolphinSetTimeSinceLastVisitCoefficient(
+        final double dolphinSetTimeSinceLastVisitCoefficient
     ) {
-        this.dolphinSetTimeSinceLastVisitLogisticMidpoint =
-            dolphinSetTimeSinceLastVisitLogisticMidpoint;
+        this.dolphinSetTimeSinceLastVisitCoefficient =
+            dolphinSetTimeSinceLastVisitCoefficient;
     }
 
-    public double getDolphinSetTimeSinceLastVisitLogisticSteepness() {
-        return dolphinSetTimeSinceLastVisitLogisticSteepness;
+    public double getDolphinSetTimeSinceLastVisitExponent() {
+        return dolphinSetTimeSinceLastVisitExponent;
     }
 
-    public void setDolphinSetTimeSinceLastVisitLogisticSteepness(
-        final double dolphinSetTimeSinceLastVisitLogisticSteepness
+    public void setDolphinSetTimeSinceLastVisitExponent(
+        final double dolphinSetTimeSinceLastVisitExponent
     ) {
-        this.dolphinSetTimeSinceLastVisitLogisticSteepness =
-            dolphinSetTimeSinceLastVisitLogisticSteepness;
+        this.dolphinSetTimeSinceLastVisitExponent =
+            dolphinSetTimeSinceLastVisitExponent;
     }
 
     @SuppressWarnings("unused")
@@ -356,7 +355,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.actionSpecificRegulations = actionSpecificRegulations;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public DoubleParameter getSuccessfulSetProbability() {
         return successfulSetProbability;
     }
@@ -418,7 +417,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                 .collect(toList())
         );
 
-        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new  FadManager<>(
+        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
             (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
@@ -434,10 +433,10 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     Stream<AttractionField> attractionFields() {
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
-                pctHoldSpaceLeftLogisticMidpoint,
-                pctHoldSpaceLeftLogisticSteepness,
-                pctSetsRemainingLogisticMidpoint,
-                pctSetsRemainingLogisticSteepness
+                pctHoldSpaceLeftCoefficient,
+                pctHoldSpaceLeftExponent,
+                pctSetsRemainingCoefficient,
+                pctSetsRemainingExponent
             );
         return Stream.of(
             new ActionAttractionField(
@@ -454,8 +453,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    opportunisticFadSetTimeSinceLastVisitLogisticMidpoint,
-                    opportunisticFadSetTimeSinceLastVisitLogisticSteepness
+                    opportunisticFadSetTimeSinceLastVisitCoefficient,
+                    opportunisticFadSetTimeSinceLastVisitExponent
                 ),
                 globalSetAttractionModulator,
                 OpportunisticFadSetAction.class,
@@ -468,8 +467,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    nonAssociatedSetTimeSinceLastVisitLogisticMidpoint,
-                    nonAssociatedSetTimeSinceLastVisitLogisticSteepness
+                    nonAssociatedSetTimeSinceLastVisitCoefficient,
+                    nonAssociatedSetTimeSinceLastVisitExponent
                 ),
                 globalSetAttractionModulator,
                 NonAssociatedSetAction.class,
@@ -482,8 +481,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    dolphinSetTimeSinceLastVisitLogisticMidpoint,
-                    dolphinSetTimeSinceLastVisitLogisticSteepness
+                    dolphinSetTimeSinceLastVisitCoefficient,
+                    dolphinSetTimeSinceLastVisitExponent
                 ),
                 globalSetAttractionModulator,
                 DolphinSetAction.class,
@@ -497,10 +496,10 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                 ),
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 new GlobalDeploymentAttractionModulator(
-                    fadDeploymentPctActiveFadsLimitLogisticMidpoint,
-                    fadDeploymentPctActiveFadsLimitLogisticSteepness,
-                    numFadsInStockLogisticMidpoint,
-                    numFadsInStockLogisticSteepness
+                    fadDeploymentPctActiveFadsLimitCoefficient,
+                    fadDeploymentPctActiveFadsLimitExponent,
+                    numFadsInStockCoefficient,
+                    numFadsInStockExponent
                 ),
                 FadDeploymentAction.class,
                 actionDistanceExponent,
@@ -508,10 +507,10 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             ),
             new PortAttractionField(
                 new PortAttractionModulator(
-                    pctHoldSpaceLeftLogisticMidpoint,
-                    pctHoldSpaceLeftLogisticSteepness,
-                    pctTravelTimeLeftLogisticMidpoint,
-                    pctTravelTimeLeftLogisticSteepness
+                    pctHoldSpaceLeftCoefficient,
+                    pctHoldSpaceLeftExponent,
+                    pctTravelTimeLeftCoefficient,
+                    pctTravelTimeLeftExponent
                 ),
                 actionDistanceExponent,
                 destinationDistanceExponent

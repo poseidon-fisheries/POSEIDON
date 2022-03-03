@@ -1,8 +1,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogisticFunction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -14,14 +16,14 @@ public class GlobalDeploymentAttractionModulator implements GlobalAttractionModu
     private final DoubleUnaryOperator numFadsInStockModulationFunction;
 
     public GlobalDeploymentAttractionModulator(
-        final double pctActiveFadsLimitLogisticMidpoint,
-        final double pctActiveFadsLimitLogisticSteepness,
-        final double numFadsInStockLogisticMidpoint,
-        final double numFadsInStockLogisticSteepness
+        final double pctActiveFadsLimitCoefficient,
+        final double pctActiveFadsLimitExponent,
+        final double numFadsInStockCoefficient,
+        final double numFadsInStockExponent
     ) {
         this(
-            new LogisticFunction(pctActiveFadsLimitLogisticMidpoint, pctActiveFadsLimitLogisticSteepness),
-            new LogisticFunction(numFadsInStockLogisticMidpoint, numFadsInStockLogisticSteepness)
+            new CompressedExponentialFunction(pctActiveFadsLimitCoefficient, pctActiveFadsLimitExponent),
+            new CompressedExponentialFunction(numFadsInStockCoefficient, numFadsInStockExponent)
         );
     }
 
@@ -40,7 +42,8 @@ public class GlobalDeploymentAttractionModulator implements GlobalAttractionModu
     }
 
     private static double getPctActiveFads(final Fisher fisher) {
-        final FadManager fadManager = getFadManager(fisher);
+        final FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager =
+            FadManager.getFadManager(fisher);
         return fadManager
             .getActionSpecificRegulations()
             .getActiveFadLimits()
