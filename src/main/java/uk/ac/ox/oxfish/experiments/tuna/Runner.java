@@ -19,12 +19,35 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider.writeRows;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -35,22 +58,6 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.*;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider.writeRows;
-
 public final class Runner<S extends Scenario> {
 
     private static final String YEARLY_DATA_FILENAME = "yearly_data.csv";
@@ -58,20 +65,24 @@ public final class Runner<S extends Scenario> {
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
 
-    private final AtomicBoolean overwriteFiles = new AtomicBoolean(true);
+    private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
 
     private final Supplier<S> scenarioSupplier;
     private final Path outputPath;
-    private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>> rowProviderFactories =
+    private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>>
+        rowProviderFactories =
         HashMultimap.create();
     private boolean parallel = true;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
     private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
-    private Consumer<State> beforeStartConsumer = __ -> {};
-    private Consumer<State> afterStartConsumer = __ -> {};
-    private Consumer<State> afterStepConsumer = __ -> {};
-    private Consumer<State> afterRunConsumer = __ -> {};
-
+    private Consumer<State> beforeStartConsumer = __ -> {
+    };
+    private Consumer<State> afterStartConsumer = __ -> {
+    };
+    private Consumer<State> afterStepConsumer = __ -> {
+    };
+    private Consumer<State> afterRunConsumer = __ -> {
+    };
     public Runner(
         final Supplier<S> scenarioSupplier,
         final Path outputPath
@@ -103,6 +114,10 @@ public final class Runner<S extends Scenario> {
                 throw new IllegalStateException("Error while reading file: " + scenarioPath, e);
             }
         };
+    }
+
+    public Path getOutputPath() {
+        return outputPath;
     }
 
     @SuppressWarnings("unused")
@@ -147,11 +162,20 @@ public final class Runner<S extends Scenario> {
     }
 
     @SuppressWarnings("SameParameterValue")
-    void run(final int numYearsToRun) { run(numYearsToRun, 1); }
+    void run(final int numYearsToRun) {
+        run(numYearsToRun, 1);
+    }
 
     public void run(final int numYearsToRun, final int numberOfRunsPerPolicy) {
+        run(numYearsToRun, numberOfRunsPerPolicy, new AtomicInteger(1));
+    }
+
+    public void run(
+        final int numYearsToRun,
+        final int numberOfRunsPerPolicy,
+        final AtomicInteger runCounter
+    ) {
         final int numRuns = policies.size() * numberOfRunsPerPolicy;
-        final AtomicInteger runCounter = new AtomicInteger(1);
         final IntStream range = range(0, numberOfRunsPerPolicy);
         (parallel ? range.parallel() : range).forEach(i ->
             (parallel ? policies.parallelStream() : policies.stream()).forEach(policy -> {
@@ -189,12 +213,14 @@ public final class Runner<S extends Scenario> {
     }
 
     private Multimap<Path, RowProvider> makeRowProviders(final State state) {
-        final ImmutableMultimap.Builder<Path, RowProvider> rowProviders = ImmutableMultimap.builder();
+        final ImmutableMultimap.Builder<Path, RowProvider> rowProviders =
+            ImmutableMultimap.builder();
         rowProviders.put(outputPath.resolve(RUNS_FILENAME), state);
         rowProviderFactories.forEach((path, factory) ->
             factory.apply(state.model).forEach(rowProvider -> {
-                if (rowProvider instanceof Startable)
+                if (rowProvider instanceof Startable) {
                     state.model.registerStartable((Startable) rowProvider);
+                }
                 rowProviders.put(path, rowProvider);
             })
         );
@@ -206,10 +232,13 @@ public final class Runner<S extends Scenario> {
         final Multimap<Path, RowProvider> rowProviders
     ) {
         synchronized (overwriteFiles) {
-            final boolean b = overwriteFiles.getAndSet(false);
             rowProviders.asMap().forEach((outputPath, providers) -> {
+                final boolean b = overwriteFiles
+                    .computeIfAbsent(outputPath, __ -> new AtomicBoolean(true))
+                    .getAndSet(false);
                 try (final Writer fileWriter = new FileWriter(outputPath.toFile(), !b)) {
-                    final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
+                    final CsvWriter csvWriter =
+                        new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
                     writeRows(csvWriter, providers, runNumber, b);
                 } catch (final IOException e) {
                     throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
@@ -230,7 +259,10 @@ public final class Runner<S extends Scenario> {
     Runner<S> requestFisherYearlyData() {
         return registerRowProviders(FISHER_YEARLY_DATA_FILENAME, fishState ->
             fishState.getFishers().stream()
-                .map(fisher -> new TidyFisherYearlyData(fisher.getYearlyData(), fisher.getTags().get(0)))
+                .map(fisher -> new TidyFisherYearlyData(
+                    fisher.getYearlyData(),
+                    fisher.getTags().get(0)
+                ))
                 .collect(toImmutableList())
         );
     }
@@ -298,21 +330,33 @@ public final class Runner<S extends Scenario> {
             yearDigits = (int) (Math.log10(numYearsToRun) + 1);
         }
 
-        public Policy<? super S> getPolicy() { return policy; }
+        public Policy<? super S> getPolicy() {
+            return policy;
+        }
 
-        public FishState getModel() { return model; }
-
-        @SuppressWarnings("unused")
-        public int getRunNumber() { return runNumber; }
-
-        @SuppressWarnings("unused")
-        public int getNumRuns() { return numRuns; }
+        public FishState getModel() {
+            return model;
+        }
 
         @SuppressWarnings("unused")
-        public int getNumYearsToRun() { return numYearsToRun; }
+        public int getRunNumber() {
+            return runNumber;
+        }
 
         @SuppressWarnings("unused")
-        public LocalDateTime getStartTime() { return startTime; }
+        public int getNumRuns() {
+            return numRuns;
+        }
+
+        @SuppressWarnings("unused")
+        public int getNumYearsToRun() {
+            return numYearsToRun;
+        }
+
+        @SuppressWarnings("unused")
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
 
         void printStep() {
             System.out.printf(
@@ -330,14 +374,22 @@ public final class Runner<S extends Scenario> {
         }
 
         @Override
-        public List<String> getHeaders() { return ImmutableList.of("policy", "run_start", "run_end"); }
+        public List<String> getHeaders() {
+            return ImmutableList.of("policy", "run_start", "run_end");
+        }
 
         @Override
         public Iterable<? extends Collection<?>> getRows() {
-            return ImmutableList.of(ImmutableList.of(policy.getName(), startTime, LocalDateTime.now()));
+            return ImmutableList.of(ImmutableList.of(
+                policy.getName(),
+                startTime,
+                LocalDateTime.now()
+            ));
         }
 
-        public S getScenario() { return scenario; }
+        public S getScenario() {
+            return scenario;
+        }
 
     }
 

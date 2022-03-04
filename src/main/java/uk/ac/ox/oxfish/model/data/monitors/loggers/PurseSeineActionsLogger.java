@@ -30,11 +30,12 @@ import java.util.List;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -59,7 +60,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     private final Collection<ActionObserver<? extends PurseSeinerAction>> observers =
         ImmutableList.of(
             new ActionObserver<>(FadDeploymentAction.class),
-            new ActionObserver<>(AbstractFadSetAction.class),
+            new ActionObserver<>(FadSetAction.class),
+            new ActionObserver<>(OpportunisticFadSetAction.class),
             new ActionObserver<>(NonAssociatedSetAction.class),
             new ActionObserver<>(DolphinSetAction.class)
         );

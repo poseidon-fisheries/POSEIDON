@@ -14,13 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 
 public class TunaEvaluator implements Runnable {
 
@@ -28,16 +28,43 @@ public class TunaEvaluator implements Runnable {
         System.getProperty("user.home"),
         "workspace", "tuna", "abundance", "calibration", "outputs", "nicolas", "2021-12-07_19.00.35"
     );
-
     private final Path calibrationFilePath;
     private final double[] solution;
+    private final GenericOptimization optimization;
+    private final Runner<Scenario> runner;
     private int numRuns = getRuntime().availableProcessors();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
     TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
+
         this.calibrationFilePath = calibrationFilePath;
         this.solution = solution.clone();
+        optimization = GenericOptimization.fromFile(calibrationFilePath);
+
+        runner = new Runner<>(
+            () -> makeScenario(optimization, solution),
+            calibrationFilePath.getParent()
+        ).registerRowProvider(
+            "evaluation_results.csv",
+            fishState -> new EvaluationResultsRowProvider(fishState, optimization)
+        );
+
+    }
+
+    private static Scenario makeScenario(
+        final GenericOptimization optimization,
+        final double[] optimalParameters
+    ) {
+        try {
+            return GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+        } catch (final FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -66,24 +93,7 @@ public class TunaEvaluator implements Runnable {
         }
 
         final double[] solution = solutionBuilder.build().toArray();
-        final Consumer<Scenario> scenarioConsumer = scenario -> {
-            final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
-            final PurseSeinerBiomassFishingStrategyFactory fishingStrategy =
-                (PurseSeinerBiomassFishingStrategyFactory) epoBiomassScenario.getFisherDefinition()
-                    .getFishingStrategy();
-            //fishingStrategy.setFadDeploymentActionLogisticMidpoint(1);
-//            ((PurseSeineGearFactory) tunaScenario
-//                .getFisherDefinition()
-//                .getGear())
-//                .getFadInitializerFactory().setAttractionRates(ImmutableMap.of(
-//                "Bigeye tuna", new FixedDoubleParameter(0.03),
-//                "Yellowfin tuna", new FixedDoubleParameter(0.07),
-//                "Skipjack tuna", new FixedDoubleParameter(0.1)
-//            ));
-        };
-        new TunaEvaluator(calibrationFilePath, solution)
-            //.setScenarioConsumer(scenarioConsumer)
-            .run();
+        new TunaEvaluator(calibrationFilePath, solution).run();
 
     }
 
@@ -105,18 +115,6 @@ public class TunaEvaluator implements Runnable {
     @Override
     public void run() {
 
-        final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
-
-        final Runner<Scenario> runner =
-            new Runner<>(
-                () -> makeScenario(optimization, solution),
-                calibrationFilePath.getParent()
-            )
-                .registerRowProvider(
-                    "evaluation_results.csv",
-                    fishState -> new EvaluationResultsRowProvider(fishState, optimization)
-                );
-
         runner.writeScenarioToFile("calibrated_scenario.yaml");
 
         scenarioConsumer.ifPresent(consumer ->
@@ -125,26 +123,18 @@ public class TunaEvaluator implements Runnable {
             ))
         );
 
-        runner.run(optimization.getSimulatedYears(), numRuns);
+        final AtomicInteger runCounter = new AtomicInteger(1);
+        runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
+        runner.registerRowProvider("actions.csv", PurseSeineActionsLogger::new);
+        runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }
 
-    private static Scenario makeScenario(
-        final GenericOptimization optimization,
-        final double[] optimalParameters
-    ) {
-        try {
-            return GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-        } catch (final FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
+    public Runner<Scenario> getRunner() {
+        return runner;
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public TunaEvaluator setScenarioConsumer(final Consumer<Scenario> scenarioConsumer) {
         this.scenarioConsumer = Optional.ofNullable(scenarioConsumer);
         return this;
