@@ -19,8 +19,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-
+import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.Nullable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -44,15 +43,14 @@ import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
  */
 public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implements Locatable {
 
+    private static final AtomicLong idCounter = new AtomicLong(0);
+    private final long id = idCounter.getAndIncrement();
+
     private final FadManager<B, F> owner;
     //it is possible for the FAD to be exogenously made
-    private @Nullable final TripRecord tripDeployed;
+    @Nullable
+    private final TripRecord tripDeployed;
     private final B biology;
-
-    public FishAttractor<B, F> getFishAttractor() {
-        return fishAttractor;
-    }
-
     private final FishAttractor<B, F> fishAttractor;
     private final double fishReleaseProbability;
     private final int stepDeployed;
@@ -60,16 +58,16 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     private final double totalCarryingCapacity;
 
     public Fad(
-            final FadManager<B, F> owner,
-            final B biology,
-            final FishAttractor<B, F> fishAttractor,
-            final double fishReleaseProbability,
-            final int stepDeployed,
-            final Int2D locationDeployed,
-            final double totalCarryingCapacity
+        final FadManager<B, F> owner,
+        final B biology,
+        final FishAttractor<B, F> fishAttractor,
+        final double fishReleaseProbability,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final double totalCarryingCapacity
     ) {
         this.owner = owner;
-        this.tripDeployed = owner.getFisher() != null ?  owner.getFisher().getCurrentTrip() : null;
+        this.tripDeployed = owner.getFisher() != null ? owner.getFisher().getCurrentTrip() : null;
         this.biology = biology;
         this.fishAttractor = fishAttractor;
         this.fishReleaseProbability = fishReleaseProbability;
@@ -78,6 +76,15 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         this.totalCarryingCapacity = totalCarryingCapacity;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public FishAttractor<B, F> getFishAttractor() {
+        return fishAttractor;
+    }
+
+    @Nullable
     public TripRecord getTripDeployed() {
         return tripDeployed;
     }
@@ -91,9 +98,9 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     }
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final LocalBiology seaTileBiology,
-            final MersenneTwisterFast rng
+        final Iterable<Species> allSpecies,
+        final LocalBiology seaTileBiology,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies, seaTileBiology);
@@ -103,8 +110,8 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     public abstract void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology);
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final MersenneTwisterFast rng
+        final Iterable<Species> allSpecies,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies);
@@ -115,8 +122,8 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
 
     public SeaTile getLocation() {
         return getOwner().getFadMap()
-                .getFadTile(this)
-                .orElseThrow(() -> new RuntimeException(this + " not on map!"));
+            .getFadTile(this)
+            .orElseThrow(() -> new RuntimeException(this + " not on map!"));
     }
 
     public FadManager<B, F> getOwner() {
@@ -132,19 +139,22 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     }
 
     public void aggregateFish(
-            final B seaTileBiology,
-            final GlobalBiology globalBiology
+        final B seaTileBiology,
+        final GlobalBiology globalBiology
     ) {
         // add them to the FAD biology
         final Catch catchObject = addCatchesToFad(seaTileBiology, globalBiology);
-        if(catchObject!=null)
+        if (catchObject != null) {
             // and remove the catches from the underlying biology:
             seaTileBiology.reactToThisAmountOfBiomassBeingFished(
-                    catchObject,
-                    catchObject,
-                    globalBiology
+                catchObject,
+                catchObject,
+                globalBiology
             );
+        }
     }
+
+    abstract Catch addCatchesToFad(B seaTileBiology, GlobalBiology globalBiology);
 
     /* This needs different implementations in the subclasses because {@link LocalBiology}
      * doesn't have a {@code getBiomass()} method even if both {@link BiomassLocalBiology}
@@ -155,6 +165,4 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     public double getTotalCarryingCapacity() {
         return totalCarryingCapacity;
     }
-
-    abstract Catch addCatchesToFad(B seaTileBiology, GlobalBiology globalBiology);
 }

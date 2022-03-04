@@ -83,6 +83,7 @@ public final class Runner<S extends Scenario> {
     };
     private Consumer<State> afterRunConsumer = __ -> {
     };
+
     public Runner(
         final Supplier<S> scenarioSupplier,
         final Path outputPath
@@ -187,12 +188,13 @@ public final class Runner<S extends Scenario> {
                 afterStartConsumer.accept(state);
                 final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
                 do {
+                    writeOutputs(runNumber, rowProviders, false);
                     state.printStep();
                     state.model.schedule.step(state.model);
                     afterStepConsumer.accept(state);
                 } while (state.model.getYear() < numYearsToRun);
                 afterRunConsumer.accept(state);
-                writeOutputs(runNumber, rowProviders);
+                writeOutputs(runNumber, rowProviders, true);
             })
         );
     }
@@ -229,22 +231,30 @@ public final class Runner<S extends Scenario> {
 
     private void writeOutputs(
         final int runNumber,
-        final Multimap<Path, RowProvider> rowProviders
+        final Multimap<Path, RowProvider> rowProviders,
+        final boolean isFinalStep
     ) {
-        synchronized (overwriteFiles) {
-            rowProviders.asMap().forEach((outputPath, providers) -> {
-                final boolean b = overwriteFiles
-                    .computeIfAbsent(outputPath, __ -> new AtomicBoolean(true))
-                    .getAndSet(false);
-                try (final Writer fileWriter = new FileWriter(outputPath.toFile(), !b)) {
-                    final CsvWriter csvWriter =
-                        new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
-                    writeRows(csvWriter, providers, runNumber, b);
-                } catch (final IOException e) {
-                    throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
+        rowProviders.asMap().forEach((outputPath, providers) -> {
+            final Collection<RowProvider> activeProviders = isFinalStep
+                ? providers
+                : providers.stream()
+                    .filter(RowProvider::isEveryStep)
+                    .collect(toImmutableList());
+            if (!activeProviders.isEmpty()) {
+                synchronized (overwriteFiles) {
+                    final boolean overwrite = overwriteFiles
+                        .computeIfAbsent(outputPath, __ -> new AtomicBoolean(true))
+                        .getAndSet(false);
+                    try (final Writer fileWriter = new FileWriter(outputPath.toFile(), !overwrite)) {
+                        final CsvWriter csvWriter =
+                            new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
+                        writeRows(csvWriter, activeProviders, runNumber, overwrite);
+                    } catch (final IOException e) {
+                        throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
+                    }
                 }
-            });
-        }
+            }
+        });
     }
 
     public void writeScenarioToFile(final String outputFileName) {

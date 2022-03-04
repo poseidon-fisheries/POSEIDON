@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.FadBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
@@ -26,7 +27,7 @@ public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
-        "workspace", "tuna", "abundance", "calibration", "outputs", "nicolas", "2021-12-07_19.00.35"
+        "workspace", "tuna", "calibration", "results", "nicolas", "2022-03-04_16.03.10_global_calibration"
     );
     private final Path calibrationFilePath;
     private final double[] solution;
@@ -125,7 +126,10 @@ public class TunaEvaluator implements Runnable {
 
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
-        runner.registerRowProvider("actions.csv", PurseSeineActionsLogger::new);
+        runner
+            .registerRowProvider("actions.csv", PurseSeineActionsLogger::new)
+            .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
+        ;
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }
