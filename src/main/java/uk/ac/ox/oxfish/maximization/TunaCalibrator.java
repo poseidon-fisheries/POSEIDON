@@ -50,7 +50,6 @@ public class TunaCalibrator implements Runnable {
     public static final int DEFAULT_POPULATION_SIZE = 20;
     public final static int MAX_FITNESS_CALLS = 5000;
     public static final int DEFAULT_RANGE = 10;
-    public static final boolean DEFAULT_ELITISM = true;
 
     private boolean localSearch = false;
     private String runNickName = "global_calibration";
