@@ -20,14 +20,28 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Inspired somewhat by the IOTC paper: a FAD that "activates" after a certain number of days and then attracts at a fixed rate until full.
- * Whether anything gets attracted depends on there being enough local biomass (over a threshold)
+ * Whether anything gets attracted depends on there being enough local biomass (for example 100 times more abundance than what would be attracted in a day).
+ *
+ * This for now uses a form of relatively questionable selectivity that updates daily to be correct in a "global" sense.
  */
-public class AbundanceLinearIntervalAttractor implements FishAttractor<AbundanceLocalBiology, AbundanceFad> {
+public class AbundanceLinearIntervalAttractor implements FishAttractor<AbundanceLocalBiology, AbundanceFad>, Steppable {
 
 
     private final int daysInWaterBeforeAttraction;
@@ -38,17 +52,85 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
 
     final double[] dailyBiomassAttractedPerSpecies;
 
-    final double minBiomassToActivate;
+    WeightedObject<AbundanceLocalBiology> dailyAttractionStep; //stored as a weighted object for speed
+
+    HashMap<Species,double[][]>  dailyAttractionThreshold; //this will just be dailyAttractionStep times minAbundanceThreshold; but easy t store and skip all computations
+
+    final double minAbundanceThreshold;
+
+    final Map<Species,NonMutatingArrayFilter> globalSelectivityCurves;
 
     public AbundanceLinearIntervalAttractor(
             int daysInWaterBeforeAttraction, int daysItTakesToFillUp, double[] carryingCapacitiesPerSpecies,
-            double[] dailyBiomassAttractedPerSpecies, double minBiomassToActivate) {
+            double minAbundanceThreshold,
+            Map<Species, NonMutatingArrayFilter> selectivityFilters,
+            FishState model
+            ) {
+        Preconditions.checkArgument(minAbundanceThreshold>=1);
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        Preconditions.checkArgument(daysItTakesToFillUp>0);
         this.daysItTakesToFillUp = daysItTakesToFillUp;
         this.carryingCapacitiesPerSpecies = carryingCapacitiesPerSpecies;
-        this.dailyBiomassAttractedPerSpecies = dailyBiomassAttractedPerSpecies;
-        this.minBiomassToActivate = minBiomassToActivate;
-        throw new RuntimeException("not finished yet");
+        this.dailyBiomassAttractedPerSpecies= new double[carryingCapacitiesPerSpecies.length];
+        for (int i = 0; i < carryingCapacitiesPerSpecies.length; i++) {
+            this.dailyBiomassAttractedPerSpecies[i] =
+                    carryingCapacitiesPerSpecies[i]/(double)daysItTakesToFillUp;
+
+        }
+        //turn biomass target into abundance target via selectivity
+        assert selectivityFilters.size()==carryingCapacitiesPerSpecies.length;
+        globalSelectivityCurves = selectivityFilters;
+
+
+        this.minAbundanceThreshold = minAbundanceThreshold;
+
+        model.scheduleEveryDay(this, StepOrder.DAWN);
+    }
+
+
+    @Override
+    public void step(SimState simState) {
+        HashMap<Species,double[][]> dailyAbundance = new HashMap<>();
+        dailyAttractionThreshold = new HashMap<>();
+        //update your daily attraction given selectivity curves
+        for (Map.Entry<Species, NonMutatingArrayFilter> speciesSelectivity : globalSelectivityCurves.entrySet()) {
+            Species species = speciesSelectivity.getKey();
+            double[][] oceanAbundance = ((FishState) simState).getTotalAbundance(species);
+            double[][] selectedAbundance = speciesSelectivity.getValue().filter(species, oceanAbundance);
+            //here we store the WEIGHT of the fish that would be selected had we applied the selectivity curve to the whole ocean
+            //ignoring (i.e. setting to 1) catchability
+            double[][] selectedWeight = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+            double totalSelectedWeight = 0;
+            //weigh the abudance of the filtered matrix for all bins
+            for (int sub = 0; sub < selectedAbundance.length; sub++) {
+                for (int bin = 0; bin < selectedAbundance[0].length; bin++) {
+                    selectedWeight[sub][bin] = selectedAbundance[sub][bin] * species.getWeight(sub,bin);
+                    totalSelectedWeight += selectedWeight[sub][bin];
+                }
+            }
+            //now given the weight per bin and total weight, find how many we need to take for each bin to perform a daily step
+            double[][] dailyStep = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+            double[][] dailyThreshold =  new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+            for (int sub = 0; sub < selectedAbundance.length; sub++) {
+                for (int bin = 0; bin < selectedAbundance[0].length; bin++) {
+                    //weight that should come from this bin
+                    dailyStep[sub][bin] =
+                            (dailyBiomassAttractedPerSpecies[species.getIndex()] *  selectedWeight[sub][bin]/totalSelectedWeight)
+                                    //and now turn it all into abundance:
+                                    / species.getWeight(sub,bin);
+
+                    dailyThreshold[sub][bin] = dailyThreshold[sub][bin] * minAbundanceThreshold;
+
+                }
+            }
+            dailyAttractionThreshold.put(species,dailyThreshold);
+            dailyAbundance.put(species,dailyStep);
+
+
+        }
+        AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundance);
+        dailyAttractionStep = new WeightedObject<>(toReturn,toReturn.getTotalBiomass());
+
 
     }
 
@@ -61,16 +143,61 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
         if(fad.getStepDeployed()<daysInWaterBeforeAttraction)
                 return null;
         //start weighing stuff
-        double[] currentBiomass = fad.getBiology().getCurrentBiomass();
         //don't bother attracting if full
-        //if(currentBiomass[i]>)
-
-        //don't bother attracting if there is less biomass than what is needed to attract a single day
-
-        //don't bother attracting below threshold
-
+        double[] currentFadBiomass = fad.getBiology().getCurrentBiomass();
+        if(currentFadBiomass[0]>=carryingCapacitiesPerSpecies[0]){
+            //by construction it should fill up the same way across all species
+            //length >0 IMPLIES second species is also full ===== length==0 OR second species full
+            assert currentFadBiomass.length==1 || currentFadBiomass[1] >= carryingCapacitiesPerSpecies[1];
+            return null;
+        }
+        //don't bother attracting if there is less biomass than what is needed to attract in a single day
+        //don't bother attracting if any abundance bin is below threshold
+        for (Map.Entry<Species, StructuredAbundance> speciesAbundance : seaTileBiology.getStructuredAbundance().entrySet()) {
+            double[][] abundanceInTile = speciesAbundance.getValue().asMatrix();
+            double[][] threshold = dailyAttractionThreshold.get(speciesAbundance.getKey());
+            for (int subdivision = 0; subdivision < threshold.length; subdivision++) {
+                for (int bin = 0; bin < threshold[subdivision].length; bin++) {
+                    if(threshold[subdivision][bin]> abundanceInTile[subdivision][bin])
+                        return null;
+                }
+            }
+        }
         //attract
+        return dailyAttractionStep;
+    }
 
-        throw new RuntimeException("not finished yet");
+    public int getDaysInWaterBeforeAttraction() {
+        return daysInWaterBeforeAttraction;
+    }
+
+    public int getDaysItTakesToFillUp() {
+        return daysItTakesToFillUp;
+    }
+
+    public double getCarryingCapacitiesPerSpecies(int speciesID) {
+        return carryingCapacitiesPerSpecies[speciesID];
+    }
+
+    public double getDailyBiomassAttractedPerSpecies(int speciesID) {
+        return dailyBiomassAttractedPerSpecies[speciesID];
+    }
+
+    @VisibleForTesting
+    public WeightedObject<AbundanceLocalBiology> getDailyAttractionStep() {
+        return dailyAttractionStep;
+    }
+
+    @VisibleForTesting
+    public HashMap<Species, double[][]> getDailyAttractionThreshold() {
+        return dailyAttractionThreshold;
+    }
+
+    public double getMinAbundanceThreshold() {
+        return minAbundanceThreshold;
+    }
+
+    public Map<Species, NonMutatingArrayFilter> getGlobalSelectivityCurves() {
+        return globalSelectivityCurves;
     }
 }

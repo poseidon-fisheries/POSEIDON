@@ -94,6 +94,7 @@ abstract class LogisticFishAttractor<WEIGHTED_CATCH extends Number, B extends Lo
                             seaTileBiology.getBiomass(currentSpecies),
                             fadBiomass);
             if(p>0 && getRng().nextDouble() < p) {
+
                 WEIGHTED_CATCH attracted = attractForSpecies(currentSpecies, seaTileBiology, fad);
                 if(attracted.doubleValue()>0)
                     attractedNothing = false;

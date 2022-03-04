@@ -50,6 +50,7 @@ public class TunaCalibrator implements Runnable {
     public static final int DEFAULT_POPULATION_SIZE = 20;
     public final static int MAX_FITNESS_CALLS = 5000;
     public static final int DEFAULT_RANGE = 10;
+    public static final boolean DEFAULT_ELITISM = true;
 
     private boolean localSearch = false;
     private String runNickName = "global_calibration";
@@ -224,6 +225,8 @@ public class TunaCalibrator implements Runnable {
         }
         problemWrapper.setDefaultRange(parameterRange);
 
+
+
         final OptimizationParameters optimizationParameters =
                 OptimizerFactory.makeParams(
                         optimizer,
@@ -232,7 +235,6 @@ public class TunaCalibrator implements Runnable {
                         System.currentTimeMillis(),
                         new EvaluationTerminator(maxFitnessCalls)
                 );
-
         final OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
