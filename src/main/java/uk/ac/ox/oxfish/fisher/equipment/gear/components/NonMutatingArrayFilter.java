@@ -40,7 +40,10 @@ public class NonMutatingArrayFilter extends ArrayFilter {
         super(false,
                 convertCollectionToPOJOArray(filters));
     }
-
+    public NonMutatingArrayFilter(double[]... filters) {
+        super(false,
+                filters);
+    }
 
     /**
      * the way I think we are using NonMutatingArrayFilter is basically as a fixed selectivity grid but with the additional

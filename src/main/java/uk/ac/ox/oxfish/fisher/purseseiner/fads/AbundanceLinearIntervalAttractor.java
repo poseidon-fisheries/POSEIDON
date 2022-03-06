@@ -60,6 +60,8 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
 
     final Map<Species,NonMutatingArrayFilter> globalSelectivityCurves;
 
+    final FishState model;
+
     public AbundanceLinearIntervalAttractor(
             int daysInWaterBeforeAttraction, int daysItTakesToFillUp, double[] carryingCapacitiesPerSpecies,
             double minAbundanceThreshold,
@@ -85,6 +87,7 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
         this.minAbundanceThreshold = minAbundanceThreshold;
 
         model.scheduleEveryDay(this, StepOrder.DAWN);
+        this.model=model;
     }
 
 
@@ -119,7 +122,7 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
                                     //and now turn it all into abundance:
                                     / species.getWeight(sub,bin);
 
-                    dailyThreshold[sub][bin] = dailyThreshold[sub][bin] * minAbundanceThreshold;
+                    dailyThreshold[sub][bin] = dailyStep[sub][bin] * minAbundanceThreshold;
 
                 }
             }
@@ -140,7 +143,7 @@ public class AbundanceLinearIntervalAttractor implements FishAttractor<Abundance
             AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
 
         //attract nothing before spending enough steps in
-        if(fad.getStepDeployed()<daysInWaterBeforeAttraction)
+        if(model.getDay()-fad.getStepDeployed()<daysInWaterBeforeAttraction)
                 return null;
         //start weighing stuff
         //don't bother attracting if full

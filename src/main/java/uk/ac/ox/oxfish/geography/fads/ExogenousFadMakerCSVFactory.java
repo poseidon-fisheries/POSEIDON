@@ -36,7 +36,8 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
     private String pathToFile = "./inputs/tests/fad_dummy_deploy.csv";
 
 
-    private FadInitializerFactory fadInitializerFactory = new BiomassFadInitializerFactory("Species 0");
+    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
+            new BiomassFadInitializerFactory("Species 0");
 
     @Override
     public AdditionalStartable apply(FishState state) {
@@ -79,7 +80,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
             @Override
             public void start(FishState model) {
                 ExogenousFadMaker maker = new ExogenousFadMaker(
-                        (FadInitializer)fadInitializerFactory.apply(model),
+                        fadInitializerFactory.apply(model),
                         dayToCoordinatesMap
 
                 );
@@ -101,11 +102,11 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
         this.pathToFile = pathToFile;
     }
 
-    public FadInitializerFactory getFadInitializer() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializer(FadInitializerFactory fadInitializer) {
+    public void setFadInitializer(AlgorithmFactory<? extends FadInitializer> fadInitializer) {
         this.fadInitializerFactory = fadInitializer;
     }
 }

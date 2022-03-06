@@ -7,9 +7,9 @@ OSMOSE WFS:
         4: 0.82875
       indexOfSpeciesToBeManagedByThisModel: 2,3,4
       numberOfOsmoseStepsToPulseBeforeSimulationStart: 1368
-      osmoseConfigurationFile: /home/carrknight/code/oxfish/temp_wfs/wfs/osm_all-parameters.csv
+      osmoseConfigurationFile: /home/carrknight/IdeaProjects/POSEIDON/temp_wfs/wfs/osm_all-parameters.csv
       preInitializedConfiguration: true
-      preInitializedConfigurationDirectory: /home/carrknight/code/oxfish/temp_wfs/wfs/randomStarts
+      preInitializedConfigurationDirectory: /home/carrknight/IdeaProjects/POSEIDON/temp_wfs/wfs/randomStarts
       recruitmentAges:
         2: 2
         3: 2

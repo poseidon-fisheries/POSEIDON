@@ -74,7 +74,7 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         exogenousFadMaker.setPathToFile(pathToFile);
     }
 
-    public FadInitializerFactory getFadInitializer() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
         return exogenousFadMaker.getFadInitializer();
     }
 

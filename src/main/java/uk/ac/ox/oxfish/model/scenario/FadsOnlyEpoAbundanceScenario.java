@@ -47,10 +47,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -117,7 +114,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AbundanceFadInitializerFactory fadInitializerFactory =
+    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory =
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
@@ -132,13 +129,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.fadMakerFactory = fadMakerFactory;
     }
 
-    @SuppressWarnings("unused")
-    public AbundanceFadInitializerFactory getFadInitializerFactory() {
+
+    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(final AbundanceFadInitializerFactory fadInitializerFactory) {
+    public void setFadInitializerFactory(AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -283,8 +279,13 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
 
-        fadInitializerFactory.setSpeciesCodes(speciesCodesFactory.get());
-        fadInitializerFactory.setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        if(fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
+            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
+            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        }
+        if(fadInitializerFactory instanceof AbundanceLinearIntervalInitializerFactory){
+            ((AbundanceLinearIntervalInitializerFactory) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        }
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(fadInitializerFactory);
 
         ImmutableList.of(

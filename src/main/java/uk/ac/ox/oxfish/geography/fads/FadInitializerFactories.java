@@ -36,6 +36,10 @@ public class FadInitializerFactories {
     static {
         NAMES.put(AbundanceFadInitializerFactory.class, "Abundance FAD Initializer");
         NAMES.put(BiomassFadInitializerFactory.class, "Biomass FAD Initializer");
+
+        NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
+
+
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
