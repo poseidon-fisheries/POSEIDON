@@ -7,13 +7,14 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class NoBoatsTiming {
 
     private final static List<Path> scenariosToTry = List.of(
-      Path.of("docs/20220208 noboats_tuna/calibration/new_currents/carrknight/2022-03-02_00.45.23_noduds/calibrated_scenario.yaml"),
-      Path.of("docs/20220208 noboats_tuna/calibration/new_currents/fad_only_scenario_linearinterval.yaml")
+            Paths.get("docs/20220208 noboats_tuna/calibration/new_currents/carrknight/2022-03-02_00.45.23_noduds/calibrated_scenario.yaml"),
+            Paths.get("docs/20220208 noboats_tuna/calibration/new_currents/fad_only_scenario_linearinterval.yaml")
     );
 
     public static void main(String[] args) throws FileNotFoundException {
