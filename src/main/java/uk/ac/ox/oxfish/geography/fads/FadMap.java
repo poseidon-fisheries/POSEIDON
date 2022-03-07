@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
@@ -15,6 +16,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadRemovalListener;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -37,6 +39,7 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     private final Class<F> fadClass;
     private final AbundanceLostObserver abundanceLostObserver = new AbundanceLostObserver();
     private Stoppable stoppable;
+    final private LinkedList<FadRemovalListener> removalListeners = new LinkedList<>();
 
     public FadMap(
         final NauticalMap nauticalMap,
@@ -165,7 +168,11 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     public void remove(final F fad) {
+
         driftingObjectsMap.remove(fad);
+        for (FadRemovalListener removalListener : getRemovalListeners()) {
+            removalListener.onFadRemoval(fad);
+        }
     }
 
     @NotNull
@@ -200,4 +207,11 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     public boolean isStarted(){
         return stoppable !=null;
     }
+
+
+    public LinkedList<FadRemovalListener> getRemovalListeners() {
+        return removalListeners;
+    }
+
+
 }
