@@ -19,15 +19,14 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import com.univocity.parsers.csv.CsvWriter;
-
-import java.util.Collection;
-import java.util.List;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.elementsEqual;
 import static com.google.common.collect.Lists.asList;
 import static com.google.common.collect.Streams.stream;
+
+import com.univocity.parsers.csv.CsvWriter;
+import java.util.Collection;
+import java.util.List;
 
 public interface RowProvider {
 
@@ -50,8 +49,9 @@ public interface RowProvider {
             checkArgument(rowProviders.stream().allMatch(provider ->
                 elementsEqual(provider.getHeaders(), headers))
             );
-            if (writeHeaders)
+            if (writeHeaders) {
                 csvWriter.writeHeaders(asList("run", headers.toArray()));
+            }
             csvWriter.writeRowsAndClose(
                 rowProviders.stream()
                     .flatMap(rowsProvider -> stream(rowsProvider.getRows()))
@@ -62,6 +62,11 @@ public interface RowProvider {
     }
 
     List<String> getHeaders();
+
     Iterable<? extends Collection<?>> getRows();
+
+    default boolean isEveryStep() {
+        return false;
+    }
 
 }
