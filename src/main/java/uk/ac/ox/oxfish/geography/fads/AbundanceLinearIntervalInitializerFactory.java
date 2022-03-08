@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 public class AbundanceLinearIntervalInitializerFactory implements
-        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
+        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);

@@ -281,14 +281,8 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
         if(fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
-            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
         }
-        else if(fadInitializerFactory instanceof AbundanceLinearIntervalInitializerFactory){
-            ((AbundanceLinearIntervalInitializerFactory) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
-        }
-        else if(fadInitializerFactory instanceof WeibullLinearIntervalAttractorFactory){
-            ((WeibullLinearIntervalAttractorFactory) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
-        }
+        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(fadInitializerFactory);
 
         ImmutableList.of(

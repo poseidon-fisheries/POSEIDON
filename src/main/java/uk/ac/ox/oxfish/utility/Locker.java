@@ -68,4 +68,9 @@ public class Locker<K,I>
     }
 
 
+    public void reset(){
+        this.key=null;
+        this.itemHeld=null;
+    }
+
 }

@@ -47,7 +47,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLoca
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -122,13 +122,13 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double numFadsInStockLogisticMidpoint = 5;
     private double numFadsInStockLogisticSteepness = 1;
 
-    FadInitializerFactory<B, F> fadInitializerFactory;
+    AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory;
 
-    public FadInitializerFactory<B, F> getFadInitializer() {
+    public AlgorithmFactory<FadInitializer<B, F>> getFadInitializer() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
+    public void setFadInitializerFactory(final AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 

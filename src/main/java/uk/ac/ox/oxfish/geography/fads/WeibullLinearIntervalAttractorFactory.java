@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
@@ -35,9 +36,10 @@ import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class WeibullLinearIntervalAttractorFactory implements
-        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
+        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
@@ -61,45 +63,57 @@ public class WeibullLinearIntervalAttractorFactory implements
 
     private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
 
+    private Locker<FishState, AbundanceFadInitializer > oneAttractorPerStateLocker = new Locker<>();
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(FishState fishState) {
-        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
-        DoubleSupplier capacityGenerator;
-        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
-            capacityGenerator = () -> Double.MAX_VALUE;
-        else
-            capacityGenerator = () -> {
-                if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
-                    return 0;
-                else
-                    return Double.MAX_VALUE;
-            };
+        return oneAttractorPerStateLocker.presentKey(fishState,
+                                              new Supplier<AbundanceFadInitializer>() {
+                                                  @Override
+                                                  public AbundanceFadInitializer get() {
+                                                      final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+                                                      DoubleSupplier capacityGenerator;
+                                                      if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
+                                                          capacityGenerator = () -> Double.MAX_VALUE;
+                                                      else
+                                                          capacityGenerator = () -> {
+                                                              if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
+                                                                  return 0;
+                                                              else
+                                                                  return Double.MAX_VALUE;
+                                                          };
 
-        DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
-        for (Species species : fishState.getBiology().getSpecies()) {
-            carryingCapacities[species.getIndex()] = new WeibullDoubleParameter(
-                    carryingCapacityShapeParameters.get(species.getName()),
-                    carryingCapacityScaleParameters.get(species.getName())
-            );
-        }
+                                                      DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
+                                                      for (Species species : fishState.getBiology().getSpecies()) {
+                                                          carryingCapacities[species.getIndex()] = new WeibullDoubleParameter(
+                                                                  carryingCapacityShapeParameters.get(species.getName()),
+                                                                  carryingCapacityScaleParameters.get(species.getName())
+                                                          );
+                                                      }
 
 
-        return new AbundanceFadInitializer(
-                fishState.getBiology(),
-                capacityGenerator,
-                new HeterogeneousLinearIntervalAttractor(
-                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                        daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
-                        minAbundanceThreshold.apply(fishState.getRandom()),
-                        selectivityFilters,
-                        fishState,
-                        carryingCapacities
+                                                      return new AbundanceFadInitializer(
+                                                              fishState.getBiology(),
+                                                              capacityGenerator,
+                                                              new HeterogeneousLinearIntervalAttractor(
+                                                                      daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
+                                                                      daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
+                                                                      minAbundanceThreshold.apply(fishState.getRandom()),
+                                                                      selectivityFilters,
+                                                                      fishState,
+                                                                      carryingCapacities
 
-                ),
-                fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                fishState::getStep
+                                                              ),
+                                                              fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+                                                              fishState::getStep
+                                                      );
+                                                  }
+                                              }
+
         );
+
+
+
     }
 
     public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
@@ -108,6 +122,8 @@ public class WeibullLinearIntervalAttractorFactory implements
 
     public void setSelectivityFilters(
             Map<Species, NonMutatingArrayFilter> selectivityFilters) {
+        oneAttractorPerStateLocker.reset();
+
         this.selectivityFilters = selectivityFilters;
     }
 
@@ -116,6 +132,9 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
 
     public void setFadDudRate(DoubleParameter fadDudRate) {
+
+        oneAttractorPerStateLocker.reset();
+
         this.fadDudRate = fadDudRate;
     }
 
@@ -125,6 +144,8 @@ public class WeibullLinearIntervalAttractorFactory implements
 
     public void setFishReleaseProbabilityInPercent(
             DoubleParameter fishReleaseProbabilityInPercent) {
+        oneAttractorPerStateLocker.reset();
+
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
@@ -134,6 +155,8 @@ public class WeibullLinearIntervalAttractorFactory implements
 
     public void setCarryingCapacityShapeParameters(
             LinkedHashMap<String, Double> carryingCapacityShapeParameters) {
+        oneAttractorPerStateLocker.reset();
+
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
     }
 
@@ -143,6 +166,8 @@ public class WeibullLinearIntervalAttractorFactory implements
 
     public void setCarryingCapacityScaleParameters(
             LinkedHashMap<String, Double> carryingCapacityScaleParameters) {
+        oneAttractorPerStateLocker.reset();
+
         this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
     }
 
@@ -151,6 +176,8 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
 
     public void setDaysInWaterBeforeAttraction(DoubleParameter daysInWaterBeforeAttraction) {
+        oneAttractorPerStateLocker.reset();
+
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
     }
 
@@ -159,6 +186,8 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
 
     public void setDaysItTakesToFillUp(DoubleParameter daysItTakesToFillUp) {
+        oneAttractorPerStateLocker.reset();
+
         this.daysItTakesToFillUp = daysItTakesToFillUp;
     }
 
@@ -167,6 +196,8 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
 
     public void setMinAbundanceThreshold(DoubleParameter minAbundanceThreshold) {
+        oneAttractorPerStateLocker.reset();
+
         this.minAbundanceThreshold = minAbundanceThreshold;
     }
 }

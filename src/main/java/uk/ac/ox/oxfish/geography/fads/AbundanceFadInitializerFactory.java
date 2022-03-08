@@ -35,7 +35,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceFadInitializerFactory
-        extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
+        extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> implements PluggableSelectivity {
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
