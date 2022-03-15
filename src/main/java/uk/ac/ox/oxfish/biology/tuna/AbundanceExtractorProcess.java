@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 
-public class AbundanceExtractor extends Extractor<AbundanceLocalBiology> {
+public class AbundanceExtractorProcess extends Extractor<AbundanceLocalBiology> {
 
     /**
      * Creates a {@link Extractor}.
@@ -28,7 +28,7 @@ public class AbundanceExtractor extends Extractor<AbundanceLocalBiology> {
      * @param includeFads     Whether or not to include FAD biologies.
      * @param includeSeaTiles Whether or not to include sea tile biologies.
      */
-    public AbundanceExtractor(
+    public AbundanceExtractorProcess(
         final boolean includeFads,
         final boolean includeSeaTiles
     ) {

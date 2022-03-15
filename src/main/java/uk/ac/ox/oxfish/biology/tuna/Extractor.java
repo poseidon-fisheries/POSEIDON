@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.Streams;
@@ -26,9 +27,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -68,30 +68,33 @@ public class Extractor<B extends LocalBiology>
     }
 
     @Override
+    public Collection<B> process(final FishState fishState, final Collection<B> biologies) {
+        checkArgument(
+            biologies == null,
+            "The biologies collection passed to the Extractor must be null, but was: %s",
+            biologies
+        );
+        return apply(fishState);
+    }
+
+    @Override
     public List<B> apply(final FishState fishState) {
 
-        final Stream<LocalBiology> seaTileBiologies =
-            (includeSeaTiles ? Stream.of(fishState.getMap()) : Stream.<NauticalMap>empty())
-                .flatMap(map -> map.getAllSeaTilesExcludingLandAsList().stream())
-                .map(SeaTile::getBiology);
+        final List<SeaTile> seaTiles = fishState
+            .getMap()
+            .getAllSeaTilesExcludingLandAsList();
 
-        final Stream<FadMap<?, ?>> fadMapStream = includeFads
-            ? Stream.of(fishState.getFadMap())
+        final Stream<LocalBiology> seaTileBiologies = includeSeaTiles
+            ? seaTiles.stream().map(SeaTile::getBiology)
             : Stream.empty();
-        final Stream<LocalBiology> fadBiologies =
-            fadMapStream
-                .flatMap(FadMap::allFads)
-                .filter(localBiologyClass::isInstance)
-                .map(localBiologyClass::cast);
+
+        final Stream<LocalBiology> fadBiologies = includeFads
+            ? fishState.getFadMap().allFads().map(Fad::getBiology)
+            : Stream.empty();
 
         return Streams.concat(seaTileBiologies, fadBiologies)
             .filter(localBiologyClass::isInstance)
             .map(localBiologyClass::cast)
             .collect(toImmutableList());
-    }
-
-    @Override
-    public Collection<B> process(final FishState fishState, final Collection<B> biologies) {
-        return apply(fishState);
     }
 }

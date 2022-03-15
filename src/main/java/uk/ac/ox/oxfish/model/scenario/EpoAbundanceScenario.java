@@ -24,6 +24,7 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,6 +40,8 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcess;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorerFactory;
@@ -97,6 +100,11 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
         );
+    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
+        new AbundanceMortalityProcessFromFileFactory(
+            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
+            ImmutableSet.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+        );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
@@ -114,7 +122,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
     private AbundanceRestorerFactory abundanceRestorerFactory =
-        new AbundanceRestorerFactory(ImmutableMap.of(0, 364));
+        new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             INPUT_PATH.resolve("depth.csv"),
@@ -161,6 +169,16 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             System.out.println("Step: " + fishState.getStep());
             fishState.schedule.step(fishState);
         }
+    }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcessFactory() {
+        return abundanceMortalityProcessFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
+        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
     }
 
     @SuppressWarnings("unused")
@@ -352,9 +370,12 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
+        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        fishState.registerStartable(scheduledAbundanceProcessesFactory.apply(fishState));
+        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
+            abundanceMortalityProcessFactory
+        );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -424,6 +445,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             ).apply(fishState);
 
         ImmutableList.of(
+            scheduledAbundanceProcessesFactory,
             abundanceRestorerFactory
         ).forEach(startableFactory ->
             fishState.registerStartable(startableFactory.apply(fishState))

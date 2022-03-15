@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
 import static com.google.common.collect.Streams.findLast;
-import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
@@ -17,30 +16,30 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.Level;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.FadBiomassLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.CsvLogger;
 
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
-        "workspace", "tuna", "calibration", "results", "nicolas", "2022-03-04_16.03.10_global_calibration"
+        "workspace", "tuna", "calibration", "results",
+        "cenv0729", "2022-03-02_13.22.08_global_calibration"
     );
-    private final Path calibrationFilePath;
-    private final double[] solution;
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
-    private int numRuns = getRuntime().availableProcessors();
+    private int numRuns = 1; //getRuntime().availableProcessors();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
     TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
 
-        this.calibrationFilePath = calibrationFilePath;
-        this.solution = solution.clone();
         optimization = GenericOptimization.fromFile(calibrationFilePath);
 
         runner = new Runner<>(
@@ -129,7 +128,7 @@ public class TunaEvaluator implements Runnable {
         runner
             .registerRowProvider("actions.csv", PurseSeineActionsLogger::new)
             .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
-        ;
+            .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }
