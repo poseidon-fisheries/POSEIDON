@@ -1,26 +1,28 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
-import net.bytebuddy.asm.Advice;
-import org.jetbrains.annotations.NotNull;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.IntFunction;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.*;
-import java.util.function.IntFunction;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class AbundanceMortalityProcessTest {
 
@@ -41,14 +43,9 @@ public class AbundanceMortalityProcessTest {
 
         Species species1 = new Species("Piano Tuna", meristics);
 
-        Map<String, String> sCodes = new HashMap<>();
-        sCodes.put("SP1", species1.getName());
-        SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
-
         Map<String, IntFunction<SmallLargeAllocationGridsSupplier.SizeGroup>> binToSizeGroupMappings = new HashMap<>();
         binToSizeGroupMappings.put("Piano Tuna", entry -> entry==0?SMALL:LARGE );
 
-        final GlobalBiology globalBiology= new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();
         abundance.put(species1, new double[][]{{10, 10}, {10, 10}});
 
@@ -58,9 +55,19 @@ public class AbundanceMortalityProcessTest {
                 )
         );
 
-
-
-        AbundanceMortalityProcess mortalityProcess = new AbundanceMortalityProcess();
+        final BiologicalProcess<AbundanceLocalBiology> mortalityProcess =
+            new AbundanceMortalityProcess(
+                ImmutableMap.of(
+                    species1,
+                    ImmutableMap.of(
+                        "test",
+                        proportionalMortalities
+                            .stream()
+                            .map(a -> stream(a).boxed().collect(toList()))
+                            .collect(toList())
+                    )
+                )
+            );
 
         List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
 
@@ -68,27 +75,28 @@ public class AbundanceMortalityProcessTest {
         for (SeaTile allSeaTile : allSeaTiles) {
             localBiologies.add((AbundanceLocalBiology) allSeaTile.getBiology());
         }
-        mortalityProcess.process(mock(FishState.class), localBiologies);
+        final List<AbundanceLocalBiology> biologiesAfterMortality =
+            ImmutableList.copyOf(mortalityProcess.process(mock(FishState.class), localBiologies));
 
         assertEquals(
-                7.5,
-                nauticalMap.getAllSeaTilesAsList().get(0).getAbundance(species1).asMatrix()[0][0],
-                0
+            7.5,
+            biologiesAfterMortality.get(0).getAbundance(species1).asMatrix()[0][0],
+            0
         );
         assertEquals(
-                6.5,
-                nauticalMap.getAllSeaTilesAsList().get(1).getAbundance(species1).asMatrix()[0][1],
-                0
+            6.5,
+            biologiesAfterMortality.get(1).getAbundance(species1).asMatrix()[0][1],
+            0
         );
         assertEquals(
-                5,
-                nauticalMap.getAllSeaTilesAsList().get(5).getAbundance(species1).asMatrix()[1][0],
-                0
+            5,
+            biologiesAfterMortality.get(2).getAbundance(species1).asMatrix()[1][0],
+            0
         );
         assertEquals(
-                2.5,
-                nauticalMap.getAllSeaTilesAsList().get(4).getAbundance(species1).asMatrix()[1][1],
-                0
+            2.5,
+            biologiesAfterMortality.get(3).getAbundance(species1).asMatrix()[1][1],
+            0
         );
     }
 
