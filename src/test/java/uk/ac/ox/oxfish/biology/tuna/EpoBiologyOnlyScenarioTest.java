@@ -19,6 +19,8 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
         fishState.setScenario(scenario);
         scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
 
+        double[] partialF = {0.132763,0.00484204,3.12056E-05,0.0296353,0.00197554,0.00632267,0.00559769,0.0555887,0.00258933};
+
         fishState.start();
 
         System.out.println("SeaTiles: " + fishState.getMap().getAllSeaTiles().size());
@@ -32,7 +34,7 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
             if(ArrayUtils.contains(checkDays,fishState.getStep())){
                 System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(fishState.getSpecies("Bigeye tuna"))/1000);
                 double[][] totalAbundance = fishState.getTotalAbundance(BET);
-                System.out.println("breakpoint");
+  //              System.out.println("breakpoint");
             }
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
