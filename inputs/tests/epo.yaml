@@ -9,11 +9,11 @@ EPO Abundance:
       binsFilePath: inputs/epo/abundance/bins.csv
   abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
     mortalityFile: inputs/epo/abundance/mortality.csv
-    sources: !!set
-      natural: null
-      obj_class_1_5: null
-      noa_class_1_5: null
-      longline: null
+    sources:
+    - natural
+    - obj_class_1_5
+    - noa_class_1_5
+    - longline
     speciesCodes: null
   abundancePurseSeineGearFactory:
     actionDistanceExponent: 1.0
