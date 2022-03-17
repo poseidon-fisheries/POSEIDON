@@ -26,11 +26,9 @@ import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
@@ -41,19 +39,21 @@ public class AbundanceMortalityProcessFromFileFactory
     implements AlgorithmFactory<AbundanceMortalityProcess> {
 
     private Path mortalityFile;
-    private Set<String> sources;
+    private List<String> sources;
     private SpeciesCodes speciesCodes;
     private final CacheByFishState<Map<Species, Map<String, List<List<Double>>>>> cache =
         new CacheByFishState<>(this::load);
+
     @SuppressWarnings("unused")
     public AbundanceMortalityProcessFromFileFactory() {
     }
+
     public AbundanceMortalityProcessFromFileFactory(
         final Path mortalityFile,
         final Iterable<String> sources
     ) {
         this.mortalityFile = checkNotNull(mortalityFile);
-        this.sources = ImmutableSet.copyOf(sources);
+        this.sources = ImmutableList.copyOf(sources);
     }
 
     @SuppressWarnings("unused")
@@ -66,12 +66,12 @@ public class AbundanceMortalityProcessFromFileFactory
         this.mortalityFile = mortalityFile;
     }
 
-    public Set<String> getSources() {
+    public List<String> getSources() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return sources;
     }
 
-    public void setSources(final Set<String> sources) {
+    public void setSources(final List<String> sources) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.sources = sources;
     }

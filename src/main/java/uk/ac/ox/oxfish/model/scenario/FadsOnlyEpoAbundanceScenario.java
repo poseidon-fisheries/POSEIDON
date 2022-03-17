@@ -24,7 +24,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -130,7 +129,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
         new AbundanceMortalityProcessFromFileFactory(
             INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableSet.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
         );
 
     @SuppressWarnings("unused")

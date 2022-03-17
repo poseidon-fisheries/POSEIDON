@@ -103,7 +103,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
         new AbundanceMortalityProcessFromFileFactory(
             INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableSet.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
         );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
