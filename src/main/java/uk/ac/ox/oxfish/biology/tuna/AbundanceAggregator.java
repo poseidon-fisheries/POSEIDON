@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Iterables.get;
 import static java.util.function.UnaryOperator.identity;
@@ -38,25 +37,26 @@ class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
         final GlobalBiology globalBiology,
         final Collection<AbundanceLocalBiology> sourceBiologies
     ) {
-        checkArgument(!sourceBiologies.isEmpty());
-        return new AbundanceLocalBiology(
-            globalBiology.getSpecies().stream().collect(toImmutableMap(
-                identity(),
-                species -> {
-                    // We're grabbing the bins and subdivisions from the first
-                    // biology instead of the species because sometimes the meristics
-                    // are not initialised in testing code.
-                    final StructuredAbundance abundance =
-                        get(sourceBiologies, 0).getAbundance(species);
-                    final int subdivisions = abundance.getSubdivisions();
-                    final int bins = abundance.getBins();
-                    return StructuredAbundance.sum(
-                        sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator,
-                        bins,
-                        subdivisions
-                    ).asMatrix();
-                }
-            ))
-        );
+        return sourceBiologies.isEmpty()
+            ? new AbundanceLocalBiology(globalBiology)
+            : new AbundanceLocalBiology(
+                globalBiology.getSpecies().stream().collect(toImmutableMap(
+                    identity(),
+                    species -> {
+                        // We're grabbing the bins and subdivisions from the first
+                        // biology instead of the species because sometimes the meristics
+                        // are not initialised in testing code.
+                        final StructuredAbundance abundance =
+                            get(sourceBiologies, 0).getAbundance(species);
+                        final int subdivisions = abundance.getSubdivisions();
+                        final int bins = abundance.getBins();
+                        return StructuredAbundance.sum(
+                            sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator,
+                            bins,
+                            subdivisions
+                        ).asMatrix();
+                    }
+                ))
+            );
     }
 }

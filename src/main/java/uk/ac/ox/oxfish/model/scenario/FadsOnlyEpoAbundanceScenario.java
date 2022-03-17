@@ -24,6 +24,7 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -34,6 +35,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorerFactory;
@@ -47,7 +49,13 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.*;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -99,7 +107,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
     private AbundanceRestorerFactory abundanceRestorerFactory =
-        new AbundanceRestorerFactory(ImmutableMap.of(0, 364));
+        new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             INPUT_PATH.resolve("depth.csv"),
@@ -108,16 +116,32 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         );
     private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
         ImmutableMap.of(
-            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_daily.csv"),
-            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_daily.csv")
+            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
+            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
         )
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory =
+    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>
+        fadInitializerFactory =
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
+    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
+        new AbundanceMortalityProcessFromFileFactory(
+            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
+            ImmutableSet.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+        );
+
+    @SuppressWarnings("unused")
+    public AbundanceMortalityProcessFromFileFactory getAbundanceMortalityProcessFactory() {
+        return abundanceMortalityProcessFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
+        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -134,7 +158,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory) {
+    @SuppressWarnings("unused")
+    public void setFadInitializerFactory(
+        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
+    ) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -260,9 +287,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
+        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        fishState.registerStartable(scheduledAbundanceProcessesFactory.apply(fishState));
+        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
+            abundanceMortalityProcessFactory
+        );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -279,13 +309,16 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
 
-        if(fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
-            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
+        if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
+            ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
+                .setSpeciesCodes(speciesCodesFactory.get());
         }
-        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(
+            FadSetAction.class));
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(fadInitializerFactory);
 
         ImmutableList.of(
+            scheduledAbundanceProcessesFactory,
             abundanceRestorerFactory,
             fadMakerFactory,
             fadSetterFactory
