@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -34,7 +35,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 public class SchoolSetOpportunityGenerator<
@@ -42,7 +42,7 @@ public class SchoolSetOpportunityGenerator<
     A extends SchoolSetAction<B>
     > extends SetOpportunityGenerator<B, A> {
 
-    private final CompressedExponentialFunction probabilityFunction;
+    private final DoubleUnaryOperator probabilityFunction;
     private final ActiveOpportunities activeOpportunities;
     private final UnaryOperator<B> targetBiologyMaker;
     private final SchoolSetActionMaker<B, A> actionMaker;
@@ -50,28 +50,7 @@ public class SchoolSetOpportunityGenerator<
     private final Class<B> biologyClass;
 
     public SchoolSetOpportunityGenerator(
-        final double coefficient,
-        final double exponent,
-        final Map<Species, Double> weights,
-        final Class<B> biologyClass,
-        final UnaryOperator<B> targetBiologyMaker,
-        final SchoolSetActionMaker<B, A> actionMaker,
-        final ActiveOpportunities activeOpportunities,
-        final DoubleSupplier durationSampler
-    ) {
-        this(
-            new CompressedExponentialFunction(coefficient, exponent),
-            weights,
-            biologyClass,
-            targetBiologyMaker,
-            actionMaker,
-            activeOpportunities,
-            durationSampler
-        );
-    }
-
-    private SchoolSetOpportunityGenerator(
-        final CompressedExponentialFunction probabilityFunction,
+        final DoubleUnaryOperator probabilityFunction,
         final Map<Species, Double> weights,
         final Class<B> biologyClass,
         final UnaryOperator<B> targetBiologyMaker,

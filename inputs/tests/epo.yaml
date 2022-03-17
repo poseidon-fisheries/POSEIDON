@@ -34,29 +34,46 @@ EPO Abundance:
     destinationDistanceExponent: 1.0
     dolphinSetObservers: !!set {
       }
-    dolphinSetTimeSinceLastVisitCoefficient: 1.0E-6
-    dolphinSetTimeSinceLastVisitExponent: 2.0
+    dolphinSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     fadDeploymentObservers: !!set {
       }
-    fadDeploymentPctActiveFadsLimitCoefficient: 1.0E-6
-    fadDeploymentPctActiveFadsLimitExponent: 2.0
+    fadDeploymentPctActiveFadsLimitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    fadInitializerFactory: null
     fadSetObservers: !!set {
       }
     locationValuesFile: inputs/epo/location_values.csv
     nonAssociatedSetObservers: !!set {
       }
-    nonAssociatedSetTimeSinceLastVisitCoefficient: 1.0E-6
-    nonAssociatedSetTimeSinceLastVisitExponent: 2.0
-    numFadsInStockCoefficient: 1.0E-6
-    numFadsInStockExponent: 2.0
-    opportunisticFadSetTimeSinceLastVisitCoefficient: 1.0E-6
-    opportunisticFadSetTimeSinceLastVisitExponent: 2.0
-    pctHoldSpaceLeftCoefficient: 1.0E-6
-    pctHoldSpaceLeftExponent: 2.0
-    pctSetsRemainingCoefficient: 1.0
-    pctSetsRemainingExponent: 1000.0
-    pctTravelTimeLeftCoefficient: 1.0E-6
-    pctTravelTimeLeftExponent: 2.0
+    nonAssociatedSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    numFadsInStockModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    opportunisticFadSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctHoldSpaceLeftModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctSetsRemainingModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctTravelTimeLeftModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
@@ -100,28 +117,44 @@ EPO Abundance:
   fishingStrategyFactory:
     attractionWeightsFile: null
     catchSamplersFactory: null
-    dolphinSetActionCoefficient: 1.0E-6
-    dolphinSetActionExponent: 2.0
+    dolphinSetActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     dolphinSetDetectionProbability: 0.1
-    dolphinSetGeneratorCoefficient: 1.0E-6
-    dolphinSetGeneratorExponent: 2.0
-    fadDeploymentActionCoefficient: 1.0E-6
+    dolphinSetGeneratorFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     fadDeploymentActionDecayConstant: 1.0
-    fadDeploymentActionExponent: 2.0
-    fadSetActionCoefficient: 0.1
-    fadSetActionExponent: 2.0
+    fadDeploymentActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    fadSetActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     movingThreshold: 0.1
-    nonAssociatedSetActionCoefficient: 1.0E-6
-    nonAssociatedSetActionExponent: 2.0
+    nonAssociatedSetActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     nonAssociatedSetDetectionProbability: 0.1
-    nonAssociatedSetGeneratorCoefficient: 1.0E-6
-    nonAssociatedSetGeneratorExponent: 2.0
-    opportunisticFadSetActionCoefficient: 1.0E-6
-    opportunisticFadSetActionExponent: 2.0
+    nonAssociatedSetGeneratorFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    opportunisticFadSetActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     opportunisticFadSetDetectionProbability: 0.1
-    searchActionCoefficient: 1.0E-6
     searchActionDecayConstant: 1.0
-    searchActionExponent: 2.0
+    searchActionValueFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
     searchBonus: 0.1
     setCompositionWeightsPath: inputs/epo/set_compositions.csv
   locationValuesFilePath: inputs/epo/location_values.csv

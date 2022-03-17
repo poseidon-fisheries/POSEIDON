@@ -45,10 +45,12 @@ abstract class Excluder<B extends LocalBiology> {
 
     B exclude(final B originalBiology, final FishState fishState) {
         final List<B> biologiesToExclude = extractor.apply(fishState);
-        return exclude(
-            originalBiology,
-            aggregator.apply(fishState.getBiology(), biologiesToExclude)
-        );
+        return biologiesToExclude.isEmpty()
+            ? originalBiology
+            : exclude(
+                originalBiology,
+                aggregator.apply(fishState.getBiology(), biologiesToExclude)
+            );
     }
 
     abstract B exclude(B aggregatedBiology, B biologyToExclude);

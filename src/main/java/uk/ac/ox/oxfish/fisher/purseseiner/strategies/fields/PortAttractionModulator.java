@@ -19,40 +19,33 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import java.util.function.DoubleUnaryOperator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
-
-import java.util.function.DoubleUnaryOperator;
 
 public class PortAttractionModulator implements GlobalAttractionModulator {
 
-    private final DoubleUnaryOperator pctHoldSpaceLeftCompressedExponentialFunction;
-    private final DoubleUnaryOperator pctTravelTimeLeftCompressedExponentialFunction;
+    private final DoubleUnaryOperator pctHoldSpaceLeftModulationFunction;
+    private final DoubleUnaryOperator pctTravelTimeLeftModulationFunction;
 
     public PortAttractionModulator(
-        final double pctHoldSpaceLeftCoefficient,
-        final double pctHoldSpaceLeftExponent,
-        final double pctTravelTimeLeftCoefficient,
-        final double pctTravelTimeLeftExponent
+        final DoubleUnaryOperator pctHoldSpaceLeftModulationFunction,
+        final DoubleUnaryOperator pctTravelTimeLeftModulationFunction
     ) {
-        this.pctHoldSpaceLeftCompressedExponentialFunction =
-            new CompressedExponentialFunction(pctHoldSpaceLeftCoefficient, pctHoldSpaceLeftExponent);
-
-        this.pctTravelTimeLeftCompressedExponentialFunction =
-            new CompressedExponentialFunction(pctTravelTimeLeftCoefficient, pctTravelTimeLeftExponent);
+        this.pctHoldSpaceLeftModulationFunction = pctHoldSpaceLeftModulationFunction;
+        this.pctTravelTimeLeftModulationFunction = pctTravelTimeLeftModulationFunction;
     }
 
     @Override
-    public double modulate(Fisher fisher) {
+    public double modulate(final Fisher fisher) {
         final double pctHoldSpaceLeft = 1.0 - fisher.getHold().getPercentageFilled();
         final double pctTravelTimeLeft = 1.0 - (fisher.getHoursAtSea() / maxTravelTime(fisher));
         return 1.0 -
-            pctTravelTimeLeftCompressedExponentialFunction.applyAsDouble(pctTravelTimeLeft) *
-                pctHoldSpaceLeftCompressedExponentialFunction.applyAsDouble(pctHoldSpaceLeft);
+            pctTravelTimeLeftModulationFunction.applyAsDouble(pctTravelTimeLeft) *
+                pctHoldSpaceLeftModulationFunction.applyAsDouble(pctHoldSpaceLeft);
     }
 
-    private double maxTravelTime(Fisher fisher) {
+    private static double maxTravelTime(final Fisher fisher) {
         return ((GravityDestinationStrategy) fisher.getDestinationStrategy()).getMaxTravelTime();
     }
 

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
@@ -114,6 +115,7 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
+import uk.ac.ox.oxfish.utility.operators.DoubleUnaryOperators;
 
 /**
  * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
@@ -239,6 +241,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(FadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
         NAMES_MAP.put(FadInitializerFactory.class, FadInitializerFactories.NAMES);
+
+        CONSTRUCTOR_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.CONSTRUCTORS);
+        NAMES_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.NAMES);
 
     }
 

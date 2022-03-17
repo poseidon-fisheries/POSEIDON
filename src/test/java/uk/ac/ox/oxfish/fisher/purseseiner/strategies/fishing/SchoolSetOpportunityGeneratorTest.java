@@ -45,6 +45,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
 
 public class SchoolSetOpportunityGeneratorTest {
 
@@ -83,13 +84,12 @@ public class SchoolSetOpportunityGeneratorTest {
             Arrays.copyOf(biomasses, biomasses.length),
             Arrays.copyOf(biomasses, biomasses.length)
         );
-        final NonAssociatedSetAction nonAssociatedSetAction = mock(NonAssociatedSetAction.class);
+        @SuppressWarnings("rawtypes") final NonAssociatedSetAction nonAssociatedSetAction = mock(NonAssociatedSetAction.class);
         when(nonAssociatedSetAction.checkIfPermitted()).thenReturn(true);
-        final SchoolSetOpportunityGenerator<BiomassLocalBiology,
+        @SuppressWarnings("rawtypes") final SchoolSetOpportunityGenerator<BiomassLocalBiology,
             NonAssociatedSetAction<BiomassLocalBiology>>
             setOpportunityGenerator = new SchoolSetOpportunityGenerator(
-            coefficient,
-            exponent,
+            new CompressedExponentialFunction(coefficient, exponent),
             ImmutableMap.of(
                 globalBiology.getSpecie(0), weight0,
                 globalBiology.getSpecie(1), weight1

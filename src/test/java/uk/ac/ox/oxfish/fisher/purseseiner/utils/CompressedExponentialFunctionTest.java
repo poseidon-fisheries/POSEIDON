@@ -22,6 +22,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import java.util.function.DoubleUnaryOperator;
 import junit.framework.TestCase;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
 
 public class CompressedExponentialFunctionTest extends TestCase {
 

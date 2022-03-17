@@ -4,7 +4,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 import java.util.function.DoubleUnaryOperator;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
 
 public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
 
@@ -12,21 +12,6 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
     private final DoubleUnaryOperator pctSetsRemainingModulationFunction;
 
     public GlobalSetAttractionModulator(
-        final double pctHoldAvailableCoefficient,
-        final double pctHoldAvailableExponent,
-        final double pctSetsRemainingCoefficient,
-        final double pctSetsRemainingExponent
-    ) {
-        this(
-            new CompressedExponentialFunction(
-                pctHoldAvailableCoefficient,
-                pctHoldAvailableExponent
-            ),
-            new CompressedExponentialFunction(pctSetsRemainingCoefficient, pctSetsRemainingExponent)
-        );
-    }
-
-    private GlobalSetAttractionModulator(
         final DoubleUnaryOperator pctHoldAvailableModulationFunction,
         final DoubleUnaryOperator pctSetsRemainingModulationFunction
     ) {

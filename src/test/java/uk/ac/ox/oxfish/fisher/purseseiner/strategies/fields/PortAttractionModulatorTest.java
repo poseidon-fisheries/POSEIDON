@@ -19,15 +19,16 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
-
 import static java.lang.Double.MAX_VALUE;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunction;
 
 public class PortAttractionModulatorTest {
 
@@ -35,10 +36,8 @@ public class PortAttractionModulatorTest {
     public void test() {
         final PortAttractionModulator modulator =
             new PortAttractionModulator(
-                0.5,
-                MAX_VALUE,
-                0.5,
-                MAX_VALUE
+                new LogisticFunction(0.5, MAX_VALUE),
+                new LogisticFunction(0.5, MAX_VALUE)
             );
 
         final GravityDestinationStrategy gravityDestinationStrategy =

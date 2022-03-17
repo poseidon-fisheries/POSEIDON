@@ -31,7 +31,7 @@ public class AbundancePurseSeineGearFactory
     public PurseSeineGear<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return new AbundancePurseSeineGear(
             makeFadManager(fishState),
-            attractionFields()::iterator,
+            attractionFields(fishState)::iterator,
             getSuccessfulSetProbability().apply(fishState.getRandom())
         );
     }

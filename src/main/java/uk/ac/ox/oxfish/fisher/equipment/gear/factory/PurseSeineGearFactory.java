@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLoca
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -55,6 +56,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -102,49 +104,133 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
-    private double pctHoldSpaceLeftCoefficient = 1E-6;
-    private double pctHoldSpaceLeftExponent = 2;
-    private double pctTravelTimeLeftCoefficient = 1E-6;
-    private double pctTravelTimeLeftExponent = 2;
-    private double pctSetsRemainingCoefficient = 2; // not calibrated for now
-    private double pctSetsRemainingExponent = 1000; // not calibrated for now
-    private double opportunisticFadSetTimeSinceLastVisitCoefficient = 1E-6;
-    private double opportunisticFadSetTimeSinceLastVisitExponent = 2;
-    private double nonAssociatedSetTimeSinceLastVisitCoefficient = 1E-6;
-    private double nonAssociatedSetTimeSinceLastVisitExponent = 2;
-    private double dolphinSetTimeSinceLastVisitCoefficient = 1E-6;
-    private double dolphinSetTimeSinceLastVisitExponent = 2;
-    private double fadDeploymentPctActiveFadsLimitCoefficient = 1E-6;
-    private double fadDeploymentPctActiveFadsLimitExponent = 2;
+    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
+
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        pctHoldSpaceLeftModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        pctSetsRemainingModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        numFadsInStockModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        fadDeploymentPctActiveFadsLimitModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        pctTravelTimeLeftModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        opportunisticFadSetTimeSinceLastVisitModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        nonAssociatedSetTimeSinceLastVisitModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        dolphinSetTimeSinceLastVisitModulationFunction =
+        new CompressedExponentialFunctionFactory(1E-6, 2);
     private double actionDistanceExponent = 1;
     private double destinationDistanceExponent = 1;
-    private double numFadsInStockCoefficient = 1E-6;
-    private double numFadsInStockExponent = 2;
 
-    private FadInitializerFactory<B, F> fadInitializerFactory;
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
+        return opportunisticFadSetTimeSinceLastVisitModulationFunction;
+    }
 
-    public FadInitializerFactory<B, F> getFadInitializer() {
+    public void setOpportunisticFadSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> opportunisticFadSetTimeSinceLastVisitModulationFunction
+    ) {
+        this.opportunisticFadSetTimeSinceLastVisitModulationFunction =
+            opportunisticFadSetTimeSinceLastVisitModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getNonAssociatedSetTimeSinceLastVisitModulationFunction() {
+        return nonAssociatedSetTimeSinceLastVisitModulationFunction;
+    }
+
+    public void setNonAssociatedSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> nonAssociatedSetTimeSinceLastVisitModulationFunction
+    ) {
+        this.nonAssociatedSetTimeSinceLastVisitModulationFunction =
+            nonAssociatedSetTimeSinceLastVisitModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getDolphinSetTimeSinceLastVisitModulationFunction() {
+        return dolphinSetTimeSinceLastVisitModulationFunction;
+    }
+
+    public void setDolphinSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetTimeSinceLastVisitModulationFunction
+    ) {
+        this.dolphinSetTimeSinceLastVisitModulationFunction =
+            dolphinSetTimeSinceLastVisitModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctHoldSpaceLeftModulationFunction() {
+        return pctHoldSpaceLeftModulationFunction;
+    }
+
+    public void setPctHoldSpaceLeftModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> pctHoldSpaceLeftModulationFunction
+    ) {
+        this.pctHoldSpaceLeftModulationFunction = pctHoldSpaceLeftModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctTravelTimeLeftModulationFunction() {
+        return pctTravelTimeLeftModulationFunction;
+    }
+
+    public void setPctTravelTimeLeftModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> pctTravelTimeLeftModulationFunction
+    ) {
+        this.pctTravelTimeLeftModulationFunction = pctTravelTimeLeftModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctSetsRemainingModulationFunction() {
+        return pctSetsRemainingModulationFunction;
+    }
+
+    public void setPctSetsRemainingModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> pctSetsRemainingModulationFunction
+    ) {
+        this.pctSetsRemainingModulationFunction = pctSetsRemainingModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getFadDeploymentPctActiveFadsLimitModulationFunction() {
+        return fadDeploymentPctActiveFadsLimitModulationFunction;
+    }
+
+    public void setFadDeploymentPctActiveFadsLimitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> fadDeploymentPctActiveFadsLimitModulationFunction
+    ) {
+        this.fadDeploymentPctActiveFadsLimitModulationFunction =
+            fadDeploymentPctActiveFadsLimitModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getNumFadsInStockModulationFunction() {
+        return numFadsInStockModulationFunction;
+    }
+
+    public void setNumFadsInStockModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> numFadsInStockModulationFunction
+    ) {
+        this.numFadsInStockModulationFunction = numFadsInStockModulationFunction;
+    }
+
+    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(final FadInitializerFactory<B, F> fadInitializerFactory) {
+    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    public double getNumFadsInStockCoefficient() {
-        return numFadsInStockCoefficient;
-    }
-
-    public void setNumFadsInStockCoefficient(final double numFadsInStockCoefficient) {
-        this.numFadsInStockCoefficient = numFadsInStockCoefficient;
-    }
-
-    public double getNumFadsInStockExponent() {
-        return numFadsInStockExponent;
-    }
-
-    public void setNumFadsInStockExponent(final double numFadsInStockExponent) {
-        this.numFadsInStockExponent = numFadsInStockExponent;
     }
 
     public double getActionDistanceExponent() {
@@ -163,24 +249,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.destinationDistanceExponent = destinationDistanceExponent;
     }
 
-    public double getPctSetsRemainingCoefficient() {
-        return pctSetsRemainingCoefficient;
-    }
-
-    public void setPctSetsRemainingCoefficient(final double pctSetsRemainingCoefficient) {
-        this.pctSetsRemainingCoefficient = pctSetsRemainingCoefficient;
-    }
-
-    public double getPctSetsRemainingExponent() {
-        return pctSetsRemainingExponent;
-    }
-
-    public void setPctSetsRemainingExponent(
-        final double pctSetsRemainingExponent
-    ) {
-        this.pctSetsRemainingExponent = pctSetsRemainingExponent;
-    }
-
     @SuppressWarnings("rawtypes")
     public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
@@ -194,138 +262,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.dolphinSetObservers = dolphinSetObservers;
     }
 
-    @SuppressWarnings("unused")
-    public double getPctHoldSpaceLeftCoefficient() {
-        return pctHoldSpaceLeftCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPctHoldSpaceLeftCoefficient(final double pctHoldSpaceLeftCoefficient) {
-        this.pctHoldSpaceLeftCoefficient = pctHoldSpaceLeftCoefficient;
-    }
-
-    public double getPctHoldSpaceLeftExponent() {
-        return pctHoldSpaceLeftExponent;
-    }
-
-    public void setPctHoldSpaceLeftExponent(
-        final double pctHoldSpaceLeftExponent
-    ) {
-        this.pctHoldSpaceLeftExponent = pctHoldSpaceLeftExponent;
-    }
-
-    public double getPctTravelTimeLeftCoefficient() {
-        return pctTravelTimeLeftCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPctTravelTimeLeftCoefficient(
-        final double pctTravelTimeLeftCoefficient
-    ) {
-        this.pctTravelTimeLeftCoefficient = pctTravelTimeLeftCoefficient;
-    }
-
-    public double getPctTravelTimeLeftExponent() {
-        return pctTravelTimeLeftExponent;
-    }
-
-    public void setPctTravelTimeLeftExponent(
-        final double pctTravelTimeLeftExponent
-    ) {
-        this.pctTravelTimeLeftExponent = pctTravelTimeLeftExponent;
-    }
-
-    public double getFadDeploymentPctActiveFadsLimitCoefficient() {
-        return fadDeploymentPctActiveFadsLimitCoefficient;
-    }
-
-    public void setFadDeploymentPctActiveFadsLimitCoefficient(
-        final double fadDeploymentPctActiveFadsLimitCoefficient
-    ) {
-        this.fadDeploymentPctActiveFadsLimitCoefficient =
-            fadDeploymentPctActiveFadsLimitCoefficient;
-    }
-
-    public double getFadDeploymentPctActiveFadsLimitExponent() {
-        return fadDeploymentPctActiveFadsLimitExponent;
-    }
-
-    public void setFadDeploymentPctActiveFadsLimitExponent(
-        final double fadDeploymentPctActiveFadsLimitExponent
-    ) {
-        this.fadDeploymentPctActiveFadsLimitExponent =
-            fadDeploymentPctActiveFadsLimitExponent;
-    }
-
-    @SuppressWarnings("unused")
-    public double getOpportunisticFadSetTimeSinceLastVisitCoefficient() {
-        return opportunisticFadSetTimeSinceLastVisitCoefficient;
-    }
-
-    public void setOpportunisticFadSetTimeSinceLastVisitCoefficient(
-        final double opportunisticFadSetTimeSinceLastVisitCoefficient
-    ) {
-        this.opportunisticFadSetTimeSinceLastVisitCoefficient =
-            opportunisticFadSetTimeSinceLastVisitCoefficient;
-    }
-
-    public double getOpportunisticFadSetTimeSinceLastVisitExponent() {
-        return opportunisticFadSetTimeSinceLastVisitExponent;
-    }
-
-    public void setOpportunisticFadSetTimeSinceLastVisitExponent(
-        final double opportunisticFadSetTimeSinceLastVisitExponent
-    ) {
-        this.opportunisticFadSetTimeSinceLastVisitExponent =
-            opportunisticFadSetTimeSinceLastVisitExponent;
-    }
-
-    @SuppressWarnings("unused")
-    public double getNonAssociatedSetTimeSinceLastVisitCoefficient() {
-        return nonAssociatedSetTimeSinceLastVisitCoefficient;
-    }
-
-    public void setNonAssociatedSetTimeSinceLastVisitCoefficient(
-        final double nonAssociatedSetTimeSinceLastVisitCoefficient
-    ) {
-        this.nonAssociatedSetTimeSinceLastVisitCoefficient =
-            nonAssociatedSetTimeSinceLastVisitCoefficient;
-    }
-
-    public double getNonAssociatedSetTimeSinceLastVisitExponent() {
-        return nonAssociatedSetTimeSinceLastVisitExponent;
-    }
-
-    public void setNonAssociatedSetTimeSinceLastVisitExponent(
-        final double nonAssociatedSetTimeSinceLastVisitExponent
-    ) {
-        this.nonAssociatedSetTimeSinceLastVisitExponent =
-            nonAssociatedSetTimeSinceLastVisitExponent;
-    }
-
-    @SuppressWarnings("unused")
-    public double getDolphinSetTimeSinceLastVisitCoefficient() {
-        return dolphinSetTimeSinceLastVisitCoefficient;
-    }
-
-    @SuppressWarnings("unused")
-    public void setDolphinSetTimeSinceLastVisitCoefficient(
-        final double dolphinSetTimeSinceLastVisitCoefficient
-    ) {
-        this.dolphinSetTimeSinceLastVisitCoefficient =
-            dolphinSetTimeSinceLastVisitCoefficient;
-    }
-
-    public double getDolphinSetTimeSinceLastVisitExponent() {
-        return dolphinSetTimeSinceLastVisitExponent;
-    }
-
-    public void setDolphinSetTimeSinceLastVisitExponent(
-        final double dolphinSetTimeSinceLastVisitExponent
-    ) {
-        this.dolphinSetTimeSinceLastVisitExponent =
-            dolphinSetTimeSinceLastVisitExponent;
-    }
 
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
@@ -430,13 +366,11 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         return fadManager;
     }
 
-    Stream<AttractionField> attractionFields() {
+    Stream<AttractionField> attractionFields(final FishState fishState) {
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
-                pctHoldSpaceLeftCoefficient,
-                pctHoldSpaceLeftExponent,
-                pctSetsRemainingCoefficient,
-                pctSetsRemainingExponent
+                pctHoldSpaceLeftModulationFunction.apply(fishState),
+                pctSetsRemainingModulationFunction.apply(fishState)
             );
         return Stream.of(
             new ActionAttractionField(
@@ -453,8 +387,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    opportunisticFadSetTimeSinceLastVisitCoefficient,
-                    opportunisticFadSetTimeSinceLastVisitExponent
+                    opportunisticFadSetTimeSinceLastVisitModulationFunction.apply(fishState)
                 ),
                 globalSetAttractionModulator,
                 OpportunisticFadSetAction.class,
@@ -467,8 +400,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    nonAssociatedSetTimeSinceLastVisitCoefficient,
-                    nonAssociatedSetTimeSinceLastVisitExponent
+                    nonAssociatedSetTimeSinceLastVisitModulationFunction.apply(fishState)
                 ),
                 globalSetAttractionModulator,
                 NonAssociatedSetAction.class,
@@ -481,8 +413,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    dolphinSetTimeSinceLastVisitCoefficient,
-                    dolphinSetTimeSinceLastVisitExponent
+                    dolphinSetTimeSinceLastVisitModulationFunction.apply(fishState)
                 ),
                 globalSetAttractionModulator,
                 DolphinSetAction.class,
@@ -496,10 +427,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                 ),
                 LocalCanFishThereAttractionModulator.INSTANCE,
                 new GlobalDeploymentAttractionModulator(
-                    fadDeploymentPctActiveFadsLimitCoefficient,
-                    fadDeploymentPctActiveFadsLimitExponent,
-                    numFadsInStockCoefficient,
-                    numFadsInStockExponent
+                    fadDeploymentPctActiveFadsLimitModulationFunction.apply(fishState),
+                    numFadsInStockModulationFunction.apply(fishState)
                 ),
                 FadDeploymentAction.class,
                 actionDistanceExponent,
@@ -507,10 +436,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             ),
             new PortAttractionField(
                 new PortAttractionModulator(
-                    pctHoldSpaceLeftCoefficient,
-                    pctHoldSpaceLeftExponent,
-                    pctTravelTimeLeftCoefficient,
-                    pctTravelTimeLeftExponent
+                    pctHoldSpaceLeftModulationFunction.apply(fishState),
+                    pctTravelTimeLeftModulationFunction.apply(fishState)
                 ),
                 actionDistanceExponent,
                 destinationDistanceExponent

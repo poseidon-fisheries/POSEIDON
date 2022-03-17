@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.CompressedExponentialFunction;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -31,15 +31,6 @@ public class LocalSetAttractionModulator implements LocalAttractionModulator {
     private final DoubleUnaryOperator timeSinceLastVisitModulationFunction;
 
     public LocalSetAttractionModulator(
-        final double timeSinceLastVisitCoefficient,
-        final double timeSinceLastVisitExponent
-    ) {
-        this(
-            new CompressedExponentialFunction(timeSinceLastVisitCoefficient, timeSinceLastVisitExponent)
-        );
-    }
-
-    private LocalSetAttractionModulator(
         final DoubleUnaryOperator timeSinceLastVisitModulationFunction
     ) {
         this.timeSinceLastVisitModulationFunction = timeSinceLastVisitModulationFunction;

@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.utils;
+package uk.ac.ox.oxfish.utility.operators;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.exp;
