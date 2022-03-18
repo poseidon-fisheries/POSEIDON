@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
@@ -72,7 +73,14 @@ public class ExogenousFadSetterFromDataTest {
         dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
         //let's log this
-        setter.startOrResetLogger(mock(FishState.class));
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        when(model.getSpecies()).thenReturn(
+                Lists.newArrayList(
+                        new Species("Species 0"),
+                        new Species("Species 1")
+                )
+        );
+        setter.startOrResetLogger(model);
 
 
         //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
@@ -82,7 +90,7 @@ public class ExogenousFadSetterFromDataTest {
         localFads.add(fad);
 
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+
         setter.start(model);
         when(model.getDay()).thenReturn(123);
         when(model.getFadMap().fadsAt(any())).thenReturn(localFads);
@@ -99,9 +107,10 @@ public class ExogenousFadSetterFromDataTest {
 
         System.out.println(setter.printLog());
 
-        assertEquals("day,x,y,result,error\n" +
-                "123,0,0,MATCH,"+ Math.sqrt(2 * Math.pow(100 - 40, 2)) +"\n" +
-                "123,0,0,FAILED,NaN" +"\n",
+        assertEquals(
+                "day,x,y,result,error,Species 0,Species 0_simulated,Species 1,Species 1_simulated\n" +
+                        "123,0,0,MATCH,"+ Math.sqrt(2 * Math.pow(100 - 40, 2)) +",100.0,40.0,100.0,40.0\n" +
+                        "123,0,0,FAILED,NaN\n",
                 setter.printLog()
 
                 );

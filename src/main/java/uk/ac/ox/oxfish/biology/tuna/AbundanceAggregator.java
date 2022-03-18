@@ -50,8 +50,9 @@ class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
                             get(sourceBiologies, 0).getAbundance(species);
                         final int subdivisions = abundance.getSubdivisions();
                         final int bins = abundance.getBins();
+                        Iterable<StructuredAbundance> iterator = sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator;
                         return StructuredAbundance.sum(
-                            sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator,
+                                iterator,
                             bins,
                             subdivisions
                         ).asMatrix();
