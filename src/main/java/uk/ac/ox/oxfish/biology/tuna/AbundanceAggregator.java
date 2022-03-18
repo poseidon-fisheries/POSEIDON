@@ -19,14 +19,13 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Iterables.get;
 import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.IntStream.range;
 
 import java.util.Collection;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 
 /**
  * An {@link Aggregator} that works with {@link AbundanceLocalBiology} biologies.
@@ -36,26 +35,28 @@ class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
     @Override
     public AbundanceLocalBiology apply(
         final GlobalBiology globalBiology,
-        final Collection<AbundanceLocalBiology> abundanceLocalBiologies
+        final Collection<AbundanceLocalBiology> sourceBiologies
     ) {
-        // Create a map from species to empty abundance arrays which we
-        // are going to mutate directly when summing up global abundance
-        final Map<Species, double[][]> abundances = globalBiology.getSpecies()
-            .stream()
-            .collect(toImmutableMap(
-                identity(),
-                species -> new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]
-            ));
-        abundanceLocalBiologies.forEach(localBiology ->
-            abundances.forEach((species, abundance) ->
-                range(0, abundance.length).forEach(subdivision ->
-                    range(0, abundance[subdivision].length).forEach(bin ->
-                        abundance[subdivision][bin] +=
-                            localBiology.getAbundance(species).getAbundance(subdivision, bin)
-                    )
-                )
-            )
-        );
-        return new AbundanceLocalBiology(abundances);
+        return sourceBiologies.isEmpty()
+            ? new AbundanceLocalBiology(globalBiology)
+            : new AbundanceLocalBiology(
+                globalBiology.getSpecies().stream().collect(toImmutableMap(
+                    identity(),
+                    species -> {
+                        // We're grabbing the bins and subdivisions from the first
+                        // biology instead of the species because sometimes the meristics
+                        // are not initialised in testing code.
+                        final StructuredAbundance abundance =
+                            get(sourceBiologies, 0).getAbundance(species);
+                        final int subdivisions = abundance.getSubdivisions();
+                        final int bins = abundance.getBins();
+                        return StructuredAbundance.sum(
+                            sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator,
+                            bins,
+                            subdivisions
+                        ).asMatrix();
+                    }
+                ))
+            );
     }
 }

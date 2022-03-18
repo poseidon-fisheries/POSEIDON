@@ -18,29 +18,24 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * This is a {@link Restorer} that works with {@link AbundanceLocalBiology}.
+ * A simple wrapper around {@link AbundanceAggregator} in order to use it in a {@link
+ * BiologicalProcess} chain.
  */
-public class AbundanceRestorer
-    extends Restorer<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+public class AbundanceAggregatorProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
-    AbundanceRestorer(
-        final AbundanceReallocator reallocator,
-        final AbundanceAggregator aggregator,
-        final Map<Integer, Integer> schedule
+    private final AbundanceAggregator abundanceAggregator = new AbundanceAggregator();
+
+    @Override
+    public Collection<AbundanceLocalBiology> process(
+        final FishState fishState,
+        final Collection<AbundanceLocalBiology> biologies
     ) {
-        super(
-            reallocator,
-            aggregator,
-            new AbundanceExtractorProcess(false, true),
-            new FadAbundanceExcluder(),
-            schedule
-        );
+        return ImmutableList.of(abundanceAggregator.apply(fishState.getBiology(), biologies));
     }
-
 }

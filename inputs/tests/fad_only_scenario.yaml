@@ -4,6 +4,14 @@ FAD only EPO Abundance:
   abundanceInitializerFactory:
     Abundance Initializer Factory:
       binsFilePath: inputs/epo/abundance/bins.csv
+  abundanceMortalityProcessFactory:
+    mortalityFile: inputs/epo/abundance/mortality.csv
+    sources:
+    - natural
+    - obj_class_1_5
+    - noa_class_1_5
+    - longline
+    speciesCodes: null
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
     firstLargeBinPerSpecies:
@@ -12,7 +20,7 @@ FAD only EPO Abundance:
       Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
-      0: 364
+      0: 365
   costsFile: inputs/epo/costs.csv
   fadInitializerFactory:
     Abundance FAD Initializer:
@@ -64,6 +72,8 @@ FAD only EPO Abundance:
     Exogenous Fad Setter CSV:
       dataInTonnes: true
       isDataInTonnes: true
+      keepLog: false
+      missingFadError: '10000.0'
       neighborhoodSearchSize: '0.0'
       pathToFile: inputs/epo/calibration/fad_sets.csv
   mapInitializerFactory:
@@ -76,6 +86,7 @@ FAD only EPO Abundance:
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
   scheduledAbundanceProcessesFactory:
+    abundanceMortalityProcessFactory: null
     biologicalProcessesDates:
     - '2017-01-01'
     - '2017-04-01'

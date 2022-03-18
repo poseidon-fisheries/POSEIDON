@@ -39,6 +39,7 @@ public class ScheduledBiomassProcessesFactory
 
     private BiomassReallocator biomassReallocator;
 
+
     @Override
     public ScheduledBiologicalProcesses<BiomassLocalBiology> apply(final FishState fishState) {
 
@@ -67,8 +68,7 @@ public class ScheduledBiomassProcessesFactory
 
         return new ScheduledBiologicalProcesses<>(
             grids.getStepMapper(),
-            schedule,
-            new Extractor<>(BiomassLocalBiology.class, true, true)
+            schedule
         );
     }
 

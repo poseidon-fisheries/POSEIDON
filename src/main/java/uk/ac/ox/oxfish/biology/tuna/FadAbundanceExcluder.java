@@ -18,55 +18,12 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-
-import java.util.Map.Entry;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-
-class FadAbundanceExcluder extends Excluder<AbundanceLocalBiology> {
+class FadAbundanceExcluder extends AbundanceExcluder {
 
     FadAbundanceExcluder() {
         super(
-            new AbundanceExtractor(true, false),
+            new AbundanceExtractorProcess(true, false),
             new AbundanceAggregator()
         );
     }
-
-    @Override
-    AbundanceLocalBiology exclude(
-        final AbundanceLocalBiology aggregatedBiology,
-        final AbundanceLocalBiology biologyToExclude
-    ) {
-        return new AbundanceLocalBiology(
-            aggregatedBiology
-                .getAbundance()
-                .entrySet()
-                .stream()
-                .collect(toImmutableMap(
-                    Entry::getKey,
-                    entry -> subtractMatrices(
-                        entry.getValue(),
-                        biologyToExclude.getAbundance().get(entry.getKey())
-                    )
-                ))
-        );
-    }
-
-
-    /**
-     * Use DoubleGrid2D as an easy way to subtract the two matrices. There might be a bit of
-     * overhead in instantiating the DoubleGrid2D objects, but we'll' deal with it if it turns out
-     * to be a problem.
-     */
-    private static double[][] subtractMatrices(
-        final double[][] initialAggregation,
-        final double[][] aggregationToSubtract
-    ) {
-        return new DoubleGrid2D(initialAggregation)
-            .add(new DoubleGrid2D(aggregationToSubtract).multiply(-1))
-            .lowerBound(0) // cannot subtract what is not there
-            .getField();
-    }
-
 }

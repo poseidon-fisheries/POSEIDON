@@ -18,48 +18,90 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 
 import com.google.common.primitives.ImmutableDoubleArray;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * A proportional mortality process. It needs all species meristics to be {@link TunaMeristics}.
- * Note that "proportional mortality" here means mortality as a direct percentage as opposed to
- * {@link uk.ac.ox.oxfish.biology.complicated.ProportionalMortalityProcess} that does
- * exponentiation.
+ * A proportional mortality process. Note that "proportional mortality" here means mortality as a
+ * direct percentage as opposed to
+ * {@link uk.ac.ox.oxfish.biology.complicated.ProportionalMortalityProcess}
+ * that does exponentiation.
  */
+@SuppressWarnings("UnstableApiUsage")
 public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
-    private final Function<FishState, List<AbundanceLocalBiology>> localBiologiesExtractor =
-        new Extractor<>(AbundanceLocalBiology.class, true, true);
+    private final Map<Species, Map<String, List<ImmutableDoubleArray>>> mortalitySources;
 
-    @SuppressWarnings("UnstableApiUsage")
+    public AbundanceMortalityProcess(
+        final Map<Species, Map<String, List<List<Double>>>> mortalitySources
+    ) {
+        // deep copy everything to immutable structures
+        this.mortalitySources =
+            mortalitySources.entrySet().stream().collect(toImmutableMap(
+                Entry::getKey,
+                entry1 -> entry1.getValue().entrySet().stream().collect(toImmutableMap(
+                    Entry::getKey,
+                    entry2 -> entry2.getValue()
+                        .stream()
+                        .map(ImmutableDoubleArray::copyOf)
+                        .collect(toImmutableList())
+                ))
+            ));
+    }
+
     @Override
     public Collection<AbundanceLocalBiology> process(
         final FishState fishState,
         final Collection<AbundanceLocalBiology> biologies
     ) {
-        // Here we go through all the local biologies (ocean cells and FADs)
-        // and we mutate the abundance matrices directly.
-        biologies.forEach(biology ->
-            biology.getAbundance().forEach((species, matrix) -> {
-                final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
-                final List<ImmutableDoubleArray> mortalities =
-                    meristics.getProportionalMortalities();
-                range(0, meristics.getNumberOfSubdivisions()).forEach(subdivision ->
-                    range(0, matrix[subdivision].length).forEach(bin ->
-                        matrix[subdivision][bin] *= (1 - mortalities.get(subdivision).get(bin))
+        return biologies.stream().map(biology ->
+            new AbundanceLocalBiology(
+                biology.getAbundance().entrySet().stream().collect(toImmutableMap(
+                    Entry::getKey,
+                    entry -> applyMortality(entry.getKey(), entry.getValue())
+                ))
+            )
+        ).collect(toImmutableList());
+    }
+
+    @NotNull
+    private double[][] applyMortality(final Species species, final double[][] abundance) {
+        final int subs = species.getNumberOfSubdivisions();
+        final int bins = species.getNumberOfBins();
+        final double[][] newAbundance =
+            stream(abundance)
+                .map(double[]::clone)
+                .toArray(double[][]::new);
+        mortalitySources
+            .get(species)
+            .values()
+            .stream()
+            .map(mortality ->
+                range(0, subs).mapToObj(sub ->
+                    range(0, bins).mapToDouble(bin ->
+                        abundance[sub][bin] * mortality.get(sub).get(bin)
+                    ).toArray()
+                ).toArray(double[][]::new)
+            )
+            .forEach(deaths ->
+                range(0, subs).forEach(sub ->
+                    range(0, bins).forEach(bin ->
+                        newAbundance[sub][bin] -= deaths[sub][bin]
                     )
-                );
-            })
-        );
-        return biologies;
+                )
+            );
+        return newAbundance;
     }
 }

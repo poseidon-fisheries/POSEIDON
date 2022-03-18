@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -9,8 +11,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +34,7 @@ public class AbundanceLinearIntervalAttractorTest {
 
 
         FishState state = mock(FishState.class);
-        when(state.getSpecies()).thenReturn(List.of(species));
+        when(state.getSpecies()).thenReturn(ImmutableList.of(species));
         AbundanceLinearIntervalAttractor attractor = new AbundanceLinearIntervalAttractor(
                 5,10,
                 new double[]{800}, //80kg a day
@@ -82,7 +82,7 @@ public class AbundanceLinearIntervalAttractorTest {
 
 
         FishState state = mock(FishState.class);
-        when(state.getSpecies()).thenReturn(List.of(species));
+        when(state.getSpecies()).thenReturn(ImmutableList.of(species));
         AbundanceLinearIntervalAttractor attractor = new AbundanceLinearIntervalAttractor(
                 5,10,
                 new double[]{800}, //80kg a day
@@ -113,9 +113,9 @@ public class AbundanceLinearIntervalAttractorTest {
         AbundanceFad fad = mock(AbundanceFad.class); when(fad.getTotalCarryingCapacity()).thenReturn(10000d);
         AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class,RETURNS_DEEP_STUBS);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fadBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{0,0})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{0,0})));
         AbundanceLocalBiology localBiology = mock(AbundanceLocalBiology.class,RETURNS_DEEP_STUBS);
-        when(localBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{999999,999999})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,999999})));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(3);
 
@@ -125,8 +125,8 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //too full
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{999999});
-        when(fadBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{999999,999999})));
-        when(localBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{999999,999999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,999999})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,999999})));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -136,8 +136,8 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //empty local biology
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{0,0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{1,1})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{0,0})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{1,1})));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -147,8 +147,8 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //valid
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{0,0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(Map.of(species,new StructuredAbundance(new double[]{999999,99999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{0,0})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,99999})));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 

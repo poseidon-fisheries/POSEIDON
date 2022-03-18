@@ -49,6 +49,8 @@ public class ScheduledAbundanceProcessesFactory
     private AbundanceReallocator abundanceReallocator;
     private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
 
+    private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory;
+
     /**
      * Empty constructor to allow YAML instantiation.
      */
@@ -60,6 +62,15 @@ public class ScheduledAbundanceProcessesFactory
         final Collection<String> biologicalProcessesDates
     ) {
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
+    }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcessFactory() {
+        return abundanceMortalityProcessFactory;
+    }
+
+    public void setAbundanceMortalityProcessFactory(final AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory) {
+        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
     }
 
     @SuppressWarnings("unused")
@@ -94,18 +105,24 @@ public class ScheduledAbundanceProcessesFactory
     public ScheduledBiologicalProcesses<AbundanceLocalBiology> apply(final FishState fishState) {
 
         checkNotNull(
+            abundanceMortalityProcessFactory,
+            "setAbundanceMortalityProcessFactory mus be called before using."
+        );
+
+        checkNotNull(
             abundanceReallocator,
             "setAbundanceReallocator must be called before using."
         );
 
         return new ScheduledBiologicalProcesses<>(
             abundanceReallocator.getAllocationGrids().getStepMapper(),
-            buildSchedule(),
-            new Extractor<>(AbundanceLocalBiology.class, true, true)
+            buildSchedule(fishState)
         );
     }
 
-    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule() {
+    private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule(
+        final FishState fishState
+    ) {
         final LocalDate startDate = LocalDate.parse(biologicalProcessesDates.get(0));
         final Set<Integer> processSteps =
             biologicalProcessesDates.stream()
@@ -126,16 +143,18 @@ public class ScheduledAbundanceProcessesFactory
         // Add all our periodical biological processes to the schedule
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
-                new AbundanceMortalityProcess(),
-                // TODO: add exogenous mortality
+                new AbundanceExtractorProcess(true, true),
+                abundanceMortalityProcessFactory.apply(fishState),
                 new AbundanceLostRecoveryProcess(),
+                new AbundanceAggregatorProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
+                new FadAbundanceExcluderProcess(),
                 abundanceReallocator
             );
 
         final List<BiologicalProcess<AbundanceLocalBiology>> reallocationProcesses =
             ImmutableList.of(
-                new AbundanceExtractor(false, true),
+                new AbundanceExtractorProcess(false, true),
                 abundanceReallocator
             );
 

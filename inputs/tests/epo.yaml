@@ -7,6 +7,14 @@ EPO Abundance:
   abundanceInitializerFactory:
     Abundance Initializer Factory:
       binsFilePath: inputs/epo/abundance/bins.csv
+  abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+    mortalityFile: inputs/epo/abundance/mortality.csv
+    sources: !!set
+      natural: null
+      obj_class_1_5: null
+      noa_class_1_5: null
+      longline: null
+    speciesCodes: null
   abundancePurseSeineGearFactory:
     actionDistanceExponent: 1.0
     actionSpecificRegulations:
@@ -58,7 +66,7 @@ EPO Abundance:
       Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
-      0: 364
+      0: 365
   attractionWeightsFile: inputs/epo/action_weights.csv
   costsFile: inputs/epo/costs.csv
   fadInitializerFactory:
@@ -156,6 +164,7 @@ EPO Abundance:
     - closure A
     - closure B
   scheduledAbundanceProcessesFactory:
+    abundanceMortalityProcessFactory: null
     biologicalProcessesDates:
     - '2017-01-01'
     - '2017-04-01'

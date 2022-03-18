@@ -35,6 +35,14 @@ abstract class Excluder<B extends LocalBiology> {
         this.aggregator = aggregator;
     }
 
+    public Aggregator<B> getAggregator() {
+        return aggregator;
+    }
+
+    public Extractor<B> getExtractor() {
+        return extractor;
+    }
+
     B exclude(final B originalBiology, final FishState fishState) {
         final List<B> biologiesToExclude = extractor.apply(fishState);
         return exclude(
