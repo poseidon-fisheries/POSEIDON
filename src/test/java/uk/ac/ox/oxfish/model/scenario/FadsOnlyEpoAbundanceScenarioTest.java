@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +51,7 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
             final FadsOnlyEpoAbundanceScenario epoAbundanceScenario =
                 fishYAML.loadAs(fileReader, FadsOnlyEpoAbundanceScenario.class);
             final FishState fishState = new FishState();
+            epoAbundanceScenario.useDummyData(INPUT_PATH.resolve("test"));
             fishState.setScenario(epoAbundanceScenario);
             fishState.start();
         } catch (final FileNotFoundException e) {
@@ -61,7 +63,8 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
     }
 
     public void testRunTwoYearsWithoutCrashing() {
-        final Scenario scenario = new FadsOnlyEpoAbundanceScenario();
+        final FadsOnlyEpoAbundanceScenario scenario = new FadsOnlyEpoAbundanceScenario();
+        scenario.useDummyData(INPUT_PATH.resolve("test"));
         final FishState fishState = new FishState();
         initFadRemovalLog();
         fishState.setScenario(scenario);

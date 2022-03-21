@@ -25,6 +25,7 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import java.nio.file.Path;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -354,5 +355,22 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory
     ) {
         this.fadSetterFactory = fadSetterFactory;
+    }
+
+    @Override
+    public void useDummyData(final Path testPath) {
+        super.useDummyData(testPath);
+        fadMapFactory.setCurrentFiles(
+            ImmutableMap.of(
+                Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_monthly.csv"),
+                Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_monthly.csv")
+            )
+        );
+        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
+            testPath.resolve("dummy_fad_deployments.csv").toString()
+        );
+        ((ExogenousFadSetterCSVFactory)fadSetterFactory).setPathToFile(
+            testPath.resolve("dummy_fad_sets.csv").toString()
+        );
     }
 }

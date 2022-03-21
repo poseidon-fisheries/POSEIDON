@@ -283,7 +283,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     @Override
     public void useDummyData(final Path testPath) {
-
         super.useDummyData(testPath);
         setAttractionWeightsFile(
             testPath.resolve("dummy_action_weights.csv")
