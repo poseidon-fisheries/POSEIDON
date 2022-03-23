@@ -24,7 +24,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import java.io.File;
 import java.io.FileWriter;
@@ -40,7 +39,6 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcess;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
@@ -64,6 +62,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -99,11 +98,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
-        );
-    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-        new AbundanceMortalityProcessFromFileFactory(
-            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
         );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
@@ -143,7 +137,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new PurseSeinerAbundanceFishingStrategyFactory();
     private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
         new AbundancePurseSeineGearFactory();
-    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory =
+    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>
+        fadInitializerFactory =
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
@@ -169,16 +164,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             System.out.println("Step: " + fishState.getStep());
             fishState.schedule.step(fishState);
         }
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcessFactory() {
-        return abundanceMortalityProcessFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
-        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
     }
 
     @SuppressWarnings("unused")
@@ -369,12 +354,14 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
-        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
-            abundanceMortalityProcessFactory
-        );
+        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
+            instanceof AbundanceMortalityProcessFromFileFactory) {
+            ((AbundanceMortalityProcessFromFileFactory)
+                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
+                .setSpeciesCodes(speciesCodes);
+        }
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -416,9 +403,12 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
         abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
-        if(fadInitializerFactory instanceof AbundanceFadInitializerFactory)
-            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
-        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
+            ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
+                .setSpeciesCodes(speciesCodesFactory.get());
+        }
+        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(
+            FadSetAction.class));
 
         abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
 

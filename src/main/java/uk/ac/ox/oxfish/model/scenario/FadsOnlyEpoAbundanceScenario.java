@@ -127,21 +127,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
-    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-        new AbundanceMortalityProcessFromFileFactory(
-            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
-        );
-
-    @SuppressWarnings("unused")
-    public AbundanceMortalityProcessFromFileFactory getAbundanceMortalityProcessFactory() {
-        return abundanceMortalityProcessFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
-        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
-    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -287,12 +272,14 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
-        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
-            abundanceMortalityProcessFactory
-        );
+        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
+            instanceof AbundanceMortalityProcessFromFileFactory) {
+            ((AbundanceMortalityProcessFromFileFactory)
+                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
+                .setSpeciesCodes(speciesCodes);
+        }
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }

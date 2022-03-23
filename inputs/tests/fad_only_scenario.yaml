@@ -4,14 +4,6 @@ FAD only EPO Abundance:
   abundanceInitializerFactory:
     Abundance Initializer Factory:
       binsFilePath: inputs/epo/abundance/bins.csv
-  abundanceMortalityProcessFactory:
-    mortalityFile: inputs/epo/abundance/mortality.csv
-    sources:
-    - natural
-    - obj_class_1_5
-    - noa_class_1_5
-    - longline
-    speciesCodes: null
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
     firstLargeBinPerSpecies:
@@ -86,7 +78,14 @@ FAD only EPO Abundance:
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
   scheduledAbundanceProcessesFactory:
-    abundanceMortalityProcessFactory: null
+    abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+      mortalityFile: inputs/epo/abundance/mortality.csv
+      sources:
+      - natural
+      - obj_class_1_5
+      - noa_class_1_5
+      - longline
+      speciesCodes: null
     biologicalProcessesDates:
     - '2017-01-01'
     - '2017-04-01'
