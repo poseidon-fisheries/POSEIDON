@@ -63,6 +63,9 @@ public class EpoAbundanceScenarioTest extends TestCase {
             gear.setPctHoldSpaceLeftModulationFunction(new LogisticFunctionFactory());
             gear.setPctSetsRemainingModulationFunction(new LogisticFunctionFactory());
             gear.setPctTravelTimeLeftModulationFunction(new LogisticFunctionFactory());
+            gear.setDolphinSetTimeSinceLastVisitModulationFunction(new LogisticFunctionFactory());
+            gear.setFadDeploymentPctActiveFadsLimitModulationFunction(new LogisticFunctionFactory());
+
             final PurseSeinerAbundanceFishingStrategyFactory strat =
                 scenario.getFishingStrategyFactory();
             strat.setDolphinSetActionValueFunction(new LogisticFunctionFactory());
@@ -77,7 +80,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
             return scenario;
         };
         saveAndLoadYaml(
-            Paths.get("inputs", "tests", "epo_logistic.yaml").toFile(),
+            Paths.get("inputs", "tests", "epo_abundance_logistic_scenario.yaml").toFile(),
             scenarioSupplier,
             (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
             EpoAbundanceScenario.class

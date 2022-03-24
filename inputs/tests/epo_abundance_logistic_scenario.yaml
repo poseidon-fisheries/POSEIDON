@@ -27,15 +27,17 @@ EPO Abundance:
     dolphinSetObservers: !!set {
       }
     dolphinSetTimeSinceLastVisitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.5
+        steepness: 1.0
     fadDeploymentObservers: !!set {
       }
     fadDeploymentPctActiveFadsLimitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.5
+        steepness: 1.0
     fadInitializerFactory: null
     fadSetObservers: !!set {
       }
