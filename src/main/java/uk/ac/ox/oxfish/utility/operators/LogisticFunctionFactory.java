@@ -23,9 +23,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunction> {
 
-    private double midpoint;
-    private double steepness;
-    private double maximum;
+    private double midpoint = 0.5;
+    private double steepness = 1.0;
+    private double maximum = 1.0;
 
     @SuppressWarnings("unused")
     public double getMidpoint() {

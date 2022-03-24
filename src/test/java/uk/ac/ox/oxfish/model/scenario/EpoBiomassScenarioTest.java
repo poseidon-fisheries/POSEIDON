@@ -21,10 +21,12 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenarioTest.saveAndLoadYaml;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -41,12 +43,12 @@ public class EpoBiomassScenarioTest {
 
     @Test
     public void canSaveToAndLoadFromYamlWithoutCrashing() {
-        final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        final FishYAML yaml = new FishYAML();
-        final String output = yaml.dump(scenario);
-        System.out.println(output);
-        final EpoBiomassScenario scenario2 = yaml.loadAs(output, EpoBiomassScenario.class);
-        assertNotNull(scenario2);
+        saveAndLoadYaml(
+            Paths.get("inputs", "tests", "epo_biomass.yaml").toFile(),
+            EpoBiomassScenario::new,
+            (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
+            EpoBiomassScenario.class
+        );
     }
 
     @Test
