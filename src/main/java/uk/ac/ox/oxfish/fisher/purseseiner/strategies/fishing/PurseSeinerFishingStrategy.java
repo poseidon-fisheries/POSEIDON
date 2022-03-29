@@ -46,6 +46,8 @@ import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -194,13 +196,15 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
                         )
                 ));
 
-        return Streams
+        ImmutableList<Entry<PurseSeinerAction, Double>> actionsAvailable = Streams
                 .concat(
                         weightedSetActions,
                         weightedSearchActions,
                         weightedFadDeploymentAction
-                )
-                .filter(entry -> entry.getKey().isPermitted())
+                ).collect(toImmutableList());
+
+        return
+                actionsAvailable.stream().filter(entry -> entry.getKey().isPermitted())
                 .filter(entry -> entry.getValue() > movingThreshold).
                 filter(purseSeinerActionDoubleEntry -> fisher.grabRandomizer().nextDouble()<purseSeinerActionDoubleEntry.getValue())
                 .collect(toImmutableList());
@@ -215,8 +219,8 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
         return entry(action, actionValue * w);
     }
 
-    private static double valueOfSetAction(
-            final AbstractSetAction<? extends LocalBiology> action,
+    protected double valueOfSetAction(
+            @NotNull final AbstractSetAction<? extends LocalBiology> action,
             final DoubleUnaryOperator actionValueFunction,
             final Collection<Species> species
     ) {

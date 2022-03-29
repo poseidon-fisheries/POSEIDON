@@ -36,6 +36,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -304,15 +307,29 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     public PurseSeinerFishingStrategy<B, F> apply(final FishState fishState) {
         checkNotNull(catchSamplersFactory);
         checkNotNull(attractionWeightsFile);
+        return callConstructor(this::loadAttractionWeights, this::makeSetOpportunityDetector,
+                               makeActionValueFunctions(fishState), searchActionDecayConstant,
+                               fadDeploymentActionDecayConstant, movingThreshold);
+    }
+
+    @NotNull
+    protected PurseSeinerFishingStrategy<B, F> callConstructor(
+            final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
+            final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
+            final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+            final double searchActionDecayConstant,
+            final double fadDeploymentActionDecayConstant,
+            final double movingThreshold) {
         return new PurseSeinerFishingStrategy<>(
-            this::loadAttractionWeights,
-            this::makeSetOpportunityDetector,
-            makeActionValueFunctions(fishState),
-            searchActionDecayConstant,
-            fadDeploymentActionDecayConstant,
-            movingThreshold
+                attractionWeights,
+                opportunityDetector,
+                actionValueFunctions,
+                searchActionDecayConstant,
+                fadDeploymentActionDecayConstant,
+                movingThreshold
         );
     }
+
 
     private Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
         final Fisher fisher
