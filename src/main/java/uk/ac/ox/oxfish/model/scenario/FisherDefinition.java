@@ -118,7 +118,7 @@ public class FisherDefinition {
      */
     private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
 
-    private LinkedHashMap<String,Integer> initialFishersPerPort = new LinkedHashMap<>();
+    private LinkedHashMap<String,Number> initialFishersPerPort = new LinkedHashMap<>();
 
 
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
@@ -580,7 +580,7 @@ public class FisherDefinition {
      *
      * @return Value for property 'initialFishersPerPort'.
      */
-    public LinkedHashMap<String, Integer> getInitialFishersPerPort() {
+    public LinkedHashMap<String, Number> getInitialFishersPerPort() {
         return initialFishersPerPort;
     }
 
@@ -589,7 +589,7 @@ public class FisherDefinition {
      *
      * @param initialFishersPerPort Value to set for property 'initialFishersPerPort'.
      */
-    public void setInitialFishersPerPort(LinkedHashMap<String, Integer> initialFishersPerPort) {
+    public void setInitialFishersPerPort(LinkedHashMap<String, Number> initialFishersPerPort) {
 
         this.initialFishersPerPort = initialFishersPerPort;
     }

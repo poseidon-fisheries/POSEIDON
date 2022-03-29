@@ -34,7 +34,7 @@ public class TunaEvaluator implements Runnable {
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
-    private int numRuns = 1; //getRuntime().availableProcessors();
+    private int numRuns = 5; //getRuntime().availableProcessors();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
@@ -49,6 +49,7 @@ public class TunaEvaluator implements Runnable {
             "evaluation_results.csv",
             fishState -> new EvaluationResultsRowProvider(fishState, optimization)
         );
+        runner.setParallel(false);
 
     }
 
