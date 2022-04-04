@@ -27,10 +27,8 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
 import org.apache.commons.collections15.set.ListOrderedSet;
@@ -175,6 +173,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     public Set<F> getDeployedFads() {
         return Collections.unmodifiableSet(deployedFads);
     }
+
 
     public Fisher getFisher() {
         return fisher;

@@ -25,11 +25,13 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
@@ -101,7 +103,8 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         final SeaTile seaTile = fisher.getLocation();
         final Int2D here = new Int2D(seaTile.getGridX(), seaTile.getGridY());
         final FishState fishState = fisher.grabState();
-        return attractionWeights
+
+         return attractionWeights
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() > 0)
