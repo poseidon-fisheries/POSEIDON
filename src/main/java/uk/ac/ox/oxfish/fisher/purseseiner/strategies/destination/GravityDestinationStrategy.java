@@ -104,16 +104,6 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         final Int2D here = new Int2D(seaTile.getGridX(), seaTile.getGridY());
         final FishState fishState = fisher.grabState();
 
-        ImmutableMap<AttractionField, Double2D> sorted = attractionWeights
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() > 0).
-                collect(toImmutableMap(
-                        entry -> entry.getKey(),
-                        entry -> entry.getKey().netAttractionHere().multiply(entry.getValue())
-                ));
-
-
          return attractionWeights
             .entrySet()
             .stream()
