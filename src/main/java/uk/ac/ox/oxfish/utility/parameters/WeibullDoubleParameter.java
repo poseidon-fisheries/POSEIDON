@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.random.Well19937c;
+import uk.ac.ox.oxfish.utility.MTFApache;
 
 public class WeibullDoubleParameter implements DoubleParameter {
 
@@ -48,8 +49,8 @@ public class WeibullDoubleParameter implements DoubleParameter {
 
         if(distribution==null)
             distribution = new WeibullDistribution(
-                    new Well19937c(
-                            mersenneTwisterFast.nextLong()
+                    new MTFApache(
+                            mersenneTwisterFast
                     ),
                     shape,scale);
 
