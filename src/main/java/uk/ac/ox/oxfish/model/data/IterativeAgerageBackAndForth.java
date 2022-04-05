@@ -1,6 +1,6 @@
 /*
  *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ *     Copyright (C) 2022  CoHESyS Lab cohesys.lab@gmail.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,20 +23,29 @@ package uk.ac.ox.oxfish.model.data;
 import com.google.common.base.Preconditions;
 
 /**
- * Just a recursive formulation for computing the average
- * Created by carrknight on 11/9/16.
+ * a simple variant of the iterative average that can move back and forth (as in, you can "remove" observations),
+ * maybe not as efficient
+ * @param <T>
  */
-public class IterativeAverage<T extends Number> implements Averager<T> {
+public class IterativeAgerageBackAndForth<T extends Number> implements Averager<T> {
 
+
+    private double totalSum = 0;
 
     private double average = 0;
 
-    private int observations = 0;
+    private double observations = 0;
 
     @Override
     public void addObservation(T observation) {
+        addObservationfromDouble(observation.doubleValue());
+    }
+
+
+    public void addObservationfromDouble(double observation) {
         observations++;
-        average += (observation.doubleValue()-average)/observations;
+        totalSum+=observation;
+        average = totalSum/observations;
     }
 
     /**
@@ -47,6 +56,12 @@ public class IterativeAverage<T extends Number> implements Averager<T> {
         return average;
     }
 
+    public void removeObservation(double observation) {
+        Preconditions.checkArgument(observations>1);
+        observations--;
+        totalSum-=observation;
+        average = totalSum/observations;
+    }
 
 
 }

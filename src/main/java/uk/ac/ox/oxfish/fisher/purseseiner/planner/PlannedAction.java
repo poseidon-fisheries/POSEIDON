@@ -2,12 +2,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
-
-import java.util.List;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -98,4 +98,46 @@ public interface PlannedAction {
             };
         }
     }
+
+
+    //very simple class, used to define the beginning and ending of a trip
+    //in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
+    class PlannedArrival implements PlannedAction{
+
+
+        private final SeaTile position;
+
+        private final boolean endOfTrip;
+
+        public PlannedArrival(SeaTile position, boolean endOfTrip) {
+            this.position = position;
+            this.endOfTrip = endOfTrip;
+        }
+
+        @Override
+        public SeaTile getLocation() {
+            return position;
+        }
+
+        @Override
+        public double hoursItTake() {
+            return 0;
+        }
+
+        /**
+         * list of actions that need to take place for the planned action to take place
+         *
+         * @param fisher
+         * @return
+         */
+        @Override
+        public Action[] actuate(Fisher fisher) {
+            return new Action[]{endOfTrip ? new Arriving() : new Moving()};
+        }
+
+        public boolean isEndOfTrip() {
+            return endOfTrip;
+        }
+    }
+
 }

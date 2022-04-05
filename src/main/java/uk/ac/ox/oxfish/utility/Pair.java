@@ -52,4 +52,14 @@ public class Pair<A,B> {
 
     /** Create a new pair from the first element of the pair and the result of a function applied to both elements */
     public <R> Pair<A, R> mapSecond(BiFunction<A, B, R> f) { return new Pair<>(first, f.apply(first, second)); }
+
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Pair{");
+        sb.append("first=").append(first);
+        sb.append(", second=").append(second);
+        sb.append('}');
+        return sb.toString();
+    }
 }

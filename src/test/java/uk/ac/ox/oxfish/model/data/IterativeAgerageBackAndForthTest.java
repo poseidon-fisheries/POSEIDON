@@ -1,6 +1,6 @@
 /*
  *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ *     Copyright (C) 2022  CoHESyS Lab cohesys.lab@gmail.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,33 +20,29 @@
 
 package uk.ac.ox.oxfish.model.data;
 
-import com.google.common.base.Preconditions;
+import org.junit.Test;
 
-/**
- * Just a recursive formulation for computing the average
- * Created by carrknight on 11/9/16.
- */
-public class IterativeAverage<T extends Number> implements Averager<T> {
+import static org.junit.Assert.*;
+
+public class IterativeAgerageBackAndForthTest {
+
+    @Test
+    public void average() throws Exception {
+
+        IterativeAgerageBackAndForth<Integer> averager = new IterativeAgerageBackAndForth<>();
+
+        averager.addObservationfromDouble(1);
+        averager.addObservationfromDouble(2);
+        averager.addObservationfromDouble(3);
+        averager.addObservationfromDouble(4);
+        assertEquals(2.5,averager.getSmoothedObservation(),.0001);
+        averager.removeObservation(4);
+        assertEquals(2,averager.getSmoothedObservation(),.0001);
+        averager.removeObservation(1);
+        assertEquals(2.5,averager.getSmoothedObservation(),.0001);
 
 
-    private double average = 0;
 
-    private int observations = 0;
-
-    @Override
-    public void addObservation(T observation) {
-        observations++;
-        average += (observation.doubleValue()-average)/observations;
     }
-
-    /**
-     * returns the average
-     */
-    @Override
-    public double getSmoothedObservation() {
-        return average;
-    }
-
-
 
 }

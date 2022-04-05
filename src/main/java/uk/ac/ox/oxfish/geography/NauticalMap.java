@@ -422,6 +422,9 @@ public Coordinate getCoordinates(int gridX, int gridY) {
      */
     public Table<SeaTile,Integer,Bag> alreadyComputedNeighbors = HashBasedTable.create();
 
+
+
+
     /**
      * one size lookups are even more common, so store them here
      */

@@ -67,5 +67,9 @@ public class DeploymentPlannedActionGenerator{
         );
     }
 
+    public boolean isReady(){
+        return seatilePicker != null;
+    }
+
 
 }
