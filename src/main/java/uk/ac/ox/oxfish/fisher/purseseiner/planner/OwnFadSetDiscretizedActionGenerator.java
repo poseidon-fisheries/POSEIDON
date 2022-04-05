@@ -1,14 +1,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.PriorityQueue;
  * was the selected one (through chooseFad)
  */
 @SuppressWarnings("ALL")
-public class OwnFadSetPlannedActionGenerator {
+public class OwnFadSetDiscretizedActionGenerator {
 
 
 
@@ -36,7 +34,7 @@ public class OwnFadSetPlannedActionGenerator {
      */
     private final double minimumFadValue;
 
-    public OwnFadSetPlannedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
+    public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
         this.discretization = discretization;
         this.minimumFadValue = minimumFadValue;
     }
@@ -97,6 +95,9 @@ public class OwnFadSetPlannedActionGenerator {
         Preconditions.checkState(selectedFad!=null);
         return new PlannedAction.PlannedFadSet(selectedFad.getFirst());
 
+    }
+    public boolean isStarted(){
+        return rankedFads != null;
     }
 
     public static class ValuedFad extends Pair<Fad,Double> {

@@ -107,6 +107,7 @@ EPO Abundance:
       Y2016: inputs/epo/currents/currents_2016.csv
       Y2017: inputs/epo/currents/currents_2017.csv
   fishingStrategyFactory:
+    ageBasedSetDecisions: false
     attractionWeightsFile: null
     catchSamplersFactory: null
     dolphinSetActionValueFunction:
