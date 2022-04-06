@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -37,11 +38,11 @@ public interface PlannedAction {
    // public boolean isAllowedAtStep(Fisher fisher, int modelTimeStep);
 
 
-    class PlannedDeploy implements PlannedAction{
+    class Deploy implements PlannedAction{
 
         private final SeaTile tile;
 
-        public PlannedDeploy(SeaTile tile) {
+        public Deploy(SeaTile tile) {
             this.tile = tile;
         }
 
@@ -68,12 +69,12 @@ public interface PlannedAction {
         }
     }
 
-    class PlannedFadSet implements PlannedAction{
+    class FadSet implements PlannedAction{
 
 
         private final Fad fadWePlanToSetOn;
 
-        public PlannedFadSet(Fad fadWePlanToSetOn) {
+        public FadSet(Fad fadWePlanToSetOn) {
             this.fadWePlanToSetOn = fadWePlanToSetOn;
         }
 
@@ -102,14 +103,14 @@ public interface PlannedAction {
 
     //very simple class, used to define the beginning and ending of a trip
     //in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
-    class PlannedArrival implements PlannedAction{
+    class Arrival implements PlannedAction{
 
 
         private final SeaTile position;
 
         private final boolean endOfTrip;
 
-        public PlannedArrival(SeaTile position, boolean endOfTrip) {
+        public Arrival(SeaTile position, boolean endOfTrip) {
             this.position = position;
             this.endOfTrip = endOfTrip;
         }
@@ -137,6 +138,58 @@ public interface PlannedAction {
 
         public boolean isEndOfTrip() {
             return endOfTrip;
+        }
+    }
+
+    //this action represents an hour of fishing, followed by a # of hours of delay (due to local processing, recovery time,
+    //or whatever else works)
+    class Fishing implements PlannedAction{
+
+
+        private final SeaTile position;
+
+        private final double delayInHours;
+
+        public Fishing(SeaTile position,
+                       double delayInHours) {
+            this.position = position;
+            this.delayInHours = delayInHours;
+        }
+
+        @Override
+        public SeaTile getLocation() {
+
+            return position;
+        }
+
+        @Override
+        public double hoursItTake() {
+            return 1+delayInHours;
+        }
+
+        /**
+         * list of actions that need to take place for the planned action to take place
+         *
+         * @param fisher
+         * @return
+         */
+        @Override
+        public Action[] actuate(Fisher fisher) {
+
+            return delayInHours > 0 ?
+                    new Action[]{new uk.ac.ox.oxfish.fisher.actions.Fishing(),new Delaying(delayInHours)} :
+                    new Action[]{new uk.ac.ox.oxfish.fisher.actions.Fishing()};
+
+        }
+
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("Fishing{");
+            sb.append("position=").append(position);
+            sb.append(", delayInHours=").append(delayInHours);
+            sb.append('}');
+            return sb.toString();
         }
     }
 

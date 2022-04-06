@@ -54,4 +54,9 @@ public interface PlanningModule extends FisherStartable {
      */
     public int maximumActionsInAPlan(FishState state, Fisher fisher);
 
+    @Override
+    void start(FishState model, Fisher fisher);
+
+    @Override
+    void turnOff(Fisher fisher);
 }

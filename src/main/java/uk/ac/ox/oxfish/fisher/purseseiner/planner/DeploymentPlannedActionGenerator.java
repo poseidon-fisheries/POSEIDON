@@ -60,9 +60,9 @@ public class DeploymentPlannedActionGenerator{
         preparePicker();
     }
 
-    public PlannedAction.PlannedDeploy drawNewDeployment(){
+    public PlannedAction.Deploy drawNewDeployment(){
         Preconditions.checkNotNull(seatilePicker,"Did not start the deploy generator yet!");
-        return new PlannedAction.PlannedDeploy(
+        return new PlannedAction.Deploy(
                 seatilePicker.sample()
         );
     }

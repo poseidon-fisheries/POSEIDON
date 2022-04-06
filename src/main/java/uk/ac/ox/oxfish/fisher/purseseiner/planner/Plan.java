@@ -41,8 +41,8 @@ public class Plan {
                 SeaTile finalPosition) {
         this.initialPosition = initialPosition;
         this.finalPosition = finalPosition;
-        plannedActions.add(new PlannedAction.PlannedArrival(initialPosition,false));
-        plannedActions.add(new PlannedAction.PlannedArrival(finalPosition,true));
+        plannedActions.add(new PlannedAction.Arrival(initialPosition, false));
+        plannedActions.add(new PlannedAction.Arrival(finalPosition, true));
 
         //update centroid of the path
         centroid[0].addObservationfromDouble(initialPosition.getGridX());
@@ -96,4 +96,11 @@ public class Plan {
         return plannedActionsView;
     }
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Plan{");
+        sb.append("plannedActions=").append(plannedActions);
+        sb.append('}');
+        return sb.toString();
+    }
 }

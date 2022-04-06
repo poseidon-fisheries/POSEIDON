@@ -26,19 +26,23 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 public enum ActionType {
 
     DeploymentAction("DPL"),
-    SetOwnFadAction("FAD");
+    SetOwnFadAction("FAD"),
+    FishingOnTile("FSH")
+    ;
 
 
     public static final ActionType[] ALL_ACTIONS =
             new ActionType[]{
                     DeploymentAction,
-                    SetOwnFadAction
+                    SetOwnFadAction,
+                    FishingOnTile
             };
 
     public static final String[] ALL_ACTION_NAMES =
             new String[]{
                     DeploymentAction.text,
-                    SetOwnFadAction.text
+                    SetOwnFadAction.text,
+                    FishingOnTile.text
             };
 
     private final String text;
