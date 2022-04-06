@@ -104,7 +104,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         assertEquals(secondGuess.getFirst().getSecond(),2.0);
 
         //if I pick one option, next time I choose it shouldn't be present anymore
-        PlannedAction.PlannedFadSet plannedFadSet = generator.chooseFad(0);
+        PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
         assertEquals(plannedFadSet.getLocation(),firstGuess.getFirst().getFirst().getLocation());
 
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();

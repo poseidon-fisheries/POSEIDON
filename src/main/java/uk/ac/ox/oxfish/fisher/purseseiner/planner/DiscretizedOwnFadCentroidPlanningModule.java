@@ -113,7 +113,8 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
     @Override
     public void turnOff(Fisher fisher) {
-        PlanningModule.super.turnOff(fisher);
+      map=null;
+
     }
 
     @Override

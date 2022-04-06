@@ -90,10 +90,10 @@ public class OwnFadSetDiscretizedActionGenerator {
         return toReturn;
     }
 
-    public PlannedAction.PlannedFadSet chooseFad(Integer discretizationGroup){
+    public PlannedAction.FadSet chooseFad(Integer discretizationGroup){
         ValuedFad selectedFad = rankedFads[discretizationGroup].poll();
         Preconditions.checkState(selectedFad!=null);
-        return new PlannedAction.PlannedFadSet(selectedFad.getFirst());
+        return new PlannedAction.FadSet(selectedFad.getFirst());
 
     }
     public boolean isStarted(){

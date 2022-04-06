@@ -2,23 +2,16 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import nl.jqno.equalsverifier.internal.exceptions.AssertionException;
 import org.junit.Test;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
@@ -55,7 +48,7 @@ public class DeploymentPlannedActionGeneratorTest {
         int timesWeDeployAt11 = 0;
 
         for (int draws = 0; draws < 100; draws++) {
-            PlannedAction.PlannedDeploy plannedDeploy = generator.drawNewDeployment();
+            PlannedAction.Deploy plannedDeploy = generator.drawNewDeployment();
             if (plannedDeploy.getLocation().getGridX() == 2 && plannedDeploy.getLocation().getGridY() == 2) {
                 timesWeDeployAt22++;
             } else {

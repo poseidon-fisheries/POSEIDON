@@ -42,12 +42,12 @@ public class PlanTest {
         assertEquals(0, plan.getGridYCentroid(), .0001);
 
         plan.insertAction(
-                new PlannedAction.PlannedDeploy(map.getSeaTile(1,1)),
+                new PlannedAction.Deploy(map.getSeaTile(1, 1)),
                 1
 
         );
         plan.insertAction(
-                new PlannedAction.PlannedDeploy(map.getSeaTile(1,3)),
+                new PlannedAction.Deploy(map.getSeaTile(1, 3)),
                 1
 
         );

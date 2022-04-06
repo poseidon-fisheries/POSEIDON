@@ -22,17 +22,21 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-import java.util.HashMap;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A simple planner where given a budget of time you can spend out:
@@ -93,7 +97,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     @Override
     public void start(FishState model, Fisher fisher) {
         this.fisher = fisher;
-        this.model=null;
+        this.model = model;
     }
 
 
@@ -165,24 +169,135 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         this.deploymentLocationValues = deploymentLocationValues;
     }
 
-    public Plan keepPlanning(Plan currentPlan, double hoursLeftInBudget){
+    private Plan planRecursively(Plan currentPlan, double hoursLeftInBudget,
+                                FishState model, Fisher fisher){
 
         //if there are no possible actions, stop
         if(!isAnyActionEvenPossible())
             return currentPlan;
         //if there are some possible actions, do them
-        throw new RuntimeException("not coded yet");
+
+        //pick at random next action!
+
+        //prepare pair list
+        ActionType nextActionType = drawNextAction(model.getRandom());
+
+        //you can't draw any actions, the plan is over!
+        if(nextActionType==null)
+            return currentPlan;
+
+        //ask the planning module for an action to add to the path
+        PlanningModule planningModule = planModules.get(nextActionType);
+        //might be the first time you call it, so get it ready
+        readyPlanningModule(nextActionType,fisher,model);
+        PlannedAction plannedAction = planningModule.chooseNextAction(currentPlan);
+
+        //if the planning module cannot propose more actions, ignore them for this plan
+        if(plannedAction==null)
+        {
+            stillAllowedActionsInPlan.get(nextActionType).setValue(0);
+            //try planning more
+            return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
+        }
+        else{
+            //there is an action and we need to take it
+            double hoursConsumed =
+                    cheapestInsert(currentPlan,plannedAction,hoursLeftInBudget,fisher.getBoat().getSpeedInKph(),
+                           model.getMap());
+            if(Double.isNaN(hoursConsumed))
+                //went overbudget! our plan is complete
+                return currentPlan;
+            else
+            {
+                hoursLeftInBudget =  hoursLeftInBudget-hoursConsumed;
+                assert hoursLeftInBudget >= -FishStateUtilities.EPSILON;
+                if(hoursLeftInBudget<=0)
+                    return currentPlan;
+                else
+                    return planRecursively(currentPlan, hoursLeftInBudget,
+                                           model, fisher);
+            }
+        }
 
 
+
+    }
+
+    private ActionType drawNextAction(MersenneTwisterFast random) {
+        List<Pair<ActionType, Double>> toDraw = new ArrayList<>(plannableActionWeights.size());
+        for (Map.Entry<ActionType, Double> actionsAvailable : plannableActionWeights.entrySet()) {
+            boolean allowed = stillAllowedActionsInPlan.getOrDefault(
+                    actionsAvailable.getKey(),
+                    new MutableInt(1)).intValue()>0;
+            if(!allowed)
+                continue;
+            toDraw.add(new Pair<>(actionsAvailable.getKey(),actionsAvailable.getValue()));
+        }
+        //feed it to the enumerated distribution
+        ActionType nextAction = null;
+        if(toDraw.size()==1)
+            nextAction = toDraw.get(0).getKey();
+        else{
+            nextAction = new EnumeratedDistribution<ActionType>(new MTFApache(random), toDraw).sample();
+        }
+        return nextAction;
     }
 
     public Plan planNewTrip(){
         assert fisher.isAtPort();
         assert fisher.isAllowedAtSea();
+        assert fisher.getLocation() == fisher.getHomePort().getLocation();
 
-        //todo
+        //create an empty plan (circling back home)
+        currentPlan = new Plan(fisher.getLocation(),
+                               fisher.getLocation());
+        //start planning
+        stillAllowedActionsInPlan.clear();
+        currentPlan = planRecursively(currentPlan, maxHoursPerTripGenerator.apply(model.getRandom()),
+                                      model, fisher);
 
         return currentPlan;
+    }
+
+    public Plan replan(){
+        Preconditions.checkArgument(fisher.getLocation() != fisher.getHomePort().getLocation());
+
+        //length of the trip is reduced by how much we have already spent outside
+        double hoursAvailable =maxHoursPerTripGenerator.apply(model.getRandom());
+        hoursAvailable = hoursAvailable - fisher.getCurrentTrip().getDurationInHours();
+
+        //the new plan will remove all previous actions except for DPLs (if any)
+        //which are constraints we don't want to move
+        SeaTile lastPlanLocation = fisher.getLocation();
+        NauticalMap map = model.getMap();
+        double speed = fisher.getBoat().getSpeedInKph();
+        Plan newPlan = new Plan(fisher.getLocation(),
+                                fisher.getHomePort().getLocation());
+
+        for (PlannedAction plannedAction : currentPlan.lookAtPlan()) {
+            if(plannedAction instanceof PlannedAction.Deploy) {
+                double hoursConsumedTravelling = map.distance(lastPlanLocation,plannedAction.getLocation()) / speed;
+                double actionDuration = plannedAction.hoursItTake();
+                if(hoursAvailable>= hoursConsumedTravelling+actionDuration){
+                    newPlan.insertAction(plannedAction, newPlan.numberOfStepsInPath()-1);
+                    hoursAvailable -=  hoursConsumedTravelling+actionDuration;
+                    lastPlanLocation = plannedAction.getLocation();
+                }
+
+            }
+        }
+
+        //do not allow more DPL
+        stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
+        assert hoursAvailable>=0;
+
+        //add more events now.
+        currentPlan = newPlan;
+        currentPlan = planRecursively(currentPlan, maxHoursPerTripGenerator.apply(model.getRandom()),
+                                      model, fisher);
+
+        return currentPlan;
+
     }
 
     /**
@@ -215,10 +330,17 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         ListIterator<PlannedAction> iterator = currentPlan.lookAtPlan().listIterator(1);
         //for each possible insertion point, adding point C between A and B has insertion cost equal to d(A,C)+d(C,B)-d(A,B);
         //this distance ought to be positive due to triangle inequality
-        for (int index = 1; index <= currentPlan.numberOfStepsInPath(); index++) {
+        for (int index = 1; index < currentPlan.numberOfStepsInPath(); index++) {
+
 
             PlannedAction from = iterator.previous();
+            iterator.next(); //this bring you back to start
             PlannedAction to = iterator.next();
+
+            //it is never optimal to squeeze yourself between two actions that take place in the same spot unless you are also in that spot
+            if(currentPlan.numberOfStepsInPath() > 2 && from.getLocation() == to.getLocation() && from.getLocation() != actionToAddToPath.getLocation())
+                continue;
+
             double firstSegment = map.distance(from.getLocation(),actionToAddToPath.getLocation());
             if(firstSegment == 0){
                 //if you are trying to insert in the same cell, this is surely the cheapest insert!
@@ -236,12 +358,12 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 bestInsertionCost = insertionCost;
                 bestIndex = index;
             }
-            iterator.next(); //move to the next
+
         }
-        assert bestIndex>0;
         double totalCostInHours = bestInsertionCost + actionToAddToPath.hoursItTake();
         if(totalCostInHours <= hoursAvailable)
         {
+            assert bestIndex>0;
             currentPlan.insertAction(actionToAddToPath,bestIndex);
             return totalCostInHours;
         }
