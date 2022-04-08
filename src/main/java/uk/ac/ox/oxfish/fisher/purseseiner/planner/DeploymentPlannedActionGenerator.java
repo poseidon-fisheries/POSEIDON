@@ -30,6 +30,11 @@ public class DeploymentPlannedActionGenerator{
      */
     private final MTFApache localRng;
 
+    /**
+     * the time it takes for the boat to "recover" after a deployment; 0 means you can drop another immediately
+     */
+    private final double delayInHoursAfterADeployment;
+
     //todo
     //we can avoid ton of waste by not instantiating this every step and only
     //when there is a change in the location value deployment
@@ -39,11 +44,17 @@ public class DeploymentPlannedActionGenerator{
 
     public DeploymentPlannedActionGenerator(DeploymentLocationValues originalLocationValues,
                                             NauticalMap map, MersenneTwisterFast random) {
+       this(originalLocationValues,map,random,0);
+    }
+
+    public DeploymentPlannedActionGenerator(DeploymentLocationValues originalLocationValues,
+                                            NauticalMap map, MersenneTwisterFast random,
+                                            double delayInHoursAfterADeployment) {
         this.originalLocationValues = originalLocationValues;
+        this.delayInHoursAfterADeployment = delayInHoursAfterADeployment;
         this.map = map;
         localRng = new MTFApache(random);
     }
-
 
     private void preparePicker(){
         seatilePicker = new EnumeratedDistribution<>(localRng,
@@ -63,13 +74,15 @@ public class DeploymentPlannedActionGenerator{
     public PlannedAction.Deploy drawNewDeployment(){
         Preconditions.checkNotNull(seatilePicker,"Did not start the deploy generator yet!");
         return new PlannedAction.Deploy(
-                seatilePicker.sample()
+                seatilePicker.sample(),
+                delayInHoursAfterADeployment
         );
     }
 
     public boolean isReady(){
         return seatilePicker != null;
     }
+
 
 
 }

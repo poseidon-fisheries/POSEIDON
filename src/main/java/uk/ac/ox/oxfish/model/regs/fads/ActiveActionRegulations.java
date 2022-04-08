@@ -105,11 +105,12 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
         return activeFadLimits;
     }
 
-    public boolean isForbidden(PurseSeinerAction purseSeinerAction) {
+    public boolean isForbidden(Class<? extends PurseSeinerAction> purseSeinerAction,
+                               Fisher fisher) {
         return actionSpecificRegulations
-            .get(purseSeinerAction.getClass())
+            .get(purseSeinerAction)
             .stream()
-            .anyMatch(reg -> reg.isForbidden(purseSeinerAction));
+            .anyMatch(reg -> reg.isForbidden(purseSeinerAction,fisher));
     }
 
     public void observe(PurseSeinerAction purseSeinerAction) {
@@ -128,4 +129,6 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     public Optional<SetLimits> getSetLimits() {
         return setLimits;
     }
+
+
 }

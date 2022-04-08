@@ -86,7 +86,7 @@ public class SetOpportunityDetectorTest {
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[] {ownFad, otherFad}));
         when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);
-        when(actionSpecificRegulations.isForbidden(any())).thenReturn(false);
+        when(actionSpecificRegulations.isForbidden(any(),any())).thenReturn(false);
         when(fisher.getRegulation()).thenReturn(regulation);
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 

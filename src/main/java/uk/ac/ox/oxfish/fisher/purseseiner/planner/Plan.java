@@ -25,6 +25,8 @@ public class Plan {
      */
     private final SeaTile finalPosition;
 
+    private double hoursEstimatedThisPlanWillTake = 0;
+
     private final IterativeAgerageBackAndForth<Integer> centroid[] = new IterativeAgerageBackAndForth[2];
     {
         centroid[0] = new IterativeAgerageBackAndForth();
@@ -51,7 +53,10 @@ public class Plan {
         centroid[1].addObservationfromDouble(finalPosition.getGridY());
     }
 
-    public void insertAction(PlannedAction newAction, int indexInPathOfNewAction){
+
+
+    public void insertAction(PlannedAction newAction, int indexInPathOfNewAction,
+                             double additionalHoursEstimatedToTake){
         Preconditions.checkArgument(indexInPathOfNewAction>0, "You probably don't want to remove the very first step");
         Preconditions.checkArgument(indexInPathOfNewAction<=plannedActions.size(),
                                     "You probably don't want to remove the very last step");
@@ -59,6 +64,7 @@ public class Plan {
         //update centroid
         centroid[0].addObservationfromDouble(newAction.getLocation().getGridX());
         centroid[1].addObservationfromDouble(newAction.getLocation().getGridY());
+        hoursEstimatedThisPlanWillTake += additionalHoursEstimatedToTake;
     }
 
     public int numberOfStepsInPath(){
@@ -102,5 +108,13 @@ public class Plan {
         sb.append("plannedActions=").append(plannedActions);
         sb.append('}');
         return sb.toString();
+    }
+
+    /**
+     * useful to add unplanned delays into the plan
+     * @param additionalHoursSpent
+     */
+    public void addHoursSpent(double additionalHoursSpent){
+        hoursEstimatedThisPlanWillTake+=additionalHoursSpent;
     }
 }

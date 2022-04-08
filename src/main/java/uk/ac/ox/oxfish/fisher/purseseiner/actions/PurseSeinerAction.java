@@ -57,7 +57,7 @@ public abstract class PurseSeinerAction implements Action, Locatable {
     public SeaTile getLocation() { return location; }
 
     public boolean checkIfPermitted() {
-        return !getFadManager(fisher).getActionSpecificRegulations().isForbidden(this);
+        return !getFadManager(fisher).getActionSpecificRegulations().isForbidden(this.getClass(),getFisher());
     }
 
     /**

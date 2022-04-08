@@ -43,12 +43,12 @@ public class PlanTest {
 
         plan.insertAction(
                 new PlannedAction.Deploy(map.getSeaTile(1, 1)),
-                1
+                1,0.1
 
         );
         plan.insertAction(
                 new PlannedAction.Deploy(map.getSeaTile(1, 3)),
-                1
+                1,0.1
 
         );
         assertEquals(plan.getGridXCentroid(), 0.5, .0001);
