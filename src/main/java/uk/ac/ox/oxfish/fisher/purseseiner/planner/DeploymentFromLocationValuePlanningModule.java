@@ -22,7 +22,10 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -39,15 +42,27 @@ public class DeploymentFromLocationValuePlanningModule
     final private DeploymentPlannedActionGenerator generator;
 
 
+
     public DeploymentFromLocationValuePlanningModule(
             DeploymentLocationValues locationValues,
             NauticalMap map,
             MersenneTwisterFast random) {
+
+        this(locationValues,map,random,0);
+
+    }
+
+    public DeploymentFromLocationValuePlanningModule(
+            DeploymentLocationValues locationValues,
+            NauticalMap map,
+            MersenneTwisterFast random,
+            double delayInHoursAfterADeployment) {
         this.locationValues = locationValues;
         this.generator = new DeploymentPlannedActionGenerator(
                 locationValues,
                 map,
-                random
+                random,
+                delayInHoursAfterADeployment
 
         );
     }
@@ -103,7 +118,15 @@ public class DeploymentFromLocationValuePlanningModule
      */
     @Override
     public int maximumActionsInAPlan(FishState state, Fisher fisher) {
-        //you are limited by the amount of fads in your stock, at least initially
-        return FadManager.getFadManager(fisher).getNumFadsInStock();
+        //you are limited by
+        // (1) the amount of fads in your boat
+        // (2) the amount of deploy actions you are still allowed to make this year
+        // (3) the number of active FAD sets this year
+        FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+        return Math.min(Math.min(
+                fadManager.getNumFadsInStock(),
+                fadManager.getHowManyActiveFadsCanWeStillDeploy()
+                ),
+                fadManager.getNumberOfRemainingYearlyActions(FadDeploymentAction.class));
     }
 }

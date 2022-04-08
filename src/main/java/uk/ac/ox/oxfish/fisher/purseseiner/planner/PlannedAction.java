@@ -1,14 +1,16 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.regs.fads.YearlyActionLimitRegulation;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -30,20 +32,27 @@ public interface PlannedAction {
     public Action[] actuate(Fisher fisher);
 
     /**
-     * whether this action will be allowed at the time we plan for it to take place
+     * whether this action is allowed (by the regulations) were it to take place now
      * @param fisher the fisher
      * @param modelTimeStep the step it will take place
      */
     //todo
-   // public boolean isAllowedAtStep(Fisher fisher, int modelTimeStep);
+   public boolean isAllowedNow(Fisher fisher);
 
 
     class Deploy implements PlannedAction{
 
         private final SeaTile tile;
 
+        private final double delayInHours;
+
         public Deploy(SeaTile tile) {
+            this(tile,0);
+        }
+
+        public Deploy(SeaTile tile, double delayInHours) {
             this.tile = tile;
+            this.delayInHours = delayInHours;
         }
 
         @Override
@@ -53,12 +62,21 @@ public interface PlannedAction {
 
         @Override
         public double hoursItTake() {
-            return 0;
+            return delayInHours; //the deployment itself is immediate
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+            return fisher.isAllowedAtSea() &&
+                    !FadManager.getFadManager(fisher).getActionSpecificRegulations().isForbidden(FadDeploymentAction.class,fisher);
         }
 
         @Override
         public Action[] actuate(Fisher fisher){
-            return new Action[]{new FadDeploymentAction(fisher)};
+            return delayInHours > 0 ?
+                    new Action[]{new FadDeploymentAction(fisher)} :
+                    new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)}
+                    ;
         }
 
         @Override
@@ -86,6 +104,18 @@ public interface PlannedAction {
         @Override
         public double hoursItTake() {
             return 1;
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+            return //you must be allowed at sea
+                    fisher.isAllowedAtSea() &&
+                            //fad setting ought not to be banned
+                    !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class,fisher) &&
+                    //we should be allowed to fish here
+                    fisher.isAllowedToFishHere(getLocation(),fisher.grabState())
+                    ;
         }
 
         @Override
@@ -123,6 +153,11 @@ public interface PlannedAction {
         @Override
         public double hoursItTake() {
             return 0;
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+            return fisher.isAllowedAtSea();
         }
 
         /**
@@ -165,6 +200,11 @@ public interface PlannedAction {
         @Override
         public double hoursItTake() {
             return 1+delayInHours;
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+            return fisher.isAllowedAtSea() && fisher.isAllowedToFishHere(position,fisher.grabState());
         }
 
         /**

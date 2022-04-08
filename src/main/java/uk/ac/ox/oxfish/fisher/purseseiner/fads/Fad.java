@@ -56,6 +56,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     private final int stepDeployed;
     private final Int2D locationDeployed;
     private final double totalCarryingCapacity;
+    private boolean lost;
 
     public Fad(
         final FadManager<B, F> owner,
@@ -74,6 +75,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         this.stepDeployed = stepDeployed;
         this.locationDeployed = locationDeployed;
         this.totalCarryingCapacity = totalCarryingCapacity;
+        this.lost = false;
     }
 
     public long getId() {
@@ -164,5 +166,13 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
 
     public double getTotalCarryingCapacity() {
         return totalCarryingCapacity;
+    }
+
+    public boolean isLost() {
+        return lost;
+    }
+
+    public void lose(){
+        lost = true;
     }
 }

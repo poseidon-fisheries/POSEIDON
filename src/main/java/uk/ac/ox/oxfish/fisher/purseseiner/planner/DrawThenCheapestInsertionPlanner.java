@@ -47,7 +47,6 @@ import java.util.*;
  * 5 - Keep doing this until you run out of budget
  *
  *
- * //todo if this works, we need replanning
  * <br>
  * hardcoded in many parts, but get it to work first and judge computational complexity first
  */
@@ -279,21 +278,25 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 double hoursConsumedTravelling = map.distance(lastPlanLocation,plannedAction.getLocation()) / speed;
                 double actionDuration = plannedAction.hoursItTake();
                 if(hoursAvailable>= hoursConsumedTravelling+actionDuration){
-                    newPlan.insertAction(plannedAction, newPlan.numberOfStepsInPath()-1);
+                    newPlan.insertAction(plannedAction, newPlan.numberOfStepsInPath()-1,
+                            hoursConsumedTravelling+actionDuration);
                     hoursAvailable -=  hoursConsumedTravelling+actionDuration;
                     lastPlanLocation = plannedAction.getLocation();
                 }
 
             }
         }
-
+        //now take into consideration the very last step (return to port)
+        double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
+        hoursAvailable -= lastStepCost;
+        newPlan.addHoursSpent(lastStepCost);
         //do not allow more DPL
         stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
         assert hoursAvailable>=0;
 
         //add more events now.
         currentPlan = newPlan;
-        currentPlan = planRecursively(currentPlan, maxHoursPerTripGenerator.apply(model.getRandom()),
+        currentPlan = planRecursively(currentPlan, hoursAvailable,
                                       model, fisher);
 
         return currentPlan;
@@ -322,6 +325,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         Preconditions.checkArgument(hoursAvailable>0);
         Preconditions.checkArgument(speed>0);
         Preconditions.checkArgument(currentPlan.numberOfStepsInPath()>=2, "the path is too short, I'd expect here to be at least two steps");
+        assert  (actionToAddToPath.getLocation()!=null) : "Action " + actionToAddToPath + " has no path!";
 
         //go through all options
         double bestInsertionCost = Double.MAX_VALUE;
@@ -364,7 +368,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         if(totalCostInHours <= hoursAvailable)
         {
             assert bestIndex>0;
-            currentPlan.insertAction(actionToAddToPath,bestIndex);
+            currentPlan.insertAction(actionToAddToPath,bestIndex,totalCostInHours );
             return totalCostInHours;
         }
         else{

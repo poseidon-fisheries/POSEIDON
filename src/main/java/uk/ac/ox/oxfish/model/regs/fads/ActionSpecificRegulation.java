@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableSet;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -30,7 +31,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 public interface ActionSpecificRegulation extends Startable, Steppable, Observer<PurseSeinerAction> {
 
     ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions();
-    boolean isForbidden(PurseSeinerAction action);
+    boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher);
     default void observe(PurseSeinerAction action) {}
     @Override default void step(SimState simState) {}
     @Override default void start(FishState model) {}

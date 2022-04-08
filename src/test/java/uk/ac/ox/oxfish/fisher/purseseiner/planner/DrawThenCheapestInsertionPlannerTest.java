@@ -20,10 +20,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -107,5 +112,104 @@ public class DrawThenCheapestInsertionPlannerTest {
 
     }
 
+    @Test
+    public void replan() {
+
+        //mix of deploys and fish but then you are forced to replan: deploys stay and don't increase in number while the location of the FSH changes
+        final Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        final FishState fishState = mock(FishState.class);
+        MersenneTwisterFast rng = new MersenneTwisterFast();
+        when(fishState.getRandom()).thenReturn(rng);
+        final NauticalMap map = makeMap(11, 11);
+        when(fishState.getMap()).thenReturn(map);
+        map.setDistance(new ManhattanDistance());
+        when(fisher.grabState()).thenReturn(fishState);
+
+        //fisher lives at position 0,0
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(0,0));
+        when(fisher.getHomePort().getLocation()).thenReturn(map.getSeaTile(0,0));
+        when(fisher.isAtPort()).thenReturn(true);
+        when(fisher.isAllowedAtSea()).thenReturn(true);
+        when(fisher.getBoat().getSpeedInKph()).thenReturn(1d); //takes about 1 hours to do 1 steps
+
+        //the fishing module always wants to fish at 10,10 (takes one hour)
+        PlanningModule fakeModule = mock(PlanningModule.class);
+        when(fakeModule.maximumActionsInAPlan(any(),any())).thenReturn(1000);
+        when(fakeModule.chooseNextAction(any())).thenReturn(
+                new PlannedAction.Fishing(map.getSeaTile(10,10),0));
+
+        //the deployment module always wants to deploy at 1,1
+        //(here we make it take an hour to deploy)
+        final ImmutableMap<Int2D, Double> initialValues = ImmutableMap.of(
+                new Int2D(1, 1), 6.9
+        );
+        final DeploymentLocationValues dplValues =
+                new DeploymentLocationValues(__ -> initialValues, 1.0);
+        DeploymentFromLocationValuePlanningModule deploymentModule = new DeploymentFromLocationValuePlanningModule(
+                dplValues, map,rng,1.0);
+        PurseSeineGear gear = mock(PurseSeineGear.class);
+        when(fisher.getGear()).thenReturn(gear);
+        FadManager fadmanager = mock(FadManager.class);
+        when(gear.getFadManager()).thenReturn(fadmanager);
+        when(fadmanager.getNumFadsInStock()).thenReturn(1000000); //no problem with the fads
+
+        //50% chance of planning for either fishing or not
+        Map<ActionType, Double> plannableActionWeights = new HashMap<>();
+        plannableActionWeights.put(ActionType.FishingOnTile,100d); //should normalize
+        plannableActionWeights.put(ActionType.DeploymentAction,100d); //should normalize
+        HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
+        planModules.put(ActionType.FishingOnTile,fakeModule);
+        planModules.put(ActionType.DeploymentAction,deploymentModule);
+
+        DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
+                new FixedDoubleParameter(100), //100hr max!
+                plannableActionWeights,
+                planModules
+        );
+        planner.start(fishState,fisher);
+        Plan plan = planner.planNewTrip();
+
+        int numberOfDPLBeforeReplan = 0;
+        int otherActions = 0;
+        for (PlannedAction step : plan.lookAtPlan()) {
+            if(step instanceof PlannedAction.Deploy)
+                numberOfDPLBeforeReplan++;
+            else{
+                otherActions++;
+            }
+        }
+        System.out.println(numberOfDPLBeforeReplan);
+        System.out.println(otherActions);
+        //now let's say we moved to position 5,5 and we are forced to replan
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(5,5));
+        when(fisher.getCurrentTrip().getDurationInHours()).thenReturn(5d); //only wasted 5 hours, there should be plenty of time for stuff
+        plan = planner.replan();
+        int numberOfDPLAfterReplan = 0;
+        int otherActionsAfterReplan = 0;
+        for (PlannedAction step : plan.lookAtPlan()) {
+            if(step instanceof PlannedAction.Deploy)
+                numberOfDPLAfterReplan++;
+            else{
+                otherActionsAfterReplan++;
+            }
+        }
+        System.out.println(numberOfDPLAfterReplan);
+        System.out.println(otherActionsAfterReplan);
+        Assert.assertEquals(numberOfDPLAfterReplan,numberOfDPLBeforeReplan);
+        //you should also go to 10,10 before doing those DPLs
+        List<PlannedAction> plannedActions = plan.lookAtPlan();
+        Assert.assertEquals(plannedActions.get(2).getLocation().getGridX(),10);
+        Assert.assertEquals(plannedActions.get(2).getLocation().getGridY(),10);
+        System.out.println(plan);
+
+        //because we teleported you at 5,5 and consumed only 5 hours (rather than the 10 it takes)
+        //and because you can only take FSH and not DPL; you should have increased the amount of FSH actions
+        //in the replan
+        Assert.assertTrue(otherActionsAfterReplan>otherActions);
+        //in fact it should increase by precisely 5 times (but rounding may screw this up)
+    }
+
+
     //todo plan test where you have some nulls
+
 }

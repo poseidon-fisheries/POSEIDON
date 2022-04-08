@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -78,7 +79,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
         }
 
         //find which seatile the centroid belongs to (the centroid is the middle of a path so a convex operation
-        //it should always land on some tile or another; if not let's adjust this)
+        //it should always land on some tile or another)
         SeaTile centroid = map.getSeaTile((int) currentPlanSoFar.getGridXCentroid(),
                                           (int) currentPlanSoFar.getGridYCentroid());
 
@@ -145,12 +146,12 @@ public class DiscretizedOwnFadCentroidPlanningModule
      */
     @Override
     public int maximumActionsInAPlan(FishState state, Fisher fisher) {
-        ActiveActionRegulations regulations = FadManager.getFadManager(
-                fisher).getActionSpecificRegulations();
-        Optional<SetLimits> limits = regulations.getSetLimits();
-        if(limits.isPresent())
-            return limits.get().getNumRemainingActions(fisher);
 
-        return MAX_OWN_FAD_SETS;
+        return
+                Math.min(
+                        FadManager.getFadManager(fisher).getNumberOfRemainingYearlyActions(FadSetAction.class),
+                        MAX_OWN_FAD_SETS);
+
+
     }
 }
