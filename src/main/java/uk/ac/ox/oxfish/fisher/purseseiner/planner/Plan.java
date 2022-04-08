@@ -114,7 +114,7 @@ public class Plan {
      * useful to add unplanned delays into the plan
      * @param additionalHoursSpent
      */
-    public void addHoursSpent(double additionalHoursSpent){
+    public void addHoursEstimatedItWillTake(double additionalHoursSpent){
         hoursEstimatedThisPlanWillTake+=additionalHoursSpent;
     }
 }
