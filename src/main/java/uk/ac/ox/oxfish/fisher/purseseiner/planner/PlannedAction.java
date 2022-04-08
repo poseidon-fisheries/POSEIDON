@@ -37,7 +37,7 @@ public interface PlannedAction {
      * @param modelTimeStep the step it will take place
      */
     //todo
-   public boolean isAllowedNow(Fisher fisher);
+    public boolean isAllowedNow(Fisher fisher);
 
 
     class Deploy implements PlannedAction{
@@ -98,7 +98,7 @@ public interface PlannedAction {
 
         @Override
         public SeaTile getLocation() {
-            return fadWePlanToSetOn.getLocation();
+            return fadWePlanToSetOn.isLost() ? null : fadWePlanToSetOn.getLocation();
         }
 
         @Override
@@ -111,10 +111,12 @@ public interface PlannedAction {
             FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
             return //you must be allowed at sea
                     fisher.isAllowedAtSea() &&
+                            //the fad has not since been destroyed
+                            !fadWePlanToSetOn.isLost() &&
                             //fad setting ought not to be banned
-                    !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class,fisher) &&
-                    //we should be allowed to fish here
-                    fisher.isAllowedToFishHere(getLocation(),fisher.grabState())
+                            !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class,fisher) &&
+                            //we should be allowed to fish here
+                            fisher.isAllowedToFishHere(getLocation(),fisher.grabState())
                     ;
         }
 

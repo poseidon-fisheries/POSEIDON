@@ -289,7 +289,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         //now take into consideration the very last step (return to port)
         double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
         hoursAvailable -= lastStepCost;
-        newPlan.addHoursSpent(lastStepCost);
+        newPlan.addHoursEstimatedItWillTake(lastStepCost);
         //do not allow more DPL
         stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
         assert hoursAvailable>=0;
