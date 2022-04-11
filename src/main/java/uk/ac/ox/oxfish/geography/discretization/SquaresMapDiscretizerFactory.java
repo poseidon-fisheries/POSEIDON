@@ -38,6 +38,15 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
 
     private DoubleParameter verticalSplits = new FixedDoubleParameter(2);
 
+
+    public SquaresMapDiscretizerFactory() {
+    }
+
+    public SquaresMapDiscretizerFactory(int horizontalSplits, int verticalSplits) {
+        this.horizontalSplits = new FixedDoubleParameter(horizontalSplits);
+        this.verticalSplits = new FixedDoubleParameter(verticalSplits);
+    }
+
     /**
      * Applies this function to the given argument.
      *

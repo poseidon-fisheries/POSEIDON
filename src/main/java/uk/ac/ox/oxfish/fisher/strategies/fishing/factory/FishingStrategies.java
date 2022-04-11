@@ -47,6 +47,8 @@ public class FishingStrategies {
         NAMES.put(FloridaLogitReturnFactory.class, "WFS Logit Return");
         NAMES.put(MaximumDaysAYearFactory.class, "Maximum Days a Year Decorator");
         NAMES.put(PurseSeinerBiomassFishingStrategyFactory.class, "Purse Seiner Biomass Fishing Strategy");
+        NAMES.put(DefaultToDestinationStrategyFishingStrategyFactory.class,
+                "Default to Destination Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

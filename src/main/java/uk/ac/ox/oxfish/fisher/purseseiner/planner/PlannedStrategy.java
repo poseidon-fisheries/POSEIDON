@@ -79,8 +79,8 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
     }
 
 
-    private void planNewTrip(){
-        hoursInTheTripSinceWeLastReplanned = 0;
+    private void planNewTrip(FishState model){
+        hoursInTheTripSinceWeLastReplanned = model.getHoursSinceStart();
         currentPlan = planner.planNewTrip();
         assert currentPlan.numberOfStepsInPath()>=2;
         //the first step is always just "beginning of the trip"
@@ -101,7 +101,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         assert !fisher.getCurrentTrip().isCompleted();
 
         //asked to replan, let's do it
-        hoursInTheTripSinceWeLastReplanned = fisher.getCurrentTrip().getDurationInHours();
+        hoursInTheTripSinceWeLastReplanned = state.getHoursSinceStart();
         currentPlan = planner.replan();
 
         //again, the first action is just a marker so we can safely skip it
@@ -137,14 +137,13 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
      * strategies should use this default implementation, but FAD fishing strategies are expected to
      * override this method and result in action types other than `Fishing`.
      *
-     * @param model
-     * @param agent
-     * @param regulation
-     * @param hoursLeft
      */
     @Override
     public ActionResult act(
             FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
+
+        //should not be called when going home is an override
+        assert !doIJustWantToGoHome(agent);
 
         //this gets called by arrival, so we have to make sure we are where we want to be
         assert agent.getLocation() == actionInProgress.getLocation();
@@ -160,7 +159,10 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
             //you have finished the queue!
             resetActionQueue();
             //is it time for a replan?
-            if((model.getHoursSinceStart()-this.hoursInTheTripSinceWeLastReplanned)>planningHorizonInHours)
+            if((
+                    model.getHoursSinceStart()-
+                            this.hoursInTheTripSinceWeLastReplanned)>planningHorizonInHours &&
+             agent.getLocation() != agent.getHomePort().getLocation())
             {
                 replan(agent,model); //this will automatically move to new next action
             }
@@ -190,15 +192,24 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
     @Override
     public SeaTile chooseDestination(
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+        //go home override
+        if(doIJustWantToGoHome(fisher))
+            return fisher.getHomePort().getLocation();
+
         //are we just departing? make new plan!
-        if(currentAction instanceof AtPort)
-            planNewTrip();
+        if(currentAction == null || currentAction instanceof AtPort)
+            planNewTrip(model);
         else
         if(
-                !actionInProgress.isAllowedNow(fisher) ||
-                        actionInProgress.getLocation() == null) {
             //if the action is now not allowed or invalid, replan
-            replan(fisher,model);
+                actionInProgress.getLocation() == null ||
+                (!actionInProgress.isAllowedNow(fisher))
+        ) {
+            //unless you are at port (probably because you beelined here after you were told to go home)
+            if(fisher.getLocation() != fisher.getHomePort().getLocation())
+                replan(fisher,model);
+            else
+                return fisher.getHomePort().getLocation();
         }
         //otherwise, you are going where the plan tells you to
         return actionInProgress.getLocation();
@@ -220,9 +231,13 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         return delegate.shouldFish(fisher, random, model, currentTrip);
     }
 
-    //todo use this
+    /**
+     * if the hold is full he plan is meaningless: go home
+     * @param fisher
+     * @return
+     */
     public boolean doIJustWantToGoHome(Fisher fisher){
-        return fisher.getTotalWeightOfCatchInHold() + EPSILON <
+        return fisher.getTotalWeightOfCatchInHold() + EPSILON >=
                 fisher.getMaximumHold();
     }
 

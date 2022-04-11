@@ -81,8 +81,11 @@ public class Plan {
     public PlannedAction pollNextAction(){
         PlannedAction toReturn = plannedActions.poll();
         if(plannedActions.size()>=1) {
-            centroid[0].removeObservation(toReturn.getLocation().getGridX());
-            centroid[1].removeObservation(toReturn.getLocation().getGridY());
+            if(toReturn.getLocation() != null) {
+                //weird exception that can occur when you are targeting a moving object that has since left the map
+                centroid[0].removeObservation(toReturn.getLocation().getGridX());
+                centroid[1].removeObservation(toReturn.getLocation().getGridY());
+            }
         }
         else{
             centroid[0] = new IterativeAgerageBackAndForth();

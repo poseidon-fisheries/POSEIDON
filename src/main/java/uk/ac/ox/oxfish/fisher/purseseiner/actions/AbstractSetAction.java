@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.Delaying;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -79,7 +80,10 @@ public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSei
             reactToFailedSet(fishState, getLocation());
         }
         notify(purseSeineGear.getFadManager());
-        return new ActionResult(new Arriving(), hoursLeft - getDuration());
+        if(getDuration()<=hoursLeft)
+            return new ActionResult(new Arriving(), hoursLeft - getDuration());
+        else
+            return new ActionResult(new Delaying(getDuration()-hoursLeft),0);
     }
 
     abstract boolean checkSuccess();

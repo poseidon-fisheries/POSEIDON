@@ -87,5 +87,10 @@ public class Scenarios {
         SCENARIOS.put("FAD only EPO Abundance", FadsOnlyEpoAbundanceScenario::new);
         DESCRIPTIONS.put("FAD only Abundance", "A vessel-less scenario for FAD parameter calibration purposes.");
 
+
+        SCENARIOS.put("EPO Abundance Pathfinding", EpoScenarioPathfinding::new);
+        DESCRIPTIONS.put("EPO Abundance Pathfinding",
+                "Like EPO Abundance but using an alternative decision process");
+
     }
 }

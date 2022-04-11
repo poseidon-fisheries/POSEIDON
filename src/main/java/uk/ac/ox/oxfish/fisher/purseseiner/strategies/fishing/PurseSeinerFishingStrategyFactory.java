@@ -63,7 +63,7 @@ import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 
-abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
+abstract public class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B, F>> {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
@@ -346,6 +346,27 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 )
             ));
     }
+
+    public static Function<Fisher,
+            Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
+            Path attractionWeightsFile
+    ) {
+        return fisher -> stream(ActionClass.values())
+                .map(ActionClass::getActionClass)
+                .collect(toImmutableMap(
+                        identity(),
+                        actionClass -> ActionWeightsCache.INSTANCE.get(
+                                attractionWeightsFile,
+                                TARGET_YEAR,
+                                fisher,
+                                actionClass
+                        )
+                ));
+
+
+    }
+
+
 
     private SetOpportunityDetector<B> makeSetOpportunityDetector(final Fisher fisher) {
 

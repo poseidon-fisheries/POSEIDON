@@ -14,32 +14,13 @@ import java.util.stream.Collectors;
 /**
  * this object exists to generate a new deployment action (probably to add to a plan)
  */
-public class DeploymentPlannedActionGenerator{
+public class DeploymentPlannedActionGenerator extends DrawFromLocationValuePlannedActionGenerator<PlannedAction.Deploy>{
 
-    /**
-     * here I use Nic's object on location values to use the whole reading toolchain;
-     * in practice however all we need here is a mapping coords --> weight
-     */
-    private final DeploymentLocationValues originalLocationValues;
-
-
-    private final NauticalMap map;
-
-    /**
-     * the rng to use (compatible with Apache)
-     */
-    private final MTFApache localRng;
 
     /**
      * the time it takes for the boat to "recover" after a deployment; 0 means you can drop another immediately
      */
     private final double delayInHoursAfterADeployment;
-
-    //todo
-    //we can avoid ton of waste by not instantiating this every step and only
-    //when there is a change in the location value deployment
-    //but unfortunately it requires a bit of work with a specialized listener
-    private EnumeratedDistribution<SeaTile> seatilePicker;
 
 
     public DeploymentPlannedActionGenerator(DeploymentLocationValues originalLocationValues,
@@ -50,37 +31,18 @@ public class DeploymentPlannedActionGenerator{
     public DeploymentPlannedActionGenerator(DeploymentLocationValues originalLocationValues,
                                             NauticalMap map, MersenneTwisterFast random,
                                             double delayInHoursAfterADeployment) {
-        this.originalLocationValues = originalLocationValues;
+        super(originalLocationValues,map,random);
         this.delayInHoursAfterADeployment = delayInHoursAfterADeployment;
-        this.map = map;
-        localRng = new MTFApache(random);
+
     }
 
-    private void preparePicker(){
-        seatilePicker = new EnumeratedDistribution<>(localRng,
-                originalLocationValues.getValues().stream().map(
-                        entry -> new Pair<>(
-                                map.getSeaTile(entry.getKey()),
-                                entry.getValue()
-                        )
-                ).collect(Collectors.toList()));
-    }
 
-    public void start(){
-        Preconditions.checkState(originalLocationValues.hasStarted(),"need to start the location values first!");
-        preparePicker();
-    }
-
-    public PlannedAction.Deploy drawNewDeployment(){
-        Preconditions.checkNotNull(seatilePicker,"Did not start the deploy generator yet!");
+    public PlannedAction.Deploy drawNewPlannedAction(){
+        Preconditions.checkState(isReady(),"Did not start the deploy generator yet!");
         return new PlannedAction.Deploy(
-                seatilePicker.sample(),
+                drawNewLocation(),
                 delayInHoursAfterADeployment
         );
-    }
-
-    public boolean isReady(){
-        return seatilePicker != null;
     }
 
 

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -69,6 +70,7 @@ public class DestinationStrategies {
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
         NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
         NAMES.put(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy");
+        NAMES.put(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

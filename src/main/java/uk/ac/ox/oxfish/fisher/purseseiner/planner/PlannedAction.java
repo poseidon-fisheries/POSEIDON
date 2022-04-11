@@ -4,13 +4,16 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.actions.FadSearchAction;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.regs.fads.YearlyActionLimitRegulation;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -73,7 +76,7 @@ public interface PlannedAction {
 
         @Override
         public Action[] actuate(Fisher fisher){
-            return delayInHours > 0 ?
+            return delayInHours <= 0 ?
                     new Action[]{new FadDeploymentAction(fisher)} :
                     new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)}
                     ;
@@ -133,9 +136,73 @@ public interface PlannedAction {
     }
 
 
+    /**
+     * stolen sets work a bit differently: you just show up at a place and steal
+     * something through the FadSearchAction but if you don't find anything you
+     * waste a bunch of time (also done through the FadSearchAction)
+     */
+    class OpportunisticFadSet implements PlannedAction{
+
+
+        private final SeaTile whereAreWeGoingToSearchForFads;
+
+        final private double hoursItTakesToSet;
+
+        final private double hoursWastedIfNoFadAround;
+
+        final private double minimumFadValueToSteal;
+
+        public OpportunisticFadSet(SeaTile whereAreWeGoingToSearchForFads,
+                                   double hoursItTakesToSet,
+                                   double hoursWastedIfNoFadAround,
+                                   double minimumFadValueToSteal) {
+            this.whereAreWeGoingToSearchForFads = whereAreWeGoingToSearchForFads;
+            this.hoursItTakesToSet = hoursItTakesToSet;
+            this.hoursWastedIfNoFadAround = hoursWastedIfNoFadAround;
+            this.minimumFadValueToSteal = minimumFadValueToSteal;
+        }
+
+        @Override
+        public SeaTile getLocation() {
+
+            return whereAreWeGoingToSearchForFads;
+        }
+
+        @Override
+        public double hoursItTake() {
+            return hoursItTakesToSet;
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+            return //you must be allowed at sea
+                    fisher.isAllowedAtSea() &&
+
+                            //fad setting ought not to be banned
+                            !fadManager.getActionSpecificRegulations().isForbidden(OpportunisticFadSetAction.class,fisher) &&
+                            //we should be allowed to fish here
+                            fisher.isAllowedToFishHere(getLocation(),fisher.grabState())
+                    ;
+        }
+
+        @Override
+        public Action[] actuate(Fisher fisher) {
+            return new Action[]{
+                    new FadSearchAction(
+                            hoursWastedIfNoFadAround,
+                            hoursItTakesToSet,
+                            minimumFadValueToSteal
+                    )
+            };
+        }
+    }
+
+
+
     //very simple class, used to define the beginning and ending of a trip
     //in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
-    class Arrival implements PlannedAction{
+    static class Arrival implements PlannedAction{
 
 
         private final SeaTile position;
@@ -180,7 +247,7 @@ public interface PlannedAction {
 
     //this action represents an hour of fishing, followed by a # of hours of delay (due to local processing, recovery time,
     //or whatever else works)
-    class Fishing implements PlannedAction{
+    static class Fishing implements PlannedAction{
 
 
         private final SeaTile position;
@@ -232,6 +299,195 @@ public interface PlannedAction {
             sb.append(", delayInHours=").append(delayInHours);
             sb.append('}');
             return sb.toString();
+        }
+    }
+
+
+    //some of the purse seine gear stuff has "fit to data" catches per event
+    //this is what we are using now
+    static abstract class AbstractSetWithCatchSampler implements PlannedAction{
+
+        private final static double DEFAULT_DOLPHIN_SET_DURATION = 2.69;
+
+        private final CatchSampler howMuchWeCanFishOutGenerator;
+
+        private final SeaTile position;
+
+        private final double searchTimeInHours;
+
+        private final double setDurationInHours;
+
+        public AbstractSetWithCatchSampler(SeaTile position,
+                                           CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
+
+            this(position,
+                    howMuchWeCanFishOutGenerator,
+                    DEFAULT_DOLPHIN_SET_DURATION,
+                    0d);
+        }
+
+
+        public AbstractSetWithCatchSampler(SeaTile position,
+                                           CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                           double delayInHours) {
+            this(position, howMuchWeCanFishOutGenerator,DEFAULT_DOLPHIN_SET_DURATION,
+                    delayInHours);
+        }
+
+        public AbstractSetWithCatchSampler(SeaTile position,
+                                           CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                           double setDurationInHours,
+                                           double delayInHours) {
+            this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
+            this.position = position;
+            this.searchTimeInHours = delayInHours;
+            this.setDurationInHours = setDurationInHours;
+        }
+        @Override
+        public SeaTile getLocation() {
+
+            return position;
+        }
+
+        abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
+
+        @Override
+        public double hoursItTake() {
+            return setDurationInHours+ searchTimeInHours;
+        }
+
+        @Override
+        public boolean isAllowedNow(Fisher fisher) {
+
+            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager =
+                    FadManager.getFadManager(fisher);
+            return //you must be allowed at sea
+                    fisher.isAllowedAtSea() &&
+                            //fad setting ought not to be banned
+                            !fadManager.getActionSpecificRegulations().
+                                    isForbidden(getTypeOfActionPlanned(),fisher) &&
+                            //we should be allowed to fish here
+                            fisher.isAllowedToFishHere(getLocation(),fisher.grabState());
+
+        }
+
+
+        abstract protected <B extends LocalBiology>  AbstractSetAction<B> createSet(
+                B potentialCatch,
+                Fisher fisher,
+                double fishingTime
+        );
+
+        /**
+         * list of actions that need to take place for the planned action to take place
+         *
+         * @param fisher
+         * @return
+         */
+        @Override
+        public Action[] actuate(Fisher fisher) {
+
+
+            LocalBiology potentialCatch =
+                    (LocalBiology) howMuchWeCanFishOutGenerator.
+                            apply(getLocation().getBiology());
+
+            if(searchTimeInHours<=0)
+            {
+                return new Action[]{
+                        createSet(potentialCatch, fisher, setDurationInHours)
+//                        new DolphinSetAction<>(
+//                        potentialCatch,
+//                        fisher,
+//                        setDurationInHours
+                        //)
+                };
+            }
+            else{
+                return new Action[]{
+                        createSet(potentialCatch, fisher, setDurationInHours),
+                        new Delaying(searchTimeInHours)
+                };
+            }
+
+        }
+
+
+        @Override
+        public String toString() {
+            return "Planned set{" +
+                    "position=" + position +
+                    "type=" + getTypeOfActionPlanned() +
+                    ", searchTimeInHours=" + searchTimeInHours +
+                    ", setDurationInHours=" + setDurationInHours +
+                    '}';
+        }
+
+
+    }
+
+    //this is not the only way to do dolphin sets, in fact it is sort of improvised
+    //but basically you decide you will go to a location and then you will draw
+    //some catches and hope for the best
+    static class DolphinSet extends  AbstractSetWithCatchSampler {
+
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
+            super(position, howMuchWeCanFishOutGenerator);
+        }
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, delayInHours);
+        }
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double setDurationInHours, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, setDurationInHours, delayInHours);
+        }
+
+        @Override
+        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
+            return DolphinSetAction.class;
+        }
+
+        @Override
+        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+                B potentialCatch, Fisher fisher, double fishingTime) {
+            return new DolphinSetAction<>(
+                    potentialCatch,
+                    fisher,
+                    fishingTime
+            );
+        }
+    }
+
+    static class NonAssociatedSet extends  AbstractSetWithCatchSampler {
+
+
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
+            super(position, howMuchWeCanFishOutGenerator);
+        }
+
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, delayInHours);
+        }
+
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double setDurationInHours, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, setDurationInHours, delayInHours);
+        }
+
+        @Override
+        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
+            return NonAssociatedSetAction.class;
+        }
+
+        @Override
+        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+                B potentialCatch, Fisher fisher, double fishingTime) {
+            return new NonAssociatedSetAction<>(
+                    potentialCatch,
+                    fisher,
+                    fishingTime
+            );
         }
     }
 

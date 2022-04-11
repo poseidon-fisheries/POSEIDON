@@ -27,23 +27,11 @@ public enum ActionType {
 
     DeploymentAction("DPL"),
     SetOwnFadAction("FAD"),
-    FishingOnTile("FSH")
+    FishingOnTile("FSH"),
+    DolphinSets("DEL"),
+    NonAssociatedSets("NOA"),
+    OpportunisticFadSets("OFS")
     ;
-
-
-    public static final ActionType[] ALL_ACTIONS =
-            new ActionType[]{
-                    DeploymentAction,
-                    SetOwnFadAction,
-                    FishingOnTile
-            };
-
-    public static final String[] ALL_ACTION_NAMES =
-            new String[]{
-                    DeploymentAction.text,
-                    SetOwnFadAction.text,
-                    FishingOnTile.text
-            };
 
     private final String text;
 

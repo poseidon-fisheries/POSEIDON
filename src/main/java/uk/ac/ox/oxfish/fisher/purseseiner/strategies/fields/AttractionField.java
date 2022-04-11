@@ -111,8 +111,14 @@ public class AttractionField implements FisherStartable {
 
     @Override
     public void start(final FishState model, final Fisher fisher) {
-        this.fisher = fisher;
-        locationValues.start(model, fisher);
+        //don't start twice
+        if(this.fisher==null) {
+            this.fisher = fisher;
+            locationValues.start(model, fisher);
+        }
     }
 
+    public LocationValues getLocationValues() {
+        return locationValues;
+    }
 }

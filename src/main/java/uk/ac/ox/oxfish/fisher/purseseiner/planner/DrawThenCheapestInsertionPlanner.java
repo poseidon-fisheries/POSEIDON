@@ -27,6 +27,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -37,6 +38,7 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * A simple planner where given a budget of time you can spend out:
@@ -189,6 +191,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         PlanningModule planningModule = planModules.get(nextActionType);
         //might be the first time you call it, so get it ready
         readyPlanningModule(nextActionType,fisher,model);
+        //it is possible that even though it's the first time we try this action, we actually can't do
+        //if so star over
+        if(stillAllowedActionsInPlan.get(nextActionType).intValue()<=0)
+            return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
+
         PlannedAction plannedAction = planningModule.chooseNextAction(currentPlan);
 
         //if the planning module cannot propose more actions, ignore them for this plan
@@ -208,6 +215,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 return currentPlan;
             else
             {
+                stillAllowedActionsInPlan.get(nextActionType).decrement();
                 hoursLeftInBudget =  hoursLeftInBudget-hoursConsumed;
                 assert hoursLeftInBudget >= -FishStateUtilities.EPSILON;
                 if(hoursLeftInBudget<=0)
@@ -296,6 +304,9 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
         //add more events now.
         currentPlan = newPlan;
+        for (PlanningModule module : planModules.values()) {
+            module.prepareForReplanning(model,fisher);
+        }
         currentPlan = planRecursively(currentPlan, hoursAvailable,
                                       model, fisher);
 

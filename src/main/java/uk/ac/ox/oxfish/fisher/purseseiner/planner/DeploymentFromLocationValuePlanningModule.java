@@ -35,13 +35,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * simply uses DeploymentPlannedActionGenerator to draw a new DPL spot, and returns it as an action
  */
 public class DeploymentFromLocationValuePlanningModule
-        implements PlanningModule {
-
-    final private DeploymentLocationValues locationValues;
-
-    final private DeploymentPlannedActionGenerator generator;
-
-
+        extends LocationValuePlanningModule {
 
     public DeploymentFromLocationValuePlanningModule(
             DeploymentLocationValues locationValues,
@@ -57,61 +51,20 @@ public class DeploymentFromLocationValuePlanningModule
             NauticalMap map,
             MersenneTwisterFast random,
             double delayInHoursAfterADeployment) {
-        this.locationValues = locationValues;
-        this.generator = new DeploymentPlannedActionGenerator(
+        super(locationValues,new DeploymentPlannedActionGenerator(
                 locationValues,
                 map,
                 random,
                 delayInHoursAfterADeployment
 
-        );
-    }
-
-    @Override
-    public PlannedAction chooseNextAction(Plan currentPlanSoFar) {
-
-
-        return generator.drawNewDeployment();
-    }
-
-    @Override
-    public boolean isStarted() {
-        return generator.isReady();
-    }
-
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-        //start the location value if needed; else start the generator
-        if(!locationValues.hasStarted())
-            locationValues.start(model,fisher);
-        generator.start();
-
-
-
-
+        ));
     }
 
     /**
-     * this is like the start(...) but gets called when we want the module to be aware that a new plan is starting
-     *
-     * @param state
-     * @param fisher
-     */
-    @Override
-    public void prepareForReplanning(FishState state, Fisher fisher) {
-        Preconditions.checkArgument(locationValues.hasStarted());
-        generator.start();
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
-
-    }
-
-    /**
-     * returns the number of FADs in stock!
+     * returns the minimum between
+     * (i) number of FADs in stock
+     * (ii) number of active fads we can still deploy
+     * (iii) number of allowed deploys this year
      * @param state
      * @param fisher
      * @return

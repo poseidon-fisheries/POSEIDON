@@ -125,7 +125,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     public SeaTile getLocation() {
         return getOwner().getFadMap()
             .getFadTile(this)
-            .orElseThrow(() -> new RuntimeException(this + " not on map!"));
+            .orElse(null);
     }
 
     public FadManager<B, F> getOwner() {

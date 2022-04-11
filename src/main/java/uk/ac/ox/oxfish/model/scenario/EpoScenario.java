@@ -50,6 +50,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
@@ -96,7 +97,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
         final FishState fishState,
         final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final PurseSeineGearFactory<B, F> purseSeineGearFactory,
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory,
+        final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {
         final FisherFactory fisherFactory = new FisherFactory(

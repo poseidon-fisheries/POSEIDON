@@ -106,4 +106,8 @@ public class OwnFadSetDiscretizedActionGenerator {
             super(first, second);
         }
     }
+
+    public int getNumberOfGroups(){
+        return rankedFads.length;
+    }
 }

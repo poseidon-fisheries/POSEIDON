@@ -102,6 +102,7 @@ public class DummyFishingPlanningModule implements PlanningModule {
         map = model.getMap();
         random = model.getRandom();
         this.fisher=fisher;
+        this.model=model;
     }
 
     @Override

@@ -136,6 +136,7 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
     }
 
     public void recordVisit(final Int2D gridLocation, final int timeStep) {
+
         lastVisits.put(gridLocation, timeStep);
     }
 

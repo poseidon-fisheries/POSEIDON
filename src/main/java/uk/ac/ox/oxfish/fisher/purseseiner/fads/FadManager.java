@@ -278,6 +278,9 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
 
 
     public int getNumberOfRemainingYearlyActions(Class<? extends PurseSeinerAction> purseSeinerAction){
+
+        //this should include set limits since those are also yearlyActionLimits
+
         return  getActionSpecificRegulations().getYearlyActionLimitRegulations().
                 get(purseSeinerAction).stream().
                 mapToInt(reg -> reg.getNumRemainingActions(fisher)).min().orElse(Integer.MAX_VALUE);

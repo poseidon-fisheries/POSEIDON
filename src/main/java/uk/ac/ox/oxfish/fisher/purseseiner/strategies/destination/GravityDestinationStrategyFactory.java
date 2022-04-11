@@ -31,6 +31,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
@@ -108,9 +110,26 @@ public class GravityDestinationStrategyFactory
 
     private double loadMaxTripDuration(final Fisher fisher) {
         return maxTripDurationCache
-            .get(maxTripDurationFile, TARGET_YEAR, fisher)
+            .get(maxTripDurationFile,
+                    TARGET_YEAR,
+                    fisher)
             .orElseThrow(() -> new IllegalStateException(
                 "No max trip duration known for " + fisher));
     }
 
+
+    public static ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
+        return new ToDoubleFunction<Fisher>() {
+            @Override
+            public double applyAsDouble(Fisher fisher) {
+                return maxTripDurationCache
+                        .get(maxTripDurationFile,
+                                TARGET_YEAR,
+                                fisher)
+                        .orElseThrow(() -> new IllegalStateException(
+                                "No max trip duration known for " + fisher));
+            }
+        };
+
+    }
 }

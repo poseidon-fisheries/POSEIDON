@@ -49,6 +49,8 @@ public class DiscretizedOwnFadCentroidPlanningModule
     private static final int MAX_OWN_FAD_SETS = 1000;
     private final OwnFadSetDiscretizedActionGenerator optionsGenerator;
 
+    //best fad is chosen as max $/(hr^penalty)
+    private final double distancePenalty;
 
     private NauticalMap map;
 
@@ -57,9 +59,17 @@ public class DiscretizedOwnFadCentroidPlanningModule
     public DiscretizedOwnFadCentroidPlanningModule(
             MapDiscretization discretization,
             double minimumValueOfFadBeforeBeingPickedUp) {
+       this(discretization,minimumValueOfFadBeforeBeingPickedUp,1.0);
+    }
+
+    public DiscretizedOwnFadCentroidPlanningModule(
+            MapDiscretization discretization,
+            double minimumValueOfFadBeforeBeingPickedUp,
+            double distancePenalty) {
         this.optionsGenerator =
                 new OwnFadSetDiscretizedActionGenerator(discretization,
-                                                        minimumValueOfFadBeforeBeingPickedUp);
+                        minimumValueOfFadBeforeBeingPickedUp);
+        this.distancePenalty = distancePenalty;
     }
 
     @Override
@@ -87,10 +97,11 @@ public class DiscretizedOwnFadCentroidPlanningModule
         double discountedValue = Double.MIN_VALUE;
         Integer fadGroupChosen = null;
         for (Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> option : options) {
-            double hoursSpentTravellingToThere = map.distance(centroid,option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
+            double hoursSpentTravellingToThere =
+                    map.distance(centroid,option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
             assert option.getFirst().getSecond()>0;
             double currentDiscountValue = option.getFirst().getSecond() /
-                    (hoursSpentTravellingToThere+1);
+                    Math.pow(hoursSpentTravellingToThere+1,distancePenalty);
             if(currentDiscountValue>= discountedValue)
             {
                 fadGroupChosen = option.getSecond();
@@ -99,6 +110,9 @@ public class DiscretizedOwnFadCentroidPlanningModule
         }
 
         assert fadGroupChosen!=null;
+        //failure here todo figure this out
+        if(fadGroupChosen==null || fadGroupChosen<0 || fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
+            return null;
         return optionsGenerator.chooseFad(fadGroupChosen);
 
     }
