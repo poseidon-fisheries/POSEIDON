@@ -182,8 +182,8 @@ public class DrawThenCheapestInsertionPlannerTest {
         System.out.println(otherActions);
         //now let's say we moved to position 5,5 and we are forced to replan
         when(fisher.getLocation()).thenReturn(map.getSeaTile(5,5));
-        when(fisher.getCurrentTrip().getDurationInHours()).thenReturn(5d); //only wasted 5 hours, there should be plenty of time for stuff
-        plan = planner.replan();
+        //only wasted 5 hours, there should be plenty of time for stuff
+        plan = planner.replan(5d);
         int numberOfDPLAfterReplan = 0;
         int otherActionsAfterReplan = 0;
         for (PlannedAction step : plan.lookAtPlan()) {

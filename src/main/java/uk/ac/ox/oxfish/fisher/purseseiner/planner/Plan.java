@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.model.data.IterativeAgerageBackAndForth;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Plan {
 
@@ -108,7 +110,10 @@ public class Plan {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Plan{");
-        sb.append("plannedActions=").append(plannedActions);
+        sb.append("plannedActions=").append(plannedActions.stream().
+                map(plannedAction -> plannedAction.toString()).
+                collect(Collectors.joining("\n"))
+        );
         sb.append('}');
         return sb.toString();
     }

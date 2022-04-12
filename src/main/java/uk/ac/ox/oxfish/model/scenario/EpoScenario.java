@@ -46,7 +46,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
@@ -94,16 +93,16 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
     abstract FadMapFactory<B, F> getFadMapFactory();
 
     @NotNull    FisherFactory makeFisherFactory(
-        final FishState fishState,
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
-        final PurseSeineGearFactory<B, F> purseSeineGearFactory,
-        final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
-        final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
+            final FishState fishState,
+            final AlgorithmFactory<? extends Regulation> regulationsFactory,
+            final PurseSeineGearFactory<B, F> purseSeineGearFactory,
+            final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
+            final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory, PurseSeinerDepartingStrategyFactory departingStrategy
     ) {
         final FisherFactory fisherFactory = new FisherFactory(
             null,
             regulationsFactory,
-            new PurseSeinerDepartingStrategyFactory(),
+                departingStrategy,
             gravityDestinationStrategyFactory,
             fishingStrategyFactory,
             new NoDiscardingFactory(),

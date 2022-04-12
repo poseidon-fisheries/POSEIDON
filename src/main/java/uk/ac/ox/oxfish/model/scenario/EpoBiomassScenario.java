@@ -330,7 +330,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             fisherDefinition.getRegulation(),
             purseSeineGearFactory,
             (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy(),
-            fisherDefinition.getFishingStrategy()
+            fisherDefinition.getFishingStrategy(), new PurseSeinerDepartingStrategyFactory()
         );
 
         final Monitors monitors = new Monitors(model);

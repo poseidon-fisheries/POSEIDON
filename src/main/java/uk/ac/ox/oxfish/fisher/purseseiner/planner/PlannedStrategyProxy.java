@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +83,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     private final double ownFadActionWeightBias;
 
     /**
+     * a multiplier to the DPL actions weight (makes it more or less common than what the data may suggest)
+     */
+    private final double deploymentBias;
+
+    /**
      *  $ a fad needs to have accumulated before we even try to target it when stealing in
      *  an area
      */
@@ -109,6 +115,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double planningHorizonInHours;
 
+    /**
+     * the trip duration will be uniformly distributed between data max_trip_duration and max_trip_duration * this parameter (which is expected to be less or = 1)
+     */
+    private final double minimumPercentageOfTripDurationAllowed;
+
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
                     ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
@@ -118,10 +129,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             double additionalHourlyDelayDeployment,
             double additionalHourlyDelayNonAssociatedSets,
             double minimumValueFadSets,
-            double ownFadActionWeightBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
+            double ownFadActionWeightBias, double deploymentBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
             MapDiscretization mapDiscretizationFadSets,
             double hoursWastedOnFailedSearches,
-            double planningHorizonInHours) {
+            double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -130,11 +141,15 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
         this.minimumValueFadSets = minimumValueFadSets;
         this.ownFadActionWeightBias = ownFadActionWeightBias;
+        this.deploymentBias = deploymentBias;
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
         this.distancePenaltyFadSets = distancePenaltyFadSets;
         this.mapDiscretizationFadSets = mapDiscretizationFadSets;
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
+        this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
+        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
+        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
     }
 
     @Override
@@ -191,7 +206,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 DeploymentLocationValues locations =
                         (DeploymentLocationValues) locationValues.get(DeploymentLocationValues.class);
                 plannableActionWeights.put(ActionType.DeploymentAction,
-                        actionWeight.getValue());
+                        actionWeight.getValue()*deploymentBias);
                 planModules.put(ActionType.DeploymentAction,
                         new DeploymentFromLocationValuePlanningModule(
                                 locations,
@@ -262,7 +277,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
         DrawThenCheapestInsertionPlanner planner =
                 new DrawThenCheapestInsertionPlanner(
-                        new FixedDoubleParameter(maxTravelTimeLoader.applyAsDouble(fisher)),
+                        new UniformDoubleParameter(
+                                minimumPercentageOfTripDurationAllowed * maxTravelTimeLoader.applyAsDouble(fisher),
+                                maxTravelTimeLoader.applyAsDouble(fisher)
+                        ),
                         plannableActionWeights,
                         planModules
                 );

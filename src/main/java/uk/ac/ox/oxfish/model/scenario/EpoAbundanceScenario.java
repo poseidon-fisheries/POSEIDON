@@ -24,7 +24,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import java.io.File;
 import java.io.FileWriter;
@@ -56,6 +55,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
@@ -432,7 +432,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             regulationsFactory,
             abundancePurseSeineGearFactory,
             gravityDestinationStrategyFactory,
-            fishingStrategyFactory
+            fishingStrategyFactory, new PurseSeinerDepartingStrategyFactory()
         );
 
         final List<Fisher> fishers =

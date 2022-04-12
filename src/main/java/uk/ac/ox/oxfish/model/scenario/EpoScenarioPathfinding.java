@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -405,7 +406,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 regulationsFactory,
                 abundancePurseSeineGearFactory,
                 destinationStrategy,
-                fishingStrategyFactory
+                fishingStrategyFactory,
+                new PurseSeinerDepartingStrategyFactory(false)
         );
 
         final List<Fisher> fishers =

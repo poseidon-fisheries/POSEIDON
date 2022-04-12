@@ -170,7 +170,9 @@ public interface PlannedAction {
 
         @Override
         public double hoursItTake() {
-            return hoursItTakesToSet;
+            //need to be pessimistic or you'll plan too many of these
+
+            return hoursItTakesToSet + hoursWastedIfNoFadAround;
         }
 
         @Override

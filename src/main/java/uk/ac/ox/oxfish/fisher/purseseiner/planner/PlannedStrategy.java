@@ -57,6 +57,11 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
     /**
      * timestamp ( in how many hours had passed since this trip began) of last time we planned
      */
+    private double timestampInHoursWhenTripStarted = 0;
+
+    /**
+     * timestamp ( in how many hours had passed since this trip began) of last time we planned
+     */
     private double hoursInTheTripSinceWeLastReplanned = 0;
 
     /**
@@ -81,6 +86,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
     private void planNewTrip(FishState model){
         hoursInTheTripSinceWeLastReplanned = model.getHoursSinceStart();
+        timestampInHoursWhenTripStarted = model.getHoursSinceStart();
         currentPlan = planner.planNewTrip();
         assert currentPlan.numberOfStepsInPath()>=2;
         //the first step is always just "beginning of the trip"
@@ -101,8 +107,9 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         assert !fisher.getCurrentTrip().isCompleted();
 
         //asked to replan, let's do it
+        double computeCurrentTripDurationInHours = computeCurrentTripDurationInHours(state);
         hoursInTheTripSinceWeLastReplanned = state.getHoursSinceStart();
-        currentPlan = planner.replan();
+        currentPlan = planner.replan(computeCurrentTripDurationInHours);
 
         //again, the first action is just a marker so we can safely skip it
         assert currentPlan.peekNextAction() instanceof PlannedAction.Arrival;
@@ -112,7 +119,6 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         //set yourself for an action in progress
         actionInProgress = currentPlan.pollNextAction();
         resetActionQueue();
-
 
     }
 
@@ -159,9 +165,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
             //you have finished the queue!
             resetActionQueue();
             //is it time for a replan?
-            if((
-                    model.getHoursSinceStart()-
-                            this.hoursInTheTripSinceWeLastReplanned)>planningHorizonInHours &&
+            if(computeCurrentTripDurationInHours(model) >planningHorizonInHours &&
              agent.getLocation() != agent.getHomePort().getLocation())
             {
                 replan(agent,model); //this will automatically move to new next action
@@ -180,6 +184,11 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
     }
 
+    private double computeCurrentTripDurationInHours(FishState model) {
+        return model.getHoursSinceStart() -
+                this.timestampInHoursWhenTripStarted;
+    }
+
     /**
      * decides where to go.
      *
@@ -193,7 +202,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
     public SeaTile chooseDestination(
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
         //go home override
-        if(doIJustWantToGoHome(fisher))
+        if(fisher.getLocation() != fisher.getHomePort().getLocation() && doIJustWantToGoHome(fisher))
             return fisher.getHomePort().getLocation();
 
         //are we just departing? make new plan!
@@ -237,8 +246,12 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
      * @return
      */
     public boolean doIJustWantToGoHome(Fisher fisher){
-        return fisher.getTotalWeightOfCatchInHold() + EPSILON >=
+        boolean amIFull = fisher.getTotalWeightOfCatchInHold() + EPSILON >=
                 fisher.getMaximumHold();
+        boolean isItTooLate =
+                actionInProgress != null && !(actionInProgress instanceof PlannedAction.Arrival) &&
+                planner.getThisTripTargetHours() >0 && planner.getThisTripTargetHours()<computeCurrentTripDurationInHours(fisher.grabState());
+        return amIFull || isItTooLate;
     }
 
 

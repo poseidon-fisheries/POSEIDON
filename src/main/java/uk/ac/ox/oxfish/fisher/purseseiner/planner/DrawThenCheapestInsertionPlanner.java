@@ -85,6 +85,8 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     private FishState model;
 
+    private double thisTripTargetHours = 0;
+
     public DrawThenCheapestInsertionPlanner(
             DoubleParameter maxHoursPerTripGenerator,
             Map<ActionType, Double> plannableActionWeights,
@@ -260,18 +262,19 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                                fisher.getLocation());
         //start planning
         stillAllowedActionsInPlan.clear();
-        currentPlan = planRecursively(currentPlan, maxHoursPerTripGenerator.apply(model.getRandom()),
+        thisTripTargetHours = maxHoursPerTripGenerator.apply(model.getRandom());
+        currentPlan = planRecursively(currentPlan, thisTripTargetHours ,
                                       model, fisher);
 
         return currentPlan;
     }
 
-    public Plan replan(){
+    public Plan replan(double hoursAlreadySpent){
         Preconditions.checkArgument(fisher.getLocation() != fisher.getHomePort().getLocation());
 
         //length of the trip is reduced by how much we have already spent outside
-        double hoursAvailable =maxHoursPerTripGenerator.apply(model.getRandom());
-        hoursAvailable = hoursAvailable - fisher.getCurrentTrip().getDurationInHours();
+        double hoursAvailable = getThisTripTargetHours();
+        hoursAvailable = hoursAvailable - hoursAlreadySpent;
 
         //the new plan will remove all previous actions except for DPLs (if any)
         //which are constraints we don't want to move
@@ -280,36 +283,37 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         double speed = fisher.getBoat().getSpeedInKph();
         Plan newPlan = new Plan(fisher.getLocation(),
                                 fisher.getHomePort().getLocation());
-
-        for (PlannedAction plannedAction : currentPlan.lookAtPlan()) {
-            if(plannedAction instanceof PlannedAction.Deploy) {
-                double hoursConsumedTravelling = map.distance(lastPlanLocation,plannedAction.getLocation()) / speed;
-                double actionDuration = plannedAction.hoursItTake();
-                if(hoursAvailable>= hoursConsumedTravelling+actionDuration){
-                    newPlan.insertAction(plannedAction, newPlan.numberOfStepsInPath()-1,
-                            hoursConsumedTravelling+actionDuration);
-                    hoursAvailable -=  hoursConsumedTravelling+actionDuration;
-                    lastPlanLocation = plannedAction.getLocation();
-                }
-
-            }
-        }
         //now take into consideration the very last step (return to port)
         double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
         hoursAvailable -= lastStepCost;
         newPlan.addHoursEstimatedItWillTake(lastStepCost);
+
+        for (PlannedAction plannedAction : currentPlan.lookAtPlan()) {
+            if(plannedAction instanceof PlannedAction.Deploy) {
+                double hoursConsumed = cheapestInsert(newPlan,plannedAction,hoursAvailable,speed,map);
+                if(Double.isNaN(hoursConsumed))
+                    break;
+                hoursAvailable-=hoursConsumed;
+                assert hoursAvailable>=0;
+                if(hoursAvailable==0)
+                    break;
+
+            }
+        }
+
         //do not allow more DPL
         stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
         assert hoursAvailable>=0;
 
         //add more events now.
         currentPlan = newPlan;
-        for (PlanningModule module : planModules.values()) {
-            module.prepareForReplanning(model,fisher);
+        if(hoursAvailable>0) {
+            for (PlanningModule module : planModules.values()) {
+                module.prepareForReplanning(model, fisher);
+            }
+            currentPlan = planRecursively(currentPlan, hoursAvailable,
+                    model, fisher);
         }
-        currentPlan = planRecursively(currentPlan, hoursAvailable,
-                                      model, fisher);
-
         return currentPlan;
 
     }
@@ -388,4 +392,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     }
 
+    public double getThisTripTargetHours() {
+        return thisTripTargetHours;
+    }
+
+    public void setThisTripTargetHours(double thisTripTargetHours) {
+        this.thisTripTargetHours = thisTripTargetHours;
+    }
 }

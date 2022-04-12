@@ -28,14 +28,33 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class PurseSeinerDepartingStrategyFactory
     implements AlgorithmFactory<CompositeDepartingStrategy> {
 
+    private final boolean destinationBased;
+
+    public PurseSeinerDepartingStrategyFactory() {
+        destinationBased = true;
+
+    }
+
+    public PurseSeinerDepartingStrategyFactory(boolean destinationBased) {
+        this.destinationBased = destinationBased;
+    }
+
     @Override
     public CompositeDepartingStrategy apply(final FishState state) {
+        if(destinationBased)
         return new CompositeDepartingStrategy(
             new FixedRestTimeDepartingStrategy(0),
             // rest times assigned in TunaScenario.populateModel
             new YearlyActionLimitsDepartingStrategy(),
             new DestinationBasedDepartingStrategy()
         );
+        else{
+            return new CompositeDepartingStrategy(
+                    new FixedRestTimeDepartingStrategy(0),
+                    // rest times assigned in TunaScenario.populateModel
+                    new YearlyActionLimitsDepartingStrategy()
+            );
+        }
     }
 
 }

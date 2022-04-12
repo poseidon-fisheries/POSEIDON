@@ -90,6 +90,17 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
      */
     private DoubleParameter ownFadActionWeightBias = new FixedDoubleParameter(1 );
 
+    /**
+     * a multiplier applied to the action weight of own fad (since it's quite low in the data)
+     */
+    private DoubleParameter deploymentBias = new FixedDoubleParameter(1 );
+
+
+    /**
+     * a multiplier applied to the action weight of own fad (since it's quite low in the data)
+     */
+    private DoubleParameter minimumPercentageOfTripDurationAllowed = new FixedDoubleParameter(1 );
+
 
     @Override
     public PlannedStrategyProxy apply(FishState state) {
@@ -102,14 +113,15 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 additionalHourlyDelayNonAssociatedSets.apply(state.getRandom()),
                 minimumValueFadSets.apply(state.getRandom()),
                 ownFadActionWeightBias.apply(state.getRandom()),
+                deploymentBias.apply(state.getRandom()),
                 minimumValueOpportunisticFadSets.apply(state.getRandom()),
                 distancePenaltyFadSets.apply(state.getRandom()),
                 new MapDiscretization(
                         mapDiscretizationFadSets.apply(state)
                 ),
                 hoursWastedOnFailedSearches.apply(state.getRandom()),
-                planningHorizonInHours.apply(state.getRandom())
-        );
+                planningHorizonInHours.apply(state.getRandom()),
+                minimumPercentageOfTripDurationAllowed.apply(state.getRandom()));
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -216,5 +228,21 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setOwnFadActionWeightBias(DoubleParameter ownFadActionWeightBias) {
         this.ownFadActionWeightBias = ownFadActionWeightBias;
+    }
+
+    public DoubleParameter getDeploymentBias() {
+        return deploymentBias;
+    }
+
+    public void setDeploymentBias(DoubleParameter deploymentBias) {
+        this.deploymentBias = deploymentBias;
+    }
+
+    public DoubleParameter getMinimumPercentageOfTripDurationAllowed() {
+        return minimumPercentageOfTripDurationAllowed;
+    }
+
+    public void setMinimumPercentageOfTripDurationAllowed(DoubleParameter minimumPercentageOfTripDurationAllowed) {
+        this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
     }
 }
