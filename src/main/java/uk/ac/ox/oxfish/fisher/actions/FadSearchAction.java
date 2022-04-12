@@ -43,28 +43,33 @@ public class FadSearchAction implements Action {
         Bag fadsHere = model.getFadMap().fadsAt(agent.getLocation());
         //if there is no fads here, spent some hours wasting time
         if(fadsHere.isEmpty())
-            return new ActionResult(new Delaying(hoursDelayIfNoFadFound),hoursLeft);
+            if(hoursDelayIfNoFadFound>0)
+                return new ActionResult(new Delaying(hoursDelayIfNoFadFound),hoursLeft);
+            else
+                return new ActionResult(new Arriving(),hoursLeft);
 
 
         //grab a random, non owned fad
-        Optional<Fad> randomFad = MasonUtils.<Fad>bagToStream(fadsHere).
+        List<Fad> fadsThatICanSteal = MasonUtils.<Fad>bagToStream(fadsHere).
                 filter(
                         fad -> fad.getOwner().getFisher() != agent
                 ).
                 filter(fad -> fad.valueOfFishFor(agent) >= minimumValueOfFad).
-                skip(model.getRandom().nextInt(fadsHere.size())).
-                findAny();
-
-        //if there are no fads,
-        return randomFad.map(fad -> new ActionResult(
-                new OpportunisticFadSetAction(
-                        fad,
-                        agent,
-                        fadSetDurationTime),
-                hoursLeft
-        )).orElseGet(
-                () -> new ActionResult(new Delaying(hoursDelayIfNoFadFound),
-                        hoursLeft));
+                collect(Collectors.toList());
+        if(fadsThatICanSteal.size()>0)
+            return new ActionResult(
+                    new OpportunisticFadSetAction(
+                            fadsThatICanSteal.get(model.getRandom().nextInt(fadsThatICanSteal.size())),
+                            agent,
+                            fadSetDurationTime),
+                    hoursLeft
+            );
+        else
+            if(hoursDelayIfNoFadFound>0)
+                return new ActionResult(new Delaying(hoursDelayIfNoFadFound),
+                            hoursLeft);
+            else
+                return new ActionResult(new Arriving(),hoursLeft);
 
     }
 }
