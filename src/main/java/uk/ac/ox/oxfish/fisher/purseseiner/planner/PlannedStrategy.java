@@ -22,11 +22,9 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.ActionResult;
-import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.fisher.actions.Moving;
+import uk.ac.ox.oxfish.fisher.actions.*;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -165,7 +163,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
             //you have finished the queue!
             resetActionQueue();
             //is it time for a replan?
-            if(computeCurrentTripDurationInHours(model) >planningHorizonInHours &&
+            if(model.getHoursSinceStart()-hoursInTheTripSinceWeLastReplanned  >planningHorizonInHours &&
              agent.getLocation() != agent.getHomePort().getLocation())
             {
                 replan(agent,model); //this will automatically move to new next action
@@ -214,6 +212,14 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 actionInProgress.getLocation() == null ||
                 (!actionInProgress.isAllowedNow(fisher))
         ) {
+
+            //check for the case when you just finished setting a fad that was destroyed (by you or others)
+            //in that case it will say that the location is unknown, but it you just need to be here a second longer
+            if(actionQueueInProgress != null &&
+                    actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
+            currentAction instanceof Arriving)
+                return fisher.getLocation();
+
             //unless you are at port (probably because you beelined here after you were told to go home)
             if(fisher.getLocation() != fisher.getHomePort().getLocation())
                 replan(fisher,model);

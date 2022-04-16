@@ -118,7 +118,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             //find the module
             PlanningModule planningModule = planModules.get(action);
             Preconditions.checkArgument(planningModule!=null,
-                                        "You have assigned weight to " + action.toString()+ " without any module associated to it");
+                    "You have assigned weight to " + action.toString()+ " without any module associated to it");
             //start the planning module
             planningModule.start(model,fisher);
             //set maximum actions
@@ -173,7 +173,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     }
 
     private Plan planRecursively(Plan currentPlan, double hoursLeftInBudget,
-                                FishState model, Fisher fisher){
+                                 FishState model, Fisher fisher){
 
         //if there are no possible actions, stop
         if(!isAnyActionEvenPossible())
@@ -211,7 +211,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             //there is an action and we need to take it
             double hoursConsumed =
                     cheapestInsert(currentPlan,plannedAction,hoursLeftInBudget,fisher.getBoat().getSpeedInKph(),
-                           model.getMap());
+                            model.getMap());
             if(Double.isNaN(hoursConsumed))
                 //went overbudget! our plan is complete
                 return currentPlan;
@@ -224,7 +224,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                     return currentPlan;
                 else
                     return planRecursively(currentPlan, hoursLeftInBudget,
-                                           model, fisher);
+                            model, fisher);
             }
         }
 
@@ -259,12 +259,12 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
         //create an empty plan (circling back home)
         currentPlan = new Plan(fisher.getLocation(),
-                               fisher.getLocation());
+                fisher.getLocation());
         //start planning
         stillAllowedActionsInPlan.clear();
         thisTripTargetHours = maxHoursPerTripGenerator.apply(model.getRandom());
         currentPlan = planRecursively(currentPlan, thisTripTargetHours ,
-                                      model, fisher);
+                model, fisher);
 
         return currentPlan;
     }
@@ -282,27 +282,37 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         NauticalMap map = model.getMap();
         double speed = fisher.getBoat().getSpeedInKph();
         Plan newPlan = new Plan(fisher.getLocation(),
-                                fisher.getHomePort().getLocation());
+                fisher.getHomePort().getLocation());
         //now take into consideration the very last step (return to port)
         double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
         hoursAvailable -= lastStepCost;
         newPlan.addHoursEstimatedItWillTake(lastStepCost);
 
-        for (PlannedAction plannedAction : currentPlan.lookAtPlan()) {
-            if(plannedAction instanceof PlannedAction.Deploy) {
-                double hoursConsumed = cheapestInsert(newPlan,plannedAction,hoursAvailable,speed,map);
-                if(Double.isNaN(hoursConsumed))
-                    break;
-                hoursAvailable-=hoursConsumed;
-                assert hoursAvailable>=0;
-                if(hoursAvailable==0)
-                    break;
+        if(hoursAvailable>=0) {
+            for (PlannedAction plannedAction : currentPlan.lookAtPlan()) {
+                if (plannedAction instanceof PlannedAction.Deploy) {
+                    double hoursConsumed = cheapestInsert(newPlan, plannedAction, hoursAvailable, speed, map);
+                    if (!Double.isFinite(hoursConsumed))
+                        break;
+                    hoursAvailable -= hoursConsumed;
+                    assert hoursAvailable >= 0;
+                    if (hoursAvailable <= 0)
+                        break;
 
+                }
             }
         }
-
+        //reset valid actions
+        for (Map.Entry<ActionType, MutableInt> allowedActions : stillAllowedActionsInPlan.entrySet()) {
+            PlanningModule planningModule = planModules.get(allowedActions.getKey());
+            if(planningModule!=null)
+                allowedActions.getValue().setValue(
+                        planningModule.maximumActionsInAPlan(model,fisher)
+                );
+        }
         //do not allow more DPL
         stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
+
         assert hoursAvailable>=0;
 
         //add more events now.

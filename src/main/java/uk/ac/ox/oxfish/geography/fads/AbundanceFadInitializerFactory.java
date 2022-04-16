@@ -25,6 +25,7 @@ import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
@@ -35,72 +36,35 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceFadInitializerFactory
-        extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> implements PluggableSelectivity {
+        extends  AbstractAbundanceFadInitializerFactory {
 
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
 
-    /**
-     * Empty constructor for YAML
-     */
+
     public AbundanceFadInitializerFactory() {
     }
 
-    public AbundanceFadInitializerFactory(final String... speciesNames) {
+    public AbundanceFadInitializerFactory(String... speciesNames) {
         super(speciesNames);
     }
 
-    @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
-        checkNotNull(selectivityFilters);
-        checkNotNull(getSpeciesCodes());
-        final MersenneTwisterFast rng = fishState.getRandom();
-        final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
-        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+    @NotNull
+    protected DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity) {
+        final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
         DoubleSupplier capacityGenerator;
-        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
-            capacityGenerator = () -> totalCarryingCapacity;
+        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud ==0)
+            capacityGenerator = () -> maximumCarryingCapacity;
         else
             capacityGenerator = () -> {
-                if(rng.nextFloat()<=probabilityOfFadBeingDud)
+                if(rng.nextFloat()<= probabilityOfFadBeingDud)
                     return 0;
                 else
-                    return totalCarryingCapacity;
+                    return maximumCarryingCapacity;
             };
-
-        return new AbundanceFadInitializer(
-                fishState.getBiology(),
-                capacityGenerator,
-                makeFishAttractor(fishState, rng),
-                getFishReleaseProbabilityInPercent().apply(rng) / 100d,
-                fishState::getStep
-        );
+        return capacityGenerator;
     }
 
-    private LogisticFishAbundanceAttractor makeFishAttractor(
-            final FishState fishState,
-            final MersenneTwisterFast rng
-    ) {
-        return new LogisticFishAbundanceAttractor(
-                fishState.getRandom(),
-                processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
-                processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
-                processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
-                processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
-                getSelectivityFilters()
-        );
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return selectivityFilters;
-    }
-
-    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
-    }
 
     public DoubleParameter getFadDudRate() {
         return fadDudRate;

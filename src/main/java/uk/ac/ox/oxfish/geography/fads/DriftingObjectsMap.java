@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import org.jetbrains.annotations.Nullable;
 import sim.field.continuous.Continuous2D;
+import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -119,6 +120,10 @@ public class DriftingObjectsMap {
 
     public Stream<Object> objects() {
         return bagToStream(field.allObjects);
+    }
+
+    public Bag getAllObjects() {
+        return field.getAllObjects();
     }
 
     public Continuous2D getField() {

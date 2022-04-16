@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
@@ -27,10 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -55,6 +53,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
@@ -123,6 +122,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             );
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
             new StandardIattcRegulationsFactory();
+
+    private boolean zapper = false;
 
     /**
      * Just runs the scenario for a year.
@@ -389,8 +390,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
         abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
-        if(fadInitializerFactory instanceof AbundanceFadInitializerFactory)
-            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
+        if(fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
+            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
         abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
@@ -424,6 +425,13 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         ).forEach(startableFactory ->
                 fishState.registerStartable(startableFactory.apply(fishState))
         );
+
+        if(zapper)
+            fishState.registerStartable(
+                    new FadZapper(
+                            fad -> fad.getLocation().getGridX()<=20
+                    )
+            );
 
         return new ScenarioPopulation(
                 fishers,
@@ -470,6 +478,14 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     public void setDestinationStrategy(EPOPlannedStrategyFactory destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
+    }
+
+    public boolean isZapper() {
+        return zapper;
+    }
+
+    public void setZapper(boolean zapper) {
+        this.zapper = zapper;
     }
 }
 

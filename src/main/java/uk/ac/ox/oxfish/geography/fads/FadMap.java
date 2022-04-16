@@ -1,8 +1,10 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -105,6 +107,10 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
             .map(fadClass::cast);
     }
 
+    public Bag allFadsAsList() {
+        return driftingObjectsMap.getAllObjects();
+    }
+
     @NotNull
     public Optional<SeaTile> getFadTile(final Fad<?, ?> fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
@@ -161,13 +167,24 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
                 // The FAD does not have a location anymore, either because is has drifted off
                 // the map or because it was explicitly removed. In that case, all that's left to
                 // do is to release the fish into the void and tell the FAD's owner about it.
-                fad.releaseFish(globalBiology.getSpecies());
-                fad.getOwner().loseFad(fad);
+                reactToLostFad(fad);
             }
         };
     }
 
-    public void remove(final F fad) {
+    public void destroyFad(Fad fad) {
+        remove(fad);
+    //    reactToLostFad(fad);
+    }
+
+
+    private void reactToLostFad(F fad) {
+        fad.releaseFish(globalBiology.getSpecies());
+        if(fad.getOwner()!=null)
+            fad.getOwner().loseFad(fad);
+    }
+
+    public void remove(final Fad fad) {
 
         driftingObjectsMap.remove(fad);
         for (FadRemovalListener removalListener : getRemovalListeners()) {

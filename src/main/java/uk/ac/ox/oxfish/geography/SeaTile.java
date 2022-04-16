@@ -202,15 +202,15 @@ public class SeaTile implements Startable, LocalBiology{
     }
 
     public double getTemperatureInCelsius() {
-        return weather.getTemperatureInCelsius();
+        return weather == null ? 0 : weather.getTemperatureInCelsius();
     }
 
     public double getWindSpeedInKph() {
-        return weather.getWindSpeedInKph();
+        return weather == null ? 0 :weather.getWindSpeedInKph();
     }
 
     public double getWindDirection() {
-        return weather.getWindDirection();
+        return weather == null ? 0 :weather.getWindDirection();
     }
 
     public boolean isPortHere() {

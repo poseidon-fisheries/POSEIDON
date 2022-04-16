@@ -120,7 +120,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        optionsGenerator.startOrReset(FadManager.getFadManager(fisher));
+        optionsGenerator.startOrReset(FadManager.getFadManager(fisher),model.getRandom());
         map = model.getMap();
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
 

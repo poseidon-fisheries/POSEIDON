@@ -59,6 +59,7 @@ public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Fad
     @Override
     public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
         // Nothing to do here since the biomass has already been removed from the ocean
+        fishState.getFadMap().destroyFad(fad);
     }
 
     /**
@@ -67,6 +68,8 @@ public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Fad
     @Override
     public void reactToFailedSet(final FishState fishState, final SeaTile locationOfSet) {
         fad.releaseFish(fishState.getBiology().getSpecies(), locationOfSet.getBiology());
+        fishState.getFadMap().destroyFad(fad);
+
     }
 
     @Override

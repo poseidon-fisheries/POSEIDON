@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableSet;
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -89,7 +90,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 -100
         );
 
-        generator.startOrReset(fadManager);
+        generator.startOrReset(fadManager,new MersenneTwisterFast());
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
         //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
@@ -162,7 +163,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 2
         );
 
-        generator.startOrReset(fadManager);
+        generator.startOrReset(fadManager,new MersenneTwisterFast());
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         assertEquals(initialOptions.size(),1);
         assertTrue(initialOptions.get(0).getSecond()==3);

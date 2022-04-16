@@ -61,10 +61,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanc
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -416,8 +413,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
         abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
-        if(fadInitializerFactory instanceof AbundanceFadInitializerFactory)
-            ((AbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
+        if(fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
+            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
         abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
