@@ -174,7 +174,6 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
 
     public void destroyFad(Fad fad) {
         remove(fad);
-    //    reactToLostFad(fad);
     }
 
 

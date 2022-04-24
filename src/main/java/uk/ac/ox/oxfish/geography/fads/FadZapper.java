@@ -36,6 +36,8 @@ public class FadZapper implements Steppable, AdditionalStartable {
         }
         for (Fad fad : listToRemove) {
             fadMap.destroyFad(fad);
+            fad.releaseFish(((FishState) simState).getSpecies());
+
         }
 
     }

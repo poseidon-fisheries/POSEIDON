@@ -27,18 +27,20 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.maximization.TunaEvaluator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * A simple planner where given a budget of time you can spend out:
@@ -408,5 +410,58 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     public void setThisTripTargetHours(double thisTripTargetHours) {
         this.thisTripTargetHours = thisTripTargetHours;
+    }
+
+//    public static void main(String[] args) throws IOException {
+////        GenericOptimization.buildLocalCalibrationProblem(
+////                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapperAge.yaml"),
+////                new double[]{-4.700,-4.317,-9.726, 10.000,-5.696,-10.000,-3.364, 9.002,-4.908,-3.535,-10.000, 2.033, 5.465,-8.304,-2.033,-6.016,-1.467,-5.014,-4.505, 2.120, 6.360, 3.727, 10.000,-5.952,-7.052,-2.532},
+////                "zapperAge_local",.2
+////        );
+////        GenericOptimization.buildLocalCalibrationProblem(
+////                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapper.yaml"),
+////                new double[]{
+////                        -0.244,-5.551,-9.394, 1.927,-1.066,-10.000, 9.442, 8.502,-7.710,-3.389, 2.360, 6.431, 10.000,-0.977,-0.218, 6.725, 5.352,-2.716,-7.049, 2.578, 10.000, 4.774,-3.275,-0.764, 0.055,-8.100
+////                },
+////                "zapper_local",.3
+////        );
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperlocal2/original.yaml"),
+//                new double[]{
+//                        5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502
+//                },
+//                "zapper_local_again",.3
+//        );
+//    }
+
+    public static void main(String[] args) throws IOException {
+
+//        double[] solution = {-3.498,-0.431,-5.375,-3.236,-1.976,-3.991,-6.029, 1.675,-5.013, 0.085, 2.348, 6.974,-6.651, 0.070, 7.658, 1.313,-6.153,-6.742, 5.033, 3.401, 2.288,-0.401, 4.435, 0.906,-5.929, 5.521,-2.117, 5.730};
+//        Path calibrationFile = Paths.get("/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/temp/powpointone/local_1000_forceddiscretization.yaml");
+//
+//
+
+
+//        double[] solution = {-1.732, 5.637,-0.049, 1.983,-0.496, 4.536,-5.810,-3.894,-7.138, 5.626, 5.600, 0.594, 4.095, 2.608, 1.965,-3.078,-4.655, 5.206, 5.751,-3.062, 6.612, 4.448, 4.792, 1.511,-6.183,-7.019, 1.016};
+//        Path calibrationFile = Paths.get(
+//                "docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/local_fd_125.yaml"
+//        );
+
+
+//        double[] solution = {0.562, 4.100,-4.186,-1.756, 3.606,-5.027, 0.635,-2.266, 1.438, 2.350,-0.368,-3.393,-2.957, 1.256, 4.433,-4.830,-2.005,-2.589,-0.782, 0.178, 0.110, 1.421, 0.591,-1.358, 2.359, 4.308};
+//        Path calibrationFile = Paths.get(
+//                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/carrknight/2022-04-20_07.33.02_local1000/local_fd_125.yaml"
+//        );
+
+        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
+        Path calibrationFile = Paths.get(
+                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
+        );
+
+
+        TunaEvaluator evaluator = new TunaEvaluator(calibrationFile,solution);
+        evaluator.setNumRuns(5);
+        evaluator.run();
+
     }
 }

@@ -124,6 +124,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             new StandardIattcRegulationsFactory();
 
     private boolean zapper = false;
+    private boolean zapperAge = false;
 
     /**
      * Just runs the scenario for a year.
@@ -426,13 +427,16 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 fishState.registerStartable(startableFactory.apply(fishState))
         );
 
-        if(zapper)
+        if(zapper) {
+            Predicate<Fad> predicate = zapperAge?
+                    fad -> fad.getLocation().getGridX() <= 20 :
+                    fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
             fishState.registerStartable(
                     new FadZapper(
-                            fad -> fad.getLocation().getGridX()<=20
+                            predicate
                     )
             );
-
+        }
         return new ScenarioPopulation(
                 fishers,
                 new SocialNetwork(new EmptyNetworkBuilder()),
@@ -486,6 +490,14 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     public void setZapper(boolean zapper) {
         this.zapper = zapper;
+    }
+
+    public boolean isZapperAge() {
+        return zapperAge;
+    }
+
+    public void setZapperAge(boolean zapperAge) {
+        this.zapperAge = zapperAge;
     }
 }
 

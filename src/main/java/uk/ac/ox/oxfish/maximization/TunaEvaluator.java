@@ -38,7 +38,7 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
-    TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
+    public TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
 
         optimization = GenericOptimization.fromFile(calibrationFilePath);
 
@@ -128,7 +128,7 @@ public class TunaEvaluator implements Runnable {
         runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
         runner
             .registerRowProvider("actions.csv", PurseSeineActionsLogger::new)
-            .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
+         //   .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
             .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 

@@ -12,9 +12,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
  * It is described by where it should take place, how much it takes in time, and the type of action
@@ -398,11 +395,6 @@ public interface PlannedAction {
             {
                 return new Action[]{
                         createSet(potentialCatch, fisher, setDurationInHours)
-//                        new DolphinSetAction<>(
-//                        potentialCatch,
-//                        fisher,
-//                        setDurationInHours
-                        //)
                 };
             }
             else{

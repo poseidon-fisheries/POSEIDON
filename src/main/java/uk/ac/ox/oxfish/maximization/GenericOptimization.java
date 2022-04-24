@@ -360,6 +360,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         return error;
     }
 
+    public static Scenario buildScenario(double[] x, Path calibrationFile) throws FileNotFoundException {
+        FishYAML yaml = new FishYAML();
+        GenericOptimization optimization = yaml.loadAs(
+                new FileReader(calibrationFile.toFile()),
+                GenericOptimization.class);
+        return buildScenario(x,Paths.get(optimization.getScenarioFile()).toFile(),optimization.getParameters());
+    }
+
     public static Scenario buildScenario(double[] x, File scenarioFile,
                                          List<OptimizationParameter> parameterList)
             throws FileNotFoundException {

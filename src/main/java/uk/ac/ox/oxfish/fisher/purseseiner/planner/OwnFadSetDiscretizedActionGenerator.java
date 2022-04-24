@@ -66,7 +66,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         //go through all your fads and rank them by profits
         for (Object fad : fadManager.getDeployedFads()) {
             Fad deployedFad = (Fad) fad;
-            double value = deployedFad.valueOfFishFor(fadManager.getFisher())  ;
+            double value = deployedFad.valueOfFishFor(fadManager.getFisher());
             if(value>=minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                         add(new ValuedFad(deployedFad,value));

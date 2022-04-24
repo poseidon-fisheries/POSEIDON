@@ -26,12 +26,12 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     private final SetLocationValues<? extends AbstractSetAction> originalLocationValues;
 
 
-    private final NauticalMap map;
+    protected final NauticalMap map;
 
     /**
      * the rng to use (compatible with Apache)
      */
-    private final MTFApache localRng;
+    protected final MTFApache localRng;
 
 
 
