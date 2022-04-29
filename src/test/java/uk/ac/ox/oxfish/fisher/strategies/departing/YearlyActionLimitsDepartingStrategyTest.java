@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -87,11 +88,12 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertEquals(2, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new NonAssociatedSetAction(biology, fisher, 1));
+        final BiomassCatchMaker catchMaker = mock(BiomassCatchMaker.class);
+        actionSpecificRegulations.observe(new NonAssociatedSetAction(biology, fisher, 1, catchMaker));
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new DolphinSetAction(biology, fisher, 1));
+        actionSpecificRegulations.observe(new DolphinSetAction(biology, fisher, 1, catchMaker));
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 

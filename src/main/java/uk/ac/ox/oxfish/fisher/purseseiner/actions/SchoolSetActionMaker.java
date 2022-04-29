@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 
+@FunctionalInterface
 public interface SchoolSetActionMaker<
     B extends LocalBiology,
     A extends SchoolSetAction<B>>

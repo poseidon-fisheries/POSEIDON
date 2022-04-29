@@ -26,9 +26,10 @@ public class NonAssociatedSetAction<B extends LocalBiology> extends SchoolSetAct
     public NonAssociatedSetAction(
         final B targetBiology,
         final Fisher fisher,
-        final double setDuration
+        final double setDuration,
+        final CatchMaker<B> catchMaker
     ) {
-        super(targetBiology, fisher, setDuration);
+        super(targetBiology, fisher, setDuration, catchMaker);
     }
 
 }

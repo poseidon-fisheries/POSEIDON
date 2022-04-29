@@ -37,13 +37,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
-
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -141,8 +143,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetGeneratorFunction(final AlgorithmFactory<?
-        extends DoubleUnaryOperator> dolphinSetGeneratorFunction) {
+    public void setDolphinSetGeneratorFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetGeneratorFunction
+    ) {
         this.dolphinSetGeneratorFunction = dolphinSetGeneratorFunction;
     }
 
@@ -211,8 +215,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetActionValueFunction(final AlgorithmFactory<?
-        extends DoubleUnaryOperator> dolphinSetActionValueFunction) {
+    public void setDolphinSetActionValueFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetActionValueFunction
+    ) {
         this.dolphinSetActionValueFunction = dolphinSetActionValueFunction;
     }
 
@@ -308,28 +314,29 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
         checkNotNull(catchSamplersFactory);
         checkNotNull(attractionWeightsFile);
         return callConstructor(this::loadAttractionWeights, this::makeSetOpportunityDetector,
-                               makeActionValueFunctions(fishState), searchActionDecayConstant,
-                               fadDeploymentActionDecayConstant, movingThreshold);
+            makeActionValueFunctions(fishState), searchActionDecayConstant,
+            fadDeploymentActionDecayConstant, movingThreshold
+        );
     }
 
     @NotNull
     protected PurseSeinerFishingStrategy<B, F> callConstructor(
-            final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
-            final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
-            final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-            final double searchActionDecayConstant,
-            final double fadDeploymentActionDecayConstant,
-            final double movingThreshold) {
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
+        final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
+    ) {
         return new PurseSeinerFishingStrategy<>(
-                attractionWeights,
-                opportunityDetector,
-                actionValueFunctions,
-                searchActionDecayConstant,
-                fadDeploymentActionDecayConstant,
-                movingThreshold
+            attractionWeights,
+            opportunityDetector,
+            actionValueFunctions,
+            searchActionDecayConstant,
+            fadDeploymentActionDecayConstant,
+            movingThreshold
         );
     }
-
 
     private Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
         final Fisher fisher
@@ -374,6 +381,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 durationSamplers.get(FadSetAction.class)
             );
 
+        final CatchMaker<B> catchMaker = getCatchMaker(fishState.getBiology());
         final SchoolSetOpportunityGenerator<B, NonAssociatedSetAction<B>>
             nonAssociatedSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
@@ -381,9 +389,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
-                NonAssociatedSetAction<B>::new,
+                (B target, Fisher fisher1, double duration) ->
+                    new NonAssociatedSetAction<>(target, fisher1, duration, catchMaker),
                 activeNonAssociatedSetOpportunitiesCache.get(fishState),
-                durationSamplers.get(NonAssociatedSetAction.class)
+                durationSamplers.get(NonAssociatedSetAction.class),
+                getBiologyAggregator()
             );
 
         final SchoolSetOpportunityGenerator<B, DolphinSetAction<B>>
@@ -393,9 +403,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(DolphinSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
-                DolphinSetAction<B>::new,
+                (B target, Fisher fisher1, double duration) ->
+                    new DolphinSetAction<>(target, fisher1, duration, catchMaker),
                 activeDolphinSetOpportunitiesCache.get(fishState),
-                durationSamplers.get(DolphinSetAction.class)
+                durationSamplers.get(DolphinSetAction.class),
+                getBiologyAggregator()
             );
 
         return new SetOpportunityDetector<>(
@@ -409,6 +421,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
             searchBonus
         );
     }
+
+    abstract Aggregator<B> getBiologyAggregator();
+
+    abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
 
     private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
     loadSetCompositionWeights(

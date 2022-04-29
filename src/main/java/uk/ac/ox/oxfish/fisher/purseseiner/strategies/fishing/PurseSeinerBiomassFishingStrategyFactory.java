@@ -19,12 +19,29 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
+import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 
 public class PurseSeinerBiomassFishingStrategyFactory
     extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology, BiomassFad> {
 
+    private final BiomassAggregator biomassAggregator = new BiomassAggregator();
+
     public PurseSeinerBiomassFishingStrategyFactory() {
         super(BiomassLocalBiology.class, BiomassFad.class);
+    }
+
+    @Override
+    Aggregator<BiomassLocalBiology> getBiologyAggregator() {
+        return biomassAggregator;
+    }
+
+    @Override
+    CatchMaker<BiomassLocalBiology> getCatchMaker(final GlobalBiology globalBiology) {
+        return new BiomassCatchMaker(globalBiology);
     }
 }

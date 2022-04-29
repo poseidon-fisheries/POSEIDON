@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 /**
  * An {@link Aggregator} that works with {@link AbundanceLocalBiology} biologies.
  */
-class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
+public class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
 
     @Override
     public AbundanceLocalBiology apply(

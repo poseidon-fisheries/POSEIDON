@@ -41,6 +41,7 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -98,7 +99,8 @@ public class SchoolSetOpportunityGeneratorTest {
             UnaryOperator.identity(),
             (__, ___, ____) -> nonAssociatedSetAction,
             new ActiveOpportunities(),
-            () -> 1.0
+            () -> 1.0,
+            new BiomassAggregator()
         );
         final FishState fishState = mock(FishState.class);
         final Fisher fisher = mock(Fisher.class);
