@@ -47,9 +47,11 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetActionMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetActionMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
@@ -115,6 +117,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
         new CompressedExponentialFunctionFactory(1E-6, 2);
+    private boolean fishUnderFadsAvailableForSchoolSets = true;
 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
@@ -122,6 +125,14 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     ) {
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
+    }
+
+    public boolean isFishUnderFadsAvailableForSchoolSets() {
+        return fishUnderFadsAvailableForSchoolSets;
+    }
+
+    public void setFishUnderFadsAvailableForSchoolSets(final boolean fishUnderFadsAvailableForSchoolSets) {
+        this.fishUnderFadsAvailableForSchoolSets = fishUnderFadsAvailableForSchoolSets;
     }
 
     @SuppressWarnings("unused")
@@ -389,11 +400,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
-                (B target, Fisher fisher1, double duration) ->
-                    new NonAssociatedSetAction<>(target, fisher1, duration, catchMaker),
+                new NonAssociatedSetActionMaker<>(catchMaker),
                 activeNonAssociatedSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(NonAssociatedSetAction.class),
-                getBiologyAggregator()
+                getBiologyAggregator(),
+                fishUnderFadsAvailableForSchoolSets
             );
 
         final SchoolSetOpportunityGenerator<B, DolphinSetAction<B>>
@@ -403,11 +414,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(DolphinSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
-                (B target, Fisher fisher1, double duration) ->
-                    new DolphinSetAction<>(target, fisher1, duration, catchMaker),
+                new DolphinSetActionMaker<>(catchMaker),
                 activeDolphinSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(DolphinSetAction.class),
-                getBiologyAggregator()
+                getBiologyAggregator(),
+                fishUnderFadsAvailableForSchoolSets
             );
 
         return new SetOpportunityDetector<>(

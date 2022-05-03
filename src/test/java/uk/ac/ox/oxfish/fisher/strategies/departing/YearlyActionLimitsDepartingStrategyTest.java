@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.Test;
@@ -89,11 +90,15 @@ public class YearlyActionLimitsDepartingStrategyTest {
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
         final BiomassCatchMaker catchMaker = mock(BiomassCatchMaker.class);
-        actionSpecificRegulations.observe(new NonAssociatedSetAction(biology, fisher, 1, catchMaker));
+        actionSpecificRegulations.observe(
+            new NonAssociatedSetAction(biology, fisher, 1, ImmutableList.of(biology), catchMaker)
+        );
         assertEquals(1, setLimits.getNumRemainingActions(fisher));
         assertTrue(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 
-        actionSpecificRegulations.observe(new DolphinSetAction(biology, fisher, 1, catchMaker));
+        actionSpecificRegulations.observe(
+            new DolphinSetAction(biology, fisher, 1, ImmutableList.of(biology), catchMaker)
+        );
         assertEquals(0, setLimits.getNumRemainingActions(fisher));
         assertFalse(strategy.shouldFisherLeavePort(actionSpecificRegulations, fisher));
 

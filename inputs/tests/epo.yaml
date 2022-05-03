@@ -128,6 +128,7 @@ EPO Abundance:
       Compressed Exponential Function:
         coefficient: 1.0E-6
         exponent: 2.0
+    fishUnderFadsAvailableForSchoolSets: true
     movingThreshold: 0.1
     nonAssociatedSetActionValueFunction:
       Compressed Exponential Function:

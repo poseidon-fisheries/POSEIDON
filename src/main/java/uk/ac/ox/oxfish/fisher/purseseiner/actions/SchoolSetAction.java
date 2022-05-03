@@ -22,34 +22,32 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Queue;
-import java.util.stream.Collectors;
-import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.MasonUtils;
 
 public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSetAction<B> {
 
     private final CatchMaker<B> catchMaker;
+    private final Queue<B> sourceBiologies;
 
     SchoolSetAction(
         final B targetBiology,
         final Fisher fisher,
         final double setDuration,
+        final Collection<B> sourceBiologies,
         final CatchMaker<B> catchMaker
     ) {
         super(targetBiology, fisher, setDuration);
         this.catchMaker = catchMaker;
+        this.sourceBiologies = new ArrayDeque<>(sourceBiologies);
     }
 
     @Override
@@ -62,22 +60,14 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
     @Override
     public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
 
-        final Bag fads = fishState.getFadMap().fadsAt(locationOfSet);
-        fads.shuffle(fishState.getRandom());
-        final Queue<B> fadBiologies =
-            MasonUtils.<Fad<B, ?>>bagToStream(fads)
-                .map(Fad::getBiology)
-                .collect(Collectors.toCollection(ArrayDeque::new));
-
-        @SuppressWarnings("unchecked") // shouldn't happen, but let it crash if it does
-        B biology = (B) locationOfSet.getBiology();
+        B biology = sourceBiologies.poll();
         B uncaught = getTargetBiology();
         while (!(biology == null || isEmpty(uncaught, fishState.getSpecies()))) {
             final Entry<Catch, B> caughtAndUncaught = catchMaker.apply(biology, uncaught);
             final Catch caught = caughtAndUncaught.getKey();
             biology.reactToThisAmountOfBiomassBeingFished(caught, caught, fishState.getBiology());
             uncaught = caughtAndUncaught.getValue();
-            biology = fadBiologies.poll();
+            biology = sourceBiologies.poll();
         }
     }
 
@@ -93,19 +83,6 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
 
     private boolean isEmpty(final B biology, final Iterable<Species> species) {
         return biology.getTotalBiomass(species) < EPSILON;
-    }
-
-    private Catch makeCatch(final B biology) {
-        if (biology instanceof VariableBiomassBasedBiology) {
-            return new Catch((VariableBiomassBasedBiology) biology);
-        } else if (biology instanceof AbundanceLocalBiology) {
-            return new Catch(
-                getFisher().grabState().getBiology(),
-                (AbundanceLocalBiology) biology
-            );
-        } else {
-            throw new IllegalArgumentException();
-        }
     }
 
 }

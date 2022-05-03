@@ -18,10 +18,32 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-@FunctionalInterface
-interface SetActionMaker<B extends LocalBiology, T, A extends AbstractSetAction<B>> {
-    A make(T target, Fisher fisher, double duration);
+public class DolphinSetActionMaker<B extends LocalBiology>
+    implements SchoolSetActionMaker<B, DolphinSetAction<B>> {
+
+    private final CatchMaker<B> catchMaker;
+
+    public DolphinSetActionMaker(final CatchMaker<B> catchMaker) {
+        this.catchMaker = catchMaker;
+    }
+
+    @Override
+    public DolphinSetAction<B> make(
+        final B targetBiology,
+        final Fisher fisher,
+        final double setDuration,
+        final Collection<B> sourceBiologies
+    ) {
+        return new DolphinSetAction<>(
+            targetBiology,
+            fisher,
+            setDuration,
+            sourceBiologies,
+            catchMaker
+        );
+    }
 }

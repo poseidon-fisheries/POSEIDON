@@ -85,7 +85,8 @@ public class SchoolSetOpportunityGeneratorTest {
             Arrays.copyOf(biomasses, biomasses.length),
             Arrays.copyOf(biomasses, biomasses.length)
         );
-        @SuppressWarnings("rawtypes") final NonAssociatedSetAction nonAssociatedSetAction = mock(NonAssociatedSetAction.class);
+        @SuppressWarnings("rawtypes") final NonAssociatedSetAction nonAssociatedSetAction =
+            mock(NonAssociatedSetAction.class);
         when(nonAssociatedSetAction.checkIfPermitted()).thenReturn(true);
         @SuppressWarnings("rawtypes") final SchoolSetOpportunityGenerator<BiomassLocalBiology,
             NonAssociatedSetAction<BiomassLocalBiology>>
@@ -97,14 +98,16 @@ public class SchoolSetOpportunityGeneratorTest {
             ),
             BiomassLocalBiology.class,
             UnaryOperator.identity(),
-            (__, ___, ____) -> nonAssociatedSetAction,
+            (__, ___, ____, _____) -> nonAssociatedSetAction,
             new ActiveOpportunities(),
             () -> 1.0,
-            new BiomassAggregator()
+            new BiomassAggregator(),
+            false
         );
         final FishState fishState = mock(FishState.class);
         final Fisher fisher = mock(Fisher.class);
         final SeaTile seaTile = mock(SeaTile.class);
+        when(fishState.getBiology()).thenReturn(globalBiology);
         when(seaTile.getBiology()).thenReturn(biology);
         when(seaTile.getGridLocation()).thenReturn(new Int2D(0, 0));
         when(fisher.getLocation()).thenReturn(seaTile);

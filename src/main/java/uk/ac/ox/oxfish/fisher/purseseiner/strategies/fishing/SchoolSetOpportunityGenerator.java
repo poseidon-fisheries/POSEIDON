@@ -31,8 +31,8 @@ import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 import sim.util.Bag;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.MasonUtils;
 
 public class SchoolSetOpportunityGenerator<
@@ -58,6 +59,8 @@ public class SchoolSetOpportunityGenerator<
     private final Map<Species, Double> weights;
     private final Class<B> biologyClass;
 
+    private final boolean fishUnderFadsAvailable;
+
     public SchoolSetOpportunityGenerator(
         final DoubleUnaryOperator probabilityFunction,
         final Map<Species, Double> weights,
@@ -66,7 +69,8 @@ public class SchoolSetOpportunityGenerator<
         final SchoolSetActionMaker<B, A> actionMaker,
         final ActiveOpportunities activeOpportunities,
         final DoubleSupplier durationSampler,
-        final Aggregator<B> biologyAggregator
+        final Aggregator<B> biologyAggregator,
+        final boolean fishUnderFadsAvailable
     ) {
         super(durationSampler);
         this.probabilityFunction = probabilityFunction;
@@ -74,6 +78,7 @@ public class SchoolSetOpportunityGenerator<
         this.biologyClass = biologyClass;
         this.targetBiologyMaker = targetBiologyMaker;
         this.biologyAggregator = biologyAggregator;
+        this.fishUnderFadsAvailable = fishUnderFadsAvailable;
 
         // make sure all weights are >= 0 and at least one is > 0
         checkArgument(weights.values().stream().allMatch(w -> w >= 0));
@@ -87,23 +92,10 @@ public class SchoolSetOpportunityGenerator<
         this.actionMaker = actionMaker;
     }
 
-    private List<B> biologiesHere(final Fisher fisher) {
-        final SeaTile seaTile = fisher.getLocation();
-        final Stream<B> tileBiology =
-            Stream.of(seaTile.getBiology())
-                .filter(biologyClass::isInstance)
-                .map(biologyClass::cast);
-        final Bag fads = fisher.grabState().getFadMap().fadsAt(seaTile);
-        final Stream<B> fadBiologies = MasonUtils.<Fad<B, ?>>bagToStream(fads).map(Fad::getBiology);
-        return Stream.concat(tileBiology, fadBiologies).collect(toImmutableList());
-    }
-
     @Override
     public Collection<A> apply(final Fisher fisher) {
-        final B biology = biologyAggregator.apply(
-            fisher.grabState().getBiology(),
-            biologiesHere(fisher)
-        );
+        final List<B> sourceBiologies = sourceBiologies(fisher);
+        final B biology = biologyAggregator.apply(fisher.grabState().getBiology(), sourceBiologies);
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
         final int step = fisher.grabState().getStep();
         final boolean opportunity;
@@ -120,10 +112,40 @@ public class SchoolSetOpportunityGenerator<
         if (opportunity) {
             final B targetBiology = targetBiologyMaker.apply(biology);
             final double duration = getDurationSampler().getAsDouble();
-            return ImmutableList.of(actionMaker.make(targetBiology, fisher, duration));
+            final A action = actionMaker.make(targetBiology, fisher, duration, sourceBiologies);
+            return ImmutableList.of(action);
         } else {
             return ImmutableList.of();
         }
+    }
+
+    private List<B> sourceBiologies(final Fisher fisher) {
+        final SeaTile seaTile = fisher.getLocation();
+        final FishState fishState = fisher.grabState();
+        final B tileBiology = seaTileBiology(seaTile);
+        if (fishUnderFadsAvailable) {
+            return Stream
+                .concat(Stream.of(tileBiology), fadBiologies(seaTile, fishState))
+                .collect(toImmutableList());
+        } else {
+            return ImmutableList.of(tileBiology);
+        }
+    }
+
+    private B seaTileBiology(final SeaTile seaTile) {
+        final LocalBiology biology = seaTile.getBiology();
+        if (biologyClass.isInstance(biology)) {
+            return biologyClass.cast(biology);
+        } else {
+            throw new IllegalArgumentException("Wrong type of tile biology.");
+        }
+    }
+
+    @NotNull
+    private Stream<B> fadBiologies(final SeaTile seaTile, final FishState fishState) {
+        final Bag fads = fishState.getFadMap().fadsAt(seaTile);
+        fads.shuffle(fishState.getRandom());
+        return MasonUtils.<Fad<B, ?>>bagToStream(fads).map(Fad::getBiology);
     }
 
     double probabilityOfOpportunity(final LocalBiology biology) {

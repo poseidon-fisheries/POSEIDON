@@ -22,16 +22,28 @@ import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
-public class NonAssociatedSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
+public class NonAssociatedSetActionMaker<B extends LocalBiology>
+    implements SchoolSetActionMaker<B, NonAssociatedSetAction<B>> {
 
-    public NonAssociatedSetAction(
+    private final CatchMaker<B> catchMaker;
+
+    public NonAssociatedSetActionMaker(final CatchMaker<B> catchMaker) {
+        this.catchMaker = catchMaker;
+    }
+
+    @Override
+    public NonAssociatedSetAction<B> make(
         final B targetBiology,
         final Fisher fisher,
         final double setDuration,
-        final Collection<B> sourceBiologies,
-        final CatchMaker<B> catchMaker
+        final Collection<B> sourceBiologies
     ) {
-        super(targetBiology, fisher, setDuration, sourceBiologies, catchMaker);
+        return new NonAssociatedSetAction<B>(
+            targetBiology,
+            fisher,
+            setDuration,
+            sourceBiologies,
+            catchMaker
+        );
     }
-
 }
