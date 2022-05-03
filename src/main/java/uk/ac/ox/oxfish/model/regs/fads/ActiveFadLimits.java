@@ -32,19 +32,22 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
         ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;
 
-    ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
+    ActiveFadLimits(final Iterable<? extends ConditionalLimit> limits) {
         this(new ConditionalFisherRelativeLimits(limits));
     }
 
-    private ActiveFadLimits(FisherRelativeLimits limits) {
+    private ActiveFadLimits(final FisherRelativeLimits limits) {
         this.limits = limits;
     }
 
     @Override
     public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 
-    @Override public boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher) {
-        assert applicableActions.contains(action.getClass());
+    @Override public boolean isForbidden(
+        final Class<? extends PurseSeinerAction> actionClass,
+        final Fisher fisher
+    ) {
+        assert applicableActions.contains(actionClass);
         return getFadManager(fisher).getNumDeployedFads() >= getLimit(fisher);
     }
 
