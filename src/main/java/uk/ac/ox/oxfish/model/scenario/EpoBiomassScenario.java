@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.base.Preconditions.checkState;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,7 +29,6 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -47,17 +45,14 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactor
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
@@ -70,8 +65,6 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -92,7 +85,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path mapFile = INPUT_PATH.resolve("depth.csv");
-    private FisherDefinition fisherDefinition = new FisherDefinition();
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -112,47 +104,38 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
-    private FadInitializerFactory<BiomassLocalBiology, BiomassFad> fadInitializerFactory =
-        new BiomassFadInitializerFactory(
-            "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-        );
+    private AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>>
+        fadInitializerFactory = new BiomassFadInitializerFactory(
+        // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
+        ImmutableMap.of(
+            "Bigeye tuna", 0.7697766896339598,
+            "Yellowfin tuna", 1.1292389959739901,
+            "Skipjack tuna", 0.0
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", 1.0184011081061861,
+            "Yellowfin tuna", 0.0,
+            "Skipjack tuna", 0.7138646301498129
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", 9.557509707646096,
+            "Yellowfin tuna", 10.419783885948643,
+            "Skipjack tuna", 9.492481930328207
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", 0.688914118975473,
+            "Yellowfin tuna", 0.30133562299610883,
+            "Skipjack tuna", 1.25
+        )
+    );
+
+    private AlgorithmFactory<? extends Regulation> regulationsFactory =
+        new StandardIattcRegulationsFactory();
 
     public EpoBiomassScenario() {
-
-        final BiomassPurseSeineGearFactory
-            purseSeineGearFactory = new BiomassPurseSeineGearFactory();
-
-        purseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
-
-        final AlgorithmFactory<? extends Regulation> standardRegulations =
-            new StandardIattcRegulationsFactory();
-
-        fisherDefinition.setRegulation(standardRegulations);
-        fisherDefinition.setGear(purseSeineGearFactory);
-        fisherDefinition.setGearStrategy(new FadRefillGearStrategyFactory());
-
-        final PurseSeinerBiomassFishingStrategyFactory
-            fishingStrategy = new PurseSeinerBiomassFishingStrategyFactory();
-        fishingStrategy.setCatchSamplersFactory(new BiomassCatchSamplersFactory());
-        fisherDefinition.setFishingStrategy(fishingStrategy);
-
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-            new GravityDestinationStrategyFactory();
-        gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
-        fisherDefinition.setDestinationStrategy(gravityDestinationStrategyFactory);
-
-        fisherDefinition.setDepartingStrategy(new PurseSeinerDepartingStrategyFactory());
-
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
+        setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory());
+        setCatchSamplersFactory(new BiomassCatchSamplersFactory());
+        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
     }
 
     public static String getBoatId(final Fisher fisher) {
@@ -167,16 +150,13 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     }
 
     @SuppressWarnings("unused")
-    public FadInitializerFactory<BiomassLocalBiology, BiomassFad> getFadInitializerFactory() {
-        return fadInitializerFactory;
+    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
+        return regulationsFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final FadInitializerFactory<BiomassLocalBiology,
-            BiomassFad> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
+    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
+        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")
@@ -258,16 +238,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
-    @SuppressWarnings("unused")
-    public FisherDefinition getFisherDefinition() {
-        return fisherDefinition;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFisherDefinition(final FisherDefinition fisherDefinition) {
-        this.fisherDefinition = fisherDefinition;
-    }
-
     @Override
     public ScenarioEssentials start(final FishState model) {
 
@@ -306,93 +276,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
-    @Override
-    public ScenarioPopulation populateModel(final FishState model) {
-
-        initModel(model);
-
-        final Double gasPrice = gasPricePerLiter.apply(model.random);
-        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
-
-        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesSupplier.get());
-        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(model);
-        portInitializer
-            .buildPorts(model.getMap(), model.random, seaTile -> marketMap, model, gasPriceMaker)
-            .forEach(port -> port.setGasPricePerLiter(gasPrice));
-
-        final List<Port> ports = model.getMap().getPorts();
-        checkState(!ports.isEmpty());
-
-        final BiomassPurseSeineGearFactory purseSeineGearFactory =
-            (BiomassPurseSeineGearFactory) fisherDefinition.getGear();
-        final FisherFactory fisherFactory = makeFisherFactory(
-            model,
-            fisherDefinition.getRegulation(),
-            purseSeineGearFactory,
-            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy(),
-            fisherDefinition.getFishingStrategy()
-        );
-
-        final Monitors monitors = new Monitors(model);
-        monitors.getMonitors().forEach(model::registerStartable);
-
-        purseSeineGearFactory.getFadDeploymentObservers()
-            .addAll(monitors.getFadDeploymentMonitors());
-        purseSeineGearFactory.getFadSetObservers().addAll(monitors.getFadSetMonitors());
-        purseSeineGearFactory.getNonAssociatedSetObservers()
-            .addAll(monitors.getNonAssociatedSetMonitors());
-        purseSeineGearFactory.getDolphinSetObservers().addAll(monitors.getDolphinSetMonitors());
-        purseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-
-        model.getYearlyDataSet().registerGatherer(
-            "Total profits",
-            fishState -> fishState.getFishers()
-                .stream()
-                .mapToDouble(fisher -> fisher.getLatestYearlyObservation("Profits"))
-                .sum(),
-            Double.NaN,
-            DOLLAR,
-            "Profits"
-        );
-
-        final List<Fisher> fishers =
-            new PurseSeineVesselReader(
-                getVesselsFilePath(),
-                TARGET_YEAR,
-                fisherFactory,
-                ports
-            ).apply(model);
-
-        // Mutate the fisher factory back into a random boat generator
-        // TODO: we don't have boat entry in the tuna model for now, but when we do, this
-        //  shouldn't be entirely random
-        fisherFactory.setBoatSupplier(fisherDefinition.makeBoatSupplier(model.random));
-        fisherFactory.setHoldSupplier(fisherDefinition.makeHoldSupplier(
-            model.random,
-            model.getBiology()
-        ));
-        fisherFactory.setPortSupplier(() -> oneOf(ports, model.random));
-
-        final Map<String, FisherFactory> fisherFactories =
-            ImmutableMap.of(FishState.DEFAULT_POPULATION_NAME, fisherFactory);
-
-        final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
-
-        exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());
-        final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
-        model.registerStartable(exogenousCatches);
-
-        plugins.forEach(plugin -> model.registerStartable(plugin.apply(model)));
-
-        return new ScenarioPopulation(
-            fishers,
-            network,
-            fisherFactories
-        );
-
-    }
-
-
     @SuppressWarnings("unused")
     public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() {
         return Collections.unmodifiableList(plugins);
@@ -422,39 +305,100 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.biomassInitializerFactory = biomassInitializerFactory;
     }
 
+    @Override
+    public ScenarioPopulation populateModel(final FishState fishState) {
+
+        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
+
+        final Double gasPrice = gasPricePerLiter.apply(fishState.random);
+        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
+
+        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesSupplier.get());
+        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
+        portInitializer
+            .buildPorts(
+                fishState.getMap(),
+                fishState.random,
+                seaTile -> marketMap,
+                fishState,
+                gasPriceMaker
+            )
+            .forEach(port -> port.setGasPricePerLiter(gasPrice));
+
+        final List<Port> ports = fishState.getMap().getPorts();
+        checkState(!ports.isEmpty());
+
+        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+            new GravityDestinationStrategyFactory();
+        gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
+        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFilePath());
+
+        final FisherFactory fisherFactory = makeFisherFactory(
+            fishState,
+            regulationsFactory,
+            gravityDestinationStrategyFactory
+        );
+
+        fishState.getYearlyDataSet().registerGatherer(
+            "Total profits",
+            model -> model.getFishers()
+                .stream()
+                .mapToDouble(fisher -> fisher.getLatestYearlyObservation("Profits"))
+                .sum(),
+            Double.NaN,
+            DOLLAR,
+            "Profits"
+        );
+
+        final List<Fisher> fishers =
+            new PurseSeineVesselReader(
+                getVesselsFilePath(),
+                TARGET_YEAR,
+                fisherFactory,
+                ports
+            ).apply(fishState);
+
+        exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());
+        final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(fishState);
+        fishState.registerStartable(exogenousCatches);
+
+        plugins.forEach(plugin -> fishState.registerStartable(plugin.apply(fishState)));
+
+        scenarioPopulation.getPopulation().addAll(fishers);
+        return scenarioPopulation;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Path getAttractionWeightsFile() {
+        return attractionWeightsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+        this.attractionWeightsFile = attractionWeightsFile;
+    }
+
     public BiomassFadMapFactory getFadMapFactory() {
         return fadMapFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadMapFactory(final BiomassFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
+    @Override
+    public AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>> getFadInitializerFactory() {
+        return fadInitializerFactory;
     }
 
-    public void useDummyData(final Path testInputsPath) {
+    @SuppressWarnings("unused")
+    @Override
+    public void setFadInitializerFactory(
+        final AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>> fadInitializerFactory
+    ) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
 
-        super.useDummyData(testInputsPath);
-
-        setCostsFile(testInputsPath.resolve("no_costs.csv"));
-        setVesselsFilePath(testInputsPath.resolve("dummy_boats.csv"));
-        getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-
-        final FisherDefinition fisherDefinition = getFisherDefinition();
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-            (GravityDestinationStrategyFactory) fisherDefinition.getDestinationStrategy();
-        gravityDestinationStrategyFactory
-            .setMaxTripDurationFile(testInputsPath.resolve("dummy_boats.csv"));
-        gravityDestinationStrategyFactory
-            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
-
-        ((PurseSeinerBiomassFishingStrategyFactory) fisherDefinition.getFishingStrategy())
-            .setAttractionWeightsFile(testInputsPath.resolve("dummy_action_weights.csv"));
-
-        //noinspection OverlyStrongTypeCast
-        ((BiomassPurseSeineGearFactory) fisherDefinition.getGear())
-            .setLocationValuesFile(testInputsPath.resolve("dummy_location_values.csv"));
-        ((FadRefillGearStrategyFactory) fisherDefinition.getGearStrategy())
-            .setMaxFadDeploymentsFile(testInputsPath.resolve("dummy_max_deployments.csv"));
+    @SuppressWarnings("unused")
+    public void setFadMapFactory(final BiomassFadMapFactory fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
     }
 
 }

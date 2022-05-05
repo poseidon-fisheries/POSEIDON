@@ -56,7 +56,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
@@ -76,8 +75,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -93,8 +90,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
         new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
-    private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
-    private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
@@ -131,12 +126,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AbundanceCatchSamplersFactory abundanceCatchSamplersFactory =
-        new AbundanceCatchSamplersFactory();
-    private PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory =
-        new PurseSeinerAbundanceFishingStrategyFactory();
-    private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
-        new AbundancePurseSeineGearFactory();
     private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>
         fadInitializerFactory =
         new AbundanceFadInitializerFactory(
@@ -144,6 +133,12 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();
+
+    public EpoAbundanceScenario() {
+        setCatchSamplersFactory(new AbundanceCatchSamplersFactory());
+        setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
+        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
+    }
 
     /**
      * Just runs the scenario for a year.
@@ -177,28 +172,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundancePurseSeineGearFactory getAbundancePurseSeineGearFactory() {
-        return abundancePurseSeineGearFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundancePurseSeineGearFactory(
-        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
-    ) {
-        this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
-    }
-
-    @SuppressWarnings("unused")
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
         return abundanceFiltersFactory;
     }
@@ -206,30 +179,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @SuppressWarnings("unused")
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceCatchSamplersFactory getAbundanceCatchSamplersFactory() {
-        return abundanceCatchSamplersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceCatchSamplersFactory(
-        final AbundanceCatchSamplersFactory abundanceCatchSamplersFactory
-    ) {
-        this.abundanceCatchSamplersFactory = abundanceCatchSamplersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public PurseSeinerAbundanceFishingStrategyFactory getFishingStrategyFactory() {
-        return fishingStrategyFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFishingStrategyFactory(
-        final PurseSeinerAbundanceFishingStrategyFactory fishingStrategyFactory
-    ) {
-        this.fishingStrategyFactory = fishingStrategyFactory;
     }
 
     @SuppressWarnings("unused")
@@ -254,27 +203,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final AbundanceRestorerFactory abundanceRestorerFactory
     ) {
         this.abundanceRestorerFactory = abundanceRestorerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
-    }
-
-    @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
-        setAttractionWeightsFile(
-            testPath.resolve("dummy_action_weights.csv")
-        );
-        setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
-        );
     }
 
     @SuppressWarnings("unused")
@@ -369,15 +297,16 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
-        initModel(fishState);
+        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-            abundanceFilters =
-            abundanceFiltersFactory.apply(fishState);
-        abundanceCatchSamplersFactory.setAbundanceFilters(abundanceFilters);
-        fishingStrategyFactory.setCatchSamplersFactory(abundanceCatchSamplersFactory);
-        fishingStrategyFactory.setAttractionWeightsFile(attractionWeightsFile);
+            abundanceFilters = abundanceFiltersFactory.apply(fishState);
+        if (getCatchSamplersFactory() instanceof AbundanceCatchSamplersFactory) {
+            ((AbundanceCatchSamplersFactory) getCatchSamplersFactory())
+                .setAbundanceFilters(abundanceFilters);
+        }
+
         marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
         final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
 
@@ -390,27 +319,14 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
         final List<Port> ports = fishState.getMap().getPorts();
 
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
-
-        abundancePurseSeineGearFactory.getFadDeploymentObservers()
-            .addAll(monitors.getFadDeploymentMonitors());
-        abundancePurseSeineGearFactory.getFadSetObservers().addAll(monitors.getFadSetMonitors());
-        abundancePurseSeineGearFactory.getNonAssociatedSetObservers()
-            .addAll(monitors.getNonAssociatedSetMonitors());
-        abundancePurseSeineGearFactory.getDolphinSetObservers()
-            .addAll(monitors.getDolphinSetMonitors());
-        abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-        abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
-
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
                 .setSpeciesCodes(speciesCodesFactory.get());
         }
-        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(
-            FadSetAction.class));
+        ((PluggableSelectivity) fadInitializerFactory)
+            .setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
-        abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
+        getPurseSeineGearFactory().setFadInitializerFactory(fadInitializerFactory);
 
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             new GravityDestinationStrategyFactory();
@@ -420,9 +336,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
             regulationsFactory,
-            abundancePurseSeineGearFactory,
-            gravityDestinationStrategyFactory,
-            fishingStrategyFactory
+            gravityDestinationStrategyFactory
         );
 
         final List<Fisher> fishers =
@@ -440,31 +354,43 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             fishState.registerStartable(startableFactory.apply(fishState))
         );
 
-        return new ScenarioPopulation(
-            fishers,
-            new SocialNetwork(new EmptyNetworkBuilder()),
-            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
+        scenarioPopulation.getPopulation().addAll(fishers);
+        return scenarioPopulation;
+    }
+
+    @SuppressWarnings("unused")
+    public AbundanceFadMapFactory getFadMapFactory() {
+        return fadMapFactory;
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void setFadInitializerFactory(
+        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
+    ) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
+
+    @Override
+    public void useDummyData(final Path testPath) {
+        super.useDummyData(testPath);
+        setAttractionWeightsFile(
+            testPath.resolve("dummy_action_weights.csv")
+        );
+        setLocationValuesFilePath(
+            testPath.resolve("dummy_location_values.csv")
         );
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public Path getLocationValuesFilePath() {
-        return locationValuesFilePath;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setLocationValuesFilePath(final Path locationValuesFilePath) {
-        this.locationValuesFilePath = locationValuesFilePath;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
+    @SuppressWarnings("unused")
+    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")

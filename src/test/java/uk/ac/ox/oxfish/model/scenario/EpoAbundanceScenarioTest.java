@@ -131,10 +131,8 @@ public class EpoAbundanceScenarioTest extends TestCase {
     }
 
     public void testSaveAndLoadYaml() {
-        saveAndLoadYaml(
-            Paths.get("inputs", "tests", "epo.yaml").toFile(),
-            EpoAbundanceScenario::new,
-            (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            "epo.yaml",
             EpoAbundanceScenario.class
         );
     }

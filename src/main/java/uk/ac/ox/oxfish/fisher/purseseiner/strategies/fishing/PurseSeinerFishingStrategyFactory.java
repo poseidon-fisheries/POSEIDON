@@ -66,8 +66,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
-abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B, F>> {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
@@ -86,37 +87,40 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
+
+    // use default values from:
+    // https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
     private double searchBonus = 0.1;
-    private double nonAssociatedSetDetectionProbability = 0.1;
-    private double dolphinSetDetectionProbability = 0.1;
-    private double opportunisticFadSetDetectionProbability = 0.1;
-    private double searchActionDecayConstant = 1;
-    private double fadDeploymentActionDecayConstant = 1;
-    private double movingThreshold = 0.1;
+    private double nonAssociatedSetDetectionProbability = 1.0;
+    private double dolphinSetDetectionProbability = 0.7136840195385347;
+    private double opportunisticFadSetDetectionProbability = 0.007275362250433118;
+    private double searchActionDecayConstant = 7.912472944827373;
+    private double fadDeploymentActionDecayConstant = 0.7228626294613664;
+    private double movingThreshold = 0.0;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetGeneratorFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(15392.989688872976, 0.692315692124877);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetGeneratorFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0, 0);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         searchActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(7081017.137484187, 3.45300091459461E-6);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(7338176.765769132, 0.0);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0, 0);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.0, 1.1404626767614229E-5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(555715.859646539, 3.6444986410608907E-6);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(1E-6, 2);
     private boolean fishUnderFadsAvailableForSchoolSets = true;
 
     PurseSeinerFishingStrategyFactory(

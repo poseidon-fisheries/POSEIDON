@@ -13,6 +13,8 @@ FAD only EPO Abundance:
   abundanceRestorerFactory:
     schedule:
       0: 365
+  attractionWeightsFile: inputs/epo/action_weights.csv
+  catchSamplersFactory: null
   costsFile: inputs/epo/costs.csv
   fadInitializerFactory:
     Abundance FAD Initializer:
@@ -29,7 +31,7 @@ FAD only EPO Abundance:
         Yellowfin tuna: '0.0'
         Skipjack tuna: '0.0'
       fadDudRate: '0.0'
-      fishReleaseProbabilityInPercent: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
       growthRates:
         Bigeye tuna: '0.0'
         Yellowfin tuna: '0.0'
@@ -42,16 +44,24 @@ FAD only EPO Abundance:
     Exogenous Fad Maker CSV:
       fadInitializer:
         Abundance FAD Initializer:
-          attractableBiomassCoefficients: {
-            }
-          biomassInteractionsCoefficients: {
-            }
-          compressionExponents: {
-            }
+          attractableBiomassCoefficients:
+            Bigeye tuna: '0.7697766896339598'
+            Yellowfin tuna: '1.1292389959739901'
+            Skipjack tuna: '0.0'
+          biomassInteractionsCoefficients:
+            Bigeye tuna: '1.0184011081061861'
+            Yellowfin tuna: '0.0'
+            Skipjack tuna: '0.7138646301498129'
+          compressionExponents:
+            Bigeye tuna: '9.557509707646096'
+            Yellowfin tuna: '10.419783885948643'
+            Skipjack tuna: '9.492481930328207'
           fadDudRate: '0.0'
-          fishReleaseProbabilityInPercent: '0.0'
-          growthRates: {
-            }
+          fishReleaseProbabilityInPercent: '2.0'
+          growthRates:
+            Bigeye tuna: '0.688914118975473'
+            Yellowfin tuna: '0.30133562299610883'
+            Skipjack tuna: '1.25'
           selectivityFilters: *id001
           speciesCodes: null
           totalCarryingCapacity: '445000.0'
@@ -68,6 +78,8 @@ FAD only EPO Abundance:
       missingFadError: '10000.0'
       neighborhoodSearchSize: '0.0'
       pathToFile: inputs/epo/calibration/fad_sets.csv
+  fishingStrategyFactory: null
+  locationValuesFilePath: inputs/epo/location_values.csv
   mapInitializerFactory:
     From File Map:
       gridWidthInCell: '101.0'
@@ -75,6 +87,7 @@ FAD only EPO Abundance:
       latLong: true
       mapFile: inputs/epo/depth.csv
       mapPaddingInDegrees: '0.5'
+  purseSeineGearFactory: null
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
   scheduledAbundanceProcessesFactory:

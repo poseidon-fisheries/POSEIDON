@@ -27,6 +27,24 @@ public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunctio
     private double steepness = 1.0;
     private double maximum = 1.0;
 
+    public LogisticFunctionFactory(final double midpoint, final double steepness) {
+        this(midpoint, steepness, 1.0);
+    }
+
+    public LogisticFunctionFactory(
+        final double midpoint,
+        final double steepness,
+        final double maximum
+    ) {
+        this.midpoint = midpoint;
+        this.steepness = steepness;
+        this.maximum = maximum;
+    }
+
+    @SuppressWarnings("unused")
+    public LogisticFunctionFactory() {
+    }
+
     @SuppressWarnings("unused")
     public double getMidpoint() {
         return midpoint;
