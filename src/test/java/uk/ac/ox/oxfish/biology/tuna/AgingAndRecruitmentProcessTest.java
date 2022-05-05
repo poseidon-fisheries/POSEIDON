@@ -36,11 +36,8 @@ public class AgingAndRecruitmentProcessTest {
         List<double[]> lengths = new ArrayList<>();
         lengths.add(new double[] {5,6,7,8,9});  //male
         lengths.add(new double[] {10,11,12,13,14}); //female
-        List<double[]> proportionalMortalities = new ArrayList<>();
-        proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
-        proportionalMortalities.add(new double[] {.25,.35,.45,.55,.65});
 
-        TunaMeristics meristics = new TunaMeristics(weights, lengths, proportionalMortalities, new double[]{.01,.05,.1,.5,.5});
+        TunaMeristics meristics = new TunaMeristics(weights, lengths, new double[]{.01,.05,.1,.5,.5});
 
         Species species1 = new Species("Piano Tuna", meristics);
 

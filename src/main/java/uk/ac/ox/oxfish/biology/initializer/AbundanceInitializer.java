@@ -116,9 +116,6 @@ public class AbundanceInitializer implements BiologyInitializer {
                     makeList(
                         bins, bin -> bin.maleLength, bin -> bin.femaleLength
                     ),
-                    makeList(
-                        bins, bin -> bin.maleNaturalMortality, bin -> bin.femaleNaturalMortality
-                    ),
                     bins.stream().mapToDouble(bin -> bin.maturity).toArray()
                 );
                 return new Species(speciesName, tunaMeristics);
