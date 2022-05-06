@@ -71,7 +71,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public static final int TARGET_YEAR = 2017;
     public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
-    public static final Path TESTS_INPUT_PATH = Paths.get("inputs", "epo_tests");
+    public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
 
     public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
