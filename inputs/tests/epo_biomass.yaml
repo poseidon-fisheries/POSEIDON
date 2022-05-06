@@ -1,13 +1,13 @@
 EPO Biomass:
-  attractionWeightsFile: inputs/epo/action_weights.csv
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
   biomassReallocatorFactory: Scheduled Biomass Processes
   biomassReallocatorInitializerFactory:
     Biomass Initializer Factory:
       biomassReallocator: null
-      schaeferParamsFile: inputs/epo/biomass/schaefer_params.csv
+      schaeferParamsFile: inputs/epo_inputs/biomass/schaefer_params.csv
   catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory
-    catchSamplesFile: inputs/epo/set_samples.csv
-  costsFile: inputs/epo/costs.csv
+    catchSamplesFile: inputs/epo_inputs/set_samples.csv
+  costsFile: inputs/epo_inputs/costs.csv
   fadInitializerFactory:
     Biomass FAD Initializer:
       attractableBiomassCoefficients:
@@ -31,7 +31,7 @@ EPO Biomass:
       totalCarryingCapacity: '445000.0'
   fadMapFactory:
     currentFiles:
-      Y2017: inputs/epo/currents/currents_2017.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
   fadMortalityIncludedInExogenousCatches: true
   fishingStrategyFactory:
     Purse Seiner Biomass Fishing Strategy:
@@ -85,19 +85,19 @@ EPO Biomass:
           midpoint: 7081017.137484187
           steepness: 3.45300091459461E-6
       searchBonus: 0.1
-      setCompositionWeightsPath: inputs/epo/set_compositions.csv
+      setCompositionWeightsPath: inputs/epo_inputs/set_compositions.csv
   gasPricePerLiter: '0.01'
-  locationValuesFilePath: inputs/epo/location_values.csv
-  mapFile: inputs/epo/depth.csv
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
+  mapFile: inputs/epo_inputs/depth.csv
   mapInitializer:
     From File Map:
       gridWidthInCell: '101.0'
       header: true
       latLong: true
-      mapFile: inputs/epo/depth.csv
+      mapFile: inputs/epo_inputs/depth.csv
       mapPaddingInDegrees: '0.5'
   marketMapFromPriceFileFactory:
-    priceFilePath: inputs/epo/prices.csv
+    priceFilePath: inputs/epo_inputs/prices.csv
     speciesCodes: null
     targetYear: 2017
   multiSpeciesBiomassRestorerFactory:
@@ -138,7 +138,7 @@ EPO Biomass:
       fadInitializerFactory: null
       fadSetObservers: !!set {
         }
-      locationValuesFile: inputs/epo/location_values.csv
+      locationValuesFile: inputs/epo_inputs/location_values.csv
       nonAssociatedSetObservers: !!set {
         }
       nonAssociatedSetTimeSinceLastVisitModulationFunction:
@@ -169,7 +169,7 @@ EPO Biomass:
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
     factories:
     - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo/galapagos_eez/eez.shp
+        shapeFilePath: inputs/epo_inputs/galapagos_eez/eez.shp
     - Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
@@ -195,7 +195,7 @@ EPO Biomass:
     - all
     - closure A
     - closure B
-  vesselsFilePath: inputs/epo/boats.csv
+  vesselsFilePath: inputs/epo_inputs/boats.csv
   weatherInitializer:
     Constant Weather:
       temperature: '30.0'

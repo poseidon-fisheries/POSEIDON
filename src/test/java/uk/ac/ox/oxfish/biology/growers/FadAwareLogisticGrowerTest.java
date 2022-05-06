@@ -43,7 +43,7 @@ public class FadAwareLogisticGrowerTest {
         );
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        scenario.useDummyData(EpoScenario.INPUT_PATH.resolve("test"));
+        scenario.useDummyData(EpoScenario.TESTS_INPUT_PATH);
 
         scenario.getExogenousCatchesFactory()
             .setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));

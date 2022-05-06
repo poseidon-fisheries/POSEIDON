@@ -151,8 +151,6 @@ public class AbundanceInitializer implements BiologyInitializer {
         final double maleWeight;
         final double femaleLength;
         final double maleLength;
-        final double femaleNaturalMortality;
-        final double maleNaturalMortality;
         final double maturity;
 
         Bin(
@@ -162,9 +160,7 @@ public class AbundanceInitializer implements BiologyInitializer {
             final double maleWeight,
             final double femaleLength,
             final double maleLength,
-            final double maturity,
-            final double femaleNaturalMortality,
-            final double maleNaturalMortality
+            final double maturity
         ) {
             this.numberOfFemales = numberOfFemales;
             this.numberOfMales = numberOfMales;
@@ -173,8 +169,6 @@ public class AbundanceInitializer implements BiologyInitializer {
             this.femaleLength = femaleLength;
             this.maleLength = maleLength;
             this.maturity = maturity;
-            this.femaleNaturalMortality = femaleNaturalMortality;
-            this.maleNaturalMortality = maleNaturalMortality;
         }
     }
 }

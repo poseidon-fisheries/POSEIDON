@@ -32,6 +32,8 @@ import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 public class AbundanceReallocatorTest {
 
@@ -65,10 +67,9 @@ public class AbundanceReallocatorTest {
                 )
         );
 
-        Path INPUT_PATH = Paths.get("inputs", "epo");
         AllocationGrids<Entry<String, SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
                 speciesCodes,
-                INPUT_PATH.resolve("test").resolve("mock_grids.csv")   ,
+                TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
                 new MapExtent(nauticalMap),
                 365).get();
 

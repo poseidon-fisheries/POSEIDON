@@ -20,16 +20,10 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,8 +39,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanc
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
@@ -119,7 +111,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
     public void testRunOneYearWithoutCrashing() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
 
@@ -132,7 +124,8 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
     public void testSaveAndLoadYaml() {
         ScenarioTestUtils.testSaveAndLoadYaml(
-            "epo.yaml",
+            TESTS_INPUT_PATH,
+            "epo_abundance.yaml",
             EpoAbundanceScenario.class
         );
     }
@@ -147,7 +140,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
         final FishState fishState = new FishState();
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
 
         fishState.setScenario(scenario);
         fishState.start();

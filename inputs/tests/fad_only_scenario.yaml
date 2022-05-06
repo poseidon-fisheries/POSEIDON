@@ -1,11 +1,19 @@
 FAD only EPO Abundance:
   abundanceFiltersFactory:
-    selectivityFilePath: inputs/epo/abundance/selectivity.csv
+    selectivityFilePath: inputs/epo_inputs/abundance/selectivity.csv
   abundanceInitializerFactory:
     Abundance Initializer Factory:
-      binsFilePath: inputs/epo/abundance/bins.csv
+      binsFilePath: inputs/epo_inputs/abundance/bins.csv
+  abundanceMortalityProcessFactory:
+    mortalityFile: inputs/epo_inputs/abundance/mortality.csv
+    sources:
+    - natural
+    - obj_class_1_5
+    - noa_class_1_5
+    - longline
+    speciesCodes: null
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
-    biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
+    biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
     firstLargeBinPerSpecies:
       Skipjack tuna: 14
       Bigeye tuna: 8
@@ -13,9 +21,9 @@ FAD only EPO Abundance:
   abundanceRestorerFactory:
     schedule:
       0: 365
-  attractionWeightsFile: inputs/epo/action_weights.csv
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
   catchSamplersFactory: null
-  costsFile: inputs/epo/costs.csv
+  costsFile: inputs/epo_inputs/costs.csv
   fadInitializerFactory:
     Abundance FAD Initializer:
       attractableBiomassCoefficients:
@@ -65,11 +73,11 @@ FAD only EPO Abundance:
           selectivityFilters: *id001
           speciesCodes: null
           totalCarryingCapacity: '445000.0'
-      pathToFile: inputs/epo/calibration/fad_deployments.csv
+      pathToFile: inputs/epo_inputs/calibration/fad_deployments.csv
   fadMapFactory:
     currentFiles:
-      Y2016: inputs/epo/currents/currents_2016.csv
-      Y2017: inputs/epo/currents/currents_2017.csv
+      Y2016: inputs/epo_inputs/currents/currents_2016.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
   fadSetterFactory:
     Exogenous Fad Setter CSV:
       dataInTonnes: true
@@ -77,19 +85,19 @@ FAD only EPO Abundance:
       keepLog: false
       missingFadError: '10000.0'
       neighborhoodSearchSize: '0.0'
-      pathToFile: inputs/epo/calibration/fad_sets.csv
+      pathToFile: inputs/epo_inputs/calibration/fad_sets.csv
   fishingStrategyFactory: null
-  locationValuesFilePath: inputs/epo/location_values.csv
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
   mapInitializerFactory:
     From File Map:
       gridWidthInCell: '101.0'
       header: true
       latLong: true
-      mapFile: inputs/epo/depth.csv
+      mapFile: inputs/epo_inputs/depth.csv
       mapPaddingInDegrees: '0.5'
   purseSeineGearFactory: null
   recruitmentProcessesFactory:
-    recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
+    recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
   scheduledAbundanceProcessesFactory:
     abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
       mortalityFile: inputs/epo/abundance/mortality.csv
@@ -105,4 +113,4 @@ FAD only EPO Abundance:
     - '2017-07-01'
     - '2017-10-01'
     recruitmentProcesses: null
-  vesselsFilePath: inputs/epo/boats.csv
+  vesselsFilePath: inputs/epo_inputs/boats.csv

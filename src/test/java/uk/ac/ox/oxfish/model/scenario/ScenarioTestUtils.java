@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -30,11 +31,12 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class ScenarioTestUtils {
 
     public static <S extends TestableScenario> void testSaveAndLoadYaml(
+        final Path testFolder,
         final String scenarioFileName,
         final Class<S> scenarioClass
     ) {
         // Dump the scenario to YAML
-        final File scenarioFile = Paths.get("inputs", "tests", scenarioFileName).toFile();
+        final File scenarioFile = testFolder.resolve(scenarioFileName).toFile();
         try {
             final Scenario scenario = scenarioClass.newInstance();
             new FishYAML().dump(scenario, new FileWriter(scenarioFile));
@@ -46,7 +48,7 @@ public class ScenarioTestUtils {
         try (final FileReader fileReader = new FileReader(scenarioFile)) {
             final FishYAML fishYAML = new FishYAML();
             final S scenario = fishYAML.loadAs(fileReader, scenarioClass);
-            scenario.useDummyData(Paths.get("inputs", "epo", "test"));
+            scenario.useDummyData(testFolder);
             final FishState fishState = new FishState();
             fishState.setScenario(scenario);
             fishState.start();

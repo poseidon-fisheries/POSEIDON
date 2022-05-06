@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenarioTest.saveAndLoadYaml;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import org.junit.Test;
@@ -35,6 +35,7 @@ public class EpoBiomassScenarioTest {
     @Test
     public void testSaveAndLoadYaml() {
         ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
             "epo_biomass.yaml",
             EpoBiomassScenario.class
         );
@@ -44,7 +45,7 @@ public class EpoBiomassScenarioTest {
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        scenario.useDummyData(EpoScenario.INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.addPlugin(state -> model -> {

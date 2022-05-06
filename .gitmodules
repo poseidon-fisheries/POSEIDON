@@ -1,0 +1,3 @@
+[submodule "inputs/epo_inputs"]
+	path = inputs/epo_inputs
+	url = git@github.com:poseidon-fisheries/epo_inputs.git

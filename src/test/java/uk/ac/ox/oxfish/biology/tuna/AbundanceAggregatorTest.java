@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import com.google.common.collect.ImmutableMap;
@@ -101,7 +101,7 @@ public class AbundanceAggregatorTest extends TestCase {
 
     public void testWithEpoAbundanceScenario() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         fishState.start();
