@@ -57,6 +57,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -94,10 +95,10 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
 
-    private double decayRateOfOpportunisticFadSetLocationValues = 0.01;
-    private double decayRateOfNonAssociatedSetLocationValues = 0.01;
-    private double decayRateOfDolphinSetLocationValues = 0.01;
-    private double decayRateOfDeploymentLocationValues = 0.01;
+    private double decayRateOfOpportunisticFadSetLocationValues = 0.6563603233600155;
+    private double decayRateOfNonAssociatedSetLocationValues = 0.0;
+    private double decayRateOfDolphinSetLocationValues = 1.2499749999999998;
+    private double decayRateOfDeploymentLocationValues = 1.1709955387012643;
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
@@ -108,30 +109,30 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.15670573908905225, 8.39239514150804);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctSetsRemainingModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.0, 0.807144443658139);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         numFadsInStockModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(465.76938287575837, 0.40173999550338946);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentPctActiveFadsLimitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.817463635675281, 4.557972989563278);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctTravelTimeLeftModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.10183241937374361, 5.375161932147479);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(73.32224086132372, 0.23520949973919156);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(51.91162666081563, 0.3758445982281733);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
-    private double actionDistanceExponent = 1;
-    private double destinationDistanceExponent = 1;
+        new LogisticFunctionFactory(72.28852668100924, 0.108746872431396);
+    private double actionDistanceExponent = 10;
+    private double destinationDistanceExponent = 2;
 
     public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
         return opportunisticFadSetTimeSinceLastVisitModulationFunction;

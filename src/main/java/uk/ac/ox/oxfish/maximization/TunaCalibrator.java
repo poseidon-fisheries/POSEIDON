@@ -47,7 +47,7 @@ public class TunaCalibrator implements Runnable {
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
     public static final int MAX_PROCESSORS_TO_USE = 16;
 
-    public static final int DEFAULT_POPULATION_SIZE = 20;
+    public static final int DEFAULT_POPULATION_SIZE = 200;
     public final static int MAX_FITNESS_CALLS = 5000;
     public static final int DEFAULT_RANGE = 10;
 
@@ -70,7 +70,7 @@ public class TunaCalibrator implements Runnable {
                             System.getProperty("user.home"),
                             "workspace", "tuna", "calibration", "results"
                     )
-                    .resolve("calibration.yaml");
+                    .resolve("logistic_calibration.yaml");
 
     private boolean verbose = false;
 
