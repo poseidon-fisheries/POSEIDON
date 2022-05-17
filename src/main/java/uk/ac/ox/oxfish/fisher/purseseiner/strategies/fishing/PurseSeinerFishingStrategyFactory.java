@@ -65,11 +65,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
 public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
-    implements AlgorithmFactory<PurseSeinerFishingStrategy<B, F>> {
+    implements AlgorithmFactory<PurseSeinerFishingStrategy<B>> {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
         new ActiveOpportunitiesFactory();
@@ -122,6 +121,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         dolphinSetActionValueFunction =
         new LogisticFunctionFactory(1E-6, 2);
     private boolean fishUnderFadsAvailableForSchoolSets = true;
+    private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
@@ -131,10 +131,22 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         this.biologyClass = biologyClass;
     }
 
+    @SuppressWarnings("unused")
+    public Path getMaxCurrentSpeedsFile() {
+        return maxCurrentSpeedsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMaxCurrentSpeedsFile(final Path maxCurrentSpeedsFile) {
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
+    }
+
+    @SuppressWarnings("unused")
     public boolean isFishUnderFadsAvailableForSchoolSets() {
         return fishUnderFadsAvailableForSchoolSets;
     }
 
+    @SuppressWarnings("unused")
     public void setFishUnderFadsAvailableForSchoolSets(final boolean fishUnderFadsAvailableForSchoolSets) {
         this.fishUnderFadsAvailableForSchoolSets = fishUnderFadsAvailableForSchoolSets;
     }
@@ -325,20 +337,36 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @Override
-    public PurseSeinerFishingStrategy<B, F> apply(final FishState fishState) {
+    public PurseSeinerFishingStrategy<B> apply(final FishState fishState) {
         checkNotNull(catchSamplersFactory);
         checkNotNull(attractionWeightsFile);
-        return callConstructor(this::loadAttractionWeights, this::makeSetOpportunityDetector,
-            makeActionValueFunctions(fishState), searchActionDecayConstant,
-            fadDeploymentActionDecayConstant, movingThreshold
+        checkNotNull(maxCurrentSpeedsFile);
+        return callConstructor(
+            this::loadAttractionWeights,
+            this::makeSetOpportunityDetector,
+            makeActionValueFunctions(fishState),
+            loadMaxCurrentSpeeds(),
+            searchActionDecayConstant,
+            fadDeploymentActionDecayConstant,
+            movingThreshold
         );
     }
 
+    private Map<Class<? extends PurseSeinerAction>, Double> loadMaxCurrentSpeeds() {
+        return parseAllRecords(maxCurrentSpeedsFile)
+            .stream()
+            .collect(toImmutableMap(
+                r -> ActionClass.valueOf(r.getString("action")).getActionClass(),
+                r -> r.getDouble("speed")
+            ));
+    }
+
     @NotNull
-    protected PurseSeinerFishingStrategy<B, F> callConstructor(
+    protected PurseSeinerFishingStrategy<B> callConstructor(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
         final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold
@@ -347,6 +375,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             attractionWeights,
             opportunityDetector,
             actionValueFunctions,
+            maxCurrentSpeeds,
             searchActionDecayConstant,
             fadDeploymentActionDecayConstant,
             movingThreshold

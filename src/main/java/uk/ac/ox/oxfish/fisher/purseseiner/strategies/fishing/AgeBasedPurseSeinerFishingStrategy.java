@@ -20,57 +20,66 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 /**
- * like purse seiner fishing strategy, but decides whether to set on own fads depending on their soak time (age) rather
- * than the value of the fish underneath
+ * like purse seiner fishing strategy, but decides whether to set on own fads depending on their
+ * soak time (age) rather than the value of the fish underneath
+ *
  * @param <B>
- * @param <F>
  */
-public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B, F>>
-        extends PurseSeinerFishingStrategy<B, F> {
+public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
+    extends PurseSeinerFishingStrategy<B> {
 
     public AgeBasedPurseSeinerFishingStrategy(
-            Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
-            Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
-            Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-            double searchActionDecayConstant, double fadDeploymentActionDecayConstant,
-            double movingThreshold) {
-        super(actionWeightsLoader, setOpportunityDetectorProvider, actionValueFunctions, searchActionDecayConstant,
-              fadDeploymentActionDecayConstant, movingThreshold);
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
+        final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
+    ) {
+        super(
+            actionWeightsLoader,
+            setOpportunityDetectorProvider,
+            actionValueFunctions,
+            maxCurrentSpeeds,
+            searchActionDecayConstant,
+            fadDeploymentActionDecayConstant,
+            movingThreshold
+        );
     }
-
 
     @Override
     protected double valueOfSetAction(
-            @NotNull AbstractSetAction<? extends LocalBiology> action,
-            DoubleUnaryOperator actionValueFunction, Collection<Species> species) {
-
+        @NotNull final AbstractSetAction<? extends LocalBiology> action,
+        final DoubleUnaryOperator actionValueFunction, final Collection<Species> species
+    ) {
         //if we know it is a fad action (own fad, not opportunistic)
-        if(action instanceof FadSetAction)
-        {
-            assert ((FadSetAction<?, ?>) action).isOwnFad();
-            int stepItWasDeployed = ((FadSetAction<?, ?>) action).getFad().getStepDeployed();
-            int time = action.getFisher().grabState().getDay()-stepItWasDeployed;
-            assert time>=0;
-            if(time==0)
+        if (action instanceof FadSetAction) {
+            assert ((AbstractFadSetAction<?, ?>) action).isOwnFad();
+            final int stepItWasDeployed =
+                ((AbstractFadSetAction<?, ?>) action).getFad().getStepDeployed();
+            final int time = action.getFisher().grabState().getDay() - stepItWasDeployed;
+            assert time >= 0;
+            if (time == 0) {
                 return 0;
+            }
             return actionValueFunction.applyAsDouble(time);
-        }
-        else
+        } else {
             return super.valueOfSetAction(action, actionValueFunction, species);
+        }
     }
 }

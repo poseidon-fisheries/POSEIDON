@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -62,11 +63,11 @@ public class SetOpportunityDetector<B extends LocalBiology> {
     }
 
     @NotNull
-    List<AbstractSetAction<B>> possibleSetActions() {
+    Stream<AbstractSetAction<B>> possibleSetActions() {
         final double bonus = hasSearched ? searchBonus : 0;
         hasSearched = false;
         return fisher.getHold().getPercentageFilled() >= 1
-            ? ImmutableList.of() // no possible sets when hold is full
+            ? Stream.of() // no possible sets when hold is full
             : detectionProbabilities
                 .entrySet()
                 .stream()
@@ -74,8 +75,7 @@ public class SetOpportunityDetector<B extends LocalBiology> {
                     final double p = min(1.0, entry.getValue() + bonus);
                     return entry.getKey().apply(fisher).stream()
                         .filter(__ -> rng.nextBoolean(p));
-                })
-                .collect(toImmutableList());
+                });
     }
 
     public void notifyOfSearch() {

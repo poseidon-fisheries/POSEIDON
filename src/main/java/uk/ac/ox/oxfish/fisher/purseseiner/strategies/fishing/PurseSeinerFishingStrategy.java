@@ -46,8 +46,8 @@ import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import org.jetbrains.annotations.NotNull;
+import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -63,41 +63,43 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B, F>>
-        implements FishingStrategy {
+public class PurseSeinerFishingStrategy<B extends LocalBiology>
+    implements FishingStrategy {
 
     private final double movingThreshold;
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>>
-            actionWeightsLoader;
+        actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider;
     private final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions;
+    private final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
     private final double searchActionDecayConstant;
     private final double fadDeploymentActionDecayConstant;
     private ImmutableMap<? extends Class<? extends PurseSeinerAction>, ActionAttractionField>
-            attractionFields;
+        attractionFields;
     private SetOpportunityDetector<B> setOpportunityDetector;
     private Map<Class<? extends PurseSeinerAction>, Double> actionWeights;
     private List<Entry<PurseSeinerAction, Double>> potentialActions = ImmutableList.of();
 
     PurseSeinerFishingStrategy(
-            final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
-            final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
-            final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-            final double searchActionDecayConstant,
-            final double fadDeploymentActionDecayConstant,
-            final double movingThreshold
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
+        final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
     ) {
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityDetectorProvider = setOpportunityDetectorProvider;
         this.actionValueFunctions = ImmutableMap.copyOf(actionValueFunctions);
+        this.maxCurrentSpeeds = ImmutableMap.copyOf(maxCurrentSpeeds);
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
         this.movingThreshold = movingThreshold;
@@ -108,30 +110,30 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
         setOpportunityDetector = setOpportunityDetectorProvider.apply(fisher);
         attractionFields =
-                getPurseSeineGear(fisher)
-                        .getAttractionFields()
-                        .stream()
-                        .filter(field -> field instanceof ActionAttractionField)
-                        .map(field -> (ActionAttractionField) field)
-                        .collect(toImmutableMap(
-                                ActionAttractionField::getActionClass,
-                                identity()
-                        ));
+            getPurseSeineGear(fisher)
+                .getAttractionFields()
+                .stream()
+                .filter(field -> field instanceof ActionAttractionField)
+                .map(field -> (ActionAttractionField) field)
+                .collect(toImmutableMap(
+                    ActionAttractionField::getActionClass,
+                    identity()
+                ));
     }
 
     private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
         final double sumOfWeights =
-                weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
+            weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
         return weightMap.entrySet().stream()
-                .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
+            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
     }
 
     @Override
     public boolean shouldFish(
-            final Fisher fisher,
-            final MersenneTwisterFast random,
-            final FishState fishState,
-            final TripRecord currentTrip
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState fishState,
+        final TripRecord currentTrip
     ) {
         if (potentialActions.isEmpty()) {
             potentialActions = findPotentialActions(fisher, fishState.getSpecies());
@@ -143,8 +145,8 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
     }
 
     private List<Entry<PurseSeinerAction, Double>> findPotentialActions(
-            final Fisher fisher,
-            final Collection<Species> species
+        final Fisher fisher,
+        final Collection<Species> species
     ) {
 
         if (fisher.getLocation().isLand()) {
@@ -152,77 +154,121 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
         }
 
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
+
+        final ImmutableSet<Class<? extends PurseSeinerAction>> safeActionClasses =
+            safeActionClasses(getCurrentVector(fisher));
+
         final List<AbstractSetAction<B>> possibleSetActions =
-                setOpportunityDetector.possibleSetActions();
+            setOpportunityDetector.possibleSetActions()
+                .filter(actionObject -> isSafe(actionObject, safeActionClasses))
+                .collect(toImmutableList());
 
         final Stream<Entry<PurseSeinerAction, Double>> weightedSetActions =
-                possibleSetActions.stream().map(action -> weightedAction(
-                        action,
-                        valueOfSetAction(action, actionValueFunctions.get(action.getClass()), species)
-                ));
+            possibleSetActions.stream().map(action -> weightedAction(
+                action,
+                valueOfSetAction(action, actionValueFunctions.get(action.getClass()), species)
+            ));
 
         // Generate a search action for each of the set classes with no opportunities,
         // and give them a weight equivalent to the class they replace
         final ImmutableSet<? extends Class<?>> possibleSetActionClasses =
-                possibleSetActions.stream().map(Object::getClass).collect(toImmutableSet());
+            possibleSetActions.stream().map(Object::getClass).collect(toImmutableSet());
         final Stream<Entry<PurseSeinerAction, Double>> weightedSearchActions = Stream
-                .of(
-                        OpportunisticFadSetAction.class,
-                        NonAssociatedSetAction.class,
-                        DolphinSetAction.class
+            .of(
+                OpportunisticFadSetAction.class,
+                NonAssociatedSetAction.class,
+                DolphinSetAction.class
+            )
+            .filter(actionClass ->
+                !possibleSetActionClasses.contains(actionClass) &&
+                    isSafe(actionClass, safeActionClasses)
+            )
+            .map(actionClass -> weightedAction(
+                new SearchAction(fisher, setOpportunityDetector, actionClass),
+                valueOfLocationBasedAction(
+                    actionCounts.count(SearchAction.class),
+                    attractionFields.get(actionClass).getActionValueAt(gridLocation),
+                    actionValueFunctions.get(SearchAction.class),
+                    searchActionDecayConstant
                 )
-                .filter(actionClass -> !possibleSetActionClasses.contains(actionClass))
-                .map(actionClass -> weightedAction(
-                        new SearchAction(fisher, setOpportunityDetector, actionClass),
-                        valueOfLocationBasedAction(
-                                actionCounts.count(SearchAction.class),
-                                attractionFields.get(actionClass).getActionValueAt(gridLocation),
-                                actionValueFunctions.get(SearchAction.class),
-                                searchActionDecayConstant
-                        )
-                ));
+            ));
 
         final Stream<Entry<PurseSeinerAction, Double>> weightedFadDeploymentAction =
-                getFadManager(fisher).getNumFadsInStock() < 1
-                        ? Stream.empty()
-                        : Stream.of(weightedAction(
-                        new FadDeploymentAction(fisher),
-                        valueOfLocationBasedAction(
-                                actionCounts.count(FadDeploymentAction.class),
-                                attractionFields.get(FadDeploymentAction.class)
-                                        .getActionValueAt(gridLocation),
-                                actionValueFunctions.get(FadDeploymentAction.class),
-                                fadDeploymentActionDecayConstant
-                        )
+            getFadManager(fisher).getNumFadsInStock() < 1
+                ? Stream.empty()
+                : Stream.of(weightedAction(
+                    new FadDeploymentAction(fisher),
+                    valueOfLocationBasedAction(
+                        actionCounts.count(FadDeploymentAction.class),
+                        attractionFields.get(FadDeploymentAction.class)
+                            .getActionValueAt(gridLocation),
+                        actionValueFunctions.get(FadDeploymentAction.class),
+                        fadDeploymentActionDecayConstant
+                    )
                 ));
 
-        ImmutableList<Entry<PurseSeinerAction, Double>> actionsAvailable = Streams
-                .concat(
-                        weightedSetActions,
-                        weightedSearchActions,
-                        weightedFadDeploymentAction
-                ).collect(toImmutableList());
+        final ImmutableList<Entry<PurseSeinerAction, Double>> actionsAvailable = Streams
+            .concat(
+                weightedSetActions,
+                weightedSearchActions,
+                weightedFadDeploymentAction
+            ).collect(toImmutableList());
 
-        return
-                actionsAvailable.stream().filter(entry -> entry.getKey().isPermitted())
-                .filter(entry -> entry.getValue() > movingThreshold).
-                filter(purseSeinerActionDoubleEntry -> fisher.grabRandomizer().nextDouble()<purseSeinerActionDoubleEntry.getValue())
-                .collect(toImmutableList());
+        return actionsAvailable.stream()
+            .filter(entry -> entry.getKey().isPermitted())
+            .filter(entry -> entry.getValue() > movingThreshold)
+            .filter(entry -> fisher.grabRandomizer().nextDouble() < entry.getValue())
+            .collect(toImmutableList());
+    }
 
+    private static Double2D getCurrentVector(final Fisher fisher) {
+        final Int2D gridLocation = fisher.getLocation().getGridLocation();
+        final int step = fisher.grabState().getStep();
+        return getFadManager(fisher)
+            .getFadMap()
+            .getDriftingObjectsMap()
+            .getCurrentVectors()
+            .getVector(step, gridLocation);
+    }
+
+    private ImmutableSet<Class<? extends PurseSeinerAction>> safeActionClasses(
+        final Double2D currentVector
+    ) {
+        final double currentSpeed = currentVector.length();
+        return maxCurrentSpeeds.entrySet().stream()
+            .filter(entry -> currentSpeed <= entry.getValue())
+            .map(Entry::getKey)
+            .collect(toImmutableSet());
+    }
+
+    private static boolean isSafe(
+        final PurseSeinerAction actionObject,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return isSafe(actionObject.getClass(), safeActionClasses);
+    }
+
+    private static boolean isSafe(
+        final Class<? extends PurseSeinerAction> actionClass,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return safeActionClasses
+            .stream()
+            .anyMatch(safeActionClass -> safeActionClass.isAssignableFrom(actionClass));
     }
 
     private Entry<PurseSeinerAction, Double> weightedAction(
-            final PurseSeinerAction action,
-            final double actionValue
+        final PurseSeinerAction action,
+        final double actionValue
     ) {
         final Double w = actionWeights.getOrDefault(action.getClassForWeighting(), 0.0);
         return entry(action, actionValue * w);
     }
 
     protected double valueOfSetAction(
-            @NotNull final AbstractSetAction<? extends LocalBiology> action,
-            final DoubleUnaryOperator actionValueFunction,
-            final Collection<Species> species
+        @NotNull final AbstractSetAction<? extends LocalBiology> action,
+        final DoubleUnaryOperator actionValueFunction,
+        final Collection<Species> species
     ) {
         final double totalBiomass = action.getTargetBiology().getTotalBiomass(species);
         assert totalBiomass >= 0;
@@ -233,23 +279,23 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
             final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
             final double catchableProportion = min(1, capacity / totalBiomass);
             final double[] biomass = species.stream()
-                    .mapToDouble(s -> action.getTargetBiology().getBiomass(s))
-                    .toArray();
+                .mapToDouble(s -> action.getTargetBiology().getBiomass(s))
+                .toArray();
             final double[] potentialCatch = Arrays.copyOf(biomass, biomass.length);
             for (int i = 0; i < potentialCatch.length; i++) {
                 potentialCatch[i] *= catchableProportion;
             }
             final double valueOfPotentialCatch =
-                    new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
+                new FishValueCalculator(action.getFisher()).valueOf(potentialCatch);
             return actionValueFunction.applyAsDouble(valueOfPotentialCatch);
         }
     }
 
     private static double valueOfLocationBasedAction(
-            final int previousActionsHere,
-            final double locationValue,
-            final DoubleUnaryOperator valueFunction,
-            final double decayConstant
+        final int previousActionsHere,
+        final double locationValue,
+        final DoubleUnaryOperator valueFunction,
+        final double decayConstant
     ) {
         final double value = valueFunction.applyAsDouble(locationValue);
         final double decay = exp(-decayConstant * previousActionsHere);
@@ -258,31 +304,31 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology, F extends Fad<B,
 
     @Override
     public ActionResult act(
-            final FishState fishState,
-            final Fisher fisher,
-            final Regulation regulation,
-            final double hoursLeft
+        final FishState fishState,
+        final Fisher fisher,
+        final Regulation regulation,
+        final double hoursLeft
     ) {
         // record our visit to that tile
         getPurseSeineGear(fisher).recordVisit(
-                fisher.getLocation().getGridLocation(),
-                fishState.getStep()
+            fisher.getLocation().getGridLocation(),
+            fishState.getStep()
         );
 
         // Pick the potential action with the highest value or
         // get moving if there aren't any possible actions.
         final Optional<PurseSeinerAction> chosenAction =
-                potentialActions.stream()
-                        .filter(entry -> entry.getKey().getDuration() <= hoursLeft)
-                        .max(comparingDouble(Entry::getValue))
-                        .map(Entry::getKey);
+            potentialActions.stream()
+                .filter(entry -> entry.getKey().getDuration() <= hoursLeft)
+                .max(comparingDouble(Entry::getValue))
+                .map(Entry::getKey);
         potentialActions = ImmutableList.of();
         return chosenAction
-                .map(action -> {
-                    actionCounts.add(action.getClass());
-                    return action.act(fishState, fisher, regulation, hoursLeft);
-                })
-                .orElse(new ActionResult(new Arriving(), 0)); // wait until tomorrow
+            .map(action -> {
+                actionCounts.add(action.getClass());
+                return action.act(fishState, fisher, regulation, hoursLeft);
+            })
+            .orElse(new ActionResult(new Arriving(), 0)); // wait until tomorrow
     }
 
 }

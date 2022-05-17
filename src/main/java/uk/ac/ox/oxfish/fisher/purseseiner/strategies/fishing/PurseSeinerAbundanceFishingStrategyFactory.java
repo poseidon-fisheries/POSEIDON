@@ -42,6 +42,40 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         super(AbundanceLocalBiology.class, AbundanceFad.class);
     }
 
+    @NotNull
+    @Override
+    protected PurseSeinerFishingStrategy<AbundanceLocalBiology> callConstructor(
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
+        final Function<Fisher, SetOpportunityDetector<AbundanceLocalBiology>> opportunityDetector,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
+    ) {
+        if (ageBasedSetDecisions) {
+            return new AgeBasedPurseSeinerFishingStrategy<>(
+                attractionWeights,
+                opportunityDetector,
+                actionValueFunctions,
+                maxCurrentSpeeds,
+                searchActionDecayConstant,
+                fadDeploymentActionDecayConstant,
+                movingThreshold
+            );
+        } else {
+            return super.callConstructor(
+                attractionWeights,
+                opportunityDetector,
+                actionValueFunctions,
+                maxCurrentSpeeds,
+                searchActionDecayConstant,
+                fadDeploymentActionDecayConstant,
+                movingThreshold
+            );
+        }
+    }
+
     @Override
     Aggregator<AbundanceLocalBiology> getBiologyAggregator() {
         return biologyAggregator;
@@ -52,37 +86,12 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         return new AbundanceCatchMaker(globalBiology);
     }
 
-    @NotNull
-    @Override
-    protected PurseSeinerFishingStrategy<AbundanceLocalBiology, AbundanceFad> callConstructor(
-        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
-        final Function<Fisher, SetOpportunityDetector<AbundanceLocalBiology>> opportunityDetector,
-        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final double searchActionDecayConstant,
-        final double fadDeploymentActionDecayConstant,
-        final double movingThreshold
-    ) {
-        if (ageBasedSetDecisions) {
-            return new AgeBasedPurseSeinerFishingStrategy<>(
-                attractionWeights,
-                opportunityDetector,
-                actionValueFunctions,
-                searchActionDecayConstant,
-                fadDeploymentActionDecayConstant,
-                movingThreshold
-            );
-        } else {
-            return
-                super.callConstructor(attractionWeights, opportunityDetector, actionValueFunctions,
-                    searchActionDecayConstant, fadDeploymentActionDecayConstant, movingThreshold
-                );
-        }
-    }
-
+    @SuppressWarnings("unused")
     public boolean isAgeBasedSetDecisions() {
         return ageBasedSetDecisions;
     }
 
+    @SuppressWarnings("unused")
     public void setAgeBasedSetDecisions(final boolean ageBasedSetDecisions) {
         this.ageBasedSetDecisions = ageBasedSetDecisions;
     }
