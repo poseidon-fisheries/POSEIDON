@@ -217,7 +217,6 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         return actionsAvailable.stream()
             .filter(entry -> entry.getKey().isPermitted())
             .filter(entry -> entry.getValue() > movingThreshold)
-            .filter(entry -> fisher.grabRandomizer().nextDouble() < entry.getValue())
             .collect(toImmutableList());
     }
 
