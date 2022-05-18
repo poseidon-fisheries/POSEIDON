@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -146,18 +147,24 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     public static void main(final String[] args) {
         final FishState fishState = new FishState();
         final Scenario scenario = new EpoAbundanceScenario();
+
         try {
             final File scenarioFile =
-                INPUT_PATH.resolve("abundance").resolve("scenario.yaml").toFile();
+                Paths.get(
+                    System.getProperty("user.home"),
+                    "workspace", "tuna", "calibration", "results",
+                    "nicolas", "2022-05-12_16.56.21_global_calibration",
+                    "calibrated_scenario.yaml"
+                ).toFile();
             new FishYAML().dump(scenario, new FileWriter(scenarioFile));
+            fishState.setScenario(scenario);
+            fishState.start();
+            while (fishState.getStep() < 365) {
+                System.out.println("Step: " + fishState.getStep());
+                fishState.schedule.step(fishState);
+            }
         } catch (final IOException e) {
             e.printStackTrace();
-        }
-        fishState.setScenario(scenario);
-        fishState.start();
-        while (fishState.getStep() < 365) {
-            System.out.println("Step: " + fishState.getStep());
-            fishState.schedule.step(fishState);
         }
     }
 
