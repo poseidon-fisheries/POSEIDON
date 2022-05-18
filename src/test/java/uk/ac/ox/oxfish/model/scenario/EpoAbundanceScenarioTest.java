@@ -27,20 +27,14 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
