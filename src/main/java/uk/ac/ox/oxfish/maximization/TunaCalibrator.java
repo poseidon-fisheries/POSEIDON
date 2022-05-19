@@ -43,43 +43,40 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 @SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator implements Runnable {
 
+    static final int MAX_PROCESSORS_TO_USE = 16;
+    static final int DEFAULT_POPULATION_SIZE = 200;
+    static final int MAX_FITNESS_CALLS = 5000;
+    static final int DEFAULT_RANGE = 10;
+
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
-    public static final int MAX_PROCESSORS_TO_USE = 16;
-
-    public static final int DEFAULT_POPULATION_SIZE = 200;
-    public final static int MAX_FITNESS_CALLS = 5000;
-    public static final int DEFAULT_RANGE = 10;
-
     private boolean localSearch = false;
     private String runNickName = "global_calibration";
     private int populationSize = DEFAULT_POPULATION_SIZE;
     private int maxFitnessCalls = MAX_FITNESS_CALLS;
-    private int parameterRange=  DEFAULT_RANGE;
+    private int parameterRange = DEFAULT_RANGE;
     private int maxProcessorsToUse = MAX_PROCESSORS_TO_USE;
     /**
-     * if this is positive then ignore the number of runs per setting in the original YAML and use this number instead
+     * if this is positive then ignore the number of runs per setting in the original YAML and use
+     * this number instead
      */
     private int numberOfRunsPerSettingOverride = -1;
-
-
-
-    private Path originalCalibrationFilePath =
-            Paths
-                    .get(
-                            System.getProperty("user.home"),
-                            "workspace", "tuna", "calibration", "results"
-                    )
-                    .resolve("logistic_calibration.yaml");
+    
+    private Path originalCalibrationFilePath = Paths
+        .get(
+            System.getProperty("user.home"),
+            "workspace", "tuna", "calibration", "results"
+        )
+        .resolve("logistic_calibration.yaml");
 
     private boolean verbose = false;
 
 
     /**
-     * list of individuals we want to force in the original population; usually these are just the output of some previous optimizations
+     * list of individuals we want to force in the original population; usually these are just the
+     * output of some previous optimizations
      */
-    private List<double[]> bestGuess  = new LinkedList<>();
-
+    private List<double[]> bestGuess = new LinkedList<>();
 
 
     public static void main(final String[] args) {
@@ -104,10 +101,10 @@ public class TunaCalibrator implements Runnable {
 
         // Finds the first argument that is a file name and uses it as the calibration file
         stream(args)
-                .map(File::new)
-                .filter(File::isFile)
-                .findFirst()
-                .ifPresent(file -> tunaCalibrator.setOriginalCalibrationFilePath(file.toPath()));
+            .map(File::new)
+            .filter(File::isFile)
+            .findFirst()
+            .ifPresent(file -> tunaCalibrator.setOriginalCalibrationFilePath(file.toPath()));
 
         tunaCalibrator.run();
     }
@@ -125,14 +122,39 @@ public class TunaCalibrator implements Runnable {
     @Override
     public void run() {
         final Path calibrationFilePath =
-                copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
+            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
         final double[] solution = calibrate(calibrationFilePath);
         evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
     }
 
-    public static void evaluateSolutionAndPrintOutErrors(Path calibrationFilePath, double[] solution) {
+    static void evaluateSolutionAndPrintOutErrors(
+        final Path calibrationFilePath,
+        final double[] solution
+    ) {
         saveCalibratedScenario(solution, calibrationFilePath);
         new TunaEvaluator(calibrationFilePath, solution).run();
+    }
+
+    private static void saveCalibratedScenario(
+        final double[] optimalParameters,
+        final Path calibrationFilePath
+    ) {
+
+        final Path calibratedScenarioPath =
+            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
+
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization =
+                GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private static Path copyToFolder(final Path sourceFile, final Path targetFolder) {
@@ -146,13 +168,14 @@ public class TunaCalibrator implements Runnable {
     @NotNull
     private Path makeOutputFolder() {
         String outputFolderName =
-                new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
-        if(runNickName != null && !runNickName.trim().isEmpty())
-            outputFolderName= outputFolderName + "_" + runNickName;
+            new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
+        if (runNickName != null && !runNickName.trim().isEmpty()) {
+            outputFolderName = outputFolderName + "_" + runNickName;
+        }
         final Path outputFolderPath = originalCalibrationFilePath
-                .getParent()
-                .resolve(System.getProperty("user.name"))
-                .resolve(outputFolderName);
+            .getParent()
+            .resolve(System.getProperty("user.name"))
+            .resolve(outputFolderName);
         try {
             createDirectories(outputFolderPath);
             final String hostName = InetAddress.getLocalHost().getHostName() + "\n";
@@ -167,10 +190,11 @@ public class TunaCalibrator implements Runnable {
 
         final Path logFilePath = calibrationFilePath.getParent().resolve(CALIBRATION_LOG_FILE_NAME);
         final GenericOptimization optimizationProblem =
-                GenericOptimization.fromFile(calibrationFilePath);
+            GenericOptimization.fromFile(calibrationFilePath);
 
-        if(numberOfRunsPerSettingOverride>0)
+        if (numberOfRunsPerSettingOverride > 0) {
             optimizationProblem.setRunsPerSetting(numberOfRunsPerSettingOverride);
+        }
 
         System.out.println("Running calibration for: " + calibrationFilePath);
         System.out.println("Logging to: " + logFilePath);
@@ -178,69 +202,68 @@ public class TunaCalibrator implements Runnable {
         System.out.println("Max fitness calls: " + maxFitnessCalls);
 
         optimizationProblem.getTargets().stream()
-                .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
-                .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(verbose));
+            .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
+            .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(verbose));
 
         final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
 
         System.out.println("Requesting " + numThreads + " threads");
         final SimpleProblemWrapper problemWrapper;
-        if(bestGuess == null)
+        if (bestGuess == null) {
             problemWrapper = new SimpleProblemWrapper();
-        else
-            problemWrapper = new SimpleProblemWrapper(){
+        } else {
+            problemWrapper = new SimpleProblemWrapper() {
                 @Override
-                public void initializePopulation(Population population) {
+                public void initializePopulation(final Population population) {
 
                     super.initializePopulation(population);
 
                     for (int scenario = 0; scenario < bestGuess.size(); scenario++) {
                         final ESIndividualDoubleData individual = new ESIndividualDoubleData(
-                                (ESIndividualDoubleData) population.get(0));
+                            (ESIndividualDoubleData) population.get(0));
                         individual.setDoubleGenotype(bestGuess.get(scenario));
                         individual.setDoublePhenotype(bestGuess.get(scenario));
 
-                        population.replaceIndividualAt(scenario,
-                                individual);
+                        population.replaceIndividualAt(
+                            scenario,
+                            individual
+                        );
                     }
 
                 }
 
 
-
             };
+        }
 
         problemWrapper.setSimpleProblem(optimizationProblem);
         problemWrapper.setParallelThreads(numThreads);
 
         final AbstractOptimizer optimizer;
-        if(localSearch){
+        if (localSearch) {
             optimizer = new NelderMeadSimplex();
             ((NelderMeadSimplex) optimizer).setPopulationSize(populationSize);
-        }
-        else {
+        } else {
             optimizer = new ClusterBasedNichingEA();
             ((ClusterBasedNichingEA) optimizer).setPopulationSize(populationSize);
         }
         problemWrapper.setDefaultRange(parameterRange);
 
-
-
         final OptimizationParameters optimizationParameters =
-                OptimizerFactory.makeParams(
-                        optimizer,
-                        populationSize,
-                        problemWrapper,
-                        System.currentTimeMillis(),
-                        new EvaluationTerminator(maxFitnessCalls)
-                );
+            OptimizerFactory.makeParams(
+                optimizer,
+                populationSize,
+                problemWrapper,
+                System.currentTimeMillis(),
+                new EvaluationTerminator(maxFitnessCalls)
+            );
         final OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
         runnable.setOutputFullStatsToText(true);
         runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
         runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
 
         try (
-                final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(logFilePath)
+            final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(logFilePath)
         ) {
             runnable.setTextListener(fileAndScreenWriter);
             runnable.run();
@@ -252,26 +275,15 @@ public class TunaCalibrator implements Runnable {
 
     }
 
-    private static void saveCalibratedScenario(
-            final double[] optimalParameters,
-            final Path calibrationFilePath
-    ) {
-
-        final Path calibratedScenarioPath =
-                calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            final GenericOptimization optimization =
-                    GenericOptimization.fromFile(calibrationFilePath);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                    optimalParameters,
-                    Paths.get(optimization.getScenarioFile()).toFile(),
-                    optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public static void logCurrentTime(final SimState simState) {
+        LogManager.getLogger("run_timer").debug(() ->
+            new ObjectArrayMessage(
+                Thread.currentThread().getId(),
+                ((FishState) simState).getTrulyUniqueID(),
+                ((FishState) simState).getStep(),
+                System.currentTimeMillis()
+            )
+        );
     }
 
     @SuppressWarnings("unused")
@@ -314,63 +326,59 @@ public class TunaCalibrator implements Runnable {
         this.maxFitnessCalls = maxFitnessCalls;
     }
 
+    @SuppressWarnings("unused")
     public String getRunNickName() {
         return runNickName;
     }
 
-    public void setRunNickName(String runNickName) {
+    void setRunNickName(final String runNickName) {
         this.runNickName = runNickName;
     }
 
+    @SuppressWarnings("unused")
     public int getParameterRange() {
         return parameterRange;
     }
 
-    public void setParameterRange(int parameterRange) {
+    void setParameterRange(final int parameterRange) {
         this.parameterRange = parameterRange;
     }
 
+    @SuppressWarnings("unused")
     public int getMaxProcessorsToUse() {
         return maxProcessorsToUse;
     }
 
-    public void setMaxProcessorsToUse(int maxProcessorsToUse) {
+    void setMaxProcessorsToUse(final int maxProcessorsToUse) {
         this.maxProcessorsToUse = maxProcessorsToUse;
     }
 
-    public boolean isLocalSearch() {
+    boolean isLocalSearch() {
         return localSearch;
     }
 
-    public void setLocalSearch(boolean localSearch) {
+    void setLocalSearch(final boolean localSearch) {
         this.localSearch = localSearch;
     }
 
-    public List<double[]> getBestGuess() {
+    List<double[]> getBestGuess() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         return bestGuess;
     }
 
-    public void setBestGuess(List<double[]> bestGuess) {
+    void setBestGuess(final List<double[]> bestGuess) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.bestGuess = bestGuess;
     }
 
+    @SuppressWarnings("unused")
     public int getNumberOfRunsPerSettingOverride() {
         return numberOfRunsPerSettingOverride;
     }
 
-    public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
+    @SuppressWarnings("WeakerAccess")
+    public void setNumberOfRunsPerSettingOverride(final int numberOfRunsPerSettingOverride) {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
-    }
-
-    public static void logCurrentTime(final SimState simState) {
-        LogManager.getLogger("run_timer").debug(() ->
-            new ObjectArrayMessage(
-                Thread.currentThread().getId(),
-                ((FishState) simState).getTrulyUniqueID(),
-                ((FishState) simState).getStep(),
-                System.currentTimeMillis()
-            )
-        );
     }
 
 }
