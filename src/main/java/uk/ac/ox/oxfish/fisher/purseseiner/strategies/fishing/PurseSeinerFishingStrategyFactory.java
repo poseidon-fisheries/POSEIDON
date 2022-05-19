@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.collect.ImmutableMap;
@@ -98,28 +99,28 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private double movingThreshold = 0.0;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetGeneratorFunction =
-        new LogisticFunctionFactory(15392.989688872976, 0.692315692124877);
+        new LogisticFunctionFactory(15392.989688872976, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetGeneratorFunction =
-        new LogisticFunctionFactory(0, 0);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         searchActionValueFunction =
-        new LogisticFunctionFactory(7081017.137484187, 3.45300091459461E-6);
+        new LogisticFunctionFactory(7081017.137484187, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentActionValueFunction =
-        new LogisticFunctionFactory(7338176.765769132, 0.0);
+        new LogisticFunctionFactory(7338176.765769132, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadSetActionValueFunction =
-        new LogisticFunctionFactory(0, 0);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetActionValueFunction =
-        new LogisticFunctionFactory(0.0, 1.1404626767614229E-5);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetActionValueFunction =
-        new LogisticFunctionFactory(555715.859646539, 3.6444986410608907E-6);
+        new LogisticFunctionFactory(555715.859646539, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
-        new LogisticFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(1E-6, 10);
     private boolean fishUnderFadsAvailableForSchoolSets = true;
     private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
 

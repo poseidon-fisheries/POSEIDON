@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -56,7 +57,6 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -109,28 +109,28 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
-        new LogisticFunctionFactory(0.15670573908905225, 8.39239514150804);
+        new LogisticFunctionFactory(0.15670573908905225, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctSetsRemainingModulationFunction =
-        new LogisticFunctionFactory(0.0, 0.807144443658139);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         numFadsInStockModulationFunction =
-        new LogisticFunctionFactory(465.76938287575837, 0.40173999550338946);
+        new LogisticFunctionFactory(465.76938287575837, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentPctActiveFadsLimitModulationFunction =
-        new LogisticFunctionFactory(0.817463635675281, 4.557972989563278);
+        new LogisticFunctionFactory(0.817463635675281, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctTravelTimeLeftModulationFunction =
-        new LogisticFunctionFactory(0.10183241937374361, 5.375161932147479);
+        new LogisticFunctionFactory(0.10183241937374361, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionFactory(73.32224086132372, 0.23520949973919156);
+        new LogisticFunctionFactory(73.32224086132372, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionFactory(51.91162666081563, 0.3758445982281733);
+        new LogisticFunctionFactory(51.91162666081563, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionFactory(72.28852668100924, 0.108746872431396);
+        new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
 

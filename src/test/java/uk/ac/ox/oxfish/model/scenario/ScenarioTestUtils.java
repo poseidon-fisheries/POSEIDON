@@ -18,13 +18,15 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static java.util.function.UnaryOperator.identity;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.function.UnaryOperator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -35,10 +37,19 @@ public class ScenarioTestUtils {
         final String scenarioFileName,
         final Class<S> scenarioClass
     ) {
+        testSaveAndLoadYaml(testFolder, scenarioFileName, scenarioClass, identity());
+    }
+
+    public static <S extends TestableScenario> void testSaveAndLoadYaml(
+        final Path testFolder,
+        final String scenarioFileName,
+        final Class<S> scenarioClass,
+        final UnaryOperator<S> scenarioOperator
+    ) {
         // Dump the scenario to YAML
         final File scenarioFile = testFolder.resolve(scenarioFileName).toFile();
         try {
-            final Scenario scenario = scenarioClass.newInstance();
+            final Scenario scenario = scenarioOperator.apply(scenarioClass.newInstance());
             new FishYAML().dump(scenario, new FileWriter(scenarioFile));
         } catch (final IOException | InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(e);

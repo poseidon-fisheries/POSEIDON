@@ -30,11 +30,16 @@ import java.util.Set;
 import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
@@ -52,12 +57,81 @@ public class EpoAbundanceScenarioTest extends TestCase {
 
     }
 
-    public void testSaveAndLoadYaml() {
+    public void testSaveAndLoadLogisticYaml() {
         ScenarioTestUtils.testSaveAndLoadYaml(
             TESTS_INPUT_PATH,
-            "epo_abundance.yaml",
+            "epo_abundance_logistic.yaml",
             EpoAbundanceScenario.class
         );
+    }
+
+    public void testSaveAndLoadExponentialYaml() {
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_abundance_exponential.yaml",
+            EpoAbundanceScenario.class,
+            EpoAbundanceScenarioTest::useCompressedExponentials
+        );
+    }
+
+    private static EpoAbundanceScenario useCompressedExponentials(final EpoAbundanceScenario scenario) {
+
+        final PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> gearFactory =
+            scenario.getPurseSeineGearFactory();
+        final PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad>
+            strategyFactory = scenario.getFishingStrategyFactory();
+
+        gearFactory.setPctHoldSpaceLeftModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setPctSetsRemainingModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setNumFadsInStockModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setFadDeploymentPctActiveFadsLimitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setPctTravelTimeLeftModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setOpportunisticFadSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setNonAssociatedSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setDolphinSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+
+        strategyFactory.setDolphinSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setFadDeploymentActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setFadSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setNonAssociatedSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setOpportunisticFadSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setDolphinSetGeneratorFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setNonAssociatedSetGeneratorFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setSearchActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        
+        return scenario;
     }
 
     /**
