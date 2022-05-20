@@ -145,14 +145,15 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
-        assert started;
-        for(Regulation regulation : regulations)
-        {
-            if(!regulation.canFishHere(agent,tile,model,timeStep))
-                return false;
-        }
-        return true;
+    public boolean canFishHere(
+        final Fisher agent,
+        final SeaTile tile,
+        final FishState model,
+        final int timeStep
+    ) {
+        return regulations
+            .stream()
+            .allMatch(regulation -> regulation.canFishHere(agent, tile, model, timeStep));
     }
 
 
