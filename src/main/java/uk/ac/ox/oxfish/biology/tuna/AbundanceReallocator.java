@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.UnaryOperator.identity;
+import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
@@ -28,8 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.IntFunction;
+import org.jetbrains.annotations.NotNull;
 import sim.field.grid.DoubleGrid2D;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -68,31 +72,47 @@ public class AbundanceReallocator
         final List<SeaTile> seaTiles,
         final AbundanceLocalBiology aggregatedBiology
     ) {
-        final Map<SeaTile, AbundanceLocalBiology> seaTileBiologies = seaTiles
-            .stream()
-            .filter(seaTile -> seaTile.getBiology() instanceof AbundanceLocalBiology)
-            .collect(toImmutableMap(
-                identity(),
-                seaTile -> (AbundanceLocalBiology) (seaTile.getBiology())
-            ));
-        globalBiology.getSpecies().forEach(species -> {
-            final double[][] matrix = aggregatedBiology.getAbundance(species).asMatrix();
-            range(0, matrix.length).forEach(subdivision ->
-                range(0, matrix[subdivision].length).forEach(bin -> {
-                    final DoubleGrid2D grid = allocationGrids.get(entry(
-                        species.getName(),
-                        binToSizeGroupMappings.get(species.getName()).apply(bin)
-                    ));
-                    final double numFish = matrix[subdivision][bin];
-                    seaTileBiologies.forEach((seaTile, localBiology) ->
-                        localBiology.getAbundance(species).asMatrix()[subdivision][bin] =
-                            numFish * grid.get(seaTile.getGridX(), seaTile.getGridY())
-                    );
-                })
-            );
+        final Map<Species, DoubleGrid2D[]> gridsPerSpecies =
+            getGrids(globalBiology, allocationGrids);
+        seaTiles.forEach(seaTile -> {
+            final LocalBiology biology = seaTile.getBiology();
+            final Int2D xy = seaTile.getGridLocation();
+            for (final Species species : globalBiology.getSpecies()) {
+                final double[][] aggregatedMatrix =
+                    aggregatedBiology.getAbundance(species).asMatrix();
+                final double[][] localMatrix =
+                    biology.getAbundance(species).asMatrix();
+                final DoubleGrid2D[] grids = gridsPerSpecies.get(species);
+                final int numSubs = species.getNumberOfSubdivisions();
+                final int numBins = species.getNumberOfBins();
+                for (int sub = 0; sub < numSubs; sub++) {
+                    for (int bin = 0; bin < numBins; bin++) {
+                        final double numFish = aggregatedMatrix[sub][bin];
+                        localMatrix[sub][bin] = numFish * grids[bin].get(xy.x, xy.y);
+                    }
+                }
+            }
         });
+    }
 
-
+    @NotNull
+    private Map<Species, DoubleGrid2D[]> getGrids(
+        final GlobalBiology globalBiology,
+        final Map<Entry<String, SizeGroup>, DoubleGrid2D> allocationGrids
+    ) {
+        return globalBiology.getSpecies().stream().collect(toImmutableMap(
+            identity(),
+            species -> {
+                final String speciesName = species.getName();
+                final IntFunction<SizeGroup> getSizeGroup = binToSizeGroupMappings.get(speciesName);
+                return range(0, species.getNumberOfBins())
+                    .mapToObj(bin -> allocationGrids.get(entry(
+                        speciesName,
+                        getSizeGroup.apply(bin)
+                    )))
+                    .toArray(DoubleGrid2D[]::new);
+            }
+        ));
     }
 
 }
