@@ -37,27 +37,9 @@ public class AbundanceAggregator extends Aggregator<AbundanceLocalBiology> {
         final GlobalBiology globalBiology,
         final Collection<AbundanceLocalBiology> sourceBiologies
     ) {
-        return sourceBiologies.isEmpty()
-            ? new AbundanceLocalBiology(globalBiology)
-            : new AbundanceLocalBiology(
-                globalBiology.getSpecies().stream().collect(toImmutableMap(
-                    identity(),
-                    species -> {
-                        // We're grabbing the bins and subdivisions from the first
-                        // biology instead of the species because sometimes the meristics
-                        // are not initialised in testing code.
-                        final StructuredAbundance abundance =
-                            get(sourceBiologies, 0).getAbundance(species);
-                        final int subdivisions = abundance.getSubdivisions();
-                        final int bins = abundance.getBins();
-                        Iterable<StructuredAbundance> iterator = sourceBiologies.stream().map(b -> b.getAbundance(species))::iterator;
-                        return StructuredAbundance.sum(
-                                iterator,
-                            bins,
-                            subdivisions
-                        ).asMatrix();
-                    }
-                ))
-            );
+        return AbundanceLocalBiology.aggregate(
+            globalBiology,
+            sourceBiologies
+        );
     }
 }

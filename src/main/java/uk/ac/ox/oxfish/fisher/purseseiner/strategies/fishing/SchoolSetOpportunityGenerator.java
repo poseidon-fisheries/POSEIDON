@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import static com.google.common.base.Suppliers.memoize;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -94,15 +96,19 @@ public class SchoolSetOpportunityGenerator<
 
     @Override
     public Collection<A> apply(final Fisher fisher) {
+
         final List<B> sourceBiologies = sourceBiologies(fisher);
-        final B biology = biologyAggregator.apply(fisher.grabState().getBiology(), sourceBiologies);
+        final Supplier<B> biology = memoize(() ->
+            // this is costly, and we may or may not need it
+            biologyAggregator.apply(fisher.grabState().getBiology(), sourceBiologies)
+        );
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
         final int step = fisher.grabState().getStep();
         final boolean opportunity;
         if (activeOpportunities.hasOpportunity(gridLocation, step)) {
             opportunity = true;
         } else {
-            final double p = probabilityOfOpportunity(biology);
+            final double p = probabilityOfOpportunity(biology.get());
             opportunity = fisher.grabRandomizer().nextBoolean(p);
             if (opportunity) {
                 final int duration = 1;
@@ -110,7 +116,7 @@ public class SchoolSetOpportunityGenerator<
             }
         }
         if (opportunity) {
-            final B targetBiology = targetBiologyMaker.apply(biology);
+            final B targetBiology = targetBiologyMaker.apply(biology.get());
             final double duration = getDurationSampler().getAsDouble();
             final A action = actionMaker.make(targetBiology, fisher, duration, sourceBiologies);
             return ImmutableList.of(action);
