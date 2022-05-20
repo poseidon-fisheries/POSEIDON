@@ -19,17 +19,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import static java.lang.Math.pow;
+
+import java.util.Map.Entry;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.MutableDouble2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-
-import java.util.Map.Entry;
-
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.Math.pow;
 
 public class AttractionField implements FisherStartable {
 
@@ -97,12 +95,12 @@ public class AttractionField implements FisherStartable {
     }
 
     public double getActionValueAt(final Int2D here) {
-        double sum = 0.0;
-        for (final Entry<Int2D, Double> entry : locationValues.getValues()) {
-            final double distance = distance(here, entry.getKey());
-            sum += entry.getValue() / pow(distance + 1, actionDistanceExponent);
-        }
-        return sum;
+        return locationValues.getValues().stream()
+            .mapToDouble(entry -> {
+                final double distance = distance(here, entry.getKey());
+                return entry.getValue() / pow(distance + 1, actionDistanceExponent);
+            })
+            .sum();
     }
 
     public double getValueAt(final Int2D location) {
