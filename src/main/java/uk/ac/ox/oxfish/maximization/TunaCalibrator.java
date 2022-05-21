@@ -43,8 +43,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 @SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator implements Runnable {
 
-    static final int MAX_PROCESSORS_TO_USE = 16;
-    static final int DEFAULT_POPULATION_SIZE = 200;
+    static final int MAX_PROCESSORS_TO_USE = 32;
+    static final int DEFAULT_POPULATION_SIZE = 100;
     static final int MAX_FITNESS_CALLS = 5000;
     static final int DEFAULT_RANGE = 10;
 
@@ -61,7 +61,7 @@ public class TunaCalibrator implements Runnable {
      * this number instead
      */
     private int numberOfRunsPerSettingOverride = -1;
-    
+
     private Path originalCalibrationFilePath = Paths
         .get(
             System.getProperty("user.home"),
