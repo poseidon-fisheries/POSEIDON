@@ -43,7 +43,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 @SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator implements Runnable {
 
-    static final int MAX_PROCESSORS_TO_USE = 32;
+    static final int MAX_PROCESSORS_TO_USE = getRuntime().availableProcessors();
     static final int DEFAULT_POPULATION_SIZE = 100;
     static final int MAX_FITNESS_CALLS = 5000;
     static final int DEFAULT_RANGE = 10;
