@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -314,7 +313,7 @@ public class AbundanceLocalBiology implements LocalBiology
         final Queue<double[]> biomassArrays = biologies.stream()
             .map(b -> b.lastComputedBiomass)
             .collect(toCollection(() -> new ArrayDeque<>(biologies.size())));
-        final double[] newBiomassArray = biomassArrays.remove();
+        final double[] newBiomassArray = biomassArrays.remove().clone();
         for (int i = 0; i < newBiomassArray.length; i++) {
             for (final double[] biomassArray : biomassArrays) {
                 if (Double.isNaN(newBiomassArray[i])) {
