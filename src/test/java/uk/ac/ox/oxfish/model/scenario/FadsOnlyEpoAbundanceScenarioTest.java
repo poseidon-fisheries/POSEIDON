@@ -34,32 +34,11 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
 
     public void testSaveAndLoadYaml() {
-
-        // Dump the scenario to YAML
-        final File scenarioFile = Paths.get("inputs", "tests", "fad_only_scenario.yaml").toFile();
-
-        try {
-            final Scenario scenario = new FadsOnlyEpoAbundanceScenario();
-            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        // Try to read it back and start it
-        try (final FileReader fileReader = new FileReader(scenarioFile)) {
-            final FishYAML fishYAML = new FishYAML();
-            final FadsOnlyEpoAbundanceScenario epoAbundanceScenario =
-                fishYAML.loadAs(fileReader, FadsOnlyEpoAbundanceScenario.class);
-            final FishState fishState = new FishState();
-            epoAbundanceScenario.useDummyData(TESTS_INPUT_PATH);
-            fishState.setScenario(epoAbundanceScenario);
-            fishState.start();
-        } catch (final FileNotFoundException e) {
-            throw new IllegalArgumentException("Can't find scenario file: " + scenarioFile, e);
-        } catch (final IOException e) {
-            throw new IllegalStateException("Error while reading file: " + scenarioFile, e);
-        }
-
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_fad_only_scenario.yaml",
+            FadsOnlyEpoAbundanceScenario.class
+        );
     }
 
     public void testRunTwoYearsWithoutCrashing() {
