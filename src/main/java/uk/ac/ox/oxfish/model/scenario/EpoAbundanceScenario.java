@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import org.apache.logging.log4j.Level;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -153,9 +155,11 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 Paths.get(
                     System.getProperty("user.home"),
                     "workspace", "tuna", "calibration", "results",
-                    "nicolas", "2022-05-12_16.56.21_global_calibration",
+                    "cenv0729", "2022-05-23_23.01.30_global_calibration",
                     "calibrated_scenario.yaml"
                 ).toFile();
+
+            addCsvLogger(Level.DEBUG, "potential_actions", "action,initial,modulated,weighted");
             new FishYAML().dump(scenario, new FileWriter(scenarioFile));
             fishState.setScenario(scenario);
             fishState.start();

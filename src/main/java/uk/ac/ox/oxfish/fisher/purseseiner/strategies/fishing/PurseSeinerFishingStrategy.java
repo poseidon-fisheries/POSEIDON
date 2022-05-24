@@ -45,6 +45,9 @@ import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -221,9 +224,17 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
                 weightedFadDeploymentAction
             ).collect(toImmutableList());
 
+        final Logger logger = LogManager.getLogger("potential_actions");
+
         return actionsAvailable.stream()
-            .filter(entry -> entry.getAction().isPermitted())
-            .filter(entry -> entry.getWeightedValue() > movingThreshold)
+            .filter(weightedAction -> weightedAction.getAction().isPermitted())
+            .peek(weightedAction -> logger.debug(() -> new ObjectArrayMessage(
+                weightedAction.getAction().getClass().getSimpleName(),
+                weightedAction.getInitialValue(),
+                weightedAction.getModulatedValue(),
+                weightedAction.getWeightedValue()
+            )))
+            .filter(weightedAction -> weightedAction.getWeightedValue() > movingThreshold)
             .collect(toImmutableList());
     }
 

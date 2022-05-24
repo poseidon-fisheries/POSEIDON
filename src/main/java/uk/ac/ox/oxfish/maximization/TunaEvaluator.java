@@ -30,7 +30,7 @@ public class TunaEvaluator implements Runnable {
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna", "calibration", "results",
-        "cenv0729", "2022-03-02_13.22.08_global_calibration"
+        "cenv0729", "2022-05-23_23.01.30_global_calibration"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
@@ -49,7 +49,7 @@ public class TunaEvaluator implements Runnable {
             "evaluation_results.csv",
             fishState -> new EvaluationResultsRowProvider(fishState, optimization)
         );
-        runner.setParallel(false);
+        runner.setParallel(true);
 
     }
 
@@ -77,7 +77,7 @@ public class TunaEvaluator implements Runnable {
         System.out.println("Using " + calibrationFolder + " as the calibration folder.");
 
         final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
-        final Path calibrationFilePath = calibrationFolder.resolve("calibration.yaml");
+        final Path calibrationFilePath = calibrationFolder.resolve("logistic_calibration.yaml");
 
         final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
         try (final Stream<String> lines = Files.lines(logFilePath)) {
@@ -128,7 +128,7 @@ public class TunaEvaluator implements Runnable {
         runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
         runner
             .registerRowProvider("actions.csv", PurseSeineActionsLogger::new)
-            .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
+            //.registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
             .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
