@@ -65,7 +65,7 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
     @Override
     protected double valueOfSetAction(
         @NotNull final AbstractSetAction<? extends LocalBiology> action,
-        final DoubleUnaryOperator actionValueFunction, final Collection<Species> species
+        final Collection<Species> species
     ) {
         //if we know it is a fad action (own fad, not opportunistic)
         if (action instanceof FadSetAction) {
@@ -77,9 +77,9 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
             if (time == 0) {
                 return 0;
             }
-            return actionValueFunction.applyAsDouble(time);
+            return time;
         } else {
-            return super.valueOfSetAction(action, actionValueFunction, species);
+            return super.valueOfSetAction(action, species);
         }
     }
 }
