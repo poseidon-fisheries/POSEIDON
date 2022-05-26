@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -28,6 +29,8 @@ import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
@@ -39,7 +42,12 @@ public class AbundanceReallocatorTest {
 
     @Test
     public void AbundanceReallocatorTester(){
-        Species species1 = new Species("Piano Tuna");
+
+        final Meristics meristics = mock(Meristics.class);
+        when(meristics.getNumberOfSubdivisions()).thenReturn(2);
+        when(meristics.getNumberOfBins()).thenReturn(2);
+
+        Species species1 = new Species("Piano Tuna", meristics);
 
         Map<String, String> sCodes = new HashMap<>();
         sCodes.put("SP1", species1.getName());
