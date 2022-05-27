@@ -136,8 +136,8 @@ EPO Abundance Pathfinding:
       totalCarryingCapacity: '445000.0'
   fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.GenericFadMapFactory
     currentFiles:
-      Y2016: inputs/epo_inputs/tests/backsliding/currents_2016_daily.csv
-      Y2017: inputs/epo_inputs/tests/backsliding/currents_2017_daily.csv
+      Y2016: inputs/epo_inputs/currents/currents_2016.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
   fishingStrategyFactory: Default to Destination Strategy
   locationValuesFilePath: inputs/epo_inputs/tests/backsliding/location_values_all2017.csv
   mapInitializerFactory:

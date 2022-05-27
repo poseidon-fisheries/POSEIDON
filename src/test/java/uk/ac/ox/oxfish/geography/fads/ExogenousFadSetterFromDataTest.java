@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -36,16 +37,23 @@ public class ExogenousFadSetterFromDataTest {
         dataset.put(123,Lists.newArrayList(firstObservation,secondObservation));
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
 
-
+        Species first = mock(Species.class);when(first.getIndex()).thenReturn(0);
+        Species second = mock(Species.class);when(second.getIndex()).thenReturn(1);
         //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
         Bag localFads = new Bag();
         for(int i=1;i<=4;i++) {
             Fad fad = mock(Fad.class,RETURNS_DEEP_STUBS);
-            when(fad.getBiomass()).thenReturn(new double[]{i*10,i*10});
+            LocalBiology biology = mock(LocalBiology.class);
+            when(fad.getBiology()).thenReturn(biology);
+            when(biology.getBiomass(first)).thenReturn(i*10d);
+            when(biology.getBiomass(second)).thenReturn(i*10d);
             localFads.add(fad);
         }
 
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+
+
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(first, second));
         setter.start(model);
         when(model.getDay()).thenReturn(123);
         when(model.getFadMap().fadsAt(any())).thenReturn(localFads);
@@ -74,10 +82,12 @@ public class ExogenousFadSetterFromDataTest {
         ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
         //let's log this
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        Species secondSpecies = new Species("Species 1");
+        secondSpecies.resetIndexTo(1);
         when(model.getSpecies()).thenReturn(
                 Lists.newArrayList(
                         new Species("Species 0"),
-                        new Species("Species 1")
+                        secondSpecies
                 )
         );
         setter.startOrResetLogger(model);
@@ -86,7 +96,10 @@ public class ExogenousFadSetterFromDataTest {
         //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
         Bag localFads = new Bag();
         Fad fad = mock(Fad.class,RETURNS_DEEP_STUBS);
-        when(fad.getBiomass()).thenReturn(new double[]{40,40});
+        LocalBiology biology = mock(LocalBiology.class);
+        when(fad.getBiology()).thenReturn(biology);
+        when(biology.getBiomass(any())).thenReturn(40d);
+//        when(fad.getBiomass()).thenReturn(new double[]{40,40});
         localFads.add(fad);
 
 
