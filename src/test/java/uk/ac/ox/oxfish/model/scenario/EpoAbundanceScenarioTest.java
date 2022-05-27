@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
@@ -45,16 +46,10 @@ import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 public class EpoAbundanceScenarioTest extends TestCase {
 
     public void testRunOneYearWithoutCrashing() {
-        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(TESTS_INPUT_PATH);
-        final FishState fishState = new FishState();
-        fishState.setScenario(scenario);
-
-        fishState.start();
+        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
         do {
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
-
     }
 
     public void testSaveAndLoadLogisticYaml() {
@@ -142,13 +137,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
      */
     public void testAllNonZeroGridCellsMapRightBiologySeaTiles() {
 
-        final FishState fishState = new FishState();
-        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(TESTS_INPUT_PATH);
-
-        fishState.setScenario(scenario);
-        fishState.start();
-
+        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
         final List<Startable> startables = fishState.viewStartables();
 
         @SuppressWarnings("OptionalGetWithoutIsPresent") final AbundanceRestorer abundanceRestorer =
