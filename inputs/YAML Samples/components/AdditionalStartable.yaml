@@ -125,12 +125,12 @@ Tow Long Logger:
   fileName: tow_log.csv
 -------
 Json Output Manager:
-  chartBuilderFactories: &id002 [
+  chartBuilderFactories: &id003 [
     ]
-  eventBuilderFactories: *id002
+  eventBuilderFactories: *id003
   fadsBuilderFactory:
     fadsColour: yellow
-  heatmapBuilderFactories: *id002
+  heatmapBuilderFactories: *id003
   numYearsToSkip: 0
   prettyPrinting: false
   regionsBuilderFactory: !!uk.ac.ox.oxfish.model.data.webviz.regions.UnifiedRegionBuilderFactory
@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-03-07'
+  startDate: '2022-04-25'
   vesselsBuilderFactory:
     vesselClassifier: {
       }

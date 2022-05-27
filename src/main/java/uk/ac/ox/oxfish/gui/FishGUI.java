@@ -163,9 +163,9 @@ public class  FishGUI extends GUIState{
             String exceptionAsString = sw.toString();
             JOptionPane.showMessageDialog(null,
 
-                    IMAGES_PATH.toAbsolutePath().toString()+"\n"+
-                            FishGUI.class.getProtectionDomain().getCodeSource().getLocation().getPath().toString()+"\n"+
-                            e.toString() +"\n"+exceptionAsString);
+                                          IMAGES_PATH.toAbsolutePath().toString()+"\n"+
+                                                  FishGUI.class.getProtectionDomain().getCodeSource().getLocation().getPath().toString()+"\n"+
+                                                  e.toString() +"\n"+exceptionAsString);
             throw new RuntimeException(e);
         }
     }
@@ -208,7 +208,7 @@ public class  FishGUI extends GUIState{
 
                         for (Object allFrame : console.getAllFrames()) {
                             ((JFrame) allFrame).dispose();
-                            
+
                         }
                         console.dispose();
                         FishGUI.this.quit();
@@ -258,7 +258,7 @@ public class  FishGUI extends GUIState{
             e.printStackTrace(new PrintWriter(sw));
             String exceptionAsString = sw.toString();
             JOptionPane.showMessageDialog(null,
-                    e.toString() +"\n"+exceptionAsString);
+                                          e.toString() +"\n"+exceptionAsString);
             throw e;
         }
 
@@ -308,7 +308,15 @@ public class  FishGUI extends GUIState{
         //MPAs portrayal
         mpaPortrayal.setField(state.getMpaVectorField());
         mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLUE, true));
-        
+
+
+        //fads
+        if (state.getFadMap() != null) {
+            fadMapPortrayal = new ContinuousPortrayal2D();
+            fadMapPortrayal.setField(state.getFadMap().getField());
+            fadMapPortrayal.setPortrayalForAll(
+                    new OvalPortrayal2D(Color.yellow, 0.5));
+        }
 
         //boats
         trails.setField(state.getFisherGrid());
@@ -316,11 +324,7 @@ public class  FishGUI extends GUIState{
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForRemainder(null);
 
-        if (state.getFadMap() != null) {
-            fadMapPortrayal = new ContinuousPortrayal2D();
-            fadMapPortrayal.setField(state.getFadMap().getField());
-            fadMapPortrayal.setPortrayalForAll(new OvalPortrayal2D(Color.yellow, 0.5));
-        }
+
 
         for(Fisher o : state.getFishers()) {
             assignPortrayalToFisher(boatPortrayalFactory.build(o), o);
@@ -438,7 +442,7 @@ public class  FishGUI extends GUIState{
                             if (chooser.showOpenDialog(gui.displayFrame) == JFileChooser.APPROVE_OPTION) {
 
                                 System.out.println("getCurrentDirectory(): "
-                                        + chooser.getSelectedFile());
+                                                           + chooser.getSelectedFile());
                                 FishStateUtilities.writeAdditionalOutputsToFolder(
                                         chooser.getSelectedFile().toPath(),
                                         (FishState) gui.state
@@ -482,7 +486,7 @@ public class  FishGUI extends GUIState{
         transformer = new CoordinateTransformer(display2D, state.getMap());
 
         MPADrawer drawer = new MPADrawer(display2D, transformer, state.getMap(),
-                mainPortrayal, this);
+                                         mainPortrayal, this);
 
 
         ((Console) controller).getTabPane().add("Policies",new RegulationTab(this, drawer) );
@@ -493,15 +497,16 @@ public class  FishGUI extends GUIState{
         scheduleRepeatingImmediatelyAfter(heatMap);
 
         displayFrame = setupDisplay2D(mainPortrayal, display2D,
-                "Bathymetry", true);
+                                      "Bathymetry", true);
         //attach it the portrayal
         display2D.attach(mainPortrayal, "Bathymetry");
         //display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(heatMap.getHeatMapPortrayal(), "Fishing Hotspots");
+        if (fadMapPortrayal != null)
+            display2D.attach(fadMapPortrayal, "Fads");
         display2D.attach(trails, "Boat Trails");
         display2D.attach(boats, "Boats");
         display2D.attach(ports, "Ports");
-        if (fadMapPortrayal != null) display2D.attach(fadMapPortrayal, "Fads");
 
         displayFrame.setVisible(true);
 
@@ -510,9 +515,9 @@ public class  FishGUI extends GUIState{
     private void assignPortrayalToFisher(SimplePortrayal2D boatPortrayal, Fisher o) {
         TrailedPortrayal2D trailed = new TrailedPortrayal2D
                 (this,
-                        boatPortrayal,
-                        trails,
-                        50, Color.BLUE,new Color(0,0,255,0));
+                 boatPortrayal,
+                 trails,
+                 50, Color.BLUE,new Color(0,0,255,0));
         trailed.setOnlyGrowTrailWhenSelected(true);
         trailed.setOnlyShowTrailWhenSelected(false);
         CircledPortrayal2D circled = new CircledPortrayal2D(trailed);

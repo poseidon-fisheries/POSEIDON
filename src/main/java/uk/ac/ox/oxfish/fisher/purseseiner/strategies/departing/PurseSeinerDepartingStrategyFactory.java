@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class PurseSeinerDepartingStrategyFactory
     implements AlgorithmFactory<CompositeDepartingStrategy> {
 
-    private final boolean destinationBased;
+    private boolean destinationBased;
 
     public PurseSeinerDepartingStrategyFactory() {
         destinationBased = true;
@@ -57,4 +57,11 @@ public class PurseSeinerDepartingStrategyFactory
         }
     }
 
+    public boolean isDestinationBased() {
+        return destinationBased;
+    }
+
+    public void setDestinationBased(boolean destinationBased) {
+        this.destinationBased = destinationBased;
+    }
 }

@@ -81,5 +81,6 @@ Full-time Seasonal Retired Decorator:
   targetVariable: '100.0'
   variableName: TRIP_PROFITS_PER_HOUR
 -------
-Purse Seiner Departing Strategy
+Purse Seiner Departing Strategy:
+  destinationBased: true
 -------

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.TunaEvaluator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -413,18 +414,18 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     }
 
 //    public static void main(String[] args) throws IOException {
-////        GenericOptimization.buildLocalCalibrationProblem(
-////                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapperAge.yaml"),
-////                new double[]{-4.700,-4.317,-9.726, 10.000,-5.696,-10.000,-3.364, 9.002,-4.908,-3.535,-10.000, 2.033, 5.465,-8.304,-2.033,-6.016,-1.467,-5.014,-4.505, 2.120, 6.360, 3.727, 10.000,-5.952,-7.052,-2.532},
-////                "zapperAge_local",.2
-////        );
-////        GenericOptimization.buildLocalCalibrationProblem(
-////                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapper.yaml"),
-////                new double[]{
-////                        -0.244,-5.551,-9.394, 1.927,-1.066,-10.000, 9.442, 8.502,-7.710,-3.389, 2.360, 6.431, 10.000,-0.977,-0.218, 6.725, 5.352,-2.716,-7.049, 2.578, 10.000, 4.774,-3.275,-0.764, 0.055,-8.100
-////                },
-////                "zapper_local",.3
-////        );
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapperAge.yaml"),
+//                new double[]{-4.700,-4.317,-9.726, 10.000,-5.696,-10.000,-3.364, 9.002,-4.908,-3.535,-10.000, 2.033, 5.465,-8.304,-2.033,-6.016,-1.467,-5.014,-4.505, 2.120, 6.360, 3.727, 10.000,-5.952,-7.052,-2.532},
+//                "zapperAge_local",.2
+//        );
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapper.yaml"),
+//                new double[]{
+//                        -0.244,-5.551,-9.394, 1.927,-1.066,-10.000, 9.442, 8.502,-7.710,-3.389, 2.360, 6.431, 10.000,-0.977,-0.218, 6.725, 5.352,-2.716,-7.049, 2.578, 10.000, 4.774,-3.275,-0.764, 0.055,-8.100
+//                },
+//                "zapper_local",.3
+//        );
 //        GenericOptimization.buildLocalCalibrationProblem(
 //                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperlocal2/original.yaml"),
 //                new double[]{
@@ -432,7 +433,14 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //                },
 //                "zapper_local_again",.3
 //        );
-//    }
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapper_expired/original.yaml"),
+//                new double[]{
+//                        3.553,-5.394,-10.000,-0.396,-6.772, 10.000, 3.984, 9.114,-5.820, 0.723,-0.827,-5.182,-4.600,-4.504, 2.559, 10.000, 4.596,-10.000, 10.000, 4.050, 10.000, 5.830, 3.143,-4.421, 3.034, 0.999, 1.545
+//                },
+//                "zapper_local_expired",.2
+//        );
+  //  }
 
     public static void main(String[] args) throws IOException {
 
@@ -453,9 +461,17 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/carrknight/2022-04-20_07.33.02_local1000/local_fd_125.yaml"
 //        );
 
-        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
+//        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
+//        Path calibrationFile = Paths.get(
+//                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
+//        );
+
+        double[] solution =
+              //  {-50.830, 22.467, 20.911,-64.333,-3.872,-71.828, 17.786, 635.530, 0.775, 33.997, 14.841,-2.065,-24.428, 1.164, 25.175, 38.979,-24.874, 13.277, 37.779,-1.461, 3.092, 4.066, 3.735, 34.309, 145.886,-13.260, 16.731};
+                {-51.724, 22.532, 21.767,-63.344,-3.947,-72.007, 25.182, 695.676, 0.686, 33.917, 14.578, 0.479,-25.794, 0.229, 25.667, 38.437,-27.530, 13.663, 37.790,-1.460, 3.542, 4.050,-0.639, 35.812, 118.978,-15.255, 24.295};
+
         Path calibrationFile = Paths.get(
-                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
+                "docs/20220223 tuna_calibration/pathfinder3/zapper_expired/zapper_local_expired.yaml"
         );
 
 
@@ -464,4 +480,6 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         evaluator.run();
 
     }
+
+
 }

@@ -81,7 +81,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -340,4 +340,7 @@ Generalized Cognitive Strategy:
 Gravity Destination Strategy:
   attractionWeightsFile: null
   maxTripDurationFile: inputs/epo/boats.csv
+-------
+Random Fishing Plans Strategy:
+  hourDelayBetweenFishing: '1.0'
 -------

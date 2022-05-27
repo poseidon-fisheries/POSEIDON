@@ -14,16 +14,12 @@ import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.OffSwitchDecorator;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.OffSwitchFactory;
-import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class Mera718Policy {
@@ -37,21 +33,22 @@ public class Mera718Policy {
 
 
         String[] otherPolicies = {
-                "BAU",
-                "multi_lastcatch_qb",
-                "multi_lastcatch_70_qb",
-                "multi_lastcatch_50_qb" ,
-                "lastcatch",
-                "lastcatch_70",
-                "closed_multi_itarget1cpue",
-                "LBSPR_season",
-                "LTARGETE_1_fleet",
-                "LTARGETE_1_season",
-                "LTARGETE_4_fleet",
-                "LTARGETE_4_season",
-                "YEARLY_LTARGETE_1_season",
-                "YEARLY_LTARGETE_4_season",
-        "closed_multi_itarget2cpue"
+                "MRreal"
+//                "BAU",
+//                "multi_lastcatch_qb",
+//                "multi_lastcatch_70_qb",
+//                "multi_lastcatch_50_qb" ,
+//                "lastcatch",
+//                "lastcatch_70",
+//                "closed_multi_itarget1cpue",
+//                "LBSPR_season",
+//                "LTARGETE_1_fleet",
+//                "LTARGETE_1_season",
+//                "LTARGETE_4_fleet",
+//                "LTARGETE_4_season",
+//                "YEARLY_LTARGETE_1_season",
+//                "YEARLY_LTARGETE_4_season",
+//        "closed_multi_itarget2cpue"
 
         };
 
@@ -66,18 +63,18 @@ public class Mera718Policy {
             );
         }
 
-        selectedPolicies.put(
-                "currentEffort",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
-                }
-        );
-        selectedPolicies.put(
-                "effort75",
-                fishState -> {
-                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(187, true);
-                }
-        );
+//        selectedPolicies.put(
+//                "currentEffort",
+//                fishState -> {
+//                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(250, true);
+//                }
+//        );
+//        selectedPolicies.put(
+//                "effort75",
+//                fishState -> {
+//                    return MeraOneSpeciesSlice1.buildMaxDaysOutPolicy(187, true);
+//                }
+//        );
         selectedPolicies.put(
                 "0_days",
                 fishState -> {
@@ -110,22 +107,17 @@ public class Mera718Policy {
         }
     };
 
-    public static void main(String[] args) throws IOException {
 
+    public static void run(Path mainDirectory, Path pathToOutput, String scenarioListName,
+                           final LinkedHashMap<String,
+                                   AlgorithmFactory<? extends AdditionalStartable>> policies) throws IOException {
 
+        pathToOutput.toFile().mkdirs();
 
-
-        Path mainDirectory = Paths.get("docs","mera_hub","slice4_nogeography_twospecies").resolve("results");
-       // Path mainDirectory = Paths.get("docs","mera_hub","slice5_yesgeography_twospecies").resolve("results");
-
-
-        Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list_faster.csv");
-        Path pathToOutput = mainDirectory.resolve("policy_monitored");
-
-
+        Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve(scenarioListName);
         final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = new LinkedHashMap<>();
         //adding additional startables!
-        for (Map.Entry<String, AlgorithmFactory<? extends AdditionalStartable>> policyFactory : selectedPolicies.entrySet()) {
+        for (Map.Entry<String, AlgorithmFactory<? extends AdditionalStartable>> policyFactory : policies.entrySet()) {
             adjustedPolicies.put(
                     policyFactory.getKey(),
                     new AlgorithmFactory<AdditionalStartable>() {
@@ -153,12 +145,93 @@ public class Mera718Policy {
             );
         }
         MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
-                pathToOutput,
-                adjustedPolicies, 50, COLUMNS_TO_PRINT, null);
+                                               pathToOutput,
+                                               adjustedPolicies, 50, COLUMNS_TO_PRINT, null);
 
+    }
+
+    public static void main(String[] args) throws IOException {
+
+//        run(Paths.get("docs", "mera_hub", "slice4_nogeography_twospecies").resolve("results"),
+//            Paths.get("docs","mera_hub","additional_runs","slice4"),
+//            "scenario_list_faster.csv",
+//            selectedPolicies
+//            );
+
+
+//        run(Paths.get("docs", "mera_hub", "slice5_yesgeography_twospecies").resolve("results"),
+//            Paths.get("docs","mera_hub","additional_runs","slice5"),
+//            "scenario_list.csv",
+//            selectedPolicies
+//            );
+
+//        run(Paths.get("docs", "mera_hub", "slice3_yesgeography_onespecies").resolve("results"),
+//            Paths.get("docs","mera_hub","additional_runs","slice3"),
+//            "scenario_list.csv",
+//            selectedPolicies
+//            );
+//
+        run(Paths.get("docs", "mera_hub", "slice2_nogeography_onespecies").resolve("results"),
+            Paths.get("docs","mera_hub","additional_runs","slice2"),
+            "scenario_list.csv",
+            selectedPolicies
+            );
 
 
     }
 
+
+
+//
+//    public static void main(String[] args) throws IOException {
+//
+//
+//
+//
+//        Path mainDirectory = Paths.get("docs","mera_hub","slice4_nogeography_twospecies").resolve("results");
+//       // Path mainDirectory = Paths.get("docs","mera_hub","slice5_yesgeography_twospecies").resolve("results");
+//
+//
+//        Path pathToScenarioFiles = mainDirectory.resolve("scenarios").resolve("scenario_list_faster.csv");
+//        Path pathToOutput = mainDirectory.resolve("policy_monitored");
+//
+//
+//        final LinkedHashMap<String, AlgorithmFactory<? extends AdditionalStartable>> adjustedPolicies = new LinkedHashMap<>();
+//        //adding additional startables!
+//        for (Map.Entry<String, AlgorithmFactory<? extends AdditionalStartable>> policyFactory : selectedPolicies.entrySet()) {
+//            adjustedPolicies.put(
+//                    policyFactory.getKey(),
+//                    new AlgorithmFactory<AdditionalStartable>() {
+//                        @Override
+//                        public AdditionalStartable apply(FishState fishState) {
+//                            //2. pull up delegate regulation for active agents (keep inactive agents off)
+//                            for (Fisher fisher : fishState.getFishers()) {
+//                                assert fisher.getRegulation() instanceof OffSwitchDecorator;
+//                                fisher.setRegulation(new Anarchy());
+//                            }
+//                            //need to change the factory too...
+//                            final AlgorithmFactory<? extends Regulation> newReg =
+//                                    new AnarchyFactory();
+//                            fishState.getFisherFactory("population0").setRegulations(newReg);
+//
+//                            AbundanceGathererBuilder builder = new AbundanceGathererBuilder();
+//                            builder.setObservationDay(364);
+//                            builder.apply(fishState);
+//
+//                            return policyFactory.getValue().apply(fishState);
+//
+//
+//                        }
+//                    }
+//            );
+//        }
+//        MeraOneSpeciesSlice1.runSetOfScenarios(pathToScenarioFiles,
+//                pathToOutput,
+//                adjustedPolicies, 50, COLUMNS_TO_PRINT, null);
+//
+//
+//
+//    }
+//
 
 }

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
 /**
@@ -58,6 +59,17 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     private final double totalCarryingCapacity;
     private boolean lost;
 
+    /**
+     * if this is set to anything more than 0, it means it'll stop attracting fish after this many days
+     */
+    private int daysBeforeTurningOff=-1;
+
+    /**
+     * as long as it is active and the totalCarryingCapacity is above 0, this will attract fish
+     */
+    private boolean isActive = true;
+
+
     public Fad(
         final FadManager<B, F> owner,
         final B biology,
@@ -76,6 +88,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         this.locationDeployed = locationDeployed;
         this.totalCarryingCapacity = totalCarryingCapacity;
         this.lost = false;
+        this.isActive = totalCarryingCapacity>0;
     }
 
     public long getId() {
@@ -168,11 +181,40 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         return totalCarryingCapacity;
     }
 
+    /**
+     * basically asks if this is a dud or deactivated or in any other way whether it can hypothetically attract more fish
+     * (without considering whether it is "full")
+     * @return true when the fad is functioning and is able to attract fish
+     */
+    public boolean canAttractFish(){
+        return isActive;
+    }
+
     public boolean isLost() {
         return lost;
     }
 
     public void lose(){
         lost = true;
+        isActive=false;
+    }
+
+    /**
+     * checks for expiration
+     * @param fishState
+     */
+    public void reactToStep(FishState fishState) {
+        if(isActive && daysBeforeTurningOff>0){
+            if((fishState.getDay() - this.stepDeployed/fishState.getStepsPerDay())>daysBeforeTurningOff)
+                isActive = false;
+        }
+    }
+
+    public int getDaysBeforeTurningOff() {
+        return daysBeforeTurningOff;
+    }
+
+    public void setDaysBeforeTurningOff(int daysBeforeTurningOff) {
+        this.daysBeforeTurningOff = daysBeforeTurningOff;
     }
 }

@@ -31,7 +31,7 @@ interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
 
     @Nullable
     default WeightedObject<B> attract(B seaTileBiology, F fad){
-        if(fad.getTotalCarryingCapacity()<=0)
+        if(!fad.canAttractFish())
             return null;
         else
             return attractImplementation(seaTileBiology, fad);

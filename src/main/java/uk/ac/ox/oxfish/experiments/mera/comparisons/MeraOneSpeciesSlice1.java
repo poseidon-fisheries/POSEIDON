@@ -1,15 +1,20 @@
 package uk.ac.ox.oxfish.experiments.mera.comparisons;
 
 import com.beust.jcommander.internal.Lists;
+import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataPolicy;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.QuotaLimitDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.QuotaLimitDecoratorFactory;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
+import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
@@ -926,6 +931,10 @@ public class MeraOneSpeciesSlice1 {
         ALL_OF_THEM.putAll(TAC_ADAPTIVE_ITARGET);
         ALL_OF_THEM.putAll(ITEWRONG);
         ALL_OF_THEM.putAll(LTARGETE);
+        ALL_OF_THEM.put("MRreal",
+                        fishState -> buildMarineProtectedArea()
+
+        );
 
         for (String policy : selectedPolicies) {
             SELECTED.put(policy,ALL_OF_THEM.get(policy));
@@ -1124,6 +1133,25 @@ public class MeraOneSpeciesSlice1 {
             //also change the rule to all existing agents!
             for (Fisher fisher : model.getFishers()) {
                 fisher.setRegulation(factory.apply(model));
+            }
+        };
+    }
+
+
+    @NotNull
+    public static AdditionalStartable buildMarineProtectedArea() {
+        return model -> {
+
+            //randomly protect some areas...
+            double probabilityOfEachCellBeingClosed = model.getRandom().nextDouble() * .40; //40% looks like the maximum in MERA
+
+            for (SeaTile seaTile : model.getMap().getAllSeaTilesExcludingLandAsList()) {
+                if(model.getRandom().nextBoolean(probabilityOfEachCellBeingClosed))
+                    seaTile.assignMpa(NauticalMap.MPA_SINGLETON);
+            }
+            //also change the rule to all existing agents!
+            for (Fisher fisher : model.getFishers()) {
+                fisher.setRegulation(new ProtectedAreasOnly());
             }
         };
     }

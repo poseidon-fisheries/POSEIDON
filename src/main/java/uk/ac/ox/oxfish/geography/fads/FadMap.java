@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
@@ -87,6 +85,7 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
         final FishState fishState = (FishState) simState;
         driftingObjectsMap.applyDrift(fishState.getStep());
         allFads().forEach(fad -> {
+            fad.reactToStep(fishState);
             final Optional<B> seaTileBiology = getFadTile(fad).flatMap(this::getTileBiology);
             if (seaTileBiology.isPresent()) {
                 fad.aggregateFish(seaTileBiology.get(), globalBiology);

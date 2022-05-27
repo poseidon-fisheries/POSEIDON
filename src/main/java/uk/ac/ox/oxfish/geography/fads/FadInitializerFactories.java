@@ -38,6 +38,7 @@ public class FadInitializerFactories {
         NAMES.put(BiomassFadInitializerFactory.class, "Biomass FAD Initializer");
 
         NAMES.put(AbundanceFadInitializerBetaFactory.class, "Abundance FAD Beta Initializer");
+        NAMES.put(AbundanceFadInitializerBetaFactoryWithExpiration.class, "Abundance FAD Beta Initializer With Expiration");
         NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
         NAMES.put(WeibullLinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
 

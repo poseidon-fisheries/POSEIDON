@@ -187,6 +187,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 //add
                 DolphinSetLocationValues locations =
                         (DolphinSetLocationValues) locationValues.get(DolphinSetLocationValues.class);
+                if(locations.getValues().size()==0)
+                    System.out.println(fisher + " failed to create DEL location values, in spite of having" +
+                                               "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(ActionType.DolphinSets,
                         actionWeight.getValue());
                 planModules.put(ActionType.DolphinSets,
@@ -205,6 +208,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
                 DeploymentLocationValues locations =
                         (DeploymentLocationValues) locationValues.get(DeploymentLocationValues.class);
+                if(locations.getValues().size()==0)
+                    System.out.println(fisher + " failed to create DPL location values, in spite of having" +
+                                               "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(ActionType.DeploymentAction,
                         actionWeight.getValue()*deploymentBias);
                 planModules.put(ActionType.DeploymentAction,

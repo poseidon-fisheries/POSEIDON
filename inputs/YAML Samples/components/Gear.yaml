@@ -142,28 +142,45 @@ Biomass Purse Seine Gear:
   destinationDistanceExponent: 1.0
   dolphinSetObservers: !!set {
     }
-  dolphinSetTimeSinceLastVisitLogisticMidpoint: 5.0
-  dolphinSetTimeSinceLastVisitLogisticSteepness: 1.0
+  dolphinSetTimeSinceLastVisitModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
   fadDeploymentObservers: !!set {
     }
-  fadDeploymentPctActiveFadsLimitLogisticMidpoint: 0.5
-  fadDeploymentPctActiveFadsLimitLogisticSteepness: 1.0
+  fadDeploymentPctActiveFadsLimitModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  fadInitializerFactory: null
   fadSetObservers: !!set {
     }
   locationValuesFile: inputs/epo/location_values.csv
   nonAssociatedSetObservers: !!set {
     }
-  nonAssociatedSetTimeSinceLastVisitLogisticMidpoint: 5.0
-  nonAssociatedSetTimeSinceLastVisitLogisticSteepness: 1.0
-  numFadsInStockLogisticMidpoint: 5.0
-  numFadsInStockLogisticSteepness: 1.0
-  opportunisticFadSetTimeSinceLastVisitLogisticMidpoint: 5.0
-  opportunisticFadSetTimeSinceLastVisitLogisticSteepness: 1.0
-  pctHoldSpaceLeftLogisticMidpoint: 0.9
-  pctHoldSpaceLeftLogisticSteepness: 1.7976931348623157E308
-  pctSetsRemainingLogisticMidpoint: 0.5
-  pctSetsRemainingLogisticSteepness: 1.0
-  pctTravelTimeLeftLogisticMidpoint: 0.9
-  pctTravelTimeLeftLogisticSteepness: 1.7976931348623157E308
+  nonAssociatedSetTimeSinceLastVisitModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  numFadsInStockModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  opportunisticFadSetTimeSinceLastVisitModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  pctHoldSpaceLeftModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  pctSetsRemainingModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
+  pctTravelTimeLeftModulationFunction:
+    Compressed Exponential Function:
+      coefficient: 1.0E-6
+      exponent: 2.0
   successfulSetProbability: '0.9231701'
 -------

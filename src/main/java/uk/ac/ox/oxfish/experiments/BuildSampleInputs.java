@@ -60,6 +60,7 @@ public class  BuildSampleInputs
         //start with each Scenario; populate them with the standard variables
         for(Supplier<Scenario> scenario : Scenarios.SCENARIOS.values())
         {
+            System.out.println(scenario.get().toString());
             String name = Scenarios.SCENARIOS.inverse().get(scenario);
             final Path file = directory.resolve(name+ ".yaml");
             final String dump = yaml.dump(scenario.get());
