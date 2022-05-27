@@ -112,6 +112,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
             getPurseSeineGearFactory().getFadDeploymentObservers()
                 .addAll(monitors.getFadDeploymentMonitors());
+            getPurseSeineGearFactory().getAllSetsObservers()
+                .addAll(monitors.getAllSetsMonitors());
             getPurseSeineGearFactory().getFadSetObservers()
                 .addAll(monitors.getFadSetMonitors());
             getPurseSeineGearFactory().getNonAssociatedSetObservers()
@@ -121,7 +123,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             getPurseSeineGearFactory().setBiomassLostMonitor(monitors.getBiomassLostMonitor());
             getPurseSeineGearFactory().setLocationValuesFile(getLocationValuesFilePath());
         }
-        ;
 
         return new ScenarioPopulation(
             new ArrayList<>(),

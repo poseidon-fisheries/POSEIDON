@@ -155,11 +155,11 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 Paths.get(
                     System.getProperty("user.home"),
                     "workspace", "tuna", "calibration", "results",
-                    "cenv0729", "2022-05-23_23.01.30_global_calibration",
+                    "cenv0729", "2022-05-24_18.49.48_global_calibration",
                     "calibrated_scenario.yaml"
                 ).toFile();
 
-            addCsvLogger(Level.DEBUG, "potential_actions", "action,initial,modulated,weighted");
+            //addCsvLogger(Level.DEBUG, "potential_actions", "action,initial,modulated,weighted");
             new FishYAML().dump(scenario, new FileWriter(scenarioFile));
             fishState.setScenario(scenario);
             fishState.start();
@@ -167,6 +167,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 System.out.println("Step: " + fishState.getStep());
                 fishState.schedule.step(fishState);
             }
+            System.out.println("Done.");
         } catch (final IOException e) {
             e.printStackTrace();
         }

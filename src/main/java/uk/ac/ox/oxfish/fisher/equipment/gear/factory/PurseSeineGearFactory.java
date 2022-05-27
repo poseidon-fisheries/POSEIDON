@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -71,30 +72,28 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
-
+    @SuppressWarnings("rawtypes")
+    private Set<Observer<AbstractSetAction>> allSetsObservers = new LinkedHashSet<>();
+    @SuppressWarnings("rawtypes")
+    private final CacheByFishState<Set<Observer<AbstractSetAction>>>
+        allSetsObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(allSetsObservers));
     @SuppressWarnings("rawtypes")
     private Set<Observer<AbstractFadSetAction>> fadSetObservers = new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<AbstractFadSetAction>>>
         fadSetObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
-
     @SuppressWarnings("rawtypes")
     private Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers =
         new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>>
         nonAssociatedSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(nonAssociatedSetObservers));
-
     @SuppressWarnings("rawtypes")
     private Set<Observer<DolphinSetAction>> dolphinSetObservers = new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
-
     private double decayRateOfOpportunisticFadSetLocationValues = 0.6563603233600155;
     private double decayRateOfNonAssociatedSetLocationValues = 0.0;
     private double decayRateOfDolphinSetLocationValues = 1.2499749999999998;
@@ -106,7 +105,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
     private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
-
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
         new LogisticFunctionFactory(0.15670573908905225, 5);
@@ -133,6 +131,18 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
+
+    @SuppressWarnings("rawtypes")
+    public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return allSetsObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.allSetsObservers = allSetsObservers;
+    }
 
     public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
         return opportunisticFadSetTimeSinceLastVisitModulationFunction;
@@ -358,6 +368,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
+            allSetsObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
             dolphinSetObserversCache.get(fishState),

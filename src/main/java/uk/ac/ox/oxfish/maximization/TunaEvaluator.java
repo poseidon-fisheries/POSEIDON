@@ -30,7 +30,7 @@ public class TunaEvaluator implements Runnable {
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna", "calibration", "results",
-        "cenv0729", "2022-05-23_23.01.30_global_calibration"
+        "cenv0729", "2022-05-24_18.49.48_global_calibration"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;

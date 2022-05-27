@@ -67,12 +67,12 @@ public class Monitors {
 
     private final RegionalDivision regionalDivision;
     private final Collection<Monitor<FadDeploymentAction, ?, ?>> fadDeploymentMonitors;
+    private final Collection<Monitor<AbstractSetAction, ?, ?>> allSetsMonitors;
     private final Collection<Monitor<AbstractFadSetAction, ?, ?>> fadSetMonitors;
     private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> nonAssociatedSetMonitors;
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
-
     public Monitors(final FishState fishState) {
 
         regionalDivision = new TicTacToeRegionalDivision(fishState.getMap());
@@ -129,6 +129,14 @@ public class Monitors {
             )
         );
 
+        allSetsMonitors = ImmutableList.of(
+            makeCatchFromSetAccumulator(
+                fishState,
+                "catches",
+                SummingAccumulator::new
+            )
+        );
+
         fadSetMonitors = ImmutableList.of(
             this.makeActionCounter("FAD sets"),
             catchFromFadSetsMonitor,
@@ -156,11 +164,8 @@ public class Monitors {
                 "sets on FADs deployed during current trip",
                 EVERY_YEAR,
                 regionalDivision,
-                region -> fadSet -> {
-                    return fadSet.getFisher() != null &&
-                            fadSet.getFisher().getCurrentTrip() == fadSet.getFad()
-                            .getTripDeployed();
-                },
+                region -> fadSet -> fadSet.getFisher() != null &&
+                    fadSet.getFisher().getCurrentTrip() == fadSet.getFad().getTripDeployed(),
                 ProportionAccumulator::new,
                 ONE,
                 "Proportion of sets"
@@ -267,12 +272,17 @@ public class Monitors {
     public Iterable<Monitor<?, ?, ?>> getMonitors() {
         return concat(
             fadDeploymentMonitors,
+            allSetsMonitors,
             fadSetMonitors,
             nonAssociatedSetMonitors,
             dolphinSetMonitors,
             ImmutableList.of(biomassLostMonitor),
             otherMonitors
         );
+    }
+
+    public Collection<Monitor<AbstractSetAction, ?, ?>> getAllSetsMonitors() {
+        return allSetsMonitors;
     }
 
     public Collection<Monitor<FadDeploymentAction, ?, ?>> getFadDeploymentMonitors() {

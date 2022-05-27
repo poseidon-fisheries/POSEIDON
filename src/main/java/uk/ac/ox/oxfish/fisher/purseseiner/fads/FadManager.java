@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -85,6 +86,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
                 ImmutableSet.of(),
                 ImmutableSet.of(),
                 ImmutableSet.of(),
+                ImmutableSet.of(),
                 Optional.empty(),
                 new ActiveActionRegulations()
         );
@@ -100,6 +102,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
             final FadMap<B, F> fadMap,
             final FadInitializer<B, F> fadInitializer,
             final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
+            final Iterable<Observer<AbstractSetAction>> allSetsObservers,
             final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
             final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
             final Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
@@ -115,6 +118,12 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
                 FadDeploymentAction.class,
                 observer
         ));
+        allSetsObservers.forEach(observer -> {
+            registerObserver(FadSetAction.class, observer);
+            registerObserver(OpportunisticFadSetAction.class, observer);
+            registerObserver(NonAssociatedSetAction.class, observer);
+            registerObserver(DolphinSetAction.class, observer);
+        });
         fadSetObservers.forEach(observer -> {
             registerObserver(FadSetAction.class, observer);
             registerObserver(OpportunisticFadSetAction.class, observer);
