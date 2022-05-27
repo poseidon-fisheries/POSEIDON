@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Comparator.comparingDouble;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
@@ -39,7 +38,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
-import java.util.stream.Stream;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
