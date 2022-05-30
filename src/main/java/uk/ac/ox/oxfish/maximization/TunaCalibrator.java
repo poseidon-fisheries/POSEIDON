@@ -44,8 +44,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class TunaCalibrator implements Runnable {
 
     static final int MAX_PROCESSORS_TO_USE = getRuntime().availableProcessors();
-    static final int DEFAULT_POPULATION_SIZE = 100;
-    static final int MAX_FITNESS_CALLS = 5000;
+    static final int DEFAULT_POPULATION_SIZE = 50;
+    static final int MAX_FITNESS_CALLS = 1000;
     static final int DEFAULT_RANGE = 10;
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
@@ -82,6 +82,11 @@ public class TunaCalibrator implements Runnable {
     public static void main(final String[] args) {
 
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
+        addCsvLogger(
+            Level.DEBUG,
+            "calibration_error",
+            "time,error"
+        );
         addCsvLogger(
             Level.DEBUG,
             "run_timer",
