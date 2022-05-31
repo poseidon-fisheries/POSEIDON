@@ -45,7 +45,7 @@ public class TripRecord {
 	 * the simulation time (day) of the trip
 	 */
 	
-	private int tripDate;
+	private int tripDay;
 	
     /**
      * how long did the trip take
@@ -122,7 +122,7 @@ public class TripRecord {
         earningsPerSpecie = new double[numberOfSpecies];
         totalCatch = new double[numberOfSpecies];
         this.hoursSinceLastTrip = hoursSpentAtPort;
-        this.tripDate = day;
+        this.tripDay = day;
     }
 
 
@@ -434,8 +434,8 @@ public class TripRecord {
      * Getter for the date of the trip, the integer day of the simulation
      * @return
      */
-    public int getTripDate(){
-    	return tripDate;
+    public int getTripDay(){
+    	return tripDay;
     }
 
     public void recordGasConsumption(double litersConsumed){

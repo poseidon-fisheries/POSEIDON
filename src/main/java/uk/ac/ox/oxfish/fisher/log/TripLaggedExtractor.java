@@ -29,15 +29,12 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import javax.annotation.Nullable;
 import java.util.DoubleSummaryStatistics;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -93,7 +90,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
         //collect all observations
         for (TripRecord tripRecord : totalLogs) {
             //ignore stuff that is too old
-            if (tripRecord.getTripDate() >= dateToday - 365) {
+            if (tripRecord.getTripDay() >= dateToday - 365) {
                 SeaTile mostFishedTileInTrip = tripRecord.getMostFishedTileInTrip();
                 if(mostFishedTileInTrip==null) //if you failed to fish anywhere, don't bother
                     continue;

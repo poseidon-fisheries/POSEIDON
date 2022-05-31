@@ -111,7 +111,7 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
         final GlobalBiology globalBiology
     ) {
 
-        WeightedObject<AbundanceLocalBiology> attracted = getFishAttractor().attract(seaTileBiology, this);
+        WeightedObject<AbundanceLocalBiology> attracted =attractFish(seaTileBiology);
         if(attracted==null)
             return null;
         if(attracted.getTotalWeight()<0){

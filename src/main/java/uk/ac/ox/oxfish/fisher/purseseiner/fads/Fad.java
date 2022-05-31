@@ -95,8 +95,8 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         return id;
     }
 
-    public FishAttractor<B, F> getFishAttractor() {
-        return fishAttractor;
+    protected WeightedObject<B> attractFish(B seaTileBiology){
+        return fishAttractor.attract(seaTileBiology, (F) this);
     }
 
     @Nullable

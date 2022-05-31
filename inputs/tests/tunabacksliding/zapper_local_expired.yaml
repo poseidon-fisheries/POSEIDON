@@ -1,0 +1,281 @@
+!!uk.ac.ox.oxfish.maximization.GenericOptimization
+maximization: false
+parameters:
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.additionalHourlyDelayDeployment
+  alwaysPositive: true
+  maximum: 0.8131800000000001
+  minimum: 0.54212
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.additionalHourlyDelayDolphinSets
+  alwaysPositive: true
+  maximum: 6.632639999999999
+  minimum: 4.42176
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.additionalHourlyDelayNonAssociatedSets
+  alwaysPositive: true
+  maximum: 0.001
+  minimum: 0.0
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.distancePenaltyFadSets
+  alwaysPositive: true
+  maximum: 2.943576
+  minimum: 1.9623840000000001
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.hoursWastedOnFailedSearches
+  alwaysPositive: true
+  maximum: 5.654639999999999
+  minimum: 3.7697599999999998
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.minimumValueFadSets
+  alwaysPositive: true
+  maximum: 60000.0
+  minimum: 40000.0
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.minimumValueOpportunisticFadSets
+  alwaysPositive: true
+  maximum: 41952.0
+  minimum: 27968.0
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.ownFadActionWeightBias
+  alwaysPositive: true
+  maximum: 17.245128
+  minimum: 11.496752
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: destinationStrategy.deploymentBias
+  alwaysPositive: true
+  maximum: 4.521359999999999
+  minimum: 3.0142399999999996
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter
+  addressToModify: destinationStrategy.minimumPercentageOfTripDurationAllowed
+  alwaysPositive: true
+  hardMaximum: 1.0
+  hardMinimum: 0.0
+  maximum: 1.0330139999999999
+  minimum: 0.6886760000000001
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.compressionExponents~Bigeye tuna
+  alwaysPositive: true
+  maximum: 6.153420000000001
+  minimum: 4.10228
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.compressionExponents~Skipjack tuna
+  alwaysPositive: true
+  maximum: 3.8017199999999995
+  minimum: 2.5344800000000003
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.compressionExponents~Yellowfin tuna
+  alwaysPositive: true
+  maximum: 4.116
+  minimum: 2.744
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.attractableBiomassCoefficients~Bigeye tuna
+  alwaysPositive: true
+  maximum: 0.32976000000000005
+  minimum: 0.21984000000000004
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.attractableBiomassCoefficients~Skipjack tuna
+  alwaysPositive: true
+  maximum: 0.7535400000000001
+  minimum: 0.5023600000000001
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.attractableBiomassCoefficients~Yellowfin
+    tuna
+  alwaysPositive: true
+  maximum: 1.2
+  minimum: 0.8
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.biomassInteractionsCoefficients~Bigeye tuna
+  alwaysPositive: true
+  maximum: 0.87576
+  minimum: 0.58384
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.biomassInteractionsCoefficients~Skipjack
+    tuna
+  alwaysPositive: true
+  maximum: 0.001
+  minimum: 0.0
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.biomassInteractionsCoefficients~Yellowfin
+    tuna
+  alwaysPositive: true
+  maximum: 1.2
+  minimum: 0.8
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.growthRates~Bigeye tuna
+  alwaysPositive: true
+  maximum: 0.8430000000000001
+  minimum: 0.5620000000000002
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.growthRates~Skipjack tuna
+  alwaysPositive: true
+  maximum: 1.2
+  minimum: 0.8
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.growthRates~Yellowfin tuna
+  alwaysPositive: true
+  maximum: 0.9498000000000001
+  minimum: 0.6332000000000001
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.fishReleaseProbabilityInPercent
+  alwaysPositive: true
+  maximum: 1.5771600004114201
+  minimum: 1.0514400002742803
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter
+  addressToModify: fadInitializerFactory.parameterAlpha
+  alwaysPositive: true
+  hardMaximum: 10.0
+  hardMinimum: 0.0
+  maximum: 1.33982526
+  minimum: 0.89321684
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter
+  addressToModify: fadInitializerFactory.parameterBeta
+  alwaysPositive: true
+  hardMaximum: 12.0
+  hardMinimum: 0.0
+  maximum: 11.05632
+  minimum: 7.37088
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter
+  addressToModify: fadInitializerFactory.totalCarryingCapacity
+  alwaysPositive: true
+  maximum: 431388.6
+  minimum: 287592.4
+  rawNumber: false
+- !!uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter
+  addressToModify: fadInitializerFactory.daysOfFadActivity
+  alwaysPositive: true
+  hardMaximum: 200.0
+  hardMinimum: 10.0
+  maximum: 84.48899999999999
+  minimum: 56.326
+  rawNumber: false
+runsPerSetting: 1
+scenarioFile: inputs/tests/tunabacksliding/base_scenario.yaml
+simulatedYears: 2
+targets:
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Number of FAD deployments
+  fixedTarget: 20497.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Number of sets on own FADs
+  fixedTarget: 7799.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Number of sets on others' FADs
+  fixedTarget: 2845.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Number of non-associated sets
+  fixedTarget: 5220.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Number of dolphin sets
+  fixedTarget: 8864.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Bigeye tuna catches from sets on own FADs
+  fixedTarget: 4.6648383E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Bigeye tuna catches from non-associated sets
+  fixedTarget: 1577000.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Bigeye tuna catches from sets on others' FADs
+  fixedTarget: 1.5766617E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Skipjack tuna catches from dolphin sets
+  fixedTarget: 1631000.0
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Skipjack tuna catches from sets on own FADs
+  fixedTarget: 1.4222334E8
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Skipjack tuna catches from non-associated sets
+  fixedTarget: 8.6583E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Skipjack tuna catches from sets on others' FADs
+  fixedTarget: 4.6522663E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Yellowfin tuna catches from dolphin sets
+  fixedTarget: 1.09806E8
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Yellowfin tuna catches from sets on own FADs
+  fixedTarget: 3.7821723E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Yellowfin tuna catches from non-associated sets
+  fixedTarget: 2.7232E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Sum of Yellowfin tuna catches from sets on others' FADs
+  fixedTarget: 1.4048277E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Average Trip Duration
+  fixedTarget: 823.2038601
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Bigeye tuna Catches (kg)
+  fixedTarget: 6.3993E7
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Skipjack tuna Catches (kg)
+  fixedTarget: 2.7696E8
+  verbose: false
+  weight: 1.0
+- !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
+  columnName: Yellowfin tuna Catches (kg)
+  fixedTarget: 1.88908E8
+  verbose: false
+  weight: 1.0
+translateNANto: 1.0E7

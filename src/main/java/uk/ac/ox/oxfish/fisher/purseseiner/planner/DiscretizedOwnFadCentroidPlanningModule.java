@@ -59,7 +59,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
     public DiscretizedOwnFadCentroidPlanningModule(
             MapDiscretization discretization,
             double minimumValueOfFadBeforeBeingPickedUp) {
-       this(discretization,minimumValueOfFadBeforeBeingPickedUp,1.0);
+        this(discretization,minimumValueOfFadBeforeBeingPickedUp,1.0);
     }
 
     public DiscretizedOwnFadCentroidPlanningModule(
@@ -68,7 +68,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
             double distancePenalty) {
         this.optionsGenerator =
                 new OwnFadSetDiscretizedActionGenerator(discretization,
-                        minimumValueOfFadBeforeBeingPickedUp);
+                                                        minimumValueOfFadBeforeBeingPickedUp);
         this.distancePenalty = distancePenalty;
     }
 
@@ -85,7 +85,9 @@ public class DiscretizedOwnFadCentroidPlanningModule
         //if there is only one option, also don't bother
         if(options.size()==1)
         {
-            return optionsGenerator.chooseFad(options.get(0).getSecond());
+            if(options.get(0).getSecond()>0)
+                return optionsGenerator.chooseFad(options.get(0).getSecond());
+            else return null;
         }
 
         //find which seatile the centroid belongs to (the centroid is the middle of a path so a convex operation
@@ -99,7 +101,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
         for (Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> option : options) {
             double hoursSpentTravellingToThere =
                     map.distance(centroid,option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
-            assert option.getFirst().getSecond()>0;
+            assert option.getFirst().getSecond()>=0;
             double currentDiscountValue = option.getFirst().getSecond() /
                     Math.pow(hoursSpentTravellingToThere+1,distancePenalty);
             if(currentDiscountValue>= discountedValue)
@@ -109,8 +111,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
             }
         }
 
-        assert fadGroupChosen!=null;
-        //failure here todo figure this out
+        //all fads are empty, don't bother setting on any!
         if(fadGroupChosen==null || fadGroupChosen<0 || fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
             return null;
         return optionsGenerator.chooseFad(fadGroupChosen);
@@ -128,7 +129,7 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
     @Override
     public void turnOff(Fisher fisher) {
-      map=null;
+        map=null;
 
     }
 

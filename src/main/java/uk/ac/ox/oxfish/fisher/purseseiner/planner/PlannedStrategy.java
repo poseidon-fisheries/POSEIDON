@@ -101,7 +101,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
     private void replan(Fisher fisher, FishState state){
         assert fisher.getCurrentTrip() != null;
-        assert fisher.getCurrentTrip().getDurationInHours() > 0;
+        assert fisher.getCurrentTrip().getTripDay() <= state.getDay();
         assert !fisher.getCurrentTrip().isCompleted();
 
         //asked to replan, let's do it
@@ -150,7 +150,13 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         assert !doIJustWantToGoHome(agent);
 
         //this gets called by arrival, so we have to make sure we are where we want to be
-        assert agent.getLocation() == actionInProgress.getLocation();
+        assert agent.getLocation() == actionInProgress.getLocation() ||
+                //there is an exception here when we have just finished setting on a fad
+                //which gets then destroyed: then the action location is null
+                actionQueueInProgress[actionQueueIndex] instanceof FadSetAction && actionInProgress instanceof PlannedAction.FadSet
+                ;
+
+
         //we may have just arrived, if so get the queue of actions we need to take
         if(actionQueueInProgress == null)
             actionQueueInProgress = actionInProgress.actuate(agent);

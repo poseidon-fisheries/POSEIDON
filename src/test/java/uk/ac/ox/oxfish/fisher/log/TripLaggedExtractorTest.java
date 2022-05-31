@@ -62,25 +62,25 @@ public class TripLaggedExtractorTest {
         LinkedList<TripRecord> records = new LinkedList<>();
         //trip 1: tile 1, 10$, day 500
         TripRecord record1 = mock(TripRecord.class);
-        when(record1.getTripDate()).thenReturn(500);
+        when(record1.getTripDay()).thenReturn(500);
         when(record1.getProfitPerHour(true)).thenReturn(10d);
         when(record1.getMostFishedTileInTrip()).thenReturn(tile1);
         records.add(record1);
         //trip 2: tile 1, 100$, day 500
         TripRecord record2 = mock(TripRecord.class);
-        when(record2.getTripDate()).thenReturn(500);
+        when(record2.getTripDay()).thenReturn(500);
         when(record2.getProfitPerHour(true)).thenReturn(100d);
         when(record2.getMostFishedTileInTrip()).thenReturn(tile1);
         records.add(record2);
         //trip 3: tile 2, 100$, day 500
         TripRecord record3 = mock(TripRecord.class);
-        when(record3.getTripDate()).thenReturn(500);
+        when(record3.getTripDay()).thenReturn(500);
         when(record3.getProfitPerHour(true)).thenReturn(10d);
         when(record3.getMostFishedTileInTrip()).thenReturn(tile2);
         records.add(record3);
         //trip 4: tile 2, 100$, day 5
         TripRecord record4 = mock(TripRecord.class);
-        when(record4.getTripDate()).thenReturn(500);
+        when(record4.getTripDay()).thenReturn(500);
         when(record4.getProfitPerHour(true)).thenReturn(10d);
         when(record4.getMostFishedTileInTrip()).thenReturn(tile2);
         records.add(record4);
@@ -144,26 +144,26 @@ public class TripLaggedExtractorTest {
         LinkedList<TripRecord> records = new LinkedList<>();
         //trip 1: tile 1, 10$, day 500
         TripRecord record1 = mock(TripRecord.class);
-        when(record1.getTripDate()).thenReturn(500);
+        when(record1.getTripDay()).thenReturn(500);
         when(record1.getProfitPerHour(true)).thenReturn(10d);
         when(record1.getMostFishedTileInTrip()).thenReturn(tile1);
         records.add(record1);
         //trip 2: tile 1, 100$, day 500
         TripRecord record2 = mock(TripRecord.class);
-        when(record2.getTripDate()).thenReturn(500);
+        when(record2.getTripDay()).thenReturn(500);
         when(record2.getProfitPerHour(true)).thenReturn(100d);
         when(record2.getMostFishedTileInTrip()).thenReturn(tile1);
         records.add(record2);
         LinkedList<TripRecord> records2 = new LinkedList<>();
         //trip 3: tile 2, 100$, day 500
         TripRecord record3 = mock(TripRecord.class);
-        when(record3.getTripDate()).thenReturn(500);
+        when(record3.getTripDay()).thenReturn(500);
         when(record3.getProfitPerHour(true)).thenReturn(10d);
         when(record3.getMostFishedTileInTrip()).thenReturn(tile2);
         records2.add(record3);
         //trip 4: tile 2, 100$, day 5
         TripRecord record4 = mock(TripRecord.class);
-        when(record4.getTripDate()).thenReturn(500);
+        when(record4.getTripDay()).thenReturn(500);
         when(record4.getProfitPerHour(true)).thenReturn(10d);
         when(record4.getMostFishedTileInTrip()).thenReturn(tile2);
         records2.add(record4);

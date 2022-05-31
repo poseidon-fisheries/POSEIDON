@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import ec.util.MersenneTwisterFast;
@@ -29,13 +28,10 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.log.SharedTripRecord;
-import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -286,7 +282,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         //Now go through the finished trips and calculate expected catch at all locations 
         for(TripRecord trip: fisher.getFinishedTrips()){
         	//Calculate the time scalar for this trip based on the time
-        	int t=model.getDay()-trip.getTripDate();
+        	int t=model.getDay()-trip.getTripDay();
         	double scalar=timeScalar(t);
         	SeaTile tripDestination = trip.getMostFishedTileInTrip();
         	for(ViableDestination viableDestination : viableDestinations){
@@ -313,7 +309,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         		if(!friendSharedTrips.isEmpty()){
 	        		for(SharedTripRecord friendSharedTrip: friendSharedTrips){
 	        			TripRecord trip = friendSharedTrip.getTrip();
-	                	int t=model.getDay()-trip.getTripDate();
+	                	int t=model.getDay()-trip.getTripDay();
 	                	double scalar=timeScalar(t);
 	                	SeaTile tripDestination = trip.getMostFishedTileInTrip();
 	                	for(ViableDestination viableDestination : viableDestinations){

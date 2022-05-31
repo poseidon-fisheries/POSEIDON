@@ -50,6 +50,9 @@ public class AtPort implements Action {
             //departing!
             agent.updateGear(model.getRandom(),model,this);
             agent.updateDestination(model,this);
+            //you can be redirected by the destination strategy to stay at port, check now
+            if(agent.getDestination().equals(agent.getHomePort().getLocation()))
+                return new ActionResult(this,Math.max(0,hoursLeft-1));
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
             agent.undock();
             return new ActionResult(new Moving(),hoursLeft);

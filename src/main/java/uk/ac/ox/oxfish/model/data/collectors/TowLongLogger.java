@@ -61,7 +61,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
 
     @Override
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        int year = (int)(record.getTripDate()/365d);
+        int year = (int)(record.getTripDay()/365d);
 
 
         for (Map.Entry<SeaTile, FishingRecord> fishingRecord : record.getFishingRecords()) {
@@ -70,7 +70,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
                     .append(fishingRecord.getKey().getGridX()).append(",")
                     .append(fishingRecord.getKey().getGridY()).append(",")
                     .append(year).append(",")
-                    .append(record.getTripDate()).append(",")
+                    .append(record.getTripDay()).append(",")
                     .append(String.join(";",fisher.getTags())).append("\n");
         }
 

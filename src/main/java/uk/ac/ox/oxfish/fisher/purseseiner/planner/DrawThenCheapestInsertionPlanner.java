@@ -384,7 +384,10 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             double replacedSegment = map.distance(from.getLocation(),to.getLocation());
 
             double insertionCost = (firstSegment+secondSegment-replacedSegment)/speed; //turn insertion cost into time
-            assert insertionCost >= 0 : "triangle inequality does not seem to hold here. Bizarre";
+            //tricky here because when you add the approximations from the curvature distance, if you are going on a straight line
+            //in the projected map, you may actually be violating by tiny amounts the triangle inequality constraint
+            //but we choose to ignore this
+            assert insertionCost >= -3 : "triangle inequality does not seem to hold here. Bizarre " + insertionCost;
 
             if(insertionCost<bestInsertionCost) {
                 bestInsertionCost = insertionCost;

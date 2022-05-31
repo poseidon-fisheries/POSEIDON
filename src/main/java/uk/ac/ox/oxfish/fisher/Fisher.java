@@ -1602,7 +1602,7 @@ public class Fisher implements Steppable, Startable{
         if(getLastFinishedTrip() == null)
             return false;
 
-        return getLastFinishedTrip().getTripDate()> state.getDay()-364 ||
+        return getLastFinishedTrip().getTripDay()> state.getDay()-364 ||
                 (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
     }
 }

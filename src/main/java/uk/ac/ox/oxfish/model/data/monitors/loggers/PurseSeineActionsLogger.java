@@ -109,7 +109,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
-            this.tripStartStep = currentTrip.getTripDate() * fishState.getStepsPerDay();
+            this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
             if (action instanceof AbstractSetAction) {
                 ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
                     this.bet = catchesKept.getWeightCaught(fishState.getSpecies("Bigeye tuna"));
