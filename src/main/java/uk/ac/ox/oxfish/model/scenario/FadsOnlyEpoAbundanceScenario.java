@@ -63,8 +63,6 @@ import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
@@ -127,21 +125,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
-    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-        new AbundanceMortalityProcessFromFileFactory(
-            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
-        );
-
-    @SuppressWarnings("unused")
-    public AbundanceMortalityProcessFromFileFactory getAbundanceMortalityProcessFactory() {
-        return abundanceMortalityProcessFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
-        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
-    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -151,18 +134,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @SuppressWarnings("unused")
     public void setFadMakerFactory(final AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory) {
         this.fadMakerFactory = fadMakerFactory;
-    }
-
-
-    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
@@ -197,16 +168,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AbundanceRestorerFactory abundanceRestorerFactory
     ) {
         this.abundanceRestorerFactory = abundanceRestorerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")
@@ -287,12 +248,14 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
-        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
-            abundanceMortalityProcessFactory
-        );
+        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
+            instanceof AbundanceMortalityProcessFromFileFactory) {
+            ((AbundanceMortalityProcessFromFileFactory)
+                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
+                .setSpeciesCodes(speciesCodes);
+        }
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -300,14 +263,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
-        initModel(fishState);
+        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
             abundanceFilters =
             abundanceFiltersFactory.apply(fishState);
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
 
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
@@ -326,11 +287,45 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             fishState.registerStartable(startableFactory.apply(fishState))
         );
 
-        return new ScenarioPopulation(
-            ImmutableList.of(),
-            new SocialNetwork(new EmptyNetworkBuilder()),
-            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
+        return scenarioPopulation;
+    }
+
+    @SuppressWarnings("unused")
+    public AbundanceFadMapFactory getFadMapFactory() {
+        return fadMapFactory;
+    }
+
+    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadInitializerFactory(
+        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
+    ) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
+
+    @Override
+    public void useDummyData(final Path testPath) {
+        super.useDummyData(testPath);
+        fadMapFactory.setCurrentFiles(
+            ImmutableMap.of(
+                Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_monthly.csv"),
+                Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_monthly.csv")
+            )
         );
+        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
+            testPath.resolve("dummy_fad_deployments.csv").toString()
+        );
+        ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
+            testPath.resolve("dummy_fad_sets.csv").toString()
+        );
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")
@@ -355,22 +350,5 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory
     ) {
         this.fadSetterFactory = fadSetterFactory;
-    }
-
-    @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
-        fadMapFactory.setCurrentFiles(
-            ImmutableMap.of(
-                Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_monthly.csv"),
-                Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_monthly.csv")
-            )
-        );
-        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
-            testPath.resolve("dummy_fad_deployments.csv").toString()
-        );
-        ((ExogenousFadSetterCSVFactory)fadSetterFactory).setPathToFile(
-            testPath.resolve("dummy_fad_sets.csv").toString()
-        );
     }
 }

@@ -22,10 +22,12 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -40,7 +42,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<FadInitializer<B, F>> {
 
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(2.0);
     private DoubleParameter totalCarryingCapacity = new FixedDoubleParameter(445_000); // TODO
     private Map<String, DoubleParameter> compressionExponents = new HashMap<>();
     private Map<String, DoubleParameter> attractableBiomassCoefficients = new HashMap<>();
@@ -48,7 +50,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
     private SpeciesCodes speciesCodes;
 
-    public FadInitializerFactory(final String... speciesNames) {
+    FadInitializerFactory(final String... speciesNames) {
 
         final Supplier<Map<String, DoubleParameter>> zeros = () ->
             Arrays.stream(speciesNames).collect(toMap(
@@ -61,6 +63,74 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         setAttractableBiomassCoefficients(zeros.get());
         setBiomassInteractionsCoefficients(zeros.get());
         setGrowthRates(zeros.get());
+    }
+
+    FadInitializerFactory(
+        final Map<String, Double> compressionExponents,
+        final Map<String, Double> attractableBiomassCoefficients,
+        final Map<String, Double> biomassInteractionsCoefficients,
+        final Map<String, Double> growthRates
+    ) {
+        setCompressionExponents(wrapParameters(compressionExponents));
+        setAttractableBiomassCoefficients(wrapParameters(attractableBiomassCoefficients));
+        setBiomassInteractionsCoefficients(wrapParameters(biomassInteractionsCoefficients));
+        setGrowthRates(wrapParameters(growthRates));
+    }
+
+    private static ImmutableMap<String, DoubleParameter> wrapParameters(
+        final Map<String, Double> params
+    ) {
+        return params.entrySet().stream().collect(toImmutableMap(
+            Entry::getKey, entry -> new FixedDoubleParameter(entry.getValue())
+        ));
+    }
+
+    FadInitializerFactory() {
+
+        // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
+        setAttractableBiomassCoefficients(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.7697766896339598),
+            "Yellowfin tuna", new FixedDoubleParameter(1.1292389959739901),
+            "Skipjack tuna", new FixedDoubleParameter(0.0)
+        ));
+        setBiomassInteractionsCoefficients(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(1.0184011081061861),
+            "Yellowfin tuna", new FixedDoubleParameter(0.0),
+            "Skipjack tuna", new FixedDoubleParameter(0.7138646301498129)
+        ));
+        setCompressionExponents(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(9.557509707646096),
+            "Yellowfin tuna", new FixedDoubleParameter(10.419783885948643),
+            "Skipjack tuna", new FixedDoubleParameter(9.492481930328207)
+        ));
+        setGrowthRates(ImmutableMap.of(
+            "Bigeye tuna", new FixedDoubleParameter(0.688914118975473),
+            "Yellowfin tuna", new FixedDoubleParameter(0.30133562299610883),
+            "Skipjack tuna", new FixedDoubleParameter(1.25)
+        ));
+    }
+
+    static Map<Species, Double> processParameterMap(
+        final Map<String, DoubleParameter> map,
+        final GlobalBiology globalBiology,
+        final MersenneTwisterFast rng
+    ) {
+        return processParameterMap(map, globalBiology, value -> value.apply(rng));
+    }
+
+    /**
+     * Turns a map from species names to some that to a map from Species objects to some mapping of
+     * the original type.
+     */
+    private static <T, U> Map<Species, U> processParameterMap(
+        final Map<String, T> map,
+        final GlobalBiology globalBiology,
+        final Function<T, U> valueMapper
+    ) {
+        return map.entrySet().stream().collect(toImmutableMap(
+            entry -> globalBiology.getSpecie(entry.getKey()),
+            entry -> valueMapper.apply(entry.getValue())
+        ));
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
@@ -90,7 +160,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         return compressionExponents;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setCompressionExponents(final Map<String, DoubleParameter> compressionExponents) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.compressionExponents = compressionExponents;
@@ -102,7 +172,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         return attractableBiomassCoefficients;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setAttractableBiomassCoefficients(
         final Map<String, DoubleParameter> attractableBiomassCoefficients
     ) {
@@ -116,7 +186,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         return biomassInteractionsCoefficients;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setBiomassInteractionsCoefficients(
         final Map<String, DoubleParameter> biomassInteractionsCoefficients
     ) {
@@ -130,33 +200,10 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         return growthRates;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setGrowthRates(final Map<String, DoubleParameter> growthRates) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.growthRates = growthRates;
-    }
-
-    static Map<Species, Double> processParameterMap(
-        final Map<String, DoubleParameter> map,
-        final GlobalBiology globalBiology,
-        final MersenneTwisterFast rng
-    ) {
-        return processParameterMap(map, globalBiology, value -> value.apply(rng));
-    }
-
-    /**
-     * Turns a map from species names to some that to a map from Species objects to some mapping of
-     * the original type.
-     */
-    private static <T, U> Map<Species, U> processParameterMap(
-        final Map<String, T> map,
-        final GlobalBiology globalBiology,
-        final Function<T, U> valueMapper
-    ) {
-        return map.entrySet().stream().collect(toImmutableMap(
-            entry -> globalBiology.getSpecie(entry.getKey()),
-            entry -> valueMapper.apply(entry.getValue())
-        ));
     }
 
     public SpeciesCodes getSpeciesCodes() {

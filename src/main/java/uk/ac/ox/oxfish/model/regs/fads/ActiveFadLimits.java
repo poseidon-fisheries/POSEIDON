@@ -32,11 +32,11 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
         ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;
 
-    ActiveFadLimits(Iterable<? extends ConditionalLimit> limits) {
+    ActiveFadLimits(final Iterable<? extends ConditionalLimit> limits) {
         this(new ConditionalFisherRelativeLimits(limits));
     }
 
-    private ActiveFadLimits(FisherRelativeLimits limits) {
+    private ActiveFadLimits(final FisherRelativeLimits limits) {
         this.limits = limits;
     }
 

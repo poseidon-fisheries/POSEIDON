@@ -23,9 +23,38 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunction> {
 
-    private double midpoint;
-    private double steepness;
-    private double maximum;
+    private double midpoint = 0.5;
+    private double steepness = 1.0;
+    private double maximum = 1.0;
+    private boolean relativeSteepness = true;
+
+    public LogisticFunctionFactory(final double midpoint, final double steepness) {
+        this(midpoint, steepness, 1.0, true);
+    }
+
+    public LogisticFunctionFactory(
+        final double midpoint,
+        final double steepness,
+        final double maximum,
+        final boolean relativeSteepness
+    ) {
+        this.midpoint = midpoint;
+        this.steepness = steepness;
+        this.maximum = maximum;
+        this.relativeSteepness = relativeSteepness;
+    }
+
+    @SuppressWarnings("unused")
+    public LogisticFunctionFactory() {
+    }
+
+    public boolean isRelativeSteepness() {
+        return relativeSteepness;
+    }
+
+    public void setRelativeSteepness(final boolean relativeSteepness) {
+        this.relativeSteepness = relativeSteepness;
+    }
 
     @SuppressWarnings("unused")
     public double getMidpoint() {
@@ -55,6 +84,10 @@ public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunctio
 
     @Override
     public LogisticFunction apply(final FishState fishState) {
-        return new LogisticFunction(midpoint, steepness, maximum);
+        return new LogisticFunction(
+            midpoint,
+            relativeSteepness ? steepness / midpoint : steepness,
+            maximum
+        );
     }
 }

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -22,6 +23,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -56,7 +58,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -70,34 +72,32 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
-
+    @SuppressWarnings("rawtypes")
+    private Set<Observer<AbstractSetAction>> allSetsObservers = new LinkedHashSet<>();
+    @SuppressWarnings("rawtypes")
+    private final CacheByFishState<Set<Observer<AbstractSetAction>>>
+        allSetsObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(allSetsObservers));
     @SuppressWarnings("rawtypes")
     private Set<Observer<AbstractFadSetAction>> fadSetObservers = new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<AbstractFadSetAction>>>
         fadSetObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
-
     @SuppressWarnings("rawtypes")
     private Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers =
         new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<NonAssociatedSetAction>>>
         nonAssociatedSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(nonAssociatedSetObservers));
-
     @SuppressWarnings("rawtypes")
     private Set<Observer<DolphinSetAction>> dolphinSetObservers = new LinkedHashSet<>();
-
     @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
-
-    private double decayRateOfOpportunisticFadSetLocationValues = 0.01;
-    private double decayRateOfNonAssociatedSetLocationValues = 0.01;
-    private double decayRateOfDolphinSetLocationValues = 0.01;
-    private double decayRateOfDeploymentLocationValues = 0.01;
+    private double decayRateOfOpportunisticFadSetLocationValues = 0.6563603233600155;
+    private double decayRateOfNonAssociatedSetLocationValues = 0.0;
+    private double decayRateOfDolphinSetLocationValues = 1.2499749999999998;
+    private double decayRateOfDeploymentLocationValues = 1.1709955387012643;
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
         ImmutableList.of(new ActiveFadLimitsFactory());
@@ -105,33 +105,44 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
     private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
-
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.15670573908905225, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctSetsRemainingModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         numFadsInStockModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(465.76938287575837, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentPctActiveFadsLimitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.817463635675281, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctTravelTimeLeftModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(0.10183241937374361, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(73.32224086132372, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(51.91162666081563, 5);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetTimeSinceLastVisitModulationFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
-    private double actionDistanceExponent = 1;
-    private double destinationDistanceExponent = 1;
+        new LogisticFunctionFactory(72.28852668100924, 5);
+    private double actionDistanceExponent = 10;
+    private double destinationDistanceExponent = 2;
+
+    @SuppressWarnings("rawtypes")
+    public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return allSetsObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.allSetsObservers = allSetsObservers;
+    }
 
     public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
         return opportunisticFadSetTimeSinceLastVisitModulationFunction;
@@ -357,6 +368,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
+            allSetsObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),
             nonAssociatedSetObserversCache.get(fishState),
             dolphinSetObserversCache.get(fishState),

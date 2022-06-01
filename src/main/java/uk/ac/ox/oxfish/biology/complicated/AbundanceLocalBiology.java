@@ -21,16 +21,22 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Iterables.get;
+import static java.util.Arrays.copyOf;
 import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toCollection;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -54,9 +60,14 @@ public class AbundanceLocalBiology implements LocalBiology
      * the hashmap contains for each species a table [age][male-female] corresponding to the number of fish of that
      * age and that sex
      */
-    private final HashMap<Species,double[][]>  abundance = new HashMap<>();
+    private final HashMap<Species, double[][]> abundance = new HashMap<>();
 
-
+    /**
+     * Private empty constructor used for fast creation by
+     * {@link #aggregate(GlobalBiology, Collection)}.
+     */
+    private AbundanceLocalBiology() {
+    }
 
     /**
      * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
@@ -259,6 +270,59 @@ public class AbundanceLocalBiology implements LocalBiology
                 .toString();
     }
 
+    public static AbundanceLocalBiology aggregate(
+        final GlobalBiology globalBiology,
+        final Collection<AbundanceLocalBiology> biologies
+    ) {
+        if (biologies.isEmpty()) return new AbundanceLocalBiology(globalBiology);
 
+        final AbundanceLocalBiology newBiology = new AbundanceLocalBiology();
+        newBiology.lastComputedBiomass = sumLastComputedBiomasses(biologies);
+
+        // Grab the abundance map from the first biology as a source for number of bins/subdivisions
+        // We don't want to use the GlobalBiology for that as the meristics might not be initialized
+        final Map<Species, double[][]> firstAbundance = get(biologies, 0).abundance;
+        globalBiology.getSpecies().forEach(species -> {
+            final double[][] firstMatrix = firstAbundance.get(species);
+            // Make a deep copy of the matrix
+            final double[][] newMatrix = stream(firstMatrix)
+                .map(a -> copyOf(a, a.length))
+                .toArray(double[][]::new);
+            biologies.stream().skip(1)
+                .map(biology -> biology.abundance.get(species))
+                .forEach(otherMatrix -> {
+                    for (int sub = 0; sub < newMatrix.length; sub++) {
+                        for (int bin = 0; bin < newMatrix[sub].length; bin++) {
+                            newMatrix[sub][bin] += otherMatrix[sub][bin];
+                        }
+                    }
+                });
+            newBiology.abundance.put(species, newMatrix);
+        });
+        return newBiology;
+    };
+
+    /**
+     * Since recomputing biomass is so expensive, we try to take advantage of the
+     * precomputed biomass of the biologies we are aggregating (provided we have them)
+     */
+    private static double [] sumLastComputedBiomasses(
+        final Collection<AbundanceLocalBiology> biologies
+    ) {
+        assert !biologies.isEmpty();
+        final Queue<double[]> biomassArrays = biologies.stream()
+            .map(b -> b.lastComputedBiomass)
+            .collect(toCollection(() -> new ArrayDeque<>(biologies.size())));
+        final double[] newBiomassArray = biomassArrays.remove().clone();
+        for (int i = 0; i < newBiomassArray.length; i++) {
+            for (final double[] biomassArray : biomassArrays) {
+                if (Double.isNaN(newBiomassArray[i])) {
+                    break;
+                }
+                newBiomassArray[i] += biomassArray[i];
+            }
+        }
+        return newBiomassArray;
+    }
 
 }

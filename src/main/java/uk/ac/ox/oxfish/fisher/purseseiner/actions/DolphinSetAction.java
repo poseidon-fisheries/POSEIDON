@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
@@ -26,8 +27,10 @@ public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B>
     public DolphinSetAction(
         final B targetBiology,
         final Fisher fisher,
-        final double setDuration
+        final double setDuration,
+        final Collection<B> sourceBiologies,
+        final CatchMaker<B> catchMaker
     ) {
-        super(targetBiology, fisher, setDuration);
+        super(targetBiology, fisher, setDuration, sourceBiologies, catchMaker);
     }
 }

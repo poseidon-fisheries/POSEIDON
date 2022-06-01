@@ -39,7 +39,7 @@ public class AbundanceMortalityProcessTest {
         proportionalMortalities.add(new double[] {.25,.35});
         proportionalMortalities.add(new double[] {.5,.75});
 
-        TunaMeristics meristics = new TunaMeristics(weights, lengths, proportionalMortalities, new double[]{10,10});
+        TunaMeristics meristics = new TunaMeristics(weights, lengths, new double[]{10,10});
 
         Species species1 = new Species("Piano Tuna", meristics);
 

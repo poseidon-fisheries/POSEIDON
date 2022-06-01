@@ -21,23 +21,36 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
-import uk.ac.ox.oxfish.maximization.generic.*;
+import uk.ac.ox.oxfish.maximization.generic.DataTarget;
+import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 
 public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
@@ -331,6 +344,10 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
                 System.out.println("was NAN!");
                 finalError = translateNANto;
             }
+
+            LogManager.getLogger("calibration_error.csv").debug(
+                new ObjectArrayMessage(System.currentTimeMillis(), finalError)
+            );
 
             System.out.println(Arrays.toString(x) + " ---> " + finalError);
             return new double[]{finalError};

@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -49,6 +50,7 @@ public class FishingStrategies {
         NAMES.put(PurseSeinerBiomassFishingStrategyFactory.class, "Purse Seiner Biomass Fishing Strategy");
         NAMES.put(DefaultToDestinationStrategyFishingStrategyFactory.class,
                 "Default to Destination Strategy");
+        NAMES.put(PurseSeinerAbundanceFishingStrategyFactory.class, "Purse Seiner Abundance Fishing Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

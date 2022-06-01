@@ -1,4 +1,0 @@
-set_type,mean_log_duration_in_hours,standard_deviation_log_in_hours
-DEL,0.975,0.171
-NOA,0.809,0.299
-FAD,0.997,0.235

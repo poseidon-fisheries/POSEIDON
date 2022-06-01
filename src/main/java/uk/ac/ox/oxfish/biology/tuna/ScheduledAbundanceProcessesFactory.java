@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.DAYS;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -49,7 +50,11 @@ public class ScheduledAbundanceProcessesFactory
     private AbundanceReallocator abundanceReallocator;
     private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
 
-    private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory;
+    private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory =
+        new AbundanceMortalityProcessFromFileFactory(
+            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
+            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+        );
 
     /**
      * Empty constructor to allow YAML instantiation.
@@ -103,12 +108,6 @@ public class ScheduledAbundanceProcessesFactory
 
     @Override
     public ScheduledBiologicalProcesses<AbundanceLocalBiology> apply(final FishState fishState) {
-
-        checkNotNull(
-            abundanceMortalityProcessFactory,
-            "setAbundanceMortalityProcessFactory mus be called before using."
-        );
-
         checkNotNull(
             abundanceReallocator,
             "setAbundanceReallocator must be called before using."

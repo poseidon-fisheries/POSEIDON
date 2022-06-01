@@ -87,9 +87,7 @@ public class AbundanceInitializerFactory
                         record.getDouble("male_weight"),
                         record.getDouble("female_length"),
                         record.getDouble("male_length"),
-                        record.getDouble("maturity"),
-                        record.getDouble("female_natural_mortality"),
-                        record.getDouble("male_natural_mortality")
+                        record.getDouble("maturity")
                     ))
                     .collect(toImmutableList())
             ));

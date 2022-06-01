@@ -18,54 +18,81 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceAggregator;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 
 public class PurseSeinerAbundanceFishingStrategyFactory
-        extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad> {
+    extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad> {
 
+    private final AbundanceAggregator biologyAggregator = new AbundanceAggregator();
     private boolean ageBasedSetDecisions = false;
 
     public PurseSeinerAbundanceFishingStrategyFactory() {
         super(AbundanceLocalBiology.class, AbundanceFad.class);
     }
 
-
     @NotNull
     @Override
-    protected PurseSeinerFishingStrategy<AbundanceLocalBiology, AbundanceFad> callConstructor(
-            Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
-            Function<Fisher, SetOpportunityDetector<AbundanceLocalBiology>> opportunityDetector,
-            Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-            double searchActionDecayConstant, double fadDeploymentActionDecayConstant,
-            double movingThreshold) {
-        if(ageBasedSetDecisions)
+    protected PurseSeinerFishingStrategy<AbundanceLocalBiology> callConstructor(
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
+        final Function<Fisher, SetOpportunityDetector<AbundanceLocalBiology>> opportunityDetector,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
+    ) {
+        if (ageBasedSetDecisions) {
             return new AgeBasedPurseSeinerFishingStrategy<>(
-                    attractionWeights,
-                    opportunityDetector,
-                    actionValueFunctions,
-                    searchActionDecayConstant,
-                    fadDeploymentActionDecayConstant,
-                    movingThreshold
+                attractionWeights,
+                opportunityDetector,
+                actionValueFunctions,
+                maxCurrentSpeeds,
+                searchActionDecayConstant,
+                fadDeploymentActionDecayConstant,
+                movingThreshold
             );
-        else
-            return
-                    super.callConstructor(attractionWeights, opportunityDetector, actionValueFunctions,
-                                          searchActionDecayConstant, fadDeploymentActionDecayConstant, movingThreshold);
+        } else {
+            return super.callConstructor(
+                attractionWeights,
+                opportunityDetector,
+                actionValueFunctions,
+                maxCurrentSpeeds,
+                searchActionDecayConstant,
+                fadDeploymentActionDecayConstant,
+                movingThreshold
+            );
+        }
     }
 
+    @Override
+    Aggregator<AbundanceLocalBiology> getBiologyAggregator() {
+        return biologyAggregator;
+    }
+
+    @Override
+    CatchMaker<AbundanceLocalBiology> getCatchMaker(final GlobalBiology globalBiology) {
+        return new AbundanceCatchMaker(globalBiology);
+    }
+
+    @SuppressWarnings("unused")
     public boolean isAgeBasedSetDecisions() {
         return ageBasedSetDecisions;
     }
 
-    public void setAgeBasedSetDecisions(boolean ageBasedSetDecisions) {
+    @SuppressWarnings("unused")
+    public void setAgeBasedSetDecisions(final boolean ageBasedSetDecisions) {
         this.ageBasedSetDecisions = ageBasedSetDecisions;
     }
 }

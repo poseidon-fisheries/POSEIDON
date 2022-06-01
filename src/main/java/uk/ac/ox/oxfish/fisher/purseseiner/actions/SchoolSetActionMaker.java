@@ -18,11 +18,20 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 
+@FunctionalInterface
 public interface SchoolSetActionMaker<
     B extends LocalBiology,
-    A extends SchoolSetAction<B>>
-    extends SetActionMaker<B, B, A> {
+    A extends SchoolSetAction<B>> {
+
+    A make(
+        final B targetBiology,
+        final Fisher fisher,
+        final double setDuration,
+        final Collection<B> sourceBiologies
+    );
 
 }
