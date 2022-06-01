@@ -96,4 +96,9 @@ public abstract class MutableLocationValues<A>
         values.replaceAll((location, value) -> value * (1 - decayRate));
     }
 
+
+    public boolean hasStarted(){
+        return values != null;
+    }
+
 }

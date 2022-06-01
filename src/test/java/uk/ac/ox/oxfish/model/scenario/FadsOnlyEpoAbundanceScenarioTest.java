@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,37 +34,16 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
 
     public void testSaveAndLoadYaml() {
-
-        // Dump the scenario to YAML
-        final File scenarioFile = Paths.get("inputs", "tests", "fad_only_scenario.yaml").toFile();
-
-        try {
-            final Scenario scenario = new FadsOnlyEpoAbundanceScenario();
-            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        // Try to read it back and start it
-        try (final FileReader fileReader = new FileReader(scenarioFile)) {
-            final FishYAML fishYAML = new FishYAML();
-            final FadsOnlyEpoAbundanceScenario epoAbundanceScenario =
-                fishYAML.loadAs(fileReader, FadsOnlyEpoAbundanceScenario.class);
-            final FishState fishState = new FishState();
-            epoAbundanceScenario.useDummyData(INPUT_PATH.resolve("test"));
-            fishState.setScenario(epoAbundanceScenario);
-            fishState.start();
-        } catch (final FileNotFoundException e) {
-            throw new IllegalArgumentException("Can't find scenario file: " + scenarioFile, e);
-        } catch (final IOException e) {
-            throw new IllegalStateException("Error while reading file: " + scenarioFile, e);
-        }
-
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_fad_only_scenario.yaml",
+            FadsOnlyEpoAbundanceScenario.class
+        );
     }
 
     public void testRunTwoYearsWithoutCrashing() {
         final FadsOnlyEpoAbundanceScenario scenario = new FadsOnlyEpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
         final FishState fishState = new FishState();
         initFadRemovalLog();
         fishState.setScenario(scenario);

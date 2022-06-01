@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Just a recursive formulation for computing the average
  * Created by carrknight on 11/9/16.
@@ -44,6 +46,7 @@ public class IterativeAverage<T extends Number> implements Averager<T> {
     public double getSmoothedObservation() {
         return average;
     }
+
 
 
 }

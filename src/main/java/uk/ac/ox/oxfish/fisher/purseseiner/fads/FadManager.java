@@ -27,10 +27,8 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
 import org.apache.commons.collections15.set.ListOrderedSet;
@@ -40,6 +38,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -60,16 +59,16 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
 
     private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
-        ImmutableList.of(
-            FadDeploymentAction.class,
-            AbstractFadSetAction.class,
-            DolphinSetAction.class,
-            NonAssociatedSetAction.class
-        );
+            ImmutableList.of(
+                    FadDeploymentAction.class,
+                    AbstractFadSetAction.class,
+                    DolphinSetAction.class,
+                    NonAssociatedSetAction.class
+            );
     private final FadMap<B, F> fadMap;
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
-        biomassLostMonitor;
+            biomassLostMonitor;
     private final ListOrderedSet<F> deployedFads = new ListOrderedSet<>();
     private final FadInitializer<B, F> fadInitializer;
     private ActiveActionRegulations actionSpecificRegulations;
@@ -77,18 +76,19 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     private int numFadsInStock;
 
     public FadManager(
-        final FadMap<B, F> fadMap,
-        final FadInitializer<B, F> fadInitializer
+            final FadMap<B, F> fadMap,
+            final FadInitializer<B, F> fadInitializer
     ) {
         this(
-            fadMap,
-            fadInitializer,
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            Optional.empty(),
-            new ActiveActionRegulations()
+                fadMap,
+                fadInitializer,
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                ImmutableSet.of(),
+                Optional.empty(),
+                new ActiveActionRegulations()
         );
     }
 
@@ -99,14 +99,15 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final FadMap<B, F> fadMap,
-        final FadInitializer<B, F> fadInitializer,
-        final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
-        final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
-        final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
-        final Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
-        final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
-        final ActiveActionRegulations actionSpecificRegulations
+            final FadMap<B, F> fadMap,
+            final FadInitializer<B, F> fadInitializer,
+            final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
+            final Iterable<Observer<AbstractSetAction>> allSetsObservers,
+            final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
+            final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
+            final Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
+            final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
+            final ActiveActionRegulations actionSpecificRegulations
     ) {
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
@@ -114,48 +115,54 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         this.actionSpecificRegulations = actionSpecificRegulations;
 
         fadDeploymentObservers.forEach(observer -> registerObserver(
-            FadDeploymentAction.class,
-            observer
+                FadDeploymentAction.class,
+                observer
         ));
+        allSetsObservers.forEach(observer -> {
+            registerObserver(FadSetAction.class, observer);
+            registerObserver(OpportunisticFadSetAction.class, observer);
+            registerObserver(NonAssociatedSetAction.class, observer);
+            registerObserver(DolphinSetAction.class, observer);
+        });
         fadSetObservers.forEach(observer -> {
             registerObserver(FadSetAction.class, observer);
             registerObserver(OpportunisticFadSetAction.class, observer);
         });
         nonAssociatedSetObservers.forEach(observer -> registerObserver(
-            NonAssociatedSetAction.class,
-            observer
+                NonAssociatedSetAction.class,
+                observer
         ));
         dolphinSetObservers.forEach(observer -> registerObserver(
-            DolphinSetAction.class,
-            observer
+                DolphinSetAction.class,
+                observer
         ));
         biomassLostMonitor.ifPresent(observer -> registerObserver(
-            BiomassLostEvent.class,
-            observer
+                BiomassLostEvent.class,
+                observer
         ));
         setActionSpecificRegulations(actionSpecificRegulations);
     }
 
     public <T> void registerObserver(
-        final Class<T> observedClass,
-        final Observer<? super T> observer
+            final Class<T> observedClass,
+            final Observer<? super T> observer
     ) {
         observers.register(observedClass, observer);
     }
 
     public static FadManager<? extends LocalBiology, ? extends Fad<?, ?>> getFadManager(
-        final Fisher fisher
+            final Fisher fisher
     ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
-            "PurseSeineGear required to get FadManager instance. Fisher "
-                + fisher + " is using " + fisher.getGear().getClass() + "."
+                "PurseSeineGear required to get FadManager instance. Fisher "
+                        + fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
     public static Optional<
-        FadManager<? extends LocalBiology, ? extends Fad<?, ?>>
-        > maybeGetFadManager(
-        final Fisher fisher
+            FadManager<? extends LocalBiology, ? extends Fad<?, ?>>
+            > maybeGetFadManager(
+            final Fisher fisher
     ) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
@@ -176,6 +183,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         return Collections.unmodifiableSet(deployedFads);
     }
 
+
     public Fisher getFisher() {
         return fisher;
     }
@@ -191,6 +199,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     public void loseFad(final F fad) {
         checkArgument(deployedFads.contains(fad));
         deployedFads.remove(fad);
+        fad.lose();
     }
 
     public F deployFad(final SeaTile seaTile) {
@@ -205,7 +214,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         final F newFad = fadInitializer.makeFad(this,
                 fisher,
                 tile
-                );
+        );
         deployedFads.add(newFad);
         return newFad;
     }
@@ -229,19 +238,19 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     }
 
     public void setActionSpecificRegulations(
-        final Stream<ActionSpecificRegulation> actionSpecificRegulations
+            final Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
     }
 
     private void setActionSpecificRegulations(
-        final ActiveActionRegulations actionSpecificRegulations
+            final ActiveActionRegulations actionSpecificRegulations
     ) {
         observers.unregister(this.actionSpecificRegulations);
         this.actionSpecificRegulations = actionSpecificRegulations;
         POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(
-            actionClass,
-            actionSpecificRegulations
+                actionClass,
+                actionSpecificRegulations
         ));
     }
 
@@ -250,8 +259,8 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     }
 
     public Optional<
-        GroupingMonitor<Species, BiomassLostEvent, Double, Mass>
-        > getBiomassLostMonitor() {
+            GroupingMonitor<Species, BiomassLostEvent, Double, Mass>
+            > getBiomassLostMonitor() {
         return biomassLostMonitor;
     }
 
@@ -261,6 +270,27 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
 
     public FadMap<B, F> getFadMap() {
         return fadMap;
+    }
+
+    /**
+     * how many active fads  can the owner of this manager still drop?
+     */
+    public int getHowManyActiveFadsCanWeStillDeploy(){
+        if(fisher==null )
+            return Integer.MAX_VALUE;
+        else {
+            return getActionSpecificRegulations().getActiveFadLimits().map(
+                    activeFadLimits1 -> activeFadLimits1.getLimit(fisher)
+            ).orElse(Integer.MAX_VALUE);
+        }
+    }
+
+
+    public int getNumberOfRemainingYearlyActions(Class<? extends PurseSeinerAction> purseSeinerAction){
+        return  getActionSpecificRegulations().getYearlyActionLimitRegulations().
+                get(purseSeinerAction).stream().
+                mapToInt(reg -> reg.getNumRemainingActions(fisher)).min().orElse(Integer.MAX_VALUE);
+
     }
 
 }

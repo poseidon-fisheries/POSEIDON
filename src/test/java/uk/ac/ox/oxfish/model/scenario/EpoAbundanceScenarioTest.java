@@ -20,123 +20,113 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 
 
 public class EpoAbundanceScenarioTest extends TestCase {
 
-    public void testInitWithLogisticFunctions() {
-        final Supplier<EpoAbundanceScenario> scenarioSupplier = () -> {
-            final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-            final AbundancePurseSeineGearFactory gear =
-                scenario.getAbundancePurseSeineGearFactory();
-            gear.setNonAssociatedSetTimeSinceLastVisitModulationFunction(new LogisticFunctionFactory());
-            gear.setNonAssociatedSetTimeSinceLastVisitModulationFunction(new LogisticFunctionFactory());
-            gear.setNumFadsInStockModulationFunction(new LogisticFunctionFactory());
-            gear.setOpportunisticFadSetTimeSinceLastVisitModulationFunction(new LogisticFunctionFactory());
-            gear.setPctHoldSpaceLeftModulationFunction(new LogisticFunctionFactory());
-            gear.setPctSetsRemainingModulationFunction(new LogisticFunctionFactory());
-            gear.setPctTravelTimeLeftModulationFunction(new LogisticFunctionFactory());
-            gear.setDolphinSetTimeSinceLastVisitModulationFunction(new LogisticFunctionFactory());
-            gear.setFadDeploymentPctActiveFadsLimitModulationFunction(new LogisticFunctionFactory());
-
-            final PurseSeinerAbundanceFishingStrategyFactory strat =
-                scenario.getFishingStrategyFactory();
-            strat.setDolphinSetActionValueFunction(new LogisticFunctionFactory());
-            strat.setDolphinSetActionValueFunction(new LogisticFunctionFactory());
-            strat.setDolphinSetGeneratorFunction(new LogisticFunctionFactory());
-            strat.setFadDeploymentActionValueFunction(new LogisticFunctionFactory());
-            strat.setFadSetActionValueFunction(new LogisticFunctionFactory());
-            strat.setNonAssociatedSetActionValueFunction(new LogisticFunctionFactory());
-            strat.setNonAssociatedSetGeneratorFunction(new LogisticFunctionFactory());
-            strat.setOpportunisticFadSetActionValueFunction(new LogisticFunctionFactory());
-            strat.setSearchActionValueFunction(new LogisticFunctionFactory());
-            return scenario;
-        };
-        saveAndLoadYaml(
-            Paths.get("inputs", "tests", "epo_abundance_logistic_scenario.yaml").toFile(),
-            scenarioSupplier,
-            (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
-            EpoAbundanceScenario.class
-        );
-    }
-
-    public static <T extends Scenario> void saveAndLoadYaml(
-        final File scenarioFile,
-        final Supplier<T> scenarioSupplier,
-        final Consumer<T> scenarioConsumer,
-        final Class<T> scenarioClass
-    ) {
-        // Dump the scenario to YAML
-        try {
-            final Scenario scenario = scenarioSupplier.get();
-            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        // Try to read it back and start it
-        try (final FileReader fileReader = new FileReader(scenarioFile)) {
-            final FishYAML fishYAML = new FishYAML();
-            final T scenario = fishYAML.loadAs(fileReader, scenarioClass);
-            scenarioConsumer.accept(scenario);
-            final FishState fishState = new FishState();
-            fishState.setScenario(scenario);
-            fishState.start();
-        } catch (final FileNotFoundException e) {
-            throw new IllegalArgumentException("Can't find scenario file: " + scenarioFile, e);
-        } catch (final IOException e) {
-            throw new IllegalStateException("Error while reading file: " + scenarioFile, e);
-        }
-
-    }
-
     public void testRunOneYearWithoutCrashing() {
-        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
-        final FishState fishState = new FishState();
-        fishState.setScenario(scenario);
-
-        fishState.start();
+        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
         do {
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
-
     }
 
-    public void testSaveAndLoadYaml() {
-        saveAndLoadYaml(
-            Paths.get("inputs", "tests", "epo.yaml").toFile(),
-            EpoAbundanceScenario::new,
-            (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
+    public void testSaveAndLoadLogisticYaml() {
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_abundance_logistic.yaml",
             EpoAbundanceScenario.class
         );
+    }
+
+    public void testSaveAndLoadExponentialYaml() {
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_abundance_exponential.yaml",
+            EpoAbundanceScenario.class,
+            EpoAbundanceScenarioTest::useCompressedExponentials
+        );
+    }
+
+    private static EpoAbundanceScenario useCompressedExponentials(final EpoAbundanceScenario scenario) {
+
+        final PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> gearFactory =
+            scenario.getPurseSeineGearFactory();
+        final PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad>
+            strategyFactory = scenario.getFishingStrategyFactory();
+
+        gearFactory.setPctHoldSpaceLeftModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setPctSetsRemainingModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setNumFadsInStockModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setFadDeploymentPctActiveFadsLimitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setPctTravelTimeLeftModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setOpportunisticFadSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setNonAssociatedSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        gearFactory.setDolphinSetTimeSinceLastVisitModulationFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+
+        strategyFactory.setDolphinSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setFadDeploymentActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setFadSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setNonAssociatedSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setOpportunisticFadSetActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setDolphinSetGeneratorFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setNonAssociatedSetGeneratorFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        strategyFactory.setSearchActionValueFunction(
+            new CompressedExponentialFunctionFactory(0.5)
+        );
+        
+        return scenario;
     }
 
     /**
@@ -147,13 +137,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
      */
     public void testAllNonZeroGridCellsMapRightBiologySeaTiles() {
 
-        final FishState fishState = new FishState();
-        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(INPUT_PATH.resolve("test"));
-
-        fishState.setScenario(scenario);
-        fishState.start();
-
+        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
         final List<Startable> startables = fishState.viewStartables();
 
         @SuppressWarnings("OptionalGetWithoutIsPresent") final AbundanceRestorer abundanceRestorer =

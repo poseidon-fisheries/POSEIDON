@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.collect.ImmutableMap;
@@ -36,15 +37,22 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetActionMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetActionMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
@@ -58,10 +66,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
-abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
-    implements AlgorithmFactory<PurseSeinerFishingStrategy<B, F>> {
+public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
+    implements AlgorithmFactory<PurseSeinerFishingStrategy<B>> {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
         new ActiveOpportunitiesFactory();
@@ -79,37 +87,42 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
+
+    // use default values from:
+    // https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
     private double searchBonus = 0.1;
-    private double nonAssociatedSetDetectionProbability = 0.1;
-    private double dolphinSetDetectionProbability = 0.1;
-    private double opportunisticFadSetDetectionProbability = 0.1;
-    private double searchActionDecayConstant = 1;
-    private double fadDeploymentActionDecayConstant = 1;
-    private double movingThreshold = 0.1;
+    private double nonAssociatedSetDetectionProbability = 1.0;
+    private double dolphinSetDetectionProbability = 0.7136840195385347;
+    private double opportunisticFadSetDetectionProbability = 0.007275362250433118;
+    private double searchActionDecayConstant = 7.912472944827373;
+    private double fadDeploymentActionDecayConstant = 0.7228626294613664;
+    private double movingThreshold = 0.0;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetGeneratorFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(15392.989688872976, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetGeneratorFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         searchActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(7081017.137484187, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(7338176.765769132, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(EPSILON, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(555715.859646539, 10);
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
-        new CompressedExponentialFunctionFactory(1E-6, 2);
+        new LogisticFunctionFactory(1E-6, 10);
+    private boolean fishUnderFadsAvailableForSchoolSets = true;
+    private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
@@ -117,6 +130,26 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     ) {
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getMaxCurrentSpeedsFile() {
+        return maxCurrentSpeedsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMaxCurrentSpeedsFile(final Path maxCurrentSpeedsFile) {
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isFishUnderFadsAvailableForSchoolSets() {
+        return fishUnderFadsAvailableForSchoolSets;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFishUnderFadsAvailableForSchoolSets(final boolean fishUnderFadsAvailableForSchoolSets) {
+        this.fishUnderFadsAvailableForSchoolSets = fishUnderFadsAvailableForSchoolSets;
     }
 
     @SuppressWarnings("unused")
@@ -138,8 +171,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetGeneratorFunction(final AlgorithmFactory<?
-        extends DoubleUnaryOperator> dolphinSetGeneratorFunction) {
+    public void setDolphinSetGeneratorFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetGeneratorFunction
+    ) {
         this.dolphinSetGeneratorFunction = dolphinSetGeneratorFunction;
     }
 
@@ -208,8 +243,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     @SuppressWarnings("unused")
-    public void setDolphinSetActionValueFunction(final AlgorithmFactory<?
-        extends DoubleUnaryOperator> dolphinSetActionValueFunction) {
+    public void setDolphinSetActionValueFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetActionValueFunction
+    ) {
         this.dolphinSetActionValueFunction = dolphinSetActionValueFunction;
     }
 
@@ -301,13 +338,45 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
     }
 
     @Override
-    public PurseSeinerFishingStrategy<B, F> apply(final FishState fishState) {
+    public PurseSeinerFishingStrategy<B> apply(final FishState fishState) {
         checkNotNull(catchSamplersFactory);
         checkNotNull(attractionWeightsFile);
-        return new PurseSeinerFishingStrategy<>(
+        checkNotNull(maxCurrentSpeedsFile);
+        return callConstructor(
             this::loadAttractionWeights,
             this::makeSetOpportunityDetector,
             makeActionValueFunctions(fishState),
+            loadMaxCurrentSpeeds(),
+            searchActionDecayConstant,
+            fadDeploymentActionDecayConstant,
+            movingThreshold
+        );
+    }
+
+    private Map<Class<? extends PurseSeinerAction>, Double> loadMaxCurrentSpeeds() {
+        return parseAllRecords(maxCurrentSpeedsFile)
+            .stream()
+            .collect(toImmutableMap(
+                r -> ActionClass.valueOf(r.getString("action")).getActionClass(),
+                r -> r.getDouble("speed")
+            ));
+    }
+
+    @NotNull
+    protected PurseSeinerFishingStrategy<B> callConstructor(
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
+        final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
+        final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
+        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final double searchActionDecayConstant,
+        final double fadDeploymentActionDecayConstant,
+        final double movingThreshold
+    ) {
+        return new PurseSeinerFishingStrategy<>(
+            attractionWeights,
+            opportunityDetector,
+            actionValueFunctions,
+            maxCurrentSpeeds,
             searchActionDecayConstant,
             fadDeploymentActionDecayConstant,
             movingThreshold
@@ -357,6 +426,7 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 durationSamplers.get(FadSetAction.class)
             );
 
+        final CatchMaker<B> catchMaker = getCatchMaker(fishState.getBiology());
         final SchoolSetOpportunityGenerator<B, NonAssociatedSetAction<B>>
             nonAssociatedSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
@@ -364,9 +434,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
-                NonAssociatedSetAction<B>::new,
+                new NonAssociatedSetActionMaker<>(catchMaker),
                 activeNonAssociatedSetOpportunitiesCache.get(fishState),
-                durationSamplers.get(NonAssociatedSetAction.class)
+                durationSamplers.get(NonAssociatedSetAction.class),
+                getBiologyAggregator(),
+                fishUnderFadsAvailableForSchoolSets
             );
 
         final SchoolSetOpportunityGenerator<B, DolphinSetAction<B>>
@@ -376,9 +448,11 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
                 setCompositionWeights.get(DolphinSetAction.class),
                 biologyClass,
                 catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
-                DolphinSetAction<B>::new,
+                new DolphinSetActionMaker<>(catchMaker),
                 activeDolphinSetOpportunitiesCache.get(fishState),
-                durationSamplers.get(DolphinSetAction.class)
+                durationSamplers.get(DolphinSetAction.class),
+                getBiologyAggregator(),
+                fishUnderFadsAvailableForSchoolSets
             );
 
         return new SetOpportunityDetector<>(
@@ -392,6 +466,10 @@ abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F exten
             searchBonus
         );
     }
+
+    abstract Aggregator<B> getBiologyAggregator();
+
+    abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
 
     private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
     loadSetCompositionWeights(

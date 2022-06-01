@@ -39,7 +39,6 @@ public class TunaMeristics implements Meristics {
     private final int numberOfBins;
     private final double[][] weights;
     private final List<ImmutableDoubleArray> lengths;
-    private final List<ImmutableDoubleArray> proportionalMortalities;
     private final ImmutableDoubleArray maturity;
 
     /**
@@ -53,13 +52,11 @@ public class TunaMeristics implements Meristics {
     public TunaMeristics(
         final Iterable<double[]> weights,
         final Iterable<double[]> lengths,
-        final Iterable<double[]> proportionalMortalities,
         final double[] maturity
     ) {
         this(
             copyArrays(weights),
             copyArrays(lengths),
-            copyArrays(proportionalMortalities),
             ImmutableDoubleArray.copyOf(maturity)
         );
     }
@@ -77,17 +74,15 @@ public class TunaMeristics implements Meristics {
      *                array is the weights of the females and the second array is the weights of the
      *                males.
      */
-    public TunaMeristics(
+    private TunaMeristics(
         final List<ImmutableDoubleArray> weights,
         final Collection<ImmutableDoubleArray> lengths,
-        final Collection<ImmutableDoubleArray> proportionalMortalities,
         final ImmutableDoubleArray maturity
     ) {
         final ImmutableList<Collection<ImmutableDoubleArray>> subdividedCollections =
             ImmutableList.of(
                 weights,
-                lengths,
-                proportionalMortalities
+                lengths
             );
         // Check that all subdivided collections have the right number of subdivisions
         checkArgument(
@@ -113,16 +108,11 @@ public class TunaMeristics implements Meristics {
             this.weights[subdivisions] = weights.get(subdivisions).toArray();
         }
         this.lengths = ImmutableList.copyOf(lengths);
-        this.proportionalMortalities = ImmutableList.copyOf(proportionalMortalities);
         this.maturity = maturity;
     }
 
     public ImmutableDoubleArray getMaturity() {
         return maturity;
-    }
-
-    public List<ImmutableDoubleArray> getProportionalMortalities() {
-        return proportionalMortalities;
     }
 
     @Override

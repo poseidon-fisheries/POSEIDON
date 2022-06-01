@@ -1,1 +1,0 @@
-http://www.fao.org:80/figis/geoserver/rfb/ows?service=WFS&request=GetFeature&version=1.0.0&typeName=RFB_IATTC&outputFormat=SHAPE-ZIP&format_options=filename%3AFAO_RFB_IATTC.zip

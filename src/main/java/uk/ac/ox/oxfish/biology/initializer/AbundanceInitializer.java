@@ -116,9 +116,6 @@ public class AbundanceInitializer implements BiologyInitializer {
                     makeList(
                         bins, bin -> bin.maleLength, bin -> bin.femaleLength
                     ),
-                    makeList(
-                        bins, bin -> bin.maleNaturalMortality, bin -> bin.femaleNaturalMortality
-                    ),
                     bins.stream().mapToDouble(bin -> bin.maturity).toArray()
                 );
                 return new Species(speciesName, tunaMeristics);
@@ -154,8 +151,6 @@ public class AbundanceInitializer implements BiologyInitializer {
         final double maleWeight;
         final double femaleLength;
         final double maleLength;
-        final double femaleNaturalMortality;
-        final double maleNaturalMortality;
         final double maturity;
 
         Bin(
@@ -165,9 +160,7 @@ public class AbundanceInitializer implements BiologyInitializer {
             final double maleWeight,
             final double femaleLength,
             final double maleLength,
-            final double maturity,
-            final double femaleNaturalMortality,
-            final double maleNaturalMortality
+            final double maturity
         ) {
             this.numberOfFemales = numberOfFemales;
             this.numberOfMales = numberOfMales;
@@ -176,8 +169,6 @@ public class AbundanceInitializer implements BiologyInitializer {
             this.femaleLength = femaleLength;
             this.maleLength = maleLength;
             this.maturity = maturity;
-            this.femaleNaturalMortality = femaleNaturalMortality;
-            this.maleNaturalMortality = maleNaturalMortality;
         }
     }
 }

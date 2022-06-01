@@ -31,7 +31,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -53,6 +55,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class SetLocationValuesTest {
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void test() {
 
@@ -64,6 +67,9 @@ public class SetLocationValuesTest {
         final MarketMap marketMap = mock(MarketMap.class);
         final GlobalBiology globalBiology = GlobalBiology.genericListOfSpecies(1);
         final Species specie = globalBiology.getSpecie(0);
+        final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
+        final FadManager fadManager = mock(FadManager.class);
+        when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(market.getSpecies()).thenReturn(specie);
         when(market.getMarginalPrice()).thenReturn(1.0);
         when(marketMap.getMarket(anyInt())).thenReturn(market);
@@ -71,6 +77,7 @@ public class SetLocationValuesTest {
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getLocation()).thenReturn(map.getSeaTile(3, 3));
         when(fisher.grabState()).thenReturn(fishState);
+        when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fishState.getBiology()).thenReturn(globalBiology);
 
         final ImmutableMap<Int2D, Double> initialValues = ImmutableMap.of(

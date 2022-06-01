@@ -34,6 +34,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
@@ -44,26 +45,34 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> implements Scenario {
+public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
+    implements TestableScenario {
 
     public static final int TARGET_YEAR = 2017;
-    public static final Path INPUT_PATH = Paths.get("inputs", "epo");
+    public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
+    public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
+
     public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     static final ImmutableMap<CurrentPattern, Path> currentFiles =
@@ -77,27 +86,104 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
     private final FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
+    private PurseSeinerFishingStrategyFactory<B, F> fishingStrategyFactory;
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
+    private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
+    private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
+    private CatchSamplersFactory<B> catchSamplersFactory;
+    private PurseSeineGearFactory<B, F> purseSeineGearFactory;
 
-    public FadRefillGearStrategyFactory getGearStrategy() {
-        return gearStrategy;
-    }
-
-    void initModel(final FishState fishState) {
+    @Override
+    public ScenarioPopulation populateModel(final FishState fishState) {
         final FadMap<B, F> fadMap = getFadMapFactory().apply(fishState);
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
+
+        final Monitors monitors = new Monitors(fishState);
+        monitors.getMonitors().forEach(fishState::registerStartable);
+
+        if (getFishingStrategyFactory() != null) {
+            getFishingStrategyFactory().setCatchSamplersFactory(getCatchSamplersFactory());
+            getFishingStrategyFactory().setAttractionWeightsFile(getAttractionWeightsFile());
+        }
+
+        if (getPurseSeineGearFactory() != null) {
+            getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
+            getPurseSeineGearFactory().getFadDeploymentObservers()
+                .addAll(monitors.getFadDeploymentMonitors());
+            getPurseSeineGearFactory().getAllSetsObservers()
+                .addAll(monitors.getAllSetsMonitors());
+            getPurseSeineGearFactory().getFadSetObservers()
+                .addAll(monitors.getFadSetMonitors());
+            getPurseSeineGearFactory().getNonAssociatedSetObservers()
+                .addAll(monitors.getNonAssociatedSetMonitors());
+            getPurseSeineGearFactory().getDolphinSetObservers()
+                .addAll(monitors.getDolphinSetMonitors());
+            getPurseSeineGearFactory().setBiomassLostMonitor(monitors.getBiomassLostMonitor());
+            getPurseSeineGearFactory().setLocationValuesFile(getLocationValuesFilePath());
+        }
+
+        return new ScenarioPopulation(
+            new ArrayList<>(),
+            new SocialNetwork(new EmptyNetworkBuilder()),
+            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
+        );
+    }
+
+    public PurseSeinerFishingStrategyFactory<B, F> getFishingStrategyFactory() {
+        return fishingStrategyFactory;
+    }
+
+    public void setFishingStrategyFactory(final PurseSeinerFishingStrategyFactory<B, F> fishingStrategyFactory) {
+        this.fishingStrategyFactory = fishingStrategyFactory;
+    }
+
+    public CatchSamplersFactory<B> getCatchSamplersFactory() {
+        return catchSamplersFactory;
+    }
+
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
+        this.catchSamplersFactory = catchSamplersFactory;
+    }
+
+    public Path getAttractionWeightsFile() {
+        return attractionWeightsFile;
+    }
+
+    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
+        this.attractionWeightsFile = attractionWeightsFile;
+    }
+
+    public Path getLocationValuesFilePath() {
+        return locationValuesFilePath;
+    }
+
+    public void setLocationValuesFilePath(final Path locationValuesFilePath) {
+        this.locationValuesFilePath = locationValuesFilePath;
+    }
+
+    public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {
+        return purseSeineGearFactory;
+    }
+
+    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B, F> purseSeineGearFactory) {
+        this.purseSeineGearFactory = purseSeineGearFactory;
     }
 
     abstract FadMapFactory<B, F> getFadMapFactory();
 
-    @NotNull    FisherFactory makeFisherFactory(
+    public abstract AlgorithmFactory<FadInitializer<B, F>> getFadInitializerFactory();
+
+    public abstract void setFadInitializerFactory(
+        final AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory
+    );
+
+    @NotNull
+    FisherFactory makeFisherFactory(
         final FishState fishState,
         final AlgorithmFactory<? extends Regulation> regulationsFactory,
-        final PurseSeineGearFactory<B, F> purseSeineGearFactory,
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory,
-        final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
+        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory
     ) {
         final FisherFactory fisherFactory = new FisherFactory(
             null,
@@ -180,14 +266,25 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>> i
         this.vesselsFilePath = vesselsFilePath;
     }
 
+    @Override
     public void useDummyData(final Path testPath) {
         getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+        setCostsFile(testPath.resolve("no_costs.csv"));
         setVesselsFilePath(
             testPath.resolve("dummy_boats.csv")
         );
         getGearStrategy().setMaxFadDeploymentsFile(
             testPath.resolve("dummy_max_deployments.csv")
         );
+        setAttractionWeightsFile(
+            testPath.resolve("dummy_action_weights.csv")
+        );
+        setLocationValuesFilePath(
+            testPath.resolve("dummy_location_values.csv")
+        );
     }
 
+    public FadRefillGearStrategyFactory getGearStrategy() {
+        return gearStrategy;
+    }
 }

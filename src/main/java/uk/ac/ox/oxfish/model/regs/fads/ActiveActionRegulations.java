@@ -19,19 +19,18 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
-import com.google.common.collect.ImmutableSetMultimap;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
+
+import com.google.common.collect.ImmutableSetMultimap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
 public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
 
@@ -49,7 +48,7 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
 
     private ActiveActionRegulations(
-        ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations
+        final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this.actionSpecificRegulations = actionSpecificRegulations;
 
@@ -84,13 +83,13 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     }
 
     public ActiveActionRegulations(
-        Iterable<ActionSpecificRegulation> actionSpecificRegulations
+        final Iterable<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this(stream(actionSpecificRegulations));
     }
 
     public ActiveActionRegulations(
-        Stream<ActionSpecificRegulation> actionSpecificRegulations
+        final Stream<ActionSpecificRegulation> actionSpecificRegulations
     ) {
         this(actionSpecificRegulations
             .collect(flatteningToImmutableSetMultimap(identity(), reg -> reg.getApplicableActions().stream()))
@@ -105,20 +104,23 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
         return activeFadLimits;
     }
 
-    public boolean isForbidden(PurseSeinerAction purseSeinerAction) {
+    public boolean isForbidden(
+        final Class<? extends PurseSeinerAction> purseSeinerActionClass,
+        final Fisher fisher
+    ) {
         return actionSpecificRegulations
-            .get(purseSeinerAction.getClass())
+            .get(purseSeinerActionClass)
             .stream()
-            .anyMatch(reg -> reg.isForbidden(purseSeinerAction));
+            .anyMatch(reg -> reg.isForbidden(purseSeinerActionClass, fisher));
     }
 
-    public void observe(PurseSeinerAction purseSeinerAction) {
+    public void observe(final PurseSeinerAction purseSeinerAction) {
         actionSpecificRegulations
             .get(purseSeinerAction.getClass())
             .forEach(reg -> reg.observe(purseSeinerAction));
     }
 
-    public boolean anyYearlyLimitedActionRemaining(Fisher fisher) {
+    public boolean anyYearlyLimitedActionRemaining(final Fisher fisher) {
         return yearlyActionLimitRegulations.values().isEmpty() ||
             yearlyActionLimitRegulations.values().stream().anyMatch(reg ->
                 reg.getNumRemainingActions(fisher) > 0
@@ -128,4 +130,6 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     public Optional<SetLimits> getSetLimits() {
         return setLimits;
     }
+
+
 }

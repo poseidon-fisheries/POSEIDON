@@ -20,11 +20,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.lang.Double.isNaN;
 import static java.util.Comparator.comparingDouble;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +47,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class GravityDestinationStrategy implements DestinationStrategy {
+
+    private static final Double2D ZERO_VECTOR = new Double2D(0.0, 0.0);
 
     private final AttractionWeightLoader attractionWeightLoader;
     private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
@@ -101,13 +103,15 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         final SeaTile seaTile = fisher.getLocation();
         final Int2D here = new Int2D(seaTile.getGridX(), seaTile.getGridY());
         final FishState fishState = fisher.grabState();
+
         return attractionWeights
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() > 0)
             .map(entry -> entry.getKey().netAttractionHere().multiply(entry.getValue()))
+            // TODO: figure out why netAttraction could be NaN
+            .filter(v -> !v.equals(ZERO_VECTOR) && !(isNaN(v.x) | isNaN(v.y)))
             .reduce(Double2D::add)
-            .filter(v -> !v.equals(new Double2D(0.0, 0.0)))
             .map(v -> new Double2D(here.x + 0.5, here.y + 0.5).add(v.normalize()))
             .map(v -> fishState.getMap().getSeaTile((int) v.x, (int) v.y))
             .flatMap(target ->
@@ -132,7 +136,7 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     @Override
     public void start(final FishState model, final Fisher fisher) {
-        attractionFields = ((PurseSeineGear) fisher.getGear()).getAttractionFields();
+        attractionFields = ((PurseSeineGear<?, ?>) fisher.getGear()).getAttractionFields();
         attractionFields.forEach(field -> field.start(model, fisher));
         maxTravelTime = maxTravelTimeLoader.applyAsDouble(fisher);
         initAttractionWeights(fisher);

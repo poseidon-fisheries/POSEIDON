@@ -20,8 +20,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.toList;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,7 @@ import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Test;
 import sim.util.Bag;
@@ -86,7 +89,7 @@ public class SetOpportunityDetectorTest {
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[] {ownFad, otherFad}));
         when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);
-        when(actionSpecificRegulations.isForbidden(any())).thenReturn(false);
+        when(actionSpecificRegulations.isForbidden(any(),any())).thenReturn(false);
         when(fisher.getRegulation()).thenReturn(regulation);
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
@@ -128,19 +131,19 @@ public class SetOpportunityDetectorTest {
 
         // when hold is full there should be no possible action
         when(hold.getPercentageFilled()).thenReturn(1.0);
-        assertTrue(setOpportunityDetector.possibleSetActions().isEmpty());
+        assertFalse(setOpportunityDetector.possibleSetActions().findAny().isPresent());
 
         // before we search, we should only detect our own FAD
         when(hold.getPercentageFilled()).thenReturn(0.0);
         assertEquals(
             ImmutableList.of(mockActions.get(FAD)),
-            setOpportunityDetector.possibleSetActions()
+            setOpportunityDetector.possibleSetActions().collect(toList())
         );
 
         setOpportunityDetector.notifyOfSearch();
         assertEquals(
             mockActions.values(),
-            setOpportunityDetector.possibleSetActions()
+            setOpportunityDetector.possibleSetActions().collect(toList())
         );
 
     }

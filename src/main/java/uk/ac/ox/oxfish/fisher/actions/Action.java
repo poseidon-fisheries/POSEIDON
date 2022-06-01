@@ -32,7 +32,7 @@ public interface Action {
 
 
     /**
-     * Do something and returns a result which is the next state and whether or not it should be lspiRun on the same turn
+     * Do something and returns a result which is the next state and whether or not it should be run on the same turn
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
      * @param regulation the regulation governing the agent

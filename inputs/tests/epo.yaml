@@ -1,13 +1,121 @@
 EPO Abundance:
-  abundanceCatchSamplersFactory:
-    abundanceFilters: null
-    catchSamplesFile: inputs/epo/set_samples.csv
   abundanceFiltersFactory:
-    selectivityFilePath: inputs/epo/abundance/selectivity.csv
+    selectivityFilePath: inputs/epo_inputs/abundance/selectivity.csv
   abundanceInitializerFactory:
     Abundance Initializer Factory:
-      binsFilePath: inputs/epo/abundance/bins.csv
-  abundancePurseSeineGearFactory:
+      binsFilePath: inputs/epo_inputs/abundance/bins.csv
+  abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+    mortalityFile: inputs/epo_inputs/abundance/mortality.csv
+    sources:
+    - natural
+    - obj_class_1_5
+    - noa_class_1_5
+    - longline
+    speciesCodes: null
+  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
+    biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
+    firstLargeBinPerSpecies:
+      Skipjack tuna: 14
+      Bigeye tuna: 8
+      Yellowfin tuna: 9
+  abundanceRestorerFactory:
+    schedule:
+      0: 365
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
+  catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
+    abundanceFilters: null
+    catchSamplesFile: inputs/epo_inputs/set_samples.csv
+  costsFile: inputs/epo_inputs/costs.csv
+  fadInitializerFactory:
+    Abundance FAD Initializer:
+      attractableBiomassCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      biomassInteractionsCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      compressionExponents:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      fadDudRate: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
+      growthRates:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      selectivityFilters: {
+        }
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  fadMapFactory:
+    currentFiles:
+      Y2016: inputs/epo_inputs/currents/currents_2016.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
+  fishingStrategyFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory
+    ageBasedSetDecisions: false
+    attractionWeightsFile: null
+    catchSamplersFactory: null
+    dolphinSetActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 1.0E-6
+        steepness: 2.0
+    dolphinSetDetectionProbability: 0.7136840195385347
+    dolphinSetGeneratorFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.0
+        steepness: 0.0
+    fadDeploymentActionDecayConstant: 0.7228626294613664
+    fadDeploymentActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 7338176.765769132
+        steepness: 0.0
+    fadSetActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.0
+        steepness: 0.0
+    fishUnderFadsAvailableForSchoolSets: true
+    movingThreshold: 0.0
+    nonAssociatedSetActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 555715.859646539
+        steepness: 3.6444986410608907E-6
+    nonAssociatedSetDetectionProbability: 1.0
+    nonAssociatedSetGeneratorFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 15392.989688872976
+        steepness: 0.692315692124877
+    opportunisticFadSetActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.0
+        steepness: 1.1404626767614229E-5
+    opportunisticFadSetDetectionProbability: 0.007275362250433118
+    searchActionDecayConstant: 7.912472944827373
+    searchActionValueFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 7081017.137484187
+        steepness: 3.45300091459461E-6
+    searchBonus: 0.1
+    setCompositionWeightsPath: inputs/epo_inputs/set_compositions.csv
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
+  mapInitializerFactory:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo_inputs/depth.csv
+      mapPaddingInDegrees: '0.5'
+  purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory
     actionDistanceExponent: 1.0
     actionSpecificRegulations:
     - Active FAD limits:
@@ -39,7 +147,7 @@ EPO Abundance:
     fadInitializerFactory: null
     fadSetObservers: !!set {
       }
-    locationValuesFile: inputs/epo/location_values.csv
+    locationValuesFile: inputs/epo_inputs/location_values.csv
     nonAssociatedSetObservers: !!set {
       }
     nonAssociatedSetTimeSinceLastVisitModulationFunction:
@@ -67,102 +175,12 @@ EPO Abundance:
         coefficient: 1.0E-6
         exponent: 2.0
     successfulSetProbability: '0.9231701'
-  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
-    biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
-    firstLargeBinPerSpecies:
-      Skipjack tuna: 14
-      Bigeye tuna: 8
-      Yellowfin tuna: 9
-  abundanceRestorerFactory:
-    schedule:
-      0: 365
-  attractionWeightsFile: inputs/epo/action_weights.csv
-  costsFile: inputs/epo/costs.csv
-  fadInitializerFactory:
-    Abundance FAD Initializer:
-      attractableBiomassCoefficients:
-        Bigeye tuna: '0.0'
-        Yellowfin tuna: '0.0'
-        Skipjack tuna: '0.0'
-      biomassInteractionsCoefficients:
-        Bigeye tuna: '0.0'
-        Yellowfin tuna: '0.0'
-        Skipjack tuna: '0.0'
-      compressionExponents:
-        Bigeye tuna: '0.0'
-        Yellowfin tuna: '0.0'
-        Skipjack tuna: '0.0'
-      fadDudRate: '0.0'
-      fishReleaseProbabilityInPercent: '0.0'
-      growthRates:
-        Bigeye tuna: '0.0'
-        Yellowfin tuna: '0.0'
-        Skipjack tuna: '0.0'
-      selectivityFilters: {
-        }
-      speciesCodes: null
-      totalCarryingCapacity: '445000.0'
-  fadMapFactory:
-    currentFiles:
-      Y2016: inputs/epo/currents/currents_2016.csv
-      Y2017: inputs/epo/currents/currents_2017.csv
-  fishingStrategyFactory:
-    attractionWeightsFile: null
-    catchSamplersFactory: null
-    dolphinSetActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    dolphinSetDetectionProbability: 0.1
-    dolphinSetGeneratorFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    fadDeploymentActionDecayConstant: 1.0
-    fadDeploymentActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    fadSetActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    movingThreshold: 0.1
-    nonAssociatedSetActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    nonAssociatedSetDetectionProbability: 0.1
-    nonAssociatedSetGeneratorFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    opportunisticFadSetActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    opportunisticFadSetDetectionProbability: 0.1
-    searchActionDecayConstant: 1.0
-    searchActionValueFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    searchBonus: 0.1
-    setCompositionWeightsPath: inputs/epo/set_compositions.csv
-  locationValuesFilePath: inputs/epo/location_values.csv
-  mapInitializerFactory:
-    From File Map:
-      gridWidthInCell: '101.0'
-      header: true
-      latLong: true
-      mapFile: inputs/epo/depth.csv
-      mapPaddingInDegrees: '0.5'
   recruitmentProcessesFactory:
-    recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
+    recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
     factories:
     - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo/galapagos_eez/eez.shp
+        shapeFilePath: inputs/epo_inputs/galapagos_eez/eez.shp
     - Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
@@ -203,4 +221,4 @@ EPO Abundance:
     - '2017-07-01'
     - '2017-10-01'
     recruitmentProcesses: null
-  vesselsFilePath: inputs/epo/boats.csv
+  vesselsFilePath: inputs/epo_inputs/boats.csv

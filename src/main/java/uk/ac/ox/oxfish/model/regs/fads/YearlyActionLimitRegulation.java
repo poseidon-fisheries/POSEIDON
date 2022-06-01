@@ -42,9 +42,9 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
     }
 
     @Override
-    public boolean isForbidden(PurseSeinerAction action) {
-        assert getApplicableActions().contains(action.getClass());
-        return counter >= getLimit(action.getFisher());
+    public boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher) {
+        assert getApplicableActions().contains(action);
+        return counter >= getLimit(fisher);
     }
 
     public double getPctLimitRemaining(Fisher fisher) {

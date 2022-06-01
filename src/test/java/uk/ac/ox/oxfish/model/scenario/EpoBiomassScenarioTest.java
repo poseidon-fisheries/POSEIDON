@@ -19,34 +19,24 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenarioTest.saveAndLoadYaml;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-import com.google.common.collect.ImmutableMap;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 public class EpoBiomassScenarioTest {
 
     @Test
-    public void canSaveToAndLoadFromYamlWithoutCrashing() {
-        saveAndLoadYaml(
-            Paths.get("inputs", "tests", "epo_biomass.yaml").toFile(),
-            EpoBiomassScenario::new,
-            (scenario) -> scenario.useDummyData(Paths.get("inputs", "epo", "test")),
+    public void testSaveAndLoadYaml() {
+        ScenarioTestUtils.testSaveAndLoadYaml(
+            TESTS_INPUT_PATH,
+            "epo_biomass.yaml",
             EpoBiomassScenario.class
         );
     }
@@ -55,7 +45,7 @@ public class EpoBiomassScenarioTest {
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        scenario.useDummyData(EpoScenario.INPUT_PATH.resolve("test"));
+        scenario.useDummyData(TESTS_INPUT_PATH);
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.addPlugin(state -> model -> {

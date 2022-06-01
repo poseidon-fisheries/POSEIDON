@@ -32,6 +32,10 @@ public class CompressedExponentialFunctionFactory
     public CompressedExponentialFunctionFactory() {
     }
 
+    public CompressedExponentialFunctionFactory(final double coefficient) {
+        this(coefficient, 2.0);
+    }
+
     public CompressedExponentialFunctionFactory(final double coefficient, final double exponent) {
         this.coefficient = coefficient;
         this.exponent = exponent;
