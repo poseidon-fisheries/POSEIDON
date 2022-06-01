@@ -116,6 +116,11 @@ public class TripLogger implements Startable
         return currentTrip;
     }
 
+
+    public void resetTrip(){
+        currentTrip=null;
+    }
+
     public TripRecord getCurrentTrip() {
         return currentTrip;
     }

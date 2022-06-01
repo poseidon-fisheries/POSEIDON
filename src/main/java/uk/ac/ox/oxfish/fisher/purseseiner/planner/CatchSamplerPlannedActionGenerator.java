@@ -2,12 +2,17 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * generates a random dolphin deployment action
@@ -20,13 +25,23 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
     private final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator;
 
+    private final CatchMaker<? extends LocalBiology> catchMaker;
+
+    private final GlobalBiology biology;
+
     public CatchSamplerPlannedActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
                                               NauticalMap map, MersenneTwisterFast random,
                                               double additionalWaitTime,
-                                              CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
+                                              CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                              GlobalBiology biology) {
         super(originalLocationValues, map, random);
         this.additionalWaitTime = additionalWaitTime;
         this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
+        this.biology = biology;
+        if(FishStateUtilities.guessIfBiologyIsBiomassOnly(biology))
+            catchMaker=new BiomassCatchMaker(biology);
+        else
+            catchMaker=new AbundanceCatchMaker(biology);
     }
 
     @Override
@@ -36,15 +51,17 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
                 turnSeatilePickedIntoAction(
                         howMuchWeCanFishOutGenerator,
                         drawNewLocation(),
-                        additionalWaitTime
-                );
+                        additionalWaitTime,
+                        catchMaker,
+                        biology);
     }
 
     abstract public PA turnSeatilePickedIntoAction(
             CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
             SeaTile tile,
-            double additionalWaitTime
-    );
+            double additionalWaitTime,
+            CatchMaker<? extends LocalBiology> catchMaker,
+            GlobalBiology biology);
 
 
     public static class DolphinActionGenerator extends CatchSamplerPlannedActionGenerator<PlannedAction.DolphinSet> {
@@ -53,19 +70,19 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         public DolphinActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
                                       NauticalMap map, MersenneTwisterFast random,
                                       double additionalWaitTime, CatchSampler<? extends LocalBiology>
-                                              howMuchWeCanFishOutGenerator) {
-            super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator);
+                                              howMuchWeCanFishOutGenerator, final GlobalBiology globalBiology) {
+            super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator,
+                  globalBiology);
         }
 
         @Override
         public PlannedAction.DolphinSet turnSeatilePickedIntoAction(
                 CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, SeaTile tile,
-                double additionalWaitTime) {
+                double additionalWaitTime, CatchMaker<? extends LocalBiology> catchMaker, GlobalBiology biology) {
             return new PlannedAction.DolphinSet(
                     tile,
-                    howMuchWeCanFishOutGenerator,
-                    additionalWaitTime
-            );
+                    howMuchWeCanFishOutGenerator,catchMaker ,
+                    additionalWaitTime);
 
         }
     }
@@ -74,19 +91,21 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
 
         public NonAssociatedActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
-                                      NauticalMap map, MersenneTwisterFast random,
+                                            NauticalMap map, MersenneTwisterFast random,
                                             double additionalWaitTime, CatchSampler<? extends LocalBiology>
-                                              howMuchWeCanFishOutGenerator) {
-            super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator);
+                                              howMuchWeCanFishOutGenerator, final GlobalBiology globalBiology) {
+            super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator,
+                  globalBiology);
         }
 
         @Override
-        public PlannedAction.NonAssociatedSet turnSeatilePickedIntoAction(CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, SeaTile tile, double additionalWaitTime) {
+        public PlannedAction.NonAssociatedSet turnSeatilePickedIntoAction(CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, SeaTile tile, double additionalWaitTime,
+                                                                          CatchMaker<? extends LocalBiology> catchMaker,
+                                                                          GlobalBiology biology) {
             return new PlannedAction.NonAssociatedSet(
                     tile,
-                    howMuchWeCanFishOutGenerator,
-                    additionalWaitTime
-            );
+                    howMuchWeCanFishOutGenerator,catchMaker ,
+                    additionalWaitTime);
 
         }
     }

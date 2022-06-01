@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -306,9 +307,12 @@ public interface PlannedAction {
     //this is what we are using now
     static abstract class AbstractSetWithCatchSampler implements PlannedAction{
 
-        private final static double DEFAULT_DOLPHIN_SET_DURATION = 2.69;
+        private final static double DEFAULT_SET_DURATION = 2.69;
 
         private final CatchSampler howMuchWeCanFishOutGenerator;
+
+
+        private final CatchMaker catchMaker;
 
         private final SeaTile position;
 
@@ -317,30 +321,31 @@ public interface PlannedAction {
         private final double setDurationInHours;
 
         public AbstractSetWithCatchSampler(SeaTile position,
-                                           CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
+                                           CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                           CatchMaker<? extends LocalBiology> catchMaker) {
 
             this(position,
-                    howMuchWeCanFishOutGenerator,
-                    DEFAULT_DOLPHIN_SET_DURATION,
-                    0d);
+                 howMuchWeCanFishOutGenerator,catchMaker ,
+                 DEFAULT_SET_DURATION, 0d);
         }
 
 
         public AbstractSetWithCatchSampler(SeaTile position,
                                            CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                           double delayInHours) {
-            this(position, howMuchWeCanFishOutGenerator,DEFAULT_DOLPHIN_SET_DURATION,
-                    delayInHours);
+                                           CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
+            this(position, howMuchWeCanFishOutGenerator,catchMaker ,
+                 DEFAULT_SET_DURATION, delayInHours);
         }
 
         public AbstractSetWithCatchSampler(SeaTile position,
                                            CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                           double setDurationInHours,
+                                           CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours,
                                            double delayInHours) {
             this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
             this.position = position;
             this.searchTimeInHours = delayInHours;
             this.setDurationInHours = setDurationInHours;
+            this.catchMaker = catchMaker;
         }
         @Override
         public SeaTile getLocation() {
@@ -374,8 +379,9 @@ public interface PlannedAction {
         abstract protected <B extends LocalBiology>  AbstractSetAction<B> createSet(
                 B potentialCatch,
                 Fisher fisher,
-                double fishingTime
-        );
+                double fishingTime,
+                SeaTile location,
+                CatchMaker catchMaker);
 
         /**
          * list of actions that need to take place for the planned action to take place
@@ -394,12 +400,12 @@ public interface PlannedAction {
             if(searchTimeInHours<=0)
             {
                 return new Action[]{
-                        createSet(potentialCatch, fisher, setDurationInHours)
+                        createSet(potentialCatch, fisher, setDurationInHours,getLocation() ,catchMaker )
                 };
             }
             else{
                 return new Action[]{
-                        createSet(potentialCatch, fisher, setDurationInHours),
+                        createSet(potentialCatch, fisher, setDurationInHours,getLocation() ,catchMaker ),
                         new Delaying(searchTimeInHours)
                 };
             }
@@ -426,16 +432,19 @@ public interface PlannedAction {
     static class DolphinSet extends  AbstractSetWithCatchSampler {
 
 
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
-            super(position, howMuchWeCanFishOutGenerator);
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker) {
+            super(position, howMuchWeCanFishOutGenerator,catchMaker );
         }
 
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, delayInHours);
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
         }
 
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double setDurationInHours, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, setDurationInHours, delayInHours);
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator,catchMaker , setDurationInHours, delayInHours);
         }
 
         @Override
@@ -445,11 +454,13 @@ public interface PlannedAction {
 
         @Override
         protected <B extends LocalBiology> AbstractSetAction<B> createSet(
-                B potentialCatch, Fisher fisher, double fishingTime) {
+                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
             return new DolphinSetAction<>(
                     potentialCatch,
                     fisher,
-                    fishingTime
+                    fishingTime,
+                    ImmutableList.of(location.getBiology()),
+                    catchMaker
             );
         }
     }
@@ -457,16 +468,20 @@ public interface PlannedAction {
     static class NonAssociatedSet extends  AbstractSetWithCatchSampler {
 
 
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator) {
-            super(position, howMuchWeCanFishOutGenerator);
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                CatchMaker<? extends LocalBiology> catchMaker) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker);
         }
 
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, delayInHours);
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
         }
 
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator, double setDurationInHours, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, setDurationInHours, delayInHours);
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator,catchMaker ,
+                  setDurationInHours, delayInHours);
         }
 
         @Override
@@ -476,11 +491,13 @@ public interface PlannedAction {
 
         @Override
         protected <B extends LocalBiology> AbstractSetAction<B> createSet(
-                B potentialCatch, Fisher fisher, double fishingTime) {
+                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
             return new NonAssociatedSetAction<>(
                     potentialCatch,
                     fisher,
-                    fishingTime
+                    fishingTime,
+                    ImmutableList.of(location.getBiology()),
+                    catchMaker
             );
         }
     }

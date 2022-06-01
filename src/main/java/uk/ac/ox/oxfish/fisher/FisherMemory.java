@@ -134,6 +134,8 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
+
+
     private DiscretizedLocationMemory discretizedLocationMemory;
 
     /**

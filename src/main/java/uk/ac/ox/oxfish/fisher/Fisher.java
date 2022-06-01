@@ -581,6 +581,9 @@ public class Fisher implements Steppable, Startable{
 	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
 
         }
+        else{
+            memory.getTripLogger().resetTrip();
+        }
 
         status.setHoursAtSea(0);
         assert  isAtPort();

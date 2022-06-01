@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
@@ -11,6 +12,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.MTFApache;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -53,13 +58,30 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     private void preparePicker(){
 
         if(originalLocationValues.getValues().size()>0) {
+            List<Pair<SeaTile, Double>> valuePairs = originalLocationValues.getValues().stream().map(
+                    entry -> new Pair<>(
+                            map.getSeaTile(entry.getKey()),
+                            entry.getValue()
+                    )
+            ).collect(Collectors.toList());
+
+            //some weird inputs have 0s everywhere. They need to sum up to something other than 0 or the randomizer
+            //goes in some sort of middle life crisis
+            double sum = 0;
+            for (Pair<SeaTile, Double> valuePair : valuePairs) {
+                sum += valuePair.getSecond();
+            }
+            if(sum==0) {
+                List<Pair<SeaTile, Double>> valuePairsNew = new LinkedList<>();
+                for (Pair<SeaTile, Double> valuePair : valuePairs) {
+                    valuePairsNew.add(new Pair<>(valuePair.getKey(),valuePair.getValue()+1));
+                }
+                valuePairs=valuePairsNew;
+            }
             seatilePicker = new EnumeratedDistribution<>(localRng,
-                    originalLocationValues.getValues().stream().map(
-                            entry -> new Pair<>(
-                                    map.getSeaTile(entry.getKey()),
-                                    entry.getValue()
-                            )
-                    ).collect(Collectors.toList()));
+                                                         valuePairs);
+
+
         }
     }
 

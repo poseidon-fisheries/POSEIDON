@@ -1,16 +1,13 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -27,7 +24,7 @@ public class NonAssociatedSetFromLocationValuePlanningModule extends LocationVal
             NauticalMap map,
             MersenneTwisterFast random,
             double additionalWaitTime,
-            CatchSampler<? extends LocalBiology> sampler
+            CatchSampler<? extends LocalBiology> sampler, final GlobalBiology globalBiology
     ) {
         this(locationValues,
                 new CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator(
@@ -35,7 +32,7 @@ public class NonAssociatedSetFromLocationValuePlanningModule extends LocationVal
                         map,
                         random,
                         additionalWaitTime,
-                        sampler
+                        sampler, globalBiology
                 ));
     }
 

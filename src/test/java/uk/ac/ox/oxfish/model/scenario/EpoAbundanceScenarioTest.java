@@ -74,7 +74,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
         final PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> gearFactory =
             scenario.getPurseSeineGearFactory();
         final PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad>
-            strategyFactory = scenario.getFishingStrategyFactory();
+            strategyFactory = (PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad>) scenario.getFishingStrategyFactory();
 
         gearFactory.setPctHoldSpaceLeftModulationFunction(
             new CompressedExponentialFunctionFactory(0.5)

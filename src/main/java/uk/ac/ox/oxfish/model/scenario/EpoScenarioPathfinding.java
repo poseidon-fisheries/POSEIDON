@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -355,16 +356,23 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private EPOPlannedStrategyFactory destinationStrategy =
             new EPOPlannedStrategyFactory();
 
+    public EpoScenarioPathfinding() {
+
+    }
+
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
-
-        initModel(fishState);
+        super.setCatchSamplersFactory(abundanceCatchSamplersFactory);
+        super.setFishingStrategyFactory(fishingStrategyFactory);
+        super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
+        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-                abundanceFilters =
-                abundanceFiltersFactory.apply(fishState);
+                abundanceFilters = abundanceFiltersFactory.apply(fishState);
+
         abundanceCatchSamplersFactory.setAbundanceFilters(abundanceFilters);
+
 
         marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
         final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
@@ -377,19 +385,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 new FixedGasPrice(0)
         );
         final List<Port> ports = fishState.getMap().getPorts();
-
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
-
-        abundancePurseSeineGearFactory.getFadDeploymentObservers()
-                .addAll(monitors.getFadDeploymentMonitors());
-        abundancePurseSeineGearFactory.getFadSetObservers().addAll(monitors.getFadSetMonitors());
-        abundancePurseSeineGearFactory.getNonAssociatedSetObservers()
-                .addAll(monitors.getNonAssociatedSetMonitors());
-        abundancePurseSeineGearFactory.getDolphinSetObservers()
-                .addAll(monitors.getDolphinSetMonitors());
-        abundancePurseSeineGearFactory.setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-        abundancePurseSeineGearFactory.setLocationValuesFile(getLocationValuesFilePath());
 
         if(fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
             ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
@@ -424,7 +419,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 scheduledAbundanceProcessesFactory,
                 abundanceRestorerFactory
         ).forEach(startableFactory ->
-                fishState.registerStartable(startableFactory.apply(fishState))
+                          fishState.registerStartable(startableFactory.apply(fishState))
         );
 
         if(zapper) {
@@ -437,11 +432,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                     )
             );
         }
-        return new ScenarioPopulation(
-                fishers,
-                new SocialNetwork(new EmptyNetworkBuilder()),
-                ImmutableMap.of() // no entry in the fishery so no need to pass factory here
-        );
+        scenarioPopulation.getPopulation().addAll(fishers);
+        return scenarioPopulation;
     }
 
     @SuppressWarnings("WeakerAccess")

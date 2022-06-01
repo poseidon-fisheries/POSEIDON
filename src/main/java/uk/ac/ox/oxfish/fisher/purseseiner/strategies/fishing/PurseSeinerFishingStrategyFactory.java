@@ -264,7 +264,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
@@ -398,6 +398,26 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                 )
             ));
     }
+
+    public static Function<Fisher,
+            Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
+            Path attractionWeightsFile
+    ) {
+        return fisher -> stream(ActionClass.values())
+                .map(ActionClass::getActionClass)
+                .collect(toImmutableMap(
+                        identity(),
+                        actionClass -> ActionWeightsCache.INSTANCE.get(
+                                attractionWeightsFile,
+                                TARGET_YEAR,
+                                fisher,
+                                actionClass
+                        )
+                ));
+
+
+    }
+
 
     private SetOpportunityDetector<B> makeSetOpportunityDetector(final Fisher fisher) {
 

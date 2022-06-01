@@ -1,14 +1,14 @@
 EPO Abundance Pathfinding:
   abundanceCatchSamplersFactory:
     abundanceFilters: null
-    catchSamplesFile: inputs/epo/set_samples.csv
+    catchSamplesFile: inputs/epo_inputs/set_samples.csv
   abundanceFiltersFactory:
-    selectivityFilePath: inputs/epo/abundance/selectivity.csv
+    selectivityFilePath: inputs/epo_inputs/abundance/selectivity.csv
   abundanceInitializerFactory:
     Abundance Initializer Factory:
-      binsFilePath: inputs/epo/abundance/bins.csv
+      binsFilePath: inputs/epo_inputs/abundance/bins.csv
   abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
-    mortalityFile: inputs/epo/abundance/mortality.csv
+    mortalityFile: inputs/epo_inputs/abundance/mortality.csv
     sources:
     - natural
     - obj_class_1_5
@@ -47,7 +47,7 @@ EPO Abundance Pathfinding:
     fadInitializerFactory: null
     fadSetObservers: !!set {
       }
-    locationValuesFile: inputs/epo/location_values.csv
+    locationValuesFile: inputs/epo_inputs/location_values.csv
     nonAssociatedSetObservers: !!set {
       }
     nonAssociatedSetTimeSinceLastVisitModulationFunction:
@@ -76,7 +76,7 @@ EPO Abundance Pathfinding:
         exponent: 2.0
     successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
-    biomassDistributionsFilePath: inputs/epo/abundance/grids.csv
+    biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
     firstLargeBinPerSpecies:
       Skipjack tuna: 14
       Bigeye tuna: 8
@@ -84,16 +84,16 @@ EPO Abundance Pathfinding:
   abundanceRestorerFactory:
     schedule:
       0: 365
-  attractionWeightsFile: inputs/epo/test/backsliding/action_weights.csv
-  costsFile: inputs/epo/costs.csv
+  attractionWeightsFile: inputs/epo_inputs/tests/backsliding/action_weights.csv
+  costsFile: inputs/epo_inputs/costs.csv
   destinationStrategy:
     additionalHourlyDelayDeployment: '0.1'
     additionalHourlyDelayDolphinSets: '5.0'
     additionalHourlyDelayNonAssociatedSets: '5.0'
-    attractionWeightsFile: inputs/epo/location_values.csv
+    attractionWeightsFile: inputs/epo_inputs/location_values.csv
     catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
       abundanceFilters: null
-      catchSamplesFile: inputs/epo/set_samples.csv
+      catchSamplesFile: inputs/epo_inputs/set_samples.csv
     deploymentBias: '1.0'
     distancePenaltyFadSets: '1.0'
     hoursWastedOnFailedSearches: '20.0'
@@ -101,7 +101,7 @@ EPO Abundance Pathfinding:
       Squared Discretization:
         horizontalSplits: '5'
         verticalSplits: '3'
-    maxTripDurationFile: inputs/epo/boats.csv
+    maxTripDurationFile: inputs/epo_inputs/boats.csv
     minimumValueFadSets: '5000.0'
     minimumValueOpportunisticFadSets: '5000.0'
     ownFadActionWeightBias: '1.0'
@@ -135,23 +135,23 @@ EPO Abundance Pathfinding:
       totalCarryingCapacity: '445000.0'
   fadMapFactory:
     currentFiles:
-      Y2016: inputs/epo/test/backsliding/currents_2016_daily.csv
-      Y2017: inputs/epo/test/backsliding/currents_2017_daily.csv
+      Y2016: inputs/epo_inputs/tests/backsliding/currents_2016_daily.csv
+      Y2017: inputs/epo_inputs/tests/backsliding/currents_2017_daily.csv
   fishingStrategyFactory: Default to Destination Strategy
-  locationValuesFilePath: inputs/epo/test/backsliding/location_values_all2017.csv
+  locationValuesFilePath: inputs/epo_inputs/tests/backsliding/location_values_all2017.csv
   mapInitializerFactory:
     From File Map:
       gridWidthInCell: '101.0'
       header: true
       latLong: true
-      mapFile: inputs/epo/depth.csv
+      mapFile: inputs/epo_inputs/depth.csv
       mapPaddingInDegrees: '0.5'
   recruitmentProcessesFactory:
-    recruitmentParametersFilePath: inputs/epo/abundance/recruitment_parameters.csv
+    recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
     factories:
     - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo/galapagos_eez/eez.shp
+        shapeFilePath: inputs/epo_inputs/galapagos_eez/eez.shp
     - Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
@@ -187,4 +187,4 @@ EPO Abundance Pathfinding:
     recruitmentProcesses: null
   zapper: true
   zapperAge: false
-  vesselsFilePath: inputs/epo/boats.csv
+  vesselsFilePath: inputs/epo_inputs/boats.csv

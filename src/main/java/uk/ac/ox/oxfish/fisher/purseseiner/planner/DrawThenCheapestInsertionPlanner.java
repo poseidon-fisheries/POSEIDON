@@ -273,7 +273,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     }
 
     public Plan replan(double hoursAlreadySpent){
-        Preconditions.checkArgument(fisher.getLocation() != fisher.getHomePort().getLocation());
+        Preconditions.checkArgument(fisher.getLocation() != fisher.getHomePort().getLocation() || fisher.getHoursAtSea()==0);
 
         //length of the trip is reduced by how much we have already spent outside
         double hoursAvailable = getThisTripTargetHours();
@@ -316,7 +316,8 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         //do not allow more DPL
         stillAllowedActionsInPlan.put(ActionType.DeploymentAction,new MutableInt(0));
 
-        assert hoursAvailable>=0;
+        //random delays (chasing FADs off course, for example), it can happen to be completely off
+        //assert hoursAvailable>=-FishStateUtilities.EPSILON : hoursAvailable;
 
         //add more events now.
         currentPlan = newPlan;
@@ -387,7 +388,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             //tricky here because when you add the approximations from the curvature distance, if you are going on a straight line
             //in the projected map, you may actually be violating by tiny amounts the triangle inequality constraint
             //but we choose to ignore this
-            assert insertionCost >= -3 : "triangle inequality does not seem to hold here. Bizarre " + insertionCost;
+            //assert insertionCost >= -5 : "triangle inequality does not seem to hold here. Bizarre " + insertionCost;
 
             if(insertionCost<bestInsertionCost) {
                 bestInsertionCost = insertionCost;

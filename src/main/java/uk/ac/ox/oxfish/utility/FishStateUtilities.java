@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Fishing;
@@ -1394,6 +1395,19 @@ public class FishStateUtilities {
         //noinspection UnstableApiUsage
         return zip(stream(keys), stream(values), AbstractMap.SimpleImmutableEntry::new)
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
+     * if global biology is made up only of species whose meristics is the default fake one, i can quite safely assume
+     * that there is no abundance to be worried of
+     * @return
+     */
+    public static boolean guessIfBiologyIsBiomassOnly(GlobalBiology biology){
+        for (Species species : biology.getSpecies()) {
+            if(species.getMeristics() !=  StockAssessmentCaliforniaMeristics.FAKE_MERISTICS)
+                return false;
+        }
+        return true;
     }
 
 }

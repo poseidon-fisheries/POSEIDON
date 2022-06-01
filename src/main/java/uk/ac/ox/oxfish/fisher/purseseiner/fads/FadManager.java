@@ -86,6 +86,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
                 ImmutableSet.of(),
                 ImmutableSet.of(),
                 ImmutableSet.of(),
+                ImmutableSet.of(),
                 Optional.empty(),
                 new ActiveActionRegulations()
         );

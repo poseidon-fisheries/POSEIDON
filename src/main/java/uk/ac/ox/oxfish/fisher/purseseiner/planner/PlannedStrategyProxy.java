@@ -18,7 +18,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.HashMap;
@@ -198,7 +197,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 model.getMap(),
                                 model.getRandom(),
                                 additionalHourlyDelayDolphinSets,
-                                catchSamplers.get(DolphinSetAction.class)
+                                catchSamplers.get(DolphinSetAction.class),
+                                model.getBiology()
                         )
                 );
             }
@@ -236,7 +236,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 model.getMap(),
                                 model.getRandom(),
                                 additionalHourlyDelayNonAssociatedSets,
-                                catchSamplers.get(NonAssociatedSetAction.class)
+                                catchSamplers.get(NonAssociatedSetAction.class),
+                                model.getBiology()
                         )
                 );
             }

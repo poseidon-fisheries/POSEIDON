@@ -227,7 +227,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 return fisher.getLocation();
 
             //unless you are at port (probably because you beelined here after you were told to go home)
-            if(fisher.getLocation() != fisher.getHomePort().getLocation())
+            if(fisher.getLocation() != fisher.getHomePort().getLocation() || fisher.getHoursAtSea()<=0)
                 replan(fisher,model);
             else
                 return fisher.getHomePort().getLocation();

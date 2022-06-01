@@ -45,6 +45,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
@@ -54,7 +55,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyF
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -86,12 +89,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
     private final FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
-    private PurseSeinerFishingStrategyFactory<B, F> fishingStrategyFactory;
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
-    private CatchSamplersFactory<B> catchSamplersFactory;
+    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory = new AbundanceCatchSamplersFactory();
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
 
     @Override
@@ -103,9 +106,9 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
 
-        if (getFishingStrategyFactory() != null) {
-            getFishingStrategyFactory().setCatchSamplersFactory(getCatchSamplersFactory());
-            getFishingStrategyFactory().setAttractionWeightsFile(getAttractionWeightsFile());
+        if (getFishingStrategyFactory() != null && getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory) {
+            ((PurseSeinerFishingStrategyFactory<B, ?>) getFishingStrategyFactory()).setCatchSamplersFactory(getCatchSamplersFactory());
+            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory()).setAttractionWeightsFile(getAttractionWeightsFile());
         }
 
         if (getPurseSeineGearFactory() != null) {
@@ -131,15 +134,15 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         );
     }
 
-    public PurseSeinerFishingStrategyFactory<B, F> getFishingStrategyFactory() {
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategyFactory() {
         return fishingStrategyFactory;
     }
 
-    public void setFishingStrategyFactory(final PurseSeinerFishingStrategyFactory<B, F> fishingStrategyFactory) {
+    public void setFishingStrategyFactory(final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory) {
         this.fishingStrategyFactory = fishingStrategyFactory;
     }
 
-    public CatchSamplersFactory<B> getCatchSamplersFactory() {
+    public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
         return catchSamplersFactory;
     }
 
@@ -185,49 +188,68 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory
     ) {
+        return makeFisherFactory(
+                fishState,
+                regulationsFactory,
+                purseSeineGearFactory,
+                gravityDestinationStrategyFactory,
+                fishingStrategyFactory,
+                new PurseSeinerDepartingStrategyFactory()
+        );
+
+    }
+
+    @NotNull    FisherFactory makeFisherFactory(
+            final FishState fishState,
+            final AlgorithmFactory<? extends Regulation> regulationsFactory,
+            final PurseSeineGearFactory<B, F> purseSeineGearFactory,
+            final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
+            final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory, PurseSeinerDepartingStrategyFactory departingStrategy
+    ) {
         final FisherFactory fisherFactory = new FisherFactory(
-            null,
-            regulationsFactory,
-            new PurseSeinerDepartingStrategyFactory(),
-            gravityDestinationStrategyFactory,
-            fishingStrategyFactory,
-            new NoDiscardingFactory(),
-            gearStrategy,
-            new IgnoreWeatherFactory(),
-            null,
-            null,
-            purseSeineGearFactory,
-            0
+                null,
+                regulationsFactory,
+                departingStrategy,
+                gravityDestinationStrategyFactory,
+                fishingStrategyFactory,
+                new NoDiscardingFactory(),
+                gearStrategy,
+                new IgnoreWeatherFactory(),
+                null,
+                null,
+                purseSeineGearFactory,
+                0
         );
 
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
-            fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
-                .getStrategies()
-                .stream()
-                .filter(strategy -> strategy instanceof DestinationBasedDepartingStrategy)
-                .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
-                .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
-            addHourlyCosts(),
-            fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> scheduleClosurePeriodChoice(fishState, fisher),
-            fisher -> fisher.getYearlyData().registerGatherer(
-                "Profits",
-                fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
-                    - fisher1.getYearlyCounterColumn(VARIABLE_COSTS),
-                Double.NaN
-            ),
-            fisher -> fisher.getYearlyCounter().addColumn("Distance travelled"),
-            fisher -> fisher.getYearlyData().registerGatherer("Distance travelled", fisher1 ->
-                fisher1.getYearlyCounterColumn("Distance travelled"), Double.NaN
-            ),
-            fisher -> fisher.addTripListener((tripRecord, fisher1) ->
-                fisher1.getYearlyCounter()
-                    .count("Distance travelled", tripRecord.getDistanceTravelled())
-            )
+                fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
+                        .getStrategies()
+                        .stream()
+                        .filter(strategy -> strategy instanceof DestinationBasedDepartingStrategy)
+                        .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
+                        .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
+                addHourlyCosts(),
+                fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
+                fisher -> scheduleClosurePeriodChoice(fishState, fisher),
+                fisher -> fisher.getYearlyData().registerGatherer(
+                        "Profits",
+                        fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
+                                - fisher1.getYearlyCounterColumn(VARIABLE_COSTS),
+                        Double.NaN
+                ),
+                fisher -> fisher.getYearlyCounter().addColumn("Distance travelled"),
+                fisher -> fisher.getYearlyData().registerGatherer("Distance travelled", fisher1 ->
+                        fisher1.getYearlyCounterColumn("Distance travelled"), Double.NaN
+                ),
+                fisher -> fisher.addTripListener((tripRecord, fisher1) ->
+                                                         fisher1.getYearlyCounter()
+                                                                 .count("Distance travelled", tripRecord.getDistanceTravelled())
+                )
         ));
 
         return fisherFactory;
     }
+
 
     @SuppressWarnings("UnstableApiUsage")
     private Consumer<Fisher> addHourlyCosts() {

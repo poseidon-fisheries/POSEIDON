@@ -40,7 +40,6 @@ public class Arriving implements Action{
      */
     @Override
     public ActionResult act(FishState model, Fisher agent, Regulation regulation,double hoursLeft) {
-        assert agent.isAtDestination();
 
         //did we arrive at port? then dock
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
