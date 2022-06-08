@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableList;
+import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -12,6 +13,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -376,7 +380,7 @@ public interface PlannedAction {
         }
 
 
-        abstract protected <B extends LocalBiology>  AbstractSetAction<B> createSet(
+        abstract protected <B extends LocalBiology>  AbstractSetAction<B>  createSet(
                 B potentialCatch,
                 Fisher fisher,
                 double fishingTime,
@@ -468,21 +472,20 @@ public interface PlannedAction {
     static class NonAssociatedSet extends  AbstractSetWithCatchSampler {
 
 
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                CatchMaker<? extends LocalBiology> catchMaker) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker);
-        }
+        final boolean canPoachFromFads;
 
         public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                 CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
+            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours,false);
         }
 
         public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator,catchMaker ,
-                  setDurationInHours, delayInHours);
+                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours,
+                                boolean canPoachFromFads) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
+            this.canPoachFromFads = canPoachFromFads;
         }
+
 
         @Override
         protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
@@ -496,10 +499,21 @@ public interface PlannedAction {
                     potentialCatch,
                     fisher,
                     fishingTime,
-                    ImmutableList.of(location.getBiology()),
+                    canPoachFromFads ? getAllBiologiesHere(location,fisher) : ImmutableList.of(location.getBiology()),
                     catchMaker
             );
         }
+
+        private static <B extends LocalBiology> List<B> getAllBiologiesHere(SeaTile tile, Fisher fisher){
+            LinkedList<B> biologies = new LinkedList<>();
+            biologies.add((B) tile.getBiology());
+            final Bag fads = fisher.grabState().getFadMap().fadsAt(tile);
+            for (Object fad : fads) {
+                biologies.add((B) ((Fad) fad).getBiology());
+            }
+            return biologies;
+        }
     }
+
 
 }

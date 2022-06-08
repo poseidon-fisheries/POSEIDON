@@ -89,13 +89,17 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
     public static class NonAssociatedActionGenerator extends CatchSamplerPlannedActionGenerator<PlannedAction.NonAssociatedSet> {
 
+        private final boolean canPoachFads;
 
         public NonAssociatedActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
                                             NauticalMap map, MersenneTwisterFast random,
                                             double additionalWaitTime, CatchSampler<? extends LocalBiology>
-                                              howMuchWeCanFishOutGenerator, final GlobalBiology globalBiology) {
+                                              howMuchWeCanFishOutGenerator,
+                                            final GlobalBiology globalBiology,
+                                            boolean canPoachFads) {
             super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator,
                   globalBiology);
+            this.canPoachFads = canPoachFads;
         }
 
         @Override
@@ -105,7 +109,8 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             return new PlannedAction.NonAssociatedSet(
                     tile,
                     howMuchWeCanFishOutGenerator,catchMaker ,
-                    additionalWaitTime);
+                    additionalWaitTime,
+                    canPoachFads);
 
         }
     }

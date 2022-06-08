@@ -119,6 +119,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double minimumPercentageOfTripDurationAllowed;
 
+    /**
+     * when this is set to true, NOA sets can "steal" biomass from under the fad
+     */
+    private final boolean noaSetsCanPoachFads;
+
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
                     ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
@@ -131,7 +136,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             double ownFadActionWeightBias, double deploymentBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
             MapDiscretization mapDiscretizationFadSets,
             double hoursWastedOnFailedSearches,
-            double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed) {
+            double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
+            boolean noaSetsCanPoachFads) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -147,6 +153,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
+        this.noaSetsCanPoachFads=noaSetsCanPoachFads;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
     }
@@ -237,7 +244,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 model.getRandom(),
                                 additionalHourlyDelayNonAssociatedSets,
                                 catchSamplers.get(NonAssociatedSetAction.class),
-                                model.getBiology()
+                                model.getBiology(),
+                                noaSetsCanPoachFads
                         )
                 );
             }

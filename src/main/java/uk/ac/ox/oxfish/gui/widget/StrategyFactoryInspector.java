@@ -56,7 +56,7 @@ public class StrategyFactoryInspector extends BaseObjectInspector {
                 .getWriteMethod()
                 .getGenericParameterTypes()[0];
             if (isAlgorithmFactory(type)) {
-                if (type instanceof ParameterizedType) {
+                if (type instanceof ParameterizedType && type.getTypeName().contains("AlgorithmFactory")) {
                     type = ((ParameterizedType) type).getActualTypeArguments()[0];
                     if (type instanceof WildcardType) {
                         type = ((WildcardType) type).getUpperBounds()[0];

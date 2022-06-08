@@ -101,6 +101,7 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
      */
     private DoubleParameter minimumPercentageOfTripDurationAllowed = new FixedDoubleParameter(1 );
 
+    private boolean noaSetsCanPoachFads = false;
 
     @Override
     public PlannedStrategyProxy apply(FishState state) {
@@ -121,7 +122,9 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 ),
                 hoursWastedOnFailedSearches.apply(state.getRandom()),
                 planningHorizonInHours.apply(state.getRandom()),
-                minimumPercentageOfTripDurationAllowed.apply(state.getRandom()));
+                minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
+                noaSetsCanPoachFads
+                );
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -244,5 +247,13 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setMinimumPercentageOfTripDurationAllowed(DoubleParameter minimumPercentageOfTripDurationAllowed) {
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
+    }
+
+    public boolean isNoaSetsCanPoachFads() {
+        return noaSetsCanPoachFads;
+    }
+
+    public void setNoaSetsCanPoachFads(boolean noaSetsCanPoachFads) {
+        this.noaSetsCanPoachFads = noaSetsCanPoachFads;
     }
 }

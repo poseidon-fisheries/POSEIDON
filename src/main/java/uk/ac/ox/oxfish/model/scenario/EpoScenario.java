@@ -146,7 +146,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 

@@ -47,6 +47,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
@@ -204,6 +206,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory
     ) {
         this.scheduledAbundanceProcessesFactory = scheduledAbundanceProcessesFactory;
+    }
+
+    public FadsOnlyEpoAbundanceScenario() {
+        this.setFishingStrategyFactory(new FishUntilFullFactory());
     }
 
     @Override

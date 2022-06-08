@@ -87,6 +87,7 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 //find out which strategy factory is currently selected and try to show it in the combo-box
                 try {
                     String address = addressFromPath(attributes, metawidget);
+
                     //current class
                     Class actualClass = PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                   address).getClass();
