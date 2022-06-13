@@ -10,17 +10,14 @@ import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * an exogenous generator of fad set events which are unconnected to both fishers and FadManagers
@@ -43,7 +40,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
      */
     private Stoppable stoppable;
 
-    abstract protected List<Fad> chooseWhichFadsToSetOnToday(
+    abstract protected List<AbstractFad> chooseWhichFadsToSetOnToday(
             FadMap fadMap,
             FishState model,
             int day
@@ -53,11 +50,11 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
     public void step(SimState simState) {
         FishState model = ((FishState) simState);
         //get fads to set on
-        List<Fad> allFadsToSetOn = chooseWhichFadsToSetOnToday(fadMap,
-                model,
-                model.getDay());
+        List<AbstractFad> allFadsToSetOn = chooseWhichFadsToSetOnToday(fadMap,
+                                                                       model,
+                                                                       model.getDay());
         //set on them
-        for (Fad fad : allFadsToSetOn) {
+        for (AbstractFad fad : allFadsToSetOn) {
             logFadRemoval(fad, model);
             setOnFad(fad);
         }
@@ -72,7 +69,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
         );
     }
 
-    private static void logFadRemoval(final Fad<?, ?> fad, final FishState fishState) {
+    private static void logFadRemoval(final AbstractFad<? extends uk.ac.ox.oxfish.biology.LocalBiology,? extends AbstractFad<?,?>> fad, final FishState fishState) {
         LogManager.getLogger("fad_removals").debug(() -> {
             final NauticalMap map = fishState.getMap();
             final Coordinate coordinatesDeployed =
@@ -103,7 +100,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
      * remove fad from circulation
      * @param fad
      */
-    private void setOnFad(Fad fad){
+    private void setOnFad(AbstractFad fad){
         //remove it from the fadMap
         fadMap.remove(fad);
         //should have been removed automatically

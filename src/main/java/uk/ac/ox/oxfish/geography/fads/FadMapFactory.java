@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -16,7 +17,7 @@ import uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class FadMapFactory<B extends LocalBiology, F extends Fad<B, F>>
+public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
     implements AlgorithmFactory<FadMap<B, F>> {
 
     private final Class<B> localBiologyClass;

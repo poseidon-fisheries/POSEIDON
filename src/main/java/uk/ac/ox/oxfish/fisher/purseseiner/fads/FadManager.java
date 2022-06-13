@@ -56,7 +56,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
+public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
 
     private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
             ImmutableList.of(
@@ -150,7 +150,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         observers.register(observedClass, observer);
     }
 
-    public static FadManager<? extends LocalBiology, ? extends Fad<?, ?>> getFadManager(
+    public static FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> getFadManager(
             final Fisher fisher
     ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
@@ -160,7 +160,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     }
 
     public static Optional<
-            FadManager<? extends LocalBiology, ? extends Fad<?, ?>>
+            FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>>
             > maybeGetFadManager(
             final Fisher fisher
     ) {

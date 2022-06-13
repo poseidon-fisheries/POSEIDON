@@ -5,8 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
@@ -112,9 +112,10 @@ public class ExogenousFadMakerTest {
         // so it should be at 18,
         assertEquals(1,state.getFadMap().fadsAt(state.getMap().getSeaTile(18, 31)).size());
         //there should be at least one FAD out there that has attracted some biomass (probability of attraction is 63% per step per FAD)
-        assertTrue(state.getFadMap().allFads().mapToDouble(new ToDoubleFunction<Fad<?, ?>>() {
+        assertTrue(state.getFadMap().allFads().mapToDouble(new ToDoubleFunction<AbstractFad<? extends uk.ac.ox.oxfish.biology.LocalBiology,? extends AbstractFad<?,?>>>() {
             @Override
-            public double applyAsDouble(Fad<?, ?> value) {
+            public double applyAsDouble(
+                    AbstractFad<? extends uk.ac.ox.oxfish.biology.LocalBiology,? extends AbstractFad<?,?>> value) {
                 return ((BiomassLocalBiology) value.getBiology()).getBiomass(state.getSpecies("Species 0"));
             }
         }).sum()>0);

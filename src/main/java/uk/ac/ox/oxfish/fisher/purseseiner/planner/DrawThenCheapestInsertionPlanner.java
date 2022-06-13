@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationVa
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
-import uk.ac.ox.oxfish.maximization.TunaEvaluator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -39,7 +38,6 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -90,13 +88,21 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     private double thisTripTargetHours = 0;
 
+    /**
+     * when this is set to true you cannot put an action in the plan if it looks illegal now.
+     * When this is not true, illegal actions stay in the plan until it's time to execute them. If they didn't become legal
+     * then, they will trigger a replan
+     */
+    private final boolean doNotWaitToPurgeIllegalActions;
+
     public DrawThenCheapestInsertionPlanner(
             DoubleParameter maxHoursPerTripGenerator,
             Map<ActionType, Double> plannableActionWeights,
-            Map<ActionType, PlanningModule> planModules) {
+            Map<ActionType, PlanningModule> planModules, boolean doNotWaitToPurgeIllegalActions) {
         this.maxHoursPerTripGenerator = maxHoursPerTripGenerator;
         this.plannableActionWeights = plannableActionWeights;
         this.planModules = planModules;
+        this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
     }
 
 
@@ -121,7 +127,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             //find the module
             PlanningModule planningModule = planModules.get(action);
             Preconditions.checkArgument(planningModule!=null,
-                    "You have assigned weight to " + action.toString()+ " without any module associated to it");
+                                        "You have assigned weight to " + action.toString()+ " without any module associated to it");
             //start the planning module
             planningModule.start(model,fisher);
             //set maximum actions
@@ -204,7 +210,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         PlannedAction plannedAction = planningModule.chooseNextAction(currentPlan);
 
         //if the planning module cannot propose more actions, ignore them for this plan
-        if(plannedAction==null)
+        if(plannedAction==null || (doNotWaitToPurgeIllegalActions &&!plannedAction.isAllowedNow(fisher)))
         {
             stillAllowedActionsInPlan.get(nextActionType).setValue(0);
             //try planning more
@@ -214,7 +220,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             //there is an action and we need to take it
             double hoursConsumed =
                     cheapestInsert(currentPlan,plannedAction,hoursLeftInBudget,fisher.getBoat().getSpeedInKph(),
-                            model.getMap());
+                                   model.getMap());
             if(Double.isNaN(hoursConsumed))
                 //went overbudget! our plan is complete
                 return currentPlan;
@@ -227,7 +233,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                     return currentPlan;
                 else
                     return planRecursively(currentPlan, hoursLeftInBudget,
-                            model, fisher);
+                                           model, fisher);
             }
         }
 
@@ -262,12 +268,12 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
         //create an empty plan (circling back home)
         currentPlan = new Plan(fisher.getLocation(),
-                fisher.getLocation());
+                               fisher.getLocation());
         //start planning
         stillAllowedActionsInPlan.clear();
         thisTripTargetHours = maxHoursPerTripGenerator.apply(model.getRandom());
         currentPlan = planRecursively(currentPlan, thisTripTargetHours ,
-                model, fisher);
+                                      model, fisher);
 
         return currentPlan;
     }
@@ -285,7 +291,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         NauticalMap map = model.getMap();
         double speed = fisher.getBoat().getSpeedInKph();
         Plan newPlan = new Plan(fisher.getLocation(),
-                fisher.getHomePort().getLocation());
+                                fisher.getHomePort().getLocation());
         //now take into consideration the very last step (return to port)
         double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
         hoursAvailable -= lastStepCost;
@@ -326,7 +332,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 module.prepareForReplanning(model, fisher);
             }
             currentPlan = planRecursively(currentPlan, hoursAvailable,
-                    model, fisher);
+                                          model, fisher);
         }
         return currentPlan;
 
@@ -417,26 +423,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         this.thisTripTargetHours = thisTripTargetHours;
     }
 
-//    public static void main(String[] args) throws IOException {
-//        GenericOptimization.buildLocalCalibrationProblem(
-//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapperAge.yaml"),
-//                new double[]{-4.700,-4.317,-9.726, 10.000,-5.696,-10.000,-3.364, 9.002,-4.908,-3.535,-10.000, 2.033, 5.465,-8.304,-2.033,-6.016,-1.467,-5.014,-4.505, 2.120, 6.360, 3.727, 10.000,-5.952,-7.052,-2.532},
-//                "zapperAge_local",.2
-//        );
-//        GenericOptimization.buildLocalCalibrationProblem(
-//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/calibration_logisticbeta_fd_zapper.yaml"),
-//                new double[]{
-//                        -0.244,-5.551,-9.394, 1.927,-1.066,-10.000, 9.442, 8.502,-7.710,-3.389, 2.360, 6.431, 10.000,-0.977,-0.218, 6.725, 5.352,-2.716,-7.049, 2.578, 10.000, 4.774,-3.275,-0.764, 0.055,-8.100
-//                },
-//                "zapper_local",.3
-//        );
-//        GenericOptimization.buildLocalCalibrationProblem(
-//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapperlocal2/original.yaml"),
-//                new double[]{
-//                        5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502
-//                },
-//                "zapper_local_again",.3
-//        );
+    public static void main(String[] args) throws IOException {
 //        GenericOptimization.buildLocalCalibrationProblem(
 //                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapper_expired/original.yaml"),
 //                new double[]{
@@ -444,46 +431,70 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //                },
 //                "zapper_local_expired",.2
 //        );
-  //  }
-
-    public static void main(String[] args) throws IOException {
-
-//        double[] solution = {-3.498,-0.431,-5.375,-3.236,-1.976,-3.991,-6.029, 1.675,-5.013, 0.085, 2.348, 6.974,-6.651, 0.070, 7.658, 1.313,-6.153,-6.742, 5.033, 3.401, 2.288,-0.401, 4.435, 0.906,-5.929, 5.521,-2.117, 5.730};
-//        Path calibrationFile = Paths.get("/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/temp/powpointone/local_1000_forceddiscretization.yaml");
-//
-//
-
-
-//        double[] solution = {-1.732, 5.637,-0.049, 1.983,-0.496, 4.536,-5.810,-3.894,-7.138, 5.626, 5.600, 0.594, 4.095, 2.608, 1.965,-3.078,-4.655, 5.206, 5.751,-3.062, 6.612, 4.448, 4.792, 1.511,-6.183,-7.019, 1.016};
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/local_fd_125.yaml"
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder3/zapper_poaching/original_fromtest.yaml"),
+//                new double[]{-51.724, 22.532, 21.767,-63.344,-3.947,-72.007, 25.182, 695.676, 0.686, 33.917, 14.578, 0.479,-25.794, 0.229, 25.667, 38.437,-27.530, 13.663, 37.790,-1.460, 3.542, 4.050,-0.639, 35.812, 118.978,-15.255, 24.295},
+//                "zapper_local_expired_poaching_test.yaml",.2
 //        );
 
-
-//        double[] solution = {0.562, 4.100,-4.186,-1.756, 3.606,-5.027, 0.635,-2.266, 1.438, 2.350,-0.368,-3.393,-2.957, 1.256, 4.433,-4.830,-2.005,-2.589,-0.782, 0.178, 0.110, 1.421, 0.591,-1.358, 2.359, 4.308};
-//        Path calibrationFile = Paths.get(
-//                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/carrknight/2022-04-20_07.33.02_local1000/local_fd_125.yaml"
+//        GenericOptimization.buildLocalCalibrationProblem(
+//                Paths.get("docs/20220223 tuna_calibration/pathfinder_lastmoment/linearcatchability_local/original.yaml"),
+//                new double[]{-12.370, 15.000, 15.000, 1.441, 2.742,-6.149, 11.639, 7.072,-3.985,-14.394,-3.017, 5.583, 8.825,-11.774},
+//                "linear_local.yaml",.2
 //        );
-
-//        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
-//        );
-
-        double[] solution =
-              //  {-50.830, 22.467, 20.911,-64.333,-3.872,-71.828, 17.786, 635.530, 0.775, 33.997, 14.841,-2.065,-24.428, 1.164, 25.175, 38.979,-24.874, 13.277, 37.779,-1.461, 3.092, 4.066, 3.735, 34.309, 145.886,-13.260, 16.731};
-                {-51.724, 22.532, 21.767,-63.344,-3.947,-72.007, 25.182, 695.676, 0.686, 33.917, 14.578, 0.479,-25.794, 0.229, 25.667, 38.437,-27.530, 13.663, 37.790,-1.460, 3.542, 4.050,-0.639, 35.812, 118.978,-15.255, 24.295};
-
-        Path calibrationFile = Paths.get(
-                "docs/20220223 tuna_calibration/pathfinder3/zapper_expired/zapper_local_expired.yaml"
+        GenericOptimization.buildLocalCalibrationProblem(
+                Paths.get("docs/20220223 tuna_calibration/pathfinder_lastmoment/logistic_newselectivity/local/original.yaml"),
+                new double[]{-6.640, 7.453,-0.121,-12.212,-11.378, 12.993,-14.779,-1.170,-9.462,-12.956,-8.052,-6.009,-12.583,-7.456, 2.450,-7.143, 3.507, 6.119, 9.399,-13.699, 9.692, 6.699, 10.526, 3.820, 4.297,-2.037,-0.092},
+                "logistic_local.yaml",.2
         );
 
+}
 
-        TunaEvaluator evaluator = new TunaEvaluator(calibrationFile,solution);
-        evaluator.setNumRuns(5);
-        evaluator.run();
-
-    }
-
+//    public static void main(String[] args) throws IOException {
+////
+//////        double[] solution = {-3.498,-0.431,-5.375,-3.236,-1.976,-3.991,-6.029, 1.675,-5.013, 0.085, 2.348, 6.974,-6.651, 0.070, 7.658, 1.313,-6.153,-6.742, 5.033, 3.401, 2.288,-0.401, 4.435, 0.906,-5.929, 5.521,-2.117, 5.730};
+//////        Path calibrationFile = Paths.get("/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/temp/powpointone/local_1000_forceddiscretization.yaml");
+//////
+//////
+////
+////
+//////        double[] solution = {-1.732, 5.637,-0.049, 1.983,-0.496, 4.536,-5.810,-3.894,-7.138, 5.626, 5.600, 0.594, 4.095, 2.608, 1.965,-3.078,-4.655, 5.206, 5.751,-3.062, 6.612, 4.448, 4.792, 1.511,-6.183,-7.019, 1.016};
+//////        Path calibrationFile = Paths.get(
+//////                "docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/local_fd_125.yaml"
+//////        );
+////
+////
+//////        double[] solution = {0.562, 4.100,-4.186,-1.756, 3.606,-5.027, 0.635,-2.266, 1.438, 2.350,-0.368,-3.393,-2.957, 1.256, 4.433,-4.830,-2.005,-2.589,-0.782, 0.178, 0.110, 1.421, 0.591,-1.358, 2.359, 4.308};
+//////        Path calibrationFile = Paths.get(
+//////                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/carrknight/2022-04-20_07.33.02_local1000/local_fd_125.yaml"
+//////        );
+////
+//////        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
+//////        Path calibrationFile = Paths.get(
+//////                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
+//////        );
+////
+////        double[] solution =
+////              //  {-50.830, 22.467, 20.911,-64.333,-3.872,-71.828, 17.786, 635.530, 0.775, 33.997, 14.841,-2.065,-24.428, 1.164, 25.175, 38.979,-24.874, 13.277, 37.779,-1.461, 3.092, 4.066, 3.735, 34.309, 145.886,-13.260, 16.731};
+////                {-51.724, 22.532, 21.767,-63.344,-3.947,-72.007, 25.182, 695.676, 0.686, 33.917, 14.578, 0.479,-25.794, 0.229, 25.667, 38.437,-27.530, 13.663, 37.790,-1.460, 3.542, 4.050,-0.639, 35.812, 118.978,-15.255, 24.295};
+////
+////        Path calibrationFile = Paths.get(
+////                "docs/20220223 tuna_calibration/pathfinder3/zapper_expired/zapper_local_expired.yaml"
+////        );
+//
+//        double[] solution =
+//                {-1.150,-0.311,-1.512, 44.211,-15.312,-11.379, 1.842,-6.530, 3.308,-0.434,-6.452, 14.363,-7.341, 44.990, 3.069, 0.488,-9.224,-4.251,-7.733, 3.186, 4.396, 3.645,-6.584,-12.566,-5.190, 7.120, 4.305};
+//
+//        Path calibrationFile = Paths.get(
+//                "docs/20220223 tuna_calibration/pathfinder3/zapper_poaching/zapper_local_expired_poaching.yaml"
+//        );
+//
+//
+//        TunaEvaluator evaluator = new TunaEvaluator(calibrationFile, solution);
+//        evaluator.setNumRuns(5);
+//        evaluator.run();
+////
+////    }
+   // }
 
 }

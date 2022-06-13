@@ -71,7 +71,7 @@ public class FadBiomassLogger implements RowProvider {
                     .add(coordinates.y)
                     .add(fishState.getStep())
                     .addAll(speciesIndices.stream()
-                        .mapToObj(i -> fad.getBiomass()[i])
+                        .mapToObj(i -> fad.getBiology().getBiomass(fishState.getBiology().getSpecie(i)))
                         .collect(toImmutableList())
                     )
                     .build();

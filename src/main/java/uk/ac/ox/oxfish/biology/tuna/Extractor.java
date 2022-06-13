@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -89,7 +89,7 @@ public class Extractor<B extends LocalBiology>
             : Stream.empty();
 
         final Stream<LocalBiology> fadBiologies = includeFads
-            ? fishState.getFadMap().allFads().map(Fad::getBiology)
+            ? fishState.getFadMap().allFads().map(AbstractFad::getBiology)
             : Stream.empty();
 
         return Streams.concat(seaTileBiologies, fadBiologies)

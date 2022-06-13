@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.actions.FadSearchAction;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -95,9 +95,9 @@ public interface PlannedAction {
     class FadSet implements PlannedAction{
 
 
-        private final Fad fadWePlanToSetOn;
+        private final AbstractFad fadWePlanToSetOn;
 
-        public FadSet(Fad fadWePlanToSetOn) {
+        public FadSet(AbstractFad fadWePlanToSetOn) {
             this.fadWePlanToSetOn = fadWePlanToSetOn;
         }
 
@@ -113,7 +113,7 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(Fisher fisher) {
-            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+            FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager = FadManager.getFadManager(fisher);
             return //you must be allowed at sea
                     fisher.isAllowedAtSea() &&
                             //the fad has not since been destroyed
@@ -179,7 +179,7 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(Fisher fisher) {
-            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+            FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager = FadManager.getFadManager(fisher);
             return //you must be allowed at sea
                     fisher.isAllowedAtSea() &&
 
@@ -367,7 +367,7 @@ public interface PlannedAction {
         @Override
         public boolean isAllowedNow(Fisher fisher) {
 
-            FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager =
+            FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager =
                     FadManager.getFadManager(fisher);
             return //you must be allowed at sea
                     fisher.isAllowedAtSea() &&
@@ -509,7 +509,7 @@ public interface PlannedAction {
             biologies.add((B) tile.getBiology());
             final Bag fads = fisher.grabState().getFadMap().fadsAt(tile);
             for (Object fad : fads) {
-                biologies.add((B) ((Fad) fad).getBiology());
+                biologies.add((B) ((AbstractFad) fad).getBiology());
             }
             return biologies;
         }

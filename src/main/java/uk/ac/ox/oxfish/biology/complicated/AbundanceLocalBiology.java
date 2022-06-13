@@ -74,6 +74,8 @@ public class AbundanceLocalBiology implements LocalBiology
      */
     private double lastComputedBiomass[];
 
+
+
     /**
      * creates an abundance based local biology that starts off as entirely empty
      * @param biology a list of species

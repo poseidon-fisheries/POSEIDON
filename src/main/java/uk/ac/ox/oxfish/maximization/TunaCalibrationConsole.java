@@ -65,6 +65,13 @@ public class TunaCalibrationConsole  {
     private boolean isLocalSearch = false;
 
     @Parameter(
+            names ="--pso",
+            description = "when true this is a Particle Swarm search"
+
+    )
+    private boolean isPSO = false;
+
+    @Parameter(
             names ="--initialGuessesTextFile",
             description = "path to text file where each line is an individual (comma separated double array) we need to add in the first population"
 
@@ -94,7 +101,10 @@ public class TunaCalibrationConsole  {
 
         tunaCalibrator.setRunNickName(arguments.getRunNickName());
         tunaCalibrator.setParameterRange(arguments.getParameterRange());
-        tunaCalibrator.setLocalSearch(arguments.isLocalSearch());
+        if(arguments.isLocalSearch())
+            tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.NELDER_MEAD);
+        if(arguments.isPSO)
+            tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.PARTICLE_SWARM);
         tunaCalibrator.setMaxProcessorsToUse(arguments.getMaxProcessorsToUse());
         tunaCalibrator.setNumberOfRunsPerSettingOverride(arguments.getNumberOfRunsPerSettingOverride());
 
@@ -116,7 +126,6 @@ public class TunaCalibrationConsole  {
             tunaCalibrator.setBestGuess(individuals);
             
         }
-        System.out.println(tunaCalibrator.isLocalSearch());
         System.out.println(tunaCalibrator.getBestGuess());
         //run the bastard
         tunaCalibrator.run();
@@ -195,5 +204,13 @@ public class TunaCalibrationConsole  {
 
     public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
+    }
+
+    public boolean isPSO() {
+        return isPSO;
+    }
+
+    public void setPSO(boolean PSO) {
+        isPSO = PSO;
     }
 }

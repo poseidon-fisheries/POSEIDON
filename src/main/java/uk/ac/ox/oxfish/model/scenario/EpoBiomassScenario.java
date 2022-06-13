@@ -104,7 +104,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
-    private AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>>
+    private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory = new BiomassFadInitializerFactory(
         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
         ImmutableMap.of(
@@ -384,14 +384,14 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     @SuppressWarnings("unused")
     @Override
-    public AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
     @Override
     public void setFadInitializerFactory(
-        final AlgorithmFactory<FadInitializer<BiomassLocalBiology, BiomassFad>> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
     }

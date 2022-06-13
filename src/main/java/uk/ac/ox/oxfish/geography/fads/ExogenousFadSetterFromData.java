@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -8,6 +10,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
 import java.util.function.Function;
@@ -81,7 +84,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
      * (iv) returns list of valid matches for fishing out within the model
      */
     @Override
-    protected List<Fad> chooseWhichFadsToSetOnToday(FadMap fadMap, FishState model, int day) {
+    protected List<AbstractFad> chooseWhichFadsToSetOnToday(FadMap fadMap, FishState model, int day) {
         //only bother if there is anything to set in the data
         List<FadSetObservation> fadSetObservationsToday = fadSetsPerDayInData.get(day);
         if(fadSetObservationsToday == null || fadSetObservationsToday.isEmpty())
@@ -91,7 +94,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
         //ready containers
         List<FadSetObservation> outOfBoundsObservations = new LinkedList<>();
         List<FadSetObservation> observationsThatCouldNotBeMatched = new LinkedList<>();
-        List<Fad> matchedFadsToFishOut = new LinkedList<>();
+        List<AbstractFad> matchedFadsToFishOut = new LinkedList<>();
         //for now, and for simplicity, let's focus on just matching FADs with observations that share the same seatile
         //first step, we need to take all the observation coordinates that were fished out today, and turn them into seatiles
         HashMap<SeaTile,List<FadSetObservation>> fadObservations = new HashMap<>();
@@ -108,7 +111,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
         //now that we have arranged observations by area, match observations with simulated fads
         for (Map.Entry<SeaTile, List<FadSetObservation>> setsPerTile : fadObservations.entrySet()) {
             //get all observable matches (i.e. all fads in the same tile)
-            ArrayList<Fad> matchableFads = new ArrayList<>(getFadMap().fadsAt(setsPerTile.getKey()));
+            ArrayList<AbstractFad> matchableFads = new ArrayList<>(getFadMap().fadsAt(setsPerTile.getKey()));
             //if you are looking in the neighborhood size...
             if(neighborhoodSearchSize>0)
             {
@@ -127,22 +130,23 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
             assert (matchableFads.size() == (new HashSet<>(matchableFads)).size()) : "some fads seem to appear in multiple spots";
             //sort them by size (to get consistent errors)
             Collections.sort(matchableFads, (o1, o2) -> -Double.compare(
-                    Arrays.stream(o1.getBiomass()).sum(),
-                    Arrays.stream(o2.getBiomass()).sum()
+                    o1.getBiology().getTotalBiomass(model.getSpecies()),
+                    o2.getBiology().getTotalBiomass(model.getSpecies())
             ));
             //for each observed set
             for (FadSetObservation observedSet : setsPerTile.getValue()) {
                 //get the closest simulated fad (in terms of error)
-                Optional<Fad> bestMatch = matchableFads.stream().min(Comparator.
+                Optional<AbstractFad> bestMatch = matchableFads.stream().min(Comparator.
                         comparingDouble(simulatedFad -> computeError(
                         observedSet,
-                        simulatedFad
+                        simulatedFad,
+                        model
                 )));
                 //if there is such thing:
                 if (bestMatch.isPresent()) {
                     //count the error
                     matchedFadsToFishOut.add(bestMatch.get());
-                    double error = computeError(observedSet, bestMatch.get());
+                    double error = computeError(observedSet, bestMatch.get(),model);
                     counter.count("Error", error);
                     //log:
                     if(setLog!=null) {
@@ -155,7 +159,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
                             setLog.append(",").append(observedSet.getBiomassCaughtInData()[i]).append(",").
                                     append(
                                             simulatedToDataScaler.apply(
-                                            bestMatch.get().getBiomass()[i]));
+                                            bestMatch.get().getBiology().getBiomass(model.getSpecies().get(i))));
                         }
 
                         setLog.append("\n");
@@ -200,9 +204,14 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
      * @return
      */
     public double computeError(FadSetObservation observation,
-                               Fad fad){
+                               AbstractFad fad,
+                               FishState state){
         double[] data = observation.getBiomassCaughtInData();
-        double[] simulated = fad.getBiomass();
+        double[] simulated = new double[state.getSpecies().size()];
+        LocalBiology biology = fad.getBiology();
+        for (Species species : state.getSpecies()) {
+            simulated[species.getIndex()] = biology.getBiomass(species);
+        }
         assert data.length == simulated.length;
         double totalError = 0;
         for (int i = 0; i < data.length; i++)

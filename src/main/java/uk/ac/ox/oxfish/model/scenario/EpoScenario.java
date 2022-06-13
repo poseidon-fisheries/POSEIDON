@@ -176,10 +176,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     abstract FadMapFactory<B, F> getFadMapFactory();
 
-    public abstract AlgorithmFactory<FadInitializer<B, F>> getFadInitializerFactory();
+    public abstract AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory();
 
     public abstract void setFadInitializerFactory(
-        final AlgorithmFactory<FadInitializer<B, F>> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     );
 
     @NotNull

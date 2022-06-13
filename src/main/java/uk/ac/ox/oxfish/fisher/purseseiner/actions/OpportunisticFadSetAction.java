@@ -24,9 +24,10 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
-public class OpportunisticFadSetAction<B extends LocalBiology, F extends Fad<B, F>>
+public class OpportunisticFadSetAction<B extends LocalBiology, F extends AbstractFad<B, F>>
     extends AbstractFadSetAction<B, F> {
 
     public OpportunisticFadSetAction(

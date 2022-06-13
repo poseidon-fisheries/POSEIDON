@@ -30,7 +30,7 @@ import java.util.Set;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -52,9 +52,9 @@ public class FadLocationValues implements LocationValues {
     @Override
     public Set<Entry<Int2D, Double>> getValues() {
 
-        final FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager =
+        final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager =
             getFadManager(fisher);
-        final FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap =
+        final FadMap<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadMap =
             fadManager.getFadMap();
 
         //noinspection UnstableApiUsage

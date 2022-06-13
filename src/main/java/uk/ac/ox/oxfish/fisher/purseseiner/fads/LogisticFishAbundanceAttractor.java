@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.google.common.collect.ImmutableMap;
@@ -73,12 +74,13 @@ public class LogisticFishAbundanceAttractor
         final DoubleSummaryStatistics totalWeight = new DoubleSummaryStatistics();
 
         StructuredAbundance structuredAbundance = fadAbundance.mapIndices((subDivision, bin) -> {
-            double binAbundance = min(
+            double binAbundance = max(
+                    min(
                     cellAbundance.getAbundance(subDivision, bin),
                     getAttractionRates(s) *
                             (selectivity.getFilterValue(subDivision,bin) +
                                     fadAbundance.getAbundance(subDivision, bin)) * space
-            );
+            ),0);
             totalWeight.accept(binAbundance * s.getWeight(subDivision, bin));
             return binAbundance;
         });

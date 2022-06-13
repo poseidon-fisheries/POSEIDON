@@ -18,11 +18,23 @@
  *
  */
 
-package uk.ac.ox.oxfish.fisher.purseseiner.fads;
+package uk.ac.ox.oxfish.geography.fads;
 
-public interface FadRemovalListener {
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 
+import java.nio.file.Path;
+import java.util.Map;
 
-    public void onFadRemoval(AbstractFad fad);
+public class GenericFadMapFactory extends FadMapFactory {
 
+    public GenericFadMapFactory(
+            Map<CurrentPattern, Path> currentFiles) {
+        super(LocalBiology.class, AbstractFad.class, currentFiles);
+    }
+
+    public GenericFadMapFactory() {
+        super(LocalBiology.class, AbstractFad.class);
+    }
 }

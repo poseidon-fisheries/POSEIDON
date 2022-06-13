@@ -122,7 +122,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>
+    private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
@@ -301,13 +301,13 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         return fadMapFactory;
     }
 
-    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
     public void setFadInitializerFactory(
-        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
     }

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -65,7 +65,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         }
         //go through all your fads and rank them by profits
         for (Object fad : fadManager.getDeployedFads()) {
-            Fad deployedFad = (Fad) fad;
+            AbstractFad deployedFad = (AbstractFad) fad;
             double value = deployedFad.valueOfFishFor(fadManager.getFisher());
             if(value>=minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
@@ -102,9 +102,9 @@ public class OwnFadSetDiscretizedActionGenerator {
         return rankedFads != null;
     }
 
-    public static class ValuedFad extends Pair<Fad,Double> {
+    public static class ValuedFad extends Pair<AbstractFad,Double> {
 
-        public ValuedFad(Fad first, Double second) {
+        public ValuedFad(AbstractFad first, Double second) {
             super(first, second);
         }
     }

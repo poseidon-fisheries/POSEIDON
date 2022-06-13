@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,10 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                             map.getSeaTile(entry.getKey()),
                             entry.getValue()
                     )
-            ).collect(Collectors.toList());
+                            //avoid areas where values have turned negative
+            ).filter(seaTileDoublePair -> seaTileDoublePair.getValue()>=0).collect(Collectors.toList());
+            if(valuePairs.isEmpty())
+                return;
 
             //some weird inputs have 0s everywhere. They need to sum up to something other than 0 or the randomizer
             //goes in some sort of middle life crisis

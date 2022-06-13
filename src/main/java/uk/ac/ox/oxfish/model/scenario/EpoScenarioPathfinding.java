@@ -18,14 +18,12 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFact
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -42,8 +40,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -103,7 +99,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                     101,
                     0.5
             );
-    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
+    private FadMapFactory fadMapFactory = new AbundanceFadMapFactory(
             ImmutableMap.of(
                     Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
                     Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
@@ -117,10 +113,12 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             new DefaultToDestinationStrategyFishingStrategyFactory();
     private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
             new AbundancePurseSeineGearFactory();
-    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory =
-            new AbundanceFadInitializerFactory(
-                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-            );
+    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
+            new LastMomentAbundanceFadInitalizerFactory();
+//            new AbundanceFadInitializerFactory(
+//                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+//            );
+
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
             new StandardIattcRegulationsFactory();
 
@@ -169,12 +167,12 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadInitializerFactory(final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory) {
+    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -246,12 +244,12 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     }
 
     @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
+    public FadMapFactory getFadMapFactory() {
         return fadMapFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
+    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
     }
 
@@ -423,7 +421,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         );
 
         if(zapper) {
-            Predicate<Fad> predicate = zapperAge?
+            Predicate<AbstractFad> predicate = zapperAge?
                     fad -> fad.getLocation().getGridX() <= 20 :
                     fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
             fishState.registerStartable(

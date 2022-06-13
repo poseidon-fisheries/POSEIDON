@@ -3,18 +3,15 @@ package uk.ac.ox.oxfish.fisher.actions;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.Delaying;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.MasonUtils;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FadSearchAction implements Action {
 
@@ -50,7 +47,7 @@ public class FadSearchAction implements Action {
 
 
         //grab a random, non owned fad
-        List<Fad> fadsThatICanSteal = MasonUtils.<Fad>bagToStream(fadsHere).
+        List<AbstractFad> fadsThatICanSteal = MasonUtils.<AbstractFad>bagToStream(fadsHere).
                 filter(
                         fad -> fad.getOwner().getFisher() != agent
                 ).

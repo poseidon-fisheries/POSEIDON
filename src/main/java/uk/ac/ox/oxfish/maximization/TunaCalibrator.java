@@ -17,6 +17,7 @@ import eva2.optimization.statistics.InterfaceStatisticsParameters;
 import eva2.optimization.strategies.AbstractOptimizer;
 import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
+import eva2.optimization.strategies.ParticleSwarmOptimizationGCPSO;
 import eva2.problems.SimpleProblemWrapper;
 import java.io.File;
 import java.io.FileWriter;
@@ -50,7 +51,8 @@ public class TunaCalibrator implements Runnable {
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
-    private boolean localSearch = false;
+
+    private OptimizationRoutine optimizationRoutine = OptimizationRoutine.CLUSTER_NICHING_GA;
     private String runNickName = "global_calibration";
     private int populationSize = DEFAULT_POPULATION_SIZE;
     private int maxFitnessCalls = MAX_FITNESS_CALLS;
@@ -245,12 +247,22 @@ public class TunaCalibrator implements Runnable {
         problemWrapper.setParallelThreads(numThreads);
 
         final AbstractOptimizer optimizer;
-        if (localSearch) {
-            optimizer = new NelderMeadSimplex();
-            ((NelderMeadSimplex) optimizer).setPopulationSize(populationSize);
-        } else {
-            optimizer = new ClusterBasedNichingEA();
-            ((ClusterBasedNichingEA) optimizer).setPopulationSize(populationSize);
+        switch (optimizationRoutine){
+            case NELDER_MEAD:
+                optimizer = new NelderMeadSimplex();
+                ((NelderMeadSimplex) optimizer).setPopulationSize(populationSize);
+                break;
+            case PARTICLE_SWARM:
+                optimizer = new ParticleSwarmOptimizationGCPSO();
+                optimizer.setPopulation(new Population(populationSize));
+                ((ParticleSwarmOptimizationGCPSO) optimizer).setCheckRange(false);
+                ((ParticleSwarmOptimizationGCPSO) optimizer).setGcpso(true);
+                break;
+            default:
+            case CLUSTER_NICHING_GA:
+                optimizer = new ClusterBasedNichingEA();
+                ((ClusterBasedNichingEA) optimizer).setPopulationSize(populationSize);
+                break;
         }
         problemWrapper.setDefaultRange(parameterRange);
 
@@ -358,12 +370,13 @@ public class TunaCalibrator implements Runnable {
         this.maxProcessorsToUse = maxProcessorsToUse;
     }
 
-    boolean isLocalSearch() {
-        return localSearch;
+
+    public OptimizationRoutine getOptimizationRoutine() {
+        return optimizationRoutine;
     }
 
-    void setLocalSearch(final boolean localSearch) {
-        this.localSearch = localSearch;
+    public void setOptimizationRoutine(OptimizationRoutine optimizationRoutine) {
+        this.optimizationRoutine = optimizationRoutine;
     }
 
     List<double[]> getBestGuess() {
@@ -384,6 +397,16 @@ public class TunaCalibrator implements Runnable {
     @SuppressWarnings("WeakerAccess")
     public void setNumberOfRunsPerSettingOverride(final int numberOfRunsPerSettingOverride) {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
+    }
+
+    public static enum OptimizationRoutine{
+
+        NELDER_MEAD,
+
+        PARTICLE_SWARM,
+
+        CLUSTER_NICHING_GA
+
     }
 
 }

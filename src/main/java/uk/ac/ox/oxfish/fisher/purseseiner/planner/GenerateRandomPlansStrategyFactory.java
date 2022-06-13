@@ -28,8 +28,8 @@ public class GenerateRandomPlansStrategyFactory implements AlgorithmFactory<Plan
         DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
                 new FixedDoubleParameter(5*24), //120hr
                 plannableActionWeights,
-                planModules
-        );
+                planModules,
+                false);
 
         return new PlannedStrategy(planner,500); //there should be no replanning!
 

@@ -42,11 +42,11 @@ public class HeterogeneousLinearIntervalAttractor
 
     private final int daysItTakesToFillUp;
 
-    private final HashMap<Fad,double[]> carryingCapacityPerFad = new HashMap<>();
+    private final HashMap<AbstractFad,double[]> carryingCapacityPerFad = new HashMap<>();
 
-    private final HashMap<Fad,HashMap<Species,double[][]>> dailyAttractionThreshold = new HashMap<>();
+    private final HashMap<AbstractFad,HashMap<Species,double[][]>> dailyAttractionThreshold = new HashMap<>();
 
-    private final HashMap<Fad,HashMap<Species,double[][]>> dailyAbundanceAttracted = new HashMap<>();
+    private final HashMap<AbstractFad,HashMap<Species,double[][]>> dailyAbundanceAttracted = new HashMap<>();
 
 
     final double minAbundanceThreshold;
@@ -178,7 +178,7 @@ public class HeterogeneousLinearIntervalAttractor
 
 
     @Override
-    public void onFadRemoval(Fad fad) {
+    public void onFadRemoval(AbstractFad fad) {
         double[] removed = carryingCapacityPerFad.remove(fad);
         if(removed!=null) {
             dailyAttractionThreshold.remove(fad);

@@ -104,7 +104,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
-    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
+    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
         new LogisticFunctionFactory(0.15670573908905225, 5);
@@ -236,11 +236,11 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.numFadsInStockModulationFunction = numFadsInStockModulationFunction;
     }
 
-    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory) {
+    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 

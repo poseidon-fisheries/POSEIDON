@@ -15,6 +15,7 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadRemovalListener;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -29,7 +30,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
  * functionality: - It's a MASON Steppable, which applies drift when stepped. - It has methods for
  * deploying and removing FADs, setting the appropriate callback in the former case.
  */
-public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
+public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
     implements AdditionalStartable, Steppable {
 
     private final DriftingObjectsMap driftingObjectsMap;
@@ -111,12 +112,12 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @NotNull
-    public Optional<SeaTile> getFadTile(final Fad<?, ?> fad) {
+    public Optional<SeaTile> getFadTile(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
     }
 
     @NotNull
-    private Optional<Double2D> getFadLocation(final Fad<?, ?> fad) {
+    private Optional<Double2D> getFadLocation(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
@@ -171,7 +172,7 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
         };
     }
 
-    public void destroyFad(Fad fad) {
+    public void destroyFad(AbstractFad fad) {
         remove(fad);
     }
 
@@ -182,7 +183,7 @@ public class FadMap<B extends LocalBiology, F extends Fad<B, F>>
             fad.getOwner().loseFad(fad);
     }
 
-    public void remove(final Fad fad) {
+    public void remove(final AbstractFad fad) {
 
         driftingObjectsMap.remove(fad);
         for (FadRemovalListener removalListener : getRemovalListeners()) {

@@ -103,6 +103,8 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     private boolean noaSetsCanPoachFads = false;
 
+    private boolean purgeIllegalActionsImmediately = true;
+
     @Override
     public PlannedStrategyProxy apply(FishState state) {
         return new PlannedStrategyProxy(
@@ -123,8 +125,8 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 hoursWastedOnFailedSearches.apply(state.getRandom()),
                 planningHorizonInHours.apply(state.getRandom()),
                 minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
-                noaSetsCanPoachFads
-                );
+                noaSetsCanPoachFads,
+                purgeIllegalActionsImmediately);
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -255,5 +257,13 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setNoaSetsCanPoachFads(boolean noaSetsCanPoachFads) {
         this.noaSetsCanPoachFads = noaSetsCanPoachFads;
+    }
+
+    public boolean isPurgeIllegalActionsImmediately() {
+        return purgeIllegalActionsImmediately;
+    }
+
+    public void setPurgeIllegalActionsImmediately(boolean purgeIllegalActionsImmediately) {
+        this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
     }
 }

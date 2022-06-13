@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -90,7 +90,7 @@ public class GlobalBiomassLogger implements RowProvider {
         return fishState
             .getFadMap()
             .allFads()
-            .map(Fad::getBiology)
+            .map(AbstractFad::getBiology)
             .collect(toImmutableList());
     }
 

@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -123,6 +123,12 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * when this is set to true, NOA sets can "steal" biomass from under the fad
      */
     private final boolean noaSetsCanPoachFads;
+    /**
+     * when this is set to true you cannot put an action in the plan if it looks illegal now.
+     * When this is not true, illegal actions stay in the plan until it's time to execute them. If they didn't become legal
+     * then, they will trigger a replan
+     */
+    private final boolean doNotWaitToPurgeIllegalActions;
 
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
@@ -137,7 +143,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             MapDiscretization mapDiscretizationFadSets,
             double hoursWastedOnFailedSearches,
             double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
-            boolean noaSetsCanPoachFads) {
+            boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -154,6 +160,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
         this.noaSetsCanPoachFads=noaSetsCanPoachFads;
+        this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
     }
@@ -166,9 +173,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
         //grab location values
         PurseSeineGear<? extends LocalBiology,
-                ? extends Fad<?, ?>> gear =
+                ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> gear =
                 ((PurseSeineGear<? extends LocalBiology,
-                        ? extends Fad<?, ?>>) fisher.getGear());
+                        ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>>) fisher.getGear());
         HashMap<Class<? extends LocationValues>,LocationValues> locationValues = new HashMap<>();
         for (AttractionField attractionField : gear.getAttractionFields()) {
             attractionField.start(model,fisher);
@@ -297,8 +304,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 maxTravelTimeLoader.applyAsDouble(fisher)
                         ),
                         plannableActionWeights,
-                        planModules
-                );
+                        planModules,
+                        doNotWaitToPurgeIllegalActions);
         //(2) create the delegate
         delegate = new PlannedStrategy(
                 planner,planningHorizonInHours);

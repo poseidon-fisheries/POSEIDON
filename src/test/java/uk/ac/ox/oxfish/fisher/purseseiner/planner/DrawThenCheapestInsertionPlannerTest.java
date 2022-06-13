@@ -91,8 +91,8 @@ public class DrawThenCheapestInsertionPlannerTest {
         DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
                 new FixedDoubleParameter(100), //100hr
                 plannableActionWeights,
-                planModules
-        );
+                planModules,
+                false);
         planner.start(fishState,fisher);
         Plan plan = planner.planNewTrip();
 
@@ -164,8 +164,8 @@ public class DrawThenCheapestInsertionPlannerTest {
         DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
                 new FixedDoubleParameter(100), //100hr max!
                 plannableActionWeights,
-                planModules
-        );
+                planModules,
+                false);
         planner.start(fishState,fisher);
         Plan plan = planner.planNewTrip();
 

@@ -129,7 +129,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>
+    private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
@@ -377,14 +377,14 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     @SuppressWarnings("unused")
     @Override
-    public AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
     @SuppressWarnings("unused")
     @Override
     public void setFadInitializerFactory(
-        final AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
     }

@@ -22,12 +22,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class AbstractFadSetAction<B extends LocalBiology, F extends AbstractFad<B, F>>
     extends AbstractSetAction<B> {
 
     private final F fad;
@@ -58,8 +59,10 @@ public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Fad
 
     @Override
     public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
+        fad.reactToBeingFished(fishState,getFisher(),locationOfSet);
         // Nothing to do here since the biomass has already been removed from the ocean
         fishState.getFadMap().destroyFad(fad);
+
     }
 
     /**

@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -75,7 +74,7 @@ public class DeploymentFromLocationValuePlanningModule
         // (1) the amount of fads in your boat
         // (2) the amount of deploy actions you are still allowed to make this year
         // (3) the number of active FAD sets this year
-        FadManager<? extends LocalBiology, ? extends Fad<?, ?>> fadManager = FadManager.getFadManager(fisher);
+        FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager = FadManager.getFadManager(fisher);
         return Math.min(Math.min(
                 fadManager.getNumFadsInStock(),
                 fadManager.getHowManyActiveFadsCanWeStillDeploy()

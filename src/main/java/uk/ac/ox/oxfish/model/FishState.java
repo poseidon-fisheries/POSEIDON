@@ -55,7 +55,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -113,7 +113,7 @@ public class FishState  extends SimState{
     /**
      * may contain the fad map, if fads are used in the scenario (null otherwise)
      */
-    private FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap = null;
+    private FadMap<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadMap = null;
 
     /**
      * Dataset of all the columns that are updated daily
@@ -949,11 +949,11 @@ public class FishState  extends SimState{
 
     }
 
-    public FadMap<? extends LocalBiology, ? extends Fad<?, ?>> getFadMap() {
+    public FadMap<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> getFadMap() {
         return fadMap;
     }
 
-    public void setFadMap(final FadMap<? extends LocalBiology, ? extends Fad<?, ?>> fadMap) {
+    public void setFadMap(final FadMap<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadMap) {
         this.fadMap = fadMap;
     }
 

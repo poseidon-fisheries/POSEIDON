@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetActionMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 public class FadSetOpportunityGenerator<
@@ -59,7 +60,7 @@ public class FadSetOpportunityGenerator<
         return getFadManager(fisher)
                 .getFadsAt(fisher.getLocation())
                 .filter(fadClass::isInstance)
-                .filter((Predicate<Fad<?, ?>>) fad -> fad.getTotalCarryingCapacity()>0)
+                .filter((Predicate<AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>>) fad -> fad.isActive())
                 .map(fadClass::cast)
                 .filter(fad -> fadPredicate.test(fisher, fad))
                 .map(fad -> actionMaker.make(fad, fisher, getDurationSampler().getAsDouble()))

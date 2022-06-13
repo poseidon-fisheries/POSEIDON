@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -151,7 +152,7 @@ public class SchoolSetOpportunityGenerator<
     private Stream<B> fadBiologies(final SeaTile seaTile, final FishState fishState) {
         final Bag fads = fishState.getFadMap().fadsAt(seaTile);
         fads.shuffle(fishState.getRandom());
-        return MasonUtils.<Fad<B, ?>>bagToStream(fads).map(Fad::getBiology);
+        return MasonUtils.<Fad<B, ?>>bagToStream(fads).map(AbstractFad::getBiology);
     }
 
     double probabilityOfOpportunity(final LocalBiology biology) {
