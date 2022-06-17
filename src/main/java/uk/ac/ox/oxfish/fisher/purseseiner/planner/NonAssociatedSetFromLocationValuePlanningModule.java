@@ -25,7 +25,8 @@ public class NonAssociatedSetFromLocationValuePlanningModule extends LocationVal
             MersenneTwisterFast random,
             double additionalWaitTime,
             CatchSampler<? extends LocalBiology> sampler, final GlobalBiology globalBiology,
-            boolean canPoachFads
+            boolean canPoachFads,
+            int rangeInSeatiles
     ) {
         this(locationValues,
                 new CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator(
@@ -34,7 +35,8 @@ public class NonAssociatedSetFromLocationValuePlanningModule extends LocationVal
                         random,
                         additionalWaitTime,
                         sampler, globalBiology,
-                        canPoachFads
+                        canPoachFads,
+                        rangeInSeatiles
                 ));
     }
 

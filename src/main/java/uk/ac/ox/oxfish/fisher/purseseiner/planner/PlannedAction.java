@@ -1,8 +1,14 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceAggregator;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
+import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -13,9 +19,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -399,7 +405,7 @@ public interface PlannedAction {
 
             LocalBiology potentialCatch =
                     (LocalBiology) howMuchWeCanFishOutGenerator.
-                            apply(getLocation().getBiology());
+                            apply(getLocalBiologyToCatchFrom(fisher));
 
             if(searchTimeInHours<=0)
             {
@@ -414,6 +420,10 @@ public interface PlannedAction {
                 };
             }
 
+        }
+
+        protected LocalBiology getLocalBiologyToCatchFrom(Fisher fisher) {
+            return getLocation().getBiology();
         }
 
 
@@ -474,16 +484,20 @@ public interface PlannedAction {
 
         final boolean canPoachFromFads;
 
+        final int rangeInSeaTiles;
+
         public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                 CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
-            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours,false);
+            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours,false,-1);
         }
 
         public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                 CatchMaker<? extends LocalBiology> catchMaker, double delayInHours,
-                                boolean canPoachFromFads) {
+                                boolean canPoachFromFads,
+                                int rangeInSeaTiles) {
             super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
             this.canPoachFromFads = canPoachFromFads;
+            this.rangeInSeaTiles = rangeInSeaTiles;
         }
 
 
@@ -499,11 +513,14 @@ public interface PlannedAction {
                     potentialCatch,
                     fisher,
                     fishingTime,
-                    canPoachFromFads ? getAllBiologiesHere(location,fisher) : ImmutableList.of(location.getBiology()),
+                    buildListOfCatchableAreas(fisher),
                     catchMaker
             );
         }
 
+        /**
+         * grabs all fad biologies in the area + the local biology
+         */
         private static <B extends LocalBiology> List<B> getAllBiologiesHere(SeaTile tile, Fisher fisher){
             LinkedList<B> biologies = new LinkedList<>();
             biologies.add((B) tile.getBiology());
@@ -513,7 +530,76 @@ public interface PlannedAction {
             }
             return biologies;
         }
+
+
+        /**
+         * get all moore neighbors's biology if they match the local one at least in type of class
+         * @param tile
+         * @param fisher
+         * @return
+         */
+        private Collection<? extends LocalBiology> getAllBiologiesInRange(SeaTile tile, Fisher fisher){
+            LocalBiology local = super.getLocalBiologyToCatchFrom(fisher);
+
+            if(rangeInSeaTiles<=0 || local instanceof EmptyLocalBiology) {
+                return ImmutableList.of(local);
+            }
+            else{
+                Set toReturn = new HashSet<>();
+                Bag mooreNeighbors = fisher.grabState().getMap().getMooreNeighbors(tile, rangeInSeaTiles);
+                for (Object mooreNeighbor : mooreNeighbors) {
+                    LocalBiology neighborBiology = ((SeaTile) mooreNeighbor).getBiology();
+                    if(local.getClass().isAssignableFrom(neighborBiology.getClass()))
+                    {
+                        toReturn.add(neighborBiology);
+                    }
+                }
+                return toReturn;
+
+            }
+        }
+
+        /**
+         * starts with the local biologies; if you can poach from local fads, add those too to the local biology;
+         * if you can poach from range, adds those biologies too.
+         * @param fisher
+         * @return
+         */
+        private Collection<LocalBiology> buildListOfCatchableAreas(Fisher fisher){
+            Set<LocalBiology> targetsSet =
+                    new HashSet<>(
+                    canPoachFromFads ? getAllBiologiesHere(getLocation(), fisher) :
+                    ImmutableList.of(getLocation().getBiology()));
+            if(rangeInSeaTiles>0)
+                targetsSet.addAll(getAllBiologiesInRange(getLocation(), fisher));
+            ArrayList<LocalBiology> targets = new ArrayList<>(targetsSet);
+            Collections.shuffle(targets, new Random(fisher.grabRandomizer().nextLong()));
+            return targets;
+        }
+
+        /**
+         * grabs local biology or local biologies of all the surrounding areas and aggregate them; this way it can
+         * target larger stocks in a wider area
+         */
+        @Override
+        protected LocalBiology getLocalBiologyToCatchFrom(Fisher fisher) {
+            LocalBiology local = super.getLocalBiologyToCatchFrom(fisher);
+            if(rangeInSeaTiles<=0 || local instanceof EmptyLocalBiology) {
+                return local;
+            } else
+            {
+                Collection<? extends LocalBiology> toAggregate = getAllBiologiesInRange(getLocation(), fisher);
+                Aggregator aggregator =
+                        local instanceof VariableBiomassBasedBiology ? new BiomassAggregator() : new AbundanceAggregator();
+                return (LocalBiology) aggregator.apply(fisher.grabState().getBiology(),
+                                                       toAggregate);
+
+
+            }
+        }
     }
+
+
 
 
 }

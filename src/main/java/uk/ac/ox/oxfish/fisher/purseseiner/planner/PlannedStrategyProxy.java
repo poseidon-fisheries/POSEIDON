@@ -87,6 +87,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     private final double deploymentBias;
 
     /**
+     * a multiplier to the NOA actions weight (makes it more or less common than what the data may suggest)
+     */
+    private final double nonAssociatedBias;
+
+    /**
      *  $ a fad needs to have accumulated before we even try to target it when stealing in
      *  an area
      */
@@ -130,6 +135,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final boolean doNotWaitToPurgeIllegalActions;
 
+    /**
+     * if this is is above 0, NOA sets can fish out
+     */
+    private final int noaSetsRangeInSeatiles;
+
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
                     ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
@@ -139,11 +149,12 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             double additionalHourlyDelayDeployment,
             double additionalHourlyDelayNonAssociatedSets,
             double minimumValueFadSets,
-            double ownFadActionWeightBias, double deploymentBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
+            double ownFadActionWeightBias, double deploymentBias, double nonAssociatedBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
             MapDiscretization mapDiscretizationFadSets,
             double hoursWastedOnFailedSearches,
             double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
-            boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions) {
+            boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions,
+            int noaSetsRangeInSeatiles) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -153,6 +164,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.minimumValueFadSets = minimumValueFadSets;
         this.ownFadActionWeightBias = ownFadActionWeightBias;
         this.deploymentBias = deploymentBias;
+        this.nonAssociatedBias = nonAssociatedBias;
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
         this.distancePenaltyFadSets = distancePenaltyFadSets;
         this.mapDiscretizationFadSets = mapDiscretizationFadSets;
@@ -163,6 +175,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
+        this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
     }
 
     @Override
@@ -243,7 +256,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 NonAssociatedSetLocationValues locations =
                         (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetLocationValues.class);
                 plannableActionWeights.put(ActionType.NonAssociatedSets,
-                        actionWeight.getValue());
+                        actionWeight.getValue() * nonAssociatedBias);
                 planModules.put(ActionType.NonAssociatedSets,
                         new NonAssociatedSetFromLocationValuePlanningModule(
                                 locations,
@@ -252,7 +265,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 additionalHourlyDelayNonAssociatedSets,
                                 catchSamplers.get(NonAssociatedSetAction.class),
                                 model.getBiology(),
-                                noaSetsCanPoachFads
+                                noaSetsCanPoachFads,
+                                noaSetsRangeInSeatiles
                         )
                 );
             }

@@ -91,11 +91,14 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
     private DoubleParameter ownFadActionWeightBias = new FixedDoubleParameter(1 );
 
     /**
-     * a multiplier applied to the action weight of own fad (since it's quite low in the data)
+     * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias = new FixedDoubleParameter(1 );
 
-
+    /**
+     * a multiplier applied to the action weight of DPL
+     */
+    private DoubleParameter noaBias = new FixedDoubleParameter(1 );
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
@@ -104,6 +107,8 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
     private boolean noaSetsCanPoachFads = false;
 
     private boolean purgeIllegalActionsImmediately = true;
+
+    private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(-1);
 
     @Override
     public PlannedStrategyProxy apply(FishState state) {
@@ -117,6 +122,7 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 minimumValueFadSets.apply(state.getRandom()),
                 ownFadActionWeightBias.apply(state.getRandom()),
                 deploymentBias.apply(state.getRandom()),
+                noaBias.apply(state.getRandom()),
                 minimumValueOpportunisticFadSets.apply(state.getRandom()),
                 distancePenaltyFadSets.apply(state.getRandom()),
                 new MapDiscretization(
@@ -126,7 +132,8 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 planningHorizonInHours.apply(state.getRandom()),
                 minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
                 noaSetsCanPoachFads,
-                purgeIllegalActionsImmediately);
+                purgeIllegalActionsImmediately,
+                noaSetsRangeInSeatiles.apply(state.getRandom()).intValue());
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -265,5 +272,21 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setPurgeIllegalActionsImmediately(boolean purgeIllegalActionsImmediately) {
         this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
+    }
+
+    public DoubleParameter getNoaSetsRangeInSeatiles() {
+        return noaSetsRangeInSeatiles;
+    }
+
+    public void setNoaSetsRangeInSeatiles(DoubleParameter noaSetsRangeInSeatiles) {
+        this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
+    }
+
+    public DoubleParameter getNoaBias() {
+        return noaBias;
+    }
+
+    public void setNoaBias(DoubleParameter noaBias) {
+        this.noaBias = noaBias;
     }
 }

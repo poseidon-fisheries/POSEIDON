@@ -134,6 +134,15 @@ test {
     maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
 }
 
+tasks.withType(Test) {
+    testLogging {
+        exceptionFormat = 'full'
+
+        // Optionally do:
+        showStackTraces = true
+    }
+}
+
 task shadowJarFoo(type: ShadowJar) {
     archiveFileName = 'foo.jar'
     from sourceSets.main.output //tells the task to include the project code

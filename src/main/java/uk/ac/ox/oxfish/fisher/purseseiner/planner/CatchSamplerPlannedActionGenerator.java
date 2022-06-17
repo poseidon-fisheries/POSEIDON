@@ -91,15 +91,19 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
         private final boolean canPoachFads;
 
+        private final int rangeInSeaTiles;
+
         public NonAssociatedActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
                                             NauticalMap map, MersenneTwisterFast random,
                                             double additionalWaitTime, CatchSampler<? extends LocalBiology>
                                               howMuchWeCanFishOutGenerator,
                                             final GlobalBiology globalBiology,
-                                            boolean canPoachFads) {
+                                            boolean canPoachFads,
+                                            int rangeInSeaTiles) {
             super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator,
                   globalBiology);
             this.canPoachFads = canPoachFads;
+            this.rangeInSeaTiles = rangeInSeaTiles;
         }
 
         @Override
@@ -110,7 +114,8 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
                     tile,
                     howMuchWeCanFishOutGenerator,catchMaker ,
                     additionalWaitTime,
-                    canPoachFads);
+                    canPoachFads,
+                    rangeInSeaTiles);
 
         }
     }
