@@ -50,7 +50,7 @@ public class LocationFisherValuesByActionCache extends FisherValuesByActionFromF
                 groupingBy(
                     record -> record.getInt("year"),
                     groupingBy(
-                        record -> record.getString("boat_id"),
+                        record -> record.getString("ves_no"),
                         groupingBy(
                             record -> ActionClass.valueOf(record.getString("event")).getActionClass(),
                             toMap(

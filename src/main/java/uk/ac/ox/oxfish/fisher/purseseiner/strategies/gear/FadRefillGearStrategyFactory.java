@@ -19,11 +19,13 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,10 +37,20 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy> {
 
     private Path maxFadDeploymentsFile = EpoScenario.INPUT_PATH.resolve("max_deployments.csv");
-    private final LoadingCache<Path, Map<String, Integer>> cache =
+    private final LoadingCache<Path, Map<Integer, ImmutableMap<String, Integer>>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));
-
+    private int targetYear = EpoScenario.TARGET_YEAR;
     private double fadCost = 1000;
+
+    @SuppressWarnings("unused")
+    public int getTargetYear() {
+        return targetYear;
+    }
+
+    @SuppressWarnings("unused")
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
+    }
 
     @SuppressWarnings("unused")
     public double getFadCost() {
@@ -50,13 +62,18 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
         this.fadCost = fadCost;
     }
 
-    private Map<String, Integer> readValues() {
+    private Map<Integer, ImmutableMap<String, Integer>> readValues() {
         return parseAllRecords(maxFadDeploymentsFile)
             .stream()
-            .collect(toImmutableMap(
-                record -> record.getString("boat_id"),
-                record -> record.getInt("max_deployments")
-            ));
+            .collect(
+                groupingBy(
+                    record -> record.getInt("year"),
+                    toImmutableMap(
+                        record -> record.getString("ves_no"),
+                        record -> record.getInt("max_deployments")
+                    )
+                )
+            );
     }
 
     @SuppressWarnings("unused")
@@ -71,7 +88,10 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     @Override
     public GearStrategy apply(final FishState fishState) {
         try {
-            return new FadRefillGearStrategy(cache.get(maxFadDeploymentsFile), fadCost);
+            return new FadRefillGearStrategy(
+                cache.get(maxFadDeploymentsFile).get(targetYear),
+                fadCost
+            );
         } catch (final ExecutionException e) {
             throw new IllegalStateException(e);
         }

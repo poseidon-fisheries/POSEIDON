@@ -46,7 +46,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider {
 
     private static final List<String> HEADERS = ImmutableList.of(
-        "boat_id",
+        "ves_no",
         "action_type",
         "lon",
         "lat",
