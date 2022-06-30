@@ -296,4 +296,10 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
 
     }
 
+    /**
+     * Increments the number of FADs in stock by one.
+     */
+    public void putFadBackInStock() {
+        numFadsInStock++;
+    }
 }
