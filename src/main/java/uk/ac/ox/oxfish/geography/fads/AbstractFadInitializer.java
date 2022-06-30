@@ -84,7 +84,7 @@ public abstract class AbstractFadInitializer<B extends LocalBiology, F extends F
     @Override
     public F makeFad(@NotNull final FadManager<B, F> fadManager,
                      Fisher owner,
-                     SeaTile initialLocation) {
+                     @NotNull SeaTile initialLocation) {
         return makeFad(
             fadManager,
             makeBiology(biology),

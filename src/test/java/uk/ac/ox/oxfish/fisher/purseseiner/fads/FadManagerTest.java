@@ -18,10 +18,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 import ec.util.MersenneTwisterFast;
 import junit.framework.TestCase;
@@ -31,7 +29,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
@@ -42,15 +40,13 @@ public class FadManagerTest extends TestCase {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void testFadsGoBackInStockAfterSet() {
 
-        final BiomassFadInitializer fadInitializer = mock(BiomassFadInitializer.class);
-        when(fadInitializer.makeFad(any(), any(), any())).then(invocation -> {
-            final BiomassFad fad = mock(BiomassFad.class);
-            final Fisher fisher = invocation.getArgument(1, Fisher.class);
-            final FadManager fadManager = getFadManager(fisher);
-            when(fad.getOwner()).thenReturn(fadManager);
-            when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[] {0}));
-            return fad;
-        });
+        final FadInitializer<BiomassLocalBiology, BiomassFad> fadInitializer =
+            (fadManager, owner, initialLocation) -> {
+                final BiomassFad fad = mock(BiomassFad.class);
+                when(fad.getOwner()).thenReturn(fadManager);
+                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[] {0}));
+                return fad;
+            };
 
         final FadMap fadMap = mock(FadMap.class);
 
