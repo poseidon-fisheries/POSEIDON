@@ -110,27 +110,17 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         ));
     }
 
-    static Map<Species, Double> processParameterMap(
+    static double[] processParameterMap(
         final Map<String, DoubleParameter> map,
         final GlobalBiology globalBiology,
         final MersenneTwisterFast rng
     ) {
-        return processParameterMap(map, globalBiology, value -> value.apply(rng));
-    }
-
-    /**
-     * Turns a map from species names to some that to a map from Species objects to some mapping of
-     * the original type.
-     */
-    private static <T, U> Map<Species, U> processParameterMap(
-        final Map<String, T> map,
-        final GlobalBiology globalBiology,
-        final Function<T, U> valueMapper
-    ) {
-        return map.entrySet().stream().collect(toImmutableMap(
-            entry -> globalBiology.getSpecie(entry.getKey()),
-            entry -> valueMapper.apply(entry.getValue())
-        ));
+        final double[] a = new double[globalBiology.getSize()];
+        map.forEach((speciesName, parameter) -> {
+            final int index = globalBiology.getSpecie(speciesName).getIndex();
+            a[index] = parameter.apply(rng);
+        });
+        return a;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})

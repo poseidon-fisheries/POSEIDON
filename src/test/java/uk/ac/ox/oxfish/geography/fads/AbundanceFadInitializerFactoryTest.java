@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import ec.util.MersenneTwisterFast;
 import junit.framework.TestCase;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -68,10 +69,14 @@ public class AbundanceFadInitializerFactoryTest {
         AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor,AbundanceFadInitializerFactory.class);
         SpeciesCodesFromFileFactory speciesCodesFactory =
                 new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-        factory.setSpeciesCodes(speciesCodesFactory.get());
+        final SpeciesCodes speciesCodes = speciesCodesFactory.get();
+        factory.setSpeciesCodes(speciesCodes);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));
         FishState fakeModel = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(fakeModel.getRandom()).thenReturn(new MersenneTwisterFast());
+        when(fakeModel.getBiology()).thenReturn(
+            GlobalBiology.fromNames(speciesCodes.getSpeciesNames())
+        );
 
         FadInitializer<AbundanceLocalBiology, AbundanceFad> initializer = factory.apply(fakeModel);
         return initializer;

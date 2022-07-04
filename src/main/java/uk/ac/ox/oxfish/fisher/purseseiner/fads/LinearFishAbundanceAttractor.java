@@ -18,9 +18,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 import ec.util.MersenneTwisterFast;
 import java.util.Collection;
 import java.util.Map;
@@ -30,10 +27,10 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 
-public class LogisticFishAbundanceAttractor
+public class LinearFishAbundanceAttractor
     extends FishAbundanceAttractor {
 
-    public LogisticFishAbundanceAttractor(
+    protected LinearFishAbundanceAttractor(
         final Collection<Species> species,
         final AttractionProbabilityFunction<AbundanceLocalBiology, AbundanceFad> attractionProbabilityFunction,
         final double[] attractionRates,
@@ -53,16 +50,12 @@ public class LogisticFishAbundanceAttractor
         final StructuredAbundance fadAbundance = fad.getBiology().getAbundance(species);
         final StructuredAbundance cellAbundance = cellBiology.getAbundance(species);
         final double attractionRate = getAttractionRate(species);
-        final double space =
-            1 - fad.getBiology().getBiomass(species) / fad.getTotalCarryingCapacity();
 
         return fadAbundance.mapAndWeigh(species, (subDivision, bin) ->
-            max(min(
-                cellAbundance.getAbundance(subDivision, bin),
+            cellAbundance.getAbundance(subDivision, bin) *
                 attractionRate *
-                    (selectivity.getFilterValue(subDivision, bin) +
-                        fadAbundance.getAbundance(subDivision, bin)) * space
-            ), 0)
+                selectivity.getFilterValue(subDivision, bin)
         );
     }
+
 }

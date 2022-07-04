@@ -18,32 +18,16 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.lang.Math.min;
-
-import javax.annotation.Nullable;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 
 @FunctionalInterface
-public interface FishAttractor<B extends LocalBiology, F extends Fad<B, F>> {
+public interface AttractionProbabilityFunction<B extends LocalBiology, F extends Fad<B, F>> {
 
-    @Nullable
-    default WeightedObject<B> attract(final B seaTileBiology, final F fad) {
-        if (!fad.canAttractFish()) {
-            return null;
-        } else {
-            return attractImplementation(seaTileBiology, fad);
-        }
-    }
-
-    @Nullable
-    WeightedObject<B> attractImplementation(B seaTileBiology, F fad);
-
-    default double biomassScalingFactor(
-        final double attractedBiomass,
-        final double totalFadBiomass,
-        final double fadCarryingCapacity
-    ) {
-        return min(1, (fadCarryingCapacity - totalFadBiomass) / attractedBiomass);
-    }
+    double apply(
+        Species species,
+        B biology,
+        Fad<B, F> fad
+    );
 
 }

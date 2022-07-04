@@ -23,9 +23,13 @@ package uk.ac.ox.oxfish.biology.complicated;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.AtomicDouble;
+import java.util.DoubleSummaryStatistics;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ToDoubleBiFunction;
@@ -101,7 +105,11 @@ public class StructuredAbundance {
             }
     }
 
-
+    public static StructuredAbundance empty(final Species species) {
+        final int subs = species.getNumberOfSubdivisions();
+        final int bins = species.getNumberOfBins();
+        return new StructuredAbundance(subs, bins);
+    }
 
     public static StructuredAbundance sum(Iterable<StructuredAbundance> abundances,
                                           int bins, int subdivisions) {
@@ -196,6 +204,20 @@ public class StructuredAbundance {
         }
         return new StructuredAbundance(abundance);
 
+    }
+
+    public Entry<StructuredAbundance, Double> mapAndWeigh(
+        final Species species,
+        final ToDoubleBiFunction<Integer, Integer> mapper
+    ) {
+        final AtomicDouble totalWeight = new AtomicDouble();
+        final StructuredAbundance structuredAbundance =
+            mapIndices((subDivision, bin) -> {
+                final double binAbundance = mapper.applyAsDouble(subDivision, bin);
+                totalWeight.addAndGet(binAbundance * species.getWeight(subDivision, bin));
+                return binAbundance;
+            });
+        return entry(structuredAbundance, totalWeight.get());
     }
 
     public void forEachIndex(final BiConsumer<Integer, Integer> consumer) {

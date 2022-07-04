@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import java.util.Map.Entry;
+
 /**
  * an helper class, really a pair, containing a reference to something with its weight.
  * Better however is to think of it as a weight number with a reference to what is being weighted
@@ -10,8 +12,11 @@ public class WeightedObject<KEY> extends Number {
 
     private final double totalWeight;
 
+    public static <K, N extends Number> WeightedObject<K> from(final Entry<K, N> entry) {
+        return new WeightedObject<>(entry.getKey(), entry.getValue().doubleValue());
+    }
 
-    public WeightedObject(KEY objectBeingWeighted, double totalWeight) {
+    public WeightedObject(final KEY objectBeingWeighted, final double totalWeight) {
         this.objectBeingWeighted = objectBeingWeighted;
         this.totalWeight = totalWeight;
     }
