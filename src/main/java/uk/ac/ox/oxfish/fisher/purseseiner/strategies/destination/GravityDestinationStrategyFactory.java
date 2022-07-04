@@ -53,7 +53,7 @@ public class GravityDestinationStrategyFactory
                     groupingBy(
                         record -> record.getInt("year"),
                         toMap(
-                            record -> record.getString("boat_id"),
+                            record -> record.getString("ves_no"),
                             record -> record.getDouble("max_trip_duration_in_hours")
                         )
                     ));

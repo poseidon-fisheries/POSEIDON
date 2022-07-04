@@ -30,7 +30,7 @@ import static java.lang.Math.toIntExact;
 
 public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
 
-    private static final List<String> HEADERS = ImmutableList.of("boat_id", "year", "variable", "value", "unit");
+    private static final List<String> HEADERS = ImmutableList.of("ves_no", "year", "variable", "value", "unit");
     private final String boatId;
 
     public TidyFisherYearlyData(final TimeSeries<Fisher> fisherYearlyData, final String boatId) {

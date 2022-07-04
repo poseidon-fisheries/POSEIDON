@@ -130,7 +130,7 @@ distZip { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
 //this makes tests multi-threaded when called from gradle. Useful!
 test {
     minHeapSize = "1024m"
-    maxHeapSize = "6G" // GitHub actions gives us 7G memory, so this should be safe for running online tests
+    maxHeapSize = "4G" // GitHub actions was crashing on 6GB, let's see if 4GB fixes it...
     maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
 }
 

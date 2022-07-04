@@ -132,7 +132,7 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                     holdVolume,
                     fishState.getBiology()
                 ));
-                final String boatId = record.getString("boat_id");
+                final String boatId = record.getString("ves_no");
                 final Fisher fisher = fisherFactory.buildFisher(fishState);
                 fisher.getTags().add(boatId);
                 setFixedRestTime(
