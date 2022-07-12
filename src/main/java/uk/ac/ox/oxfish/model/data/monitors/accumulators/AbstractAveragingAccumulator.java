@@ -23,9 +23,23 @@ import uk.ac.ox.oxfish.model.data.Averager;
 
 public abstract class AbstractAveragingAccumulator<V extends Number> implements Accumulator<V> {
 
+    private final boolean ignoreNulls;
+
+    AbstractAveragingAccumulator() {
+        this(true);
+    }
+
+    AbstractAveragingAccumulator(final boolean ignoreNulls) {
+        this.ignoreNulls = ignoreNulls;
+    }
+
     abstract Averager<V> getAverager();
 
-    @Override public void accumulate(V value) { getAverager().addObservation(value); }
+    @Override public void accumulate(final V value) {
+        if (value != null || !ignoreNulls) {
+            getAverager().addObservation(value);
+        }
+    }
 
     @Override public double get() { return getAverager().getSmoothedObservation(); }
 

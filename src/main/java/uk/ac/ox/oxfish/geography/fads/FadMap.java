@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadRemovalListener;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -89,7 +88,7 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
             fad.reactToStep(fishState);
             final Optional<B> seaTileBiology = getFadTile(fad).flatMap(this::getTileBiology);
             if (seaTileBiology.isPresent()) {
-                fad.aggregateFish(seaTileBiology.get(), globalBiology);
+                fad.aggregateFish(seaTileBiology.get(), globalBiology, fishState.getStep());
                 fad.maybeReleaseFish(
                     globalBiology.getSpecies(),
                     seaTileBiology.get(),

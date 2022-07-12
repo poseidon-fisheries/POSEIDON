@@ -225,6 +225,18 @@ public class Monitors {
                     species -> region -> fad -> fad.getBiology().getBiomass(species),
                     regionalDivision
                 )
+            ),
+            new ObservingAtIntervalMonitor<>(
+                EVERY_YEAR,
+                model -> model.getFadMap().allFads()::iterator,
+                new BasicMonitor<>(
+                    "days before attraction",
+                    EVERY_YEAR,
+                    IterativeAveragingAccumulator::new,
+                    DAY,
+                    "Days",
+                    fad -> fad.getStepsBeforeFirstAttraction()
+                )
             )
         );
 

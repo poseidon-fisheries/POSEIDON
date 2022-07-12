@@ -20,7 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import ec.util.MersenneTwisterFast;
+import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.Nullable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -32,8 +36,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<B, F>> implements Locatable {
     protected static final AtomicLong idCounter = new AtomicLong(0);
@@ -55,6 +57,7 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     private boolean isActive;
     private boolean lost;
 
+    private Integer stepOfFirstAttraction = null;
 
     public AbstractFad(
             TripRecord tripDeployed, int stepDeployed, Int2D locationDeployed, double fishReleaseProbability,
@@ -128,8 +131,9 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     public abstract B getBiology();
 
     public abstract void aggregateFish(
-            B seaTileBiology,
-            GlobalBiology globalBiology
+        B seaTileBiology,
+        GlobalBiology globalBiology,
+        int currentStep
     );
 
 
@@ -166,6 +170,13 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
         }
     }
 
+    /**
+     * Tells us is if the FAD is empty. Could be sped pu by overwriting in subclasses.
+     */
+    public boolean isEmpty(final Iterable<? extends Species> species) {
+        return getBiology().getTotalBiomass(species) > 0;
+    }
+
     public boolean isActive() {
         return isActive;
     }
@@ -182,6 +193,24 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public int soakTimeInDays(FishState model){
         return (model.getStep()-this.getStepDeployed())/ model.getStepsPerDay();
+    }
+
+    Integer getStepOfFirstAttraction() {
+        return stepOfFirstAttraction;
+    }
+
+    public Integer getStepsBeforeFirstAttraction() {
+        return stepOfFirstAttraction != null
+            ? stepOfFirstAttraction - getStepDeployed()
+            : null;
+    }
+
+    void setStepOfFirstAttraction(final Integer stepOfFirstAttraction) {
+        checkState(
+            this.stepOfFirstAttraction == null,
+            "Step of first attraction can only be set once."
+        );
+        this.stepOfFirstAttraction = checkNotNull(stepOfFirstAttraction);
     }
 
 }

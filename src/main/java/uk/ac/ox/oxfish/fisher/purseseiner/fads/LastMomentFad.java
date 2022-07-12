@@ -71,7 +71,7 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
 
 
     @Override
-    public void aggregateFish(B seaTileBiology, GlobalBiology globalBiology) {
+    public void aggregateFish(B seaTileBiology, GlobalBiology globalBiology, int currentStep) {
         //ignored
     }
 
