@@ -18,8 +18,6 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import ec.util.MersenneTwisterFast;
 import java.util.function.DoubleSupplier;
 
@@ -58,6 +56,7 @@ public class AbundanceFadInitializerFactory
     }
 
 
+    @SuppressWarnings("unused")
     public DoubleParameter getFadDudRate() {
         return fadDudRate;
     }

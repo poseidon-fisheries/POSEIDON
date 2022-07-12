@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 public class LinearFishAbundanceAttractor
     extends FishAbundanceAttractor {
 
-    protected LinearFishAbundanceAttractor(
+    public LinearFishAbundanceAttractor(
         final Collection<Species> species,
         final AttractionProbabilityFunction<AbundanceLocalBiology, AbundanceFad> attractionProbabilityFunction,
         final double[] attractionRates,
