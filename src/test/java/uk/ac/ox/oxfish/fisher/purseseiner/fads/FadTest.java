@@ -19,9 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,6 +34,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FadTest {
 
     private final GlobalBiology globalBiology =
@@ -93,5 +92,27 @@ public class FadTest {
         fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
         assertTrue(fadBiology.isEmpty());
 
+    }
+
+    @Test
+    public void testAggregateFish() {
+        final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
+        final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
+        final BiomassFad fad = new BiomassFad(
+            fadManager,
+            fadBiology,
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
+            0.5,
+            10,
+            new Int2D(),
+            1.5
+        );
+        assertNull(fad.getStepOfFirstAttraction());
+        assertNull(fad.getStepsBeforeFirstAttraction());
+        final BiomassLocalBiology cellBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
+        globalBiology.getSpecies().forEach(s -> cellBiology.setCurrentBiomass(s, 1));
+        fad.aggregateFish(cellBiology, globalBiology, 20);
+        assertEquals(Integer.valueOf(20), fad.getStepOfFirstAttraction());
+        assertEquals(Integer.valueOf(10), fad.getStepsBeforeFirstAttraction());
     }
 }
