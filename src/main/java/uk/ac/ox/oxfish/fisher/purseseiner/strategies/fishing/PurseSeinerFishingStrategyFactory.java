@@ -60,7 +60,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;

@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class SetDurationSamplersFactory

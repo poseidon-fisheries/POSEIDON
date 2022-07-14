@@ -27,10 +27,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DEL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.utils.TempFileMaker.makeTempFile;
 
 public class ActionWeightsCacheTest {

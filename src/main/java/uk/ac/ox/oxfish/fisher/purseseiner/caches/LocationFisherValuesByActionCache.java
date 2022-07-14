@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 import com.vividsolutions.jts.geom.Coordinate;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 

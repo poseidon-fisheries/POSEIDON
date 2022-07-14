@@ -24,7 +24,7 @@ import static com.google.common.collect.ImmutableListMultimap.toImmutableListMul
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.Streams.stream;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.getSetActionClass;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;

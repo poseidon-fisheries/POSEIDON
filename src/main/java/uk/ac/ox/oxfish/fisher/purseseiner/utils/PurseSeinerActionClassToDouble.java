@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 
 import java.nio.file.Path;
 import java.util.Map;

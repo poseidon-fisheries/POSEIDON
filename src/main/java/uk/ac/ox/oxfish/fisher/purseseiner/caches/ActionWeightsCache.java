@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 import java.nio.file.Path;
