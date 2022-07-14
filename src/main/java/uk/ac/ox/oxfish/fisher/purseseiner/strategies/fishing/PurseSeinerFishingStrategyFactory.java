@@ -38,6 +38,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -63,6 +65,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -264,7 +267,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
@@ -346,20 +349,11 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             this::loadAttractionWeights,
             this::makeSetOpportunityDetector,
             makeActionValueFunctions(fishState),
-            loadMaxCurrentSpeeds(),
+            PurseSeinerActionClassToDouble.fromFile(maxCurrentSpeedsFile, "action", "speed"),
             searchActionDecayConstant,
             fadDeploymentActionDecayConstant,
             movingThreshold
         );
-    }
-
-    private Map<Class<? extends PurseSeinerAction>, Double> loadMaxCurrentSpeeds() {
-        return parseAllRecords(maxCurrentSpeedsFile)
-            .stream()
-            .collect(toImmutableMap(
-                r -> ActionClass.valueOf(r.getString("action")).getActionClass(),
-                r -> r.getDouble("speed")
-            ));
     }
 
     @NotNull
@@ -367,7 +361,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
         final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold

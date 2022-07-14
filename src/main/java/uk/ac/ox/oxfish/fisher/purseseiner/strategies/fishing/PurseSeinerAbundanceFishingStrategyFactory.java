@@ -21,6 +21,8 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -48,7 +50,7 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
         final Function<Fisher, SetOpportunityDetector<AbundanceLocalBiology>> opportunityDetector,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold

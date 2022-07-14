@@ -19,8 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -29,11 +29,14 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPur
 public class LocalSetAttractionModulator implements LocalAttractionModulator {
 
     private final DoubleUnaryOperator timeSinceLastVisitModulationFunction;
+    private final double maxCurrentSpeed;
 
     public LocalSetAttractionModulator(
-        final DoubleUnaryOperator timeSinceLastVisitModulationFunction
+        final DoubleUnaryOperator timeSinceLastVisitModulationFunction,
+        final double maxCurrentSpeed
     ) {
         this.timeSinceLastVisitModulationFunction = timeSinceLastVisitModulationFunction;
+        this.maxCurrentSpeed = maxCurrentSpeed;
     }
 
     @Override
@@ -43,9 +46,11 @@ public class LocalSetAttractionModulator implements LocalAttractionModulator {
         final int t,
         final Fisher fisher
     ) {
-        if (!canFishThere(x, y, t, fisher))
+        if (getCurrentSpeed(x, y, t, fisher) > maxCurrentSpeed) {
             return 0;
-        else {
+        } else if (!canFishThere(x, y, t, fisher)) {
+            return 0;
+        } else {
             return getPurseSeineGear(fisher)
                 .getLastVisit(fisher.getLocation().getGridLocation())
                 .map(lastVisit -> timeSinceLastVisitModulationFunction.applyAsDouble(t - lastVisit))
@@ -53,5 +58,12 @@ public class LocalSetAttractionModulator implements LocalAttractionModulator {
         }
     }
 
-
+    private double getCurrentSpeed(int x, int y, int t, Fisher fisher) {
+        return fisher.grabState()
+            .getFadMap()
+            .getDriftingObjectsMap()
+            .getCurrentVectors()
+            .getVector(t, new Int2D(x, y))
+            .length();
+    }
 }

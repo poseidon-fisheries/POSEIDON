@@ -94,8 +94,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
-    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory =
-        new AbundanceCatchSamplersFactory();
+    private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
 
     @Override
@@ -109,10 +108,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
         if (getFishingStrategyFactory() != null
             && getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory) {
-            ((PurseSeinerFishingStrategyFactory<B, ?>) getFishingStrategyFactory()).setCatchSamplersFactory(
-                getCatchSamplersFactory());
-            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory()).setAttractionWeightsFile(
-                getAttractionWeightsFile());
+            ((PurseSeinerFishingStrategyFactory<B, F>) getFishingStrategyFactory())
+                .setCatchSamplersFactory(getCatchSamplersFactory());
+            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
+                .setAttractionWeightsFile(getAttractionWeightsFile());
         }
 
         if (getPurseSeineGearFactory() != null) {
@@ -146,11 +145,11 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.fishingStrategyFactory = fishingStrategyFactory;
     }
 
-    public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
+    public CatchSamplersFactory<B> getCatchSamplersFactory() {
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
