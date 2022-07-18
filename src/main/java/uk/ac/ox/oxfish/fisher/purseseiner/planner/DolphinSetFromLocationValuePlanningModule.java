@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 public class DolphinSetFromLocationValuePlanningModule extends LocationValuePlanningModule {
 
+
     public DolphinSetFromLocationValuePlanningModule(
             DolphinSetLocationValues locationValues,
             CatchSamplerPlannedActionGenerator.DolphinActionGenerator generator) {
@@ -25,16 +26,17 @@ public class DolphinSetFromLocationValuePlanningModule extends LocationValuePlan
             MersenneTwisterFast random,
             double additionalWaitTime,
             CatchSampler<? extends LocalBiology> sampler,
-            final GlobalBiology globalBiology
-    ) {
+            final GlobalBiology globalBiology,
+            int rangeInSeatiles) {
         super(locationValues,
                 new CatchSamplerPlannedActionGenerator.DolphinActionGenerator(
                         locationValues,
                         map,
                         random,
                         additionalWaitTime,
-                        sampler, globalBiology
-                ));
+                        sampler, globalBiology,
+                        rangeInSeatiles
+                        ));
     }
 
     @Override

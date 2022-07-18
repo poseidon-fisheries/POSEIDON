@@ -51,6 +51,7 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -567,12 +568,15 @@ public class FishState  extends SimState{
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
 
+            StructuredAbundance localAbundance = seaTile.getAbundance(species);
+
             for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
             {
                 for (int bin = 0; bin < species.getNumberOfBins(); bin++)
                 {
-                    if (seaTile.isFishingEvenPossibleHere())
-                        totalAbundance[subdivision][bin] += seaTile.getAbundance(species).getAbundance(subdivision, bin);
+                    if (seaTile.isFishingEvenPossibleHere()) {
+                        totalAbundance[subdivision][bin] += localAbundance.getAbundance(subdivision, bin);
+                    }
                 }
             }
         }

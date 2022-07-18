@@ -519,7 +519,7 @@ Boxcar Biology with pulses:
 -------
 Biomass Initializer Factory:
   biomassReallocator: null
-  schaeferParamsFile: inputs/epo/biomass/schaefer_params.csv
+  schaeferParamsFile: inputs/epo_inputs/biomass/schaefer_params.csv
 -------
 Abundance Initializer Factory:
   binsFilePath: null

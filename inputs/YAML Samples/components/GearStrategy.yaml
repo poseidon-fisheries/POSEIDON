@@ -40,5 +40,5 @@ Periodic Gear Update Selectivity:
 -------
 FAD Refill:
   fadCost: 1000.0
-  maxFadDeploymentsFile: inputs/epo/max_deployments.csv
+  maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
 -------

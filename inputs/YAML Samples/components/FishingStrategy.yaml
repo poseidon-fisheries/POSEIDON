@@ -36,45 +36,126 @@ Purse Seiner Biomass Fishing Strategy:
   attractionWeightsFile: null
   catchSamplersFactory: null
   dolphinSetActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
-  dolphinSetDetectionProbability: 0.1
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 1.0E-6
+      relativeSteepness: true
+      steepness: 10.0
+  dolphinSetDetectionProbability: 0.7136840195385347
   dolphinSetGeneratorFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
-  fadDeploymentActionDecayConstant: 1.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  fadDeploymentActionDecayConstant: 0.7228626294613664
   fadDeploymentActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 7338176.765769132
+      relativeSteepness: true
+      steepness: 10.0
   fadSetActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
-  movingThreshold: 0.1
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  fishUnderFadsAvailableForSchoolSets: true
+  maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+  movingThreshold: 0.0
   nonAssociatedSetActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
-  nonAssociatedSetDetectionProbability: 0.1
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 555715.859646539
+      relativeSteepness: true
+      steepness: 10.0
+  nonAssociatedSetDetectionProbability: 1.0
   nonAssociatedSetGeneratorFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 15392.989688872976
+      relativeSteepness: true
+      steepness: 10.0
   opportunisticFadSetActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
-  opportunisticFadSetDetectionProbability: 0.1
-  searchActionDecayConstant: 1.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  opportunisticFadSetDetectionProbability: 0.007275362250433118
+  searchActionDecayConstant: 7.912472944827373
   searchActionValueFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 7081017.137484187
+      relativeSteepness: true
+      steepness: 10.0
   searchBonus: 0.1
-  setCompositionWeightsPath: inputs/epo/set_compositions.csv
+  setCompositionWeightsPath: inputs/epo_inputs/set_compositions.csv
 -------
 Default to Destination Strategy
+-------
+Purse Seiner Abundance Fishing Strategy:
+  ageBasedSetDecisions: false
+  attractionWeightsFile: null
+  catchSamplersFactory: null
+  dolphinSetActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 1.0E-6
+      relativeSteepness: true
+      steepness: 10.0
+  dolphinSetDetectionProbability: 0.7136840195385347
+  dolphinSetGeneratorFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  fadDeploymentActionDecayConstant: 0.7228626294613664
+  fadDeploymentActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 7338176.765769132
+      relativeSteepness: true
+      steepness: 10.0
+  fadSetActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  fishUnderFadsAvailableForSchoolSets: true
+  maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+  movingThreshold: 0.0
+  nonAssociatedSetActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 555715.859646539
+      relativeSteepness: true
+      steepness: 10.0
+  nonAssociatedSetDetectionProbability: 1.0
+  nonAssociatedSetGeneratorFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 15392.989688872976
+      relativeSteepness: true
+      steepness: 10.0
+  opportunisticFadSetActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
+  opportunisticFadSetDetectionProbability: 0.007275362250433118
+  searchActionDecayConstant: 7.912472944827373
+  searchActionValueFunction:
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 7081017.137484187
+      relativeSteepness: true
+      steepness: 10.0
+  searchBonus: 0.1
+  setCompositionWeightsPath: inputs/epo_inputs/set_compositions.csv
 -------

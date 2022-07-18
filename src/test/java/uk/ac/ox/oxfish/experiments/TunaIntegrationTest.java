@@ -54,4 +54,43 @@ public class TunaIntegrationTest {
 
 
     }
+    //    @Test
+//    public void lastMomentBacksliding() throws IOException {
+//
+//        double[] solution =
+//                {-6.615,-3.512, 9.033,-3.895, 2.017, 10.000,-6.421,-0.553, 0.210, 4.370, 4.600,-2.585, 6.533, 9.977,-9.485};
+//
+//
+//        new TunaEvaluator(Paths.get(
+//                "docs/20220223 tuna_calibration/pathfinder_lastmoment/cenv0477/2022-06-15_09.59.31_noreach2_bias/test_with_range/newdata/linearcatchability_noareach2_bias.yaml"),
+//                          solution).run();
+//
+//
+//
+//
+//
+//    }
+    @Test
+    public void logisticBacksliding() throws IOException {
+
+        double[] solution =
+                {
+                        -51.979, 22.402,-21.136,-18.328,-3.078,-8.661,-199.316, 165.836, 2.330, 11.756,-48.978,-4.760,-1.190,-4.217,-45.867,-32.822, 14.977,-7.667,-58.219, 2.365, 2.720, 3.929,-95.199,-15.215, 57.180,-24.763, 15.735, 3.249,-25.388
+                };
+
+
+
+        Path calibrationFile = Paths.get(
+                "inputs/tests/tunabacksliding/calibration_logistic.yaml"
+        );
+        GenericOptimization optimization = GenericOptimization.fromFile(calibrationFile);
+        double[] evaluate = optimization.evaluate(solution);
+        System.out.println(evaluate[0]);
+        Assert.assertTrue(evaluate[0]<120);
+
+
+
+
+
+    }
 }

@@ -125,12 +125,12 @@ Tow Long Logger:
   fileName: tow_log.csv
 -------
 Json Output Manager:
-  chartBuilderFactories: &id003 [
+  chartBuilderFactories: &id002 [
     ]
-  eventBuilderFactories: *id003
+  eventBuilderFactories: *id002
   fadsBuilderFactory:
     fadsColour: yellow
-  heatmapBuilderFactories: *id003
+  heatmapBuilderFactories: *id002
   numYearsToSkip: 0
   prettyPrinting: false
   regionsBuilderFactory: !!uk.ac.ox.oxfish.model.data.webviz.regions.UnifiedRegionBuilderFactory
@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-04-25'
+  startDate: '2022-06-24'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -281,7 +281,7 @@ Exogenous Fad Maker CSV:
         Species 0: '0.0'
       compressionExponents:
         Species 0: '0.0'
-      fishReleaseProbabilityInPercent: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
       growthRates:
         Species 0: '0.0'
       speciesCodes: null
@@ -298,7 +298,7 @@ Fad Demo:
         Species 0: '0.0'
       compressionExponents:
         Species 0: '0.0'
-      fishReleaseProbabilityInPercent: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
       growthRates:
         Species 0: '0.0'
       speciesCodes: null

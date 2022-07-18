@@ -48,9 +48,16 @@ public abstract class CatchSampler<B extends LocalBiology> implements UnaryOpera
     }
 
     public ImmutableDoubleArray next(final B sourceBiology) {
-        return sampler.next(catchArray -> test(sourceBiology, catchArray));
+       return sampler.next(catchArray -> test(sourceBiology, catchArray));
     }
 
     abstract boolean test(B sourceBiology, ImmutableDoubleArray catchArray);
+
+    /**
+     * forces the sampler to look at the whole original data-set again
+     */
+    public void reset(){
+        this.sampler.resetQueue();
+    }
 
 }

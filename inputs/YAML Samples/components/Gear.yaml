@@ -124,7 +124,7 @@ Max Throughput Limit:
   maxThroughput: '400.0'
 -------
 Biomass Purse Seine Gear:
-  actionDistanceExponent: 1.0
+  actionDistanceExponent: 10.0
   actionSpecificRegulations:
   - Active FAD limits:
       limitClass1: 70
@@ -134,53 +134,71 @@ Biomass Purse Seine Gear:
       limitClass5: 120
       limitClass6a: 300
       limitClass6b: 450
+  allSetsObservers: !!set {
+    }
   biomassLostMonitor: null
-  decayRateOfDeploymentLocationValues: 0.01
-  decayRateOfDolphinSetLocationValues: 0.01
-  decayRateOfNonAssociatedSetLocationValues: 0.01
-  decayRateOfOpportunisticFadSetLocationValues: 0.01
-  destinationDistanceExponent: 1.0
+  decayRateOfDeploymentLocationValues: 1.1709955387012643
+  decayRateOfDolphinSetLocationValues: 1.2499749999999998
+  decayRateOfNonAssociatedSetLocationValues: 0.0
+  decayRateOfOpportunisticFadSetLocationValues: 0.6563603233600155
+  destinationDistanceExponent: 2.0
   dolphinSetObservers: !!set {
     }
   dolphinSetTimeSinceLastVisitModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 72.28852668100924
+      relativeSteepness: true
+      steepness: 5.0
   fadDeploymentObservers: !!set {
     }
   fadDeploymentPctActiveFadsLimitModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.817463635675281
+      relativeSteepness: true
+      steepness: 5.0
   fadInitializerFactory: null
   fadSetObservers: !!set {
     }
-  locationValuesFile: inputs/epo/location_values.csv
+  locationValuesFile: inputs/epo_inputs/location_values.csv
   nonAssociatedSetObservers: !!set {
     }
   nonAssociatedSetTimeSinceLastVisitModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 51.91162666081563
+      relativeSteepness: true
+      steepness: 5.0
   numFadsInStockModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 465.76938287575837
+      relativeSteepness: true
+      steepness: 5.0
   opportunisticFadSetTimeSinceLastVisitModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 73.32224086132372
+      relativeSteepness: true
+      steepness: 5.0
   pctHoldSpaceLeftModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.15670573908905225
+      relativeSteepness: true
+      steepness: 5.0
   pctSetsRemainingModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.01
+      relativeSteepness: true
+      steepness: 10.0
   pctTravelTimeLeftModulationFunction:
-    Compressed Exponential Function:
-      coefficient: 1.0E-6
-      exponent: 2.0
+    Logistic Function:
+      maximum: 1.0
+      midpoint: 0.10183241937374361
+      relativeSteepness: true
+      steepness: 5.0
   successfulSetProbability: '0.9231701'
 -------

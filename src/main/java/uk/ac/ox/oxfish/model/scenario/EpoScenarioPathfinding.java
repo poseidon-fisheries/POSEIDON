@@ -107,8 +107,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     );
     private AbundanceFiltersFactory abundanceFiltersFactory =
             new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
-    private AbundanceCatchSamplersFactory abundanceCatchSamplersFactory =
-            new AbundanceCatchSamplersFactory();
+
     private DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory =
             new DefaultToDestinationStrategyFishingStrategyFactory();
     private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
@@ -196,18 +195,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @SuppressWarnings("unused")
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceCatchSamplersFactory getAbundanceCatchSamplersFactory() {
-        return abundanceCatchSamplersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceCatchSamplersFactory(
-            final AbundanceCatchSamplersFactory abundanceCatchSamplersFactory
-    ) {
-        this.abundanceCatchSamplersFactory = abundanceCatchSamplersFactory;
     }
 
 
@@ -360,7 +347,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
-        super.setCatchSamplersFactory(abundanceCatchSamplersFactory);
         super.setFishingStrategyFactory(fishingStrategyFactory);
         super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
@@ -369,7 +355,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
                 abundanceFilters = abundanceFiltersFactory.apply(fishState);
 
-        abundanceCatchSamplersFactory.setAbundanceFilters(abundanceFilters);
+        AbundanceCatchSamplersFactory abundanceSamplerFactory = (AbundanceCatchSamplersFactory) getCatchSamplersFactory();
+        abundanceSamplerFactory.setAbundanceFilters(abundanceFilters);
 
 
         marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
@@ -394,7 +381,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         destinationStrategy.setAttractionWeightsFile(getAttractionWeightsFile());
         destinationStrategy.setMaxTripDurationFile(getVesselsFilePath());
 
-        destinationStrategy.setCatchSamplersFactory(abundanceCatchSamplersFactory);
+        destinationStrategy.setCatchSamplersFactory(abundanceSamplerFactory);
         destinationStrategy.setAttractionWeightsFile(attractionWeightsFile);
         final FisherFactory fisherFactory = makeFisherFactory(
                 fishState,

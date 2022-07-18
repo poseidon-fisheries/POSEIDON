@@ -21,6 +21,8 @@ package uk.ac.ox.oxfish.geography.fads;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -41,6 +43,7 @@ public class FadInitializerFactories {
         NAMES.put(AbundanceFadInitializerBetaFactoryWithExpiration.class, "Abundance FAD Beta Initializer With Expiration");
         NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
         NAMES.put(WeibullLinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
+        NAMES.put(WeibullCatchabilitySelectivityAttractorFactory.class, "Weibull FAD Catchability Selectivity Initializer");
 
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);

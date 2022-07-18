@@ -66,13 +66,17 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
     public static class DolphinActionGenerator extends CatchSamplerPlannedActionGenerator<PlannedAction.DolphinSet> {
 
+        private final int rangeInSeaTiles;
+
 
         public DolphinActionGenerator(SetLocationValues<? extends AbstractSetAction> originalLocationValues,
                                       NauticalMap map, MersenneTwisterFast random,
                                       double additionalWaitTime, CatchSampler<? extends LocalBiology>
-                                              howMuchWeCanFishOutGenerator, final GlobalBiology globalBiology) {
+                                              howMuchWeCanFishOutGenerator, final GlobalBiology globalBiology,
+                                      int rangeInSeaTiles) {
             super(originalLocationValues, map, random, additionalWaitTime, howMuchWeCanFishOutGenerator,
                   globalBiology);
+            this.rangeInSeaTiles = rangeInSeaTiles;
         }
 
         @Override
@@ -82,7 +86,8 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             return new PlannedAction.DolphinSet(
                     tile,
                     howMuchWeCanFishOutGenerator,catchMaker ,
-                    additionalWaitTime);
+                    additionalWaitTime,false,
+                    rangeInSeaTiles);
 
         }
     }

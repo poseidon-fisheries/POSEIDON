@@ -136,9 +136,14 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     private final boolean doNotWaitToPurgeIllegalActions;
 
     /**
-     * if this is is above 0, NOA sets can fish out
+     * if this is is above 0, NOA sets can fish out of the seatile they actually happen in
      */
     private final int noaSetsRangeInSeatiles;
+
+    /**
+     * if this is is above 0, DEL sets can fish out
+     */
+    private final int delSetsRangeInSeatiles;
 
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
@@ -154,7 +159,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             double hoursWastedOnFailedSearches,
             double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
             boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions,
-            int noaSetsRangeInSeatiles) {
+            int noaSetsRangeInSeatiles, int delSetsRangeInSeatiles) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -173,6 +178,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
         this.noaSetsCanPoachFads=noaSetsCanPoachFads;
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
+        this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
@@ -225,8 +231,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                                 model.getRandom(),
                                 additionalHourlyDelayDolphinSets,
                                 catchSamplers.get(DolphinSetAction.class),
-                                model.getBiology()
-                        )
+                                model.getBiology(),
+                                delSetsRangeInSeatiles)
                 );
             }
             //DPL

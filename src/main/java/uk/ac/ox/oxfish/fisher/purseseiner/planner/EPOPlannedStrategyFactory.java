@@ -11,10 +11,12 @@ import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
@@ -110,10 +112,20 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(-1);
 
+
+    private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(-1);
+
+    private boolean uniqueCatchSamplerForEachStrategy = false;
+
+    private Locker<FishState, Map> catchSamplerLocker = new Locker<>();
+
     @Override
     public PlannedStrategyProxy apply(FishState state) {
         return new PlannedStrategyProxy(
-                catchSamplersFactory.apply(state),
+                uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
+                        catchSamplerLocker.presentKey(state,
+                                                      () -> catchSamplersFactory.apply(state))
+                ,
                 PurseSeinerFishingStrategyFactory.loadAttractionWeights(attractionWeightsFile),
                 GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile),
                 additionalHourlyDelayDolphinSets.apply(state.getRandom()),
@@ -133,7 +145,8 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
                 noaSetsCanPoachFads,
                 purgeIllegalActionsImmediately,
-                noaSetsRangeInSeatiles.apply(state.getRandom()).intValue());
+                noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
+                delSetsRangeInSeatiles.apply(state.getRandom()).intValue());
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -288,5 +301,21 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setNoaBias(DoubleParameter noaBias) {
         this.noaBias = noaBias;
+    }
+
+    public DoubleParameter getDelSetsRangeInSeatiles() {
+        return delSetsRangeInSeatiles;
+    }
+
+    public void setDelSetsRangeInSeatiles(DoubleParameter delSetsRangeInSeatiles) {
+        this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
+    }
+
+    public boolean isUniqueCatchSamplerForEachStrategy() {
+        return uniqueCatchSamplerForEachStrategy;
+    }
+
+    public void setUniqueCatchSamplerForEachStrategy(boolean uniqueCatchSamplerForEachStrategy) {
+        this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 }

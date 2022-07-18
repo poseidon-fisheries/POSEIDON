@@ -66,4 +66,9 @@ public class ConditionalSampler<E> {
         queue.addAll(sample);
     }
 
+    public void resetQueue() {
+        queue.clear();
+        Collections.shuffle(sample, rng);
+        queue.addAll(sample);
+    }
 }

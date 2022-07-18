@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -72,11 +73,20 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
             return new AbundanceLocalBiology(biology);
 
         LocalBiology biology = super.getLocation().getBiology();
+        return extractFadBiologyFromLocalBiology(state, catchability, biology, selectivityFilters);
+    }
+
+    @NotNull
+    public static AbundanceLocalBiology extractFadBiologyFromLocalBiology(
+            FishState state,
+            double[] catchability,
+            LocalBiology seaTileBiology,
+            Map<Species, NonMutatingArrayFilter> selectivityFilters) {
         double[] caught = new double[state.getBiology().getSize()];
         //for each species, same operation
         Map<Species,double[][]> caughtAbundances = new HashMap<>();
         for (Species species : state.getBiology().getSpecies()) {
-            StructuredAbundance localAbundance = biology.getAbundance(species);
+            StructuredAbundance localAbundance = seaTileBiology.getAbundance(species);
             double[][] caughtAbundance = new double[localAbundance.getSubdivisions()][localAbundance.getBins()];
             caughtAbundances.put(species, caughtAbundance);
             NonMutatingArrayFilter selectivity = selectivityFilters.get(species);
@@ -86,6 +96,9 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
                             catchability[species.getIndex()] * localAbundance.getAbundance(subdivision, bins) *
                                     selectivity.getFilterValue(subdivision, bins);
 
+                    if(caughtAbundance[subdivision][bins]<.0001)
+                        caughtAbundance[subdivision][bins]=0;
+
 
                 }
             }
@@ -93,7 +106,6 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
 
         return new AbundanceLocalBiology(caughtAbundances);
     }
-
 
 
     @Override

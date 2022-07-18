@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
 
-class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLocalBiology, AbundanceFad> {
+public class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLocalBiology, AbundanceFad> {
 
 
     public AbundanceFadInitializer(GlobalBiology globalBiology, DoubleSupplier carryingCapacityGenerator,

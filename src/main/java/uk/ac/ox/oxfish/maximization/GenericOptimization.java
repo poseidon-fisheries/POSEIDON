@@ -353,7 +353,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             return new double[]{finalError};
 
         }catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.out.println("was NAN!");
+            LogManager.getLogger("calibration_error.csv").debug(
+                    new ObjectArrayMessage(System.currentTimeMillis(), translateNANto)
+            );
+            System.out.println(Arrays.toString(x) + " ---> " + translateNANto);
+
+            return new double[]{translateNANto};
         }
     }
 

@@ -76,9 +76,17 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
             AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
 
-        //attract nothing before spending enough steps in
-        if(model.getDay()-fad.getStepDeployed()<daysInWaterBeforeAttraction)
+        if (shouldICancelTheAttractionToday(seaTileBiology, fad))
             return null;
+
+        //you passed all checks! attract
+        return attractDaily(seaTileBiology,fad);
+    }
+
+    protected boolean shouldICancelTheAttractionToday(AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
+        //attract nothing before spending enough steps in
+        if(model.getDay()- fad.getStepDeployed()<daysInWaterBeforeAttraction || !fad.isActive())
+            return true;
         //start weighing stuff
         //don't bother attracting if full
         double[] currentFadBiomass = fad.getBiology().getCurrentBiomass();
@@ -88,7 +96,7 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
                 continue;
             //if one is full, they are all full
             if(currentFadBiomass[i]>=carryingCapacitiesPerSpecies[i])
-                return null;
+                return true;
 
         }
         //don't bother attracting if there is less abundance than the threshold
@@ -102,13 +110,11 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
             for (int subdivision = 0; subdivision < threshold.length; subdivision++) {
                 for (int bin = 0; bin < threshold[subdivision].length; bin++) {
                     if(threshold[subdivision][bin]> abundanceInTile[subdivision][bin])
-                        return null;
+                        return true;
                 }
             }
         }
-
-        //you passed all checks! attract
-        return attractDaily(seaTileBiology,fad);
+        return false;
     }
 
     /**
@@ -166,6 +172,7 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
                                     / species.getWeight(sub, bin);
 
 
+                    dailyStep[sub][bin] = Math.max(0,dailyStep[sub][bin]);
                 }
             }
             abundancePerDailyKgLanded.put(species, dailyStep);

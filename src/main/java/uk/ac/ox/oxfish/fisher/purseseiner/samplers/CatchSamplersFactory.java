@@ -38,11 +38,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -51,6 +55,8 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
 
     private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
     private Path catchSamplesFile = INPUT_PATH.resolve("set_samples.csv");
+
+    private boolean yearlyReset = false;
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -76,7 +82,12 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             .stream()
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> makeCatchSampler(entry.getKey(), entry.getValue(), rng)
+                entry -> {
+                    CatchSampler<B> instance = makeCatchSampler(entry.getKey(), entry.getValue(), rng);
+                    if(yearlyReset)
+                        fishState.scheduleEveryYear((Steppable) simState -> instance.reset(), StepOrder.DAWN);
+                    return instance;
+                }
             ));
     }
 
@@ -106,5 +117,14 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             ))
             .collect(toImmutableSortedMap(Ordering.natural(), Entry::getKey, Entry::getValue))
             .values();
+    }
+
+
+    public boolean isYearlyReset() {
+        return yearlyReset;
+    }
+
+    public void setYearlyReset(boolean yearlyReset) {
+        this.yearlyReset = yearlyReset;
     }
 }

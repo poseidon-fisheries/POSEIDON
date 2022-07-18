@@ -42,7 +42,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 @SuppressWarnings("UnstableApiUsage")
-public class TunaCalibrator implements Runnable {
+public class TunaCalibrator {
 
     static final int MAX_PROCESSORS_TO_USE = getRuntime().availableProcessors();
     static final int DEFAULT_POPULATION_SIZE = 50;
@@ -126,12 +126,12 @@ public class TunaCalibrator implements Runnable {
         }));
     }
 
-    @Override
-    public void run() {
+    public double[] run() {
         final Path calibrationFilePath =
             copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
         final double[] solution = calibrate(calibrationFilePath);
         evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+        return solution;
     }
 
     static void evaluateSolutionAndPrintOutErrors(

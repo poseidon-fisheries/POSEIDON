@@ -28,9 +28,7 @@ import uk.ac.ox.oxfish.utility.CsvLogger;
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-        System.getProperty("user.home"),
-        "workspace", "tuna", "calibration", "results",
-        "cenv0729", "2022-05-24_18.49.48_global_calibration"
+            "docs/20220223 tuna_calibration/pathfinder_julydata/carrknight/2022-07-10_10.13.49_catchability_original/local/carrknight/2022-07-11_07.51.40_catchability_local/test_yearlyreset/calibrated_scenario.yaml"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;

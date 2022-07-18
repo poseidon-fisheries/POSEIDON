@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -10,16 +9,14 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceAggregator;
 import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.actions.FadSearchAction;
-import uk.ac.ox.oxfish.fisher.actions.Moving;
+import uk.ac.ox.oxfish.fisher.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.*;
 
@@ -317,7 +314,7 @@ public interface PlannedAction {
     //this is what we are using now
     static abstract class AbstractSetWithCatchSampler implements PlannedAction{
 
-        private final static double DEFAULT_SET_DURATION = 2.69;
+        protected final static double DEFAULT_SET_DURATION = 2.69;
 
         private final CatchSampler howMuchWeCanFishOutGenerator;
 
@@ -330,32 +327,40 @@ public interface PlannedAction {
 
         private final double setDurationInHours;
 
+        private final boolean canPoachFromFads;
+
+
+        private final int rangeInSeaTiles;
+
+
         public AbstractSetWithCatchSampler(SeaTile position,
                                            CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                            CatchMaker<? extends LocalBiology> catchMaker) {
 
             this(position,
-                 howMuchWeCanFishOutGenerator,catchMaker ,
-                 DEFAULT_SET_DURATION, 0d);
+                 howMuchWeCanFishOutGenerator, catchMaker ,
+                 DEFAULT_SET_DURATION, 0d, false, -1);
         }
 
 
         public AbstractSetWithCatchSampler(SeaTile position,
                                            CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                            CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
-            this(position, howMuchWeCanFishOutGenerator,catchMaker ,
-                 DEFAULT_SET_DURATION, delayInHours);
+            this(position, howMuchWeCanFishOutGenerator, catchMaker ,
+                 DEFAULT_SET_DURATION, delayInHours, false, -1);
         }
 
         public AbstractSetWithCatchSampler(SeaTile position,
                                            CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
                                            CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours,
-                                           double delayInHours) {
+                                           double delayInHours, boolean canPoachFromFads, int rangeInSeaTiles) {
             this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
             this.position = position;
             this.searchTimeInHours = delayInHours;
             this.setDurationInHours = setDurationInHours;
             this.catchMaker = catchMaker;
+            this.canPoachFromFads = canPoachFromFads;
+            this.rangeInSeaTiles = rangeInSeaTiles;
         }
         @Override
         public SeaTile getLocation() {
@@ -403,119 +408,28 @@ public interface PlannedAction {
         public Action[] actuate(Fisher fisher) {
 
 
-            LocalBiology potentialCatch =
-                    (LocalBiology) howMuchWeCanFishOutGenerator.
-                            apply(getLocalBiologyToCatchFrom(fisher));
 
             if(searchTimeInHours<=0)
             {
                 return new Action[]{
-                        createSet(potentialCatch, fisher, setDurationInHours,getLocation() ,catchMaker )
+                        new PotentialSetAction(this,fisher)
                 };
             }
             else{
                 return new Action[]{
-                        createSet(potentialCatch, fisher, setDurationInHours,getLocation() ,catchMaker ),
+                        new PotentialSetAction(this,fisher),
                         new Delaying(searchTimeInHours)
                 };
             }
 
         }
 
-        protected LocalBiology getLocalBiologyToCatchFrom(Fisher fisher) {
-            return getLocation().getBiology();
-        }
+        private Action turnToAction(Fisher fisher){
 
-
-        @Override
-        public String toString() {
-            return "Planned set{" +
-                    "position=" + position +
-                    "type=" + getTypeOfActionPlanned() +
-                    ", searchTimeInHours=" + searchTimeInHours +
-                    ", setDurationInHours=" + setDurationInHours +
-                    '}';
-        }
-
-
-    }
-
-    //this is not the only way to do dolphin sets, in fact it is sort of improvised
-    //but basically you decide you will go to a location and then you will draw
-    //some catches and hope for the best
-    static class DolphinSet extends  AbstractSetWithCatchSampler {
-
-
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                          CatchMaker<? extends LocalBiology> catchMaker) {
-            super(position, howMuchWeCanFishOutGenerator,catchMaker );
-        }
-
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                          CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
-        }
-
-        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                          CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours, double delayInHours) {
-            super(position, howMuchWeCanFishOutGenerator,catchMaker , setDurationInHours, delayInHours);
-        }
-
-        @Override
-        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
-            return DolphinSetAction.class;
-        }
-
-        @Override
-        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
-                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
-            return new DolphinSetAction<>(
-                    potentialCatch,
-                    fisher,
-                    fishingTime,
-                    ImmutableList.of(location.getBiology()),
-                    catchMaker
-            );
-        }
-    }
-
-    static class NonAssociatedSet extends  AbstractSetWithCatchSampler {
-
-
-        final boolean canPoachFromFads;
-
-        final int rangeInSeaTiles;
-
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
-            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours,false,-1);
-        }
-
-        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours,
-                                boolean canPoachFromFads,
-                                int rangeInSeaTiles) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
-            this.canPoachFromFads = canPoachFromFads;
-            this.rangeInSeaTiles = rangeInSeaTiles;
-        }
-
-
-        @Override
-        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
-            return NonAssociatedSetAction.class;
-        }
-
-        @Override
-        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
-                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
-            return new NonAssociatedSetAction<>(
-                    potentialCatch,
-                    fisher,
-                    fishingTime,
-                    buildListOfCatchableAreas(fisher),
-                    catchMaker
-            );
+            LocalBiology potentialCatch =
+                    (LocalBiology) howMuchWeCanFishOutGenerator.
+                            apply(getLocalBiologiesAndAggregateThem(fisher));
+            return  createSet(potentialCatch, fisher, setDurationInHours,getLocation() ,catchMaker );
         }
 
         /**
@@ -539,7 +453,7 @@ public interface PlannedAction {
          * @return
          */
         private Collection<? extends LocalBiology> getAllBiologiesInRange(SeaTile tile, Fisher fisher){
-            LocalBiology local = super.getLocalBiologyToCatchFrom(fisher);
+            LocalBiology local = getLocation().getBiology();
 
             if(rangeInSeaTiles<=0 || local instanceof EmptyLocalBiology) {
                 return ImmutableList.of(local);
@@ -560,20 +474,21 @@ public interface PlannedAction {
         }
 
         /**
-         * starts with the local biologies; if you can poach from local fads, add those too to the local biology;
-         * if you can poach from range, adds those biologies too.
+         * starts with the local biologies; if you can poach from local fads, add those too to the list;
+         * if you can poach in range, adds those biologies too.
          * @param fisher
          * @return
          */
-        private Collection<LocalBiology> buildListOfCatchableAreas(Fisher fisher){
+        protected Collection<LocalBiology> buildListOfCatchableAreas(Fisher fisher){
             Set<LocalBiology> targetsSet =
                     new HashSet<>(
-                    canPoachFromFads ? getAllBiologiesHere(getLocation(), fisher) :
-                    ImmutableList.of(getLocation().getBiology()));
+                            canPoachFromFads ? getAllBiologiesHere(getLocation(), fisher) :
+                                    ImmutableList.of(getLocation().getBiology()));
             if(rangeInSeaTiles>0)
                 targetsSet.addAll(getAllBiologiesInRange(getLocation(), fisher));
             ArrayList<LocalBiology> targets = new ArrayList<>(targetsSet);
-            Collections.shuffle(targets, new Random(fisher.grabRandomizer().nextLong()));
+            if(targets.size()>=1)
+                Collections.shuffle(targets, new Random(fisher.grabRandomizer().nextLong()));
             return targets;
         }
 
@@ -581,9 +496,8 @@ public interface PlannedAction {
          * grabs local biology or local biologies of all the surrounding areas and aggregate them; this way it can
          * target larger stocks in a wider area
          */
-        @Override
-        protected LocalBiology getLocalBiologyToCatchFrom(Fisher fisher) {
-            LocalBiology local = super.getLocalBiologyToCatchFrom(fisher);
+        protected LocalBiology getLocalBiologiesAndAggregateThem(Fisher fisher) {
+            LocalBiology local = getLocation().getBiology();
             if(rangeInSeaTiles<=0 || local instanceof EmptyLocalBiology) {
                 return local;
             } else
@@ -597,6 +511,126 @@ public interface PlannedAction {
 
             }
         }
+
+
+        @Override
+        public String toString() {
+            return "Planned set{" +
+                    "position=" + position +
+                    "type=" + getTypeOfActionPlanned() +
+                    ", searchTimeInHours=" + searchTimeInHours +
+                    ", setDurationInHours=" + setDurationInHours +
+                    '}';
+        }
+
+
+
+    }
+
+    /**
+     * an object that prepares itself to use a catch sampler to fish stuff out but
+     * has not sampled yet (avoiding spoiling the sampler for sets that may end up not happening)
+     */
+    public static class PotentialSetAction implements Action{
+
+        private final PlannedAction.AbstractSetWithCatchSampler generator;
+
+        private final Fisher fisher;
+
+
+        public PotentialSetAction(AbstractSetWithCatchSampler generator, Fisher fisher) {
+            this.generator = generator;
+            this.fisher = fisher;
+        }
+
+        @Override
+        public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
+            return generator.turnToAction(fisher).act(model, agent, regulation, hoursLeft);
+        }
+    }
+
+    //this is not the only way to do dolphin sets, in fact it is sort of improvised
+    //but basically you decide you will go to a location and then you will draw
+    //some catches and hope for the best
+    static class DolphinSet extends  AbstractSetWithCatchSampler {
+
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker) {
+            super(position, howMuchWeCanFishOutGenerator,catchMaker );
+        }
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
+        }
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker, double setDurationInHours, double delayInHours) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker , setDurationInHours, delayInHours,
+                  false, -1);
+        }
+
+
+        public DolphinSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                          CatchMaker<? extends LocalBiology> catchMaker, double delayInHours, boolean canPoachFromFads, int rangeInSeatiles) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker , DEFAULT_SET_DURATION, delayInHours,
+                  canPoachFromFads, rangeInSeatiles);
+        }
+
+        @Override
+        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
+            return DolphinSetAction.class;
+        }
+
+        @Override
+        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
+            return new DolphinSetAction<>(
+                    potentialCatch,
+                    fisher,
+                    fishingTime,
+                    buildListOfCatchableAreas(fisher),
+                    catchMaker
+            );
+        }
+    }
+
+    static class NonAssociatedSet extends  AbstractSetWithCatchSampler {
+
+
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours) {
+            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours,false,-1);
+        }
+
+        public NonAssociatedSet(SeaTile position, CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
+                                CatchMaker<? extends LocalBiology> catchMaker, double delayInHours,
+                                boolean canPoachFromFads,
+                                int rangeInSeaTiles) {
+            super(position, howMuchWeCanFishOutGenerator, catchMaker,DEFAULT_SET_DURATION, delayInHours,canPoachFromFads,rangeInSeaTiles);
+
+        }
+
+
+        @Override
+        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
+            return NonAssociatedSetAction.class;
+        }
+
+        @Override
+        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+                B potentialCatch, Fisher fisher, double fishingTime, SeaTile location, CatchMaker catchMaker) {
+            return new NonAssociatedSetAction<>(
+                    potentialCatch,
+                    fisher,
+                    fishingTime,
+                    buildListOfCatchableAreas(fisher),
+                    catchMaker
+            );
+        }
+
+
     }
 
 

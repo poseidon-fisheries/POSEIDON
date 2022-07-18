@@ -54,7 +54,7 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
     private LinkedHashMap<String,Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
     {
-        carryingCapacityShapeParameters.put("Species 0", 100000d);
+        carryingCapacityScaleParameters.put("Species 0", 100000d);
     }
 
     private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);

@@ -60,9 +60,11 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
 
         // ...and then check that this maximum abundance contains enough biomass
         // to satisfy the desired catch for all species.
-        return species().allMatch(species ->
-            catchArray.get(species.getIndex()) <= catchableAbundance.getBiomass(species)
+        boolean isThereEnough = species().allMatch(species ->
+                                               catchArray.get(species.getIndex()) <= catchableAbundance.getBiomass(
+                                                       species)
         );
+        return isThereEnough;
     }
 
     private Stream<Species> species() {
