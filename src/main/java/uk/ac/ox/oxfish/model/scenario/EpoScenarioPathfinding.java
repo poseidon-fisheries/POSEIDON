@@ -121,6 +121,12 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
             new StandardIattcRegulationsFactory();
 
+    private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
+        speciesCodesFactory.get().getSpeciesNames(),
+        ImmutableList.of("small", "medium", "large"),
+        ImmutableList.of(12.0, 15.0)
+    );
+
     private boolean zapper = false;
     private boolean zapperAge = false;
 
@@ -315,6 +321,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setWeightGroupsPerSpecies(weightGroupsFactory.get());
         final AbundanceInitializer abundanceInitializer =
                 this.abundanceInitializerFactory.apply(fishState);
 
@@ -477,6 +484,16 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     public void setZapperAge(boolean zapperAge) {
         this.zapperAge = zapperAge;
+    }
+
+    @SuppressWarnings("unused")
+    public WeightGroupsFactory getWeightGroupsFactory() {
+        return weightGroupsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
+        this.weightGroupsFactory = weightGroupsFactory;
     }
 }
 

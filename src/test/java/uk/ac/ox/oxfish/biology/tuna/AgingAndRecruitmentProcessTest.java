@@ -8,23 +8,14 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-
-import java.util.*;
-import java.util.function.IntFunction;
-
-import static org.junit.Assert.*;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class AgingAndRecruitmentProcessTest {
 
@@ -37,16 +28,18 @@ public class AgingAndRecruitmentProcessTest {
         lengths.add(new double[] {5,6,7,8,9});  //male
         lengths.add(new double[] {10,11,12,13,14}); //female
 
-        TunaMeristics meristics = new TunaMeristics(weights, lengths, new double[]{.01,.05,.1,.5,.5});
+        TunaMeristics meristics = new TunaMeristics(
+            weights,
+            lengths,
+            new double[]{.01, .05, .1, .5, .5},
+            WeightGroups.SINGLE_GROUP
+        );
 
         Species species1 = new Species("Piano Tuna", meristics);
 
         Map<String, String> sCodes = new HashMap<>();
         sCodes.put("SP1", species1.getName());
         SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
-
-        Map<String, IntFunction<SmallLargeAllocationGridsSupplier.SizeGroup>> binToSizeGroupMappings = new HashMap<>();
-        binToSizeGroupMappings.put("Piano Tuna", entry -> entry==0?SMALL:LARGE );
 
         final GlobalBiology globalBiology= new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();

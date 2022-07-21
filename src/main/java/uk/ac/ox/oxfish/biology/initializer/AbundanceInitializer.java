@@ -18,17 +18,9 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.Arrays.setAll;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
-
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -36,18 +28,31 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Arrays.setAll;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 public class AbundanceInitializer implements BiologyInitializer {
 
     private final Map<String, List<Bin>> binsPerSpecies;
     private final AbundanceReallocator abundanceReallocator;
+    private final Map<String, WeightGroups> weightGroupsPerSpecies;
 
     AbundanceInitializer(
         final SpeciesCodes speciesCodes,
         final Map<String, List<Bin>> binsPerSpecies,
+        final Map<String, WeightGroups> weightGroupsPerSpecies,
         final AbundanceReallocator abundanceReallocator
     ) {
         this.binsPerSpecies = binsPerSpecies.entrySet().stream()
@@ -55,6 +60,7 @@ public class AbundanceInitializer implements BiologyInitializer {
                 entry -> speciesCodes.getSpeciesName(entry.getKey()),
                 entry -> ImmutableList.copyOf(entry.getValue())
             ));
+        this.weightGroupsPerSpecies = ImmutableMap.copyOf(weightGroupsPerSpecies);
         this.abundanceReallocator = abundanceReallocator;
     }
 
@@ -110,13 +116,10 @@ public class AbundanceInitializer implements BiologyInitializer {
                 final String speciesName = entry.getKey();
                 final List<Bin> bins = entry.getValue();
                 final TunaMeristics tunaMeristics = new TunaMeristics(
-                    makeList(
-                        bins, bin -> bin.maleWeight, bin -> bin.femaleWeight
-                    ),
-                    makeList(
-                        bins, bin -> bin.maleLength, bin -> bin.femaleLength
-                    ),
-                    bins.stream().mapToDouble(bin -> bin.maturity).toArray()
+                    makeList(bins, bin -> bin.maleWeight, bin -> bin.femaleWeight),
+                    makeList(bins, bin -> bin.maleLength, bin -> bin.femaleLength),
+                    bins.stream().mapToDouble(bin -> bin.maturity).toArray(),
+                    weightGroupsPerSpecies.get(speciesName)
                 );
                 return new Species(speciesName, tunaMeristics);
             })
