@@ -21,7 +21,7 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 
 public class CurrentVectorsEPO implements CurrentVectors {
 
-    private static final Double2D ZERO_VECTOR = new Double2D();
+    public static final Double2D ZERO_VECTOR = new Double2D();
 
     private final CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder();
 
