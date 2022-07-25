@@ -45,7 +45,7 @@ public class WeightGroups {
                 groupingBy(
                     bin -> groupNames.get(toIntExact(
                         cutoffs.stream()
-                            .filter(cutoff -> cutoff < weights[bin])
+                            .filter(cutoff -> cutoff <= weights[bin])
                             .count()
                     )),
                     toImmutableList()

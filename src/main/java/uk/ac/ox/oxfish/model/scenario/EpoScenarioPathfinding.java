@@ -52,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
@@ -82,11 +84,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
             new AbundanceReallocatorFactory(
                     INPUT_PATH.resolve("abundance").resolve("grids.csv"),
-                    ImmutableMap.of(
-                            "Skipjack tuna", 14,
-                            "Bigeye tuna", 8,
-                            "Yellowfin tuna", 9
-                    ),
                     365
             );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
@@ -122,9 +119,15 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             new StandardIattcRegulationsFactory();
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        speciesCodesFactory.get().getSpeciesNames(),
-        ImmutableList.of("small", "medium", "large"),
-        ImmutableList.of(12.0, 15.0)
+        speciesCodesFactory.get().getSpeciesNames().stream().collect(
+            toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", ImmutableList.of(12.0, 15.0),
+            // use the last two bins of SKJ as "medium" and "large"
+            "Skipjack tuna", ImmutableList.of(11.5016, 11.5019),
+            "Yellowfin tuna", ImmutableList.of(12.0, 15.0)
+        )
     );
 
     private boolean zapper = false;

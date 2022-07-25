@@ -77,10 +77,6 @@ EPO Abundance Pathfinding:
     successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
-    firstLargeBinPerSpecies:
-      Skipjack tuna: 14
-      Bigeye tuna: 8
-      Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
       0: 365
