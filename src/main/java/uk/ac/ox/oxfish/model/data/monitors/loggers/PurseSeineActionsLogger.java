@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Lists.newArrayList;
@@ -139,15 +141,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private Double bet;
         private Double skj;
         private Double yft;
-        private Double betSmall;
-        private Double betMedium;
-        private Double betLarge;
-        private Double skjSmall;
-        private Double skjMedium;
-        private Double skjLarge;
-        private Double yftSmall;
-        private Double yftMedium;
-        private Double yftLarge;
+        private Map<String, Double> betCatchPerSize;
+        private Map<String, Double> skjCatchPerSize;
+        private Map<String, Double> yftCatchPerSize;
 
         private ActionRecord(final PurseSeinerAction action) {
             this.boatId = action.getFisher().getTags().get(0);
@@ -160,34 +156,26 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
             if (action instanceof AbstractSetAction) {
                 ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
-                    // SO MUCH repeated code in there. I'm making myself cry.
-                    final Species bigeyeTuna = fishState.getSpecies("Bigeye tuna");
-                    final Species skipjackTuna = fishState.getSpecies("Skipjack tuna");
-                    final Species yellowfinTuna = fishState.getSpecies("Yellowfin tuna");
-                    this.bet = catchesKept.getWeightCaught(bigeyeTuna);
-                    this.skj = catchesKept.getWeightCaught(skipjackTuna);
-                    this.yft = catchesKept.getWeightCaught(yellowfinTuna);
-                    if (catchesKept.hasAbundanceInformation()) {
-                        final StructuredAbundance betAbundance = requireNonNull(catchesKept.getAbundance(bigeyeTuna));
-                        final StructuredAbundance skjAbundance = requireNonNull(catchesKept.getAbundance(skipjackTuna));
-                        final StructuredAbundance yftAbundance = requireNonNull(catchesKept.getAbundance(yellowfinTuna));
-                        final Map<String, Double> betCatchPerSize = getCatchPerSize(bigeyeTuna, betAbundance);
-                        final Map<String, Double> skjCatchPerSize = getCatchPerSize(bigeyeTuna, skjAbundance);
-                        final Map<String, Double> yftCatchPerSize = getCatchPerSize(bigeyeTuna, yftAbundance);
-                        this.betSmall = betCatchPerSize.get("small");
-                        this.betMedium = betCatchPerSize.get("medium");
-                        this.betLarge = betCatchPerSize.get("large");
-                        this.skjSmall = skjCatchPerSize.get("small");
-                        this.skjMedium = skjCatchPerSize.get("medium");
-                        this.skjLarge = skjCatchPerSize.get("large");
-                        this.yftSmall = yftCatchPerSize.get("small");
-                        this.yftMedium = yftCatchPerSize.get("medium");
-                        this.yftLarge = yftCatchPerSize.get("large");
-                    }
-
+                    setCatches(catchesKept, "Bigeye tuna", x -> this.bet = x, x -> this.betCatchPerSize = x);
+                    setCatches(catchesKept, "Skipjack tuna", x -> this.skj = x, x -> this.skjCatchPerSize = x);
+                    setCatches(catchesKept, "Yellowfin tuna", x -> this.yft = x, x -> this.yftCatchPerSize = x);
                 });
             }
             action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
+        }
+
+        private void setCatches(
+            Catch catchesKept,
+            String speciesName,
+            Consumer<Double> weightCaughtSetter,
+            Consumer<Map<String, Double>> catchPerSizeSetter
+        ) {
+            final Species species = fishState.getSpecies(speciesName);
+            weightCaughtSetter.accept(catchesKept.getWeightCaught(species));
+            if (catchesKept.hasAbundanceInformation()) {
+                final StructuredAbundance abundance = requireNonNull(catchesKept.getAbundance(species));
+                catchPerSizeSetter.accept(getCatchPerSize(species, abundance));
+            }
         }
 
         private List<?> asRow() {
@@ -202,15 +190,15 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 bet,
                 skj,
                 yft,
-                betSmall,
-                betMedium,
-                betLarge,
-                skjSmall,
-                skjMedium,
-                skjLarge,
-                yftSmall,
-                yftMedium,
-                yftLarge
+                betCatchPerSize.get("small"),
+                betCatchPerSize.get("medium"),
+                betCatchPerSize.get("large"),
+                skjCatchPerSize.get("small"),
+                skjCatchPerSize.get("medium"),
+                skjCatchPerSize.get("large"),
+                yftCatchPerSize.get("small"),
+                yftCatchPerSize.get("medium"),
+                yftCatchPerSize.get("large")
             ));
         }
 
