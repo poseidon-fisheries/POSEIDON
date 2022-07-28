@@ -29,7 +29,7 @@ public enum CurrentVectorsFactory {
     INSTANCE;
 
     public static final int STEPS_PER_DAY = 1;
-    private static final int SECONDS_PER_DAY = 60 * 60 * 24;
+    public static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
 
     static public LoadingCache<Entry<MapExtent, Map<CurrentPattern, Path>>, CurrentVectors> getCache(
@@ -104,7 +104,7 @@ public enum CurrentVectorsFactory {
      * This is slightly convoluted because the translation of distance into grid offsets depends on the latitude,
      * so we need to use lon/lat coordinates as an intermediate and then convert back to grid coordinates.
      */
-    private static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
+    public static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
         final Double2D metresPerDayVector = metrePerSecondVector.multiply(SECONDS_PER_DAY);
         final Double2D startXY = coordinateToXY(startCoord, mapExtent);
         final Double2D lonLatVector = metresVectorToLonLatVector(startCoord, metresPerDayVector.x, metresPerDayVector.y);
