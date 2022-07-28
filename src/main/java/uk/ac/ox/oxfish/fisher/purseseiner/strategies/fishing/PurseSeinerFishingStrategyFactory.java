@@ -386,7 +386,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                     mapExtent
                 ).length()
             );
-        System.out.println(maxCurrentSpeeds);
         return maxCurrentSpeeds;
     }
 
