@@ -106,10 +106,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(
-            "Bigeye tuna", ImmutableList.of(12.0, 15.0),
+            "Bigeye tuna", ImmutableList.of(2.5, 15.0),
             // use the last two bins of SKJ as "medium" and "large"
-            "Skipjack tuna", ImmutableList.of(11.5016, 11.5019),
-            "Yellowfin tuna", ImmutableList.of(12.0, 15.0)
+            "Skipjack tuna", ImmutableList.of(2.5, 11.5019),
+            "Yellowfin tuna", ImmutableList.of(2.5, 15.0)
         )
 
     );
