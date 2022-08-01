@@ -36,11 +36,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -190,15 +187,15 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 bet,
                 skj,
                 yft,
-                betCatchPerSize.get("small"),
-                betCatchPerSize.get("medium"),
-                betCatchPerSize.get("large"),
-                skjCatchPerSize.get("small"),
-                skjCatchPerSize.get("medium"),
-                skjCatchPerSize.get("large"),
-                yftCatchPerSize.get("small"),
-                yftCatchPerSize.get("medium"),
-                yftCatchPerSize.get("large")
+                betCatchPerSize == null ? null : betCatchPerSize.get("small"),
+                betCatchPerSize == null ? null : betCatchPerSize.get("medium"),
+                betCatchPerSize == null ? null : betCatchPerSize.get("large"),
+                skjCatchPerSize == null ? null : skjCatchPerSize.get("small"),
+                skjCatchPerSize == null ? null : skjCatchPerSize.get("medium"),
+                skjCatchPerSize == null ? null : skjCatchPerSize.get("large"),
+                yftCatchPerSize == null ? null : yftCatchPerSize.get("small"),
+                yftCatchPerSize == null ? null : yftCatchPerSize.get("medium"),
+                yftCatchPerSize == null ? null : yftCatchPerSize.get("large")
             ));
         }
 
