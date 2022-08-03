@@ -94,6 +94,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
         when(fad.getTotalCarryingCapacity()).thenReturn(1d);
+        when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
 
@@ -190,6 +191,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
         when(fad.getTotalCarryingCapacity()).thenReturn(1d);
+        when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
 
@@ -255,6 +257,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,999999})));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(3);
+        when(fad.isActive()).thenReturn(true);
 
         assertNull(
                 attractor.attractImplementation(localBiology,fad)

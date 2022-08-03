@@ -150,6 +150,7 @@ public class AbundanceLinearIntervalAttractorTest {
         when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{0,0})));
         when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,new StructuredAbundance(new double[]{999999,99999})));
         when(fad.getStepDeployed()).thenReturn(1);
+        when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
         assertNotNull(

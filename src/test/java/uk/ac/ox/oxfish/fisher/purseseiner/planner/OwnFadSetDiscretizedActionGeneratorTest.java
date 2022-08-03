@@ -90,7 +90,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 -100
         );
 
-        generator.startOrReset(fadManager,new MersenneTwisterFast());
+        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
         //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
@@ -163,7 +163,57 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 2
         );
 
-        generator.startOrReset(fadManager,new MersenneTwisterFast());
+        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
+        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
+        assertEquals(initialOptions.size(),1);
+        assertTrue(initialOptions.get(0).getSecond()==3);
+    }
+
+
+    @Test
+    public void banLocations() {
+        final FishState fishState = mock(FishState.class);
+        final NauticalMap map = makeMap(4, 4);
+        final Fisher fisher = mock(Fisher.class);
+        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
+                mock(PurseSeineGear.class);
+        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
+                fadManager = mock(FadManager.class);
+        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
+                mock(FadMap.class);
+        when(fadManager.getFadMap()).thenReturn(fadMap);
+        when(gear.getFadManager()).thenReturn(fadManager);
+        when(fisher.getGear()).thenReturn(gear);
+        when(fisher.grabState()).thenReturn(fishState);
+        when(fishState.getMap()).thenReturn(map);
+
+        final List<BiomassFad> fads = range(0, 3)
+                .mapToObj(index -> {
+                    final BiomassFad fad = mock(BiomassFad.class);
+                    when(fad.valueOfFishFor(any())).thenReturn((double)index);
+                    when(fad.getLocation()).thenReturn(map.getSeaTile(index,index));
+                    return fad;
+                })
+                .collect(toImmutableList());
+
+        when(fadManager.getDeployedFads())
+                .thenReturn(ImmutableSet.copyOf(fads));
+
+        //discretized map split into 2x2
+        MapDiscretization discretization = new MapDiscretization(
+                new SquaresMapDiscretizer(1,1)
+        );
+        discretization.discretize(map);
+        OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
+                discretization,
+                0
+        );
+
+        generator.setBannedGridBounds(new double[]{-100,1},new double[]{-100,1});
+        //only 3,3 will do
+
+
+        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         assertEquals(initialOptions.size(),1);
         assertTrue(initialOptions.get(0).getSecond()==3);
