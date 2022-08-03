@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
@@ -23,6 +22,10 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
     private final Class<B> localBiologyClass;
     private final Class<F> fadClass;
     private Map<CurrentPattern, Path> currentFiles;
+
+
+    private boolean inputIsMetersPerSecond = true;
+
 
     FadMapFactory(
         final Class<B> localBiologyClass,
@@ -61,7 +64,7 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         final CurrentVectors currentVectors =
             CurrentVectorsFactory.INSTANCE.getCurrentVectors(
                 new MapExtent(nauticalMap),
-                currentFiles
+                currentFiles, inputIsMetersPerSecond
             );
         return new FadMap<>(
             nauticalMap,
@@ -72,4 +75,11 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         );
     }
 
+    public boolean isInputIsMetersPerSecond() {
+        return inputIsMetersPerSecond;
+    }
+
+    public void setInputIsMetersPerSecond(boolean inputIsMetersPerSecond) {
+        this.inputIsMetersPerSecond = inputIsMetersPerSecond;
+    }
 }

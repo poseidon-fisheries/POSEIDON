@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -117,15 +118,20 @@ public interface PlannedAction {
         @Override
         public boolean isAllowedNow(Fisher fisher) {
             FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> fadManager = FadManager.getFadManager(fisher);
-            return //you must be allowed at sea
-                    fisher.isAllowedAtSea() &&
-                            //the fad has not since been destroyed
-                            !fadWePlanToSetOn.isLost() &&
-                            //fad setting ought not to be banned
-                            !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class,fisher) &&
-                            //we should be allowed to fish here
-                            fisher.isAllowedToFishHere(getLocation(),fisher.grabState())
-                    ;
+            return isFadSetAllowed(fisher, fadManager,fadWePlanToSetOn);
+        }
+
+        public static boolean isFadSetAllowed(
+                Fisher fisher,
+                FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager,
+                AbstractFad set) {
+            return fisher.isAllowedAtSea() &&
+                    //the fad has not since been destroyed
+                    !set.isLost() &&
+                    //fad setting ought not to be banned
+                    !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class, fisher) &&
+                    //we should be allowed to fish here
+                    fisher.isAllowedToFishHere(set.getLocation(), fisher.grabState());
         }
 
         @Override

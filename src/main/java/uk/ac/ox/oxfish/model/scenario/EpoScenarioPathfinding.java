@@ -124,6 +124,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private boolean zapper = false;
     private boolean zapperAge = false;
 
+   // private boolean galapagosZapper = false;
+
     /**
      * Just runs the scenario for a year.
      */

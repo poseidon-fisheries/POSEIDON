@@ -73,6 +73,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
 
+    private boolean fadSettingActive = true;
+
+
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
@@ -284,14 +287,11 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             FadSetAction.class));
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(fadInitializerFactory);
 
-        ImmutableList.of(
-            scheduledAbundanceProcessesFactory,
-            abundanceRestorerFactory,
-            fadMakerFactory,
-            fadSetterFactory
-        ).forEach(startableFactory ->
-            fishState.registerStartable(startableFactory.apply(fishState))
-        );
+        fishState.registerStartable(scheduledAbundanceProcessesFactory.apply(fishState));
+        fishState.registerStartable(abundanceRestorerFactory.apply(fishState));
+        fishState.registerStartable(fadMakerFactory.apply(fishState));
+        if(fadSettingActive)
+            fishState.registerStartable(fadSetterFactory.apply(fishState));
 
         return scenarioPopulation;
     }
@@ -356,5 +356,13 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory
     ) {
         this.fadSetterFactory = fadSetterFactory;
+    }
+
+    public boolean isFadSettingActive() {
+        return fadSettingActive;
+    }
+
+    public void setFadSettingActive(boolean fadSettingActive) {
+        this.fadSettingActive = fadSettingActive;
     }
 }

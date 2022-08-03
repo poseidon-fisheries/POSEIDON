@@ -31,28 +31,34 @@ public enum CurrentVectorsFactory {
     public static final int STEPS_PER_DAY = 1;
     private static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
-    private final LoadingCache<Entry<MapExtent, Map<CurrentPattern, Path>>, CurrentVectors> cache =
-        CacheBuilder.newBuilder()
-            .build(CacheLoader.from(entry -> {
-                MapExtent mapExtent = entry.getKey();
-                Map<CurrentPattern, Path> currentFiles = entry.getValue();
-                return new CurrentVectorsEPO(
-                    makeVectorMaps(mapExtent, currentFiles),
-                    STEPS_PER_DAY,
-                    mapExtent.getGridWidth(),
-                    mapExtent.getGridHeight()
-                );
-            }));
+
+    static public LoadingCache<Entry<MapExtent, Map<CurrentPattern, Path>>, CurrentVectors> getCache(
+            boolean inputIsMetersPerSecond
+    ){
+        return CacheBuilder.newBuilder()
+                .build(CacheLoader.from(entry -> {
+                    MapExtent mapExtent = entry.getKey();
+                    Map<CurrentPattern, Path> currentFiles = entry.getValue();
+                    return new CurrentVectorsEPO(
+                            makeVectorMaps(mapExtent, currentFiles, inputIsMetersPerSecond),
+                            STEPS_PER_DAY,
+                            mapExtent.getGridWidth(),
+                            mapExtent.getGridHeight()
+                    );
+                }));
+    }
 
 
-    public CurrentVectors getCurrentVectors(final MapExtent mapExtent, final Map<CurrentPattern, Path> currentFiles) {
-        return cache.getUnchecked(entry(mapExtent, currentFiles));
+
+    public CurrentVectors getCurrentVectors(final MapExtent mapExtent, final Map<CurrentPattern, Path> currentFiles,
+                                            boolean inputIsMetersPerSecond) {
+        return getCache(inputIsMetersPerSecond).getUnchecked(entry(mapExtent, currentFiles));
     }
 
     @SuppressWarnings("SameParameterValue")
     private static TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> makeVectorMaps(
-        final MapExtent mapExtent,
-        final Map<CurrentPattern, Path> currentFiles
+            final MapExtent mapExtent,
+            final Map<CurrentPattern, Path> currentFiles, boolean inputIsMetersPerSecond1
     ) {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> currentVectors = new TreeMap<>();
         final SparseGrid2D dummyGrid = new SparseGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
@@ -66,7 +72,7 @@ public enum CurrentVectorsFactory {
                 final Map<Int2D, Double2D> vectorByLocation = currentVectors
                     .computeIfAbsent(dayOfYear, __ -> new EnumMap<>(CurrentPattern.class))
                     .computeIfAbsent(currentPattern, __ -> new HashMap<>());
-                final Double2D vector = readVector(record, coordinate, mapExtent);
+                final Double2D vector = readVector(record, coordinate, mapExtent, inputIsMetersPerSecond1);
                 final Int2D gridLocation = new Int2D(
                     geomGridField.toXCoord(coordinate.x),
                     geomGridField.toYCoord(coordinate.y)
@@ -81,12 +87,16 @@ public enum CurrentVectorsFactory {
         return new Coordinate(record.getDouble("lon"), record.getDouble("lat"));
     }
 
-    private static Double2D readVector(final Record record, final Coordinate startCoord, final MapExtent mapExtent) {
-        final Double2D metrePerSecondVector = new Double2D(
+    private static Double2D readVector(final Record record, final Coordinate startCoord, final MapExtent mapExtent, boolean inputIsMetersPerSecond1) {
+        final Double2D input = new Double2D(
             record.getDouble("u"),
             record.getDouble("v")
         );
-        return metrePerSecondToXyPerDaysVector(metrePerSecondVector, startCoord, mapExtent);
+        if(inputIsMetersPerSecond1){
+        return metrePerSecondToXyPerDaysVector(input, startCoord, mapExtent);}
+        else{
+            return input;
+        }
     }
 
     /**
@@ -114,5 +124,7 @@ public enum CurrentVectorsFactory {
         final double dy = (180 / Math.PI) * (v / r);
         return new Double2D(dx, dy);
     }
+
+
 
 }
