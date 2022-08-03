@@ -145,6 +145,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final int delSetsRangeInSeatiles;
 
+    private double[] impossibleFadAreaXBounds;
+    private double[] impossibleFadAreaYBounds;
+
+
     public PlannedStrategyProxy(
             Map<Class<? extends AbstractSetAction<?>>,
                     ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
@@ -282,12 +286,17 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 mapDiscretizationFadSets.discretize(model.getMap());
                 plannableActionWeights.put(ActionType.SetOwnFadAction,
                         actionWeight.getValue()*ownFadActionWeightBias);
+                DiscretizedOwnFadCentroidPlanningModule module = new DiscretizedOwnFadCentroidPlanningModule(
+                        mapDiscretizationFadSets,
+                        minimumValueFadSets,
+                        distancePenaltyFadSets
+                );
+                if(impossibleFadAreaXBounds != null){
+                    assert impossibleFadAreaYBounds !=null;
+                    module.setBannedGridBounds(impossibleFadAreaYBounds,impossibleFadAreaXBounds);
+                }
                 planModules.put(ActionType.SetOwnFadAction,
-                        new DiscretizedOwnFadCentroidPlanningModule(
-                                mapDiscretizationFadSets,
-                                minimumValueFadSets,
-                                distancePenaltyFadSets
-                        )
+                        module
                 );
             }
             //OFS
@@ -354,4 +363,19 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     }
 
 
+    public double[] getImpossibleFadAreaXBounds() {
+        return impossibleFadAreaXBounds;
+    }
+
+    public void setImpossibleFadAreaXBounds(double[] impossibleFadAreaXBounds) {
+        this.impossibleFadAreaXBounds = impossibleFadAreaXBounds;
+    }
+
+    public double[] getImpossibleFadAreaYBounds() {
+        return impossibleFadAreaYBounds;
+    }
+
+    public void setImpossibleFadAreaYBounds(double[] impossibleFadAreaYBounds) {
+        this.impossibleFadAreaYBounds = impossibleFadAreaYBounds;
+    }
 }

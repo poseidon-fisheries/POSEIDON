@@ -119,12 +119,13 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     private Locker<FishState, Map> catchSamplerLocker = new Locker<>();
 
+    private boolean blockEPOFadAreas = false;
     @Override
     public PlannedStrategyProxy apply(FishState state) {
-        return new PlannedStrategyProxy(
+        PlannedStrategyProxy proxy = new PlannedStrategyProxy(
                 uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
                         catchSamplerLocker.presentKey(state,
-                                                      () -> catchSamplersFactory.apply(state))
+                                () -> catchSamplersFactory.apply(state))
                 ,
                 PurseSeinerFishingStrategyFactory.loadAttractionWeights(attractionWeightsFile),
                 GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile),
@@ -147,6 +148,11 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 purgeIllegalActionsImmediately,
                 noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
                 delSetsRangeInSeatiles.apply(state.getRandom()).intValue());
+        if(blockEPOFadAreas) {
+            proxy.setImpossibleFadAreaYBounds(new double[]{47, 51});
+            proxy.setImpossibleFadAreaXBounds(new double[]{-1, 75});
+        }
+        return proxy;
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
@@ -317,5 +323,13 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     public void setUniqueCatchSamplerForEachStrategy(boolean uniqueCatchSamplerForEachStrategy) {
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
+    }
+
+    public boolean isBlockEPOFadAreas() {
+        return blockEPOFadAreas;
+    }
+
+    public void setBlockEPOFadAreas(boolean blockEPOFadAreas) {
+        this.blockEPOFadAreas = blockEPOFadAreas;
     }
 }

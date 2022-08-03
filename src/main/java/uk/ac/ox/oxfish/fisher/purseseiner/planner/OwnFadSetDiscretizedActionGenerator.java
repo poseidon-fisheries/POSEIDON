@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
 
@@ -35,6 +37,16 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private final double minimumFadValue;
 
+    /**
+     * if some bounds are provided, within them you will decide not to fish
+     */
+    private double[] bannedGridYBounds;
+
+    /**
+     * if some bounds are provided, within them you will decide not to fish
+     */
+    private double[] bannedGridXBounds;
+
     public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
         this.discretization = discretization;
         this.minimumFadValue = minimumFadValue;
@@ -57,7 +69,8 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     public void startOrReset(
             FadManager fadManager,
-            MersenneTwisterFast random){
+            MersenneTwisterFast random,
+            NauticalMap map){
 
         rankedFads = new PriorityQueue[discretization.getNumberOfGroups()];
         for (int i = 0; i < rankedFads.length; i++) {
@@ -67,6 +80,13 @@ public class OwnFadSetDiscretizedActionGenerator {
         for (Object fad : fadManager.getDeployedFads()) {
             AbstractFad deployedFad = (AbstractFad) fad;
             double value = deployedFad.valueOfFishFor(fadManager.getFisher());
+            SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
+            if(bannedGridYBounds != null &&
+                    location.getGridY()>= bannedGridYBounds[0] &&
+                    location.getGridY()<=bannedGridYBounds[1] &&
+                    location.getGridX()>= bannedGridXBounds[0] &&
+                    location.getGridX()<=bannedGridXBounds[1])
+                continue;
             if(value>=minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                         add(new ValuedFad(deployedFad,value));
@@ -111,5 +131,19 @@ public class OwnFadSetDiscretizedActionGenerator {
 
     public int getNumberOfGroups(){
         return rankedFads.length;
+    }
+
+
+    public double[] getBannedGridYBounds() {
+        return bannedGridYBounds;
+    }
+    public void setBannedGridBounds(double[] bannedGridYBounds,
+                                     double[] bannedGridXBounds) {
+        this.bannedGridYBounds = bannedGridYBounds;
+        this.bannedGridXBounds = bannedGridXBounds;
+    }
+
+    public double[] getBannedGridXBounds() {
+        return bannedGridXBounds;
     }
 }

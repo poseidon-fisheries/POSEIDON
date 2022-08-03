@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -121,7 +122,10 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        optionsGenerator.startOrReset(FadManager.getFadManager(fisher),model.getRandom());
+        optionsGenerator.startOrReset(
+                FadManager.getFadManager(fisher),
+                model.getRandom(),
+                model.getMap());
         map = model.getMap();
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
 
@@ -169,4 +173,21 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
 
     }
+
+    public double[] getBannedGridYBounds() {
+        return optionsGenerator.getBannedGridYBounds();
+    }
+
+    public void setBannedGridBounds(double[] bannedGridYBounds, double[] bannedGridXBounds) {
+        Preconditions.checkArgument(bannedGridXBounds.length==2);
+        Preconditions.checkArgument(bannedGridYBounds.length==2);
+        Preconditions.checkArgument(bannedGridYBounds[0]<=bannedGridYBounds[1]);
+        Preconditions.checkArgument(bannedGridXBounds[0]<=bannedGridXBounds[1]);
+        optionsGenerator.setBannedGridBounds(bannedGridYBounds, bannedGridXBounds);
+    }
+
+    public double[] getBannedGridXBounds() {
+        return optionsGenerator.getBannedGridXBounds();
+    }
+
 }
