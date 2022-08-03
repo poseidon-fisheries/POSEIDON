@@ -7,6 +7,7 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.Level;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
@@ -22,8 +24,11 @@ import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.FadBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.CsvLogger;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 public class TunaEvaluator implements Runnable {
 
@@ -41,25 +46,51 @@ public class TunaEvaluator implements Runnable {
         optimization = GenericOptimization.fromFile(calibrationFilePath);
 
         runner = new Runner<>(
-            () -> makeScenario(optimization, solution),
-            calibrationFilePath.getParent()
+                () -> makeScenario(optimization, solution),
+                calibrationFilePath.getParent()
         ).registerRowProvider(
-            "evaluation_results.csv",
-            fishState -> new EvaluationResultsRowProvider(fishState, optimization)
+                "evaluation_results.csv",
+                fishState -> new EvaluationResultsRowProvider(fishState, optimization)
+        );
+        runner.setParallel(false);
+
+    }
+
+
+    public TunaEvaluator(final Path scenarioFile,final Path calibrationFilePath) {
+
+        optimization = GenericOptimization.fromFile(calibrationFilePath);
+
+        runner = new Runner<Scenario>(
+                () -> {
+                            try {
+                                FishYAML yaml = new FishYAML();
+
+                                EpoScenario epoScenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), EpoScenario.class);
+                                return epoScenario;
+                            } catch (FileNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                        },                scenarioFile.getParent()
+
+        ).registerRowProvider(
+                "evaluation_results.csv",
+                fishState -> new EvaluationResultsRowProvider(fishState, optimization)
         );
         runner.setParallel(false);
 
     }
 
     private static Scenario makeScenario(
-        final GenericOptimization optimization,
-        final double[] optimalParameters
+            final GenericOptimization optimization,
+            final double[] optimalParameters
     ) {
         try {
             return GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
+                    optimalParameters,
+                    Paths.get(optimization.getScenarioFile()).toFile(),
+                    optimization.getParameters()
             );
         } catch (final FileNotFoundException e) {
             throw new IllegalStateException(e);
@@ -98,17 +129,17 @@ public class TunaEvaluator implements Runnable {
 
     private static Path getCalibrationFolder(final String[] args) {
         return stream(args)
-            .map(Paths::get)
-            .filter(Files::isDirectory)
-            .map(path -> {
-                try {
-                    return path.toRealPath();
-                } catch (final IOException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            })
-            .findFirst()
-            .orElse(DEFAULT_CALIBRATION_FOLDER);
+                .map(Paths::get)
+                .filter(Files::isDirectory)
+                .map(path -> {
+                    try {
+                        return path.toRealPath();
+                    } catch (final IOException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                })
+                .findFirst()
+                .orElse(DEFAULT_CALIBRATION_FOLDER);
     }
 
     @Override
@@ -117,17 +148,17 @@ public class TunaEvaluator implements Runnable {
         runner.writeScenarioToFile("calibrated_scenario.yaml");
 
         scenarioConsumer.ifPresent(consumer ->
-            runner.setPolicies(ImmutableList.of(
-                new Policy<>("Modified scenario", "", consumer)
-            ))
+                runner.setPolicies(ImmutableList.of(
+                        new Policy<>("Modified scenario", "", consumer)
+                ))
         );
 
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
         runner
-            .registerRowProvider("actions.csv", PurseSeineActionsLogger::new);
-         //   .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
-      //      .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
+                .registerRowProvider("actions.csv", PurseSeineActionsLogger::new);
+        //   .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
+        //      .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }
