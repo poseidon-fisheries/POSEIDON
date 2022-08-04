@@ -62,6 +62,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             "lon",
             "lat",
             "step",
+            "trip_id",
             "trip_start",
             "trip_end"
         ).addAll(
@@ -133,6 +134,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final double lon;
         private final double lat;
         private final int actionStep;
+        private final long tripId;
         private final int tripStartStep;
         private Integer tripEndStep;
         private Double bet;
@@ -150,6 +152,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
+            this.tripId = currentTrip.getTripId();
             this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
             if (action instanceof AbstractSetAction) {
                 ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
@@ -182,6 +185,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 lon,
                 lat,
                 actionStep,
+                tripId,
                 tripStartStep,
                 tripEndStep,
                 bet,
