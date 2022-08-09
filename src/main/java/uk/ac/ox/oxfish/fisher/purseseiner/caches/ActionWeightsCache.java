@@ -45,7 +45,7 @@ public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double
                     groupingBy(
                         record -> record.getString("ves_no"),
                         toMap(
-                            record -> ActionClass.valueOf(record.getString("event")).getActionClass(),
+                            record -> ActionClass.valueOf(record.getString("action_type")).getActionClass(),
                             record -> record.getDouble("w")
                         )
                     )

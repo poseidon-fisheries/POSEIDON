@@ -53,7 +53,7 @@ public class LocationFisherValuesByActionCacheTest {
 
         final Path path = makeTempFile(String.join(
             System.getProperty("line.separator"),
-            "ves_no,year,lon,lat,event,value",
+            "ves_no,year,lon,lat,action_type,value",
             "Fisher0,2017,0.5,0.5,OFS,10",
             "Fisher0,2017,0.5,1.5,OFS,20",
             "Fisher0,2017,0.5,2.5,OFS,30",

@@ -40,7 +40,7 @@ public class ActionWeightsCacheTest {
     @Test
     public void test() {
 
-        final String headers = "ves_no,year,event,w";
+        final String headers = "ves_no,year,action_type,w";
         final Path path1 = makeTempFile(String.join(
             System.getProperty("line.separator"),
             headers,

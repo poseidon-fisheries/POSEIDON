@@ -13,7 +13,7 @@ import static java.util.function.Function.identity;
  * These enums are mostly used to convert strings to action classes when loading data from CSV
  * files, e.g:
  * <p>
- * {@code ActionClasses.valueOf(record.getString("event")).getActionClass()}
+ * {@code ActionClasses.valueOf(record.getString("action_type")).getActionClass()}
  * <p>
  * They could also be used to get the action class directly, e.g. {@code OFS.getActionClass()}
  * instead of writing {@code OpportunisticFadSetAction.class}.

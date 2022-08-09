@@ -29,6 +29,7 @@ import com.google.common.primitives.Doubles;
 import ec.util.MersenneTwisterFast;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -188,6 +189,8 @@ public class FishState  extends SimState{
 
     private List<EntryPlugin> entryPlugins;
 
+    private LocalDate startDate;
+
     public int getStepsPerDay() {
         return stepsPerDay;
     }
@@ -266,8 +269,7 @@ public class FishState  extends SimState{
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateDailySteppables.entrySet()  )
             schedule.scheduleRepeating(steppable.getValue(),steppable.getKey().ordinal(), stepsPerDay);
 
-
-
+        this.startDate = scenario.getStartDate();
         ScenarioEssentials initialization = scenario.start(this);
 
         //read raster bathymetry

@@ -53,7 +53,7 @@ public class LocationFisherValuesByActionCache extends FisherValuesByActionFromF
                     groupingBy(
                         record -> record.getString("ves_no"),
                         groupingBy(
-                            record -> ActionClass.valueOf(record.getString("event")).getActionClass(),
+                            record -> ActionClass.valueOf(record.getString("action_type")).getActionClass(),
                             toMap(
                                 record -> new Coordinate(record.getDouble("lon"), record.getDouble("lat")),
                                 record -> record.getDouble("value")
