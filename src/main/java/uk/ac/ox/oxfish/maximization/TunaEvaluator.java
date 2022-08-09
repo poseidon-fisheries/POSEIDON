@@ -156,9 +156,9 @@ public class TunaEvaluator implements Runnable {
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(optimization.getSimulatedYears(), numRuns - 1, runCounter);
         runner
-                .registerRowProvider("actions.csv", PurseSeineActionsLogger::new);
-        //   .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
-        //      .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
+            .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+         //   .registerRowProvider("fad_biomass.csv", FadBiomassLogger::new)
+      //      .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }
