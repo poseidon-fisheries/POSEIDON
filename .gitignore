@@ -139,3 +139,6 @@ OptimizationParameters.yml
 Statistics.yml
 eva/flexible.yaml
 eva/generic.yaml
+
+# backup files from the meld mergetool
+*.orig
