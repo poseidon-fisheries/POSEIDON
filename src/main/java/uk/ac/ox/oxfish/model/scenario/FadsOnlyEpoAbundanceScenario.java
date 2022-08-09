@@ -67,6 +67,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  */
 public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
+    private boolean fadSettingActive = true;
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
@@ -129,16 +130,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         )
 
     );
-
-    private boolean fadSettingActive;
-
-    public boolean isFadSettingActive() {
-        return fadSettingActive;
-    }
-
-    public void setFadSettingActive(boolean fadSettingActive) {
-        this.fadSettingActive = fadSettingActive;
-    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -378,5 +369,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.weightGroupsFactory = weightGroupsFactory;
     }
 
+    public boolean isFadSettingActive() {
+        return fadSettingActive;
+    }
+
+    public void setFadSettingActive(boolean fadSettingActive) {
+        this.fadSettingActive = fadSettingActive;
+    }
 
 }
