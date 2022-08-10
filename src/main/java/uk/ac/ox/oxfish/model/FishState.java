@@ -418,10 +418,16 @@ public class FishState  extends SimState{
         return  ((scheduleTime / stepsPerDay) / 365);
     }
 
-
-
     public int getHour() {
         return (int) (schedule.getTime() % stepsPerDay * 24 / stepsPerDay);
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getDate() {
+        return getStartDate().plusDays(getDay());
     }
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)
