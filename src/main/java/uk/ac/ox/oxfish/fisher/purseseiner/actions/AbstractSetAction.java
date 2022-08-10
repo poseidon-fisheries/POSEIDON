@@ -79,6 +79,7 @@ public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSei
         } else {
             reactToFailedSet(fishState, getLocation());
         }
+        setTime(hoursLeft);
         notify(purseSeineGear.getFadManager());
         if(getDuration()<=hoursLeft)
             return new ActionResult(new Arriving(), hoursLeft - getDuration());

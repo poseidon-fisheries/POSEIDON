@@ -55,6 +55,7 @@ public class FadDeploymentAction extends PurseSeinerAction {
         assert (fisher.getLocation() == getLocation());
         final FadManager fadManager = getFadManager(fisher);
         fadManager.deployFad(getLocation(), fishState.random);
+        setTime(hoursLeft);
         fadManager.reactTo(this);
         return new ActionResult(new Arriving(), hoursLeft - getDuration());
     }

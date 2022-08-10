@@ -33,7 +33,9 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
-            "docs/20220223 tuna_calibration/pathfinder_julydata/carrknight/2022-07-10_10.13.49_catchability_original/local/carrknight/2022-07-11_07.51.40_catchability_local/test_yearlyreset/calibrated_scenario.yaml"
+        System.getProperty("user.home"),
+        "workspace", "tuna", "calibration", "results",
+        "nicolas", "2022-07-26_15.56.12_global_calibration"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
@@ -52,7 +54,7 @@ public class TunaEvaluator implements Runnable {
                 "evaluation_results.csv",
                 fishState -> new EvaluationResultsRowProvider(fishState, optimization)
         );
-        runner.setParallel(false);
+        runner.setParallel(true);
 
     }
 

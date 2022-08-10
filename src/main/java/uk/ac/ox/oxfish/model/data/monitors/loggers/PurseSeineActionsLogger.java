@@ -36,8 +36,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -62,6 +66,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             "lon",
             "lat",
             "step",
+            "date_time",
             "trip_id",
             "trip_start",
             "trip_end"
@@ -134,6 +139,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final double lon;
         private final double lat;
         private final int actionStep;
+        private final LocalDateTime dateTime;
         private final long tripId;
         private final int tripStartStep;
         private Integer tripEndStep;
@@ -151,6 +157,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.lon = coordinates.x;
             this.lat = coordinates.y;
             this.actionStep = action.getStep();
+            this.dateTime = action.getTime()
+                .map(action.getDate()::atTime)
+                .orElseThrow(() -> new IllegalStateException("Time not set for action: " + action));
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripId = currentTrip.getTripId();
             this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
@@ -185,6 +194,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 lon,
                 lat,
                 actionStep,
+                dateTime,
                 tripId,
                 tripStartStep,
                 tripEndStep,
