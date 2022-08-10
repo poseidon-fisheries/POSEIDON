@@ -40,7 +40,7 @@ public class FadDeploymentAction extends PurseSeinerAction {
     public FadDeploymentAction(final Fisher fisher) {
         super(
             fisher,
-            0.0 // see https://github.com/poseidon-fisheries/tuna/issues/6
+            5.0 / 60 // see https://github.com/poseidon-fisheries/tuna/issues/6
         );
     }
 
