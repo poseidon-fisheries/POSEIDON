@@ -31,17 +31,15 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -67,6 +65,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             "lat",
             "step",
             "date_time",
+            "fad_id",
             "trip_id",
             "trip_start",
             "trip_end"
@@ -140,6 +139,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final double lat;
         private final int actionStep;
         private final LocalDateTime dateTime;
+        private final String fadId;
         private final long tripId;
         private final int tripStartStep;
         private Integer tripEndStep;
@@ -160,6 +160,12 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.dateTime = action.getTime()
                 .map(action.getDate()::atTime)
                 .orElseThrow(() -> new IllegalStateException("Time not set for action: " + action));
+            this.fadId = Optional.of(action)
+                .filter(a -> a instanceof FadRelatedAction<?, ?>)
+                .map(a -> ((FadRelatedAction<?, ?>) a).getFad())
+                .map(AbstractFad::getId)
+                .map(Object::toString)
+                .orElse("NA");
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripId = currentTrip.getTripId();
             this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
@@ -195,6 +201,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 lat,
                 actionStep,
                 dateTime,
+                fadId,
                 tripId,
                 tripStartStep,
                 tripEndStep,

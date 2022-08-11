@@ -222,13 +222,14 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
     /**
      * Deploys a FAD at a random position in the given sea tile.
      */
-    public void deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
+    public F deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
         Double2D location = new Double2D(
                 seaTile.getGridX() + random.nextDouble(),
                 seaTile.getGridY() + random.nextDouble()
         );
         final F newFad = initFad(seaTile);
         fadMap.deployFad(newFad, location);
+        return newFad;
     }
 
 

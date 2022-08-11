@@ -43,7 +43,7 @@ public class TripRecord {
 
     private static final AtomicLong nextTripId = new AtomicLong();
 
-    private final long tripId;
+    private final long tripId = nextTripId.getAndIncrement();
 
     /**
 	 * the simulation time (day) of the trip
@@ -127,7 +127,6 @@ public class TripRecord {
         totalCatch = new double[numberOfSpecies];
         this.hoursSinceLastTrip = hoursSpentAtPort;
         this.tripDay = day;
-        this.tripId = nextTripId.getAndIncrement();
     }
 
 

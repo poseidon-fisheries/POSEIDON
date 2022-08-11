@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 public abstract class AbstractFadSetAction<B extends LocalBiology, F extends AbstractFad<B, F>>
-    extends AbstractSetAction<B> {
+    extends AbstractSetAction<B> implements FadRelatedAction {
 
     private final F fad;
 
