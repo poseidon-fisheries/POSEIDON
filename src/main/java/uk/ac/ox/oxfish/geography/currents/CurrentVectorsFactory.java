@@ -31,28 +31,25 @@ public enum CurrentVectorsFactory {
     public static final int STEPS_PER_DAY = 1;
     public static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
+    private final LoadingCache<Entry<MapExtent, Entry<Boolean, Map<CurrentPattern, Path>>>, CurrentVectors> cache =
+        CacheBuilder.newBuilder().build(CacheLoader.from(entry -> {
+            MapExtent mapExtent = entry.getKey();
+            boolean inputIsMetersPerSecond = entry.getValue().getKey();
+            Map<CurrentPattern, Path> currentFiles = entry.getValue().getValue();
+            return new CurrentVectorsEPO(
+                makeVectorMaps(mapExtent, currentFiles, inputIsMetersPerSecond),
+                STEPS_PER_DAY,
+                mapExtent.getGridWidth(),
+                mapExtent.getGridHeight()
+            );
+        }));
 
-    static public LoadingCache<Entry<MapExtent, Map<CurrentPattern, Path>>, CurrentVectors> getCache(
-            boolean inputIsMetersPerSecond
-    ){
-        return CacheBuilder.newBuilder()
-                .build(CacheLoader.from(entry -> {
-                    MapExtent mapExtent = entry.getKey();
-                    Map<CurrentPattern, Path> currentFiles = entry.getValue();
-                    return new CurrentVectorsEPO(
-                            makeVectorMaps(mapExtent, currentFiles, inputIsMetersPerSecond),
-                            STEPS_PER_DAY,
-                            mapExtent.getGridWidth(),
-                            mapExtent.getGridHeight()
-                    );
-                }));
-    }
-
-
-
-    public CurrentVectors getCurrentVectors(final MapExtent mapExtent, final Map<CurrentPattern, Path> currentFiles,
-                                            boolean inputIsMetersPerSecond) {
-        return getCache(inputIsMetersPerSecond).getUnchecked(entry(mapExtent, currentFiles));
+    public CurrentVectors getCurrentVectors(
+        final MapExtent mapExtent,
+        final Map<CurrentPattern, Path> currentFiles,
+        boolean inputIsMetersPerSecond
+    ) {
+        return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
     }
 
     @SuppressWarnings("SameParameterValue")
