@@ -35,6 +35,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import javax.measure.quantity.Mass;
@@ -74,6 +75,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
     public static final int TARGET_YEAR = 2017;
+    public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
     public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
 
@@ -318,4 +320,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public void setGearStrategy(final FadRefillGearStrategyFactory gearStrategy) {
         this.gearStrategy = gearStrategy;
     }
+
+    @Override
+    public LocalDate getStartDate() {
+        return START_DATE;
+    }
+
 }

@@ -20,12 +20,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Streams.stream;
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
@@ -64,7 +64,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * is lost.
      */
     @Override
-    public void releaseFish(final Iterable<Species> allSpecies, final LocalBiology seaTileBiology) {
+    public void releaseFish(final Collection<Species> allSpecies, final LocalBiology seaTileBiology) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology) {
             releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
         } else {
@@ -77,7 +77,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
      */
     private void releaseFish(
-        final Iterable<Species> allSpecies,
+        final Collection<Species> allSpecies,
         final VariableBiomassBasedBiology seaTileBiology
     ) {
         allSpecies.forEach(species -> {
@@ -101,9 +101,9 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * losing the fish.
      */
     @Override
-    public void releaseFish(final Iterable<Species> allSpecies) {
+    public void releaseFish(final Collection<Species> allSpecies) {
         final Map<Species, Double> biomassLost =
-            stream(allSpecies).collect(toImmutableMap(identity(), getBiology()::getBiomass));
+            allSpecies.stream().collect(toImmutableMap(identity(), getBiology()::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
         allSpecies.forEach(species -> getBiology().setCurrentBiomass(species, 0));
     }

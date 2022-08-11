@@ -308,7 +308,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    class State implements RowProvider {
+    public class State implements RowProvider {
 
         private final S scenario;
         private final Policy<? super S> policy;

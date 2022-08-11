@@ -428,4 +428,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
     }
+
+    public SpeciesCodesFromFileFactory grabSpeciesCodesFactory() {
+        return speciesCodesFactory;
+    }
+
 }

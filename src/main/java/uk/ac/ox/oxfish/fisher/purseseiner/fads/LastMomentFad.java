@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -76,12 +77,12 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
     }
 
     @Override
-    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
+    public void releaseFish(Collection<Species> allSpecies, LocalBiology seaTileBiology) {
         //nothing to release
     }
 
     @Override
-    public void releaseFish(Iterable<Species> allSpecies) {
+    public void releaseFish(Collection<Species> allSpecies) {
         //nothing to release
     }
 

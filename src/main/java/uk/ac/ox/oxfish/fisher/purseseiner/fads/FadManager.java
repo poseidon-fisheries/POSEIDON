@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.measure.quantity.Mass;
 import org.apache.commons.collections15.set.ListOrderedSet;
@@ -257,6 +258,10 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
 
     public <O> void reactTo(final O observable) {
         this.observers.reactTo(observable);
+    }
+
+    public <O> void reactTo(final Class<O> observedClass, final Supplier<O> observableSupplier) {
+        this.observers.reactTo(observedClass, observableSupplier);
     }
 
     public Optional<

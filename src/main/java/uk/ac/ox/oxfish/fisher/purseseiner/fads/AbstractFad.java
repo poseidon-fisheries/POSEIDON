@@ -20,11 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 import ec.util.MersenneTwisterFast;
-import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.Nullable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -36,6 +32,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
+
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<B, F>> implements Locatable {
     protected static final AtomicLong idCounter = new AtomicLong(0);
@@ -90,9 +92,9 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     }
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final LocalBiology seaTileBiology,
-            final MersenneTwisterFast rng
+        final Collection<Species> allSpecies,
+        final LocalBiology seaTileBiology,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies, seaTileBiology);
@@ -100,18 +102,17 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     }
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final MersenneTwisterFast rng
+        final Collection<Species> allSpecies,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies);
         }
     }
 
+    public abstract void releaseFish(final Collection<Species> allSpecies, LocalBiology seaTileBiology);
 
-    public abstract void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology);
-
-    public abstract void releaseFish(final Iterable<Species> allSpecies);
+    public abstract void releaseFish(final Collection<Species> allSpecies);
 
 
     public SeaTile getLocation() {

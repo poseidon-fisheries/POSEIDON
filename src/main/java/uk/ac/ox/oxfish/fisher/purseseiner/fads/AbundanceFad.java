@@ -18,13 +18,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Streams.stream;
-import static java.util.function.Function.identity;
-
-import java.util.Arrays;
-import java.util.Map;
-
 import com.google.common.base.Preconditions;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -35,6 +28,14 @@ import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
@@ -60,9 +61,13 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
     @Override
     public void releaseFish(
-        final Iterable<Species> allSpecies,
+        final Collection<Species> allSpecies,
         final LocalBiology seaTileBiology
     ) {
+        getOwner().reactTo(
+            AbundanceFadAttractionEvent.class,
+            () -> makeReleaseEvent(allSpecies, seaTileBiology)
+        );
         if (seaTileBiology instanceof AbundanceLocalBiology) {
             allSpecies.forEach(species -> {
                 final double[][] fadAbundance = getBiology().getAbundance(species).asMatrix();
@@ -79,9 +84,30 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
         }
     }
 
+    private AbundanceFadAttractionEvent makeReleaseEvent(
+        final Collection<Species> allSpecies,
+        LocalBiology seaTileBiology
+    ) {
+        // If we're on a proper abundance tile, we grab that tile's biology directly.
+        // Otherwise, we're probably on an empty biology, so we create an empty abundance
+        final AbundanceLocalBiology tileAbundanceBefore = seaTileBiology instanceof AbundanceLocalBiology
+            ? (AbundanceLocalBiology) seaTileBiology
+            : new AbundanceLocalBiology(allSpecies);
+
+        // turn all abundance numbers from the FAD to negative, since we're loosing it.
+        // this will be horribly slow but hopefully doesn't happen *too* often
+        final AbundanceLocalBiology fadAbundanceDelta = new AbundanceLocalBiology(
+            this.getBiology().getStructuredAbundance().entrySet().stream().collect(toImmutableMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().mapValues(v -> -v).asMatrix()
+            )));
+
+        return new AbundanceFadAttractionEvent(this, tileAbundanceBefore, fadAbundanceDelta);
+    }
+
     @Override
-    public void releaseFish(final Iterable<Species> allSpecies) {
-        final Map<Species, Double> biomassLost = stream(allSpecies)
+    public void releaseFish(final Collection<Species> allSpecies) {
+        final Map<Species, Double> biomassLost = allSpecies.stream()
             .collect(toImmutableMap(identity(), getBiology()::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
         getOwner().getFadMap().getAbundanceLostObserver().observe(
@@ -112,6 +138,16 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     ) {
 
         WeightedObject<AbundanceLocalBiology> attracted =attractFish(seaTileBiology);
+
+        final AbundanceLocalBiology attractedFish =
+            Optional.ofNullable(attracted)
+                .map(WeightedObject::getObjectBeingWeighted)
+                .orElseGet(() -> new AbundanceLocalBiology(globalBiology));
+
+        this.getOwner().reactTo(
+            new AbundanceFadAttractionEvent(this, seaTileBiology, attractedFish)
+        );
+
         if(attracted==null)
             return null;
         if(attracted.getTotalWeight()<0){
@@ -120,9 +156,6 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
             Preconditions.checkArgument(attracted.getTotalWeight()>-FishStateUtilities.EPSILON);
             return null;
         }
-        final AbundanceLocalBiology attractedFish =
-            attracted.getObjectBeingWeighted();
-
 
         getBiology().getStructuredAbundance().forEach((species, fadAbundance) -> {
             final double[][] attractedAbundance = attractedFish.getAbundance(species).asMatrix();
