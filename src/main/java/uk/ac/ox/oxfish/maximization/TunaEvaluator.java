@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
@@ -36,12 +37,19 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class TunaEvaluator implements Runnable {
 
-    private static final Set<String> boatsToTrack = ImmutableSet.of("161");
+    // I identified the vessels to follow using (in R):
+    // obs_action_events |>
+    //  filter(year == 2017, action_type %in% c("DEL", "FAD", "NOA")) |>
+    //  count(ves_no, action_type) |>
+    //  group_by(action_type) |>
+    //  slice_max(n, with_ties = FALSE)
+    private static final Set<String> boatsToTrack = ImmutableSet.of("1779", "453", "1552");
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna", "calibration", "results",
-        "nicolas", "2022-07-26_15.56.12_global_calibration"
+        "ernesto", "2022-07-18 catchability_updated"
+        //        "nicolas", "2022-08-11_20.04.58_global_calibration"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
@@ -112,7 +120,7 @@ public class TunaEvaluator implements Runnable {
         System.out.println("Using " + calibrationFolder + " as the calibration folder.");
 
         final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
-        final Path calibrationFilePath = calibrationFolder.resolve("logistic_calibration.yaml");
+        final Path calibrationFilePath = calibrationFolder.resolve("test.yaml"); //calibrationFolder.resolve("logistic_calibration.yaml");
 
         final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
         try (final Stream<String> lines = Files.lines(logFilePath)) {
@@ -151,7 +159,7 @@ public class TunaEvaluator implements Runnable {
     private void registerFadAttractionEventProviders() {
         runner.setAfterStartConsumer(state -> {
             final FishState fishState = state.getModel();
-            final EpoAbundanceScenario scenario = (EpoAbundanceScenario) state.getScenario();
+            final EpoScenario<?, ?> scenario = (EpoScenario<?, ?>) state.getScenario();
             final SpeciesCodes speciesCodes = scenario.grabSpeciesCodesFactory().get();
             final AbundanceFadAttractionEventObserver observer =
                 new AbundanceFadAttractionEventObserver(fishState, speciesCodes);
@@ -188,7 +196,7 @@ public class TunaEvaluator implements Runnable {
             registerFadAttractionEventProviders();
         }
 
-        //      .registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
+        runner.registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(optimization.getSimulatedYears(), 1, runCounter);
 
     }

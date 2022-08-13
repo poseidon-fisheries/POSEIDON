@@ -116,7 +116,7 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
     }
 
     @NotNull
-    private Optional<Double2D> getFadLocation(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
+    public Optional<Double2D> getFadLocation(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 

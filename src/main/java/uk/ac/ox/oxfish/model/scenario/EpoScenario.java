@@ -91,6 +91,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             //.put(EL_NINO, input("currents_el_nino.csv"))
             //.put(LA_NINA, input("currents_la_nina.csv"))
             .build();
+    protected final SpeciesCodesFromFileFactory speciesCodesFactory =
+        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
@@ -326,4 +328,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return START_DATE;
     }
 
+    public SpeciesCodesFromFileFactory grabSpeciesCodesFactory() {
+        return speciesCodesFactory;
+    }
 }

@@ -63,7 +63,7 @@ public class FadDeploymentAction<B extends LocalBiology, F extends AbstractFad<B
         this.fad = fadManager.deployFad(getLocation(), fishState.random);
         setTime(hoursLeft);
         fadManager.reactTo(this);
-        return new ActionResult(new Arriving(), hoursLeft - getDuration());
+        return new ActionResult(new Arriving(), Math.max(0, hoursLeft - getDuration()));
     }
 
     /**
