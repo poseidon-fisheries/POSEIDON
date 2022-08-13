@@ -21,6 +21,8 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.profit;
 
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -30,6 +32,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by carrknight on 7/13/16.
@@ -85,5 +89,21 @@ public class GasCostTest {
             state.schedule.step(state);
 
 
+    }
+
+    @Test
+    public void additionalGasCost() {
+        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        //100$ per liter
+        //2 liter per km
+        when(fisher.getHomePort().getGasPricePerLiter()).thenReturn(100d);
+        when(fisher.getBoat().expectedFuelConsumption(anyDouble())).thenAnswer(
+                (Answer<Double>) invocation -> ((Double) invocation.getArgument(0)) * 2
+        );
+        //5 km travelled
+        //===> 5 * 2 * 100
+        GasCost cost = new GasCost();
+        assertEquals(1000d,cost.expectedAdditionalCosts(fisher,999,888,5),
+                .0001);
     }
 }

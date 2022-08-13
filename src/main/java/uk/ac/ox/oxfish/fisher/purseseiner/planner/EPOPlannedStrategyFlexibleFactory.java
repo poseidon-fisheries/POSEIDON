@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -19,10 +18,9 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.util.Map;
 
-
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
-public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrategyProxy> {
+public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy> {
 
 
 
@@ -57,26 +55,13 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets = new FixedDoubleParameter(5);
 
-    /**
-     *  $ a fad needs to have accumulated before we even try to target it
-     */
-    private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(5000);
+
     /**
      *  $ a stolen fad needs to have accumulated before we even try to target it
      */
     private DoubleParameter minimumValueOpportunisticFadSets = new FixedDoubleParameter(5000);
-    /**
-     * higher this is, the more a fisher will prefer to target FADs closer to the centroid
-     * of the path
-     */
-    private DoubleParameter distancePenaltyFadSets = new FixedDoubleParameter(1);
 
-    /**
-     * discretizes map so that when it is time to target FADs you just
-     * go through a few relevant ones
-     */
-    private AlgorithmFactory<? extends MapDiscretizer> mapDiscretizationFadSets =
-            new SquaresMapDiscretizerFactory(6,3);
+
 
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
@@ -120,18 +105,21 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
 
     private Locker<FishState, Map> catchSamplerLocker = new Locker<>();
 
-    private boolean blockEPOFadAreas = false;
+
+
+    private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule = new DiscretizedOwnFadPlanningFactory();
+    {
+        //old default values
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setDiscretization( new SquaresMapDiscretizerFactory(6,3));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setDistancePenalty(  new FixedDoubleParameter(1));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setMinimumValueFadSets(  new FixedDoubleParameter(5000));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedXCoordinateBounds("-1,75");
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedYCoordinateBounds("47, 51");
+    }
+
     @Override
     public PlannedStrategyProxy apply(FishState state) {
 
-        DiscretizedOwnFadPlanningFactory delegate = new DiscretizedOwnFadPlanningFactory();
-        delegate.setDiscretization(mapDiscretizationFadSets);
-        delegate.setDistancePenalty(distancePenaltyFadSets);
-        delegate.setMinimumValueFadSets(minimumValueFadSets);
-        if(blockEPOFadAreas) {
-            delegate.setBannedXCoordinateBounds("-1,75");
-            delegate.setBannedYCoordinateBounds("47, 51");
-        }
 
         PlannedStrategyProxy proxy = new PlannedStrategyProxy(
                 uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
@@ -154,7 +142,7 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                 purgeIllegalActionsImmediately,
                 noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
                 delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
-                delegate);
+                fadModule);
 
         return proxy;
     }
@@ -205,29 +193,6 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
     }
 
-    public DoubleParameter getMinimumValueFadSets() {
-        return minimumValueFadSets;
-    }
-
-    public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
-        this.minimumValueFadSets = minimumValueFadSets;
-    }
-
-    public DoubleParameter getDistancePenaltyFadSets() {
-        return distancePenaltyFadSets;
-    }
-
-    public void setDistancePenaltyFadSets(DoubleParameter distancePenaltyFadSets) {
-        this.distancePenaltyFadSets = distancePenaltyFadSets;
-    }
-
-    public AlgorithmFactory<? extends MapDiscretizer> getMapDiscretizationFadSets() {
-        return mapDiscretizationFadSets;
-    }
-
-    public void setMapDiscretizationFadSets(AlgorithmFactory<? extends MapDiscretizer> mapDiscretizationFadSets) {
-        this.mapDiscretizationFadSets = mapDiscretizationFadSets;
-    }
 
     public DoubleParameter getHoursWastedOnFailedSearches() {
         return hoursWastedOnFailedSearches;
@@ -329,11 +294,11 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 
-    public boolean isBlockEPOFadAreas() {
-        return blockEPOFadAreas;
+    public AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> getFadModule() {
+        return fadModule;
     }
 
-    public void setBlockEPOFadAreas(boolean blockEPOFadAreas) {
-        this.blockEPOFadAreas = blockEPOFadAreas;
+    public void setFadModule(AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule) {
+        this.fadModule = fadModule;
     }
 }

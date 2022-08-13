@@ -72,6 +72,10 @@ public class OwnFadSetDiscretizedActionGenerator {
             MersenneTwisterFast random,
             NauticalMap map){
 
+        //if you haven't, discretize!
+        if(!discretization.isActive())
+            discretization.discretize(map);
+
         rankedFads = new PriorityQueue[discretization.getNumberOfGroups()];
         for (int i = 0; i < rankedFads.length; i++) {
             rankedFads[i] = new PriorityQueue<>(COMPARATOR);
@@ -112,6 +116,24 @@ public class OwnFadSetDiscretizedActionGenerator {
         return toReturn;
     }
 
+    /**
+     * returns a list of all fads, geographically discretized and each are has a queue sorting (descending) all fads in that area
+     * by their monetary amount
+     * @return
+     */
+    @Nonnull
+    public List<Pair<PriorityQueue<ValuedFad>,Integer>> peekAllFads(){
+        assert rankedFads != null : "not started";
+        List<Pair<PriorityQueue<ValuedFad>,Integer>> toReturn = new LinkedList<>();
+        //for each group retrieve the best
+        for (int group = 0; group < rankedFads.length; group++) {
+            if(rankedFads[group].size()>0)
+                toReturn.add(new Pair<>(rankedFads[group],group));
+        }
+        return toReturn;
+    }
+
+
     public PlannedAction.FadSet chooseFad(Integer discretizationGroup){
         ValuedFad selectedFad = rankedFads[discretizationGroup].poll();
         Preconditions.checkState(selectedFad!=null);
@@ -139,6 +161,10 @@ public class OwnFadSetDiscretizedActionGenerator {
     }
     public void setBannedGridBounds(double[] bannedGridYBounds,
                                      double[] bannedGridXBounds) {
+        Preconditions.checkArgument(bannedGridXBounds.length==2);
+        Preconditions.checkArgument(bannedGridYBounds.length==2);
+        Preconditions.checkArgument(bannedGridYBounds[0]<=bannedGridYBounds[1]);
+        Preconditions.checkArgument(bannedGridXBounds[0]<=bannedGridXBounds[1]);
         this.bannedGridYBounds = bannedGridYBounds;
         this.bannedGridXBounds = bannedGridXBounds;
     }

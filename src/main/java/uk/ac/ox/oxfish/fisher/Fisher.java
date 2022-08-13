@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.GasCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
@@ -262,27 +263,27 @@ public class Fisher implements Steppable, Startable{
     }
 
 
-	public Fisher(int id, Port port,
-			MersenneTwisterFast random,
-			Regulation regulation,
-			ReputationalRestrictions reputationalRestrictions,
-			RegionalRestrictions communityRestrictions,
-			//strategies:
-            DepartingStrategy departingStrategy,
-            DestinationStrategy destinationStrategy,
-            FishingStrategy fishingStrategy,
-            GearStrategy gearStrategy,
-            DiscardingStrategy discardingStrategy,
-            WeatherEmergencyStrategy weatherStrategy,
-            //equipment:
-            Boat boat, Hold hold, Gear gear,
-            int numberOfSpecies) {
-		// TODO Auto-generated constructor stub
-		this(id,port,random,regulation,departingStrategy,destinationStrategy,
-				fishingStrategy,gearStrategy,discardingStrategy,weatherStrategy,boat, hold, gear, numberOfSpecies);
-		this.status.setCommunalStandards(communityRestrictions);
-		this.status.setReputationalRisk(reputationalRestrictions);
-	}
+    public Fisher(int id, Port port,
+                  MersenneTwisterFast random,
+                  Regulation regulation,
+                  ReputationalRestrictions reputationalRestrictions,
+                  RegionalRestrictions communityRestrictions,
+                  //strategies:
+                  DepartingStrategy departingStrategy,
+                  DestinationStrategy destinationStrategy,
+                  FishingStrategy fishingStrategy,
+                  GearStrategy gearStrategy,
+                  DiscardingStrategy discardingStrategy,
+                  WeatherEmergencyStrategy weatherStrategy,
+                  //equipment:
+                  Boat boat, Hold hold, Gear gear,
+                  int numberOfSpecies) {
+        // TODO Auto-generated constructor stub
+        this(id,port,random,regulation,departingStrategy,destinationStrategy,
+                fishingStrategy,gearStrategy,discardingStrategy,weatherStrategy,boat, hold, gear, numberOfSpecies);
+        this.status.setCommunalStandards(communityRestrictions);
+        this.status.setReputationalRisk(reputationalRestrictions);
+    }
 
 
 
@@ -303,7 +304,7 @@ public class Fisher implements Steppable, Startable{
 
 
 
-	public SeaTile getLocation()
+    public SeaTile getLocation()
     {
         return status.getLocation();
     }
@@ -575,10 +576,10 @@ public class Fisher implements Steppable, Startable{
 
         //finish trip!
         if(status.getHoursAtSea()>0) {
-	        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
-	        //account for the costs
-	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
-	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+            TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
+            //account for the costs
+            memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
+            memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
 
         }
         else{
@@ -728,9 +729,9 @@ public class Fisher implements Steppable, Startable{
     public boolean shouldIFish(FishState state)
     {
         return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(this,
-                                                                            state.getRandom(),
-                                                                            state,
-                                                                            getCurrentTrip());
+                state.getRandom(),
+                state,
+                getCurrentTrip());
 
     }
 
@@ -816,10 +817,10 @@ public class Fisher implements Steppable, Startable{
         //Preconditions.checkState(here.isWater(), );
         //compute the catches (but kill nothing yet)
         Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
-                                                               localBiology,
-                                                               hoursSpentFishing,
-                                                               modelBiology,
-                                                               state);
+                localBiology,
+                hoursSpentFishing,
+                modelBiology,
+                state);
         //make local react to catches (involves killing, usually)
         removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
         //pull the fish up, store it, and burn fuel
@@ -831,14 +832,14 @@ public class Fisher implements Steppable, Startable{
 
     private Pair<Catch,Catch> computeCatchesHere(SeaTile context,
                                                  LocalBiology biology,
-                                                int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
+                                                 int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
     {
         //transfer fish from local to here
         Catch catchOfTheDay = equipment.getGear().fish(this,
-                                                       biology,
-                                                       context ,
-                                                       hoursSpentFishing,
-                                                       modelBiology);
+                biology,
+                context ,
+                hoursSpentFishing,
+                modelBiology);
         Catch kept = discardingStrategy.chooseWhatToKeep(
                 context,
                 this,
@@ -873,7 +874,7 @@ public class Fisher implements Steppable, Startable{
         //learn, record and collect
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,
-                                                 here, catchOfTheDay);
+                here, catchOfTheDay);
         memory.getTripLogger().recordFishing(record);
 
         //now let regulations and the hold deal with it
@@ -882,8 +883,8 @@ public class Fisher implements Steppable, Startable{
 
         //consume gas
         final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,
-                                                                                           equipment.getBoat(),
-                                                                                           here) * hoursSpentFishing;
+                equipment.getBoat(),
+                here) * hoursSpentFishing;
         if(litersBurned>0)
             consumeFuel(litersBurned);
 
@@ -1002,7 +1003,7 @@ public class Fisher implements Steppable, Startable{
         memory.getDailyCounter().countLanding(species, info.getBiomassTraded());
         memory.getDailyCounter().countEarnings(species, info.getMoneyExchanged());
         memory.getTripLogger().recordEarnings(species.getIndex(), info.getBiomassTraded(),
-                                              info.getMoneyExchanged());
+                info.getMoneyExchanged());
 
     }
 
@@ -1061,21 +1062,21 @@ public class Fisher implements Steppable, Startable{
     public List<TripRecord> getFinishedTrips() {
         return memory.getTripLogger().getFinishedTrips();
     }
-    
+
     public List<SharedTripRecord> getSharedTrips(){
-    	return memory.getSharedTrips();
+        return memory.getSharedTrips();
     }
-    
+
     public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
-    	Collection<Fisher> friends = this.getDirectedFriends();
-    	if(friends.contains(friend))
-    		return memory.getTripsSharedWith(friend);
-    	else
-    		return new ArrayList<SharedTripRecord>();
+        Collection<Fisher> friends = this.getDirectedFriends();
+        if(friends.contains(friend))
+            return memory.getTripsSharedWith(friend);
+        else
+            return new ArrayList<SharedTripRecord>();
     }
-    
+
     public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
-    	memory.shareTrip(trip, allFriends, sharedFriends);
+        memory.shareTrip(trip, allFriends, sharedFriends);
     }
 
     public String getAction() {
@@ -1277,10 +1278,10 @@ public class Fisher implements Steppable, Startable{
     public Fisher replaceFriend(Fisher friendToReplace,
                                 boolean ignoreDirection) {
         return status.getNetwork().replaceFriend(this,
-                                                 friendToReplace,
-                                                 ignoreDirection,
-                                                 state.getRandom(),
-                                                 state.getFishers());
+                friendToReplace,
+                ignoreDirection,
+                state.getRandom(),
+                state.getFishers());
     }
 
     /**
@@ -1344,17 +1345,17 @@ public class Fisher implements Steppable, Startable{
     public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
         return status.isAllowedToFishHere(this, tile, model);
     }
-    
+
     public boolean isAllowedReputationToFishHere(SeaTile tile, FishState model){
-    	return status.isAllowedReputationToFishHere(this, tile, model);
+        return status.isAllowedReputationToFishHere(this, tile, model);
     }
-    
+
     public int countTerritories(){
-    	return status.countTerritories();
+        return status.countTerritories();
     }
-    
+
     public boolean isAllowedByCommunityStandardsToFishHere(SeaTile tile, FishState model){
-    	return status.isAllowedByCommunityStandardsToFishHere(this, tile, model);
+        return status.isAllowedByCommunityStandardsToFishHere(this, tile, model);
     }
 
     /**
@@ -1445,7 +1446,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public double getExpectedFuelConsumption(double distanceKM){
-    	return equipment.getBoat().expectedFuelConsumption(distanceKM);
+        return equipment.getBoat().expectedFuelConsumption(distanceKM);
     }
 
 
@@ -1578,10 +1579,10 @@ public class Fisher implements Steppable, Startable{
         return memory.getHoursAtSeaThisYear() + getHoursAtSea();
     }
     public boolean isTerritory(SeaTile tile){
-		if(status.getReputationalRisk()==null)
-			return false;
-    	else
-    		return status.getReputationalRisk().isTerritory(tile);
+        if(status.getReputationalRisk()==null)
+            return false;
+        else
+            return status.getReputationalRisk().isTerritory(tile);
     }
 
 
@@ -1607,5 +1608,21 @@ public class Fisher implements Steppable, Startable{
 
         return getLastFinishedTrip().getTripDay()> state.getDay()-364 ||
                 (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
+    }
+
+
+    public double getExpectedAdditionalCosts(double additionalTripHours,
+                                             double additionalEffortHours,
+                                             double additionalKmTravelled){
+
+
+        double totalCost = GasCost.expectedAdditionalGasCosts(this,additionalKmTravelled);
+        for (Cost otherCosts : getAdditionalTripCosts()) {
+            totalCost += otherCosts.expectedAdditionalCosts(this,
+                    additionalTripHours,
+                    additionalEffortHours,
+                    additionalKmTravelled);
+        }
+        return totalCost;
     }
 }

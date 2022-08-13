@@ -15,9 +15,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.HashMap;
@@ -72,11 +72,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     private final double additionalHourlyDelayNonAssociatedSets;
 
     /**
-     *  $ a fad needs to have accumulated before we even try to target it
-     */
-    private final double minimumValueFadSets;
-
-    /**
      * a multiplier to the data-read action weight for own fad
      */
     private final double ownFadActionWeightBias;
@@ -96,17 +91,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      *  an area
      */
     private final double minimumValueOpportunisticFadSets;
-    /**
-     * higher this is, the more a fisher will prefer to target FADs closer to the centroid
-     * of the path
-     */
-    private final double distancePenaltyFadSets;
 
-    /**
-     * discretizes map so that when it is time to target FADs you just
-     * go through a few relevant ones
-     */
-    private final MapDiscretization mapDiscretizationFadSets;
+
+
 
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
@@ -145,8 +132,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final int delSetsRangeInSeatiles;
 
-    private double[] impossibleFadAreaXBounds;
-    private double[] impossibleFadAreaYBounds;
+
+    private final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule;
 
 
     public PlannedStrategyProxy(
@@ -157,32 +144,29 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             double additionalHourlyDelayDolphinSets,
             double additionalHourlyDelayDeployment,
             double additionalHourlyDelayNonAssociatedSets,
-            double minimumValueFadSets,
-            double ownFadActionWeightBias, double deploymentBias, double nonAssociatedBias, double minimumValueOpportunisticFadSets, double distancePenaltyFadSets,
-            MapDiscretization mapDiscretizationFadSets,
+            double ownFadActionWeightBias, double deploymentBias, double nonAssociatedBias,
+            double minimumValueOpportunisticFadSets,
             double hoursWastedOnFailedSearches,
             double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
             boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions,
-            int noaSetsRangeInSeatiles, int delSetsRangeInSeatiles) {
+            int noaSetsRangeInSeatiles, int delSetsRangeInSeatiles, AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
         this.additionalHourlyDelayDolphinSets = additionalHourlyDelayDolphinSets;
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
-        this.minimumValueFadSets = minimumValueFadSets;
         this.ownFadActionWeightBias = ownFadActionWeightBias;
         this.deploymentBias = deploymentBias;
         this.nonAssociatedBias = nonAssociatedBias;
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
-        this.distancePenaltyFadSets = distancePenaltyFadSets;
-        this.mapDiscretizationFadSets = mapDiscretizationFadSets;
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
         this.noaSetsCanPoachFads=noaSetsCanPoachFads;
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
+        this.fadPlanningModule = fadPlanningModule;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
@@ -283,20 +267,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             //FAD
             else if(actionWeight.getKey().equals(FadSetAction.class))
             {
-                mapDiscretizationFadSets.discretize(model.getMap());
                 plannableActionWeights.put(ActionType.SetOwnFadAction,
                         actionWeight.getValue()*ownFadActionWeightBias);
-                DiscretizedOwnFadCentroidPlanningModule module = new DiscretizedOwnFadCentroidPlanningModule(
-                        mapDiscretizationFadSets,
-                        minimumValueFadSets,
-                        distancePenaltyFadSets
-                );
-                if(impossibleFadAreaXBounds != null){
-                    assert impossibleFadAreaYBounds !=null;
-                    module.setBannedGridBounds(impossibleFadAreaYBounds,impossibleFadAreaXBounds);
-                }
                 planModules.put(ActionType.SetOwnFadAction,
-                        module
+                        fadPlanningModule.apply(model)
                 );
             }
             //OFS
@@ -363,19 +337,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     }
 
 
-    public double[] getImpossibleFadAreaXBounds() {
-        return impossibleFadAreaXBounds;
-    }
 
-    public void setImpossibleFadAreaXBounds(double[] impossibleFadAreaXBounds) {
-        this.impossibleFadAreaXBounds = impossibleFadAreaXBounds;
-    }
 
-    public double[] getImpossibleFadAreaYBounds() {
-        return impossibleFadAreaYBounds;
-    }
-
-    public void setImpossibleFadAreaYBounds(double[] impossibleFadAreaYBounds) {
-        this.impossibleFadAreaYBounds = impossibleFadAreaYBounds;
-    }
 }

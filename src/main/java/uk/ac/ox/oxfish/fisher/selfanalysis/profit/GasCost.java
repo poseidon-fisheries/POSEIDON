@@ -44,6 +44,16 @@ public class GasCost implements Cost{
         return record.getLitersOfGasConsumed() * fisher.getHomePort().getGasPricePerLiter();
     }
 
+    @Override
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+        return expectedAdditionalGasCosts(fisher,additionalKmTravelled);
+    }
+
+
+    public static double expectedAdditionalGasCosts(Fisher fisher, double additionalKmTravelled){
+        return fisher.getBoat().expectedFuelConsumption(additionalKmTravelled) * fisher.getHomePort().getGasPricePerLiter();
+
+    }
 
     /**
      //gas consumption = movement + fishing

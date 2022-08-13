@@ -134,6 +134,10 @@ public class MapDiscretization {
         return groups.length;
     }
 
+    public boolean isActive(){
+        return groups != null;
+    }
+
     public boolean isValid(int groupIndex)
     {
         return validGroup[groupIndex];

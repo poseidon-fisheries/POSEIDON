@@ -58,18 +58,25 @@ public class OpportunityCostsTest {
         state.start();
         for(Fisher fisher : state.getFishers())
             fisher.getOpportunityCosts().add(new Cost() {
-                @Override
-                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
-                    //account for opportunity costs
-                    SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
-                    double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
-                    if(biomass > 0)
-                    {
-                        return 1000*biomass;
-                    }
-                    return 0d;
-                }
-            });
+                                                 @Override
+                                                 public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
+                                                     //account for opportunity costs
+                                                     SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
+                                                     double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
+                                                     if(biomass > 0)
+                                                     {
+                                                         return 1000*biomass;
+                                                     }
+                                                     return 0d;
+                                                 }
+
+                                                 @Override
+                                                 public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+                                                     return 0;
+                                                 }
+                                             }
+
+            );
 
         //lspiRun it for two years
         while (state.getYear() < 2) {
@@ -119,6 +126,11 @@ public class OpportunityCostsTest {
                         return 1000*biomass;
                     }
                     return 0d;
+                }
+
+                @Override
+                public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+                    return 0;
                 }
             });
 

@@ -55,4 +55,9 @@ public class HourlyCost implements Cost{
     public double getHourlyCost() {
         return hourlyCost;
     }
+
+    @Override
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+        return additionalTripHours * hourlyCost;
+    }
 }

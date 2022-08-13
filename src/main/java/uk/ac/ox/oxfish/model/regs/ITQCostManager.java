@@ -69,4 +69,9 @@ public class ITQCostManager implements Cost{
         }
         return total;
     }
+
+    @Override
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+        return 0;
+    }
 }

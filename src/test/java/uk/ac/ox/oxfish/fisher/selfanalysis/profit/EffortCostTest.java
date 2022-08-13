@@ -28,4 +28,16 @@ public class EffortCostTest {
         Assert.assertEquals(effortCost,60,.001);
 
     }
+
+    @Test
+    public void additionalCostCorrect() {
+
+        EffortCost cost = new EffortCost(10);
+        assertEquals(20,cost.expectedAdditionalCosts(mock(Fisher.class),
+                999,
+                2,
+                -999),.001);
+
+
+    }
 }

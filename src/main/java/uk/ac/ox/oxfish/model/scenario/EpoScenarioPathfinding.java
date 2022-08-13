@@ -21,6 +21,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
@@ -340,8 +341,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
-    private EPOPlannedStrategyFactory destinationStrategy =
-            new EPOPlannedStrategyFactory();
+    private EPOPlannedStrategyFlexibleFactory destinationStrategy =
+            new EPOPlannedStrategyFlexibleFactory();
 
     public EpoScenarioPathfinding() {
 
@@ -455,11 +456,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         this.mapInitializerFactory = mapInitializerFactory;
     }
 
-    public EPOPlannedStrategyFactory getDestinationStrategy() {
+    public EPOPlannedStrategyFlexibleFactory getDestinationStrategy() {
         return destinationStrategy;
     }
 
-    public void setDestinationStrategy(EPOPlannedStrategyFactory destinationStrategy) {
+    public void setDestinationStrategy(EPOPlannedStrategyFlexibleFactory destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
     }
 

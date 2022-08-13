@@ -68,6 +68,8 @@ import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializers;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.TimeScalarFunctions;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.FadPlanningFactories;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -242,8 +244,16 @@ public class AlgorithmFactories {
         CONSTRUCTOR_MAP.put(FadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
         NAMES_MAP.put(FadInitializerFactory.class, FadInitializerFactories.NAMES);
 
+        CONSTRUCTOR_MAP.put(DiscretizedOwnFadPlanningModule.class,
+                FadPlanningFactories.CONSTRUCTORS);
+        NAMES_MAP.put(DiscretizedOwnFadPlanningModule.class,
+                FadPlanningFactories.NAMES);
+
         CONSTRUCTOR_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.CONSTRUCTORS);
         NAMES_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.NAMES);
+
+
+
 
     }
 

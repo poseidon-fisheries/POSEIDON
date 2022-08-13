@@ -28,4 +28,9 @@ public class EffortCost implements Cost {
     public void setCostPerHourSpentFishing(double costPerHourSpentFishing) {
         this.costPerHourSpentFishing = costPerHourSpentFishing;
     }
+
+    @Override
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+        return additionalEffortHours * costPerHourSpentFishing;
+    }
 }

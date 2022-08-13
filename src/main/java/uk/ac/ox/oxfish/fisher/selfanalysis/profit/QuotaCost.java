@@ -75,4 +75,9 @@ public class QuotaCost implements Cost{
         }
         return totalCosts;
     }
+
+    @Override
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+        return 0;
+    }
 }

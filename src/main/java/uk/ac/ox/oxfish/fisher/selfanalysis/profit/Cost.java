@@ -34,7 +34,6 @@ public interface Cost {
     /**
      * computes and return the cost
      * @param fisher agent that did the trip
-     * @param model
      * @param record the trip record
      * @param revenue revenue from catches
      * @param durationInHours this is given as an argument because when the fisher is acting for real this is called
@@ -45,4 +44,12 @@ public interface Cost {
     public double cost(
             Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours);
 
+    /**
+     * ask the cost object to return the $ spent for a trip modification
+     *
+     * @param additionalTripHours   the amount of hours you will spend out (travelling + fishing + whatever)
+     * @param additionalEffortHours the additional amount of hours you will spend as "effort" (so not travelling, pure fishing)
+     * @param additionalKmTravelled the additional distance travelled.
+     */
+    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled);
 }

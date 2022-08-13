@@ -93,4 +93,19 @@ public class TunaIntegrationTest {
 
 
     }
+
+    @Test
+    public void linearCatchabilityBacksliding() {
+        double[] solution = {
+                8.893, 2.455, 17.227, 67.858,-8.136,-13.613,-24.908, 5.191,-24.692,-2.021, 8.118,-4.814, 8.429, 1.952, 11.970, 27.800, 49.643, 50.614,-10.319, 12.254,-31.352,-27.689,-2.648,-2.549,-0.319
+        };
+
+        Path calibrationFile = Paths.get(
+                "inputs/tests/tunabacksliding/linear_calibration.yaml"
+        );
+        GenericOptimization optimization = GenericOptimization.fromFile(calibrationFile);
+        double[] evaluate = optimization.evaluate(solution);
+        System.out.println(evaluate[0]);
+        Assert.assertTrue(evaluate[0]<70);
+    }
 }

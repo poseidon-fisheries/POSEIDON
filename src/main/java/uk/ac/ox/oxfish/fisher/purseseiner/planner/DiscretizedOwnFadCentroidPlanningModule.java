@@ -44,37 +44,28 @@ import java.util.Optional;
  * Science 39, no. 2 (2005): 188–205.
  */
 public class DiscretizedOwnFadCentroidPlanningModule
-        implements PlanningModule {
-
-
-    private static final int MAX_OWN_FAD_SETS = 1000;
-    private final OwnFadSetDiscretizedActionGenerator optionsGenerator;
+        extends DiscretizedOwnFadPlanningModule {
 
     //best fad is chosen as max $/(hr^penalty)
     private final double distancePenalty;
 
-    private NauticalMap map;
-
-    private double speedInKmPerHours;
-
-    public DiscretizedOwnFadCentroidPlanningModule(
-            MapDiscretization discretization,
-            double minimumValueOfFadBeforeBeingPickedUp) {
-        this(discretization,minimumValueOfFadBeforeBeingPickedUp,1.0);
-    }
-
-    public DiscretizedOwnFadCentroidPlanningModule(
-            MapDiscretization discretization,
-            double minimumValueOfFadBeforeBeingPickedUp,
-            double distancePenalty) {
-        this.optionsGenerator =
-                new OwnFadSetDiscretizedActionGenerator(discretization,
-                                                        minimumValueOfFadBeforeBeingPickedUp);
+    public DiscretizedOwnFadCentroidPlanningModule(MapDiscretization discretization,
+                                                   double minimumValueOfFadBeforeBeingPickedUp, double distancePenalty) {
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
         this.distancePenalty = distancePenalty;
     }
 
-    @Override
-    public PlannedAction chooseNextAction(Plan currentPlanSoFar) {
+    public DiscretizedOwnFadCentroidPlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, double distancePenalty) {
+        super(optionsGenerator);
+        this.distancePenalty = distancePenalty;
+    }
+
+    protected PlannedAction chooseFadSet(Plan currentPlanSoFar,
+                                         Fisher fisher,
+                                         FishState model,
+                                         NauticalMap map,
+                                         OwnFadSetDiscretizedActionGenerator optionsGenerator
+                                                  ) {
 
 
         List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> options =
@@ -120,74 +111,6 @@ public class DiscretizedOwnFadCentroidPlanningModule
     }
 
 
-    @Override
-    public void start(FishState model, Fisher fisher) {
-        optionsGenerator.startOrReset(
-                FadManager.getFadManager(fisher),
-                model.getRandom(),
-                model.getMap());
-        map = model.getMap();
-        speedInKmPerHours = fisher.getBoat().getSpeedInKph();
 
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-        map=null;
-
-    }
-
-    @Override
-    public boolean isStarted() {
-        return this.map != null;
-    }
-
-    /**
-     * this is like the start(...) but gets called when we want the module to be aware that a new plan is starting
-     *
-     * @param state
-     * @param fisher
-     */
-    @Override
-    public void prepareForReplanning(FishState state, Fisher fisher) {
-        start(state,fisher);
-        speedInKmPerHours = fisher.getBoat().getSpeedInKph();
-    }
-
-    /**
-     * if a plan is about to start, how many times are we allowed to call this planning module (it may fail before
-     * then, the
-     * point of this function is to deal with regulations or other constraints)
-     *
-     * @param state
-     * @param fisher
-     * @return
-     */
-    @Override
-    public int maximumActionsInAPlan(FishState state, Fisher fisher) {
-
-        return
-                Math.min(
-                        FadManager.getFadManager(fisher).getNumberOfRemainingYearlyActions(FadSetAction.class),
-                        MAX_OWN_FAD_SETS);
-
-
-    }
-
-    public double[] getBannedGridYBounds() {
-        return optionsGenerator.getBannedGridYBounds();
-    }
-
-    public void setBannedGridBounds(double[] bannedGridYBounds, double[] bannedGridXBounds) {
-        Preconditions.checkArgument(bannedGridXBounds.length==2);
-        Preconditions.checkArgument(bannedGridYBounds.length==2);
-        Preconditions.checkArgument(bannedGridYBounds[0]<=bannedGridYBounds[1]);
-        Preconditions.checkArgument(bannedGridXBounds[0]<=bannedGridXBounds[1]);
-        optionsGenerator.setBannedGridBounds(bannedGridYBounds, bannedGridXBounds);
-    }
-
-    public double[] getBannedGridXBounds() {
-        return optionsGenerator.getBannedGridXBounds();
-    }
 
 }
