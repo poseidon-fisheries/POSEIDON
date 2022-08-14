@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -47,6 +48,13 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private double[] bannedGridXBounds;
 
+    /**
+     * when this is set to true, the generator will immediately remove all fads that are currently not
+     * allowed to be caught. This is set to false because the standard procedure is to wait till the action
+     * comes up in the plan before checking its validity.
+     */
+    private boolean filterOutCurrentlyInvalidFads = false;
+
     public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
         this.discretization = discretization;
         this.minimumFadValue = minimumFadValue;
@@ -83,7 +91,12 @@ public class OwnFadSetDiscretizedActionGenerator {
         //go through all your fads and rank them by profits
         for (Object fad : fadManager.getDeployedFads()) {
             AbstractFad deployedFad = (AbstractFad) fad;
-            double value = deployedFad.valueOfFishFor(fadManager.getFisher());
+            Fisher fisher = fadManager.getFisher();
+            if(filterOutCurrentlyInvalidFads && !PlannedAction.FadSet.isFadSetAllowed(fisher,
+                    fadManager,
+                    deployedFad))
+                continue;
+            double value = deployedFad.valueOfFishFor(fisher);
             SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
             if(bannedGridYBounds != null &&
                     location.getGridY()>= bannedGridYBounds[0] &&
@@ -171,5 +184,14 @@ public class OwnFadSetDiscretizedActionGenerator {
 
     public double[] getBannedGridXBounds() {
         return bannedGridXBounds;
+    }
+
+
+    public boolean isFilterOutCurrentlyInvalidFads() {
+        return filterOutCurrentlyInvalidFads;
+    }
+
+    public void setFilterOutCurrentlyInvalidFads(boolean filterOutCurrentlyInvalidFads) {
+        this.filterOutCurrentlyInvalidFads = filterOutCurrentlyInvalidFads;
     }
 }

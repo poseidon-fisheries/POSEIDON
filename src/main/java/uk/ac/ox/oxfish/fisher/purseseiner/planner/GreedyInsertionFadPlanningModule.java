@@ -33,6 +33,7 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
 
     public GreedyInsertionFadPlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, int additionalFadInspected) {
         super(optionsGenerator);
+        optionsGenerator.setFilterOutCurrentlyInvalidFads(true);
         this.additionalFadInspected = additionalFadInspected;
     }
 
