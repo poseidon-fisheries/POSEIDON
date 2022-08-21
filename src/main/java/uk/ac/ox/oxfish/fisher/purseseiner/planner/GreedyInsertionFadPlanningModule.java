@@ -70,7 +70,8 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
                     potentialAction,
                     Integer.MAX_VALUE, //don't want to censor time now
                     speedInKmPerHours,
-                    map
+                    map,
+                    false
             );
             double costHere =  fisher.getExpectedAdditionalCosts(additionalHoursTravelled,
                     potentialAction.hoursItTake(),

@@ -20,7 +20,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;

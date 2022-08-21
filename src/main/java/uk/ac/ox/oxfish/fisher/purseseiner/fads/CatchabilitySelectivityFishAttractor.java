@@ -59,7 +59,7 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
     /**
      * if the fad has been attracting fish (potentially, anyway) for these many days, it stops attracting any more (but doesn't lose them, yet!)
      */
-    private final int maximumAttractionDays;
+    private int maximumAttractionDays;
 
     private final FishState model;
 
