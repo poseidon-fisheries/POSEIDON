@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -16,6 +17,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
@@ -24,6 +26,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFact
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LocalizedActionCounter;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -350,6 +353,26 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         super.setFishingStrategyFactory(fishingStrategyFactory);
+        LocalizedActionCounter<AbstractFadSetAction> calzone1 = new LocalizedActionCounter<AbstractFadSetAction>(
+                abstractFadSetAction -> {
+                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                    return coordinates.x <= -140;
+                },
+                "calzone1"
+        );
+        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone1);
+        LocalizedActionCounter<AbstractFadSetAction> calzone2 = new LocalizedActionCounter<AbstractFadSetAction>(
+                abstractFadSetAction -> {
+                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                    return coordinates.x <= -140;
+                },
+                "calzone2"
+        );
+        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone2);
+
+
+        fishState.registerStartable(calzone1);
+
         super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 

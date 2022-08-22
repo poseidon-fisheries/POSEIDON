@@ -310,6 +310,21 @@ task fatJarTunaCalibrator(type: com.github.jengelman.gradle.plugins.shadow.tasks
     }
 }
 
+
+task fatJarTunaTwoPunchCalibrator(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'tuna_calibrator_twopunch.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.TwoPunchCalibration'
+    }
+}
+
+
+
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath

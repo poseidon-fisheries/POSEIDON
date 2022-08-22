@@ -1,10 +1,12 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
+import com.opencsv.CSVWriter;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -49,7 +51,15 @@ public class RowProviderToOutputPluginAdaptor implements OutputPlugin, Additiona
         builder.append("\n");
 
         for (Collection<?> row : delegate.getRows()) {
-            builder.append(row).append("\n");
+            Iterator<?> rowElements = row.iterator();
+            while(rowElements.hasNext())
+            {
+                builder.append(rowElements.next());
+                if(rowElements.hasNext())
+                    builder.append(",");
+            }
+
+            builder.append("\n");
         }
 
 

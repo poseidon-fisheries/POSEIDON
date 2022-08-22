@@ -93,26 +93,36 @@ public class TunaCalibrationConsole  {
 
 
         //build calibrator and feed it the arguments
-        final TunaCalibrator tunaCalibrator = new TunaCalibrator();
-        tunaCalibrator.setMaxFitnessCalls(arguments.getMaxFitnessCalls());
-        tunaCalibrator.setPopulationSize(arguments.getPopulationSize());
-        if(arguments.pathToCalibrationYaml != null && !arguments.pathToCalibrationYaml.trim().isEmpty())
-            tunaCalibrator.setOriginalCalibrationFilePath(Paths.get(arguments.getPathToCalibrationYaml()));
+        final TunaCalibrator tunaCalibrator = arguments.generateCalibratorProblem();
+        //run the bastard
+        double[] solution = tunaCalibrator.run();
 
-        tunaCalibrator.setRunNickName(arguments.getRunNickName());
-        tunaCalibrator.setParameterRange(arguments.getParameterRange());
-        if(arguments.isLocalSearch())
+
+    }
+
+
+    public TunaCalibrator generateCalibratorProblem() throws IOException {
+        //build calibrator and feed it the arguments
+        final TunaCalibrator tunaCalibrator = new TunaCalibrator();
+        tunaCalibrator.setMaxFitnessCalls(this.getMaxFitnessCalls());
+        tunaCalibrator.setPopulationSize(this.getPopulationSize());
+        if(this.pathToCalibrationYaml != null && !this.pathToCalibrationYaml.trim().isEmpty())
+            tunaCalibrator.setOriginalCalibrationFilePath(Paths.get(this.getPathToCalibrationYaml()));
+
+        tunaCalibrator.setRunNickName(this.getRunNickName());
+        tunaCalibrator.setParameterRange(this.getParameterRange());
+        if(this.isLocalSearch())
             tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.NELDER_MEAD);
-        if(arguments.isPSO)
+        if(this.isPSO)
             tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.PARTICLE_SWARM);
-        tunaCalibrator.setMaxProcessorsToUse(arguments.getMaxProcessorsToUse());
-        tunaCalibrator.setNumberOfRunsPerSettingOverride(arguments.getNumberOfRunsPerSettingOverride());
+        tunaCalibrator.setMaxProcessorsToUse(this.getMaxProcessorsToUse());
+        tunaCalibrator.setNumberOfRunsPerSettingOverride(this.getNumberOfRunsPerSettingOverride());
 
 
         //add initial guesses if provided
-        if(arguments.getBestGuessesTextFile() != null && !arguments.getBestGuessesTextFile().trim().isEmpty()){
+        if(this.getBestGuessesTextFile() != null && !this.getBestGuessesTextFile().trim().isEmpty()){
             tunaCalibrator.getBestGuess().clear();
-            List<String> allLines = Files.readAllLines(Paths.get(arguments.getBestGuessesTextFile()));
+            List<String> allLines = Files.readAllLines(Paths.get(this.getBestGuessesTextFile()));
             List<double[]> individuals = new LinkedList<>();
             for (String readLine : allLines) {
                 if(readLine.trim().isEmpty())
@@ -124,15 +134,11 @@ public class TunaCalibrationConsole  {
 
             }
             tunaCalibrator.setBestGuess(individuals);
-            
+
         }
         System.out.println(tunaCalibrator.getBestGuess());
-        //run the bastard
-        tunaCalibrator.run();
-
-
+        return tunaCalibrator;
     }
-
 
     public String getRunNickName() {
         return runNickName;

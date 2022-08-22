@@ -154,76 +154,85 @@ public class TunaGeographicalSensitivity {
 
 
     public static void main(String[] args) throws IOException {
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.UNCHANGED,
-                "baseline");
-
-        runAndOutput(4.0,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.UNCHANGED,
-                "hazardHigh");
-        runAndOutput(0.0,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.UNCHANGED,
-                "hazardLow");
-        runAndOutput(Double.NaN,
-                true,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.UNCHANGED,
-                "agezapNo");
-        runAndOutput(0.0,
-                true,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.UNCHANGED,
-                "agezapNo_hazardLow");
 
         runAndOutput(Double.NaN,
                 false,
                 Double.NaN,
-                Double.NaN,
-                Behaviour.GREEDY,
-                "greedy");
+                0.5,
+                Behaviour.UNCHANGED,
 
+                "lowcalibration");
 
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.GREEDY_0,
-                "greedy0");
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.GREEDY_HIGH_GREED_FACTOR,
-                "greedy500");
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.GREEDY_VERY_HIGH_MINFADVALUE,
-                "greedySelective");
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.GREEDY_IDENTITY,
-                "greedyIdentity");
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                Double.NaN,
-                Behaviour.NEGATIVE_CENTROID,
-                "negativeCentroid");
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.UNCHANGED,
+//                "baseline");
+//
+//        runAndOutput(4.0,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.UNCHANGED,
+//                "hazardHigh");
+//        runAndOutput(0.0,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.UNCHANGED,
+//                "hazardLow");
+//        runAndOutput(Double.NaN,
+//                true,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.UNCHANGED,
+//                "agezapNo");
+//        runAndOutput(0.0,
+//                true,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.UNCHANGED,
+//                "agezapNo_hazardLow");
+//
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.GREEDY,
+//                "greedy");
+//
+//
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.GREEDY_0,
+//                "greedy0");
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.GREEDY_HIGH_GREED_FACTOR,
+//                "greedy500");
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.GREEDY_VERY_HIGH_MINFADVALUE,
+//                "greedySelective");
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.GREEDY_IDENTITY,
+//                "greedyIdentity");
+//        runAndOutput(Double.NaN,
+//                false,
+//                Double.NaN,
+//                Double.NaN,
+//                Behaviour.NEGATIVE_CENTROID,
+//                "negativeCentroid");
     }
 
     enum Behaviour{
