@@ -162,7 +162,7 @@ EPO Abundance Pathfinding:
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
     factories:
     - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo_inputs/galapagos_eez/eez.shp
+        shapeFilePath: inputs/epo_inputs/eez/galapagos/eez.shp
     - Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
