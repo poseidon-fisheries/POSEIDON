@@ -139,8 +139,8 @@ EPO Abundance Pathfinding:
         }
   fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.GenericFadMapFactory
     currentFiles:
-      Y2016: inputs/epo_inputs/currents/currents_2016.csv
-      Y2017: inputs/epo_inputs/currents/currents_2017.csv
+      Y2016: inputs/epo_inputs/currents/currents_2016_dead_cells.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017_dead_cells.csv
     inputIsMetersPerSecond: true
   fishingStrategyFactory: Default to Destination Strategy
   gearStrategy:
