@@ -128,6 +128,16 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
 
+    private boolean fadSettingActive;
+
+    public boolean isFadSettingActive() {
+        return fadSettingActive;
+    }
+
+    public void setFadSettingActive(boolean fadSettingActive) {
+        this.fadSettingActive = fadSettingActive;
+    }
+
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
         return fadMakerFactory;
