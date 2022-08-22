@@ -53,6 +53,7 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
+import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
@@ -103,7 +104,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
-    private BiomassFadMapFactory fadMapFactory = new BiomassFadMapFactory(currentFiles);
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory = new BiomassFadInitializerFactory(
         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
@@ -133,6 +133,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         new StandardIattcRegulationsFactory();
 
     public EpoBiomassScenario() {
+        setFadMapFactory(new BiomassFadMapFactory(currentFiles));
         setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory());
         setCatchSamplersFactory(new BiomassCatchSamplersFactory());
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
@@ -378,10 +379,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.attractionWeightsFile = attractionWeightsFile;
     }
 
-    public BiomassFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
     @SuppressWarnings("unused")
     @Override
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
@@ -394,11 +391,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final BiomassFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
 }

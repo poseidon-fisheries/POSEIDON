@@ -72,8 +72,7 @@ import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
@@ -121,12 +120,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             101,
             0.5
         );
-    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(
-            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
-            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
-        )
-    );
+
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
@@ -137,6 +131,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();
     public EpoAbundanceScenario() {
+        setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory());
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
@@ -378,16 +373,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")

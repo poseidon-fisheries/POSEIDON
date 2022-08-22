@@ -18,27 +18,10 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.function.Consumer;
-import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -47,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
@@ -62,6 +44,7 @@ import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
@@ -70,6 +53,23 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import javax.measure.quantity.Mass;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
+import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
@@ -81,18 +81,15 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-    static final ImmutableMap<CurrentPattern, Path> currentFiles =
-        new ImmutableMap.Builder<CurrentPattern, Path>()
-            //.put(Y2015, input("currents_2015.csv"))
-            .put(Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"))
-            .put(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
-            //.put(Y2018, input("currents_2018.csv"))
-            //.put(NEUTRAL, input("currents_neutral.csv"))
-            //.put(EL_NINO, input("currents_el_nino.csv"))
-            //.put(LA_NINA, input("currents_la_nina.csv"))
-            .build();
+    private static final Path currentsFolder = INPUT_PATH.resolve("currents");
+    static final ImmutableMap<CurrentPattern, Path> currentFiles = new ImmutableMap.Builder<CurrentPattern, Path>()
+        .put(Y2016, currentsFolder.resolve("currents_2016.csv"))
+        .put(Y2017, currentsFolder.resolve("currents_2017.csv"))
+        .put(Y2018, currentsFolder.resolve("currents_2017.csv"))
+        .build();
     protected final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+    private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
@@ -182,7 +179,13 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.purseSeineGearFactory = purseSeineGearFactory;
     }
 
-    abstract FadMapFactory<B, F> getFadMapFactory();
+    public FadMapFactory<B, F> getFadMapFactory() {
+        return this.fadMapFactory;
+    };
+
+    public void setFadMapFactory(FadMapFactory<B, F> fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
+    }
 
     public abstract AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory();
 

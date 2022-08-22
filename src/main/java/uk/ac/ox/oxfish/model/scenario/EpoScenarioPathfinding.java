@@ -96,12 +96,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                     101,
                     0.5
             );
-    private FadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-            ImmutableMap.of(
-                    Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_dead_cells.csv"),
-                    Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_dead_cells.csv")
-            )
-    );
     private AbundanceFiltersFactory abundanceFiltersFactory =
             new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
 
@@ -239,16 +233,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             final AbundanceRestorerFactory abundanceRestorerFactory
     ) {
         this.abundanceRestorerFactory = abundanceRestorerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public FadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
     @Override
