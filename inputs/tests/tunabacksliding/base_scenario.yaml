@@ -106,7 +106,6 @@ EPO Abundance Pathfinding:
         minimumValueFadSets: '6971.021459999999'
     hoursWastedOnFailedSearches: '1.4932888800000002'
     maxTripDurationFile: inputs/epo_inputs/tests/backsliding/boats.csv
-    minimumValueFadSets: '5000.0'
     minimumValueOpportunisticFadSets: '5000.0'
     ownFadActionWeightBias: '1.0'
     minimumPercentageOfTripDurationAllowed: '1.0'
