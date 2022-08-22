@@ -141,6 +141,7 @@ EPO Abundance Pathfinding:
     currentFiles:
       Y2016: inputs/epo_inputs/currents/currents_2016.csv
       Y2017: inputs/epo_inputs/currents/currents_2017.csv
+      Y2018: inputs/epo_inputs/currents/currents_2018.csv
   fishingStrategyFactory: Default to Destination Strategy
   locationValuesFilePath: inputs/epo_inputs/tests/backsliding/location_values_all2017.csv
   mapInitializerFactory:
