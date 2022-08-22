@@ -105,12 +105,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             101,
             0.5
         );
-    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(
-            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
-            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
-        )
-    );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
@@ -212,6 +206,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     }
 
     public FadsOnlyEpoAbundanceScenario() {
+        this.setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         this.setFishingStrategyFactory(new FishUntilFullFactory());
     }
 
@@ -297,11 +292,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         return scenarioPopulation;
     }
 
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
@@ -316,23 +306,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @Override
     public void useDummyData(final Path testPath) {
         super.useDummyData(testPath);
-        fadMapFactory.setCurrentFiles(
-            ImmutableMap.of(
-                Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_monthly.csv"),
-                Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_monthly.csv")
-            )
-        );
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
             testPath.resolve("dummy_fad_deployments.csv").toString()
         );
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
             testPath.resolve("dummy_fad_sets.csv").toString()
         );
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")
