@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.time.LocalDate;
+
 /**
  * A scenario is a set of commands called to initialize the model
  */
@@ -43,7 +45,8 @@ public interface Scenario {
      */
     ScenarioPopulation populateModel(FishState model);
 
-
-
+    default LocalDate getStartDate() {
+        return LocalDate.now();
+    }
 
 }

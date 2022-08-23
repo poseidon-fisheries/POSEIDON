@@ -76,10 +76,6 @@ EPO Abundance Pathfinding:
     successfulSetProbability: '0.9290048914'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
-    firstLargeBinPerSpecies:
-      Skipjack tuna: 14
-      Bigeye tuna: 8
-      Yellowfin tuna: 9
   abundanceRestorerFactory:
     schedule:
       0: 365
@@ -143,8 +139,9 @@ EPO Abundance Pathfinding:
         }
   fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.GenericFadMapFactory
     currentFiles:
-      Y2016: inputs/epo_inputs/currents/currents_2016.csv
-      Y2017: inputs/epo_inputs/currents/currents_2017.csv
+      Y2016: inputs/epo_inputs/currents/currents_2016_dead_cells.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017_dead_cells.csv
+      Y2018: inputs/epo_inputs/currents/currents_2018_dead_cells.csv
     inputIsMetersPerSecond: true
   fishingStrategyFactory: Default to Destination Strategy
   gearStrategy:
@@ -166,7 +163,7 @@ EPO Abundance Pathfinding:
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
     factories:
     - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo_inputs/galapagos_eez/eez.shp
+        shapeFilePath: inputs/epo_inputs/eez/galapagos/eez.shp
     - Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:

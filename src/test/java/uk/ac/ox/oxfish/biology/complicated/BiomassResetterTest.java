@@ -37,6 +37,7 @@ import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
@@ -54,6 +55,8 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.ConstantAttractionProbabilityFunction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -63,6 +66,7 @@ import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class BiomassResetterTest {
 
     @Test
@@ -185,13 +189,15 @@ public class BiomassResetterTest {
         final double carryingCapacity = 1000;
         final double fadAttractionRate = 0.5;
 
+        final double[] attractionRates = new double[species.size()];
+        Arrays.fill(attractionRates, fadAttractionRate);
+
         final LinearFishBiomassAttractor fishBiomassAttractor =
             new LinearFishBiomassAttractor(
-                species.stream().collect(toImmutableMap(
-                    identity(),
-                    s -> fadAttractionRate
-                    )
-                )
+                species,
+                new ConstantAttractionProbabilityFunction<>(1.0),
+                attractionRates,
+                new MersenneTwisterFast()
             );
 
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
@@ -236,7 +242,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(fad -> fad.getBiology()).collect(toImmutableList());
+            fadMap.allFads().map(Fad::getBiology).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses =
             totalBiomasses(globalBiology, fadBiologies);
 

@@ -4,8 +4,6 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 import com.google.common.collect.ImmutableList;
@@ -14,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.IntFunction;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -39,12 +35,9 @@ public class AbundanceMortalityProcessTest {
         proportionalMortalities.add(new double[] {.25,.35});
         proportionalMortalities.add(new double[] {.5,.75});
 
-        TunaMeristics meristics = new TunaMeristics(weights, lengths, new double[]{10,10});
+        TunaMeristics meristics = new TunaMeristics(weights, lengths, new double[]{10,10}, WeightGroups.SINGLE_GROUP);
 
         Species species1 = new Species("Piano Tuna", meristics);
-
-        Map<String, IntFunction<SmallLargeAllocationGridsSupplier.SizeGroup>> binToSizeGroupMappings = new HashMap<>();
-        binToSizeGroupMappings.put("Piano Tuna", entry -> entry==0?SMALL:LARGE );
 
         HashMap<Species, double[][]> abundance = new HashMap<>();
         abundance.put(species1, new double[][]{{10, 10}, {10, 10}});

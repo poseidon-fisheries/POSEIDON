@@ -18,6 +18,8 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
@@ -35,19 +37,12 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorerFactory;
-import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
-import uk.ac.ox.oxfish.biology.tuna.ScheduledAbundanceProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -72,9 +67,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  */
 public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-
     private boolean fadSettingActive = true;
-
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
@@ -100,11 +93,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
             INPUT_PATH.resolve("abundance").resolve("grids.csv"),
-            ImmutableMap.of(
-                "Skipjack tuna", 14,
-                "Bigeye tuna", 8,
-                "Yellowfin tuna", 9
-            ),
             365
         );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
@@ -117,12 +105,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             101,
             0.5
         );
-    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(
-            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
-            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
-        )
-    );
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
@@ -130,6 +112,18 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new AbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
+    private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
+        speciesCodesFactory.get().getSpeciesNames().stream().collect(
+            toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", ImmutableList.of(2.5, 15.0),
+            // use the last two bins of SKJ as "large"
+            "Skipjack tuna", ImmutableList.of(2.5, 11.501600),
+            "Yellowfin tuna", ImmutableList.of(2.5, 15.0)
+        )
+
+    );
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -212,6 +206,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     }
 
     public FadsOnlyEpoAbundanceScenario() {
+        this.setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         this.setFishingStrategyFactory(new FishUntilFullFactory());
     }
 
@@ -242,6 +237,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setWeightGroupsPerSpecies(weightGroupsFactory.get());
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
 
@@ -296,11 +292,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         return scenarioPopulation;
     }
 
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
-    }
-
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
@@ -315,23 +306,12 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @Override
     public void useDummyData(final Path testPath) {
         super.useDummyData(testPath);
-        fadMapFactory.setCurrentFiles(
-            ImmutableMap.of(
-                Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016_monthly.csv"),
-                Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017_monthly.csv")
-            )
-        );
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
             testPath.resolve("dummy_fad_deployments.csv").toString()
         );
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
             testPath.resolve("dummy_fad_sets.csv").toString()
         );
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
     }
 
     @SuppressWarnings("unused")
@@ -358,6 +338,16 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.fadSetterFactory = fadSetterFactory;
     }
 
+    @SuppressWarnings("unused")
+    public WeightGroupsFactory getWeightGroupsFactory() {
+        return weightGroupsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
+        this.weightGroupsFactory = weightGroupsFactory;
+    }
+
     public boolean isFadSettingActive() {
         return fadSettingActive;
     }
@@ -365,4 +355,5 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     public void setFadSettingActive(boolean fadSettingActive) {
         this.fadSettingActive = fadSettingActive;
     }
+
 }

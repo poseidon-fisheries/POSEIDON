@@ -18,25 +18,10 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.function.Consumer;
-import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -45,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
@@ -63,40 +47,69 @@ import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
+import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
+import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import javax.measure.quantity.Mass;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
+import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
     public static final int TARGET_YEAR = 2017;
+    public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
     public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
 
     public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-    static final ImmutableMap<CurrentPattern, Path> currentFiles =
-        new ImmutableMap.Builder<CurrentPattern, Path>()
-            //.put(Y2015, input("currents_2015.csv"))
-            //.put(Y2016, input("currents_2016.csv"))
-            .put(Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv"))
-            //.put(Y2018, input("currents_2018.csv"))
-            //.put(NEUTRAL, input("currents_neutral.csv"))
-            //.put(EL_NINO, input("currents_el_nino.csv"))
-            //.put(LA_NINA, input("currents_la_nina.csv"))
-            .build();
+    private static final Path currentsFolder = INPUT_PATH.resolve("currents");
+    static final ImmutableMap<CurrentPattern, Path> currentFiles = new ImmutableMap.Builder<CurrentPattern, Path>()
+        .put(Y2016, currentsFolder.resolve("currents_2016.csv"))
+        .put(Y2017, currentsFolder.resolve("currents_2017.csv"))
+        .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
+        .build();
+    protected final SpeciesCodesFromFileFactory speciesCodesFactory =
+        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+    private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
-    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory =
-        new AbundanceCatchSamplersFactory();
+    private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
+
+    private final PortInitializer portInitializer =
+        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
+
+    AlgorithmFactory<? extends MarketMap> marketMapFactory =
+        new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
@@ -109,10 +122,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
         if (getFishingStrategyFactory() != null
             && getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory) {
-            ((PurseSeinerFishingStrategyFactory<B, ?>) getFishingStrategyFactory()).setCatchSamplersFactory(
-                getCatchSamplersFactory());
-            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory()).setAttractionWeightsFile(
-                getAttractionWeightsFile());
+            ((PurseSeinerFishingStrategyFactory<B, F>) getFishingStrategyFactory())
+                .setCatchSamplersFactory(getCatchSamplersFactory());
+            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
+                .setAttractionWeightsFile(getAttractionWeightsFile());
         }
 
         if (getPurseSeineGearFactory() != null) {
@@ -131,6 +144,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             getPurseSeineGearFactory().setLocationValuesFile(getLocationValuesFilePath());
         }
 
+        if (marketMapFactory instanceof SpeciesCodeAware) {
+            ((SpeciesCodeAware) marketMapFactory).setSpeciesCodes(grabSpeciesCodesFactory().get());
+        }
+
         return new ScenarioPopulation(
             new ArrayList<>(),
             new SocialNetwork(new EmptyNetworkBuilder()),
@@ -146,11 +163,11 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.fishingStrategyFactory = fishingStrategyFactory;
     }
 
-    public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
+    public CatchSamplersFactory<B> getCatchSamplersFactory() {
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
@@ -178,7 +195,25 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.purseSeineGearFactory = purseSeineGearFactory;
     }
 
-    abstract FadMapFactory<B, F> getFadMapFactory();
+    public FadMapFactory<B, F> getFadMapFactory() {
+        return this.fadMapFactory;
+    }
+
+    public void setFadMapFactory(FadMapFactory<B, F> fadMapFactory) {
+        this.fadMapFactory = fadMapFactory;
+    }
+
+    List<Port> buildPorts(FishState fishState) {
+        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
+        portInitializer.buildPorts(
+            fishState.getMap(),
+            fishState.random,
+            seaTile -> marketMap,
+            fishState,
+            new FixedGasPrice(0)
+        );
+        return fishState.getMap().getPorts();
+    }
 
     public abstract AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory();
 
@@ -259,7 +294,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("UnstableApiUsage")
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            parseAllRecords(costsFile).stream().collect(toImmutableRangeMap(
+            recordStream(costsFile).collect(toImmutableRangeMap(
                 r -> Range.openClosed(
                     getQuantity(r.getInt("lower_capacity"), TONNE),
                     getQuantity(r.getInt("upper_capacity"), TONNE)
@@ -318,4 +353,22 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public void setGearStrategy(final FadRefillGearStrategyFactory gearStrategy) {
         this.gearStrategy = gearStrategy;
     }
+
+    @Override
+    public LocalDate getStartDate() {
+        return START_DATE;
+    }
+
+    public SpeciesCodesFromFileFactory grabSpeciesCodesFactory() {
+        return speciesCodesFactory;
+    }
+
+    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
+        return marketMapFactory;
+    }
+
+    public void setMarketMapFactory(AlgorithmFactory<? extends MarketMap> marketMapFactory) {
+        this.marketMapFactory = marketMapFactory;
+    }
+
 }

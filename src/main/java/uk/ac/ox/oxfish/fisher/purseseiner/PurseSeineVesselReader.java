@@ -29,7 +29,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
@@ -101,7 +101,7 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
     @Override
     public List<Fisher> apply(final FishState fishState) {
 
-        return parseAllRecords(vesselsFilePath).stream()
+        return recordStream(vesselsFilePath)
             .filter(record -> record.getInt("year") == targetYear)
             .map(record -> {
                 final String portName = record.getString("port_name");

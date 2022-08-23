@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 import java.nio.file.Path;
@@ -26,7 +27,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double> {
 
@@ -36,15 +37,14 @@ public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double
 
     @Override
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Double>>> readValues(final Path valuesFile) {
-        return parseAllRecords(valuesFile)
-            .stream()
+        return recordStream(valuesFile)
             .collect(
                 groupingBy(
                     record -> record.getInt("year"),
                     groupingBy(
                         record -> record.getString("ves_no"),
                         toMap(
-                            record -> ActionClass.valueOf(record.getString("event")).getActionClass(),
+                            record -> ActionClass.valueOf(record.getString("action_type")).getActionClass(),
                             record -> record.getDouble("w")
                         )
                     )

@@ -18,14 +18,9 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Iterables.get;
-import static java.util.function.UnaryOperator.identity;
-
 import java.util.Collection;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 
 /**
  * An {@link Aggregator} that works with {@link AbundanceLocalBiology} biologies.

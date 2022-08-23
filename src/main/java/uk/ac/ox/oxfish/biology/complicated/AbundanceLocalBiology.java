@@ -20,23 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Iterables.get;
-import static java.util.Arrays.copyOf;
-import static java.util.Arrays.stream;
-import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.toCollection;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -44,6 +29,16 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Iterables.get;
+import static java.util.Arrays.copyOf;
+import static java.util.Arrays.stream;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * A local biology object based on abundance.
@@ -78,18 +73,24 @@ public class AbundanceLocalBiology implements LocalBiology
 
     /**
      * creates an abundance based local biology that starts off as entirely empty
-     * @param biology a list of species
+     * @param biology a GlobalBiology object containing a list of species
      */
-    public AbundanceLocalBiology(GlobalBiology biology)
-    {
+    public AbundanceLocalBiology(GlobalBiology biology) {
+        this(biology.getSpecies());
+    }
 
+    /**
+     * creates an abundance based local biology that starts off as entirely empty
+     * @param biology a collection of species
+     */
+    public AbundanceLocalBiology(Collection<Species> allSpecies) {
         //for each species create cohorts
-        for(Species species : biology.getSpecies()) {
+        for (Species species : allSpecies) {
             abundance.put(species, makeAbundanceArray(species));
         }
         //done!
-        lastComputedBiomass = new double[biology.getSpecies().size()];
-        Arrays.fill(lastComputedBiomass,Double.NaN);
+        lastComputedBiomass = new double[allSpecies.size()];
+        Arrays.fill(lastComputedBiomass, Double.NaN);
     }
 
     public static double[][] makeAbundanceArray(final Species species) {

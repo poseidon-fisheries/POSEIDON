@@ -5,6 +5,7 @@ import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishBiomassAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishBiomassAttractor;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -53,12 +54,33 @@ public class BiomassFadInitializerFactory
         final FishState fishState,
         final MersenneTwisterFast rng
     ) {
+        final double[] compressionExponents =
+            processParameterMap(
+                getCompressionExponents(),
+                fishState.getBiology(), rng
+            );
+        final double[] attractableBiomassCoefficients =
+            processParameterMap(
+                getAttractableBiomassCoefficients(),
+                fishState.getBiology(),
+                rng
+            );
+        final double[] biomassInteractionCoefficients =
+            processParameterMap(
+                getBiomassInteractionsCoefficients(),
+                fishState.getBiology(),
+                rng
+            );
+        final double[] attractionRates =
+            processParameterMap(getGrowthRates(), fishState.getBiology(), rng);
         return new LogisticFishBiomassAttractor(
-            fishState.getRandom(),
-            processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
-            processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
-            processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
-            processParameterMap(getGrowthRates(), fishState.getBiology(), rng)
+            fishState.getBiology().getSpecies(),
+            new CompressedExponentialAttractionProbability<>(
+                compressionExponents,
+                attractableBiomassCoefficients,
+                biomassInteractionCoefficients
+            ),
+            attractionRates, fishState.getRandom()
         );
     }
 

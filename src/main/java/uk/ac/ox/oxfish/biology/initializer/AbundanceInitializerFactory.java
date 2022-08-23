@@ -18,26 +18,28 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class AbundanceInitializerFactory
     implements AlgorithmFactory<AbundanceInitializer> {
@@ -51,6 +53,7 @@ public class AbundanceInitializerFactory
 
     private AbundanceReallocator abundanceReallocator;
     private SpeciesCodes speciesCodes;
+    private Map<String, WeightGroups> weightGroupsPerSpecies;
 
     /**
      * Empty constructor to allow YAML instantiation.
@@ -60,6 +63,7 @@ public class AbundanceInitializerFactory
 
     }
 
+
     public AbundanceInitializerFactory(
         final Path binsFilePath
     ) {
@@ -67,7 +71,7 @@ public class AbundanceInitializerFactory
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
-        return parseAllRecords(binsFilePath).stream()
+        return recordStream(binsFilePath)
             .collect(groupingBy(
                 record -> record.getString("species_code")
             ))
@@ -93,6 +97,10 @@ public class AbundanceInitializerFactory
             ));
     }
 
+    public void setWeightGroupsPerSpecies(Map<String, WeightGroups> weightGroupsPerSpecies) {
+        this.weightGroupsPerSpecies = weightGroupsPerSpecies;
+    }
+
     public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
         this.speciesCodes = speciesCodes;
     }
@@ -111,9 +119,11 @@ public class AbundanceInitializerFactory
     public AbundanceInitializer apply(final FishState fishState) {
         checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator() before using");
+        checkNotNull(weightGroupsPerSpecies, "need to call setWeightGroupsPerSpecies() before using");
         return new AbundanceInitializer(
             speciesCodes,
             binsCache.getUnchecked(this.binsFilePath),
+            weightGroupsPerSpecies,
             abundanceReallocator
         );
     }

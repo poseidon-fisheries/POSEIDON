@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -46,7 +48,7 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold

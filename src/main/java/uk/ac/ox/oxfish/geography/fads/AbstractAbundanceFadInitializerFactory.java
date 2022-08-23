@@ -7,9 +7,10 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
 import uk.ac.ox.oxfish.model.FishState;
-
 
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -37,7 +38,7 @@ public abstract class  AbstractAbundanceFadInitializerFactory
         checkNotNull(getSpeciesCodes());
         final MersenneTwisterFast rng = fishState.getRandom();
         final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
-        DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);
+        final DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);
 
         return new AbundanceFadInitializer(
                 fishState.getBiology(),
@@ -49,19 +50,52 @@ public abstract class  AbstractAbundanceFadInitializerFactory
     }
 
     @NotNull
-    abstract protected DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity);
+    protected abstract DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity);
 
-    private LogisticFishAbundanceAttractor makeFishAttractor(
-            final FishState fishState,
-            final MersenneTwisterFast rng
+    private FishAbundanceAttractor makeFishAttractor(
+        final FishState fishState,
+        final MersenneTwisterFast rng
+    ) {
+        final double[] compressionExponents =
+            processParameterMap(
+                getCompressionExponents(),
+                fishState.getBiology(), rng
+            );
+        final double[] attractableBiomassCoefficients =
+            processParameterMap(
+            getAttractableBiomassCoefficients(),
+            fishState.getBiology(),
+            rng
+        );
+        final double[] biomassInteractionCoefficients =
+            processParameterMap(
+            getBiomassInteractionsCoefficients(),
+            fishState.getBiology(),
+            rng
+        );
+        final double[] attractionRates =
+            processParameterMap(getGrowthRates(), fishState.getBiology(), rng);
+        return makeFishAttractor(fishState, compressionExponents, attractableBiomassCoefficients, biomassInteractionCoefficients, attractionRates);
+    }
+
+    @NotNull
+    FishAbundanceAttractor makeFishAttractor(
+        FishState fishState,
+        double[] compressionExponents,
+        double[] attractableBiomassCoefficients,
+        double[] biomassInteractionCoefficients,
+        double[] attractionRates
     ) {
         return new LogisticFishAbundanceAttractor(
-                fishState.getRandom(),
-                processParameterMap(getCompressionExponents(), fishState.getBiology(), rng),
-                processParameterMap(getAttractableBiomassCoefficients(), fishState.getBiology(), rng),
-                processParameterMap(getBiomassInteractionsCoefficients(), fishState.getBiology(), rng),
-                processParameterMap(getGrowthRates(), fishState.getBiology(), rng),
-                getSelectivityFilters()
+            fishState.getBiology().getSpecies(),
+            new CompressedExponentialAttractionProbability<>(
+                compressionExponents,
+                attractableBiomassCoefficients,
+                biomassInteractionCoefficients
+            ),
+            attractionRates,
+            fishState.getRandom(),
+            getSelectivityFilters()
         );
     }
 

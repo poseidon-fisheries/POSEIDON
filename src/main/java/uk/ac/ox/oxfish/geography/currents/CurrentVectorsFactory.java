@@ -29,30 +29,27 @@ public enum CurrentVectorsFactory {
     INSTANCE;
 
     public static final int STEPS_PER_DAY = 1;
-    private static final int SECONDS_PER_DAY = 60 * 60 * 24;
+    public static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
+    private final LoadingCache<Entry<MapExtent, Entry<Boolean, Map<CurrentPattern, Path>>>, CurrentVectors> cache =
+        CacheBuilder.newBuilder().maximumSize(1).build(CacheLoader.from(entry -> {
+            MapExtent mapExtent = entry.getKey();
+            boolean inputIsMetersPerSecond = entry.getValue().getKey();
+            Map<CurrentPattern, Path> currentFiles = entry.getValue().getValue();
+            return new CurrentVectorsEPO(
+                makeVectorMaps(mapExtent, currentFiles, inputIsMetersPerSecond),
+                STEPS_PER_DAY,
+                mapExtent.getGridWidth(),
+                mapExtent.getGridHeight()
+            );
+        }));
 
-    static public LoadingCache<Entry<MapExtent, Map<CurrentPattern, Path>>, CurrentVectors> getCache(
-            boolean inputIsMetersPerSecond
-    ){
-        return CacheBuilder.newBuilder()
-                .build(CacheLoader.from(entry -> {
-                    MapExtent mapExtent = entry.getKey();
-                    Map<CurrentPattern, Path> currentFiles = entry.getValue();
-                    return new CurrentVectorsEPO(
-                            makeVectorMaps(mapExtent, currentFiles, inputIsMetersPerSecond),
-                            STEPS_PER_DAY,
-                            mapExtent.getGridWidth(),
-                            mapExtent.getGridHeight()
-                    );
-                }));
-    }
-
-
-
-    public CurrentVectors getCurrentVectors(final MapExtent mapExtent, final Map<CurrentPattern, Path> currentFiles,
-                                            boolean inputIsMetersPerSecond) {
-        return getCache(inputIsMetersPerSecond).getUnchecked(entry(mapExtent, currentFiles));
+    public CurrentVectors getCurrentVectors(
+        final MapExtent mapExtent,
+        final Map<CurrentPattern, Path> currentFiles,
+        boolean inputIsMetersPerSecond
+    ) {
+        return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -66,7 +63,7 @@ public enum CurrentVectorsFactory {
         geomGridField.setMBR(mapExtent.getEnvelope());
 
         currentFiles.forEach((currentPattern, path) ->
-            CsvParserUtil.parseAllRecords(path).forEach(record -> {
+            CsvParserUtil.recordStream(path).forEach(record -> {
                 final Coordinate coordinate = readCoordinate(record);
                 final int dayOfYear = getLocalDate(record, "dttm", "yyyy-MM-dd").getDayOfYear();
                 final Map<Int2D, Double2D> vectorByLocation = currentVectors
@@ -104,7 +101,7 @@ public enum CurrentVectorsFactory {
      * This is slightly convoluted because the translation of distance into grid offsets depends on the latitude,
      * so we need to use lon/lat coordinates as an intermediate and then convert back to grid coordinates.
      */
-    private static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
+    public static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
         final Double2D metresPerDayVector = metrePerSecondVector.multiply(SECONDS_PER_DAY);
         final Double2D startXY = coordinateToXY(startCoord, mapExtent);
         final Double2D lonLatVector = metresVectorToLonLatVector(startCoord, metresPerDayVector.x, metresPerDayVector.y);

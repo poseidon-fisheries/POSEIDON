@@ -20,25 +20,10 @@
 
 package uk.ac.ox.oxfish.model;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Doubles;
 import ec.util.MersenneTwisterFast;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.DoubleSummaryStatistics;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -70,14 +55,21 @@ import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
-import uk.ac.ox.oxfish.model.scenario.FisherFactory;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
-import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
+import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleBiFunction;
+import java.util.function.ToDoubleFunction;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 /**
  *
@@ -188,6 +180,8 @@ public class FishState  extends SimState{
 
     private List<EntryPlugin> entryPlugins;
 
+    private LocalDate startDate;
+
     public int getStepsPerDay() {
         return stepsPerDay;
     }
@@ -266,8 +260,7 @@ public class FishState  extends SimState{
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateDailySteppables.entrySet()  )
             schedule.scheduleRepeating(steppable.getValue(),steppable.getKey().ordinal(), stepsPerDay);
 
-
-
+        this.startDate = scenario.getStartDate();
         ScenarioEssentials initialization = scenario.start(this);
 
         //read raster bathymetry
@@ -416,10 +409,23 @@ public class FishState  extends SimState{
         return  ((scheduleTime / stepsPerDay) / 365);
     }
 
-
-
     public int getHour() {
         return (int) (schedule.getTime() % stepsPerDay * 24 / stepsPerDay);
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getDate() {
+        // we add year and "day of the year" separately because our simulation years
+        // are always 365 days, so adding `getDays()` would get us out of sync for
+        // when leap years occur
+        return getStartDate().plusYears(getYear()).plusDays(getDayOfTheYear() - 1);
+    }
+
+    public int getCalendarYear() {
+        return getDate().getYear();
     }
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)
@@ -764,6 +770,25 @@ public class FishState  extends SimState{
         return started;
     }
 
+    private Gatherer<FishState> makeMostFishedTileGatherer(ToDoubleBiFunction<Fisher, SeaTile> extractor) {
+        return state -> {
+            double sum = 0;
+            double observations = 0;
+            for (Fisher fisher : getFishers()) {
+                TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                if (lastFinishedTrip != null) {
+                    SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
+                    if (mostFishedTileInTrip != null) {
+                        sum += extractor.applyAsDouble(fisher, mostFishedTileInTrip);
+                        observations++;
+                    }
+                }
+            }
+            if (observations == 0)
+                return Double.NaN;
+            return sum / observations;
+        };
+    }
 
     /**
      * //todo move this to a config file rather than an all or nothing switch
@@ -771,62 +796,29 @@ public class FishState  extends SimState{
     public void attachAdditionalGatherers()
     {
         //keep track of average X location at the end of the year
-        DataColumn dailyX = this.dailyDataSet.registerGatherer("Average X Towed", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState state) {
-                double sum = 0;
-                double observations = 0;
-                for (Fisher fisher : getFishers()) {
-                    TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                    if(lastFinishedTrip != null) {
-                        SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
-                        if (mostFishedTileInTrip != null) {
-                            sum += mostFishedTileInTrip.getGridX();
-                            observations++;
-                        }
-                    }
-                }
-                if (observations == 0)
-                    return Double.NaN;
-                return sum / observations;
-            }
-        }, Double.NaN);
-
-
-
+        DataColumn dailyX = this.dailyDataSet.registerGatherer(
+            "Average X Towed",
+            makeMostFishedTileGatherer((fisher, mostFishedTileInTrip) ->
+                mostFishedTileInTrip.getGridX()
+            ),
+            Double.NaN
+        );
 
         //yearly you account for the average
-        this.yearlyDataSet.registerGatherer("Average X Towed",
-                                            FishStateUtilities.generateYearlyAverage(dailyX),
-                                            Double.NaN)
-        ;
-
+        this.yearlyDataSet.registerGatherer(
+            "Average X Towed",
+            FishStateUtilities.generateYearlyAverage(dailyX),
+            Double.NaN
+        );
 
         //keep track of average X location at the end of the year
-        this.dailyDataSet.registerGatherer("Average Distance From Port",
-                                           new Gatherer<FishState>() {
-                                               @Override
-                                               public Double apply(FishState state) {
-                                                   double sum = 0;
-                                                   double observations = 0;
-                                                   for (Fisher fisher : getFishers()) {
-                                                       TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                                                       if(lastFinishedTrip != null) {
-                                                           SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
-                                                           if (mostFishedTileInTrip != null) {
-                                                               sum +=
-                                                                       map.distance(fisher.getHomePort().getLocation(),
-                                                                                    mostFishedTileInTrip);
-                                                               observations++;
-                                                           }
-                                                       }
-                                                   }
-                                                   if (observations == 0)
-                                                       return Double.NaN;
-                                                   return sum / observations;
-                                               }
-                                           }, Double.NaN);
-
+        this.dailyDataSet.registerGatherer(
+            "Average Distance From Port",
+            makeMostFishedTileGatherer((fisher, mostFishedTileInTrip) ->
+                map.distance(fisher.getHomePort().getLocation(), mostFishedTileInTrip)
+            ),
+            Double.NaN
+        );
 
         this.dailyDataSet.registerGatherer("% of Tows on the Line",
                                            new Gatherer<FishState>() {

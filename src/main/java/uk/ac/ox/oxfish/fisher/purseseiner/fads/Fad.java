@@ -77,7 +77,8 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends A
     @Override
     public void aggregateFish(
         final B seaTileBiology,
-        final GlobalBiology globalBiology
+        final GlobalBiology globalBiology,
+        final int currentStep
     ) {
         // add them to the FAD biology
         final Catch catchObject = addCatchesToFad(seaTileBiology, globalBiology);
@@ -88,6 +89,9 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends A
                 catchObject,
                 globalBiology
             );
+            if (getStepOfFirstAttraction() == null && !this.isEmpty(globalBiology.getSpecies())) {
+                setStepOfFirstAttraction(currentStep);
+            }
         }
     }
 

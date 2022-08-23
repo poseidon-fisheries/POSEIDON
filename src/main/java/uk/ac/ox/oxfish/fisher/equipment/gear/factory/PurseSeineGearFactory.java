@@ -1,54 +1,21 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.DoubleUnaryOperator;
-import java.util.stream.Stream;
-import javax.measure.quantity.Mass;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.FadLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.GlobalDeploymentAttractionModulator;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.GlobalSetAttractionModulator;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocalCanFishThereAttractionModulator;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocalSetAttractionModulator;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionModulator;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -61,6 +28,18 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import javax.measure.quantity.Mass;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.toList;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 @SuppressWarnings("unused")
 public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
@@ -131,6 +110,15 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
+    private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
+
+    public Path getMaxCurrentSpeedsFile() {
+        return maxCurrentSpeedsFile;
+    }
+
+    public void setMaxCurrentSpeedsFile(Path maxCurrentSpeedsFile) {
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
+    }
 
     @SuppressWarnings("rawtypes")
     public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
@@ -348,8 +336,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
     @SuppressWarnings("unused")
     public void setNonAssociatedSetObservers(
-        @SuppressWarnings("rawtypes")
-        final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
+        @SuppressWarnings("rawtypes") final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.nonAssociatedSetObservers = nonAssociatedSetObservers;
@@ -379,6 +366,12 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     }
 
     Stream<AttractionField> attractionFields(final FishState fishState) {
+
+        final PurseSeinerActionClassToDouble maxCurrentSpeed =
+            PurseSeinerActionClassToDouble.fromFile(
+                getMaxCurrentSpeedsFile(), "action", "speed"
+            );
+
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
                 pctHoldSpaceLeftModulationFunction.apply(fishState),
@@ -399,7 +392,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfOpportunisticFadSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    opportunisticFadSetTimeSinceLastVisitModulationFunction.apply(fishState)
+                    opportunisticFadSetTimeSinceLastVisitModulationFunction.apply(fishState),
+                    maxCurrentSpeed.applyAsDouble(OpportunisticFadSetAction.class)
                 ),
                 globalSetAttractionModulator,
                 OpportunisticFadSetAction.class,
@@ -412,7 +406,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfNonAssociatedSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    nonAssociatedSetTimeSinceLastVisitModulationFunction.apply(fishState)
+                    nonAssociatedSetTimeSinceLastVisitModulationFunction.apply(fishState),
+                    maxCurrentSpeed.applyAsDouble(NonAssociatedSetAction.class)
                 ),
                 globalSetAttractionModulator,
                 NonAssociatedSetAction.class,
@@ -425,7 +420,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                     getDecayRateOfDolphinSetLocationValues()
                 ),
                 new LocalSetAttractionModulator(
-                    dolphinSetTimeSinceLastVisitModulationFunction.apply(fishState)
+                    dolphinSetTimeSinceLastVisitModulationFunction.apply(fishState),
+                    maxCurrentSpeed.applyAsDouble(DolphinSetAction.class)
                 ),
                 globalSetAttractionModulator,
                 DolphinSetAction.class,

@@ -26,7 +26,7 @@ import static java.util.Comparator.comparing;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class FromSimpleFilePortInitializer implements PortInitializer {
 
@@ -75,8 +75,7 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
     }
 
     private Map<String, Coordinate> readPortCoordinatesFromFile(Path portFilePath, int targetYear) {
-        return parseAllRecords(portFilePath)
-            .stream()
+        return recordStream(portFilePath)
             .filter(record -> record.getInt("year") == targetYear)
             .collect(toImmutableMap(
                 record -> record.getString("port_name"),

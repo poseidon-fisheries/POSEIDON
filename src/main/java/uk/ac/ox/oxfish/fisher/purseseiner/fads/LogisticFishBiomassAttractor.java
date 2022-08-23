@@ -19,69 +19,42 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import static java.lang.Math.min;
-import static java.util.Comparator.comparingInt;
-import static java.util.Map.Entry.comparingByKey;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
 public class LogisticFishBiomassAttractor
-    extends LogisticFishAttractor<Double, BiomassLocalBiology, BiomassFad>
-    implements FishBiomassAttractor {
+    extends FishBiomassAttractor {
 
     public LogisticFishBiomassAttractor(
-        final MersenneTwisterFast rng,
-        final Map<Species, Double> compressionExponents,
-        final Map<Species, Double> attractableBiomassCoefficients,
-        final Map<Species, Double> biomassInteractionCoefficients,
-        final Map<Species, Double> attractionRates
+        final Collection<Species> species,
+        final AttractionProbabilityFunction<BiomassLocalBiology, BiomassFad> attractionProbabilityFunction,
+        final double[] attractionRates,
+        final MersenneTwisterFast rng
     ) {
-        super(
-            rng,
-            compressionExponents,
-            attractableBiomassCoefficients,
-            biomassInteractionCoefficients,
-            attractionRates
-        );
+        super(species, attractionProbabilityFunction, attractionRates, rng);
     }
 
     @Override
-    Double attractForSpecies(
-        final Species s, final BiomassLocalBiology cellBiology, final BiomassFad fad
+    Entry<Double, Double> attractForSpecies(
+        final Species species,
+        final BiomassLocalBiology cellBiology,
+        final BiomassFad fad
     ) {
-        final double fadBiomass = fad.getBiology().getBiomass(s);
-        final double cellBiomass = cellBiology.getBiomass(s);
-        final double attractionRate = getAttractionRates(s);
+        final double fadBiomass = fad.getBiology().getBiomass(species);
+        final double cellBiomass = cellBiology.getBiomass(species);
+        final double attractionRate = getAttractionRate(species);
         final double fadCarryingCapacity = fad.getTotalCarryingCapacity();
-        return min(
+        final double caughtBiomass = min(
             cellBiomass,
             attractionRate *
                 (1 + fadBiomass) *
                 ((1 - fadBiomass) / fadCarryingCapacity)
         );
+        return entry(caughtBiomass, caughtBiomass);
     }
-
-    @Override
-    Double attractNothing(final Species s, final BiomassFad fad) {
-        return 0.0;
-    }
-
-    @Override
-    WeightedObject<BiomassLocalBiology> scale(final Map<Species, Double> attractedFish, final BiomassFad fad) {
-        final double[] biomassArray = new double[attractedFish.size()];
-        double totalBiomass = 0;
-        for (Entry<Species, Double> attracted : attractedFish.entrySet()) {
-            totalBiomass += attracted.getValue();
-            biomassArray[attracted.getKey().getIndex()] = attracted.getValue();
-        }
-        return
-                new WeightedObject<>(
-                new BiomassLocalBiology(scaleAttractedBiomass(biomassArray, fad)),
-                        totalBiomass
-                );
-    }
-
 }

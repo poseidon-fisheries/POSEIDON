@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -47,12 +48,11 @@ public class CsvLogger {
      *
      * <p>It's not strictly necessary to use the lambda syntax, but avoids constructing the
      * message if the logger has not been initialized.
-     *
-     * @param level      The level at which to start logging
+     *  @param level      The level at which to start logging
      * @param loggerName The name of the logger, from which the output file name will be derived.
      * @param header     The header of the CSV file.
      */
-    public static void addCsvLogger(
+    public static Logger addCsvLogger(
         final Level level,
         final String loggerName,
         final String header
@@ -97,6 +97,7 @@ public class CsvLogger {
         loggerConfig.addAppender(appender, null, null);
         config.addLogger(loggerName, loggerConfig);
         loggerContext.updateLoggers();
+        return LogManager.getLogger(loggerName);
     }
 
 

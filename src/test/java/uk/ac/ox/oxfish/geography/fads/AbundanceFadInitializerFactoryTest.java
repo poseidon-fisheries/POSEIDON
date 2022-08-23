@@ -1,8 +1,16 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import static java.util.stream.IntStream.range;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+
 import ec.util.MersenneTwisterFast;
-import junit.framework.TestCase;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -11,33 +19,22 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
-
 public class AbundanceFadInitializerFactoryTest {
 
+    private long generateAndCountDuds(final double fadDudRate, final int numFadsToGenerate) {
+        final AbstractFadInitializer<?, ?> initializer =
+            (AbstractFadInitializer<?, ?>)generateFakeInitializer(fadDudRate);
+        return range(0, numFadsToGenerate)
+            .filter(__ -> initializer.generateCarryingCapacity() == 0)
+            .count();
+    }
 
     @Test
     public void generatesDudsWhenNeeded() {
-
-
-        FadInitializer<AbundanceLocalBiology, AbundanceFad> initializer = generateFakeInitializer(0.5);
-
-        int counterOfTimesItIsZero = 0;
-        for (int i = 0; i < 100; i++) {
-            if(((AbstractFadInitializer) initializer).generateCarryingCapacity()==0)
-                counterOfTimesItIsZero++;
-        }
+        final long counterOfTimesItIsZero = generateAndCountDuds(0.5, 100);
         System.out.println("Times it was zero: " + counterOfTimesItIsZero);
-        assertTrue(counterOfTimesItIsZero>20);
-        assertTrue(counterOfTimesItIsZero<80);
-
-
-
+        assertTrue(counterOfTimesItIsZero > 20);
+        assertTrue(counterOfTimesItIsZero < 80);
     }
 
     private FadInitializer<AbundanceLocalBiology, AbundanceFad> generateFakeInitializer(double fadDudRate) {
@@ -68,10 +65,14 @@ public class AbundanceFadInitializerFactoryTest {
         AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor,AbundanceFadInitializerFactory.class);
         SpeciesCodesFromFileFactory speciesCodesFactory =
                 new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-        factory.setSpeciesCodes(speciesCodesFactory.get());
+        final SpeciesCodes speciesCodes = speciesCodesFactory.get();
+        factory.setSpeciesCodes(speciesCodes);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));
         FishState fakeModel = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(fakeModel.getRandom()).thenReturn(new MersenneTwisterFast());
+        when(fakeModel.getBiology()).thenReturn(
+            GlobalBiology.fromNames(speciesCodes.getSpeciesNames())
+        );
 
         FadInitializer<AbundanceLocalBiology, AbundanceFad> initializer = factory.apply(fakeModel);
         return initializer;
@@ -80,19 +81,8 @@ public class AbundanceFadInitializerFactoryTest {
 
     @Test
     public void generatesNoDudsWhenNeeded() {
-
-
-        FadInitializer<AbundanceLocalBiology, AbundanceFad> initializer = generateFakeInitializer(0);
-
-        int counterOfTimesItIsZero = 0;
-        for (int i = 0; i < 100; i++) {
-            if(((AbstractFadInitializer) initializer).generateCarryingCapacity()==0)
-                counterOfTimesItIsZero++;
-        }
+        final long counterOfTimesItIsZero = generateAndCountDuds(0, 100);
         System.out.println("Times it was zero: " + counterOfTimesItIsZero);
-        assertEquals(counterOfTimesItIsZero,0);
-
-
-
+        assertEquals(counterOfTimesItIsZero, 0);
     }
 }

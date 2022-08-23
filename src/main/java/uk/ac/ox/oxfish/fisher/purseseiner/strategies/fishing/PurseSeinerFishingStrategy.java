@@ -19,32 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static java.lang.Double.min;
-import static java.lang.Math.exp;
-import static java.util.Comparator.comparingDouble;
-import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
@@ -58,31 +34,40 @@ import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.WeightedAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.lang.Double.min;
+import static java.lang.Math.exp;
+import static java.util.Comparator.comparingDouble;
+import static java.util.function.Function.identity;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+
 public class PurseSeinerFishingStrategy<B extends LocalBiology>
     implements FishingStrategy {
-
-    private static double maxActionValue = 0;
 
     private final double movingThreshold;
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>>
         actionWeightsLoader;
     private final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider;
     private final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions;
-    private final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds;
+    private final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds;
     private final Multiset<Class<? extends PurseSeinerAction>> actionCounts = HashMultiset.create();
     private final double searchActionDecayConstant;
     private final double fadDeploymentActionDecayConstant;
@@ -96,7 +81,7 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> actionWeightsLoader,
         final Function<Fisher, SetOpportunityDetector<B>> setOpportunityDetectorProvider,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold
@@ -104,7 +89,7 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         this.actionWeightsLoader = actionWeightsLoader;
         this.setOpportunityDetectorProvider = setOpportunityDetectorProvider;
         this.actionValueFunctions = ImmutableMap.copyOf(actionValueFunctions);
-        this.maxCurrentSpeeds = ImmutableMap.copyOf(maxCurrentSpeeds);
+        this.maxCurrentSpeeds = maxCurrentSpeeds;
         this.searchActionDecayConstant = searchActionDecayConstant;
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
         this.movingThreshold = movingThreshold;
@@ -252,9 +237,9 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         final Double2D currentVector
     ) {
         final double currentSpeed = currentVector.length();
-        return maxCurrentSpeeds.entrySet().stream()
-            .filter(entry -> currentSpeed <= entry.getValue())
-            .map(Entry::getKey)
+        return ActionClass.classMap.keySet()
+            .stream()
+            .filter(entry -> currentSpeed <= maxCurrentSpeeds.applyAsDouble(entry))
             .collect(toImmutableSet());
     }
 

@@ -220,4 +220,29 @@ public class FishStateTest {
                 });
         do fishState.schedule.step(fishState); while (fishState.getDay() <= 900);
     }
+
+    @Test
+    public void testGetDate() {
+        final FishState fishState = new FishState();
+        final int daysFromNow = 5;
+        fishState.start();
+        fishState.scheduleOnce(
+            simState1 -> {
+                final FishState fs1 = (FishState) simState1;
+                assertEquals(fs1.getStartDate(), fs1.getDate());
+                fishState.scheduleOnceInXDays(
+                    simState2 -> {
+                        final FishState fs2 = (FishState) simState2;
+                        assertEquals(fs2.getStartDate().plusDays(daysFromNow), fs2.getDate());
+                    },
+                    DAWN,
+                    daysFromNow
+                );
+            },
+            DAWN
+        );
+        for (int i = 0; i < daysFromNow; i++) {
+            fishState.schedule.step(fishState);
+        }
+    }
 }

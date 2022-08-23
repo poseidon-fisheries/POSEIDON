@@ -20,19 +20,19 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.DoubleStream;
-
 import com.google.common.base.Preconditions;
-
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.DoubleStream;
 
 /**
  * Holds summary statistics of a trip, specifically how much money was made and how much was spent.
@@ -41,7 +41,11 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  */
 public class TripRecord {
 
-	/**
+    private static final AtomicLong nextTripId = new AtomicLong();
+
+    private final long tripId = nextTripId.getAndIncrement();
+
+    /**
 	 * the simulation time (day) of the trip
 	 */
 	
@@ -465,4 +469,13 @@ public class TripRecord {
             flushLastRecordOfTileCache();
         return lastFishingRecordOfTile.get(tile);
     }
+
+    /**
+     * Just a unique identifier for the trip. It's initialized from a
+     * static counter so it should be unique across multiple runs.
+     */
+    public long getTripId() {
+        return tripId;
+    }
+
 }

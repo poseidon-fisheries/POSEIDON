@@ -23,6 +23,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
+import java.util.Collection;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 public class Observers {
 
     private final Multimap<Class<?>, Observer<?>> observers = HashMultimap.create();
@@ -46,6 +50,19 @@ public class Observers {
         this.observers
             .get(observable.getClass())
             .forEach(observer -> ((Observer<O>) observer).observe(observable));
+    }
+
+    /**
+     * This method will only construct the observable if it's class is one we're interested in.
+     * Useful when observable construction is costly.
+     */
+    public <O> void reactTo(final Class<O> observedClass, final Supplier<O> observableSupplier) {
+        final Collection<Observer<?>> relevantObservers = this.observers.get(observedClass);
+        if (!relevantObservers.isEmpty()) {
+            final O observable = observableSupplier.get();
+            //noinspection unchecked
+            relevantObservers.forEach(observer -> ((Observer<O>) observer).observe(observable));
+        }
     }
 
 }

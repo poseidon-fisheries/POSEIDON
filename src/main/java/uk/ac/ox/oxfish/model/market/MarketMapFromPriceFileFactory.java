@@ -3,15 +3,16 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.SpeciesCodeAware;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap> {
+public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap>, SpeciesCodeAware {
 
     private Path priceFilePath;
     private int targetYear;
@@ -28,10 +29,12 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
     @SuppressWarnings("unused")
     public MarketMapFromPriceFileFactory() { }
 
+    @Override
     public SpeciesCodes getSpeciesCodes() {
         return speciesCodes;
     }
 
+    @Override
     public void setSpeciesCodes(SpeciesCodes speciesCodes) {
         this.speciesCodes = speciesCodes;
     }
@@ -58,7 +61,7 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
 
     @Override
     public MarketMap apply(FishState fishState) {
-        Map<String, Double> prices = parseAllRecords(priceFilePath).stream()
+        Map<String, Double> prices = recordStream(priceFilePath)
             .filter(
                 r -> r.getInt("year") == targetYear
             )

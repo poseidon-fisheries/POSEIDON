@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology;
 
 import static com.google.common.cache.CacheLoader.from;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
@@ -30,7 +30,7 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
     @NotNull
     private static SpeciesCodes getSpeciesCodes(final Path path) {
         return new SpeciesCodes(
-            parseAllRecords(path).stream().collect(toImmutableBiMap(
+            recordStream(path).collect(toImmutableBiMap(
                 r -> r.getString("species_code"),
                 r -> r.getString("species_name")
             ))

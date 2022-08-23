@@ -49,6 +49,7 @@ public class SearchAction extends PurseSeinerAction {
     ) {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
+        setTime(hoursLeft);
         setOpportunityDetector.notifyOfSearch();
         return new ActionResult(new Arriving(), hoursLeft - getDuration());
     }

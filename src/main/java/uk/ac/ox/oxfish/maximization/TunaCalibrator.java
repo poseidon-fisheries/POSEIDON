@@ -1,11 +1,6 @@
 package uk.ac.ox.oxfish.maximization;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.Runtime.getRuntime;
-import static java.nio.file.Files.createDirectories;
-import static java.util.Arrays.stream;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
-
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableIntArray;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
@@ -19,6 +14,16 @@ import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.optimization.strategies.ParticleSwarmOptimizationGCPSO;
 import eva2.problems.SimpleProblemWrapper;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
+import org.jetbrains.annotations.NotNull;
+import sim.engine.SimState;
+import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,22 +36,19 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
-import org.jetbrains.annotations.NotNull;
-import sim.engine.SimState;
-import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import static java.lang.Integer.parseInt;
+import static java.lang.Runtime.getRuntime;
+import static java.nio.file.Files.createDirectories;
+import static java.util.Arrays.stream;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator {
 
     static final int MAX_PROCESSORS_TO_USE = getRuntime().availableProcessors();
-    static final int DEFAULT_POPULATION_SIZE = 50;
-    static final int MAX_FITNESS_CALLS = 1000;
+    static final int DEFAULT_POPULATION_SIZE = 100;
+    static final int MAX_FITNESS_CALLS = 2000;
     static final int DEFAULT_RANGE = 10;
 
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
@@ -83,7 +85,16 @@ public class TunaCalibrator {
 
     public static void main(final String[] args) {
 
+
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
+
+        tunaCalibrator.setBestGuess(ImmutableList.of(
+            new double[]{0.313, -5.761, 0.809, -3.742, -10.000, -7.861, 2.365, -2.139, 8.461, 5.007, 4.444, -1.546, -3.790, 4.470, 8.133, -10.000, 5.963, 7.210, 6.646, 0.393, -5.293, 1.765, -1.370, -7.434, 0.300, -9.658, 4.065, -9.686, 3.105, -0.150, -8.127, 9.834, -10.000, -9.417, -5.385, -8.168, 10.000, -3.846, -1.639, 3.979, 5.605, -2.995, 6.011, 4.926, 8.673, 1.998, -9.186, -6.695, 0.550, 0.123, 2.675, -4.567, 8.381, -8.140, 8.402, 7.539, 7.410},
+            new double[]{3.782, -0.632, 6.757, 3.293, -0.651, 4.139, -4.293, 10.000, -0.703, 5.301, -3.247, -6.799, -2.802, 4.687, 3.858, -7.355, 8.727, 7.075, -4.786, 4.701, 0.902, 2.674, -5.527, 0.944, -3.984, -9.301, 0.959, 9.570, -1.391, -3.476, -8.894, -2.100, 9.674, 7.360, -3.604, 1.303, -5.967, -0.382, -3.650, -10.000, -2.916, -10.000, 1.362, 2.151, -3.573, -2.072, -1.465, 4.509, -0.078, 7.464, 1.187, 1.241, 0.911, 2.298, -2.489, 3.550, -0.986},
+            new double[]{3.929, 1.729, 2.601, 1.338, -0.938, 8.053, 2.388, 8.373, 1.670, 6.009, -7.618, -9.670, -6.031, 4.673, -2.834, -1.093, 10.000, 8.524, -4.045, 8.547, -4.509, 4.278, 1.113, 1.181, -7.505, -9.556, 5.384, 9.684, 8.217, -3.704, -8.807, -4.014, 10.000, 6.842, -0.635, -1.195, -7.965, 0.456, -7.540, -7.308, -5.415, -10.000, 4.988, 4.732, 4.192, 0.704, -4.109, 5.095, 0.391, 6.507, -5.303, -0.476, 5.861, -2.811, 2.487, 0.706, 1.179},
+            new double[]{-5.846, -7.551, -0.707, -0.911, -3.120, -4.527, 0.985, -4.595, 10.000, 8.730, 1.819, -4.617, -1.118, 9.748, 9.862, -7.980, 0.792, 2.138, 10.000, -2.077, -0.829, 1.568, 3.595, -4.051, 1.079, -9.816, 10.000, -8.250, 0.840, -6.954, 2.899, -0.068, 3.914, -0.511, 6.991, -4.219, 4.447, 8.034, -6.530, 3.903, 6.271, -10.000, 3.949, 9.769, 10.000, 4.047, -7.011, -10.000, -3.172, 0.827, 1.397, -9.105, 10.000, -4.216, 8.119, 4.918, 8.175}
+        ));
+
         addCsvLogger(
             Level.DEBUG,
             "calibration_error",
@@ -126,14 +137,6 @@ public class TunaCalibrator {
         }));
     }
 
-    public double[] run() {
-        final Path calibrationFilePath =
-            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
-        final double[] solution = calibrate(calibrationFilePath);
-        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
-        return solution;
-    }
-
     static void evaluateSolutionAndPrintOutErrors(
         final Path calibrationFilePath,
         final double[] solution
@@ -170,6 +173,25 @@ public class TunaCalibrator {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static void logCurrentTime(final SimState simState) {
+        LogManager.getLogger("run_timer").debug(() ->
+            new ObjectArrayMessage(
+                Thread.currentThread().getId(),
+                ((FishState) simState).getTrulyUniqueID(),
+                ((FishState) simState).getStep(),
+                System.currentTimeMillis()
+            )
+        );
+    }
+
+    public double[] run() {
+        final Path calibrationFilePath =
+            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
+        final double[] solution = calibrate(calibrationFilePath);
+        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+        return solution;
     }
 
     @NotNull
@@ -247,7 +269,7 @@ public class TunaCalibrator {
         problemWrapper.setParallelThreads(numThreads);
 
         final AbstractOptimizer optimizer;
-        switch (optimizationRoutine){
+        switch (optimizationRoutine) {
             case NELDER_MEAD:
                 optimizer = new NelderMeadSimplex();
                 ((NelderMeadSimplex) optimizer).setPopulationSize(populationSize);
@@ -290,17 +312,6 @@ public class TunaCalibrator {
 
         return runnable.getDoubleSolution();
 
-    }
-
-    public static void logCurrentTime(final SimState simState) {
-        LogManager.getLogger("run_timer").debug(() ->
-            new ObjectArrayMessage(
-                Thread.currentThread().getId(),
-                ((FishState) simState).getTrulyUniqueID(),
-                ((FishState) simState).getStep(),
-                System.currentTimeMillis()
-            )
-        );
     }
 
     @SuppressWarnings("unused")
@@ -399,7 +410,7 @@ public class TunaCalibrator {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
     }
 
-    public static enum OptimizationRoutine{
+    public static enum OptimizationRoutine {
 
         NELDER_MEAD,
 

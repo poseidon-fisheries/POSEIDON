@@ -18,16 +18,22 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.primitives.ImmutableDoubleArray;
+import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Tuna-style meristics track male and females separately.
@@ -40,6 +46,7 @@ public class TunaMeristics implements Meristics {
     private final double[][] weights;
     private final List<ImmutableDoubleArray> lengths;
     private final ImmutableDoubleArray maturity;
+    private final List<Map<String, List<Integer>>> weightBins;
 
     /**
      * Constructs a new TunaMeristics object.
@@ -52,17 +59,15 @@ public class TunaMeristics implements Meristics {
     public TunaMeristics(
         final Iterable<double[]> weights,
         final Iterable<double[]> lengths,
-        final double[] maturity
+        final double[] maturity,
+        final WeightGroups weightGroups
     ) {
         this(
             copyArrays(weights),
             copyArrays(lengths),
-            ImmutableDoubleArray.copyOf(maturity)
+            ImmutableDoubleArray.copyOf(maturity),
+            stream(weights).map(weightGroups::getBinsPerGroup).collect(toList())
         );
-    }
-
-    private static List<ImmutableDoubleArray> copyArrays(final Iterable<double[]> arrays) {
-        return stream(arrays).map(ImmutableDoubleArray::copyOf).collect(toImmutableList());
     }
 
     /**
@@ -77,7 +82,8 @@ public class TunaMeristics implements Meristics {
     private TunaMeristics(
         final List<ImmutableDoubleArray> weights,
         final Collection<ImmutableDoubleArray> lengths,
-        final ImmutableDoubleArray maturity
+        final ImmutableDoubleArray maturity,
+        final Collection<Map<String, List<Integer>>> weightBins
     ) {
         final ImmutableList<Collection<ImmutableDoubleArray>> subdividedCollections =
             ImmutableList.of(
@@ -109,6 +115,22 @@ public class TunaMeristics implements Meristics {
         }
         this.lengths = ImmutableList.copyOf(lengths);
         this.maturity = maturity;
+        this.weightBins = weightBins.stream()
+            .map(binsPerGroup ->
+                binsPerGroup.entrySet().stream().collect(toImmutableMap(
+                    Entry::getKey,
+                    entry -> (List<Integer>) (ImmutableList.copyOf(entry.getValue()))
+                ))
+            )
+            .collect(toImmutableList());
+    }
+
+    private static List<ImmutableDoubleArray> copyArrays(final Iterable<double[]> arrays) {
+        return stream(arrays).map(ImmutableDoubleArray::copyOf).collect(toImmutableList());
+    }
+
+    public List<Map<String, List<Integer>>> getWeightBins() {
+        return weightBins;
     }
 
     public ImmutableDoubleArray getMaturity() {

@@ -19,6 +19,39 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import com.google.common.collect.ImmutableMap;
+import com.univocity.parsers.common.record.Record;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.jetbrains.annotations.NotNull;
+import sim.util.Double2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.tuna.Aggregator;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
+import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
+
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -26,47 +59,11 @@ import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
-
-import com.google.common.collect.ImmutableMap;
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.tuna.Aggregator;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.SearchAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B>> {
@@ -130,6 +127,22 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     ) {
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
+    }
+
+    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
+        Path attractionWeightsFile
+    ) {
+        return fisher -> stream(ActionClass.values())
+            .map(ActionClass::getActionClass)
+            .collect(toImmutableMap(
+                identity(),
+                actionClass -> ActionWeightsCache.INSTANCE.get(
+                    attractionWeightsFile,
+                    TARGET_YEAR,
+                    fisher,
+                    actionClass
+                )
+            ));
     }
 
     @SuppressWarnings("unused")
@@ -264,7 +277,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
@@ -346,20 +359,34 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             this::loadAttractionWeights,
             this::makeSetOpportunityDetector,
             makeActionValueFunctions(fishState),
-            loadMaxCurrentSpeeds(),
+            getMaxCurrentSpeeds(fishState.getMap()),
             searchActionDecayConstant,
             fadDeploymentActionDecayConstant,
             movingThreshold
         );
     }
 
-    private Map<Class<? extends PurseSeinerAction>, Double> loadMaxCurrentSpeeds() {
-        return parseAllRecords(maxCurrentSpeedsFile)
-            .stream()
-            .collect(toImmutableMap(
-                r -> ActionClass.valueOf(r.getString("action")).getActionClass(),
-                r -> r.getDouble("speed")
-            ));
+    /**
+     * Convert the max current speeds in m/s per seconds given in the input file into degrees per day.
+     * For the purpose of the conversion, we assume that we're at the equator. This means that the max
+     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator, and
+     * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
+     * difference is small enough to ignore and doing thing the right way would massively complicate things.
+     */
+    @NotNull
+    private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(NauticalMap nauticalMap) {
+        final Coordinate coordinate = new Coordinate(0, 0);
+        final MapExtent mapExtent = new MapExtent(nauticalMap);
+        final PurseSeinerActionClassToDouble maxCurrentSpeeds = PurseSeinerActionClassToDouble
+            .fromFile(maxCurrentSpeedsFile, "action", "speed")
+            .mapValues(speed ->
+                metrePerSecondToXyPerDaysVector(
+                    new Double2D(speed, 0),
+                    coordinate,
+                    mapExtent
+                ).length()
+            );
+        return maxCurrentSpeeds;
     }
 
     @NotNull
@@ -367,7 +394,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
         final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
         final Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator> actionValueFunctions,
-        final Map<Class<? extends PurseSeinerAction>, Double> maxCurrentSpeeds,
+        final ToDoubleFunction<Class<? extends PurseSeinerAction>> maxCurrentSpeeds,
         final double searchActionDecayConstant,
         final double fadDeploymentActionDecayConstant,
         final double movingThreshold
@@ -398,26 +425,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                 )
             ));
     }
-
-    public static Function<Fisher,
-            Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
-            Path attractionWeightsFile
-    ) {
-        return fisher -> stream(ActionClass.values())
-                .map(ActionClass::getActionClass)
-                .collect(toImmutableMap(
-                        identity(),
-                        actionClass -> ActionWeightsCache.INSTANCE.get(
-                                attractionWeightsFile,
-                                TARGET_YEAR,
-                                fisher,
-                                actionClass
-                        )
-                ));
-
-
-    }
-
 
     private SetOpportunityDetector<B> makeSetOpportunityDetector(final Fisher fisher) {
 
@@ -495,8 +502,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     loadSetCompositionWeights(
         final FishState fishState
     ) {
-        return parseAllRecords(setCompositionWeightsPath)
-            .stream()
+        return recordStream(setCompositionWeightsPath)
             .collect(groupingBy(r -> ActionClass.valueOf(r.getString("set_type"))
                 .getActionClass()))
             .entrySet()

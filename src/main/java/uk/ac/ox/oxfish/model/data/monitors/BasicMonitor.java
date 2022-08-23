@@ -19,7 +19,8 @@
 
 package uk.ac.ox.oxfish.model.data.monitors;
 
-import com.google.common.collect.ImmutableList;
+import static java.util.Collections.singletonList;
+
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
@@ -44,8 +45,8 @@ public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O
         this.valueExtractor = valueExtractor;
     }
 
-    @Override public Iterable<V> extractValues(O observable) {
-        return ImmutableList.of(valueExtractor.apply(observable));
+    @Override public Iterable<V> extractValues(final O observable) {
+        return singletonList(valueExtractor.apply(observable));
     }
 
 }

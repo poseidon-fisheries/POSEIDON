@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -77,8 +77,7 @@ public class RecruitmentProcessesFactory
         checkNotNull(speciesCodes);
         checkNotNull(globalBiology);
         checkNotNull(recruitmentParametersFilePath);
-        return parseAllRecords(recruitmentParametersFilePath)
-            .stream()
+        return recordStream(recruitmentParametersFilePath)
             .map(record -> {
                 final Species species = speciesCodes.getSpeciesFromCode(
                     globalBiology,

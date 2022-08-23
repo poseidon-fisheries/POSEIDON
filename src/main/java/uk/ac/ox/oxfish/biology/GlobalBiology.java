@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,6 +61,11 @@ public class GlobalBiology
         for(int i=0; i<numberOfSpecies; i++)
             generics[i] = new Species("Species " + i);
         return new GlobalBiology(generics);
+    }
+
+    public static GlobalBiology fromNames(final Collection<String> names) {
+        final Species[] species = names.stream().map(Species::new).toArray(Species[]::new);
+        return new GlobalBiology(species);
     }
 
     public static GlobalBiology listOfSpeciesWithNames(String... names){

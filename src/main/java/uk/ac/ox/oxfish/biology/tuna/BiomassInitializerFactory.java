@@ -26,7 +26,7 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -114,8 +114,7 @@ public class BiomassInitializerFactory
         final Map<String, ? extends GridAllocator> initialAllocators,
         final SpeciesCodes speciesCodes
     ) {
-        return parseAllRecords(schaeferParamsFile)
-            .stream()
+        return recordStream(schaeferParamsFile)
             .map(r -> {
                 final String speciesName = speciesCodes.getSpeciesName(r.getString("species_code"));
                 final Double logisticGrowthRate = r.getDouble("logistic_growth_rate");

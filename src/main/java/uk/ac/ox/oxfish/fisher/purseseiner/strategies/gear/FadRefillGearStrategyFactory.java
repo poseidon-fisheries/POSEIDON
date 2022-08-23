@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -63,8 +63,7 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     }
 
     private Map<Integer, ImmutableMap<String, Integer>> readValues() {
-        return parseAllRecords(maxFadDeploymentsFile)
-            .stream()
+        return recordStream(maxFadDeploymentsFile)
             .collect(
                 groupingBy(
                     record -> record.getInt("year"),

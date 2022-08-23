@@ -18,29 +18,28 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
-import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
-
-import com.google.common.collect.ImmutableMap;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.IntFunction;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
+import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
+
 /**
- * Creates an {@link AbundanceReallocator}. The mildly peculiar thing here is the {@code
- * firstLargeBinPerSpecies} map, which is used to create the "bin to size category" mapping. It's
- * just a way to tell the factory where the cutoff between "mall" and "large" is and let the factory
- * build the relevant function. Note that this is very tuna specific. We'd need to make this class a
- * bit more general if it was to be used with different groupings.
+ * Creates an {@link AbundanceReallocator}. The mildly peculiar thing here is that we use the weight groups from the
+ * tuna meristics to create the "bin to size category" mapping. It's just a way to tell the factory where the cutoff
+ * between "small" and "large" is and let the factory build the relevant function. Note that this is very tuna specific.
+ * We'd need to make this class a bit more general if it was to be used with different groupings or meristics classes.
  */
 public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceReallocator> {
-
-    private Map<String, Integer> firstLargeBinPerSpecies;
 
     /**
      * Empty constructor needed for YAML.
@@ -51,27 +50,16 @@ public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceRea
 
     public AbundanceReallocatorFactory(
         final Path biomassDistributionsFilePath,
-        final Map<String, Integer> firstLargeBinPerSpecies,
         final int period
     ) {
         super(biomassDistributionsFilePath, period);
-        this.firstLargeBinPerSpecies = ImmutableMap.copyOf(firstLargeBinPerSpecies);
-    }
-
-    @SuppressWarnings("unused")
-    public Map<String, Integer> getFirstLargeBinPerSpecies() {
-        return ImmutableMap.copyOf(firstLargeBinPerSpecies);
-    }
-
-    @SuppressWarnings("unused")
-    public void setFirstLargeBinPerSpecies(final Map<String, Integer> firstLargeBinPerSpecies) {
-        this.firstLargeBinPerSpecies = ImmutableMap.copyOf(firstLargeBinPerSpecies);
     }
 
     @Override
     public AbundanceReallocator apply(final FishState fishState) {
         checkNotNull(getSpeciesCodes(), "Need to call setSpeciesCodes() before using");
         checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
+
         final AllocationGrids<Entry<String, SizeGroup>> grids =
             new SmallLargeAllocationGridsSupplier(
                 getSpeciesCodes(),
@@ -80,12 +68,16 @@ public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceRea
                 365
             ).get();
 
-        final Map<String, IntFunction<SizeGroup>> binToSizeGroupMappings =
-            firstLargeBinPerSpecies.entrySet().stream().collect(toImmutableMap(
-                Entry::getKey,
-                entry -> bin -> bin >= entry.getValue() ? LARGE : SMALL
-            ));
+        final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
+            (species, bin) -> {
+                final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
+                final List<Map<String, List<Integer>>> weightBins = meristics.getWeightBins();
+                final Map<String, List<Integer>> stringListMap = weightBins.get(0);
+                final List<Integer> large = stringListMap.get("large");
+                final int firstLargeBin = large.get(0);
+                return bin >= firstLargeBin ? LARGE : SMALL;
+            };
 
-        return new AbundanceReallocator(grids, binToSizeGroupMappings);
+        return new AbundanceReallocator(grids, binToSizeGroup);
     }
 }

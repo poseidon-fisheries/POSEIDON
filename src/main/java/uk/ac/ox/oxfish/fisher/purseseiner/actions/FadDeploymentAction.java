@@ -19,9 +19,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
@@ -31,16 +33,19 @@ import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public class FadDeploymentAction extends PurseSeinerAction {
+public class FadDeploymentAction<B extends LocalBiology, F extends AbstractFad<B, F>> extends PurseSeinerAction
+    implements FadRelatedAction<B, F> {
 
     // TODO: this should ideally be configurable, but we'll need to implement
     //       temporary regulation at the action specific level for that.
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
 
+    private F fad;
+
     public FadDeploymentAction(final Fisher fisher) {
         super(
             fisher,
-            0.0 // see https://github.com/poseidon-fisheries/tuna/issues/6
+            5.0 / 60 // see https://github.com/poseidon-fisheries/tuna/issues/6
         );
     }
 
@@ -53,10 +58,12 @@ public class FadDeploymentAction extends PurseSeinerAction {
     ) {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
-        final FadManager fadManager = getFadManager(fisher);
-        fadManager.deployFad(getLocation(), fishState.random);
+        @SuppressWarnings("unchecked")
+        final FadManager<B, F> fadManager = (FadManager<B, F>) getFadManager(fisher);
+        this.fad = fadManager.deployFad(getLocation(), fishState.random);
+        setTime(hoursLeft);
         fadManager.reactTo(this);
-        return new ActionResult(new Arriving(), hoursLeft - getDuration());
+        return new ActionResult(new Arriving(), Math.max(0, hoursLeft - getDuration()));
     }
 
     /**
@@ -88,4 +95,8 @@ public class FadDeploymentAction extends PurseSeinerAction {
             !isNoFishingAtStep(getFisher().getRegulation(), getStep() + BUFFER_PERIOD_BEFORE_CLOSURE);
     }
 
+    @Override
+    public F getFad() {
+        return fad;
+    }
 }

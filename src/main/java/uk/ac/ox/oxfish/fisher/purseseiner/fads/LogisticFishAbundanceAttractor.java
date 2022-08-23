@@ -18,115 +18,51 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
-
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 
 public class LogisticFishAbundanceAttractor
-        extends LogisticFishAttractor<WeightedObject<StructuredAbundance>, AbundanceLocalBiology, AbundanceFad> {
-
-    private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
+    extends FishAbundanceAttractor {
 
     public LogisticFishAbundanceAttractor(
-            final MersenneTwisterFast rng,
-            final Map<Species, Double> compressionExponents,
-            final Map<Species, Double> attractableBiomassCoefficients,
-            final Map<Species, Double> biomassInteractionCoefficients,
-            final Map<Species, Double> attractionRates,
-            final Map<Species, NonMutatingArrayFilter> selectivityFilters
+        final Collection<Species> species,
+        final AttractionProbabilityFunction<AbundanceLocalBiology, AbundanceFad> attractionProbabilityFunction,
+        final double[] attractionRates,
+        final MersenneTwisterFast rng,
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters
     ) {
-        super(
-                rng,
-                compressionExponents,
-                attractableBiomassCoefficients,
-                biomassInteractionCoefficients,
-                attractionRates
+        super(species, attractionProbabilityFunction, rng, selectivityFilters, attractionRates);
+    }
+
+    @Override
+    Entry<StructuredAbundance, Double> attractForSpecies(
+        final Species species,
+        final AbundanceLocalBiology cellBiology,
+        final AbundanceFad fad
+    ) {
+        final NonMutatingArrayFilter selectivity = getSelectivityFilters().get(species);
+        final StructuredAbundance fadAbundance = fad.getBiology().getAbundance(species);
+        final StructuredAbundance cellAbundance = cellBiology.getAbundance(species);
+        final double attractionRate = getAttractionRate(species);
+        final double space =
+            1 - fad.getBiology().getBiomass(species) / fad.getTotalCarryingCapacity();
+
+        return fadAbundance.mapAndWeigh(species, (subDivision, bin) ->
+            max(min(
+                cellAbundance.getAbundance(subDivision, bin),
+                attractionRate *
+                    (selectivity.getFilterValue(subDivision, bin) +
+                        fadAbundance.getAbundance(subDivision, bin)) * space
+            ), 0)
         );
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
     }
-
-    @SuppressWarnings("UnstableApiUsage")
-    @Override
-    WeightedObject<StructuredAbundance> attractForSpecies(
-            final Species s, final AbundanceLocalBiology cellBiology, final AbundanceFad fad
-    ) {
-        NonMutatingArrayFilter selectivity = selectivityFilters.get(s);
-        final StructuredAbundance fadAbundance = fad.getBiology().getAbundance(s);
-        final StructuredAbundance cellAbundance = cellBiology.getAbundance(s);
-
-        final double space = 1 - fad.getBiology().getBiomass(s) / fad.getTotalCarryingCapacity();
-
-        final DoubleSummaryStatistics totalWeight = new DoubleSummaryStatistics();
-
-        StructuredAbundance structuredAbundance = fadAbundance.mapIndices((subDivision, bin) -> {
-            double binAbundance = max(
-                    min(
-                    cellAbundance.getAbundance(subDivision, bin),
-                    getAttractionRates(s) *
-                            (selectivity.getFilterValue(subDivision,bin) +
-                                    fadAbundance.getAbundance(subDivision, bin)) * space
-            ),0);
-            totalWeight.accept(binAbundance * s.getWeight(subDivision, bin));
-            return binAbundance;
-        });
-
-        return new WeightedObject(structuredAbundance,totalWeight.getSum());
-    }
-
-    @Override
-    WeightedObject attractNothing(final Species s, final AbundanceFad fad) {
-        return new WeightedObject<>(
-                new StructuredAbundance(s.getNumberOfSubdivisions(), s.getNumberOfBins()),
-                0d);
-        //return fad.getBiology().getAbundance(s).mapIndices((sub, bin) -> 0.0);
-    }
-
-    @Override
-    WeightedObject<AbundanceLocalBiology> scale(
-            final Map<Species, WeightedObject<StructuredAbundance>> attractedFish,
-            final AbundanceFad fad
-    ) {
-
-        final double attractedBiomass = attractedFish.entrySet()
-                .stream()
-                .mapToDouble(entry -> entry.getValue().getTotalWeight())
-                .sum();
-
-        double originalBiomass = fad.getBiology().getTotalBiomass();
-        final double scalingFactor = biomassScalingFactor(
-                attractedBiomass,
-                originalBiomass,
-                fad.getTotalCarryingCapacity()
-        );
-
-
-        return new WeightedObject<>(new AbundanceLocalBiology(
-                    attractedFish.entrySet()
-                            .stream()
-                            .collect(toImmutableMap(
-                                    Entry::getKey,
-                                    entry -> entry.getValue().getObjectBeingWeighted().mapValues(a -> a * scalingFactor).asMatrix()
-                            ))
-            ),
-                attractedBiomass * scalingFactor
-
-            );
-    }
-
-
 }

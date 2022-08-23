@@ -42,16 +42,6 @@ public class FadSetAction<B extends LocalBiology, F extends AbstractFad<B, F>>
     }
 
     @Override
-    public ActionResult act(
-        final FishState fishState,
-        final Fisher fisher,
-        final Regulation regulation,
-        final double hoursLeft
-    ) {
-        return super.act(fishState, fisher, regulation, hoursLeft);
-    }
-
-    @Override
     public boolean isOwnFad() {
         return true;
     }

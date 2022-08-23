@@ -35,8 +35,8 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DPL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.utils.TempFileMaker.makeTempFile;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeCornerPortMap;
 
@@ -53,7 +53,7 @@ public class LocationFisherValuesByActionCacheTest {
 
         final Path path = makeTempFile(String.join(
             System.getProperty("line.separator"),
-            "ves_no,year,lon,lat,event,value",
+            "ves_no,year,lon,lat,action_type,value",
             "Fisher0,2017,0.5,0.5,OFS,10",
             "Fisher0,2017,0.5,1.5,OFS,20",
             "Fisher0,2017,0.5,2.5,OFS,30",

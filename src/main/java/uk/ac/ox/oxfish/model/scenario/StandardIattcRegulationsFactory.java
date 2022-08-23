@@ -18,29 +18,24 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static java.time.Month.JANUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
-import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
-import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
-
 import com.google.common.collect.ImmutableMap;
-import java.nio.file.Path;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
-import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
+import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.nio.file.Path;
+
+import static java.time.Month.*;
+import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
+import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
+import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
 public class StandardIattcRegulationsFactory extends MultipleRegulationsFactory {
 
@@ -62,17 +57,28 @@ public class StandardIattcRegulationsFactory extends MultipleRegulationsFactory 
             new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
         );
     private static final Path GALAPAGOS_EEZ_SHAPE_FILE =
-        EpoScenario.INPUT_PATH.resolve("galapagos_eez").resolve("eez.shp");
+        EpoScenario.INPUT_PATH.resolve("eez").resolve("galapagos").resolve("eez.shp");
     public static final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
         new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
+    private static final Path KIRIBATI_EEZ_SHAPE_FILE =
+        EpoScenario.INPUT_PATH.resolve("eez").resolve("kiribati").resolve("eez.shp");
+    public static final AlgorithmFactory<SpecificProtectedArea> kiribatiEezReg =
+        new SpecificProtectedAreaFromShapeFileFactory(KIRIBATI_EEZ_SHAPE_FILE);
+    private static final Path FRENCH_POLYNESIA_EEZ_SHAPE_FILE =
+        EpoScenario.INPUT_PATH.resolve("eez").resolve("french_polynesia").resolve("eez.shp");
+    public static final AlgorithmFactory<SpecificProtectedArea> frenchPolynesiaEezReg =
+        new SpecificProtectedAreaFromShapeFileFactory(FRENCH_POLYNESIA_EEZ_SHAPE_FILE);
 
     public StandardIattcRegulationsFactory() {
-        super(ImmutableMap.of(
-            galapagosEezReg, TAG_FOR_ALL,
-            elCorralitoReg, TAG_FOR_ALL,
-            closureAReg, "closure A",
-            closureBReg, "closure B"
-        ));
+        super(ImmutableMap.<AlgorithmFactory<? extends Regulation>, String>builder()
+            .put(galapagosEezReg, TAG_FOR_ALL)
+            .put(kiribatiEezReg, TAG_FOR_ALL)
+            .put(frenchPolynesiaEezReg, TAG_FOR_ALL)
+            .put(elCorralitoReg, TAG_FOR_ALL)
+            .put(closureAReg, "closure A")
+            .put(closureBReg, "closure B")
+            .build()
+        );
     }
 
     public static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher) {

@@ -1,41 +1,28 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import org.junit.Test;
 import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import java.nio.file.Path;
-import java.time.format.DateTimeFormatter;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.IntFunction;
-import java.util.stream.Stream;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import java.nio.file.Paths;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.lang.Double.POSITIVE_INFINITY;
-import static java.util.function.Function.identity;
-import static java.util.stream.IntStream.range;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 public class AbundanceReallocatorTest {
@@ -53,18 +40,9 @@ public class AbundanceReallocatorTest {
         sCodes.put("SP1", species1.getName());
         SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
 
-        Map<String, IntFunction<SizeGroup>> binToSizeGroupMappings = new HashMap<>();
-        binToSizeGroupMappings.put("Piano Tuna", entry -> entry==0?SMALL:LARGE );
+        final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
+            (species, bin) -> bin == 0 ? SMALL : LARGE;
 
-/*        ImmutableList<DoubleGrid2D> grids = Stream
-                .of(
-                        new double[][] {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}},
-                        new double[][] {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}},
-                        new double[][] {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}}
-                )
-                .map(DoubleGrid2D::new)
-                .map(AllocationGridsSupplier::normalize)
-                .collect(toImmutableList());*/
         final GlobalBiology globalBiology= new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();
         abundance.put(species1, new double[][]{{10, 10}, {10, 10}});
@@ -83,7 +61,7 @@ public class AbundanceReallocatorTest {
 
         AbundanceReallocator reallocator = new AbundanceReallocator(
                 allocationGrids,
-                binToSizeGroupMappings
+                binToSizeGroup
         );
 
 

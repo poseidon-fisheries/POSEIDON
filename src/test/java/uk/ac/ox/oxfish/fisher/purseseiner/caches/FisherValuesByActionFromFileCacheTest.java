@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 
 import java.nio.file.Path;
@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.DPL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache.ActionClass.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DEL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 
 public class FisherValuesByActionFromFileCacheTest {
 

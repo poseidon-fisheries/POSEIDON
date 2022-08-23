@@ -20,8 +20,10 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.Nullable;
+import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -29,11 +31,17 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<B, F>> implements Locatable {
     protected static final AtomicLong idCounter = new AtomicLong(0);
@@ -55,6 +63,7 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     private boolean isActive;
     private boolean lost;
 
+    private Integer stepOfFirstAttraction = null;
 
     public AbstractFad(
             TripRecord tripDeployed, int stepDeployed, Int2D locationDeployed, double fishReleaseProbability,
@@ -87,9 +96,9 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     }
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final LocalBiology seaTileBiology,
-            final MersenneTwisterFast rng
+        final Collection<Species> allSpecies,
+        final LocalBiology seaTileBiology,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies, seaTileBiology);
@@ -97,19 +106,39 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     }
 
     public void maybeReleaseFish(
-            final Iterable<Species> allSpecies,
-            final MersenneTwisterFast rng
+        final Collection<Species> allSpecies,
+        final MersenneTwisterFast rng
     ) {
         if (rng.nextDouble() < fishReleaseProbability) {
             releaseFish(allSpecies);
         }
     }
 
+    public abstract void releaseFish(final Collection<Species> allSpecies, LocalBiology seaTileBiology);
 
-    public abstract void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology);
+    public abstract void releaseFish(final Collection<Species> allSpecies);
 
-    public abstract void releaseFish(final Iterable<Species> allSpecies);
+    private Double2D getGridLocation() {
+        return getOwner().getFadMap().getFadLocation(this).orElse(null);
+    }
 
+    /**
+     * Infers the precise lon/lat coordinates of the FAD using a combination of the
+     * tile's geographical coordinates and the precise grid location of the FAD.
+     * This is a bit of hack and RELIES ON THE ASSUMPTION THAT WE HAVE A 1°x1° MAP.
+     * It's currently used to log FAD trajectories, but probably shouldn't be used
+     * to do anything that actually affects the model's behaviour.
+     */
+    public Coordinate getCoordinate() {
+        final FadMap<B, F> fadMap = getOwner().getFadMap();
+        final NauticalMap nauticalMap = fadMap.getNauticalMap();
+        final Coordinate tileCoordinates = nauticalMap.getCoordinates(getLocation());
+        final Double2D gridLocation = getGridLocation();
+        return new Coordinate(
+            ((int) tileCoordinates.x) + (1 - (gridLocation.x % 1)),
+            ((int) tileCoordinates.y) + (1 - (gridLocation.y % 1))
+        );
+    }
 
     public SeaTile getLocation() {
         return getOwner().getFadMap()
@@ -128,8 +157,9 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     public abstract B getBiology();
 
     public abstract void aggregateFish(
-            B seaTileBiology,
-            GlobalBiology globalBiology
+        B seaTileBiology,
+        GlobalBiology globalBiology,
+        int currentStep
     );
 
 
@@ -166,6 +196,13 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
         }
     }
 
+    /**
+     * Tells us is if the FAD is empty. Could be sped pu by overwriting in subclasses.
+     */
+    public boolean isEmpty(final Iterable<? extends Species> species) {
+        return getBiology().getTotalBiomass(species) > 0;
+    }
+
     public boolean isActive() {
         return isActive;
     }
@@ -182,6 +219,24 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public int soakTimeInDays(FishState model){
         return (model.getStep()-this.getStepDeployed())/ model.getStepsPerDay();
+    }
+
+    Integer getStepOfFirstAttraction() {
+        return stepOfFirstAttraction;
+    }
+
+    public Integer getStepsBeforeFirstAttraction() {
+        return stepOfFirstAttraction != null
+            ? stepOfFirstAttraction - getStepDeployed()
+            : null;
+    }
+
+    void setStepOfFirstAttraction(final Integer stepOfFirstAttraction) {
+        checkState(
+            this.stepOfFirstAttraction == null,
+            "Step of first attraction can only be set once."
+        );
+        this.stepOfFirstAttraction = checkNotNull(stepOfFirstAttraction);
     }
 
 }

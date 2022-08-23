@@ -18,49 +18,33 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.util.Arrays.stream;
-import static java.util.Comparator.comparingInt;
-import static java.util.Map.Entry.comparingByKey;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.DoubleSummaryStatistics;
-import java.util.Map;
+import ec.util.MersenneTwisterFast;
+import java.util.Collection;
+import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
-public class LinearFishBiomassAttractor implements FishBiomassAttractor {
-
-    private final Map<Species, Double> attractionRates;
+public class LinearFishBiomassAttractor extends FishBiomassAttractor {
 
     public LinearFishBiomassAttractor(
-        final Map<Species, Double> attractionRates
+        final Collection<Species> species,
+        final AttractionProbabilityFunction<BiomassLocalBiology, BiomassFad> attractionProbabilityFunction,
+        final double[] attractionRates,
+        final MersenneTwisterFast rng
     ) {
-        this.attractionRates = ImmutableMap.copyOf(attractionRates);
+        super(species, attractionProbabilityFunction, attractionRates, rng);
     }
 
     @Override
-    public WeightedObject<BiomassLocalBiology> attractImplementation(
-        final BiomassLocalBiology seaTileBiology,
+    Entry<Double, Double> attractForSpecies(
+        final Species species,
+        final BiomassLocalBiology cellBiology,
         final BiomassFad fad
     ) {
-        DoubleSummaryStatistics totalAttraction = new DoubleSummaryStatistics();
-        final double[] attractedBiomass = attractionRates.entrySet()
-            .stream()
-            .sorted(comparingByKey(comparingInt(Species::getIndex)))
-            .mapToDouble(entry -> {
-                final Species species = entry.getKey();
-                final Double attractionRate = entry.getValue();
-                double attracted = attractionRate * seaTileBiology.getBiomass(species);
-                totalAttraction.accept(attracted);
-                return attracted;
-            })
-            .toArray();
-
-        return new WeightedObject<>(
-                new BiomassLocalBiology(scaleAttractedBiomass(attractedBiomass, fad)),
-                totalAttraction.getSum()
-        );
+        final double caughtBiomass =
+            getAttractionRate(species) * cellBiology.getBiomass(species);
+        return entry(caughtBiomass, caughtBiomass);
     }
-
 }

@@ -26,7 +26,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class GravityDestinationStrategyFactory
     private static final FisherValuesFromFileCache<Double> maxTripDurationCache =
         new FisherValuesFromFileCache<Double>() {
             protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
-                return parseAllRecords(valuesFile).stream().collect(
+                return recordStream(valuesFile).collect(
                     groupingBy(
                         record -> record.getInt("year"),
                         toMap(

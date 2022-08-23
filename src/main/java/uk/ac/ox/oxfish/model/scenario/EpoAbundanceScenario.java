@@ -18,36 +18,17 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import org.apache.logging.log4j.Level;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorerFactory;
-import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
-import uk.ac.ox.oxfish.biology.tuna.ScheduledAbundanceProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
@@ -61,38 +42,34 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
-import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-    private final SpeciesCodesFromFileFactory speciesCodesFactory =
-        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-    private final PortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
-    private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
-        new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
@@ -104,13 +81,21 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
             INPUT_PATH.resolve("abundance").resolve("grids.csv"),
-            ImmutableMap.of(
-                "Skipjack tuna", 14,
-                "Bigeye tuna", 8,
-                "Yellowfin tuna", 9
-            ),
             365
         );
+
+    private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
+        grabSpeciesCodesFactory().get().getSpeciesNames().stream().collect(
+            toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
+        ),
+        ImmutableMap.of(
+            "Bigeye tuna", ImmutableList.of(2.5, 15.0),
+            // use the last two bins of SKJ as "medium" and "large"
+            "Skipjack tuna", ImmutableList.of(2.5, 11.5019),
+            "Yellowfin tuna", ImmutableList.of(2.5, 15.0)
+        )
+
+    );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
     private AbundanceRestorerFactory abundanceRestorerFactory =
@@ -121,23 +106,18 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             101,
             0.5
         );
-    private AbundanceFadMapFactory fadMapFactory = new AbundanceFadMapFactory(
-        ImmutableMap.of(
-            Y2016, INPUT_PATH.resolve("currents").resolve("currents_2016.csv"),
-            Y2017, INPUT_PATH.resolve("currents").resolve("currents_2017.csv")
-        )
-    );
+
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
-        new AbundanceFadInitializerFactory(
+        new LinearAbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();
-
     public EpoAbundanceScenario() {
+        setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory());
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
@@ -155,7 +135,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 Paths.get(
                     System.getProperty("user.home"),
                     "workspace", "tuna", "calibration", "results",
-                    "cenv0729", "2022-05-24_18.49.48_global_calibration",
+                    "cenv0729", "2022-06-01_18.14.02_global_calibration",
                     "calibrated_scenario.yaml"
                 ).toFile();
 
@@ -171,6 +151,16 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         } catch (final IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @SuppressWarnings("unused")
+    public WeightGroupsFactory getWeightGroupsFactory() {
+        return weightGroupsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
+        this.weightGroupsFactory = weightGroupsFactory;
     }
 
     @SuppressWarnings("unused")
@@ -259,7 +249,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        final SpeciesCodes speciesCodes = speciesCodesFactory.get();
+        final SpeciesCodes speciesCodes = grabSpeciesCodesFactory().get();
 
         final NauticalMap nauticalMap =
             mapInitializerFactory
@@ -279,6 +269,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setWeightGroupsPerSpecies(weightGroupsFactory.get());
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
 
@@ -311,7 +302,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
+        abundanceFiltersFactory.setSpeciesCodes(grabSpeciesCodesFactory().get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
             abundanceFilters = abundanceFiltersFactory.apply(fishState);
         if (getCatchSamplersFactory() instanceof AbundanceCatchSamplersFactory) {
@@ -319,21 +310,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 .setAbundanceFilters(abundanceFilters);
         }
 
-        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
-        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
-
-        portInitializer.buildPorts(
-            fishState.getMap(),
-            fishState.random,
-            seaTile -> marketMap,
-            fishState,
-            new FixedGasPrice(0)
-        );
-        final List<Port> ports = fishState.getMap().getPorts();
-
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
-                .setSpeciesCodes(speciesCodesFactory.get());
+                .setSpeciesCodes(grabSpeciesCodesFactory().get());
         }
         ((PluggableSelectivity) fadInitializerFactory)
             .setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
@@ -356,7 +335,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                ports
+                buildPorts(fishState)
             ).apply(fishState);
 
         ImmutableList.of(
@@ -368,11 +347,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFadMapFactory getFadMapFactory() {
-        return fadMapFactory;
     }
 
     @SuppressWarnings("unused")
@@ -401,11 +375,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     }
 
     @SuppressWarnings("unused")
-    public void setFadMapFactory(final AbundanceFadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
-    }
-
-    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;
     }
@@ -416,4 +385,5 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
     }
+
 }

@@ -18,16 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
-import com.google.common.collect.ImmutableMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.IntFunction;
 import org.jetbrains.annotations.NotNull;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
@@ -37,6 +27,16 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * A {@link Reallocator} class where the local biology is abundance based. The type of key used to
@@ -48,21 +48,20 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public class AbundanceReallocator
     extends Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology> {
 
-    private final Map<String, ? extends IntFunction<SizeGroup>> binToSizeGroupMappings;
+    private final BiFunction<Species, Integer, SizeGroup> binToSizeGroup;
 
     /**
      * Constructs a new AbundanceReallocator.
      *
-     * @param allocationGrids        The distribution grids used to reallocate biomass
-     * @param binToSizeGroupMappings A map from species names to a function giving us the size group
-     *                               (small or large) for each age bin
+     * @param allocationGrids The distribution grids used to reallocate biomass
+     * @param binToSizeGroup  A function giving us the size group for a species and bin
      */
     AbundanceReallocator(
         final AllocationGrids<Entry<String, SizeGroup>> allocationGrids,
-        final Map<String, ? extends IntFunction<SizeGroup>> binToSizeGroupMappings
+        final BiFunction<Species, Integer, SizeGroup> binToSizeGroup
     ) {
         super(allocationGrids, new AbundanceAggregator());
-        this.binToSizeGroupMappings = ImmutableMap.copyOf(binToSizeGroupMappings);
+        this.binToSizeGroup = binToSizeGroup;
     }
 
     @Override
@@ -102,16 +101,12 @@ public class AbundanceReallocator
     ) {
         return globalBiology.getSpecies().stream().collect(toImmutableMap(
             identity(),
-            species -> {
-                final String speciesName = species.getName();
-                final IntFunction<SizeGroup> getSizeGroup = binToSizeGroupMappings.get(speciesName);
-                return range(0, species.getNumberOfBins())
-                    .mapToObj(bin -> allocationGrids.get(entry(
-                        speciesName,
-                        getSizeGroup.apply(bin)
-                    )))
-                    .toArray(DoubleGrid2D[]::new);
-            }
+            species -> range(0, species.getNumberOfBins())
+                .mapToObj(bin -> allocationGrids.get(entry(
+                    species.getName(),
+                    binToSizeGroup.apply(species, bin)
+                )))
+                .toArray(DoubleGrid2D[]::new)
         ));
     }
 
