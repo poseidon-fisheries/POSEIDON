@@ -63,7 +63,7 @@ public enum CurrentVectorsFactory {
         geomGridField.setMBR(mapExtent.getEnvelope());
 
         currentFiles.forEach((currentPattern, path) ->
-            CsvParserUtil.parseAllRecords(path).forEach(record -> {
+            CsvParserUtil.recordStream(path).forEach(record -> {
                 final Coordinate coordinate = readCoordinate(record);
                 final int dayOfYear = getLocalDate(record, "dttm", "yyyy-MM-dd").getDayOfYear();
                 final Map<Int2D, Double2D> vectorByLocation = currentVectors

@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.utility.csv;
 
 import com.univocity.parsers.common.AbstractParser;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.ResultIterator;
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -13,8 +15,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Just a bunch of utility methods to facilitate the use of the Univocity CSV parsers.
@@ -33,6 +39,14 @@ public class CsvParserUtil {
 
     public static List<Record> parseAllRecords(Path inputFilePath) {
         return parse(inputFilePath, AbstractParser::parseAllRecords);
+    }
+
+    public static Stream<Record> recordStream(Path inputFilePath) {
+        final CsvParser csvParser = getCsvParser();
+        final Reader reader = getReader(inputFilePath);
+        final ResultIterator<Record, ParsingContext> iterator = csvParser.iterateRecords(reader).iterator();
+        final Spliterator<Record> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+        return StreamSupport.stream(spliterator, false).onClose(csvParser::stopParsing);
     }
 
     private static <T> T parse(Path inputFilePath, BiFunction<CsvParser, Reader, T> parseFunction) {
