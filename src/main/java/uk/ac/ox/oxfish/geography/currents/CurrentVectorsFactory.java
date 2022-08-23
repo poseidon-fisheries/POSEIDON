@@ -32,7 +32,7 @@ public enum CurrentVectorsFactory {
     public static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
     private final LoadingCache<Entry<MapExtent, Entry<Boolean, Map<CurrentPattern, Path>>>, CurrentVectors> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(entry -> {
+        CacheBuilder.newBuilder().maximumSize(1).build(CacheLoader.from(entry -> {
             MapExtent mapExtent = entry.getKey();
             boolean inputIsMetersPerSecond = entry.getValue().getKey();
             Map<CurrentPattern, Path> currentFiles = entry.getValue().getValue();
