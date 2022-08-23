@@ -19,25 +19,11 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static com.google.common.base.Preconditions.checkState;
-import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-
 import com.google.common.collect.ImmutableMap;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.tuna.BiomassInitializer;
-import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.BiomassReallocator;
-import uk.ac.ox.oxfish.biology.tuna.BiomassReallocatorFactory;
-import uk.ac.ox.oxfish.biology.tuna.BiomassRestorerFactory;
-import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -53,31 +39,31 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
-import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
  */
 public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
-    private final FromSimpleFilePortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private final BiomassReallocatorFactory biomassReallocatorFactory =
         new BiomassReallocatorFactory(
@@ -98,8 +84,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    private MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
-        new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
@@ -181,16 +165,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     }
 
     @SuppressWarnings("unused")
-    public MarketMapFromPriceFileFactory getMarketMapFromPriceFileFactory() {
-        return marketMapFromPriceFileFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMarketMapFromPriceFileFactory(final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory) {
-        this.marketMapFromPriceFileFactory = marketMapFromPriceFileFactory;
-    }
-
-    @SuppressWarnings("unused")
     public Path getMapFile() {
         return mapFile;
     }
@@ -202,11 +176,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getPortFilePath() {
-        return portInitializer.getFilePath();
     }
 
     public FromFileMapInitializerFactory getMapInitializer() {
@@ -311,24 +280,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        final Double gasPrice = gasPricePerLiter.apply(fishState.random);
-        final GasPriceMaker gasPriceMaker = new FixedGasPrice(gasPrice);
-
-        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesSupplier.get());
-        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
-        portInitializer
-            .buildPorts(
-                fishState.getMap(),
-                fishState.random,
-                seaTile -> marketMap,
-                fishState,
-                gasPriceMaker
-            )
-            .forEach(port -> port.setGasPricePerLiter(gasPrice));
-
-        final List<Port> ports = fishState.getMap().getPorts();
-        checkState(!ports.isEmpty());
-
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             new GravityDestinationStrategyFactory();
         gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
@@ -356,7 +307,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                ports
+                buildPorts(fishState)
             ).apply(fishState);
 
         exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());

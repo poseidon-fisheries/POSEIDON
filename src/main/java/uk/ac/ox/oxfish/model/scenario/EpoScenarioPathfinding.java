@@ -31,15 +31,9 @@ import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
-import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -54,18 +48,12 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
             new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
-    private final PortInitializer portInitializer =
-            new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
-    private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
-            new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
@@ -355,18 +343,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         abundanceSamplerFactory.setAbundanceFilters(abundanceFilters);
 
 
-        marketMapFromPriceFileFactory.setSpeciesCodes(speciesCodesFactory.get());
-        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
-
-        portInitializer.buildPorts(
-                fishState.getMap(),
-                fishState.random,
-                seaTile -> marketMap,
-                fishState,
-                new FixedGasPrice(0)
-        );
-        final List<Port> ports = fishState.getMap().getPorts();
-
         if(fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
             ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
@@ -393,7 +369,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                         getVesselsFilePath(),
                         TARGET_YEAR,
                         fisherFactory,
-                        ports
+                        buildPorts(fishState)
                 ).apply(fishState);
 
         ImmutableList.of(

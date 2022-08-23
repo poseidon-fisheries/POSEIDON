@@ -418,7 +418,14 @@ public class FishState  extends SimState{
     }
 
     public LocalDate getDate() {
-        return getStartDate().plusDays(getDay());
+        // we add year and "day of the year" separately because our simulation years
+        // are always 365 days, so adding `getDays()` would get us out of sync for
+        // when leap years occur
+        return getStartDate().plusYears(getYear()).plusDays(getDayOfTheYear() - 1);
+    }
+
+    public int getCalendarYear() {
+        return getDate().getYear();
     }
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)

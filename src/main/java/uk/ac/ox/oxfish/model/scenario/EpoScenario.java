@@ -47,7 +47,13 @@ import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
+import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
+import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -58,6 +64,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
@@ -98,6 +105,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
 
+    private final PortInitializer portInitializer =
+        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
+
+    AlgorithmFactory<? extends MarketMap> marketMapFactory =
+        new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
+
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         final FadMap<B, F> fadMap = getFadMapFactory().apply(fishState);
@@ -129,6 +142,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
                 .addAll(monitors.getDolphinSetMonitors());
             getPurseSeineGearFactory().setBiomassLostMonitor(monitors.getBiomassLostMonitor());
             getPurseSeineGearFactory().setLocationValuesFile(getLocationValuesFilePath());
+        }
+
+        if (marketMapFactory instanceof SpeciesCodeAware) {
+            ((SpeciesCodeAware) marketMapFactory).setSpeciesCodes(grabSpeciesCodesFactory().get());
         }
 
         return new ScenarioPopulation(
@@ -180,10 +197,22 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public FadMapFactory<B, F> getFadMapFactory() {
         return this.fadMapFactory;
-    };
+    }
 
     public void setFadMapFactory(FadMapFactory<B, F> fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
+    }
+
+    List<Port> buildPorts(FishState fishState) {
+        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
+        portInitializer.buildPorts(
+            fishState.getMap(),
+            fishState.random,
+            seaTile -> marketMap,
+            fishState,
+            new FixedGasPrice(0)
+        );
+        return fishState.getMap().getPorts();
     }
 
     public abstract AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory();
@@ -333,4 +362,13 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public SpeciesCodesFromFileFactory grabSpeciesCodesFactory() {
         return speciesCodesFactory;
     }
+
+    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
+        return marketMapFactory;
+    }
+
+    public void setMarketMapFactory(AlgorithmFactory<? extends MarketMap> marketMapFactory) {
+        this.marketMapFactory = marketMapFactory;
+    }
+
 }

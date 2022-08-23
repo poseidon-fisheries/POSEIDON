@@ -24,7 +24,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
@@ -47,15 +46,9 @@ import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
-import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -67,12 +60,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
@@ -80,10 +70,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
  */
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-    private final PortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
-    private final MarketMapFromPriceFileFactory marketMapFromPriceFileFactory =
-        new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR);
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
@@ -324,18 +310,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 .setAbundanceFilters(abundanceFilters);
         }
 
-        marketMapFromPriceFileFactory.setSpeciesCodes(grabSpeciesCodesFactory().get());
-        final MarketMap marketMap = marketMapFromPriceFileFactory.apply(fishState);
-
-        portInitializer.buildPorts(
-            fishState.getMap(),
-            fishState.random,
-            seaTile -> marketMap,
-            fishState,
-            new FixedGasPrice(0)
-        );
-        final List<Port> ports = fishState.getMap().getPorts();
-
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
                 .setSpeciesCodes(grabSpeciesCodesFactory().get());
@@ -361,7 +335,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                ports
+                buildPorts(fishState)
             ).apply(fishState);
 
         ImmutableList.of(
