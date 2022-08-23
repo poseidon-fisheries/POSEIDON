@@ -10,7 +10,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.ToDoubleFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class PurseSeinerActionClassToDouble implements ToDoubleFunction<Class<? extends PurseSeinerAction>> {
     private final Map<Class<? extends PurseSeinerAction>, Double> values;
@@ -21,8 +21,7 @@ public class PurseSeinerActionClassToDouble implements ToDoubleFunction<Class<? 
 
     public static PurseSeinerActionClassToDouble fromFile(Path path, String actionColumn, String valueColumn) {
         return new PurseSeinerActionClassToDouble(
-            parseAllRecords(path)
-                .stream()
+            recordStream(path)
                 .collect(toImmutableMap(
                     r -> ActionClass.valueOf(r.getString(actionColumn)).getActionClass(),
                     r -> r.getDouble(valueColumn)

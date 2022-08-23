@@ -36,7 +36,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class LocationFisherValuesByActionCache extends FisherValuesByActionFromFileCache<Map<Coordinate, Double>> {
 
@@ -45,8 +45,7 @@ public class LocationFisherValuesByActionCache extends FisherValuesByActionFromF
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Map<Coordinate, Double>>>> readValues(
         final Path locationValuesFile
     ) {
-        return parseAllRecords(locationValuesFile)
-            .stream()
+        return recordStream(locationValuesFile)
             .collect(
                 groupingBy(
                     record -> record.getInt("year"),

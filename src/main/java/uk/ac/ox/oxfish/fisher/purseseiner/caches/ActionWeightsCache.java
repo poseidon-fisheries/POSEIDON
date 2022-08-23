@@ -27,7 +27,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double> {
 
@@ -37,8 +37,7 @@ public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double
 
     @Override
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Double>>> readValues(final Path valuesFile) {
-        return parseAllRecords(valuesFile)
-            .stream()
+        return recordStream(valuesFile)
             .collect(
                 groupingBy(
                     record -> record.getInt("year"),

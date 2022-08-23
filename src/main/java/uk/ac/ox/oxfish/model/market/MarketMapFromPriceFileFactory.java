@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap> {
 
@@ -58,7 +58,7 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
 
     @Override
     public MarketMap apply(FishState fishState) {
-        Map<String, Double> prices = parseAllRecords(priceFilePath).stream()
+        Map<String, Double> prices = recordStream(priceFilePath)
             .filter(
                 r -> r.getInt("year") == targetYear
             )

@@ -37,23 +37,12 @@ public class CsvParserUtil {
         defaultParserSettings.setReadInputOnSeparateThread(false);
     }
 
-    public static List<Record> parseAllRecords(Path inputFilePath) {
-        return parse(inputFilePath, AbstractParser::parseAllRecords);
-    }
-
     public static Stream<Record> recordStream(Path inputFilePath) {
         final CsvParser csvParser = getCsvParser();
         final Reader reader = getReader(inputFilePath);
         final ResultIterator<Record, ParsingContext> iterator = csvParser.iterateRecords(reader).iterator();
         final Spliterator<Record> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
         return StreamSupport.stream(spliterator, false).onClose(csvParser::stopParsing);
-    }
-
-    private static <T> T parse(Path inputFilePath, BiFunction<CsvParser, Reader, T> parseFunction) {
-        final CsvParser csvParser = getCsvParser();
-        T result = parseFunction.apply(csvParser, getReader(inputFilePath));
-        csvParser.stopParsing();
-        return result;
     }
 
     public static CsvParser getCsvParser() {

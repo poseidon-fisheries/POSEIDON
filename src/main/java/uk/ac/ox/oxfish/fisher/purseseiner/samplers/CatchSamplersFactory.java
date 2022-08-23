@@ -27,7 +27,7 @@ import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.collect.Ordering;
 import com.univocity.parsers.common.record.Record;
@@ -71,8 +71,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     @Override
     public Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
-        return parseAllRecords(catchSamplesFile)
-            .stream()
+        return recordStream(catchSamplesFile)
             .collect(toImmutableListMultimap(
                 r -> getSetActionClass(r.getString("set_type")),
                 r -> getBiomasses(r, fishState.getBiology())

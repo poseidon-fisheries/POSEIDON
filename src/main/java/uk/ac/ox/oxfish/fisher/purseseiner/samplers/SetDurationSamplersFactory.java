@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class SetDurationSamplersFactory
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, DurationSampler>> {
@@ -19,8 +19,7 @@ public class SetDurationSamplersFactory
 
     @Override
     public Map<Class<? extends AbstractSetAction<?>>, DurationSampler> apply(FishState fishState) {
-        return parseAllRecords(setDurationsFile)
-            .stream()
+        return recordStream(setDurationsFile)
             .collect(toImmutableMap(
                 r -> getSetActionClass(r.getString("set_type")),
                 r -> new DurationSampler(

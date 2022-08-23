@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import com.univocity.parsers.common.record.Record;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -36,8 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
-
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 /**
  * Reads a list of ports and returns an hashmap of it

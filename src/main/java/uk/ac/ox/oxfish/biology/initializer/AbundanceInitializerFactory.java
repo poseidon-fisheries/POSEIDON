@@ -39,7 +39,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class AbundanceInitializerFactory
     implements AlgorithmFactory<AbundanceInitializer> {
@@ -71,7 +71,7 @@ public class AbundanceInitializerFactory
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
-        return parseAllRecords(binsFilePath).stream()
+        return recordStream(binsFilePath)
             .collect(groupingBy(
                 record -> record.getString("species_code")
             ))

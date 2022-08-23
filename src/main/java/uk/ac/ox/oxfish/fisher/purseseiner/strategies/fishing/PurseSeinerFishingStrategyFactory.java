@@ -63,7 +63,7 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerS
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B>> {
@@ -502,8 +502,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     loadSetCompositionWeights(
         final FishState fishState
     ) {
-        return parseAllRecords(setCompositionWeightsPath)
-            .stream()
+        return recordStream(setCompositionWeightsPath)
             .collect(groupingBy(r -> ActionClass.valueOf(r.getString("set_type"))
                 .getActionClass()))
             .entrySet()

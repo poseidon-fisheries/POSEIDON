@@ -25,7 +25,7 @@ import static com.google.common.collect.Ordering.natural;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.base.Supplier;
 import com.google.common.cache.CacheBuilder;
@@ -95,7 +95,7 @@ abstract class AbstractAllocationGridsSupplier<K>
         checkNotNull(this.mapExtent);
 
         final Map<LocalDate, Map<K, List<Record>>> recordsByDateAndKey =
-            parseAllRecords(gridsFilePath).stream()
+            recordStream(gridsFilePath)
                 .collect(groupingBy(
                     r -> LocalDate.parse(r.getString("date")),
                     groupingBy(record -> extractKeyFromRecord(speciesCodes, record))

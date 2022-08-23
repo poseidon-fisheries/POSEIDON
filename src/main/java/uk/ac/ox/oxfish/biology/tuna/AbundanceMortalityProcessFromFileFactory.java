@@ -23,7 +23,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
@@ -93,8 +93,7 @@ public class AbundanceMortalityProcessFromFileFactory
         checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         checkNotNull(sources);
         checkNotNull(mortalityFile);
-        return parseAllRecords(mortalityFile)
-            .stream()
+        return recordStream(mortalityFile)
             .filter(r -> sources.contains(r.getString("source")))
             .collect(groupingBy(
                 r -> speciesCodes.getSpeciesFromCode(

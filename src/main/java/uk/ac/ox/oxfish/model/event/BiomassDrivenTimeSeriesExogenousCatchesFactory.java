@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.event;
 
-import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
@@ -17,7 +16,7 @@ import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     implements AlgorithmFactory<BiomassDrivenTimeSeriesExogenousCatches> {
@@ -69,7 +68,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     @Override
     public BiomassDrivenTimeSeriesExogenousCatches apply(FishState fishState) {
         Map<Species, SortedMap<Integer, Quantity<Mass>>> catchesBySpecies = new HashMap<>();
-        for (Record record : parseAllRecords(catchesFile)) {
+        recordStream(catchesFile).forEach(record -> {
             final Integer year = record.getInt("year");
             if (year >= startingYear) {
                 String speciesName = speciesCodes.getSpeciesName(record.getString("species_code"));
@@ -78,7 +77,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
                     .computeIfAbsent(species, __ -> new TreeMap<>())
                     .put(year, getQuantity(record.getDouble("catches_in_tonnes"), TONNE));
             }
-        }
+        });
         LinkedHashMap<Species, Queue<Double>> catchesTimeSeries = new LinkedHashMap<>();
         catchesBySpecies.forEach((species, catches) ->
             catchesTimeSeries.put(species,
