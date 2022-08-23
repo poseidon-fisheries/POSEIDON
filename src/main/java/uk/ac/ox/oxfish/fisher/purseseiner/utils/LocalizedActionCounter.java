@@ -17,18 +17,17 @@ import java.util.function.Predicate;
  *
  * Following convention here assuming that we start ourselves to register gatherers but somebody else has already registered
  * us as observers in the fad manager!
- * @param <A>
  */
-public class LocalizedActionCounter<A extends AbstractFadSetAction> implements Observer<A>, AdditionalStartable {
+public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, AdditionalStartable {
 
     private final Counter validActions;
 
-    private final Predicate<A> passThisIfYouWantToBeCounted;
+    private final Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted;
 
 
     private final String counterName;
 
-    public LocalizedActionCounter(Predicate<A> passThisIfYouWantToBeCounted,
+    public LocalizedActionCounter(Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted,
                                   String counterName) {
         this.passThisIfYouWantToBeCounted = passThisIfYouWantToBeCounted;
         this.counterName = counterName;
@@ -39,7 +38,7 @@ public class LocalizedActionCounter<A extends AbstractFadSetAction> implements O
 
 
     @Override
-    public void observe(A observable) {
+    public void observe(AbstractFadSetAction observable) {
         if(passThisIfYouWantToBeCounted.test(observable))
         {
             validActions.count("Number of Actions",1.0);
@@ -58,14 +57,14 @@ public class LocalizedActionCounter<A extends AbstractFadSetAction> implements O
                 new Gatherer<FishState>() {
                     @Override
                     public Double apply(FishState fishState) {
-                        return validActions.getColumn("Number of Actions");
+                        return getNumberOfActionsThisYearSoFar();
                     }
                 }, Double.NaN);
                 model.getYearlyDataSet().registerGatherer(counterName + ": Total Catch",
                 new Gatherer<FishState>() {
                     @Override
                     public Double apply(FishState fishState) {
-                        return validActions.getColumn("Total Catch");
+                        return getTotalCatchThisYearSoFar();
                     }
                 }, Double.NaN);
 
@@ -74,5 +73,12 @@ public class LocalizedActionCounter<A extends AbstractFadSetAction> implements O
     @Override
     public void turnOff() {
         validActions.turnOff();
+    }
+
+    public double getNumberOfActionsThisYearSoFar(){
+        return validActions.getColumn("Number of Actions");
+    }
+    public double getTotalCatchThisYearSoFar(){
+        return validActions.getColumn("Total Catch");
     }
 }

@@ -40,7 +40,7 @@ public class TwoPunchCalibration {
                             int nProcs) throws IOException {
 
         TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
-        secondStep.setLocalSearch(false);secondStep.setPSO(false);
+        secondStep.setLocalSearch(false);secondStep.setPSO(true);
         secondStep.setPopulationSize(50);
         secondStep.setMaxProcessorsToUse(nProcs);
         secondStep.setNumberOfRunsPerSettingOverride(2);

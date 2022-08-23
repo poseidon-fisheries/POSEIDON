@@ -353,7 +353,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         super.setFishingStrategyFactory(fishingStrategyFactory);
-        LocalizedActionCounter<AbstractFadSetAction> calzone1 = new LocalizedActionCounter<AbstractFadSetAction>(
+        LocalizedActionCounter calzone1 = new LocalizedActionCounter(
                 abstractFadSetAction -> {
                     Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
                     return coordinates.x <= -140;
@@ -361,7 +361,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 "calzone1"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(calzone1);
-        LocalizedActionCounter<AbstractFadSetAction> calzone2 = new LocalizedActionCounter<AbstractFadSetAction>(
+        LocalizedActionCounter calzone2 = new LocalizedActionCounter(
                 abstractFadSetAction -> {
                     Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
                     return coordinates.x <= -140;
