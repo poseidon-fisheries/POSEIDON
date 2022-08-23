@@ -84,7 +84,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     static final ImmutableMap<CurrentPattern, Path> currentFiles = new ImmutableMap.Builder<CurrentPattern, Path>()
         .put(Y2016, currentsFolder.resolve("currents_2016.csv"))
         .put(Y2017, currentsFolder.resolve("currents_2017.csv"))
-        .put(Y2018, currentsFolder.resolve("currents_2017.csv"))
+        .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
         .build();
     protected final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
