@@ -20,8 +20,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2016;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 import com.google.common.collect.ImmutableList;
@@ -237,7 +235,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
-        abundanceInitializerFactory.setWeightGroupsPerSpecies(weightGroupsFactory.get());
+        abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
 
