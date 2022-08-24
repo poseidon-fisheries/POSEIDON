@@ -1,5 +1,8 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +14,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
-public class WeightGroupsFactory implements Supplier<Map<String, WeightGroups>> {
+public class WeightGroupsFactory implements AlgorithmFactory<Map<String, WeightGroups>> {
 
     private Map<String, List<String>> weightGroupNamesPerSpecies;
     private Map<String, List<Double>> weightGroupCutoffsPerSpecies;
@@ -61,7 +64,7 @@ public class WeightGroupsFactory implements Supplier<Map<String, WeightGroups>> 
     }
 
     @Override
-    public Map<String, WeightGroups> get() {
+    public Map<String, WeightGroups> apply(FishState fishState) {
         checkState(weightGroupNamesPerSpecies.keySet().equals(weightGroupCutoffsPerSpecies.keySet()));
         return weightGroupNamesPerSpecies.keySet().stream().collect(toImmutableMap(
             identity(),

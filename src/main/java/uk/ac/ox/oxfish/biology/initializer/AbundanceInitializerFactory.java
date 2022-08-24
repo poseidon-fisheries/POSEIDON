@@ -97,7 +97,11 @@ public class AbundanceInitializerFactory
             ));
     }
 
-    public void setWeightGroupsPerSpecies(Map<String, WeightGroups> weightGroupsPerSpecies) {
+    /**
+     * This is named `assign` instead of `set` to avoid confusing the GUI and having it try to build
+     * a widget for a map it cannot build one for.
+     */
+    public void assignWeightGroupsPerSpecies(Map<String, WeightGroups> weightGroupsPerSpecies) {
         this.weightGroupsPerSpecies = weightGroupsPerSpecies;
     }
 
@@ -131,4 +135,5 @@ public class AbundanceInitializerFactory
     public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
         this.abundanceReallocator = abundanceReallocator;
     }
+
 }
