@@ -60,12 +60,9 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             "action_type",
             "lon",
             "lat",
-            "step",
             "date_time",
             "fad_id",
-            "trip_id",
-            "trip_start",
-            "trip_end"
+            "trip_id"
         ).addAll(
             SPECIES_CODES
         ).addAll(
@@ -134,7 +131,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final String actionType;
         private final double lon;
         private final double lat;
-        private final int actionStep;
         private final LocalDateTime dateTime;
         private final String fadId;
         private final long tripId;
@@ -151,7 +147,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             final Coordinate coordinates = fishState.getMap().getCoordinates(action.getLocation());
             this.lon = coordinates.x;
             this.lat = coordinates.y;
-            this.actionStep = action.getStep();
             this.dateTime = action.getTime()
                 .map(action.getDate()::atTime)
                 .orElseThrow(() -> new IllegalStateException("Time not set for action: " + action));
@@ -192,7 +187,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 actionType,
                 lon,
                 lat,
-                actionStep,
                 dateTime,
                 fadId,
                 tripId,
