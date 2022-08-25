@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -56,7 +57,7 @@ public class TunaEvaluator implements Runnable {
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
 
-    private int numRuns = 1; //getRuntime().availableProcessors();
+    private int numRuns = 3; //getRuntime().availableProcessors();
     private int numYearsToRuns = 3; //getRuntime().availableProcessors();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
@@ -232,12 +233,13 @@ public class TunaEvaluator implements Runnable {
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(numYearsToRuns, numRuns - 1, runCounter);
         runner.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+        runner.registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new);
 
         if (!boatsToTrack.isEmpty()) {
             registerFadAttractionEventProviders();
         }
 
-        runner.registerRowProvider("global_biomass.csv", GlobalBiomassLogger::new);
+        runner.registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(numYearsToRuns, 1, runCounter);
 
     }

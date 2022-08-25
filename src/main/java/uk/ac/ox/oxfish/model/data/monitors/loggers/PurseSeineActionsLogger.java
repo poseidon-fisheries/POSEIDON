@@ -26,15 +26,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.time.LocalDateTime;
@@ -141,8 +138,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private final LocalDateTime dateTime;
         private final String fadId;
         private final long tripId;
-        private final int tripStartStep;
-        private Integer tripEndStep;
         private Double bet;
         private Double skj;
         private Double yft;
@@ -168,7 +163,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 .orElse("NA");
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripId = currentTrip.getTripId();
-            this.tripStartStep = currentTrip.getTripDay() * fishState.getStepsPerDay();
             if (action instanceof AbstractSetAction) {
                 ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
                     setCatches(catchesKept, "Bigeye tuna", x -> this.bet = x, x -> this.betCatchPerSize = x);
@@ -176,7 +170,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                     setCatches(catchesKept, "Yellowfin tuna", x -> this.yft = x, x -> this.yftCatchPerSize = x);
                 });
             }
-            action.getFisher().addTripListener(new TripEndRecorder(currentTrip));
         }
 
         private void setCatches(
@@ -203,8 +196,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 dateTime,
                 fadId,
                 tripId,
-                tripStartStep,
-                tripEndStep,
                 bet,
                 skj,
                 yft,
@@ -218,25 +209,6 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 yftCatchPerSize == null ? null : yftCatchPerSize.get("medium"),
                 yftCatchPerSize == null ? null : yftCatchPerSize.get("large")
             ));
-        }
-
-        private class TripEndRecorder implements TripListener {
-
-            private final TripRecord currentTrip;
-
-            private TripEndRecorder(final TripRecord currentTrip) {
-                this.currentTrip = currentTrip;
-            }
-
-            @Override
-            public void reactToFinishedTrip(final TripRecord trip, final Fisher fisher) {
-                if (trip == currentTrip) {
-                    tripEndStep = fishState.getStep();
-                    // removal needs to be scheduled to avoid ConcurrentModificationException
-                    fishState.scheduleOnce(__ -> fisher.removeTripListener(this), StepOrder.DAWN);
-                }
-            }
-
         }
 
     }
