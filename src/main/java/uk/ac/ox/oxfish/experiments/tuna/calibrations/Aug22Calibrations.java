@@ -6,27 +6,24 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import javax.annotation.Nullable;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Aug22Calibrations {
 
 
     private final static Path MAIN_DIRECTORY = Paths.get(
-            "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/calzones/"
+            "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/sep2/"
     );
 
 
@@ -51,8 +48,8 @@ public class Aug22Calibrations {
                                   Path originalCalibration,
                                   Path originalScenario,
                                   boolean fixHazardAndWait,
-                                  boolean flipCentroid
-    ) throws IOException, InvocationTargetException, IllegalAccessException {
+                                  boolean flipCentroid,
+                                  boolean targetCalzone1) throws IOException, InvocationTargetException, IllegalAccessException {
 
         FishYAML yaml = new FishYAML();
 
@@ -138,6 +135,12 @@ public class Aug22Calibrations {
 
         }
 
+        if(!targetCalzone1){
+
+            optimization.getTargets().removeIf(dataTarget ->
+                    ((SmapeDataTarget) dataTarget).getColumnName().equals("calzone1: Number of Actions") ||
+                            ((SmapeDataTarget) dataTarget).getColumnName().equals("calzone1: Total Catch"));
+        }
 
 
         Path outputFolder = MAIN_DIRECTORY.resolve(name + "/");
@@ -158,37 +161,52 @@ public class Aug22Calibrations {
                 gaLinearCalibration,
                 linearScenario,
                 false,
-                false);
+                false, true);
 
         createYaml("baseline_constrained",
                 gaLinearCalibration,
                 linearScenario,
                 true,
-                false);
-
-        createYaml("greedy",
-                gaLinearCalibration,
-                linearScenario,
-                false,
-                false);
-
-        createYaml("greedy_constrained",
-                gaLinearCalibration,
-                linearScenario,
-                true,
-                false);
-
+                false, true);
 
         createYaml("flipped",
                 gaLinearCalibration,
                 linearScenario,
                 false,
-                true);
+                true, true);
 
         createYaml("flipped_constrained",
                 gaLinearCalibration,
                 linearScenario,
                 true,
-                true);
+                true, true);
+
+        //modified manually
+        createYaml("baseline_nocalzone",
+                gaLinearCalibration,
+                linearScenario,
+                false,
+                false, false);
+
+
+        createYaml("real_greedy",
+                gaGreedyCalibration,
+                greedyScenario ,
+                false,
+                false, true);
+
+        createYaml("real_greedy_constrained",
+                gaGreedyCalibration,
+                greedyScenario ,
+                true,
+                false, true);
+
+        createYaml("real_greedy_nocalzone",
+                gaGreedyCalibration,
+                greedyScenario ,
+                false,
+                false, false);
+
+
     }
 }

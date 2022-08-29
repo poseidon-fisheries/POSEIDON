@@ -58,6 +58,8 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
@@ -271,7 +273,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
                 .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
             addHourlyCosts(),
             fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> scheduleClosurePeriodChoice(fishState, fisher),
+            fisher -> scheduleClosurePeriodChoice(fishState, fisher,
+                    getProportionBoatsInClosureOne().apply(fishState.getRandom())),
             fisher -> fisher.getYearlyData().registerGatherer(
                 "Profits",
                 fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
@@ -369,6 +372,18 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setMarketMapFactory(AlgorithmFactory<? extends MarketMap> marketMapFactory) {
         this.marketMapFactory = marketMapFactory;
+    }
+
+
+
+    private DoubleParameter proportionBoatsInClosureOne = new FixedDoubleParameter(.5);
+
+    public DoubleParameter getProportionBoatsInClosureOne() {
+        return proportionBoatsInClosureOne;
+    }
+
+    public void setProportionBoatsInClosureOne(DoubleParameter probabilityBoatBelongsToClosureOne) {
+        this.proportionBoatsInClosureOne = probabilityBoatBelongsToClosureOne;
     }
 
 }
