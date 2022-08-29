@@ -70,6 +70,7 @@ public class TwoPunchCalibration {
         //run once again locally
         TunaEvaluator evaluator = new TunaEvaluator(localCalibrationFile, localSolution);
         evaluator.setNumRuns(10);
+        evaluator.setParallel(false);
         evaluator.run();
 
 
@@ -82,7 +83,7 @@ public class TwoPunchCalibration {
         writer.write(Double.toString(gaSolution[0]));
         for (int i = 1; i < gaSolution.length; i++) {
             writer.write(",");
-            writer.write(Double.toString(gaSolution[0]));
+            writer.write(Double.toString(gaSolution[i]));
         }
         writer.close();
     }

@@ -57,6 +57,9 @@ public class TunaEvaluator implements Runnable {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
+
+    private boolean parallel = false;
+
     public TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
 
         optimization = GenericOptimization.fromFile(calibrationFilePath);
@@ -180,6 +183,7 @@ public class TunaEvaluator implements Runnable {
     @Override
     public void run() {
 
+        runner.setParallel(parallel);
         runner.writeScenarioToFile("calibrated_scenario.yaml");
 
         scenarioConsumer.ifPresent(consumer ->
@@ -221,4 +225,12 @@ public class TunaEvaluator implements Runnable {
         this.numRuns = numRuns;
     }
 
+
+    public boolean isParallel() {
+        return parallel;
+    }
+
+    public void setParallel(boolean parallel) {
+        this.parallel = parallel;
+    }
 }
