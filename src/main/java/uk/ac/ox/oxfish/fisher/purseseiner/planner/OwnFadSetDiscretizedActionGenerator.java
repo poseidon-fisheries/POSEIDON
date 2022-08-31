@@ -55,6 +55,8 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private boolean filterOutCurrentlyInvalidFads = false;
 
+    private double badReadingsProbability = 0d;
+
     public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
         this.discretization = discretization;
         this.minimumFadValue = minimumFadValue;
@@ -107,6 +109,11 @@ public class OwnFadSetDiscretizedActionGenerator {
             if(value>=minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                         add(new ValuedFad(deployedFad,value));
+            //if there is a chance of reading rankedfad wrong, it will be assumed to be at minimum acceptable fad here
+            else if(isFadMisreadAsFull(random)){
+                rankedFads[discretization.getGroup(deployedFad.getLocation())].
+                        add(new ValuedFad(deployedFad,minimumFadValue));
+            }
         }
 
     }
@@ -194,4 +201,18 @@ public class OwnFadSetDiscretizedActionGenerator {
     public void setFilterOutCurrentlyInvalidFads(boolean filterOutCurrentlyInvalidFads) {
         this.filterOutCurrentlyInvalidFads = filterOutCurrentlyInvalidFads;
     }
+
+    public double getBadReadingsProbability() {
+        return badReadingsProbability;
+    }
+
+    public void setBadReadingsProbability(double badReadingsProbability) {
+        this.badReadingsProbability = badReadingsProbability;
+    }
+
+    public boolean isFadMisreadAsFull(MersenneTwisterFast random){
+        return badReadingsProbability>0 && random.nextDouble()<badReadingsProbability;
+    }
+
+
 }

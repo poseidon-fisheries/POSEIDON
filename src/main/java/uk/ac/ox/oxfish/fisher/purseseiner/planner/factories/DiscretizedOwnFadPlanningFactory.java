@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadCentroidPlanningModule;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
@@ -31,6 +30,8 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
     private String bannedXCoordinateBounds = "";
     private String bannedYCoordinateBounds = "";
 
+    private DoubleParameter badReadingsProbability = new FixedDoubleParameter(0d);
+
     @Override
     public DiscretizedOwnFadCentroidPlanningModule apply(FishState state) {
 
@@ -54,6 +55,7 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
                 optionsGenerator.setBannedGridBounds(bannedY,bannedX);
             }
         }
+        optionsGenerator.setBadReadingsProbability(badReadingsProbability.apply(state.getRandom()));
         return new DiscretizedOwnFadCentroidPlanningModule(
                 optionsGenerator,
                 distancePenalty.apply(state.getRandom())
@@ -100,5 +102,13 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
 
     public void setBannedYCoordinateBounds(String bannedYCoordinateBounds) {
         this.bannedYCoordinateBounds = bannedYCoordinateBounds;
+    }
+
+    public DoubleParameter getBadReadingsProbability() {
+        return badReadingsProbability;
+    }
+
+    public void setBadReadingsProbability(DoubleParameter badReadingsProbability) {
+        this.badReadingsProbability = badReadingsProbability;
     }
 }
