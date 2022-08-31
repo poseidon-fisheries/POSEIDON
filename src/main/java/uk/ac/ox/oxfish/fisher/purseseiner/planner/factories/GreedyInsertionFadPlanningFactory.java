@@ -30,6 +30,9 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
     private String bannedXCoordinateBounds = "";
     private String bannedYCoordinateBounds = "";
 
+
+    private DoubleParameter badReadingsProbability = new FixedDoubleParameter(0d);
+
     @Override
     public GreedyInsertionFadPlanningModule apply(FishState state) {
 
@@ -53,6 +56,9 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
                 optionsGenerator.setBannedGridBounds(bannedY,bannedX);
             }
         }
+        optionsGenerator.setBadReadingsProbability(badReadingsProbability.apply(state.getRandom()));
+
+
         return new GreedyInsertionFadPlanningModule(
                 optionsGenerator,
                 additionalFadInspected.apply(state.getRandom()).intValue()
@@ -99,5 +105,13 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
 
     public void setAdditionalFadInspected(DoubleParameter additionalFadInspected) {
         this.additionalFadInspected = additionalFadInspected;
+    }
+
+    public DoubleParameter getBadReadingsProbability() {
+        return badReadingsProbability;
+    }
+
+    public void setBadReadingsProbability(DoubleParameter badReadingsProbability) {
+        this.badReadingsProbability = badReadingsProbability;
     }
 }
