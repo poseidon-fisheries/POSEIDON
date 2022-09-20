@@ -20,6 +20,19 @@
 
 package uk.ac.ox.oxfish.experiments.tuna.calibrations;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import uk.ac.ox.oxfish.maximization.GenericOptimization;
+import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -39,5 +52,83 @@ public class Sep20Calibrations {
             MAIN_DIRECTORY.resolve("calzone1_greedy_scenario.yaml");
 
 
+    public static void createYaml(String name,
+                                  Path originalCalibration,
+                                  Path originalScenario,
+                                  boolean addDiscretizationOptions,
+                                  boolean modifyAdditionalFadInspected,
+                                  boolean vpsScenario
+                                  ) throws IOException, InvocationTargetException, IllegalAccessException {
 
+        FishYAML yaml = new FishYAML();
+
+        EpoScenarioPathfinding scenario = yaml.loadAs(new FileReader(originalScenario.toFile()),
+                                                      EpoScenarioPathfinding.class);
+        GenericOptimization optimization = yaml.loadAs(new FileReader(originalCalibration.toFile()),
+                                                       GenericOptimization.class);
+
+        if(addDiscretizationOptions)
+        {
+
+            HardEdgeOptimizationParameter verticalSplits = new HardEdgeOptimizationParameter();
+            verticalSplits.setAlwaysPositive(true);
+            verticalSplits.setHardMaximum(50);
+            verticalSplits.setHardMinimum(1);
+            verticalSplits.setMinimum(3);
+            verticalSplits.setMaximum(30);
+            verticalSplits.setAddressToModify("destinationStrategy.fadModule.verticalSplits");
+            optimization.getParameters().add(
+                    verticalSplits
+            );
+            HardEdgeOptimizationParameter horizontalSplits = new HardEdgeOptimizationParameter();
+            horizontalSplits.setHardMaximum(50);
+            horizontalSplits.setHardMinimum(1);
+            horizontalSplits.setMinimum(3);
+            horizontalSplits.setMaximum(30);
+            horizontalSplits.setAlwaysPositive(true);
+
+            horizontalSplits.setAddressToModify("destinationStrategy.fadModule.horizontalSplits");
+            optimization.getParameters().add(
+                    horizontalSplits
+            );
+
+        }
+        if(modifyAdditionalFadInspected){
+            HardEdgeOptimizationParameter additionalFadInspected = new HardEdgeOptimizationParameter();
+            additionalFadInspected.setHardMaximum(50);
+            additionalFadInspected.setHardMinimum(0);
+            additionalFadInspected.setMinimum(0);
+            additionalFadInspected.setMaximum(30);
+            additionalFadInspected.setAlwaysPositive(true);
+            additionalFadInspected.setAddressToModify("destinationStrategy.fadModule.additionalFadInspected");
+            optimization.getParameters().add(
+                    additionalFadInspected
+            );
+        }
+        if(vpsScenario){
+            //remove superfluous optimization value
+            optimization.getParameters().removeIf(
+                    (Predicate<OptimizationParameter>) parameter -> parameter.getName().equals(
+                            "destinationStrategy.fadModule.minimumValueFadSets"));
+            //add intercepts and slope
+            //todo
+        }
+        
+
+
+
+
+
+        Path outputFolder = MAIN_DIRECTORY.resolve(name + "/");
+        outputFolder.toFile().mkdir();
+
+        Path filePath = outputFolder.resolve("scenario.yaml");
+        yaml.dump(scenario,new FileWriter(filePath.toFile()));
+        optimization.setScenarioFile(filePath.toString());
+        yaml.dump(optimization,new FileWriter(outputFolder.resolve("calibration.yaml").toFile()));
+
+
+
+
+    }
 }
