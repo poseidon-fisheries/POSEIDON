@@ -11,10 +11,7 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import javax.annotation.Nonnull;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * generates a list of possible fads to set on.
@@ -126,6 +123,10 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     @Nonnull
     public List<Pair<ValuedFad,Integer>> generateBestFadOpportunities(){
+
+        //you may be here asking: "why isn't this a map?".
+        //the answer, my friend, is blowing in the wind
+
         assert rankedFads != null : "not started";
         List<Pair<ValuedFad,Integer>> toReturn = new LinkedList<>();
         //for each group retrieve the best
@@ -134,6 +135,16 @@ public class OwnFadSetDiscretizedActionGenerator {
                 toReturn.add(new Pair<>(rankedFads[group].peek(),group));
         }
         return toReturn;
+    }
+
+
+    /**
+     * returns the value of the "best" fad at this area
+     */
+    public double getValueOfThisOption(int groupID){
+        if(rankedFads[groupID].size()>0)
+            return rankedFads[groupID].peek().getSecond();
+        return Double.NaN;
     }
 
     /**
@@ -214,5 +225,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         return badReadingsProbability>0 && random.nextDouble()<badReadingsProbability;
     }
 
-
+    public double getMinimumFadValue() {
+        return minimumFadValue;
+    }
 }

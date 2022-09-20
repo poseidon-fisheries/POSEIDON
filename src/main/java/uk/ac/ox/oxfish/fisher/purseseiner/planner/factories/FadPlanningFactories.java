@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.MarginalValueFadPlanningModule;
 import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
@@ -22,6 +23,8 @@ public class FadPlanningFactories {
     static {
         NAMES.put(DiscretizedOwnFadPlanningFactory.class, "Centroid FAD Planning");
         NAMES.put(GreedyInsertionFadPlanningFactory.class, "Greedy FAD Module");
+        NAMES.put(MarginalValueFadPlanningModuleFactory.class, "MVT FAD Module");
+        NAMES.put(ValuePerSetFadModuleFactory.class, "VPS FAD Module");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

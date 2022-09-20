@@ -52,6 +52,24 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
                 return optionsGenerator.chooseFad(options.get(0).getSecond());
             else return null;
         }
+
+        int fadGroupChosen = selectFadByCheapestInsertion(currentPlanSoFar, fisher, map, options,
+                                                      speedInKmPerHours, additionalFadInspected);
+
+
+        //all fads are empty, don't bother setting on any!
+        if(fadGroupChosen<0 ||
+                fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
+            return null;
+        return optionsGenerator.chooseFad(fadGroupChosen);
+
+
+    }
+
+    public static int selectFadByCheapestInsertion(
+            Plan currentPlanSoFar, Fisher fisher, NauticalMap map,
+            List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
+             final double boatSpeed, final int numberOfAdditionalFadToCount) {
         double maxProfitsSoFar = 0;
         int fadGroupChosen = - 1;
 
@@ -69,41 +87,32 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
                     currentPlanSoFar,
                     potentialAction,
                     Integer.MAX_VALUE, //don't want to censor time now
-                    speedInKmPerHours,
+                    boatSpeed,
                     map,
                     false
             );
             double costHere =  fisher.getExpectedAdditionalCosts(additionalHoursTravelled,
-                    potentialAction.hoursItTake(),
-                    additionalHoursTravelled/speedInKmPerHours);
+                                                                 potentialAction.hoursItTake(),
+                                                                 additionalHoursTravelled/ boatSpeed);
 
             //compute the revenues for harvesting the first X fads
             // (the first we will actually do, the others are there to trick us into setting in more promising areas)
             double revenuesHere = bestFad.getSecond();
             int additionalFadsInspected = 0;
-            while(additionalFadsInspected< additionalFadInspected && iterator.hasNext())
+            while(additionalFadsInspected< numberOfAdditionalFadToCount && iterator.hasNext())
             {
                 revenuesHere += iterator.next().getSecond();
                 additionalFadsInspected++;
             }
 
             double profitHere = revenuesHere - costHere;
-            if(profitHere>maxProfitsSoFar){
+            if(profitHere> maxProfitsSoFar){
                 maxProfitsSoFar = profitHere;
                 fadGroupChosen = option.getSecond();
             }
 
         }
-
-
-
-        //all fads are empty, don't bother setting on any!
-        if(fadGroupChosen<0 ||
-                fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
-            return null;
-        return optionsGenerator.chooseFad(fadGroupChosen);
-
-
+        return fadGroupChosen;
     }
 
 }
