@@ -22,11 +22,15 @@ package uk.ac.ox.oxfish.experiments.tuna.calibrations;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import org.apache.commons.beanutils.BeanUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
@@ -44,12 +48,7 @@ public class Sep20Calibrations {
     );
 
 
-    private final static Path greedyCalibration =
-            MAIN_DIRECTORY.resolve("calzone1_greedy_ga.yaml");
 
-
-    private final static Path greedyScenario =
-            MAIN_DIRECTORY.resolve("calzone1_greedy_scenario.yaml");
 
 
     public static void createYaml(String name,
@@ -57,7 +56,8 @@ public class Sep20Calibrations {
                                   Path originalScenario,
                                   boolean addDiscretizationOptions,
                                   boolean modifyAdditionalFadInspected,
-                                  boolean vpsScenario
+                                  boolean vpsScenario,
+                                  boolean fixHazardAndWait
                                   ) throws IOException, InvocationTargetException, IllegalAccessException {
 
         FishYAML yaml = new FishYAML();
@@ -110,10 +110,59 @@ public class Sep20Calibrations {
             optimization.getParameters().removeIf(
                     (Predicate<OptimizationParameter>) parameter -> parameter.getName().equals(
                             "destinationStrategy.fadModule.minimumValueFadSets"));
-            //add intercepts and slope
-            //todo
+            //add intercept
+            HardEdgeOptimizationParameter intercept = new HardEdgeOptimizationParameter();
+            intercept.setHardMaximum(100);
+            intercept.setHardMinimum(0);
+            intercept.setMinimum(0);
+            intercept.setMaximum(10);
+            intercept.setAlwaysPositive(true);
+            intercept.setAddressToModify("destinationStrategy.fadModule.intercept");
+            optimization.getParameters().add(
+                    intercept
+            );
         }
-        
+
+        if(fixHazardAndWait){
+            //set the scenario
+            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            //weird but we know the name, not the class!
+            BeanUtils.setProperty(fadInitializer,"fishReleaseProbabilityInPercent",new FixedDoubleParameter(2.0));
+            //set the optimization parameter
+            OptimizationParameter toRemove = null;
+            for (OptimizationParameter parameter : optimization.getParameters()) {
+                if(parameter.getName().equals("fadInitializerFactory.fishReleaseProbabilityInPercent"))
+                {
+                    toRemove = parameter;
+                    break;
+                }
+            }
+            Preconditions.checkArgument(toRemove != null,
+                    "Couldn't find the fish release probability!");
+
+            optimization.getParameters().remove(toRemove);
+            //weird but we know the name, not the class!
+            BeanUtils.setProperty(fadInitializer,"maximumDaysAttractions",
+                    new FixedDoubleParameter(500));
+
+            //weird but we know the name, not the class!
+            BeanUtils.setProperty(fadInitializer,"daysInWaterBeforeAttraction",
+                    new FixedDoubleParameter(13));
+
+            //set the optimization parameter
+            toRemove = null;
+            for (OptimizationParameter parameter : optimization.getParameters()) {
+                if(parameter.getName().equals("fadInitializerFactory.daysInWaterBeforeAttraction"))
+                {
+                    toRemove = parameter;
+                    break;
+                }
+            }
+            Preconditions.checkArgument(toRemove != null,
+                    "Couldn't find the fish release probability!");
+
+            optimization.getParameters().remove(toRemove);
+        }
 
 
 
@@ -128,6 +177,70 @@ public class Sep20Calibrations {
         yaml.dump(optimization,new FileWriter(outputFolder.resolve("calibration.yaml").toFile()));
 
 
+
+
+    }
+
+    public static void main(String[] args) throws IOException, InvocationTargetException, IllegalAccessException {
+
+        createYaml(
+                "greedy_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+                true,
+                true,
+                false,
+                true
+        );
+        createYaml(
+                "greedy_unconstrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+                true,
+                true,
+                false,
+                false
+        );
+
+
+        createYaml(
+                "vps_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+                true,
+                false,
+                true,
+                true
+        );
+        createYaml(
+                "vps_unconstrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+                true,
+                false,
+                true,
+                false
+        );
+
+
+        createYaml(
+                "mvt_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+                true,
+                false,
+                false,
+                true
+        );
+        createYaml(
+                "mvt_unconstrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+                true,
+                false,
+                false,
+                false
+        );
 
 
     }

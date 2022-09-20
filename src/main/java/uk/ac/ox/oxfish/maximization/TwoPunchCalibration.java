@@ -41,6 +41,9 @@ public class TwoPunchCalibration {
 
         TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
         secondStep.setLocalSearch(false);secondStep.setPSO(true);
+        secondStep.setBestGuessesTextFile(
+                calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath().toString()
+        );
         secondStep.setPopulationSize(50);
         secondStep.setMaxProcessorsToUse(nProcs);
         secondStep.setNumberOfRunsPerSettingOverride(2);
@@ -57,6 +60,9 @@ public class TwoPunchCalibration {
         //run GA
         double[] gaSolution = stepOne(calibrationFile, nProcs);
         writeSolutionOut(calibrationFile, gaSolution, "ga_solution.txt");
+        double[] zeros = new double[gaSolution.length];
+        Arrays.fill(zeros,0d);
+        writeSolutionOut(calibrationFile, zeros,"zeros.txt");
         //run PSO
         GenericOptimization.buildLocalCalibrationProblem(calibrationFile,
                 gaSolution,
