@@ -337,8 +337,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                buildPorts(fishState),
-                    getProportionBoatsInClosureOne().apply(fishState.getRandom())).apply(fishState);
+                buildPorts(fishState)
+            ).apply(fishState);
 
         ImmutableList.of(
             scheduledAbundanceProcessesFactory,

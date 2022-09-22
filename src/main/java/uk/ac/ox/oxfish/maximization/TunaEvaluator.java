@@ -36,6 +36,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.findLast;
 import static com.google.common.io.Files.getFileExtension;
+import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
@@ -47,18 +48,18 @@ public class TunaEvaluator implements Runnable {
     //  count(ves_no, action_type) |>
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
-    private static final Set<String> boatsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
+    private static final Set<String> boatsToTrack = ImmutableSet.of("1779", "453", "1552");
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna", "calibration", "results",
-        "nicolas", "2022-08-13_19.14.27_global_calibration"
+        "cenv0729", "2022-09-11_08.27.13_global_calibration"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
 
-    private int numRuns = 3; //getRuntime().availableProcessors();
-    private int numYearsToRuns = 3; //getRuntime().availableProcessors();
+    private int numRuns = getRuntime().availableProcessors() + 1;
+    private int numYearsToRuns = 3;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
 
@@ -127,8 +128,9 @@ public class TunaEvaluator implements Runnable {
         final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
 
         final double[] solution = extractSolution(logFilePath);
-        new TunaEvaluator(calibrationFilePath, solution).run();
-
+        final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
+        tunaEvaluator.setParallel(true);
+        tunaEvaluator.run();
     }
 
     @SuppressWarnings("UnstableApiUsage")

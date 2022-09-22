@@ -19,11 +19,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
@@ -33,7 +28,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 
 import static java.time.Month.*;
-import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
@@ -78,25 +72,6 @@ public class StandardIattcRegulationsFactory extends MultipleRegulationsFactory 
             .put(closureAReg, "closure A")
             .put(closureBReg, "closure B")
             .build()
-        );
-    }
-
-    public static void scheduleClosurePeriodChoice(final FishState model, final Fisher fisher,
-                                                   double proportionOfBoatsInClosure1) {
-        // Every year, on July 15th, purse seine vessels must choose which temporal closure
-        // period they will observe.
-        final int daysFromNow = 1 + dayOfYear(JULY, 15);
-        final Steppable assignClosurePeriod = simState -> {
-            if (fisher.getRegulation() instanceof MultipleRegulations) {
-                chooseClosurePeriod(fisher, model.getRandom(),proportionOfBoatsInClosure1);
-                ((MultipleRegulations) fisher.getRegulation()).reassignRegulations(model, fisher);
-            }
-        };
-        model.scheduleOnceInXDays(assignClosurePeriod, StepOrder.DAWN, daysFromNow);
-        model.scheduleOnceInXDays(
-            simState -> model.scheduleEveryXDay(assignClosurePeriod, StepOrder.DAWN, 365),
-            StepOrder.DAWN,
-            daysFromNow
         );
     }
 
