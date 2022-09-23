@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
+    public static final String CLOROPHILL = "Clorophill";
     private String pathToClorophillFile = "inputs/tests/clorophill.csv";
 
     public ClorophillMapFactory() {
@@ -53,13 +54,13 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
                 SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
                         Paths.get(pathToClorophillFile),
                         new MapExtent(model.getMap()),
-                        "Clorophill"
+                        CLOROPHILL
                 );
 
                 AllocationGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
-                        "Clorophill",
-                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get("Clorophill")
+                        CLOROPHILL,
+                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(CLOROPHILL)
                 );
 
 
@@ -67,7 +68,7 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
 
             @Override
             public void turnOff() {
-                model.getMap().getAdditionalMaps().remove("Clorophill");
+                model.getMap().getAdditionalMaps().remove(CLOROPHILL);
             }
         };
 

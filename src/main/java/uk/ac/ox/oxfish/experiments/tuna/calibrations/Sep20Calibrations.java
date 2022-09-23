@@ -43,7 +43,7 @@ public class Sep20Calibrations {
 
 
     private final static Path MAIN_DIRECTORY = Paths.get(
-            "docs/20220223 tuna_calibration/pathfinder_september/"
+            "docs/20220223 tuna_calibration/clorophill/"
     );
 
 
@@ -184,68 +184,17 @@ public class Sep20Calibrations {
 
     public static void main(String[] args) throws IOException, InvocationTargetException, IllegalAccessException {
 
-//        createYaml(
-//                "greedy_constrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
-//                true,
-//                true,
-//                false,
-//                true,
-//                false);
-//        createYaml(
-//                "greedy_unconstrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
-//                true,
-//                true,
-//                false,
-//                false,
-//                false);
-//
-//
-//        createYaml(
-//                "vps_constrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-//                true,
-//                false,
-//                true,
-//                true,
-//                false);
-//        createYaml(
-//                "vps_unconstrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-//                true,
-//                false,
-//                true,
-//                false,
-//                false);
-//
-//
-//        createYaml(
-//                "mvt_constrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
-//                true,
-//                false,
-//                false,
-//                true,
-//                false);
-//        createYaml(
-//                "mvt_unconstrained",
-//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
-//                true,
-//                false,
-//                false,
-//                false,
-//                false);
-
-
         createYaml(
-                "greedy_unconstrained_closurecorrect",
+                "greedy_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+                true,
+                true,
+                false,
+                true,
+                true);
+        createYaml(
+                "greedy_unconstrained",
                 MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
                 MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
                 true,
@@ -254,8 +203,38 @@ public class Sep20Calibrations {
                 false,
                 true);
 
+
         createYaml(
-                "mvt_unconstrained_closurecorrect",
+                "vps_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+                true,
+                false,
+                true,
+                true,
+                true);
+        createYaml(
+                "vps_unconstrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+                true,
+                false,
+                true,
+                false,
+                true);
+
+
+        createYaml(
+                "mvt_constrained",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+                true,
+                false,
+                false,
+                true,
+                true);
+        createYaml(
+                "mvt_unconstrained",
                 MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
                 MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
                 true,
@@ -263,5 +242,26 @@ public class Sep20Calibrations {
                 false,
                 false,
                 true);
+//
+//
+//        createYaml(
+//                "greedy_unconstrained_closurecorrect",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+//                true,
+//                true,
+//                false,
+//                false,
+//                true);
+//
+//        createYaml(
+//                "mvt_unconstrained_closurecorrect",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                false,
+//                true);
     }
 }

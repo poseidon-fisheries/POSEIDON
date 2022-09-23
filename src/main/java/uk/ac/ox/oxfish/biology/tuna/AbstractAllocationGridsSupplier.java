@@ -155,7 +155,7 @@ abstract class AbstractAllocationGridsSupplier<K>
                 record.getDouble("value")
             );}
             else {
-                System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
+                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
             }
         });
         if(normalize){
