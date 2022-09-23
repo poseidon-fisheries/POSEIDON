@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.experiments.tuna.calibrations;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import org.apache.commons.beanutils.BeanUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
@@ -57,8 +56,8 @@ public class Sep20Calibrations {
                                   boolean addDiscretizationOptions,
                                   boolean modifyAdditionalFadInspected,
                                   boolean vpsScenario,
-                                  boolean fixHazardAndWait
-                                  ) throws IOException, InvocationTargetException, IllegalAccessException {
+                                  boolean fixHazardAndWait,
+                                  boolean moreEffortClosureOne) throws IOException, InvocationTargetException, IllegalAccessException {
 
         FishYAML yaml = new FishYAML();
 
@@ -76,7 +75,7 @@ public class Sep20Calibrations {
             verticalSplits.setHardMinimum(1);
             verticalSplits.setMinimum(3);
             verticalSplits.setMaximum(30);
-            verticalSplits.setAddressToModify("destinationStrategy.fadModule.verticalSplits");
+            verticalSplits.setAddressToModify("destinationStrategy.fadModule.discretization.verticalSplits");
             optimization.getParameters().add(
                     verticalSplits
             );
@@ -87,7 +86,7 @@ public class Sep20Calibrations {
             horizontalSplits.setMaximum(30);
             horizontalSplits.setAlwaysPositive(true);
 
-            horizontalSplits.setAddressToModify("destinationStrategy.fadModule.horizontalSplits");
+            horizontalSplits.setAddressToModify("destinationStrategy.fadModule.discretization.horizontalSplits");
             optimization.getParameters().add(
                     horizontalSplits
             );
@@ -165,7 +164,9 @@ public class Sep20Calibrations {
         }
 
 
-
+        if(moreEffortClosureOne){
+            scenario.setProportionBoatsInClosureOne(new FixedDoubleParameter(.2));
+        }
 
 
         Path outputFolder = MAIN_DIRECTORY.resolve(name + "/");
@@ -183,65 +184,84 @@ public class Sep20Calibrations {
 
     public static void main(String[] args) throws IOException, InvocationTargetException, IllegalAccessException {
 
+//        createYaml(
+//                "greedy_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+//                true,
+//                true,
+//                false,
+//                true,
+//                false);
+//        createYaml(
+//                "greedy_unconstrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+//                true,
+//                true,
+//                false,
+//                false,
+//                false);
+//
+//
+//        createYaml(
+//                "vps_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+//                true,
+//                false,
+//                true,
+//                true,
+//                false);
+//        createYaml(
+//                "vps_unconstrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+//                true,
+//                false,
+//                true,
+//                false,
+//                false);
+//
+//
+//        createYaml(
+//                "mvt_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                true,
+//                false);
+//        createYaml(
+//                "mvt_unconstrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                false,
+//                false);
+
+
         createYaml(
-                "greedy_constrained",
+                "greedy_unconstrained_closurecorrect",
                 MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
                 MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
                 true,
                 true,
                 false,
-                true
-        );
-        createYaml(
-                "greedy_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
-                true,
-                true,
                 false,
-                false
-        );
-
+                true);
 
         createYaml(
-                "vps_constrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-                true,
-                false,
-                true,
-                true
-        );
-        createYaml(
-                "vps_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-                true,
-                false,
-                true,
-                false
-        );
-
-
-        createYaml(
-                "mvt_constrained",
+                "mvt_unconstrained_closurecorrect",
                 MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
                 MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
                 true,
                 false,
                 false,
-                true
-        );
-        createYaml(
-                "mvt_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
-                true,
                 false,
-                false,
-                false
-        );
-
-
+                true);
     }
 }

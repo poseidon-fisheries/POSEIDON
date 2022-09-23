@@ -75,56 +75,57 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
 
 
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(FishState fishState) {
-        return oneAttractorPerStateLocker.presentKey(fishState,
-                                                     new Supplier<AbundanceFadInitializer>() {
-                                                         @Override
-                                                         public AbundanceFadInitializer get() {
-                                                             final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
-                                                             DoubleSupplier capacityGenerator;
-                                                             if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
-                                                                 capacityGenerator = () -> Double.MAX_VALUE;
-                                                             else
-                                                                 capacityGenerator = () -> {
-                                                                     if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
-                                                                         return 0;
-                                                                     else
-                                                                         return Double.MAX_VALUE;
-                                                                 };
+        return oneAttractorPerStateLocker.presentKey(
+                fishState,
+                new Supplier<AbundanceFadInitializer>() {
+                    @Override
+                    public AbundanceFadInitializer get() {
+                        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+                        DoubleSupplier capacityGenerator;
+                        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
+                            capacityGenerator = () -> Double.MAX_VALUE;
+                        else
+                            capacityGenerator = () -> {
+                                if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
+                                    return 0;
+                                else
+                                    return Double.MAX_VALUE;
+                            };
 
-                                                             DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
-                                                             double[] catchabilitiesHere = new double[fishState.getBiology().getSize()];
+                        DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
+                        double[] catchabilitiesHere = new double[fishState.getBiology().getSize()];
 
-                                                             for (Species species : fishState.getBiology().getSpecies()) {
-                                                                 carryingCapacities[species.getIndex()] =
-                                                                         carryingCapacityScaleParameters.containsKey(species.getName()) ?
-                                                                         new WeibullDoubleParameter(
-                                                                         carryingCapacityShapeParameters.get(species.getName()),
-                                                                         carryingCapacityScaleParameters.get(species.getName())
-                                                                 ) : new FixedDoubleParameter(-1);
+                        for (Species species : fishState.getBiology().getSpecies()) {
+                            carryingCapacities[species.getIndex()] =
+                                    carryingCapacityScaleParameters.containsKey(species.getName()) ?
+                                            new WeibullDoubleParameter(
+                                                    carryingCapacityShapeParameters.get(species.getName()),
+                                                    carryingCapacityScaleParameters.get(species.getName())
+                                            ) : new FixedDoubleParameter(-1);
 
-                                                                 catchabilitiesHere[species.getIndex()] =
-                                                                         catchabilities.getOrDefault(species.getName(),0d);
+                            catchabilitiesHere[species.getIndex()] =
+                                    catchabilities.getOrDefault(species.getName(),0d);
 
-                                                             }
+                        }
 
 
-                                                             return new AbundanceFadInitializer(
-                                                                     fishState.getBiology(),
-                                                                     capacityGenerator,
-                                                                     new CatchabilitySelectivityFishAttractor(
-                                                                             carryingCapacities,
-                                                                             catchabilitiesHere,
-                                                                             daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                                                                             maximumDaysAttractions.apply(fishState.getRandom()).intValue(),
-                                                                             fishState,
-                                                                             selectivityFilters
+                        return new AbundanceFadInitializer(
+                                fishState.getBiology(),
+                                capacityGenerator,
+                                new CatchabilitySelectivityFishAttractor(
+                                        carryingCapacities,
+                                        catchabilitiesHere,
+                                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
+                                        maximumDaysAttractions.apply(fishState.getRandom()).intValue(),
+                                        fishState,
+                                        selectivityFilters
 
-                                                                     ),
-                                                                     fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                                                                     fishState::getStep
-                                                             );
-                                                         }
-                                                     }
+                                ),
+                                fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+                                fishState::getStep
+                        );
+                    }
+                }
 
         );
 

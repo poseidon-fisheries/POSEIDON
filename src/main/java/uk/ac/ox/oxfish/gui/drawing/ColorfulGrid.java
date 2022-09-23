@@ -65,7 +65,9 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      * the default encoder just returns altitude
      */
 
-    private final ColorMap depthColor = new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, new Color(0,100,0));
+    private final ColorMap depthColor = new TriColorMap(-6000, 0, 6000,
+                                                        Color.BLUE, Color.CYAN, Color.GREEN,
+                                                        new Color(0,100,0));
 
 
     private final Queue<Color> defaultFishColors = new LinkedList<>();
@@ -236,30 +238,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         return ImmutableMap.copyOf(encodings);
     }
 
-    /**
-     * Associates the specified value with the specified key in this map
-     * (optional operation).  If the map previously contained a mapping for
-     * the key, the old value is replaced by the specified value.  (A map
-     * {@code m} is said to contain a mapping for a key {@code k} if and only
-     * if {@link #containsKey(Object) m.containsKey(k)} would return
-     * {@code true}.)
-     *
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with {@code key}, or
-     *         {@code null} if there was no mapping for {@code key}.
-     *         (A {@code null} return can also indicate that the map
-     *         previously associated {@code null} with {@code key},
-     *         if the implementation supports {@code null} values.)
-     * @throws UnsupportedOperationException if the {@code put} operation
-     *         is not supported by this map
-     * @throws ClassCastException if the class of the specified key or value
-     *         prevents it from being stored in this map
-     * @throws NullPointerException if the specified key or value is null
-     *         and this map does not permit null keys or values
-     * @throws IllegalArgumentException if some property of the specified key
-     *         or value prevents it from being stored in this map
-     */
+
     public ColorEncoding put(String key, ColorEncoding value) {
         ColorEncoding put = encodings.put(key, value);
         for (ColorfulGridSwitcher listener : listeners) {

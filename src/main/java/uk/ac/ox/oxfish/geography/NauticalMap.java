@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
@@ -33,10 +34,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.Grid2D;
-import sim.field.grid.IntGrid2D;
-import sim.field.grid.ObjectGrid2D;
-import sim.field.grid.SparseGrid2D;
+import sim.field.grid.*;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
@@ -52,14 +50,8 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.MasonUtils;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
@@ -135,6 +127,7 @@ public class NauticalMap implements Startable
     private GeomVectorField mpaVectorField;
 
 
+    private final LinkedHashMap<String, Supplier<DoubleGrid2D>> additionalMaps;
 
 
     /**
@@ -151,6 +144,7 @@ public class NauticalMap implements Startable
         this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
         this.coordinateCache = new ObjectGrid2D(getWidth(), getHeight());
+        additionalMaps = new LinkedHashMap<>();
         recomputeTilesMPA();
 
         ports = new LinkedList<>();
@@ -633,4 +627,7 @@ public Coordinate getCoordinates(int gridX, int gridY) {
         return getDistance().distance(tileHere, tileThere, this);
     }
 
+    public LinkedHashMap<String, Supplier<DoubleGrid2D>> getAdditionalMaps() {
+        return additionalMaps;
+    }
 }
