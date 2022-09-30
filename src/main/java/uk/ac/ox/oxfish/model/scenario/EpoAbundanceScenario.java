@@ -49,10 +49,7 @@ import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
@@ -116,8 +113,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new LinearAbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
-    private AlgorithmFactory<? extends Regulation> regulationsFactory =
-        new StandardIattcRegulationsFactory();
+
     public EpoAbundanceScenario() {
         setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory());
@@ -163,16 +159,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @SuppressWarnings("unused")
     public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
         this.weightGroupsFactory = weightGroupsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")
@@ -328,7 +314,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
-            regulationsFactory,
+            getRegulationsFactory(),
             gravityDestinationStrategyFactory
         );
 

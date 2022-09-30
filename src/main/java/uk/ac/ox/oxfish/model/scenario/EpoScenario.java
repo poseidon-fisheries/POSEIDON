@@ -109,6 +109,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
+    private AlgorithmFactory<? extends Regulation> regulationsFactory =
+        new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
 
@@ -373,6 +375,16 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setMarketMapFactory(AlgorithmFactory<? extends MarketMap> marketMapFactory) {
         this.marketMapFactory = marketMapFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
+        return regulationsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
+        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")

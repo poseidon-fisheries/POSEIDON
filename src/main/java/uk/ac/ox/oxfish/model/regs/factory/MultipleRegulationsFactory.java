@@ -21,16 +21,19 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Map.Entry;
 
+import static com.google.common.collect.Streams.zip;
+import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 
 /**
@@ -81,15 +84,15 @@ public class MultipleRegulationsFactory implements AlgorithmFactory<MultipleRegu
      */
     @Override
     public MultipleRegulations apply(FishState fishState) {
-
-        Preconditions.checkArgument(factories.size()>0);
-        Preconditions.checkArgument(factories.size()==tags.size());
-        Map<AlgorithmFactory<? extends Regulation>,String> regulations = new HashMap<>();
-
-        for(int i=0; i<tags.size(); i++)
-            regulations.put(factories.get(i),tags.get(i));
-
-        return new MultipleRegulations(regulations);
+        Preconditions.checkArgument(factories.size() > 0);
+        Preconditions.checkArgument(factories.size() == tags.size());
+        //noinspection UnstableApiUsage
+        return new MultipleRegulations(
+            zip(tags.stream(), factories.stream(), FishStateUtilities::entry).collect(toMap(
+                Entry::getKey,
+                entry -> ImmutableList.of(entry.getValue())
+            ))
+        );
     }
 
     /**

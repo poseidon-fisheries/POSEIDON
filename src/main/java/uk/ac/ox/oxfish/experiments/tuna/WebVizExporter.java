@@ -37,14 +37,15 @@ import uk.ac.ox.oxfish.model.data.webviz.heatmaps.*;
 import uk.ac.ox.oxfish.model.data.webviz.regions.SpecificRegionsBuilderFactory;
 import uk.ac.ox.oxfish.model.data.webviz.vessels.VesselClassifier;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -99,11 +100,7 @@ public final class WebVizExporter {
             "Tuna - No El Corralito closure",
             "When removing El Corralito closure, results do not differ significantly from business as usual scenario.",
             ImmutableList.of(currentFadLimits),
-            scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
-                StandardIattcRegulationsFactory.closureAReg, "closure A",
-                StandardIattcRegulationsFactory.closureBReg, "closure B"
-            ))
+            scenario -> new StandardIattcRegulationsFactory()
         ),
         makePolicy(
             "Tuna - Stricter limits on active FADs",
@@ -121,20 +118,25 @@ public final class WebVizExporter {
             "Tuna - Longer seasonal closures",
             "Length of closure periods A and B increased by 40% (100 days instead of 72).",
             ImmutableList.of(currentFadLimits),
-            scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
-                StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
-                new TemporaryRegulationFactory(
-                    EpoBiomassScenario.dayOfYear(JULY, 1),
-                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
-                    new NoFishingFactory()
-                ), "closure A",
-                new TemporaryRegulationFactory(
-                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
-                    EpoBiomassScenario.dayOfYear(FEBRUARY, 16),
-                    new NoFishingFactory()
-                ), "closure B"
-            ))
+            scenario ->
+                new CompositeMultipleRegulationsFactory(
+                    ImmutableList.of(
+                        StandardIattcRegulationsFactory.PROTECTED_AREAS_FROM_FOLDER_FACTORY,
+                        new MultipleRegulationsFactory(ImmutableMap.of(
+                            StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
+                            new TemporaryRegulationFactory(
+                                EpoBiomassScenario.dayOfYear(JULY, 1),
+                                EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                new NoFishingFactory()
+                            ), "closure A",
+                            new TemporaryRegulationFactory(
+                                EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
+                                EpoBiomassScenario.dayOfYear(FEBRUARY, 16),
+                                new NoFishingFactory()
+                            ), "closure B"
+                        ))
+                    )
+                )
         )
     );
 

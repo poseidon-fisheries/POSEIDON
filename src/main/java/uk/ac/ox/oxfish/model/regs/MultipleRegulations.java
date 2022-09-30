@@ -24,6 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -31,10 +33,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -42,59 +41,65 @@ import static com.google.common.base.Preconditions.checkState;
  * This class is given a map of regulation factories it calls at its start() to fill
  * in its list of regs. Only the regulations with the right tag will be instantiated for each fisher.
  * All regs are assumed to apply.
- *
+ * <p>
  * Created by carrknight on 4/4/17.
  */
 //todo quotaPerSpecieRegulation implementation is disgusting. It needs to go
 public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation {
 
     /**
-     * regulations active, filled by the map
-     */
-    private final List<Regulation> regulations;
-
-    /**
-     * the factories provided
-     */
-    private final Map<AlgorithmFactory<? extends Regulation>,String> factories;
-
-    private boolean started = false;
-
-    public MultipleRegulations(
-            Map<AlgorithmFactory<? extends Regulation>, String> factories) {
-        Preconditions.checkArgument(!factories.isEmpty(), "empty factories!");
-
-        this.regulations = new LinkedList<>();
-        this.factories = factories;
-    }
-
-
-
-
-
-    /**
-     * returns a copy of the regulation, used defensively
-     *
-     * @return
-     */
-    @Override
-    public Regulation makeCopy() {
-        Preconditions.checkArgument(!factories.isEmpty(), "turned off!");
-        return new MultipleRegulations(factories);
-    }
-
-    /**
      * when this tag is found
      */
     public static String TAG_FOR_ALL = "all";
 
+    /**
+     * regulations active, filled by the map
+     */
+    private final List<Regulation> regulations = new LinkedList<>();
+    /**
+     * the factories provided
+     */
+    private final Multimap<String, AlgorithmFactory<? extends Regulation>> factoriesByTag =
+        MultimapBuilder.hashKeys().linkedListValues().build();
+    private boolean started = false;
+    private QuotaPerSpecieRegulation delegateHack = null;
+    public MultipleRegulations(
+        Multimap<String, AlgorithmFactory<? extends Regulation>> factoriesByTag
+    ) {
+        Preconditions.checkArgument(!factoriesByTag.isEmpty(), "empty factories!");
+        factoriesByTag.forEach(this.factoriesByTag::put);
+    }
+
+    public MultipleRegulations(
+        Map<String, ? extends List<AlgorithmFactory<? extends Regulation>>> factoriesByTag
+    ) {
+        Preconditions.checkArgument(!factoriesByTag.isEmpty(), "empty factories!");
+        factoriesByTag.forEach(this.factoriesByTag::putAll);
+    }
+
+    public Map<String, Collection<AlgorithmFactory<? extends Regulation>>> getFactoriesByTag() {
+        return factoriesByTag.asMap();
+    }
+
+    public void addFactory(String tag, AlgorithmFactory<? extends Regulation> factory) {
+        this.factoriesByTag.put(tag, factory);
+    }
+
+    /**
+     * returns a copy of the regulation, used defensively
+     */
+    @Override
+    public Regulation makeCopy() {
+        Preconditions.checkArgument(!factoriesByTag.isEmpty(), "turned off!");
+        return new MultipleRegulations(factoriesByTag);
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("regulations", regulations)
-                .toString();
+            .add("regulations", regulations)
+            .toString();
     }
-
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -107,11 +112,10 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
 
     private void assignRegulations(FishState model, Fisher fisher) {
         checkState(regulations.isEmpty(), "Regulations already assigned!");
-        checkState(!factories.isEmpty(), "No factories to instantiate!");
-        final Set<String> tags = tagSet(fisher);
-        factories.entrySet().stream()
-            .filter(entry -> tags.contains(entry.getValue()))
-            .map(entry -> entry.getKey().apply(model))
+        checkState(!factoriesByTag.isEmpty(), "No factories to instantiate!");
+        tagSet(fisher).stream()
+            .flatMap(tag -> factoriesByTag.get(tag).stream())
+            .map(factory -> factory.apply(model))
             .forEach(regulation -> {
                 regulation.start(model, fisher);
                 regulations.add(regulation);
@@ -156,24 +160,24 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
             .allMatch(regulation -> regulation.canFishHere(agent, tile, model, timeStep));
     }
 
-
     /**
      * tell the regulation object this much has been caught
-     *  @param where             where the fishing occurred
+     *
+     * @param where             where the fishing occurred
      * @param who               who did the fishing
      * @param fishCaught        catch object
-     * @param fishRetained
+     * @param fishRetained      catch object for the fish that's actually kept
      * @param hoursSpentFishing how many hours were spent fishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+        int hoursSpentFishing, FishState model, int timeStep
+    ) {
         assert started;
-        for(Regulation regulation : regulations)
-            regulation.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing, model, timeStep);
+        for (Regulation regulation : regulations)
+            regulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
-
 
     /**
      * tell the regulation object this much of this species has been sold
@@ -184,10 +188,17 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         assert started;
-        for(Regulation regulation : regulations)
-            regulation.reactToSale(species,seller,biomass,revenue,model,timeStep);
+        for (Regulation regulation : regulations)
+            regulation.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**
@@ -200,14 +211,12 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         double max = Double.MAX_VALUE;
-        for(Regulation regulation : regulations)
-        {
-
-            max = Math.min(max,regulation.maximumBiomassSellable(agent,species,model,timeStep));
+        for (Regulation regulation : regulations) {
+            max = Math.min(max, regulation.maximumBiomassSellable(agent, species, model, timeStep));
         }
-
         return max;
     }
 
@@ -222,9 +231,8 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         assert started;
-        for(Regulation regulation : regulations)
-        {
-            if(!regulation.allowedAtSea(fisher,model,timeStep))
+        for (Regulation regulation : regulations) {
+            if (!regulation.allowedAtSea(fisher, model, timeStep))
                 return false;
         }
         return true;
@@ -232,13 +240,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
 
     @Override
     public void turnOff(Fisher fisher) {
-        factories.clear();
-        for(Regulation regulation : regulations)
+        factoriesByTag.clear();
+        for (Regulation regulation : regulations)
             regulation.turnOff(fisher);
         regulations.clear();
     }
-
-    private QuotaPerSpecieRegulation delegateHack = null;
 
     private QuotaPerSpecieRegulation getQuotaDelegate() {
         if (delegateHack == null) {
@@ -253,7 +259,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     @Override
     public double getQuotaRemaining(int specieIndex) {
         QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
-        if(quotaDelegate!= null)
+        if (quotaDelegate != null)
             return quotaDelegate.getQuotaRemaining(specieIndex);
         else
             return Double.POSITIVE_INFINITY;
@@ -261,7 +267,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
 
     @Override
     public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
-        getQuotaDelegate().setQuotaRemaining(specieIndex,newQuotaValue);
+        getQuotaDelegate().setQuotaRemaining(specieIndex, newQuotaValue);
     }
 
     /**
@@ -274,7 +280,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         return regulations;
     }
 
-    public boolean containsRegulation(Regulation regulation){
+    public boolean containsRegulation(Regulation regulation) {
         return regulations.contains(regulation);
     }
 }

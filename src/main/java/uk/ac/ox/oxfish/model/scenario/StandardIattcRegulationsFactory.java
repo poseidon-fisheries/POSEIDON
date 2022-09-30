@@ -18,61 +18,96 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static java.time.Month.*;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
-public class StandardIattcRegulationsFactory extends MultipleRegulationsFactory {
+public class StandardIattcRegulationsFactory implements AlgorithmFactory<MultipleRegulations> {
 
-    public static final AlgorithmFactory<TemporaryRegulation> closureAReg =
+    public static final AlgorithmFactory<TemporaryRegulation> CLOSURE_A_REG =
         new TemporaryRegulationFactory(
             dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
             new NoFishingFactory()
         );
-
-    public static final AlgorithmFactory<TemporaryRegulation> closureBReg =
+    public static final AlgorithmFactory<TemporaryRegulation> CLOSURE_B_REG =
         new TemporaryRegulationFactory(
             dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
             new NoFishingFactory()
         );
-
-    public static final AlgorithmFactory<TemporaryRegulation> elCorralitoReg =
+    public static final AlgorithmFactory<TemporaryRegulation> EL_CORRALITO_REG =
         new TemporaryRegulationFactory(
             dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
             new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
         );
-    private static final Path GALAPAGOS_EEZ_SHAPE_FILE =
-        EpoScenario.INPUT_PATH.resolve("eez").resolve("galapagos").resolve("eez.shp");
-    public static final AlgorithmFactory<SpecificProtectedArea> galapagosEezReg =
-        new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE);
-    private static final Path KIRIBATI_EEZ_SHAPE_FILE =
-        EpoScenario.INPUT_PATH.resolve("eez").resolve("kiribati").resolve("eez.shp");
-    public static final AlgorithmFactory<SpecificProtectedArea> kiribatiEezReg =
-        new SpecificProtectedAreaFromShapeFileFactory(KIRIBATI_EEZ_SHAPE_FILE);
-    private static final Path FRENCH_POLYNESIA_EEZ_SHAPE_FILE =
-        EpoScenario.INPUT_PATH.resolve("eez").resolve("french_polynesia").resolve("eez.shp");
-    public static final AlgorithmFactory<SpecificProtectedArea> frenchPolynesiaEezReg =
-        new SpecificProtectedAreaFromShapeFileFactory(FRENCH_POLYNESIA_EEZ_SHAPE_FILE);
-
-    public StandardIattcRegulationsFactory() {
-        super(ImmutableMap.<AlgorithmFactory<? extends Regulation>, String>builder()
-            .put(galapagosEezReg, TAG_FOR_ALL)
-            .put(kiribatiEezReg, TAG_FOR_ALL)
-            .put(frenchPolynesiaEezReg, TAG_FOR_ALL)
-            .put(elCorralitoReg, TAG_FOR_ALL)
-            .put(closureAReg, "closure A")
-            .put(closureBReg, "closure B")
-            .build()
+    public static final ProtectedAreasFromFolderFactory PROTECTED_AREAS_FROM_FOLDER_FACTORY =
+        new ProtectedAreasFromFolderFactory(
+            EpoScenario.INPUT_PATH.resolve("regions"),
+            Paths.get("tags.csv")
         );
+    private AlgorithmFactory<TemporaryRegulation> closureAReg = CLOSURE_A_REG;
+    private AlgorithmFactory<TemporaryRegulation> closureBReg = CLOSURE_B_REG;
+    private AlgorithmFactory<TemporaryRegulation> elCorralitoReg = EL_CORRALITO_REG;
+    private ProtectedAreasFromFolderFactory protectedAreasFromFolderFactory = PROTECTED_AREAS_FROM_FOLDER_FACTORY;
+
+    public AlgorithmFactory<TemporaryRegulation> getClosureAReg() {
+        return closureAReg;
     }
 
+    @SuppressWarnings("unused")
+    public void setClosureAReg(AlgorithmFactory<TemporaryRegulation> closureAReg) {
+        this.closureAReg = closureAReg;
+    }
+
+    public AlgorithmFactory<TemporaryRegulation> getClosureBReg() {
+        return closureBReg;
+    }
+
+    @SuppressWarnings("unused")
+    public void setClosureBReg(AlgorithmFactory<TemporaryRegulation> closureBReg) {
+        this.closureBReg = closureBReg;
+    }
+
+    public AlgorithmFactory<TemporaryRegulation> getElCorralitoReg() {
+        return elCorralitoReg;
+    }
+
+    @SuppressWarnings("unused")
+    public void setElCorralitoReg(AlgorithmFactory<TemporaryRegulation> elCorralitoReg) {
+        this.elCorralitoReg = elCorralitoReg;
+    }
+
+    public ProtectedAreasFromFolderFactory getProtectedAreasFromFolderFactory() {
+        return protectedAreasFromFolderFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setProtectedAreasFromFolderFactory(ProtectedAreasFromFolderFactory protectedAreasFromFolderFactory) {
+        this.protectedAreasFromFolderFactory = protectedAreasFromFolderFactory;
+    }
+
+    @Override
+    public MultipleRegulations apply(FishState fishState) {
+        return new CompositeMultipleRegulationsFactory(
+            ImmutableList.of(
+                new MultipleRegulationsFactory(
+                    ImmutableMap.of(
+                        getElCorralitoReg(), TAG_FOR_ALL,
+                        getClosureAReg(), "closure A",
+                        getClosureBReg(), "closure B"
+                    )
+                ),
+                getProtectedAreasFromFolderFactory()
+            )
+        ).apply(fishState);
+    }
 }

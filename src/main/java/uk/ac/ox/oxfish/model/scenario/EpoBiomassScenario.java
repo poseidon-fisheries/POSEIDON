@@ -113,9 +113,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         )
     );
 
-    private AlgorithmFactory<? extends Regulation> regulationsFactory =
-        new StandardIattcRegulationsFactory();
-
     public EpoBiomassScenario() {
         setFadMapFactory(new BiomassFadMapFactory(currentFiles));
         setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory());
@@ -132,16 +129,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public static int dayOfYear(final Month month, final int dayOfMonth) {
         return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")
@@ -287,7 +274,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
-            regulationsFactory,
+            getRegulationsFactory(),
             gravityDestinationStrategyFactory
         );
 
