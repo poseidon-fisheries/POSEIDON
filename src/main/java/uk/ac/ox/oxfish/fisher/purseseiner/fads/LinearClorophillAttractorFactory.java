@@ -24,22 +24,22 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * like the linear catchability weibull attractor, but this one sets catchability to 0 whenever clorophill is below a specific value
+ * catchability is moduled by clorophill, but there is no max carrying capacity. Just keeps attracting
+ * till it's time to stop
  */
-public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
+public class LinearClorophillAttractorFactory implements
         AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+
 
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
 
-    private LinkedHashMap<String,Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String,Double> maximumCarryingCapacities = new LinkedHashMap<>();
     {
-        carryingCapacityShapeParameters.put("Species 0", 0.5d);
-    }
-    private LinkedHashMap<String,Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
-    {
-        carryingCapacityScaleParameters.put("Species 0", 100000d);
+        maximumCarryingCapacities.put("Skipjack tuna",135000d);
+        maximumCarryingCapacities.put("Yellowfin tuna",40000d);
+        maximumCarryingCapacities.put("Bigeye tuna",60000d);
     }
 
     private LinkedHashMap<String,Double> catchabilities = new LinkedHashMap<>();
@@ -55,6 +55,8 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
     private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
+
+    private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
 
     private String clorophillMapPath = "inputs/tests/clorophill.csv";
 
@@ -91,14 +93,16 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
 
                         DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
                         //double[] maxCatchability = new double[fishState.getBiology().getSize()];
-                       // double[] cachabilityOtherwise = new double[fishState.getBiology().getSize()];
+                        // double[] cachabilityOtherwise = new double[fishState.getBiology().getSize()];
                         for (Species species : fishState.getBiology().getSpecies()) {
                             carryingCapacities[species.getIndex()] =
-                                    carryingCapacityScaleParameters.containsKey(species.getName()) ?
-                                            new WeibullDoubleParameter(
-                                                    carryingCapacityShapeParameters.get(species.getName()),
-                                                    carryingCapacityScaleParameters.get(species.getName())
-                                            ) : new FixedDoubleParameter(-1);
+                                    maximumCarryingCapacities.containsKey(species.getName()) ?
+                                            new FixedDoubleParameter(
+                                                    maximumCarryingCapacities.get(species.getName()) *
+                                                            carryingCapacityMultiplier.apply(fishState.getRandom())
+
+                                            ) :
+                                            new FixedDoubleParameter(-1);
 
 
                         }
@@ -152,23 +156,6 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
         this.selectivityFilters = selectivityFilters;
     }
 
-    public LinkedHashMap<String, Double> getCarryingCapacityShapeParameters() {
-        return carryingCapacityShapeParameters;
-    }
-
-    public void setCarryingCapacityShapeParameters(
-            LinkedHashMap<String, Double> carryingCapacityShapeParameters) {
-        this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
-    }
-
-    public LinkedHashMap<String, Double> getCarryingCapacityScaleParameters() {
-        return carryingCapacityScaleParameters;
-    }
-
-    public void setCarryingCapacityScaleParameters(
-            LinkedHashMap<String, Double> carryingCapacityScaleParameters) {
-        this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
-    }
 
     public LinkedHashMap<String, Double> getCatchabilities() {
         return catchabilities;
@@ -225,5 +212,21 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
 
     public void setClorophillThreshold(DoubleParameter clorophillThreshold) {
         this.clorophillThreshold = clorophillThreshold;
+    }
+
+    public LinkedHashMap<String, Double> getMaximumCarryingCapacities() {
+        return maximumCarryingCapacities;
+    }
+
+    public void setMaximumCarryingCapacities(LinkedHashMap<String, Double> maximumCarryingCapacities) {
+        this.maximumCarryingCapacities = maximumCarryingCapacities;
+    }
+
+    public DoubleParameter getCarryingCapacityMultiplier() {
+        return carryingCapacityMultiplier;
+    }
+
+    public void setCarryingCapacityMultiplier(DoubleParameter carryingCapacityMultiplier) {
+        this.carryingCapacityMultiplier = carryingCapacityMultiplier;
     }
 }

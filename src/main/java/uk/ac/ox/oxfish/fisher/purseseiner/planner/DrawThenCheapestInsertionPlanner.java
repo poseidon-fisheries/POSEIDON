@@ -467,13 +467,17 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //////
 //        GenericOptimization.buildLocalCalibrationProblem(
 //                Paths.get(
-//                        "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/calibration_base.yaml"),
+//                        "docs/20220223 tuna_calibration/clorophill/greedy_unconstrained_nocalzone_square_noweibull/cenv0477/2022-09-26_13.28.17_global/calibration.yaml"),
 //                new double[]{
-//                        11.366, 2.465, 13.248, 68.620,-3.238,-13.843,-24.131, 5.467,-25.930,-1.987, 8.039,-3.949, 8.321, 2.389, 12.699, 38.852, 46.776, 37.540,-10.365, 12.171,-33.112,-27.241, 27.253,-4.165,-0.039
+//                        -0.5001154986470797, 4.316687510298508, -3.2955427635214427, 10.416087454193578, -11.53794460063702, 0.590146596365984, -2.431855931730542, 15.0 ,-4.620028821484866, 6.506843766050387, 11.162732654106351, -8.629976177897001, -12.461350675088646, -8.859888250322072, 15.0, 9.9677178324451, 5.6765357070850255, 10.87375650767638, 2.922750294667625, -9.03184813295324
+//
 //                },
-//                "calibration.yaml", .2
+//                "local.yaml", .2
 //        );
 //}
+
+
+
 
 ////
     public static void main(String[] args) throws IOException {
@@ -553,10 +557,9 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //        );
         double[] solution =
                 {
-                        -10.434, 16.046,-15.811, 15.073,-16.355, 52.823,-11.017,-5.168,-12.093, 16.198,-3.761,-2.118,-1.630, 5.078, 4.064,-7.311, 10.801,-12.097,-0.492, 2.318, 16.215, 2.311,-93.608
-                                       };
+                        0.151,-19.809, 17.639, 15.310, 10.801,-16.195,-10.396, 12.883, 3.068, 5.094, 3.922,-64.652,-61.915, 10.941, 1.185,-10.349, 76.397,-21.784,-5.645, 11.131,-30.639, 15.117                                       };
         Path calibrationFile = Paths.get(
-                "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/sep2/real_greedy_constrained/carrknight/2022-08-29_21.57.46_local/local_calibration.yaml"
+                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/greedy_unconstrained_nocalzone_square_noweibull2/carrknight/manual/carrknight/2022-09-28_09.52.19_first_calibration/manual.yaml"
         );
 
 

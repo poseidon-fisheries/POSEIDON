@@ -23,10 +23,12 @@ package uk.ac.ox.oxfish.experiments.tuna.calibrations;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import org.apache.commons.beanutils.BeanUtils;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearClorophillAttractorFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -57,7 +59,9 @@ public class Sep20Calibrations {
                                   boolean modifyAdditionalFadInspected,
                                   boolean vpsScenario,
                                   boolean fixHazardAndWait,
-                                  boolean moreEffortClosureOne) throws IOException, InvocationTargetException, IllegalAccessException {
+                                  boolean moreEffortClosureOne,
+                                  boolean noCalzone,
+                                  boolean baseline, boolean noWeibull) throws IOException, InvocationTargetException, IllegalAccessException {
 
         FishYAML yaml = new FishYAML();
 
@@ -168,6 +172,48 @@ public class Sep20Calibrations {
             scenario.setProportionBoatsInClosureOne(new FixedDoubleParameter(.2));
         }
 
+        if(baseline){
+            HardEdgeOptimizationParameter distancePenalty = new HardEdgeOptimizationParameter();
+            distancePenalty.setHardMaximum(10);
+            distancePenalty.setHardMinimum(0.0001);
+            distancePenalty.setMinimum(0.2);
+            distancePenalty.setMaximum(6);
+            distancePenalty.setAlwaysPositive(true);
+            distancePenalty.setAddressToModify("destinationStrategy.fadModule.distancePenalty");
+            optimization.getParameters().add(
+                    distancePenalty
+            );
+        }
+
+        if(noCalzone){
+
+            optimization.getTargets().removeIf(dataTarget -> ((SmapeDataTarget) dataTarget).getColumnName().contains("calzone"));
+        }
+
+        if(noWeibull){
+
+            //set the gear to linear
+            LinearClorophillAttractorFactory fadInitializer = new LinearClorophillAttractorFactory();
+            scenario.setFadInitializerFactory(fadInitializer);
+            fadInitializer.getCatchabilities().clear();
+            fadInitializer.getCatchabilities().put("Skipjack tuna",0d);
+            fadInitializer.getCatchabilities().put("Yellowfin tuna",0d);
+            fadInitializer.getCatchabilities().put("Bigeye tuna",0d);
+            //remove mentions of carrying capacity from the calibration problem
+            optimization.getParameters().removeIf(optimizationParameter -> optimizationParameter.getName().contains("carryingCapacityScaleParameters"));
+            optimization.getParameters().removeIf(optimizationParameter -> optimizationParameter.getName().contains(".carryingCapacityShapeParameters"));
+
+            //but add back the maximum days
+            HardEdgeOptimizationParameter maximumDaysAttraction = new HardEdgeOptimizationParameter();
+            maximumDaysAttraction.setAddressToModify("fadInitializerFactory.maximumDaysAttractions");
+            maximumDaysAttraction.setMaximum(40);
+            maximumDaysAttraction.setMinimum(10);
+            maximumDaysAttraction.setHardMinimum(5);
+            maximumDaysAttraction.setHardMaximum(100);
+            optimization.getParameters().add(maximumDaysAttraction);
+
+        }
+
 
         Path outputFolder = MAIN_DIRECTORY.resolve(name + "/");
         outputFolder.toFile().mkdir();
@@ -184,84 +230,143 @@ public class Sep20Calibrations {
 
     public static void main(String[] args) throws IOException, InvocationTargetException, IllegalAccessException {
 
-        createYaml(
-                "greedy_constrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
-                true,
-                true,
-                false,
-                true,
-                true);
-        createYaml(
-                "greedy_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
-                true,
-                true,
-                false,
-                false,
-                true);
-
-
-        createYaml(
-                "vps_constrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-                true,
-                false,
-                true,
-                true,
-                true);
-        createYaml(
-                "vps_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
-                true,
-                false,
-                true,
-                false,
-                true);
-
-
-        createYaml(
-                "mvt_constrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
-                true,
-                false,
-                false,
-                true,
-                true);
-        createYaml(
-                "mvt_unconstrained",
-                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
-                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
-                true,
-                false,
-                false,
-                false,
-                true);
-//
-//
 //        createYaml(
-//                "greedy_unconstrained_closurecorrect",
+//                "greedy_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+//                true,
+//                true,
+//                false,
+//                true,
+//                true,
+//                false,
+//                false);
+//        createYaml(
+//                "greedy_unconstrained",
 //                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
 //                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
 //                true,
 //                true,
 //                false,
 //                false,
-//                true);
+//                true,
+//                false,
+//                false);
+//
 //
 //        createYaml(
-//                "mvt_unconstrained_closurecorrect",
+//                "vps_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+//                true,
+//                false,
+//                true,
+//                true,
+//                true,
+//                false,
+//                false);
+//        createYaml(
+//                "vps_unconstrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("vps_scenario.yaml"),
+//                true,
+//                false,
+//                true,
+//                false,
+//                true,
+//                false,
+//                false);
+//
+//
+//        createYaml(
+//                "mvt_constrained",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                true,
+//                true,
+//                false,
+//                false);
+//        createYaml(
+//                "mvt_unconstrained",
 //                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
 //                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
 //                true,
 //                false,
 //                false,
 //                false,
-//                true);
+//                true,
+//                false,
+//                false);
+
+//        createYaml(
+//                "mvt_unconstrained_nocalzone_square",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                false,
+//                true,
+//                true,
+//                false, false);
+//        createYaml(
+//                "centroid_unconstrained_nocalzone_square",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("centroid_scenario.yaml"),
+//                true,
+//                false,
+//                false,
+//                false,
+//                true,
+//                true,
+//                true, false);
+//        createYaml(
+//                "greedy_unconstrained_nocalzone_square",
+//                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+//                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+//                true,
+//                true,
+//                false,
+//                false,
+//                true,
+//                true,
+//                false, false);
+        createYaml(
+                "mvt_unconstrained_nocalzone_square_noweibull",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("mvt_scenario.yaml"),
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                false, true);
+        createYaml(
+                "centroid_unconstrained_nocalzone_square_noweibull",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("centroid_scenario.yaml"),
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true, true);
+        createYaml(
+                "greedy_unconstrained_nocalzone_square_noweibull",
+                MAIN_DIRECTORY.resolve("greedy_calibration.yaml"),
+                MAIN_DIRECTORY.resolve("greedy_scenario.yaml"),
+                true,
+                true,
+                false,
+                false,
+                true,
+                true,
+                false, true);
+
     }
 }
