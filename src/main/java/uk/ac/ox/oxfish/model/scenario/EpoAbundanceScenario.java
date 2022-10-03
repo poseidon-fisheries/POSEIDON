@@ -50,8 +50,6 @@ import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
@@ -325,8 +323,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                buildPorts(fishState),
-                    getProportionBoatsInClosureOne().apply(fishState.getRandom())).apply(fishState);
+                buildPorts(fishState)
+            ).apply(fishState);
 
         ImmutableList.of(
             scheduledAbundanceProcessesFactory,

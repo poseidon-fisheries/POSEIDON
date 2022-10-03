@@ -33,7 +33,7 @@ import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
+
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -68,13 +68,11 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         final Path vesselsFilePath,
         final int targetYear,
         final FisherFactory fisherFactory,
-        final Collection<Port> ports,
-        double probabilityBoatBelongsToClosureOne) {
+        final Collection<Port> ports) {
         this.vesselsFilePath = vesselsFilePath;
         this.targetYear = targetYear;
         this.fisherFactory = fisherFactory;
         this.portsByName = ports.stream().collect(toImmutableMap(Port::getName, identity()));
-        this.probabilityBoatBelongsToClosureOne = probabilityBoatBelongsToClosureOne;
     }
 
     /**

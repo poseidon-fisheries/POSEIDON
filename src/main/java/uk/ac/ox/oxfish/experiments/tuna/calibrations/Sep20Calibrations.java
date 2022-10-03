@@ -168,9 +168,9 @@ public class Sep20Calibrations {
         }
 
 
-        if(moreEffortClosureOne){
-            scenario.setProportionBoatsInClosureOne(new FixedDoubleParameter(.2));
-        }
+//        if(moreEffortClosureOne){
+//            scenario.setProportionBoatsInClosureOne(new FixedDoubleParameter(.2));
+//        }
 
         if(baseline){
             HardEdgeOptimizationParameter distancePenalty = new HardEdgeOptimizationParameter();

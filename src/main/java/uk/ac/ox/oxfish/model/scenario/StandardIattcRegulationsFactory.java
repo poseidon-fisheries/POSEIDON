@@ -75,7 +75,7 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
     @SuppressWarnings("unused")
     public void setClosureBReg(AlgorithmFactory<TemporaryRegulation> closureBReg) {
         this.closureBReg = closureBReg;
-
+    }
 
     public AlgorithmFactory<TemporaryRegulation> getElCorralitoReg() {
         return elCorralitoReg;

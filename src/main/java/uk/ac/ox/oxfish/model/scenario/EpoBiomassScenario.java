@@ -45,7 +45,6 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -294,8 +293,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                buildPorts(fishState),
-                    getProportionBoatsInClosureOne().apply(fishState.getRandom())).apply(fishState);
+                buildPorts(fishState)
+            ).apply(fishState);
 
         exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(fishState);
