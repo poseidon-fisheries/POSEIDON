@@ -193,3 +193,6 @@ EPO Abundance Pathfinding:
   zapper: true
   zapperAge: false
   vesselsFilePath: inputs/epo_inputs/tests/backsliding/boats.csv
+  additionalStartables:
+    - IATTC Closure Period Randomizer:
+        proportionOfBoatsInClosureA: 0.5

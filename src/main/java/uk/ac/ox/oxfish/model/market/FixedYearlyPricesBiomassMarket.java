@@ -13,16 +13,22 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Comparator.naturalOrder;
 
 public class FixedYearlyPricesBiomassMarket
     extends AbstractBiomassMarket
     implements Steppable {
 
     private final Map<Integer, Double> yearlyPrices;
+    private final int lastYear;
+    private boolean defaultingToLastYear = true;
     private Integer currentYear;
 
     public FixedYearlyPricesBiomassMarket(Map<Integer, Double> yearlyPrices) {
         this.yearlyPrices = ImmutableMap.copyOf(yearlyPrices);
+        this.lastYear = yearlyPrices.keySet().stream()
+            .max(naturalOrder())
+            .orElseThrow(() -> new IllegalStateException("No prices defined."));
     }
 
     public int getCurrentYear() {
@@ -30,8 +36,13 @@ public class FixedYearlyPricesBiomassMarket
     }
 
     public void setCurrentYear(int currentYear) {
-        checkArgument(yearlyPrices.containsKey(currentYear));
-        this.currentYear = currentYear;
+        if (yearlyPrices.containsKey(currentYear)) {
+            this.currentYear = currentYear;
+        } else if (defaultingToLastYear) {
+            this.currentYear = lastYear;
+        } else {
+            throw new IllegalArgumentException("No prices defined for year " + currentYear);
+        }
     }
 
     @Override
@@ -42,7 +53,15 @@ public class FixedYearlyPricesBiomassMarket
         FishState fishState,
         Species species
     ) {
-        checkArgument(fishState.getCalendarYear() == getCurrentYear());
+        if (defaultingToLastYear) {
+            checkArgument(
+                fishState.getCalendarYear() == getCurrentYear() ||
+                    (getCurrentYear() == lastYear &&
+                        fishState.getCalendarYear() > getCurrentYear())
+            );
+        } else {
+            checkArgument(fishState.getCalendarYear() == getCurrentYear());
+        }
         return Market.defaultMarketTransaction(
             biomass,
             fisher,
@@ -77,4 +96,13 @@ public class FixedYearlyPricesBiomassMarket
         }
     }
 
+    @SuppressWarnings("unused")
+    public boolean isDefaultingToLastYear() {
+        return defaultingToLastYear;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDefaultingToLastYear(boolean defaultingToLastYear) {
+        this.defaultingToLastYear = defaultingToLastYear;
+    }
 }

@@ -30,6 +30,7 @@ import java.io.Serializable;
  */
 public interface TripListener extends Serializable{
 
+    default void reactToNewTrip(TripRecord record, Fisher fisher) {};
     void reactToFinishedTrip(TripRecord record, Fisher fisher);
 
 }

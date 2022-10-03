@@ -228,4 +228,5 @@ public class OwnFadSetDiscretizedActionGenerator {
     public double getMinimumFadValue() {
         return minimumFadValue;
     }
+
 }

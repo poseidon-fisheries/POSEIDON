@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -63,9 +64,6 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
     private final Map<String, Port> portsByName;
     private final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
-    private final double probabilityBoatBelongsToClosureOne;
-
-
     public PurseSeineVesselReader(
         final Path vesselsFilePath,
         final int targetYear,
@@ -95,15 +93,12 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         }
     }
 
-    public static void chooseClosurePeriod(final Fisher fisher, final MersenneTwisterFast rng,
-                                           double probabilityBoatsBelongToClosureOne) {
+    public static void chooseClosurePeriod(final Fisher fisher, final String closure) {
         final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
+        final String tag = "closure " + closure;
+        checkArgument(periods.contains(tag));
         fisher.getTags().removeIf(periods::contains);
-        if(rng.nextDouble()< probabilityBoatsBelongToClosureOne)
-            fisher.getTags().add(periods.get(0));
-        else
-            fisher.getTags().add(periods.get(1));
-
+        fisher.getTags().add(tag);
     }
 
     @Override
@@ -147,8 +142,10 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                     fisher.getDepartingStrategy(),
                     record.getDouble("mean_time_at_port_in_hours")
                 );
-                chooseClosurePeriod(fisher, fishState.getRandom(),
-                        probabilityBoatBelongsToClosureOne);
+                if (record.getMetaData().containsColumn("closure")) {
+                    chooseClosurePeriod(fisher, record.getString("closure"));
+                }
+                fisher.getTags().add(record.getString("flag"));
                 // TODO: setMaxTravelTime(fisher, record.getDouble
                 //  ("max_trip_duration_in_hours"));
                 return fisher;

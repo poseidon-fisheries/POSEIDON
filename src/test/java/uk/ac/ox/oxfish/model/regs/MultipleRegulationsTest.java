@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -33,6 +35,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -42,6 +46,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 
 /**
  * Created by carrknight on 4/4/17.
@@ -96,36 +101,16 @@ public class MultipleRegulationsTest {
     @Test
     public void simpleChecks() throws Exception {
 
-
-        HashMap<AlgorithmFactory<? extends Regulation>, String> factories = new HashMap<>();
         TemporaryProtectedArea mpa = mock(TemporaryProtectedArea.class);
-        factories.put(new AlgorithmFactory<Regulation>() {
-            @Override
-            public Regulation apply(FishState fishState) {
-                return mpa;
-            }
-        },MultipleRegulations.TAG_FOR_ALL);
-
         FishingSeason season = mock(FishingSeason.class);
-        factories.put(new AlgorithmFactory<Regulation>() {
-            @Override
-            public Regulation apply(FishState fishState) {
-                return season;
-            }
-        },MultipleRegulations.TAG_FOR_ALL);
-
-
         QuotaPerSpecieRegulation quota = mock(QuotaPerSpecieRegulation.class);
-        factories.put(new AlgorithmFactory<Regulation>() {
-            @Override
-            public Regulation apply(FishState fishState) {
-                return quota;
-            }
-        },MultipleRegulations.TAG_FOR_ALL);
 
-
-        MultipleRegulations regs = new MultipleRegulations(factories);
-
+        MultipleRegulations regs = new MultipleRegulations(
+            ImmutableMap.of(
+                TAG_FOR_ALL,
+                ImmutableList.of(fishState -> mpa, fishState -> season, fishState -> quota)
+            )
+        );
 
         regs.start(mock(FishState.class),mock(Fisher.class));
 

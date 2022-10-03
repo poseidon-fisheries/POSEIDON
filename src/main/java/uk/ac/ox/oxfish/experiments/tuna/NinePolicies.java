@@ -26,14 +26,15 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -43,10 +44,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
+import static java.time.Month.*;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 
 public class NinePolicies {
@@ -113,38 +111,48 @@ public class NinePolicies {
             makePolicy(
                 "86-day closures",
                 ImmutableList.of(currentFadLimits),
-                scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
-                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
-                    new TemporaryRegulationFactory(
-                        scenario.dayOfYear(JULY, 15),
-                        scenario.dayOfYear(OCTOBER, 8),
-                        new NoFishingFactory()
-                    ), "closure A",
-                    new TemporaryRegulationFactory(
-                        scenario.dayOfYear(NOVEMBER, 9),
-                        scenario.dayOfYear(FEBRUARY, 2),
-                        new NoFishingFactory()
-                    ), "closure B"
-                ))
+                scenario ->
+                    new CompositeMultipleRegulationsFactory(
+                        ImmutableList.of(
+                            StandardIattcRegulationsFactory.PROTECTED_AREAS_FROM_FOLDER_FACTORY,
+                            new MultipleRegulationsFactory(ImmutableMap.of(
+                                StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
+                                new TemporaryRegulationFactory(
+                                    EpoBiomassScenario.dayOfYear(JULY, 15),
+                                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                    new NoFishingFactory()
+                                ), "closure A",
+                                new TemporaryRegulationFactory(
+                                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
+                                    EpoBiomassScenario.dayOfYear(FEBRUARY, 2),
+                                    new NoFishingFactory()
+                                ), "closure B"
+                            ))
+                        )
+                    )
             ),
             makePolicy(
                 "100-day closures",
                 ImmutableList.of(currentFadLimits),
-                scenario -> new MultipleRegulationsFactory(ImmutableMap.of(
-                    StandardIattcRegulationsFactory.galapagosEezReg, TAG_FOR_ALL,
-                    StandardIattcRegulationsFactory.elCorralitoReg, TAG_FOR_ALL,
-                    new TemporaryRegulationFactory(
-                        scenario.dayOfYear(JULY, 1),
-                        scenario.dayOfYear(OCTOBER, 8),
-                        new NoFishingFactory()
-                    ), "closure A",
-                    new TemporaryRegulationFactory(
-                        scenario.dayOfYear(NOVEMBER, 9),
-                        scenario.dayOfYear(FEBRUARY, 16),
-                        new NoFishingFactory()
-                    ), "closure B"
-                ))
+                scenario ->
+                    new CompositeMultipleRegulationsFactory(
+                        ImmutableList.of(
+                            StandardIattcRegulationsFactory.PROTECTED_AREAS_FROM_FOLDER_FACTORY,
+                            new MultipleRegulationsFactory(ImmutableMap.of(
+                                StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
+                                new TemporaryRegulationFactory(
+                                    EpoBiomassScenario.dayOfYear(JULY, 1),
+                                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                    new NoFishingFactory()
+                                ), "closure A",
+                                new TemporaryRegulationFactory(
+                                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
+                                    EpoBiomassScenario.dayOfYear(FEBRUARY, 16),
+                                    new NoFishingFactory()
+                                ), "closure B"
+                            ))
+                        )
+                    )
             ),
             makePolicy(
                 "Business as usual",

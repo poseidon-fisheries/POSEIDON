@@ -50,6 +50,7 @@ import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
@@ -66,6 +67,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -76,7 +78,6 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
-import static uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory.scheduleClosurePeriodChoice;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
@@ -97,6 +98,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         .build();
     protected final SpeciesCodesFromFileFactory speciesCodesFactory =
         new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+    private final PortInitializer portInitializer =
+        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
+    AlgorithmFactory<? extends MarketMap> marketMapFactory =
+        new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
@@ -106,12 +111,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
-
-    private final PortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
-
-    AlgorithmFactory<? extends MarketMap> marketMapFactory =
-        new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
+    private AlgorithmFactory<? extends Regulation> regulationsFactory =
+        new StandardIattcRegulationsFactory();
+    private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
+        new LinkedList<>();
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
@@ -149,6 +152,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         if (marketMapFactory instanceof SpeciesCodeAware) {
             ((SpeciesCodeAware) marketMapFactory).setSpeciesCodes(grabSpeciesCodesFactory().get());
         }
+
+        additionalStartables.stream()
+            .map(additionalStartable -> additionalStartable.apply(fishState))
+            .forEach(fishState::registerStartable);
 
         return new ScenarioPopulation(
             new ArrayList<>(),
@@ -273,8 +280,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
                 .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
             addHourlyCosts(),
             fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> scheduleClosurePeriodChoice(fishState, fisher,
-                    getProportionBoatsInClosureOne().apply(fishState.getRandom())),
             fisher -> fisher.getYearlyData().registerGatherer(
                 "Profits",
                 fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
@@ -374,16 +379,25 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.marketMapFactory = marketMapFactory;
     }
 
-
-
-    private DoubleParameter proportionBoatsInClosureOne = new FixedDoubleParameter(.5);
-
-    public DoubleParameter getProportionBoatsInClosureOne() {
-        return proportionBoatsInClosureOne;
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
+        return regulationsFactory;
     }
 
-    public void setProportionBoatsInClosureOne(DoubleParameter probabilityBoatBelongsToClosureOne) {
-        this.proportionBoatsInClosureOne = probabilityBoatBelongsToClosureOne;
+    @SuppressWarnings("unused")
+    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
+        this.regulationsFactory = regulationsFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getAdditionalStartables() {
+        return additionalStartables;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAdditionalStartables(List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
+        this.additionalStartables = additionalStartables;
+
     }
 
 }

@@ -393,8 +393,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                         getVesselsFilePath(),
                         TARGET_YEAR,
                         fisherFactory,
-                        buildPorts(fishState),
-                        getProportionBoatsInClosureOne().apply(fishState.getRandom())).
+                        buildPorts(fishState)).
                         apply(fishState);
 
         ImmutableList.of(

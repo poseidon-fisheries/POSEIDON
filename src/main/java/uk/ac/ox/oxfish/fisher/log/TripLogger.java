@@ -89,10 +89,13 @@ public class TripLogger implements Startable
      * log the start of a new trip
      * @param hoursAtPort
      */
-    public void newTrip(double hoursAtPort, int tripDay){
+    public void newTrip(double hoursAtPort, int tripDay, Fisher fisher){
         assert currentTrip == null || currentTrip.isCompleted(); //the other trip is over
         //just replace the old trip
         currentTrip = new TripRecord(numberOfSpecies, hoursAtPort, tripDay);
+        //tell the listeners
+        for (TripListener listener : listeners)
+            listener.reactToNewTrip(currentTrip, fisher);
     }
 
     /**

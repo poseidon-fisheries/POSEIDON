@@ -73,12 +73,11 @@ public class AdditionalStartables {
 
         NAMES.put(ScheduledBiomassProcessesFactory.class, "Scheduled Biomass Processes");
         NAMES.put(BiomassRestorerFactory.class, "Biomass Restorer");
-      //  NAMES.put(AbundanceReallocatorFactory.class, "Abundance Reallocator");
 
         NAMES.put(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV");
         NAMES.put(FadDemoFactory.class, "Fad Demo");
         NAMES.put(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV");
-
+        NAMES.put(IattcClosurePeriodRandomizerFactory.class, "IATTC Closure Period Randomizer");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
