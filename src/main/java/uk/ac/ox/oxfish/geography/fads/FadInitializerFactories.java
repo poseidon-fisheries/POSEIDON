@@ -22,7 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearClorophillAttractorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityClorophillAttractorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -45,6 +47,10 @@ public class FadInitializerFactories {
         NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
         NAMES.put(WeibullLinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
         NAMES.put(WeibullCatchabilitySelectivityAttractorFactory.class, "Weibull FAD Catchability Selectivity Initializer");
+        NAMES.put(WeibullCatchabilitySelectivityClorophillAttractorFactory.class,
+                "Weibull FAD Catchability Selectivity Clorophill Initializer");
+        NAMES.put(LinearClorophillAttractorFactory.class,
+                "Linear FAD Catchability Selectivity Clorophill Initializer");
 
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);

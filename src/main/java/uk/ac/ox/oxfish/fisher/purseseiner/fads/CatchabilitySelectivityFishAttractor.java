@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * simple "linear" attractor for abundance fads: as long as it is old enough (but not too old) the fad attracts a fixed
@@ -47,7 +48,10 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
      */
     private final DoubleParameter[] carryingCapacitiesGenerator;
 
-    private final double[] catchabilityPerSpecies;
+    /**
+     * given a fad, returns its current catchability per species
+     */
+    private final Function<AbstractFad,double[]> catchabilityPerSpeciesSupplier;
 
 
     /**
@@ -69,13 +73,30 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
 
     public CatchabilitySelectivityFishAttractor(
             DoubleParameter[] carryingCapacitiesGenerator,
+            Function<AbstractFad,double[]> catchabilityPerSpeciesSupplier,
+            int daysInWaterBeforeAttraction,
+            int maximumAttractionDays,
+            FishState model,
+            Map<Species, NonMutatingArrayFilter> globalSelectivityCurves) {
+        this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
+        this.catchabilityPerSpeciesSupplier = catchabilityPerSpeciesSupplier;
+
+        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        this.maximumAttractionDays = maximumAttractionDays;
+        this.model = model;
+        this.globalSelectivityCurves = globalSelectivityCurves;
+    }
+
+    public CatchabilitySelectivityFishAttractor(
+            DoubleParameter[] carryingCapacitiesGenerator,
             double[] catchabilityPerSpecies,
             int daysInWaterBeforeAttraction,
             int maximumAttractionDays,
             FishState model,
             Map<Species, NonMutatingArrayFilter> globalSelectivityCurves) {
         this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
-        this.catchabilityPerSpecies = catchabilityPerSpecies;
+        catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
+
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maximumAttractionDays = maximumAttractionDays;
         this.model = model;
@@ -115,13 +136,14 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
                 continue;
 
             //start filling them up!
+            double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);
             for (int subdivision = 0; subdivision < abundanceInTile.length; subdivision++) {
                 for (int bin = 0; bin < abundanceInTile[subdivision].length; bin++) {
                     abundanceCaught[subdivision][bin] = Math.max(
-                            catchabilityPerSpecies[species.getIndex()] *
+                            catchabilityHere[species.getIndex()] *
                             selectivity.getFilterValue(subdivision,bin) *
                             abundanceInTile[subdivision][bin],
-                    0);
+                            0);
 
                 }
             }

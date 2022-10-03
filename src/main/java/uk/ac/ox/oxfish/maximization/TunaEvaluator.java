@@ -66,6 +66,8 @@ public class TunaEvaluator implements Runnable {
 
     private boolean parallel = false;
 
+    private boolean completeOutput = true;
+
     public TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
 
         optimization = GenericOptimization.fromFile(calibrationFilePath);
@@ -216,11 +218,13 @@ public class TunaEvaluator implements Runnable {
                 .forEach(fadManager ->
                     fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
                 );
-            ImmutableMap.of(
-                "fad_attraction_events.csv", observer.getEventLogger(),
-                "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
-                "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
-            ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
+            if(completeOutput) {
+                ImmutableMap.of(
+                        "fad_attraction_events.csv", observer.getEventLogger(),
+                        "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
+                        "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
+                ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
+            }
         });
     }
 
@@ -277,5 +281,13 @@ public class TunaEvaluator implements Runnable {
 
     public void setParallel(boolean parallel) {
         this.parallel = parallel;
+    }
+
+    public boolean isCompleteOutput() {
+        return completeOutput;
+    }
+
+    public void setCompleteOutput(boolean completeOutput) {
+        this.completeOutput = completeOutput;
     }
 }

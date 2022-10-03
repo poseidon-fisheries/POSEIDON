@@ -42,27 +42,35 @@ import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
+import javax.annotation.Nullable;
+
 abstract class AbstractAllocationGridsSupplier<K>
     implements Supplier<AllocationGrids<K>> {
 
+    @Nullable
     private final SpeciesCodes speciesCodes;
     private final Path gridsFilePath;
     private final MapExtent mapExtent;
     private final int period;
 
+    private final boolean toNormalize;
+
     private final LoadingCache<AbstractAllocationGridsSupplier<K>, AllocationGrids<K>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
 
     AbstractAllocationGridsSupplier(
-        final SpeciesCodes speciesCodes,
+            @Nullable
+
+            final SpeciesCodes speciesCodes,
         final Path gridsFilePath,
         final MapExtent mapExtent,
-        final int period
-    ) {
+        final int period,
+        boolean toNormalize) {
         this.speciesCodes = speciesCodes;
         this.gridsFilePath = gridsFilePath;
         this.mapExtent = mapExtent;
         this.period = period;
+        this.toNormalize = toNormalize;
     }
 
     @Override
@@ -91,7 +99,6 @@ abstract class AbstractAllocationGridsSupplier<K>
     private AllocationGrids<K> readGridsFromFile() {
 
         checkNotNull(this.gridsFilePath);
-        checkNotNull(this.speciesCodes);
         checkNotNull(this.mapExtent);
 
         final Map<LocalDate, Map<K, List<Record>>> recordsByDateAndKey =
@@ -118,7 +125,7 @@ abstract class AbstractAllocationGridsSupplier<K>
                     entry -> (int) DAYS.between(startDate, entry.getKey()),
                     entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
                         Map.Entry::getKey,
-                        subEntry -> makeGrid(mapExtent, subEntry.getValue())
+                        subEntry -> makeGrid(mapExtent, subEntry.getValue(), toNormalize)
                     ))
                 )),
             period
@@ -128,8 +135,8 @@ abstract class AbstractAllocationGridsSupplier<K>
     abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
 
     private static DoubleGrid2D makeGrid(
-        final MapExtent mapExtent,
-        final Iterable<? extends Record> records
+            final MapExtent mapExtent,
+            final Iterable<? extends Record> records, final boolean normalize
     ) {
         final DoubleGrid2D grid = new DoubleGrid2D(
             mapExtent.getGridWidth(),
@@ -138,13 +145,22 @@ abstract class AbstractAllocationGridsSupplier<K>
         records.forEach(record -> {
             final double lon = record.getDouble("lon");
             final double lat = record.getDouble("lat");
+            int x = mapExtent.toGridX(lon);
+            int y = mapExtent.toGridY(lat);
+            if(x<grid.getWidth() && y<grid.getHeight() &&
+            x>=0 && y>=0) {
             grid.set(
-                mapExtent.toGridX(lon),
-                mapExtent.toGridY(lat),
+                    x,
+                    y,
                 record.getDouble("value")
-            );
+            );}
+            else {
+                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
+            }
         });
-        return normalize(grid);
+        if(normalize){
+        return normalize(grid);}
+        return grid;
     }
 
     /**

@@ -294,8 +294,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 getVesselsFilePath(),
                 TARGET_YEAR,
                 fisherFactory,
-                buildPorts(fishState)
-            ).apply(fishState);
+                buildPorts(fishState),
+                    getProportionBoatsInClosureOne().apply(fishState.getRandom())).apply(fishState);
 
         exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(fishState);

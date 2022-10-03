@@ -55,13 +55,13 @@ public class AllocationGrids<K> {
         final ImmutableSortedMap<Integer, Map<K, DoubleGrid2D>> grids,
         final int period
     ) {
-        // Make sure all grids sum to 1.
-        checkArgument(
-            grids.values()
-                .stream()
-                .flatMap(map -> map.values().stream())
-                .allMatch(grid -> fuzzyEquals(Arrays.stream(grid.toArray()).sum(), 1.0, EPSILON))
-        );
+        // don't check normalization anymore; it is not always given
+//        checkArgument(
+//            grids.values()
+//                .stream()
+//                .flatMap(map -> map.values().stream())
+//                .allMatch(grid -> fuzzyEquals(Arrays.stream(grid.toArray()).sum(), 1.0, EPSILON))
+//        );
         this.grids = grids;
         this.stepMapper = new PeriodicStepMapper(period);
     }
@@ -99,7 +99,7 @@ public class AllocationGrids<K> {
         return grids;
     }
 
-    Map<K, DoubleGrid2D> atOrBeforeStep(final Integer step) {
+    public Map<K, DoubleGrid2D> atOrBeforeStep(final Integer step) {
         final Entry<? super Integer, Map<K, DoubleGrid2D>> floorEntry =
             grids.floorEntry(stepMapper.applyAsInt(step));
         checkNotNull(floorEntry, "No grids at or before step " + step);

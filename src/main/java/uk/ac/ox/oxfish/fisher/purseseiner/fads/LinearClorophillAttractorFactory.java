@@ -1,33 +1,16 @@
-/*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2022  CoHESyS Lab cohesys.lab@gmail.com
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- */
-
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
+import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.ClorophillMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -37,22 +20,26 @@ import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class WeibullCatchabilitySelectivityAttractorFactory implements
+/**
+ * catchability is moduled by clorophill, but there is no max carrying capacity. Just keeps attracting
+ * till it's time to stop
+ */
+public class LinearClorophillAttractorFactory implements
         AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+
 
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
 
-    private LinkedHashMap<String,Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String,Double> maximumCarryingCapacities = new LinkedHashMap<>();
     {
-        carryingCapacityShapeParameters.put("Species 0", 0.5d);
-    }
-    private LinkedHashMap<String,Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
-    {
-        carryingCapacityScaleParameters.put("Species 0", 100000d);
+        maximumCarryingCapacities.put("Skipjack tuna",135000d);
+        maximumCarryingCapacities.put("Yellowfin tuna",40000d);
+        maximumCarryingCapacities.put("Bigeye tuna",60000d);
     }
 
     private LinkedHashMap<String,Double> catchabilities = new LinkedHashMap<>();
@@ -69,8 +56,15 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
 
+    private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
 
-    private Locker<FishState, AbundanceFadInitializer > oneAttractorPerStateLocker = new Locker<>();
+    private String clorophillMapPath = "inputs/tests/clorophill.csv";
+
+
+    private DoubleParameter clorophillThreshold = new FixedDoubleParameter(0.15);
+
+    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
+            new Locker<>();
 
 
 
@@ -80,6 +74,11 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                 new Supplier<AbundanceFadInitializer>() {
                     @Override
                     public AbundanceFadInitializer get() {
+                        //create the map
+                        ClorophillMapFactory factory = new ClorophillMapFactory(clorophillMapPath);
+                        fishState.registerStartable(factory.apply(fishState));
+
+                        //attractor:
                         final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
                         DoubleSupplier capacityGenerator;
                         if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
@@ -93,20 +92,33 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                             };
 
                         DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
-                        double[] catchabilitiesHere = new double[fishState.getBiology().getSize()];
-
+                        //double[] maxCatchability = new double[fishState.getBiology().getSize()];
+                        // double[] cachabilityOtherwise = new double[fishState.getBiology().getSize()];
                         for (Species species : fishState.getBiology().getSpecies()) {
                             carryingCapacities[species.getIndex()] =
-                                    carryingCapacityScaleParameters.containsKey(species.getName()) ?
-                                            new WeibullDoubleParameter(
-                                                    carryingCapacityShapeParameters.get(species.getName()),
-                                                    carryingCapacityScaleParameters.get(species.getName())
-                                            ) : new FixedDoubleParameter(-1);
+                                    maximumCarryingCapacities.containsKey(species.getName()) ?
+                                            new FixedDoubleParameter(
+                                                    maximumCarryingCapacities.get(species.getName()) *
+                                                            carryingCapacityMultiplier.apply(fishState.getRandom())
 
-                            catchabilitiesHere[species.getIndex()] =
-                                    catchabilities.getOrDefault(species.getName(),0d);
+                                            ) :
+                                            new FixedDoubleParameter(-1);
+
 
                         }
+                        Function<AbstractFad,double[]> catchabilitySupplier = abstractFad -> {
+
+                            double[] cachability = new double[fishState.getBiology().getSize()];
+                            SeaTile fadLocation = abstractFad.getLocation();
+                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get(ClorophillMapFactory.CLOROPHILL).get();
+                            double currentHere = currentClorophill.get(
+                                    fadLocation.getGridX(),
+                                    fadLocation.getGridY());
+                            for (Species species : fishState.getBiology().getSpecies())
+                                cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(),0d) *
+                                        Math.pow(Math.min(1d,currentHere/clorophillThreshold.apply(fishState.getRandom())),2);
+                            return cachability;
+                        };
 
 
                         return new AbundanceFadInitializer(
@@ -114,7 +126,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                                 capacityGenerator,
                                 new CatchabilitySelectivityFishAttractor(
                                         carryingCapacities,
-                                        catchabilitiesHere,
+                                        catchabilitySupplier,
                                         daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
                                         maximumDaysAttractions.apply(fishState.getRandom()).intValue(),
                                         fishState,
@@ -144,23 +156,6 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         this.selectivityFilters = selectivityFilters;
     }
 
-    public LinkedHashMap<String, Double> getCarryingCapacityShapeParameters() {
-        return carryingCapacityShapeParameters;
-    }
-
-    public void setCarryingCapacityShapeParameters(
-            LinkedHashMap<String, Double> carryingCapacityShapeParameters) {
-        this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
-    }
-
-    public LinkedHashMap<String, Double> getCarryingCapacityScaleParameters() {
-        return carryingCapacityScaleParameters;
-    }
-
-    public void setCarryingCapacityScaleParameters(
-            LinkedHashMap<String, Double> carryingCapacityScaleParameters) {
-        this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
-    }
 
     public LinkedHashMap<String, Double> getCatchabilities() {
         return catchabilities;
@@ -201,5 +196,37 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
 
     public void setFadDudRate(DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
+    }
+
+    public String getClorophillMapPath() {
+        return clorophillMapPath;
+    }
+
+    public void setClorophillMapPath(String clorophillMapPath) {
+        this.clorophillMapPath = clorophillMapPath;
+    }
+
+    public DoubleParameter getClorophillThreshold() {
+        return clorophillThreshold;
+    }
+
+    public void setClorophillThreshold(DoubleParameter clorophillThreshold) {
+        this.clorophillThreshold = clorophillThreshold;
+    }
+
+    public LinkedHashMap<String, Double> getMaximumCarryingCapacities() {
+        return maximumCarryingCapacities;
+    }
+
+    public void setMaximumCarryingCapacities(LinkedHashMap<String, Double> maximumCarryingCapacities) {
+        this.maximumCarryingCapacities = maximumCarryingCapacities;
+    }
+
+    public DoubleParameter getCarryingCapacityMultiplier() {
+        return carryingCapacityMultiplier;
+    }
+
+    public void setCarryingCapacityMultiplier(DoubleParameter carryingCapacityMultiplier) {
+        this.carryingCapacityMultiplier = carryingCapacityMultiplier;
     }
 }

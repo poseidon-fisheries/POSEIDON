@@ -68,12 +68,13 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         final Path vesselsFilePath,
         final int targetYear,
         final FisherFactory fisherFactory,
-        final Collection<Port> ports
-    ) {
+        final Collection<Port> ports,
+        double probabilityBoatBelongsToClosureOne) {
         this.vesselsFilePath = vesselsFilePath;
         this.targetYear = targetYear;
         this.fisherFactory = fisherFactory;
         this.portsByName = ports.stream().collect(toImmutableMap(Port::getName, identity()));
+        this.probabilityBoatBelongsToClosureOne = probabilityBoatBelongsToClosureOne;
     }
 
     /**

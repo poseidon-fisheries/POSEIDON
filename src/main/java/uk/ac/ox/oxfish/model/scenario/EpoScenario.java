@@ -59,6 +59,8 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
@@ -395,6 +397,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("unused")
     public void setAdditionalStartables(List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
         this.additionalStartables = additionalStartables;
+
     }
 
 }

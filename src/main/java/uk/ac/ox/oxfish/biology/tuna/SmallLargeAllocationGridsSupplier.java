@@ -49,7 +49,7 @@ class SmallLargeAllocationGridsSupplier
         final MapExtent mapExtent,
         final int period
     ) {
-        super(speciesCodes, gridsFilePath, mapExtent, period);
+        super(speciesCodes, gridsFilePath, mapExtent, period, true);
     }
 
     @Override
