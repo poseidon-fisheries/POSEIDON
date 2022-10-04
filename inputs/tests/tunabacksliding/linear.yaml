@@ -161,10 +161,20 @@ EPO Abundance Pathfinding:
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
-    factories:
-    - Specific MPA from Shape File:
-        shapeFilePath: inputs/epo_inputs/eez/galapagos/eez.shp
-    - Temporary Regulation:
+    closureAReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '281.0'
+        inactiveDelegate: Anarchy
+        startDay: '210.0'
+    closureBReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '19.0'
+        inactiveDelegate: Anarchy
+        startDay: '313.0'
+    elCorralitoReg:
+      Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
             eastLongitude: '-96.0'
@@ -174,21 +184,9 @@ EPO Abundance Pathfinding:
         endDay: '312.0'
         inactiveDelegate: Anarchy
         startDay: '282.0'
-    - Temporary Regulation:
-        delegate: No Fishing
-        endDay: '281.0'
-        inactiveDelegate: Anarchy
-        startDay: '210.0'
-    - Temporary Regulation:
-        delegate: No Fishing
-        endDay: '19.0'
-        inactiveDelegate: Anarchy
-        startDay: '313.0'
-    tags:
-    - all
-    - all
-    - closure A
-    - closure B
+    protectedAreasFromFolderFactory:
+      shapefilesFolder: inputs/tests/tunabacksliding/regions
+      tagsFile: tags.csv
   scheduledAbundanceProcessesFactory:
     abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
       mortalityFile: inputs/epo_inputs/abundance/mortality.csv
