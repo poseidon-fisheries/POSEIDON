@@ -143,7 +143,9 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                 if (record.getMetaData().containsColumn("closure")) {
                     chooseClosurePeriod(fisher, record.getString("closure"));
                 }
-                fisher.getTags().add(record.getString("flag"));
+                if (record.getMetaData().containsColumn("flag")) {
+                    fisher.getTags().add(record.getString("flag"));
+                }
                 // TODO: setMaxTravelTime(fisher, record.getDouble
                 //  ("max_trip_duration_in_hours"));
                 return fisher;
