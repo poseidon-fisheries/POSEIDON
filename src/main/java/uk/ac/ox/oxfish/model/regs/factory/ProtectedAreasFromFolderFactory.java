@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
+import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -82,7 +83,7 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
                 .collect(groupingBy(
                     record -> record.getString("tag"),
                     mapping(
-                        record -> checkNotNull(factoriesByName.get(record.getString("name"))),
+                        (Record record) -> checkNotNull(factoriesByName.get(record.getString("name"))),
                         toList()
                     )
                 ));
