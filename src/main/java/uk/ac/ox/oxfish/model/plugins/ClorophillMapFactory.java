@@ -37,6 +37,8 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
     public static final String CLOROPHILL = "Clorophill";
     private String pathToClorophillFile = "inputs/tests/clorophill.csv";
 
+    private int mapPeriod = 365;
+
     public ClorophillMapFactory() {
     }
 
@@ -54,6 +56,8 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
                 SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
                         Paths.get(pathToClorophillFile),
                         new MapExtent(model.getMap()),
+                        mapPeriod,
+                        false,
                         CLOROPHILL
                 );
 
@@ -80,5 +84,13 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
 
     public void setPathToClorophillFile(String pathToClorophillFile) {
         this.pathToClorophillFile = pathToClorophillFile;
+    }
+
+    public int getMapPeriod() {
+        return mapPeriod;
+    }
+
+    public void setMapPeriod(int mapPeriod) {
+        this.mapPeriod = mapPeriod;
     }
 }

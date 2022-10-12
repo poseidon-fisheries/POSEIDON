@@ -60,6 +60,7 @@ public class LinearClorophillAttractorFactory implements
 
     private String clorophillMapPath = "inputs/tests/clorophill.csv";
 
+    private int clorophillMapPeriodInDays = 365;
 
     private DoubleParameter clorophillThreshold = new FixedDoubleParameter(0.15);
 
@@ -76,6 +77,7 @@ public class LinearClorophillAttractorFactory implements
                     public AbundanceFadInitializer get() {
                         //create the map
                         ClorophillMapFactory factory = new ClorophillMapFactory(clorophillMapPath);
+                        factory.setMapPeriod(clorophillMapPeriodInDays);
                         fishState.registerStartable(factory.apply(fishState));
 
                         //attractor:
@@ -228,5 +230,13 @@ public class LinearClorophillAttractorFactory implements
 
     public void setCarryingCapacityMultiplier(DoubleParameter carryingCapacityMultiplier) {
         this.carryingCapacityMultiplier = carryingCapacityMultiplier;
+    }
+
+    public int getClorophillMapPeriodInDays() {
+        return clorophillMapPeriodInDays;
+    }
+
+    public void setClorophillMapPeriodInDays(int clorophillMapPeriodInDays) {
+        this.clorophillMapPeriodInDays = clorophillMapPeriodInDays;
     }
 }

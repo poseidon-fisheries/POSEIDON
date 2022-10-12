@@ -20,11 +20,14 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
+import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -75,13 +78,23 @@ public class TunaBiomassSensitivity {
                         "yellowfin.csv"
                 )
         );
-        model.schedule.step(model);
-        model.schedule.step(model);
-        model.schedule.step(model);
-        model.schedule.step(model);
-        MAIN_DIRECTORY.resolve("biomass_test").toFile().mkdir();
+        model.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                for (Fisher fisher : model.getFishers()) {
+                    fisher.setRegulation(new FishingSeason(true,0));
+                }
+            }
+        });
+        while(model.getStep()<=365)
+            model.schedule.step(model);
+//        model.schedule.step(model);
+//        model.schedule.step(model);
+//        model.schedule.step(model);
+//        model.schedule.step(model);
+        MAIN_DIRECTORY.resolve("biomass_test_2").toFile().mkdir();
         FishStateUtilities.writeAdditionalOutputsToFolder(
-                MAIN_DIRECTORY.resolve("biomass_test"),
+                MAIN_DIRECTORY.resolve("biomass_test_2"),
                 model
         );
 

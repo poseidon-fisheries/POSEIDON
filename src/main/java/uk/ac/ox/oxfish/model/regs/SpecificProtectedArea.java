@@ -1,12 +1,15 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import com.google.common.collect.ImmutableSet;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.Collection;
 
@@ -32,7 +35,10 @@ public class SpecificProtectedArea implements Regulation {
     @Override
     public void start(FishState model, Fisher fisher) {
         Regulation.super.start(model, fisher);
-        updateProtectedArea(model);
+        model.scheduleOnce(
+                (Steppable) simState -> updateProtectedArea(model), StepOrder.DAWN
+        );
+
     }
 
     public void updateProtectedArea(FishState model) {
