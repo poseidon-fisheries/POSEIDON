@@ -100,7 +100,7 @@ public class GISReaders {
         return  vectorField;
     }
 
-    private static GeomVectorField readShapeFile(String filename) {
+    public static GeomVectorField readShapeFile(String filename) {
         URL resource = GISReaders.class.getClassLoader().getResource(filename);
         File input = null;
         if(resource!= null)
