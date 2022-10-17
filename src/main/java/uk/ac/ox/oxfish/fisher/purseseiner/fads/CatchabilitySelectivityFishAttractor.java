@@ -26,13 +26,15 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * simple "linear" attractor for abundance fads: as long as it is old enough (but not too old) the fad attracts a fixed
@@ -120,7 +122,13 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
             return null;
 
         Map<Species, double[][]> abundanceHere = ((AbundanceLocalBiology) biology).getAbundance();
-        Map<Species, double[][]> caughtHere = new HashMap<>();
+        final Map<Species, double[][]> caughtHere =
+            abundanceHere.entrySet().stream().collect(toMap(
+                Map.Entry::getKey,
+                entry -> stream(entry.getValue())
+                    .map(a -> new double[a.length])
+                    .toArray(double[][]::new)
+            ));
         //get the carrying capacities or generate them if they don't exist
         double[] carryingCapacityHere = getCarryingCapacities(fad);
         for (Species species : model.getSpecies()) {
@@ -128,7 +136,7 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
 
             //set up catches
             double[][] abundanceInTile = abundanceHere.get(species);
-            double[][] abundanceCaught = new double[abundanceInTile.length][abundanceInTile[0].length];
+            double[][] abundanceCaught = caughtHere.get(species);
             caughtHere.put(species,abundanceCaught);
 
             //if you are full, ignore it!
@@ -153,9 +161,6 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
 
 
     }
-
-
-
 
     @Override
     public void onFadRemoval(AbstractFad fad) {

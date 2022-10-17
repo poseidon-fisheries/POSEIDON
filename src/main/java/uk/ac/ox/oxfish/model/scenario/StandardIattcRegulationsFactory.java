@@ -52,7 +52,7 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
     public static final ProtectedAreasFromFolderFactory PROTECTED_AREAS_FROM_FOLDER_FACTORY =
         new ProtectedAreasFromFolderFactory(
             EpoScenario.INPUT_PATH.resolve("regions"),
-            Paths.get("tags.csv")
+            Paths.get("region_tags.csv")
         );
     private AlgorithmFactory<TemporaryRegulation> closureAReg = CLOSURE_A_REG;
     private AlgorithmFactory<TemporaryRegulation> closureBReg = CLOSURE_B_REG;

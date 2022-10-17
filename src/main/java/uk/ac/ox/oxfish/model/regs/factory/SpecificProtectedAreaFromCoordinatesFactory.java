@@ -1,15 +1,14 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.google.common.collect.ImmutableSet;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import ec.util.MersenneTwisterFast;
-import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.function.BiPredicate;
 
 public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtectedAreaFactory {
 
@@ -30,27 +29,59 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this.eastLongitude = new FixedDoubleParameter(eastLongitude);
     }
 
-    @SuppressWarnings("unused") public SpecificProtectedAreaFromCoordinatesFactory() {
+    @SuppressWarnings("unused")
+    public SpecificProtectedAreaFromCoordinatesFactory() {
         this(1, 1, 1, 1);
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getNorthLatitude() { return northLatitude; }
-    @SuppressWarnings("unused") public void setNorthLatitude(DoubleParameter northLatitude) { this.northLatitude = northLatitude; }
-    @SuppressWarnings("unused") public DoubleParameter getWestLongitude() { return westLongitude; }
-    @SuppressWarnings("unused") public void setWestLongitude(DoubleParameter westLongitude) { this.westLongitude = westLongitude; }
-    @SuppressWarnings("unused") public DoubleParameter getSouthLatitude() { return southLatitude; }
-    @SuppressWarnings("unused") public void setSouthLatitude(DoubleParameter southLatitude) { this.southLatitude = southLatitude; }
-    @SuppressWarnings("unused") public DoubleParameter getEastLongitude() { return eastLongitude; }
-    @SuppressWarnings("unused") public void setEastLongitude(DoubleParameter eastLongitude) { this.eastLongitude = eastLongitude; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getNorthLatitude() {
+        return northLatitude;
+    }
 
-    @Override ImmutableSet<MasonGeometry> buildGeometries(FishState fishState) {
+    @SuppressWarnings("unused")
+    public void setNorthLatitude(DoubleParameter northLatitude) {
+        this.northLatitude = northLatitude;
+    }
+
+    @SuppressWarnings("unused")
+    public DoubleParameter getWestLongitude() {
+        return westLongitude;
+    }
+
+    @SuppressWarnings("unused")
+    public void setWestLongitude(DoubleParameter westLongitude) {
+        this.westLongitude = westLongitude;
+    }
+
+    @SuppressWarnings("unused")
+    public DoubleParameter getSouthLatitude() {
+        return southLatitude;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSouthLatitude(DoubleParameter southLatitude) {
+        this.southLatitude = southLatitude;
+    }
+
+    @SuppressWarnings("unused")
+    public DoubleParameter getEastLongitude() {
+        return eastLongitude;
+    }
+
+    @SuppressWarnings("unused")
+    public void setEastLongitude(DoubleParameter eastLongitude) {
+        this.eastLongitude = eastLongitude;
+    }
+
+    @Override
+    BiPredicate<Integer, Integer> inAreaPredicate(FishState fishState) {
+        final NauticalMap map = fishState.getMap();
         final MersenneTwisterFast rng = fishState.getRandom();
-        final GeometryFactory geometryFactory = new GeometryFactory();
         final Envelope envelope = new Envelope(
             new Coordinate(westLongitude.apply(rng), northLatitude.apply(rng)),
             new Coordinate(eastLongitude.apply(rng), southLatitude.apply(rng))
         );
-        final Geometry geometry = geometryFactory.toGeometry(envelope);
-        return ImmutableSet.of(new MasonGeometry(geometry));
+        return (x, y) -> envelope.covers(map.getCoordinates(x, y));
     }
 }

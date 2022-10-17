@@ -1,32 +1,62 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.google.common.collect.ImmutableSet;
-import org.jetbrains.annotations.NotNull;
+import com.vividsolutions.jts.geom.Point;
+import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.function.BiPredicate;
 
-import static uk.ac.ox.oxfish.utility.MasonUtils.bagToSet;
+import static com.google.common.io.MoreFiles.getNameWithoutExtension;
 
 public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtectedAreaFactory {
 
     private Path shapeFilePath;
 
-    @SuppressWarnings("unused") public SpecificProtectedAreaFromShapeFileFactory() { this.shapeFilePath = Paths.get("inputs"); }
-    public SpecificProtectedAreaFromShapeFileFactory(Path shapeFilePath) { this.shapeFilePath = shapeFilePath; }
-
-    @SuppressWarnings("unused") public Path getShapeFilePath() { return shapeFilePath; }
-    @SuppressWarnings("unused") public void setShapeFilePath(Path shapeFilePath) { this.shapeFilePath = shapeFilePath; }
-
-    @Override ImmutableSet<MasonGeometry> buildGeometries(@NotNull FishState fishState) {
-        final GeomVectorField geomVectorField = GISReaders.readShapeAndMergeWithRaster(
-            fishState.getMap().getRasterBathymetry(),
-            shapeFilePath.toString()
-        );
-        return bagToSet(geomVectorField.getGeometries());
+    @SuppressWarnings("unused")
+    public SpecificProtectedAreaFromShapeFileFactory() {
     }
+
+    public SpecificProtectedAreaFromShapeFileFactory(
+        Path shapeFilePath
+    ) {
+        //noinspection UnstableApiUsage
+        this(shapeFilePath, getNameWithoutExtension(shapeFilePath.getFileName()));
+    }
+
+    public SpecificProtectedAreaFromShapeFileFactory(
+        Path shapeFilePath,
+        String name
+    ) {
+        this.shapeFilePath = shapeFilePath;
+        this.setName(name);
+    }
+
+    @SuppressWarnings("unused")
+    public Path getShapeFilePath() {
+        return shapeFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeFilePath(Path shapeFilePath) {
+        this.shapeFilePath = shapeFilePath;
+    }
+
+    private GeomVectorField readShapeFile() {
+        return GISReaders.readShapeFile(getShapeFilePath().toString());
+    }
+
+    @Override
+    BiPredicate<Integer, Integer> inAreaPredicate(FishState fishState) {
+        final GeomVectorField vectorField = readShapeFile();
+        final GeomGridField rasterBathymetry = fishState.getMap().getRasterBathymetry();
+        vectorField.setMBR(rasterBathymetry.getMBR());
+        return (x, y) -> {
+            final Point gridPoint = rasterBathymetry.toPoint(x, y);
+            return !vectorField.getCoveringObjects(gridPoint).isEmpty();
+        };
+    }
+
 }
