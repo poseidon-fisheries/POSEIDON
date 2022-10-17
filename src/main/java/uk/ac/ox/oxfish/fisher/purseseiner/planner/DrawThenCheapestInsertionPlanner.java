@@ -555,11 +555,17 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //        Path calibrationFile = Paths.get(
 //                "docs/20220223 tuna_calibration/pathfinder_julydata/greedytest/carrknight/2022-08-14_10.18.11_longtrips_local/identity/identity_calibration.yaml"
 //        );
+    //        double[] solution =
+    //                {
+    //                        0.091,-16.511, 1.583,-74.989,-34.695,-22.996,-7.547, 26.354, 4.517,-1.779,-3.435,-34.744,-12.812,-52.711,-23.208,-6.768,-22.525,-63.385,-6.759, 6.604,-128.135,-12.487                               };
+    //        Path calibrationFile = Paths.get(
+    //                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_calzone_all/cenv0477/2022-10-11_18.41.28_local/local_calibration.yaml"
+    //        );
         double[] solution =
                 {
-                        0.151,-19.809, 17.639, 15.310, 10.801,-16.195,-10.396, 12.883, 3.068, 5.094, 3.922,-64.652,-61.915, 10.941, 1.185,-10.349, 76.397,-21.784,-5.645, 11.131,-30.639, 15.117                                       };
+                        -3.917,-13.419,-11.295, 7.326,-6.007, 18.535,-8.852, 1.824, 3.505, 4.512, 4.229,-3.035,-2.948, 42.966, 4.175, 3.672,-4.506, 6.922,-11.295,-21.336,-36.316,-21.747                               };
         Path calibrationFile = Paths.get(
-                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/greedy_unconstrained_nocalzone_square_noweibull2/carrknight/manual/carrknight/2022-09-28_09.52.19_first_calibration/manual.yaml"
+                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_tripleweight/carrknight/2022-10-12_22.41.44_manual1/manual.yaml"
         );
 
 

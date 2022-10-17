@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-08-12'
+  startDate: '2022-10-14'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -314,4 +314,15 @@ Exogenous Fad Setter CSV:
   missingFadError: '10000.0'
   neighborhoodSearchSize: '0.0'
   pathToFile: ./inputs/tests/fad_dummmy_sets.csv
+-------
+IATTC Closure Period Randomizer:
+  proportionOfBoatsInClosureA: '0.5'
+-------
+Fad Temperature Hazard:
+  hazardProbability: '0.2'
+  mapPeriod: 365
+  mapVariableName: Temperature
+  minimumDaysBeforeHazardCanTakePlace: '10.0'
+  pathToMapFile: ./inputs/tests/temperature.csv
+  valueBelowWhichHazardHappens: '25.0'
 -------

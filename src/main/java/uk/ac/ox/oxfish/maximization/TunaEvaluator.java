@@ -83,7 +83,7 @@ public class TunaEvaluator implements Runnable {
 
     }
 
-    public TunaEvaluator(final Path scenarioFile, final Path calibrationFilePath) {
+    public TunaEvaluator(final Path alreadyCalibratedScenario, final Path calibrationFilePath) {
 
         optimization = GenericOptimization.fromFile(calibrationFilePath);
 
@@ -91,12 +91,12 @@ public class TunaEvaluator implements Runnable {
             () -> {
                 try {
                     FishYAML yaml = new FishYAML();
-                    return yaml.loadAs(new FileReader(scenarioFile.toFile()), EpoScenario.class);
+                    return yaml.loadAs(new FileReader(alreadyCalibratedScenario.toFile()), EpoScenario.class);
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             },
-            scenarioFile.getParent()
+            alreadyCalibratedScenario.getParent()
         ).registerRowProvider(
             "yearly_results.csv",
             fishState -> new YearlyResultsRowProvider(fishState, optimization)

@@ -162,6 +162,7 @@ Biomass Purse Seine Gear:
   fadSetObservers: !!set {
     }
   locationValuesFile: inputs/epo_inputs/location_values.csv
+  maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
   nonAssociatedSetObservers: !!set {
     }
   nonAssociatedSetTimeSinceLastVisitModulationFunction:

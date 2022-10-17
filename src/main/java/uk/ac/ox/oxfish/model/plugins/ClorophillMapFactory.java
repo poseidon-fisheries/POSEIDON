@@ -34,7 +34,8 @@ import java.nio.file.Paths;
 public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
-    public static final String CLOROPHILL = "Clorophill";
+
+    public String mapVariableName = "Clorophill";
     private String pathToClorophillFile = "inputs/tests/clorophill.csv";
 
     private int mapPeriod = 365;
@@ -58,13 +59,13 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
                         new MapExtent(model.getMap()),
                         mapPeriod,
                         false,
-                        CLOROPHILL
+                        mapVariableName
                 );
 
                 AllocationGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
-                        CLOROPHILL,
-                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(CLOROPHILL)
+                        mapVariableName,
+                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
                 );
 
 
@@ -72,7 +73,7 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
 
             @Override
             public void turnOff() {
-                model.getMap().getAdditionalMaps().remove(CLOROPHILL);
+                model.getMap().getAdditionalMaps().remove(mapVariableName);
             }
         };
 
@@ -92,5 +93,13 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
 
     public void setMapPeriod(int mapPeriod) {
         this.mapPeriod = mapPeriod;
+    }
+
+    public String getMapVariableName() {
+        return mapVariableName;
+    }
+
+    public void setMapVariableName(String mapVariableName) {
+        this.mapVariableName = mapVariableName;
     }
 }

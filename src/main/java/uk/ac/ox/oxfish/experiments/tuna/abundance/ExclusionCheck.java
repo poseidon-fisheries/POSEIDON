@@ -20,14 +20,14 @@ public class ExclusionCheck {
    // private static final Path scenarioOldCurrents = Paths.get("docs/20220725 currents/desperate_weibull/scenario.yaml");
 
     ///home/carrknight/Dropbox/oxfish_docs/20220725 currents/oldcurrents_blocked_test/runandgun/
-     private static final Path scenarioOldCurrents = Paths.get("docs/20220725 currents/oldcurrents_blocked_test/runandgun/scenario.yaml");
     //private static final Path scenarioOldCurrents = Paths.get("docs/20220725 currents/newcurrents_blocked_test/complete/rungun/scenario.yaml");
     //private static final Path scenarioOldCurrents = Paths.get("docs/20220725 currents/newcurrents_blocked_weibull/complete/rungun/scenario.yaml");
-    private static final Path calibrationOldCurrents = scenarioOldCurrents.getParent().resolve("test.yaml");
+    private static final Path calibration =Paths.get("docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed/manual.yaml");
+    private static final Path scenario = Paths.get("docs/20220223 tuna_calibration/clorophill/neweez/temperature_test3//scenario.yaml");
 
     public static void main(String[] args){
-        TunaEvaluator evaluator = new TunaEvaluator(scenarioOldCurrents,
-                calibrationOldCurrents);
+        TunaEvaluator evaluator = new TunaEvaluator(scenario,
+                                                    calibration);
         evaluator.setNumRuns(0);
         evaluator.run();
 

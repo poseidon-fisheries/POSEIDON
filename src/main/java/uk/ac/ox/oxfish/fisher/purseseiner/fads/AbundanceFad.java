@@ -29,10 +29,7 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -107,15 +104,25 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
 
     @Override
     public void releaseFish(final Collection<Species> allSpecies) {
-        final Map<Species, Double> biomassLost = allSpecies.stream()
-            .collect(toImmutableMap(identity(), getBiology()::getBiomass));
-        getOwner().reactTo(new BiomassLostEvent(biomassLost));
-        getOwner().getFadMap().getAbundanceLostObserver().observe(
-            new AbundanceLostEvent(ImmutableAbundance.extractFrom(getBiology()))
-        );
-        // directly reset the biology's abundance arrays to zero
-        getBiology().getAbundance().values().stream().flatMap(Arrays::stream)
-            .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));
+
+        double totalBiomassToRelease = 0;
+        final Map<Species, Double> biomassLost = new HashMap<>(allSpecies.size());
+        for (Species species : allSpecies) {
+            double biomassHere = getBiology().getBiomass(species);
+            totalBiomassToRelease+=biomassHere;
+            biomassLost.put(species, biomassHere);
+        }
+
+        if(totalBiomassToRelease>0) {
+
+            getOwner().reactTo(new BiomassLostEvent(biomassLost));
+            getOwner().getFadMap().getAbundanceLostObserver().observe(
+                    new AbundanceLostEvent(ImmutableAbundance.extractFrom(getBiology()))
+            );
+            // directly reset the biology's abundance arrays to zero
+            getBiology().getAbundance().values().stream().flatMap(Arrays::stream)
+                    .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));
+        }
     }
 
     @Override

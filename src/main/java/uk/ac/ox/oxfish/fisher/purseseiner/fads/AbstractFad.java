@@ -118,6 +118,8 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public abstract void releaseFish(final Collection<Species> allSpecies);
 
+
+
     private Double2D getGridLocation() {
         return getOwner().getFadMap().getFadLocation(this).orElse(null);
     }

@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -112,7 +111,7 @@ public class LinearClorophillAttractorFactory implements
 
                             double[] cachability = new double[fishState.getBiology().getSize()];
                             SeaTile fadLocation = abstractFad.getLocation();
-                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get(ClorophillMapFactory.CLOROPHILL).get();
+                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get( "Clorophill").get();
                             double currentHere = currentClorophill.get(
                                     fadLocation.getGridX(),
                                     fadLocation.getGridY());
