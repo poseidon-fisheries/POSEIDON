@@ -111,7 +111,7 @@ public class LinearClorophillAttractorFactory implements
 
                             double[] cachability = new double[fishState.getBiology().getSize()];
                             SeaTile fadLocation = abstractFad.getLocation();
-                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get( "Clorophill").get();
+                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get( factory.getMapVariableName()).get();
                             double currentHere = currentClorophill.get(
                                     fadLocation.getGridX(),
                                     fadLocation.getGridY());
