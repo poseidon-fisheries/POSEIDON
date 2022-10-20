@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.MasonUtils.coordinateToXY;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.getLocalDate;
 
 public enum CurrentVectorsFactory {
@@ -44,18 +43,10 @@ public enum CurrentVectorsFactory {
             );
         }));
 
-    public CurrentVectors getCurrentVectors(
-        final MapExtent mapExtent,
-        final Map<CurrentPattern, Path> currentFiles,
-        boolean inputIsMetersPerSecond
-    ) {
-        return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
-    }
-
     @SuppressWarnings("SameParameterValue")
     private static TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> makeVectorMaps(
-            final MapExtent mapExtent,
-            final Map<CurrentPattern, Path> currentFiles, boolean inputIsMetersPerSecond1
+        final MapExtent mapExtent,
+        final Map<CurrentPattern, Path> currentFiles, boolean inputIsMetersPerSecond1
     ) {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> currentVectors = new TreeMap<>();
         final SparseGrid2D dummyGrid = new SparseGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
@@ -84,14 +75,19 @@ public enum CurrentVectorsFactory {
         return new Coordinate(record.getDouble("lon"), record.getDouble("lat"));
     }
 
-    private static Double2D readVector(final Record record, final Coordinate startCoord, final MapExtent mapExtent, boolean inputIsMetersPerSecond1) {
+    private static Double2D readVector(
+        final Record record,
+        final Coordinate startCoord,
+        final MapExtent mapExtent,
+        boolean inputIsMetersPerSecond1
+    ) {
         final Double2D input = new Double2D(
             record.getDouble("u"),
             record.getDouble("v")
         );
-        if(inputIsMetersPerSecond1){
-        return metrePerSecondToXyPerDaysVector(input, startCoord, mapExtent);}
-        else{
+        if (inputIsMetersPerSecond1) {
+            return metrePerSecondToXyPerDaysVector(input, startCoord, mapExtent);
+        } else {
             return input;
         }
     }
@@ -101,12 +97,20 @@ public enum CurrentVectorsFactory {
      * This is slightly convoluted because the translation of distance into grid offsets depends on the latitude,
      * so we need to use lon/lat coordinates as an intermediate and then convert back to grid coordinates.
      */
-    public static Double2D metrePerSecondToXyPerDaysVector(final Double2D metrePerSecondVector, final Coordinate startCoord, final MapExtent mapExtent) {
+    public static Double2D metrePerSecondToXyPerDaysVector(
+        final Double2D metrePerSecondVector,
+        final Coordinate startCoord,
+        final MapExtent mapExtent
+    ) {
         final Double2D metresPerDayVector = metrePerSecondVector.multiply(SECONDS_PER_DAY);
-        final Double2D startXY = coordinateToXY(startCoord, mapExtent);
-        final Double2D lonLatVector = metresVectorToLonLatVector(startCoord, metresPerDayVector.x, metresPerDayVector.y);
+        final Double2D startXY = mapExtent.coordinateToXY(startCoord);
+        final Double2D lonLatVector = metresVectorToLonLatVector(
+            startCoord,
+            metresPerDayVector.x,
+            metresPerDayVector.y
+        );
         final Coordinate endCoord = new Coordinate(startCoord.x + lonLatVector.x, startCoord.y + lonLatVector.y);
-        final Double2D endXY = coordinateToXY(endCoord, mapExtent);
+        final Double2D endXY = mapExtent.coordinateToXY(endCoord);
         return endXY.add(startXY.negate());
     }
 
@@ -122,6 +126,13 @@ public enum CurrentVectorsFactory {
         return new Double2D(dx, dy);
     }
 
+    public CurrentVectors getCurrentVectors(
+        final MapExtent mapExtent,
+        final Map<CurrentPattern, Path> currentFiles,
+        boolean inputIsMetersPerSecond
+    ) {
+        return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
+    }
 
 
 }

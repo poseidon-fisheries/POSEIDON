@@ -48,12 +48,6 @@ public class CentroidMapDiscretizerTest {
 
 
         FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
-        );
         state.getMap().recomputeTilesMPA();
 
         assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
@@ -88,12 +82,6 @@ public class CentroidMapDiscretizerTest {
 
 
         FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
-        );
         state.getMap().recomputeTilesMPA();
 
         assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
@@ -122,12 +110,6 @@ public class CentroidMapDiscretizerTest {
 
 
         FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
-        );
         state.getMap().recomputeTilesMPA();
 
         assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));

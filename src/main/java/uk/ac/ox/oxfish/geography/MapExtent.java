@@ -1,11 +1,16 @@
 package uk.ac.ox.oxfish.geography;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.Math.floor;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Point;
+import sim.util.Double2D;
+
 import java.util.Objects;
 
+import static java.lang.Math.floor;
 
 /**
  * This is a value class that stores some essential geographic properties of a NauticalMap so that
@@ -14,22 +19,58 @@ import java.util.Objects;
  */
 public final class MapExtent {
 
+    // This cache looks weird but here is the deal: MapExtent is an immutable value class,
+    // so it's safe to share instances and there is no point in having multiple copies
+    // around. For any MapExtent object, the cache will spit back the first equivalent
+    // instance that was created. The big win here is that it allows every simulation
+    // with the same map extent to share the same coordinate field.
+    private static final LoadingCache<MapExtent, MapExtent> cache =
+        CacheBuilder.newBuilder().build(CacheLoader.from(mapExtent -> mapExtent));
+
     private final int gridWidth;   // the width in cells
     private final int gridHeight;  // the height in cells
     private final double cellWidth;   // the width of a cell in degrees
     private final double cellHeight;  // the height of a cell in degrees
     private final Envelope envelope;
+    private final int hashCode;
 
-    public MapExtent(final NauticalMap map) {
-        this(map.getWidth(), map.getHeight(), map.getRasterBathymetry().getMBR());
-    }
+    private final CoordinateField coordinateField;
 
-    public MapExtent(final int gridWidth, final int gridHeight, final Envelope envelope) {
+    private MapExtent(final int gridWidth, final int gridHeight, final Envelope envelope) {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.envelope = checkNotNull(envelope);
+        this.envelope = new Envelope(envelope); // The Envelope class is mutable, so we store a copy
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
+        this.hashCode = Objects.hash(gridWidth, gridHeight, envelope);
+        this.coordinateField = new CoordinateField(this);
+    }
+
+    public static MapExtent from(final NauticalMap map) {
+        return from(map.getWidth(), map.getHeight(), map.getRasterBathymetry().getMBR());
+    }
+
+    public static MapExtent from(final int gridWidth, final int gridHeight, final Envelope envelope) {
+        return cache.getUnchecked(new MapExtent(gridWidth, gridHeight, envelope));
+    }
+
+    /**
+     * Transforms a lon/lat coordinate to an x/y coordinate that can be used with a continuous field
+     * covering the same space as the nautical map. This is basically a floating point version of
+     * vectors.size().toXCoord/.toYCoord; not sure why it doesn't exist in GeomVectorField in the
+     * first place...
+     */
+    public static Double2D coordinateToXY(
+        Coordinate coordinate,
+        double gridWidth,
+        double gridHeight,
+        Envelope mbr
+    ) {
+        double pixelWidth = mbr.getWidth() / gridWidth;
+        double pixelHeight = mbr.getHeight() / gridHeight;
+        final double x = (coordinate.x - mbr.getMinX()) / pixelWidth;
+        final double y = (mbr.getMaxY() - coordinate.y) / pixelHeight;
+        return new Double2D(x, y);
     }
 
     public int getGridWidth() {
@@ -40,13 +81,17 @@ public final class MapExtent {
         return gridHeight;
     }
 
+    /**
+     * Returns a copy of the map's envelope. The Envelope class is mutable, so we don't
+     * want to expose a copy of our envelope and risk it being changed under our feet.
+     */
     public Envelope getEnvelope() {
-        return envelope;
+        return new Envelope(envelope);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(gridWidth, gridHeight, envelope);
+        return hashCode;
     }
 
     @Override
@@ -68,5 +113,22 @@ public final class MapExtent {
 
     public int toGridY(final double latitude) {
         return (int) floor((envelope.getMaxY() - latitude) / cellHeight);
+    }
+
+    public Double2D coordinateToXY(Coordinate coordinate) {
+        return coordinateToXY(
+            coordinate,
+            getGridWidth(),
+            getGridHeight(),
+            getEnvelope()
+        );
+    }
+
+    public Coordinate getCoordinates(int gridX, int gridY) {
+        return coordinateField.getCoordinate(gridX, gridY);
+    }
+
+    public Point toPoint(int gridX, int gridY) {
+        return coordinateField.toPoint(gridX, gridY);
     }
 }

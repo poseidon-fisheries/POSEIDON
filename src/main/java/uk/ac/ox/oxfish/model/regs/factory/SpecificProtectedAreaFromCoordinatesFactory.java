@@ -2,20 +2,16 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.util.function.BiPredicate;
 
 public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtectedAreaFactory {
 
-    private DoubleParameter northLatitude;
-    private DoubleParameter westLongitude;
-    private DoubleParameter southLatitude;
-    private DoubleParameter eastLongitude;
+    private double northLatitude;
+    private double westLongitude;
+    private double southLatitude;
+    private double eastLongitude;
 
     public SpecificProtectedAreaFromCoordinatesFactory(
         double northLatitude,
@@ -23,10 +19,10 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         double southLatitude,
         double eastLongitude
     ) {
-        this.northLatitude = new FixedDoubleParameter(northLatitude);
-        this.westLongitude = new FixedDoubleParameter(westLongitude);
-        this.southLatitude = new FixedDoubleParameter(southLatitude);
-        this.eastLongitude = new FixedDoubleParameter(eastLongitude);
+        this.northLatitude = northLatitude;
+        this.westLongitude = westLongitude;
+        this.southLatitude = southLatitude;
+        this.eastLongitude = eastLongitude;
     }
 
     @SuppressWarnings("unused")
@@ -34,54 +30,48 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this(1, 1, 1, 1);
     }
 
-    @SuppressWarnings("unused")
-    public DoubleParameter getNorthLatitude() {
+    public double getNorthLatitude() {
         return northLatitude;
     }
 
     @SuppressWarnings("unused")
-    public void setNorthLatitude(DoubleParameter northLatitude) {
+    public void setNorthLatitude(double northLatitude) {
         this.northLatitude = northLatitude;
     }
 
-    @SuppressWarnings("unused")
-    public DoubleParameter getWestLongitude() {
+    public double getWestLongitude() {
         return westLongitude;
     }
 
     @SuppressWarnings("unused")
-    public void setWestLongitude(DoubleParameter westLongitude) {
+    public void setWestLongitude(double westLongitude) {
         this.westLongitude = westLongitude;
     }
 
-    @SuppressWarnings("unused")
-    public DoubleParameter getSouthLatitude() {
+    public double getSouthLatitude() {
         return southLatitude;
     }
 
     @SuppressWarnings("unused")
-    public void setSouthLatitude(DoubleParameter southLatitude) {
+    public void setSouthLatitude(double southLatitude) {
         this.southLatitude = southLatitude;
     }
 
-    @SuppressWarnings("unused")
-    public DoubleParameter getEastLongitude() {
+    public double getEastLongitude() {
         return eastLongitude;
     }
 
     @SuppressWarnings("unused")
-    public void setEastLongitude(DoubleParameter eastLongitude) {
+    public void setEastLongitude(double eastLongitude) {
         this.eastLongitude = eastLongitude;
     }
 
     @Override
-    BiPredicate<Integer, Integer> inAreaPredicate(FishState fishState) {
-        final NauticalMap map = fishState.getMap();
-        final MersenneTwisterFast rng = fishState.getRandom();
+    BiPredicate<Integer, Integer> inAreaPredicate(MapExtent mapExtent) {
         final Envelope envelope = new Envelope(
-            new Coordinate(westLongitude.apply(rng), northLatitude.apply(rng)),
-            new Coordinate(eastLongitude.apply(rng), southLatitude.apply(rng))
+            new Coordinate(getWestLongitude(), getNorthLatitude()),
+            new Coordinate(getEastLongitude(), getSouthLatitude())
         );
-        return (x, y) -> envelope.covers(map.getCoordinates(x, y));
+        return (x, y) -> envelope.covers(mapExtent.getCoordinates(x, y));
     }
 }

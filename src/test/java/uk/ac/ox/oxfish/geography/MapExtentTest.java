@@ -13,7 +13,7 @@ public class MapExtentTest extends TestCase {
     public void testCoords() {
         // Note: this would be a good candidate for property based testing
         Envelope envelope = new Envelope(-5, 5, -5, 5);
-        MapExtent mapExtent = new MapExtent(10, 10, envelope);
+        MapExtent mapExtent = MapExtent.from(10, 10, envelope);
         GeomGridField geomGridField = new GeomGridField(new ObjectGrid2D(10, 10));
         geomGridField.setMBR(envelope);
 

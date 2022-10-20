@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.actions;
 
+import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;
@@ -306,8 +307,11 @@ public class MovingTest
             for(int j=0;j<4;j++)
                 grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
 
+        final GeomGridField rasterBathymetry = new GeomGridField(grid2D);
+        rasterBathymetry.setMBR(new Envelope(0, 1, 0, 1));
+
         //great
-        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
+        NauticalMap map = new NauticalMap(rasterBathymetry, new GeomVectorField(),
                                           new EquirectangularDistance(0.0,1), new StraightLinePathfinder());
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(model.getMap()).thenReturn(map);

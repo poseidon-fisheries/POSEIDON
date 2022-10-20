@@ -19,7 +19,7 @@ public class CurrentVectorsFactoryTest extends TestCase {
     public void testMetrePerSecondToXyPerDaysVector() {
 
         final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
-        final MapExtent mapExtent = new MapExtent(fishState.getMap());
+        final MapExtent mapExtent = fishState.getMap().getMapExtent();
 
         final double oneMeterPerSecondAtEquatorInDegreesPerDay =
             metrePerSecondToXyPerDaysVector(new Double2D(1, 0), new Coordinate(0, 0), mapExtent).length();

@@ -44,7 +44,7 @@ public class SimpleAllocationGridsSupplierTest {
         model.start();
         SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
                 Paths.get("inputs/tests/clorophill.csv"),
-                new MapExtent(model.getMap()),
+                model.getMap().getMapExtent(),
                 "Clorophill"
         );
 

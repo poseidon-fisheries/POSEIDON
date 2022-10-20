@@ -376,7 +376,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     @NotNull
     private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(NauticalMap nauticalMap) {
         final Coordinate coordinate = new Coordinate(0, 0);
-        final MapExtent mapExtent = new MapExtent(nauticalMap);
+        final MapExtent mapExtent = nauticalMap.getMapExtent();
         final PurseSeinerActionClassToDouble maxCurrentSpeeds = PurseSeinerActionClassToDouble
             .fromFile(maxCurrentSpeedsFile, "action", "speed")
             .mapValues(speed ->
