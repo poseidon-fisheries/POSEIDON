@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.plugins.ClorophillMapFactory;
+import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -53,9 +53,9 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         );
     }
 
-    ClorophillMapFactory additionalMapFactory = new ClorophillMapFactory();
+    AdditionalMapFactory additionalMapFactory = new AdditionalMapFactory();
     {
-        additionalMapFactory.setPathToClorophillFile("./inputs/tests/temperature.csv");
+        additionalMapFactory.setPathToGridFile("./inputs/tests/temperature.csv");
         additionalMapFactory.setMapPeriod(365);
         additionalMapFactory.setMapVariableName("Temperature");
     }
@@ -90,11 +90,11 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
 
 
     public String getPathToMapFile() {
-        return additionalMapFactory.getPathToClorophillFile();
+        return additionalMapFactory.getPathToGridFile();
     }
 
     public void setPathToMapFile(String pathToClorophillFile) {
-        additionalMapFactory.setPathToClorophillFile(pathToClorophillFile);
+        additionalMapFactory.setPathToGridFile(pathToClorophillFile);
     }
 
     public int getMapPeriod() {

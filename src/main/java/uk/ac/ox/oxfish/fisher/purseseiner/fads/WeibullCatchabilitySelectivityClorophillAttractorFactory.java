@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.plugins.ClorophillMapFactory;
+import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -73,7 +73,7 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
                     @Override
                     public AbundanceFadInitializer get() {
                         //create the map
-                        ClorophillMapFactory factory = new ClorophillMapFactory(clorophillMapPath);
+                        AdditionalMapFactory factory = new AdditionalMapFactory(clorophillMapPath);
                         fishState.registerStartable(factory.apply(fishState));
 
                         //attractor:

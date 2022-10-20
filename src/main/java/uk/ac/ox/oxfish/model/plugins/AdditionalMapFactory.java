@@ -31,20 +31,26 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
 
-public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartable> {
+public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
 
     public String mapVariableName = "Clorophill";
-    private String pathToClorophillFile = "inputs/tests/clorophill.csv";
+    private String pathToGridFile = "inputs/tests/clorophill.csv";
 
     private int mapPeriod = 365;
 
-    public ClorophillMapFactory() {
+    public AdditionalMapFactory() {
     }
 
-    public ClorophillMapFactory(String pathToClorophillFile) {
-        this.pathToClorophillFile = pathToClorophillFile;
+    public AdditionalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
+        this.mapVariableName = mapVariableName;
+        this.pathToGridFile = pathToGridFile;
+        this.mapPeriod = mapPeriod;
+    }
+
+    public AdditionalMapFactory(String pathToClorophillFile) {
+        this.pathToGridFile = pathToClorophillFile;
     }
 
     @Override
@@ -55,7 +61,7 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
             @Override
             public void start(FishState model) {
                 SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
-                        Paths.get(pathToClorophillFile),
+                        Paths.get(pathToGridFile),
                         new MapExtent(model.getMap()),
                         mapPeriod,
                         false,
@@ -79,12 +85,12 @@ public class ClorophillMapFactory implements AlgorithmFactory<AdditionalStartabl
 
     }
 
-    public String getPathToClorophillFile() {
-        return pathToClorophillFile;
+    public String getPathToGridFile() {
+        return pathToGridFile;
     }
 
-    public void setPathToClorophillFile(String pathToClorophillFile) {
-        this.pathToClorophillFile = pathToClorophillFile;
+    public void setPathToGridFile(String pathToGridFile) {
+        this.pathToGridFile = pathToGridFile;
     }
 
     public int getMapPeriod() {

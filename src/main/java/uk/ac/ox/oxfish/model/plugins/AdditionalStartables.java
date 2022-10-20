@@ -81,6 +81,8 @@ public class AdditionalStartables {
         NAMES.put(IattcClosurePeriodRandomizerFactory.class, "IATTC Closure Period Randomizer");
         NAMES.put(FadTemperatureHazardFactory.class, "Fad Temperature Hazard");
 
+        NAMES.put(AdditionalMapFactory.class, "Environmental Map");
+
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
