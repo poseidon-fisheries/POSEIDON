@@ -561,11 +561,18 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     //        Path calibrationFile = Paths.get(
     //                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_calzone_all/cenv0477/2022-10-11_18.41.28_local/local_calibration.yaml"
     //        );
+//        double[] solution =
+//                {
+//                        -3.917,-13.419,-11.295, 7.326,-6.007, 18.535,-8.852, 1.824, 3.505, 4.512, 4.229,-3.035,-2.948, 42.966, 4.175, 3.672,-4.506, 6.922,-11.295,-21.336,-36.316,-21.747                               };
+//        Path calibrationFile = Paths.get(
+//                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_tripleweight/carrknight/2022-10-12_22.41.44_manual1/manual.yaml"
+//        );
+
         double[] solution =
                 {
-                        -3.917,-13.419,-11.295, 7.326,-6.007, 18.535,-8.852, 1.824, 3.505, 4.512, 4.229,-3.035,-2.948, 42.966, 4.175, 3.672,-4.506, 6.922,-11.295,-21.336,-36.316,-21.747                               };
+                        3.794049168316043, 4.451468565151611, 2.6474190968404905, 7.020455995135954, 8.070595111940086, -13.801854831027553, 6.355651752738183, 4.5968094609688634, -10.205273050249225, -4.017591619944959, -2.9267265838845784, -13.715907084624545, 7.365378281516083, 13.41678655851953, -3.400105860537977, 10.134328391479006, 0.4795274192124648, -13.669829396720697, -9.454034681302858, -3.1692694707911286, -11.515633266600979, 9.92186627361832, -10.48929847128147, 9.468988270533174, 13.114721973874794, -7.387773632285959, -13.362106811580137                              };
         Path calibrationFile = Paths.get(
-                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_tripleweight/carrknight/2022-10-12_22.41.44_manual1/manual.yaml"
+                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/environmental/manual_all/manual.yaml"
         );
 
 

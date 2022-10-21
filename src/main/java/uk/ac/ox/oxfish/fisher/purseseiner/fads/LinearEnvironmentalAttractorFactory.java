@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -168,6 +169,8 @@ public class LinearEnvironmentalAttractorFactory  implements
                             double[] cachability = new double[fishState.getBiology().getSize()];
                             SeaTile fadLocation = abstractFad.getLocation();
                             double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
+                            if(penaltyHere <= 0 || !Double.isFinite(penaltyHere))
+                                return cachability;
 
                             for (Species species : fishState.getBiology().getSpecies())
                                 cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(),0d) *
