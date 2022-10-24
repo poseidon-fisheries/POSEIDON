@@ -26,6 +26,7 @@ public class FadPlanningFactories {
         NAMES.put(MarginalValueFadPlanningModuleFactory.class, "MVT FAD Module");
         NAMES.put(ValuePerSetFadModuleFactory.class, "VPS FAD Module");
         NAMES.put(WhereFadsAreFadModuleFactory.class, "Where Fads Are FAD Module");
+        NAMES.put(WhereMoneyIsPlanningFactory.class, "Where Money Is FAD Module");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
