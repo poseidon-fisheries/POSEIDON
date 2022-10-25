@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearClorophillAttractorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityClorophillAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -45,11 +45,16 @@ public class FadInitializerFactories {
 
         NAMES.put(AbundanceFadInitializerBetaFactory.class, "Abundance FAD Beta Initializer");
         NAMES.put(AbundanceFadInitializerBetaFactoryWithExpiration.class, "Abundance FAD Beta Initializer With Expiration");
-        NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
+        //weibul linear intervals
         NAMES.put(WeibullLinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
+        NAMES.put(WeibullLinearIntervalEnvironmentalAttractorFactory.class, "Weibull FAD Linear Interval Environmental Initializer");
+        //weibull linear catchability
         NAMES.put(WeibullCatchabilitySelectivityAttractorFactory.class, "Weibull FAD Catchability Selectivity Initializer");
-        NAMES.put(WeibullCatchabilitySelectivityClorophillAttractorFactory.class,
-                "Weibull FAD Catchability Selectivity Clorophill Initializer");
+        NAMES.put(WeibullCatchabilitySelectivityEnvironmentalAttractorFactory.class,
+                  "Weibull FAD Catchability Selectivity Environmental Initializer");
+
+        //linear catchabilities
+        NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
         NAMES.put(LinearClorophillAttractorFactory.class,
                 "Linear FAD Catchability Selectivity Clorophill Initializer");
 

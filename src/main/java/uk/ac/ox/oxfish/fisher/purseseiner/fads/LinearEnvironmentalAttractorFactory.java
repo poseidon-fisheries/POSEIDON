@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
@@ -38,7 +37,6 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -110,32 +108,7 @@ public class LinearEnvironmentalAttractorFactory  implements
                         Preconditions.checkArgument(environmentalMaps.size()==environmentalPenalties.size());
                         Preconditions.checkArgument(environmentalMaps.size()==environmentalThresholds.size());
 
-                        Function<SeaTile,Double> catchabilityPenaltyFunction = null;
 
-                        //start the map
-                        for (int environmental = 0; environmental < environmentalMaps.size(); environmental++) {
-
-                            AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
-                            fishState.registerStartable(newMap);
-                            final String mapName = environmentalMaps.get(environmental).mapVariableName;
-                            final double threshold = environmentalThresholds.get(environmental).apply(fishState.getRandom());
-                            final double penalty = environmentalPenalties.get(environmental).apply(fishState.getRandom());
-
-                            final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
-                                double currentHere = fishState.getMap().getAdditionalMaps().get(
-                                        mapName).get().get(
-                                        seaTile.getGridX(),
-                                        seaTile.getGridY()
-                                );
-                                return Math.pow(Math.min(1d, currentHere / threshold), penalty);
-                            };
-                            if(catchabilityPenaltyFunction == null) catchabilityPenaltyFunction = penaltyMultiplier;
-                            else {
-                                Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
-                                catchabilityPenaltyFunction = seaTile -> oldPenalty.apply(seaTile) * penaltyMultiplier.apply(seaTile);
-                            }
-
-                        }
 
                         //attractor:
                         final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
@@ -163,7 +136,9 @@ public class LinearEnvironmentalAttractorFactory  implements
 
 
                         }
-                        final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = catchabilityPenaltyFunction;
+                        final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+                                environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
+
                         Function<AbstractFad,double[]> catchabilitySupplier = abstractFad -> {
 
                             double[] cachability = new double[fishState.getBiology().getSize()];
@@ -200,6 +175,39 @@ public class LinearEnvironmentalAttractorFactory  implements
         );
 
 
+    }
+
+    public static Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+            LinkedList<AdditionalMapFactory> environmentalMaps,
+            LinkedList<DoubleParameter> environmentalPenalties,
+            LinkedList<DoubleParameter> environmentalThresholds,
+            FishState fishState) {
+        Function<SeaTile, Double> catchabilityPenaltyFunction = null;
+        //start the map
+        for (int environmental = 0; environmental < environmentalMaps.size(); environmental++) {
+
+            AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
+            fishState.registerStartable(newMap);
+            final String mapName = environmentalMaps.get(environmental).mapVariableName;
+            final double threshold = environmentalThresholds.get(environmental).apply(fishState.getRandom());
+            final double penalty = environmentalPenalties.get(environmental).apply(fishState.getRandom());
+
+            final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
+                double currentHere = fishState.getMap().getAdditionalMaps().get(
+                        mapName).get().get(
+                        seaTile.getGridX(),
+                        seaTile.getGridY()
+                );
+                return Math.pow(Math.min(1d, currentHere / threshold), penalty);
+            };
+            if(catchabilityPenaltyFunction == null) catchabilityPenaltyFunction = penaltyMultiplier;
+            else {
+                Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
+                catchabilityPenaltyFunction = seaTile -> oldPenalty.apply(seaTile) * penaltyMultiplier.apply(seaTile);
+            }
+
+        }
+        return catchabilityPenaltyFunction;
     }
 
     public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {

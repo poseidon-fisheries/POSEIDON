@@ -9,10 +9,12 @@ MPA Only:
     ]
 -------
 Specific MPA from Shape File:
-  shapeFilePath: inputs
+  name: null
+  shapeFilePath: null
 -------
 Specific MPA from Coordinates:
   eastLongitude: '1.0'
+  name: null
   northLatitude: '1.0'
   southLatitude: '1.0'
   westLongitude: '1.0'

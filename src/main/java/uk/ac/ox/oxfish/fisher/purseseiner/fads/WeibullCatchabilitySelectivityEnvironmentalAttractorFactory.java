@@ -18,15 +18,18 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttractorFactory.createEnvironmentalPenaltyAndStartEnvironmentalMaps;
+
 /**
  * like the linear catchability weibull attractor, but this one sets catchability to 0 whenever clorophill is below a specific value
  */
-public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
+public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory implements
         AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
 
@@ -56,13 +59,24 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
 
-    private String clorophillMapPath = "inputs/tests/clorophill.csv";
-
-
-    private DoubleParameter clorophillThreshold = new FixedDoubleParameter(0.15);
 
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
             new Locker<>();
+
+
+
+    private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
+
+    private LinkedList<DoubleParameter>  environmentalThresholds = new LinkedList<>();
+
+    private LinkedList<DoubleParameter>  environmentalPenalties = new LinkedList<>();
+
+    {
+        AdditionalMapFactory e = new AdditionalMapFactory();
+        environmentalMaps.add(e);
+        environmentalThresholds.add(new FixedDoubleParameter(0.15));
+        environmentalPenalties.add(new FixedDoubleParameter(2));
+    }
 
 
 
@@ -72,9 +86,7 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
                 new Supplier<AbundanceFadInitializer>() {
                     @Override
                     public AbundanceFadInitializer get() {
-                        //create the map
-                        AdditionalMapFactory factory = new AdditionalMapFactory(clorophillMapPath);
-                        fishState.registerStartable(factory.apply(fishState));
+
 
                         //attractor:
                         final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
@@ -102,17 +114,20 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
 
 
                         }
+                        final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+                                environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
+
                         Function<AbstractFad,double[]> catchabilitySupplier = abstractFad -> {
 
                             double[] cachability = new double[fishState.getBiology().getSize()];
                             SeaTile fadLocation = abstractFad.getLocation();
-                            DoubleGrid2D currentClorophill = fishState.getMap().getAdditionalMaps().get("Clorophill").get();
-                            double currentHere = currentClorophill.get(
-                                    fadLocation.getGridX(),
-                                    fadLocation.getGridY());
+                            double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
+                            if(penaltyHere <= 0 || !Double.isFinite(penaltyHere))
+                                return cachability;
+
                             for (Species species : fishState.getBiology().getSpecies())
                                 cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(),0d) *
-                                        Math.pow(Math.min(1d,currentHere/clorophillThreshold.apply(fishState.getRandom())),2);
+                                        penaltyHere;
                             return cachability;
                         };
 
@@ -211,19 +226,30 @@ public class WeibullCatchabilitySelectivityClorophillAttractorFactory implements
         this.fadDudRate = fadDudRate;
     }
 
-    public String getClorophillMapPath() {
-        return clorophillMapPath;
+
+    public LinkedList<AdditionalMapFactory> getEnvironmentalMaps() {
+        return environmentalMaps;
     }
 
-    public void setClorophillMapPath(String clorophillMapPath) {
-        this.clorophillMapPath = clorophillMapPath;
+    public void setEnvironmentalMaps(LinkedList<AdditionalMapFactory> environmentalMaps) {
+        this.environmentalMaps = environmentalMaps;
     }
 
-    public DoubleParameter getClorophillThreshold() {
-        return clorophillThreshold;
+    public LinkedList<DoubleParameter> getEnvironmentalThresholds() {
+        return environmentalThresholds;
     }
 
-    public void setClorophillThreshold(DoubleParameter clorophillThreshold) {
-        this.clorophillThreshold = clorophillThreshold;
+    public void setEnvironmentalThresholds(
+            LinkedList<DoubleParameter> environmentalThresholds) {
+        this.environmentalThresholds = environmentalThresholds;
+    }
+
+    public LinkedList<DoubleParameter> getEnvironmentalPenalties() {
+        return environmentalPenalties;
+    }
+
+    public void setEnvironmentalPenalties(
+            LinkedList<DoubleParameter> environmentalPenalties) {
+        this.environmentalPenalties = environmentalPenalties;
     }
 }

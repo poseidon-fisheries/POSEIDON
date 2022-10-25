@@ -28,11 +28,13 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * Inspired somewhat by the IOTC paper: a FAD that "activates" after a certain number of days and then attracts at a fixed rate until full.
@@ -60,6 +62,11 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
 
     private final int daysInWaterBeforeAttraction;
 
+    /**
+     * if this predicate is not true, there will be no further attraction this day
+     */
+    private Predicate<SeaTile> additionalAttractionHurdle = seaTile -> true;
+
 
     public AbstractAbundanceLinearIntervalAttractor(
             Map<Species, NonMutatingArrayFilter> globalSelectivityCurves, FishState model,
@@ -84,6 +91,9 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
     }
 
     protected boolean shouldICancelTheAttractionToday(AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
+        if(!additionalAttractionHurdle.test(fad.getLocation()))
+            return true;
+
         //attract nothing before spending enough steps in
         if(model.getDay()- fad.getStepDeployed()<daysInWaterBeforeAttraction || !fad.isActive())
             return true;
@@ -128,6 +138,7 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
 
     @Override
     public void step(SimState simState) {
+        System.out.println("step " + ((FishState) simState).getStep());
         abundancePerDailyKgLanded = turnSelectivityIntoBiomassToAbundanceConverter(
                 ((FishState) simState),globalSelectivityCurves
         );
@@ -199,4 +210,13 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
      * get the minimum amount of abundance there needs to be in a cell for this species without which the FAD won't attract!
      */
     public abstract HashMap<Species,double[][]> getDailyAttractionThreshold(AbundanceFad fad);
+
+    public Predicate<SeaTile> getAdditionalAttractionHurdle() {
+        return additionalAttractionHurdle;
+    }
+
+    public void setAdditionalAttractionHurdle(
+            Predicate<SeaTile> additionalAttractionHurdle) {
+        this.additionalAttractionHurdle = additionalAttractionHurdle;
+    }
 }

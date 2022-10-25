@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-10-14'
+  startDate: '2022-10-25'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
@@ -325,4 +325,9 @@ Fad Temperature Hazard:
   minimumDaysBeforeHazardCanTakePlace: '10.0'
   pathToMapFile: ./inputs/tests/temperature.csv
   valueBelowWhichHazardHappens: '25.0'
+-------
+Environmental Map:
+  mapPeriod: 365
+  mapVariableName: Clorophill
+  pathToGridFile: inputs/tests/clorophill.csv
 -------
