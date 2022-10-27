@@ -19,14 +19,29 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import sim.util.Double2D;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Collection;
 
 public interface RegionalDivision {
 
+    MapExtent getMapExtent();
+
     Collection<Region> getRegions();
+
     Region getRegion(int gridX, int gridY);
+
+    default Region getRegion(Coordinate coordinate) {
+        return getRegion(getMapExtent().coordinateToXY(coordinate));
+    }
+
+    default Region getRegion(Double2D xy) {
+        return getRegion((int) xy.x, (int) xy.y);
+    }
+
     default Region getRegion(SeaTile seaTile) {
         return getRegion(seaTile.getGridX(), seaTile.getGridY());
     }
@@ -41,11 +56,18 @@ public interface RegionalDivision {
             this.number = number;
         }
 
-        @Override public String toString() { return getName(); }
+        @Override
+        public String toString() {
+            return getName();
+        }
 
-        public int getNumber() { return number; }
+        public int getNumber() {
+            return number;
+        }
 
-        public String getName() { return name; }
+        public String getName() {
+            return name;
+        }
 
     }
 

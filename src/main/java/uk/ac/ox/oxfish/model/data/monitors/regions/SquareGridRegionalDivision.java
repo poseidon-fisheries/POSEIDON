@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
 import java.util.Collection;
@@ -48,6 +49,11 @@ abstract class SquareGridRegionalDivision implements RegionalDivision {
             .collect(toImmutableList());
         this.map = map;
         this.numberOfDivisions = numberOfDivisions;
+    }
+
+    @Override
+    public MapExtent getMapExtent() {
+        return map.getMapExtent();
     }
 
     @Override public Collection<Region> getRegions() { return regions; }
