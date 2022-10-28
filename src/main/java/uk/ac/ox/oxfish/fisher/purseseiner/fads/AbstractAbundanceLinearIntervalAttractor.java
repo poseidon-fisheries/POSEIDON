@@ -138,7 +138,6 @@ public abstract class  AbstractAbundanceLinearIntervalAttractor implements FishA
 
     @Override
     public void step(SimState simState) {
-        System.out.println("step " + ((FishState) simState).getStep());
         abundancePerDailyKgLanded = turnSelectivityIntoBiomassToAbundanceConverter(
                 ((FishState) simState),globalSelectivityCurves
         );

@@ -430,24 +430,6 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
 //    public static void main(String[] args) throws IOException {
 ////
-//////        GenericOptimization.buildLocalCalibrationProblem(
-//////                Paths.get("docs/20220223 tuna_calibration/pathfinder_junedata/delrange/localweibull/original.yaml"),
-//////                new double[]{
-//////                        -5.812, 3.047,-8.904,-11.564,-12.497, 15.000,-7.554, 10.789,-5.319,-12.632, 4.380,-5.309, 4.292, 4.952,-0.271,-13.241,-3.238,-12.161,-14.519, 0.319,-11.572,-9.196,-1.602},
-//////                "weibull_local_calibration.yaml",.2
-//////        );
-//////        GenericOptimization.buildLocalCalibrationProblem(
-//////                Paths.get("docs/20220223 tuna_calibration/pathfinder_junedata/delrange/localcatchability/original.yaml"),
-//////                new double[]{
-//////                        -12.433618836531698, 2.089121611457278, -7.792420986566349, -5.127758236857524, -2.08772894418047,
-//////                        12.160129309960192, -6.320890604415937, 15.0, 2.128653134214911 ,-13.90456850826462, 5.697883994689165,
-//////                        -5.24187869242912, 4.819920797437995, 7.816956699054028, 2.4752418876629285, -14.240855068159028,
-//////                        14.861926358544158,
-//////                        6.745607003258465, 10.555829913676163, 15.0, -11.744228270993785 ,-0.32958642016429485,
-//////                        -10.168756436306179, -15.0, -0.33077078347355904
-//////                        },
-//////                "catchability_local_calibration.yaml",.2
-//////        );
 ////
 //////        GenericOptimization.buildLocalCalibrationProblem(
 //////                Paths.get(
@@ -467,12 +449,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 //////
 //        GenericOptimization.buildLocalCalibrationProblem(
 //                Paths.get(
-//                        "docs/20220223 tuna_calibration/clorophill/greedy_unconstrained_nocalzone_square_noweibull/cenv0477/2022-09-26_13.28.17_global/calibration.yaml"),
+//                        "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/environmental/skjincluded/weibull_value/more/original_calibration.yaml"),
 //                new double[]{
-//                        -0.5001154986470797, 4.316687510298508, -3.2955427635214427, 10.416087454193578, -11.53794460063702, 0.590146596365984, -2.431855931730542, 15.0 ,-4.620028821484866, 6.506843766050387, 11.162732654106351, -8.629976177897001, -12.461350675088646, -8.859888250322072, 15.0, 9.9677178324451, 5.6765357070850255, 10.87375650767638, 2.922750294667625, -9.03184813295324
-//
+//                        1.6296715072412908,-86.7293032265776,-29.71955183248816,-23.301130791889246,147.75630814989503,-2.1424338866954464,-25.718407690183653,18.800744639090695,10.570074492531134,-27.154560249134107,-118.11745092021698,17.77260734197482,9.965487262463206,-74.17039002034682,16.302644722665246,-54.543593904725434,-7.646861465532954,-8.648538634304845,2.6422097519329606,14.154899325110927,-2.6680704569728784,2.323597481426466,53.33190429315141,-14.358622067490462,20.7872931058517,20.620703701194767
 //                },
-//                "local.yaml", .2
+//                "more.yaml", .05
 //        );
 //}
 
@@ -482,85 +463,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 ////
     public static void main(String[] args) throws IOException {
 ////
-//////        double[] solution = {-3.498,-0.431,-5.375,-3.236,-1.976,-3.991,-6.029, 1.675,-5.013, 0.085, 2.348, 6.974,-6.651, 0.070, 7.658, 1.313,-6.153,-6.742, 5.033, 3.401, 2.288,-0.401, 4.435, 0.906,-5.929, 5.521,-2.117, 5.730};
-//////        Path calibrationFile = Paths.get("/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/temp/powpointone/local_1000_forceddiscretization.yaml");
-//////
-//////
-////
-////
-//////        double[] solution = {-1.732, 5.637,-0.049, 1.983,-0.496, 4.536,-5.810,-3.894,-7.138, 5.626, 5.600, 0.594, 4.095, 2.608, 1.965,-3.078,-4.655, 5.206, 5.751,-3.062, 6.612, 4.448, 4.792, 1.511,-6.183,-7.019, 1.016};
-//////        Path calibrationFile = Paths.get(
-//////                "docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/local_fd_125.yaml"
-//////        );
-////
-////
-//////        double[] solution = {0.562, 4.100,-4.186,-1.756, 3.606,-5.027, 0.635,-2.266, 1.438, 2.350,-0.368,-3.393,-2.957, 1.256, 4.433,-4.830,-2.005,-2.589,-0.782, 0.178, 0.110, 1.421, 0.591,-1.358, 2.359, 4.308};
-//////        Path calibrationFile = Paths.get(
-//////                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/pathfinder3/local_experiment/fd/carrknight/2022-04-20_07.33.02_local1000/local_fd_125.yaml"
-//////        );
-////
-//////        double[] solution = {5.928, 10.000,-4.629,-1.743,-7.331, 7.256, 4.467, 8.542, 2.461, 6.235,-0.453, 10.000,-0.762, 1.933, 10.000,-2.604, 3.901, 8.284,-5.620, 2.860, 1.831, 5.348,-10.000,-7.821, 2.593,-0.502};
-//////        Path calibrationFile = Paths.get(
-//////                "docs/20220223 tuna_calibration/pathfinder3/zapperAge_local/carrknight/2022-04-22_16.51.48_zapper_local/zapper_local.yaml"
-//////        );
-////
-////        double[] solution =
-////              //  {-50.830, 22.467, 20.911,-64.333,-3.872,-71.828, 17.786, 635.530, 0.775, 33.997, 14.841,-2.065,-24.428, 1.164, 25.175, 38.979,-24.874, 13.277, 37.779,-1.461, 3.092, 4.066, 3.735, 34.309, 145.886,-13.260, 16.731};
-////                {-51.724, 22.532, 21.767,-63.344,-3.947,-72.007, 25.182, 695.676, 0.686, 33.917, 14.578, 0.479,-25.794, 0.229, 25.667, 38.437,-27.530, 13.663, 37.790,-1.460, 3.542, 4.050,-0.639, 35.812, 118.978,-15.255, 24.295};
-////
-////        Path calibrationFile = Paths.get(
-////                "docs/20220223 tuna_calibration/pathfinder3/zapper_expired/zapper_local_expired.yaml"
-////        );
-//
-//        double[] solution =
-//                {
-//                        -5.151, 1.876,-6.999, 10.663, 12.197, 28.479, 13.608, 1.293, 7.905,-6.197, 20.351, 18.313,-3.973,-0.792, 16.141, 2.254,-4.214, 8.540, 12.744, 6.925,-2.947, 23.986,-1.374, 9.571,-11.311
-//                };
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder_julydata/carrknight/2022-07-10_10.13.49_catchability_original/local/carrknight/2022-07-11_07.51.40_catchability_local/test_yearlyreset/test.yaml"
-//        );
-//
-//
-//        double[] solution =
-//                {
-//                        8.893, 2.455, 17.227, 67.858,-8.136,-13.613,-24.908, 5.191,-24.692,-2.021, 8.118,-4.814, 8.429, 1.952, 11.970, 27.800, 49.643, 50.614,-10.319, 12.254,-31.352,-27.689,-2.648,-2.549,-0.319                };
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder_julydata/carrknight/2022-07-13_12.05.49_catchability_shorttrips_yearlyreset/local/carrknight/2022-07-15_19.34.34_catchability_shorttrips_local/test/test.yaml"
-//        );
 
-//        double[] solution =
-//                {
-//                        11.366, 2.465, 13.248, 68.620,-3.238,-13.843,-24.131, 5.467,-25.930,-1.987, 8.039,-3.949, 8.321, 2.389, 12.699, 38.852, 46.776, 37.540,-10.365, 12.171,-33.112,-27.241, 27.253,-4.165,-0.039              };
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder_julydata/uploadable/2022-07-18 catchability/new_interface/test.yaml"
-//        );
-
-//        double[] solution =
-//                {
-//                        -6.365, 7.113,-2.599, 21.071, 18.909,-48.465, 3.517, 4.103,-15.507, 4.250,-1.537, 4.798,-4.444,-17.181, 1.208, 2.238,-21.044,-3.558, 9.290, 6.909, 2.555, 6.162,-46.681,-0.184
-//                };
-//        Path calibrationFile = Paths.get(
-//                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/pathfinder_julydata/greedytest/carrknight/2022-08-14_10.18.11_longtrips_local/greedy_calibration.yaml"
-//        );
-//
-//
-//        TunaEvaluator evaluator = new TunaEvaluator(calibrationFile, solution);
-//        evaluator.setNumRuns(5);
-//        evaluator.run();
-//
-//        double[] solution =
-//                {
-//                        -6.365, 7.113,-2.599, 21.071, 18.909,-48.465, 3.517, 4.103,-15.507, 4.250,-1.537, 4.798,-4.444,-17.181, 1.208, 2.238,-21.044,-3.558, 9.290, 6.909, 2.555, 6.162,-46.681,-0.184
-//                };
-//        Path calibrationFile = Paths.get(
-//                "docs/20220223 tuna_calibration/pathfinder_julydata/greedytest/carrknight/2022-08-14_10.18.11_longtrips_local/identity/identity_calibration.yaml"
-//        );
-    //        double[] solution =
-    //                {
-    //                        0.091,-16.511, 1.583,-74.989,-34.695,-22.996,-7.547, 26.354, 4.517,-1.779,-3.435,-34.744,-12.812,-52.711,-23.208,-6.768,-22.525,-63.385,-6.759, 6.604,-128.135,-12.487                               };
-    //        Path calibrationFile = Paths.get(
-    //                "/home/carrknight/Dropbox/oxfish_docs/20220223 tuna_calibration/clorophill/neweez/manual1_fixed_calzone_all/cenv0477/2022-10-11_18.41.28_local/local_calibration.yaml"
-    //        );
 //        double[] solution =
 //                {
 //                        -3.917,-13.419,-11.295, 7.326,-6.007, 18.535,-8.852, 1.824, 3.505, 4.512, 4.229,-3.035,-2.948, 42.966, 4.175, 3.672,-4.506, 6.922,-11.295,-21.336,-36.316,-21.747                               };
@@ -570,14 +473,15 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
         double[] solution =
                 {
-                        3.794049168316043, 4.451468565151611, 2.6474190968404905, 7.020455995135954, 8.070595111940086, -13.801854831027553, 6.355651752738183, 4.5968094609688634, -10.205273050249225, -4.017591619944959, -2.9267265838845784, -13.715907084624545, 7.365378281516083, 13.41678655851953, -3.400105860537977, 10.134328391479006, 0.4795274192124648, -13.669829396720697, -9.454034681302858, -3.1692694707911286, -11.515633266600979, 9.92186627361832, -10.48929847128147, 9.468988270533174, 13.114721973874794, -7.387773632285959, -13.362106811580137                              };
+                        2.161,-29.924,-48.141,-6.032, 0.175, 4.096,-2.428,-15.746, 7.684, 9.575, 5.658, 14.134,-0.885,-4.833, 5.226, 10.053, 9.452,-2.723, 12.029,-0.410, 13.310,-7.526, 5.416
+                        };
         Path calibrationFile = Paths.get(
-                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/environmental/manual_all/manual.yaml"
+                "/home/carrknight/code/oxfish/docs/20220223 tuna_calibration/clorophill/environmental/skjincluded/weibull_value/more/carrknight/2022-10-27_11.26.13_manual1/more.yaml"
         );
 
 
         TunaEvaluator evaluator = new TunaEvaluator(calibrationFile, solution);
-        evaluator.setNumRuns(5);
+        evaluator.setNumRuns(1);
         evaluator.run();
 ////
 ////    }
