@@ -362,10 +362,20 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 "thegap"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(thegap);
+        //filter(lon_n>= -90 & lat_n <= -10)
+        LocalizedActionCounter calzone3 = new LocalizedActionCounter(
+                abstractFadSetAction -> {
+                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                    return coordinates.x >= -90  & coordinates.y <= -10;
+                },
+                "calzone3"
+        );
+        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone3);
 
 
         fishState.registerStartable(calzone1);
         fishState.registerStartable(calzone2);
+        fishState.registerStartable(calzone3);
         fishState.registerStartable(thegap);
 
         super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
