@@ -1,20 +1,20 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.collect.ImmutableMap;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
     implements AlgorithmFactory<FadMap<B, F>> {
@@ -61,11 +61,7 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         // support different steps per day, but I don't see that happening any time soon.
         checkState(fishState.getStepsPerDay() == CurrentVectorsFactory.STEPS_PER_DAY);
         final NauticalMap nauticalMap = fishState.getMap();
-        final CurrentVectors currentVectors =
-            CurrentVectorsFactory.INSTANCE.getCurrentVectors(
-                nauticalMap.getMapExtent(),
-                currentFiles, inputIsMetersPerSecond
-            );
+        final CurrentVectors currentVectors = buildCurrentVectors(fishState);
         return new FadMap<>(
             nauticalMap,
             currentVectors,
@@ -75,6 +71,15 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         );
     }
 
+    CurrentVectors buildCurrentVectors(FishState fishState) {
+        return CurrentVectorsFactory.INSTANCE.getCurrentVectors(
+            fishState.getMap().getMapExtent(),
+            currentFiles,
+            inputIsMetersPerSecond
+        );
+    }
+
+    @SuppressWarnings("unused")
     public boolean isInputIsMetersPerSecond() {
         return inputIsMetersPerSecond;
     }
