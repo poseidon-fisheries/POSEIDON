@@ -62,16 +62,20 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         checkState(fishState.getStepsPerDay() == CurrentVectorsFactory.STEPS_PER_DAY);
         final NauticalMap nauticalMap = fishState.getMap();
         final CurrentVectors currentVectors =
-            CurrentVectorsFactory.INSTANCE.getCurrentVectors(
-                new MapExtent(nauticalMap),
-                currentFiles, inputIsMetersPerSecond
-            );
+                buildCurrentVector(nauticalMap, fishState);
         return new FadMap<>(
             nauticalMap,
             currentVectors,
             fishState.getBiology(),
             localBiologyClass,
             fadClass
+        );
+    }
+
+    protected CurrentVectors buildCurrentVector(NauticalMap nauticalMap,  FishState fishState) {
+        return CurrentVectorsFactory.INSTANCE.getCurrentVectors(
+                new MapExtent(nauticalMap),
+                currentFiles, inputIsMetersPerSecond
         );
     }
 
