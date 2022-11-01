@@ -36,7 +36,7 @@ public class AllocationGridsTest {
         AllocationGrids<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
                 speciesCodes,
                 TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
-                new MapExtent(nauticalMap),
+                nauticalMap.getMapExtent(),
                 365).get();
 
 

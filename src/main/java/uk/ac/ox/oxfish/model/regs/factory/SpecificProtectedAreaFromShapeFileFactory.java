@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import com.vividsolutions.jts.geom.Point;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.nio.file.Path;
@@ -49,12 +49,11 @@ public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtected
     }
 
     @Override
-    BiPredicate<Integer, Integer> inAreaPredicate(FishState fishState) {
+    BiPredicate<Integer, Integer> inAreaPredicate(MapExtent mapExtent) {
         final GeomVectorField vectorField = readShapeFile();
-        final GeomGridField rasterBathymetry = fishState.getMap().getRasterBathymetry();
-        vectorField.setMBR(rasterBathymetry.getMBR());
+        vectorField.setMBR(mapExtent.getEnvelope());
         return (x, y) -> {
-            final Point gridPoint = rasterBathymetry.toPoint(x, y);
+            final Point gridPoint = mapExtent.toPoint(x, y);
             return !vectorField.getCoveringObjects(gridPoint).isEmpty();
         };
     }

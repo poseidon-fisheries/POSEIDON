@@ -246,7 +246,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
             (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
-        abundanceReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
+        abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
         final AbundanceReallocator reallocator =
             this.abundanceReallocatorFactory.apply(fishState);

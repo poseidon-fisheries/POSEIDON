@@ -111,38 +111,6 @@ public class MasonUtils {
         return candidates.get(oneOfIndices(candidates, random));
     }
 
-    /**
-     * Transforms a lon/lat coordinate to an x/y coordinate that can be used with a continuous field
-     * covering the same space as the nautical map. This is basically a floating point version of
-     * vectors.size().toXCoord/.toYCoord; not sure why it doesn't exist in GeomVectorField in the
-     * first place...
-     */
-    public static Double2D coordinateToXY(Coordinate coordinate, GeomGridField geomGridField) {
-        return coordinateToXY(
-            coordinate,
-            geomGridField.getGridWidth(),
-            geomGridField.getGridHeight(),
-            geomGridField.getMBR()
-        );
-    }
-
-    public static Double2D coordinateToXY(Coordinate coordinate, double gridWidth, double gridHeight, Envelope mbr) {
-        double pixelWidth = mbr.getWidth() / gridWidth;
-        double pixelHeight = mbr.getHeight() / gridHeight;
-        final double x = (coordinate.x - mbr.getMinX()) / pixelWidth;
-        final double y = (mbr.getMaxY() - coordinate.y) / pixelHeight;
-        return new Double2D(x, y);
-    }
-
-    public static Double2D coordinateToXY(Coordinate coordinate, MapExtent mapExtent) {
-        return coordinateToXY(
-            coordinate,
-            mapExtent.getGridWidth(),
-            mapExtent.getGridHeight(),
-            mapExtent.getEnvelope()
-        );
-    }
-
     public static boolean inBounds(Double2D location, Continuous2D continuous2D) {
         return inBounds(location, continuous2D.getWidth(), continuous2D.getHeight());
     }

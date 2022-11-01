@@ -62,7 +62,7 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
             public void start(FishState model) {
                 SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
                         Paths.get(pathToGridFile),
-                        new MapExtent(model.getMap()),
+                        model.getMap().getMapExtent(),
                         mapPeriod,
                         false,
                         mapVariableName

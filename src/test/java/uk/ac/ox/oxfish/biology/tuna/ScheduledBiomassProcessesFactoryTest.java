@@ -48,7 +48,7 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
         final MapInitializer mapInitializer =
             new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
-        biomassReallocatorFactory.setMapExtent(new MapExtent(nauticalMap));
+        biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         final BiomassReallocator biomassReallocator =
             biomassReallocatorFactory.apply(mock(FishState.class));
         final AllocationGrids<String> allocationGrids =

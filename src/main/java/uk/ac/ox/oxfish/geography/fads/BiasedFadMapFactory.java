@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.BiasedCurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -31,8 +30,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class BiasedFadMapFactory extends GenericFadMapFactory {
-
 
     private DoubleParameter biasY = new FixedDoubleParameter(0);
 
@@ -42,57 +41,64 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
 
     private DoubleParameter gridYMaximum = new FixedDoubleParameter(0);
 
-
-
-    public BiasedFadMapFactory(
-            Map<CurrentPattern, Path> currentFiles) {
+    @SuppressWarnings("unused")
+    public BiasedFadMapFactory(Map<CurrentPattern, Path> currentFiles) {
         super(currentFiles);
     }
 
+    @SuppressWarnings("unused")
     public BiasedFadMapFactory() {
     }
 
     @Override
-    protected CurrentVectors buildCurrentVector(NauticalMap nauticalMap,
-                                                FishState fishState) {
+    protected CurrentVectors buildCurrentVectors(FishState fishState) {
         return
-                new BiasedCurrentVectors(super.buildCurrentVector(nauticalMap,fishState),
-                                         biasY.apply(fishState.getRandom()),
-                                         biasX.apply(fishState.getRandom()),
-                                         gridYMinimum.apply(fishState.getRandom()).intValue(),
-                                         gridYMaximum.apply(fishState.getRandom()).intValue()
-                                         );
+            new BiasedCurrentVectors(
+                super.buildCurrentVectors(fishState),
+                biasY.apply(fishState.getRandom()),
+                biasX.apply(fishState.getRandom()),
+                gridYMinimum.apply(fishState.getRandom()).intValue(),
+                gridYMaximum.apply(fishState.getRandom()).intValue()
+            );
 
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getBiasY() {
         return biasY;
     }
 
+    @SuppressWarnings("unused")
     public void setBiasY(DoubleParameter biasY) {
         this.biasY = biasY;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getBiasX() {
         return biasX;
     }
 
+    @SuppressWarnings("unused")
     public void setBiasX(DoubleParameter biasX) {
         this.biasX = biasX;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getGridYMinimum() {
         return gridYMinimum;
     }
 
+    @SuppressWarnings("unused")
     public void setGridYMinimum(DoubleParameter gridYMinimum) {
         this.gridYMinimum = gridYMinimum;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getGridYMaximum() {
         return gridYMaximum;
     }
 
+    @SuppressWarnings("unused")
     public void setGridYMaximum(DoubleParameter gridYMaximum) {
         this.gridYMaximum = gridYMaximum;
     }

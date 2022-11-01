@@ -19,34 +19,123 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import sim.util.Double2D;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Collection;
 
-public interface RegionalDivision {
+public abstract class RegionalDivision {
 
-    Collection<Region> getRegions();
-    Region getRegion(int gridX, int gridY);
-    default Region getRegion(SeaTile seaTile) {
-        return getRegion(seaTile.getGridX(), seaTile.getGridY());
+    private final MapExtent mapExtent;
+    private final CachePerTile<Region> cache;
+
+    public RegionalDivision(final MapExtent mapExtent) {
+        this.mapExtent = mapExtent;
+        this.cache = new CachePerTile<>(
+            mapExtent,
+            gridXY ->
+                getRegions()
+                    .stream()
+                    .filter(region -> region.contains(gridXY))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Grid point (" + mapExtent.getCoordinates(gridXY) + ", " +
+                            gridXY + ") not in any defined regions."
+                    ))
+        );
     }
 
-    class Region {
+    public Region getRegion(final SeaTile seaTile) {
+        return cache.get(seaTile.getGridLocation());
+    }
 
-        private final int number;
+    public Region getRegion(final Int2D gridXY) {
+        return cache.get(gridXY);
+    }
+
+    public Region getRegion(final Double2D gridXY) {
+        return getRegion(new Int2D((int) gridXY.x, (int) gridXY.y));
+    }
+
+    public Region getRegion(final Coordinate coordinate) {
+        return getRegion(getMapExtent().coordinateToXY(coordinate));
+    }
+
+    public abstract Collection<Region> getRegions();
+
+    public MapExtent getMapExtent() {
+        return mapExtent;
+    }
+
+    public static class Region {
+
         private final String name;
+        private final int minX;
+        private final int maxX;
+        private final int minY;
+        private final int maxY;
 
-        Region(int number, String name) {
+        public Region(
+            final String name,
+            final int minX,
+            final int maxX,
+            final int minY,
+            final int maxY
+        ) {
             this.name = name;
-            this.number = number;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
         }
 
-        @Override public String toString() { return getName(); }
+        @SuppressWarnings("unused")
+        public int getMinX() {
+            return minX;
+        }
 
-        public int getNumber() { return number; }
+        @SuppressWarnings("unused")
+        public int getMaxX() {
+            return maxX;
+        }
 
-        public String getName() { return name; }
+        @SuppressWarnings("unused")
+        public int getMinY() {
+            return minY;
+        }
 
+        @SuppressWarnings("unused")
+        public int getMaxY() {
+            return maxY;
+        }
+
+        @Override
+        public String toString() {
+            return getName();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean contains(final Double2D gridXY) {
+            return contains((int) gridXY.x, (int) gridXY.y);
+        }
+
+        public boolean contains(final Int2D gridXY) {
+            return contains(gridXY.x, gridXY.y);
+        }
+
+        public boolean contains(final int gridX, final int gridY) {
+            return gridX >= minX & gridX <= maxX & gridY >= minY & gridY <= maxY;
+        }
+
+        public boolean contains(final Coordinate coordinate, final MapExtent mapExtent) {
+            return contains(mapExtent.coordinateToXY(coordinate));
+        }
     }
 
 }

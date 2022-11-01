@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
@@ -31,10 +31,8 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
-import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -42,122 +40,70 @@ import static org.mockito.Mockito.mock;
  */
 public class CentroidMapDiscretizerTest {
 
-
     @Test
-    public void centroid() throws Exception {
-
-
-        FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
+    public void centroid() {
+        final FishState state = buildState();
+        final CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+            Lists.newArrayList(
+                new Coordinate(0, 1),
+                new Coordinate(1, 0)
+            )
         );
-        state.getMap().recomputeTilesMPA();
-
-        assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
-        assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
-
-
-        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
-                Lists.newArrayList(
-                        new Coordinate(0,1),
-                        new Coordinate(1,0)
-                )
-        );
-
-        MapDiscretization discretization = new MapDiscretization(discretizer);
-        discretization.discretize(state.getMap());
-
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,0)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(1,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(2,2)),1);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
-
+        final MapDiscretization discretization = new MapDiscretization(discretizer);
+        checkDiscretization(state, discretization, 0);
     }
 
+    private void checkDiscretization(
+        final FishState state,
+        final MapDiscretization discretization,
+        final Integer tileZeroZeroGroup
+    ) {
+        discretization.discretize(state.getMap());
+        assertEquals(tileZeroZeroGroup, discretization.getGroup(state.getMap().getSeaTile(0, 0)));
+        assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(1, 1)));
+        assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(0, 1)));
+        assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(2, 2)));
+        assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(3, 3)));
+    }
 
-
-
+    @NotNull
+    private FishState buildState() {
+        final FishState state = MovingTest.generateSimple4x4Map();
+        state.getMap().recomputeTilesMPA();
+        assertEquals(new Coordinate(0.125, .875, 0), state.getMap().getCoordinates(0, 0));
+        assertEquals(new Coordinate(.875, 0.125, 0), state.getMap().getCoordinates(3, 3));
+        return state;
+    }
 
     //same as above, but builds the map from factory
     @Test
-    public void centroidFromFactory() throws Exception {
-
-
-        FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
-        );
-        state.getMap().recomputeTilesMPA();
-
-        assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
-        assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
-
-
-        CentroidMapFileFactory factory = new CentroidMapFileFactory();
-        factory.setFilePath(Paths.get("inputs","tests","fake_centroids.txt").toString());
+    public void centroidFromFactory() {
+        final FishState state = buildState();
+        final CentroidMapFileFactory factory = new CentroidMapFileFactory();
+        factory.setFilePath(Paths.get("inputs", "tests", "fake_centroids.txt").toString());
         factory.setxColumnName("x");
         factory.setyColumnName("y");
-        MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
-        discretization.discretize(state.getMap());
-
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,0)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(1,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(2,2)),1);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
-
+        final MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
+        checkDiscretization(state, discretization, 0);
     }
-
 
     //like above but not allowing 0,0 to be grouped
     @Test
-    public void centroidFiltered() throws Exception {
+    public void centroidFiltered() {
 
+        final FishState state = buildState();
 
-        FishState state = MovingTest.generateSimple4x4Map();
-        state.getMap().getRasterBathymetry().setMBR(
-                new Envelope(
-                        0,1,
-                        0,1
-                )
+        final CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+            Lists.newArrayList(
+                new Coordinate(0, 1),
+                new Coordinate(1, 0)
+            )
         );
-        state.getMap().recomputeTilesMPA();
+        discretizer.addFilter(tile -> tile.getGridY() > 0 || tile.getGridX() > 0);
 
-        assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
-        assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
-
-
-        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
-                Lists.newArrayList(
-                        new Coordinate(0,1),
-                        new Coordinate(1,0)
-                )
-        );
-        discretizer.addFilter(new Predicate<SeaTile>() {
-            @Override
-            public boolean test(SeaTile tile) {
-                return tile.getGridY() >0 || tile.getGridX() > 0;
-            }
-        });
-
-        MapDiscretization discretization = new MapDiscretization(discretizer);
-        discretization.discretize(state.getMap());
-
-        assertNull(discretization.getGroup(state.getMap().getSeaTile(0,0)));
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(1,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,1)),0);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(2,2)),1);
-        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
+        final MapDiscretization discretization = new MapDiscretization(discretizer);
+        checkDiscretization(state, discretization, null);
 
     }
-
-
 
 }

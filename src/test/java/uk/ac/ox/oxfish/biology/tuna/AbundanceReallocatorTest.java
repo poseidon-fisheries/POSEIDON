@@ -56,7 +56,7 @@ public class AbundanceReallocatorTest {
         AllocationGrids<Entry<String, SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
                 speciesCodes,
                 TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
-                new MapExtent(nauticalMap),
+                nauticalMap.getMapExtent(),
                 365).get();
 
         AbundanceReallocator reallocator = new AbundanceReallocator(

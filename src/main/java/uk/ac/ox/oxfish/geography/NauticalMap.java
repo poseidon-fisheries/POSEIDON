@@ -129,6 +129,7 @@ public class NauticalMap implements Startable
 
     private final LinkedHashMap<String, Supplier<DoubleGrid2D>> additionalMaps;
 
+    private final MapExtent mapExtent;
 
     /**
      * set all the base fields. Calls recomputeTilesMPA() in order to tell tiles if they are covered by an MPA or not
@@ -143,7 +144,6 @@ public class NauticalMap implements Startable
         this.mpaVectorField = mpaVectorField;
         this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
-        this.coordinateCache = new ObjectGrid2D(getWidth(), getHeight());
         additionalMaps = new LinkedHashMap<>();
         recomputeTilesMPA();
 
@@ -151,12 +151,7 @@ public class NauticalMap implements Startable
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
         dailyTrawlsMap = new IntGrid2D(getWidth(),getHeight());
-    }
-
-    private void resetCoordinateCache(GeomGridField rasterBathymetry) {
-        for (int i = 0; i < coordinateCache.getWidth(); i++)
-            for (int j = 0; j < coordinateCache.getHeight(); j++)
-                coordinateCache.set(i, j, rasterBathymetry.toPoint(i, j).getCoordinate());
+        this.mapExtent = MapExtent.from(this);
     }
 
     public int getHeight() {
@@ -293,7 +288,6 @@ public class NauticalMap implements Startable
         }
 
         alreadyComputedNeighbors.clear();
-        coordinateCache.clear();
         sizeOneNeighborhoods.clear();
     }
 
@@ -329,7 +323,6 @@ public class NauticalMap implements Startable
                 }
 
             }
-        resetCoordinateCache(rasterBathymetry);
     }
 
     /**
@@ -349,28 +342,14 @@ public class NauticalMap implements Startable
         return getSeaTile(gridLocation.x, gridLocation.y);
     }
 
-    /**
-     * basically getting coordinates is an expensive call; so we store previous calls here
-     */
-    private final ObjectGrid2D coordinateCache;
 
-//    public Coordinate getCoordinates(SeaTile tile)
-//    {
-//        return coordinateCache.computeIfAbsent(tile, 
-//            input -> rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate()
-//        );
-//    } 
-
-public Coordinate getCoordinates(int gridX, int gridY) {
-  return (Coordinate) coordinateCache.get(gridX, gridY);
+    public Coordinate getCoordinates(int gridX, int gridY) {
+  return mapExtent.getCoordinates(gridX, gridY);
 }
 
     public Coordinate getCoordinates(SeaTile tile) {
         return getCoordinates(tile.getGridX(), tile.getGridY());
     }
-
-
-
 
     public SeaTile getSeaTile(Coordinate coordinate)
     {
@@ -630,4 +609,9 @@ public Coordinate getCoordinates(int gridX, int gridY) {
     public LinkedHashMap<String, Supplier<DoubleGrid2D>> getAdditionalMaps() {
         return additionalMaps;
     }
+
+    public MapExtent getMapExtent() {
+        return mapExtent;
+    }
+
 }

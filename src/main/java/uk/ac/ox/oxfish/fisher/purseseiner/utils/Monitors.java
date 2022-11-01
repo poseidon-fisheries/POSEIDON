@@ -19,48 +19,34 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
+import com.google.common.collect.ImmutableList;
+import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.*;
+import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
+import uk.ac.ox.oxfish.model.data.monitors.regions.TwoByTwoRegionalDivision;
+
+import javax.measure.quantity.Dimensionless;
+import javax.measure.quantity.Mass;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import static com.google.common.collect.Iterables.concat;
 import static java.util.function.Function.identity;
 import static tech.units.indriya.AbstractUnit.ONE;
 import static tech.units.indriya.unit.Units.DAY;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicGroupingMonitor;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerRegionMonitor;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.basicPerSpeciesMonitor;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesMonitor;
-import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.perSpeciesPerRegionMonitor;
-
-import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import javax.measure.quantity.Dimensionless;
-import javax.measure.quantity.Mass;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.monitors.BasicMonitor;
-import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
-import uk.ac.ox.oxfish.model.data.monitors.Monitor;
-import uk.ac.ox.oxfish.model.data.monitors.ObservingAtIntervalMonitor;
-import uk.ac.ox.oxfish.model.data.monitors.ProportionalGatherer;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.IncrementingAccumulator;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.IterativeAveragingAccumulator;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.ProportionAccumulator;
-import uk.ac.ox.oxfish.model.data.monitors.accumulators.SummingAccumulator;
-import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
-import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
+import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT;
 
 @SuppressWarnings("rawtypes")
 public class Monitors {
@@ -73,9 +59,13 @@ public class Monitors {
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
+
     public Monitors(final FishState fishState) {
 
-        regionalDivision = new TicTacToeRegionalDivision(fishState.getMap());
+        regionalDivision = new TwoByTwoRegionalDivision(
+            new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT
+        );
+
         final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
 
         fadDeploymentMonitors = ImmutableList.of(
