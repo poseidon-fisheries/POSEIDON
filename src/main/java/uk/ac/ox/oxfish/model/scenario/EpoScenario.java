@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
@@ -54,6 +55,8 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
@@ -78,6 +81,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
@@ -85,6 +89,16 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public static final MapExtent DEFAULT_MAP_EXTENT =
         MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
+
+    public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
+        DEFAULT_MAP_EXTENT,
+        ImmutableMap.of(
+            "West", entry(new Coordinate(-170.5, 49.5), new Coordinate(-140.5, -49.5)),
+            "North", entry(new Coordinate(-139.5, 50), new Coordinate(-90.5, 0.5)),
+            "South", entry(new Coordinate(-139.5, -0.5), new Coordinate(-90.5, -49.5)),
+            "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
+        )
+    );
 
     public static final int TARGET_YEAR = 2017;
     public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);

@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.util.List;
 
@@ -38,6 +38,8 @@ public final class TicTacToeRegionalDivision extends SquareGridRegionalDivision 
         "Southeast"
     );
 
-    public TicTacToeRegionalDivision(NauticalMap map) { super(map, 3, REGION_NAMES); }
+    public TicTacToeRegionalDivision(final MapExtent mapExtent) {
+        super(mapExtent, 3, REGION_NAMES);
+    }
 
 }

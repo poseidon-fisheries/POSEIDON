@@ -6,47 +6,39 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.util.Collection;
+import java.util.List;
 
-public class TwoByTwoRegionalDivision implements RegionalDivision {
+public class TwoByTwoRegionalDivision extends RegionalDivision {
 
-    private static final ImmutableList<Region> REGIONS = ImmutableList.of(
-        new Region(0, "Northwest"),
-        new Region(1, "Northeast"),
-        new Region(2, "Southwest"),
-        new Region(3, "Southeast")
-    );
-    private final MapExtent mapExtent;
-    private final int middleX;
-    private final int middleY;
+    private final List<Region> regions;
 
-    public TwoByTwoRegionalDivision(MapExtent mapExtent, final int middleX, final int middleY) {
-        this.mapExtent = mapExtent;
-        this.middleX = middleX;
-        this.middleY = middleY;
+    public TwoByTwoRegionalDivision(
+        final Coordinate middleCoordinate,
+        final MapExtent mapExtent
+    ) {
+        this(mapExtent.coordinateToXY(middleCoordinate), mapExtent);
     }
 
-    public static TwoByTwoRegionalDivision from(final Coordinate middleCoordinate, final MapExtent mapExtent) {
-        final Double2D xy = mapExtent.coordinateToXY(middleCoordinate);
-        return new TwoByTwoRegionalDivision(mapExtent, (int) xy.x, (int) xy.y);
-    }
-
-    @Override
-    public MapExtent getMapExtent() {
-        return mapExtent;
+    public TwoByTwoRegionalDivision(
+        final Double2D middleGridXY,
+        final MapExtent mapExtent
+    ) {
+        super(mapExtent);
+        final int w = mapExtent.getGridWidth();
+        final int h = mapExtent.getGridHeight();
+        final int x = (int) middleGridXY.x;
+        final int y = (int) middleGridXY.y;
+        this.regions = ImmutableList.of(
+            new Region("Northwest", 0, x, 0, y),
+            new Region("Northeast", x + 1, w, 0, y),
+            new Region("Southwest", 0, x, y + 1, h),
+            new Region("Southeast", x + 1, w, y + 1, h)
+        );
     }
 
     @Override
     public Collection<Region> getRegions() {
-        return REGIONS;
-    }
-
-    @Override
-    public Region getRegion(int gridX, int gridY) {
-        return REGIONS.get(
-            gridY <= middleY
-                ? (gridX <= middleX ? 0 : 1)
-                : (gridX <= middleX ? 2 : 3)
-        );
+        return regions;
     }
 
 }

@@ -10,7 +10,7 @@ public class TwoByTwoRegionalDivisionTest extends TestCase {
 
     public void testLocationsInDivision() {
         final TwoByTwoRegionalDivision division =
-            TwoByTwoRegionalDivision.from(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT);
+            new TwoByTwoRegionalDivision(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT);
 
         final ImmutableMap<Coordinate, String> testPoints =
             new ImmutableMap.Builder<Coordinate, String>()

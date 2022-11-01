@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import sim.util.Double2D;
+import sim.util.Int2D;
 
 import java.util.Objects;
 
@@ -61,13 +62,13 @@ public final class MapExtent {
      * first place...
      */
     public static Double2D coordinateToXY(
-        Coordinate coordinate,
-        double gridWidth,
-        double gridHeight,
-        Envelope mbr
+        final Coordinate coordinate,
+        final double gridWidth,
+        final double gridHeight,
+        final Envelope mbr
     ) {
-        double pixelWidth = mbr.getWidth() / gridWidth;
-        double pixelHeight = mbr.getHeight() / gridHeight;
+        final double pixelWidth = mbr.getWidth() / gridWidth;
+        final double pixelHeight = mbr.getHeight() / gridHeight;
         final double x = (coordinate.x - mbr.getMinX()) / pixelWidth;
         final double y = (mbr.getMaxY() - coordinate.y) / pixelHeight;
         return new Double2D(x, y);
@@ -115,7 +116,7 @@ public final class MapExtent {
         return (int) floor((envelope.getMaxY() - latitude) / cellHeight);
     }
 
-    public Double2D coordinateToXY(Coordinate coordinate) {
+    public Double2D coordinateToXY(final Coordinate coordinate) {
         return coordinateToXY(
             coordinate,
             getGridWidth(),
@@ -124,11 +125,15 @@ public final class MapExtent {
         );
     }
 
-    public Coordinate getCoordinates(int gridX, int gridY) {
+    public Coordinate getCoordinates(final int gridX, final int gridY) {
         return coordinateField.getCoordinate(gridX, gridY);
     }
 
-    public Point toPoint(int gridX, int gridY) {
+    public Coordinate getCoordinates(final Int2D gridXY) {
+        return coordinateField.getCoordinate(gridXY.x, gridXY.y);
+    }
+
+    public Point toPoint(final int gridX, final int gridY) {
         return coordinateField.toPoint(gridX, gridY);
     }
 }

@@ -34,7 +34,7 @@ public class PurseSeinerActionTest {
     @Test
     public void getRegionNumber() {
         final NauticalMap map = generateSimple50x50Map().getMap();
-        final RegionalDivision regionalDivision = new TicTacToeRegionalDivision(map);
+        final RegionalDivision regionalDivision = new TicTacToeRegionalDivision(map.getMapExtent());
 
         ImmutableMap.<SeaTile, String>builder()
             .put(map.getSeaTile(0, 0), "Northwest")
@@ -51,7 +51,7 @@ public class PurseSeinerActionTest {
             .put(map.getSeaTile(17, map.getHeight() - 1), "South")
             .put(map.getSeaTile(map.getWidth() - 1, map.getHeight() - 1), "Southeast")
             .build()
-            .forEach((seaTile, region) -> assertEquals(region, regionalDivision.getRegion(seaTile).getName()));
+            .forEach((seaTile, region) -> assertEquals(region, regionalDivision.getRegion(seaTile.getGridLocation()).getName()));
     }
 
 }

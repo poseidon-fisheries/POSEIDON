@@ -231,7 +231,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
             accumulatorSupplier,
             unit,
             yLabel,
-            event -> ImmutableList.of(regionalDivision.getRegion(event.getLocation())),
+            event -> ImmutableList.of(regionalDivision.getRegion(event.getLocation().getGridLocation())),
             regionalDivision.getRegions(),
             groupMonitorBuilder
         );

@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 import java.io.*;
 import java.util.Comparator;
@@ -17,36 +18,25 @@ import java.util.DoubleSummaryStatistics;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.summarizingDouble;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
-public class WestSoutheastNortheastRegionalDivisionTest extends TestCase {
+public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
 
-    final WestSoutheastNortheastRegionalDivision division =
-        WestSoutheastNortheastRegionalDivision.from(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT);
+    final RegionalDivision division = EpoScenario.REGIONAL_DIVISION;
 
     public void testLocationsInDivision() {
 
         final ImmutableMap<Coordinate, String> testPoints =
             new ImmutableMap.Builder<Coordinate, String>()
                 .put(new Coordinate(-149.5, 49.5), "West")
-                .put(new Coordinate(-140.5, 49.5), "West")
-                .put(new Coordinate(-149.5, 0.5), "West")
-                .put(new Coordinate(-140.5, 0.5), "West")
-                .put(new Coordinate(-149.5, -49.5), "West")
                 .put(new Coordinate(-140.5, -49.5), "West")
-                .put(new Coordinate(-149.5, -0.5), "West")
-                .put(new Coordinate(-140.5, -0.5), "West")
-                .put(new Coordinate(-139.5, 49.5), "Northeast")
-                .put(new Coordinate(-70.5, 49.5), "Northeast")
-                .put(new Coordinate(-139.5, 0.5), "Northeast")
-                .put(new Coordinate(-70.5, 0.5), "Northeast")
-                .put(new Coordinate(-139.5, -49.5), "Southeast")
-                .put(new Coordinate(-70.5, -49.5), "Southeast")
-                .put(new Coordinate(-139.5, -0.5), "Southeast")
-                .put(new Coordinate(-70.5, -0.5), "Southeast")
+                .put(new Coordinate(-139.5, 50), "North")
+                .put(new Coordinate(-90.5, 0.5), "North")
+                .put(new Coordinate(-139.5, -0.5), "South")
+                .put(new Coordinate(-90.5, -49.5), "South")
+                .put(new Coordinate(-89.5, 49.5), "East")
+                .put(new Coordinate(-70.5, -49.5), "East")
                 .build();
 
         testPoints.forEach(((coordinate, regionName) ->
@@ -75,7 +65,7 @@ public class WestSoutheastNortheastRegionalDivisionTest extends TestCase {
                                 .collect(summarizingDouble(coord -> coord.x));
                             final DoubleSummaryStatistics ys = coordinates.stream()
                                 .collect(summarizingDouble(coord -> coord.y));
-                            return new Object[] {
+                            return new Object[]{
                                 xs.getMin(), xs.getMax(), ys.getMin(), ys.getMax()
                             };
                         }

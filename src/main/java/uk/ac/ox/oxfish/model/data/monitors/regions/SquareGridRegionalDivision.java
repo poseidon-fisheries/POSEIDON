@@ -19,52 +19,68 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.Math.floor;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.IntStream.range;
 
-abstract class SquareGridRegionalDivision implements RegionalDivision {
+abstract class SquareGridRegionalDivision extends RegionalDivision {
 
-    private final NauticalMap map;
     private final int numberOfDivisions;
     private final List<Region> regions;
 
-    @SuppressWarnings("SameParameterValue") SquareGridRegionalDivision(
-        NauticalMap map,
-        int numberOfDivisions,
-        List<String> regionNames
+    SquareGridRegionalDivision(
+        final MapExtent mapExtent,
+        final int numberOfDivisions,
+        final List<String> regionNames
     ) {
+        super(mapExtent);
         final int numberOfRegions = numberOfDivisions * numberOfDivisions;
         checkArgument(regionNames.size() == numberOfRegions);
-        this.regions = IntStream
-            .range(0, numberOfRegions)
-            .mapToObj(n -> new Region(n, regionNames.get(n)))
-            .collect(toImmutableList());
-        this.map = map;
         this.numberOfDivisions = numberOfDivisions;
+
+        // This is not the most efficient implementation, but it was an easy way of reusing the logic that
+        // we had before the regional divisions refactoring, and shouldn't be noticeable anyway...
+        //noinspection OptionalGetWithoutIsPresent
+        this.regions =
+            range(0, mapExtent.getGridWidth())
+                .boxed()
+                .flatMap(x -> range(0, mapExtent.getGridHeight()).mapToObj(y -> new Int2D(x, y)))
+                .collect(groupingBy(this::getRegionIndex))
+                .entrySet()
+                .stream()
+                .map(entry ->
+                    new Region(
+                        regionNames.get(entry.getKey()),
+                        entry.getValue().stream().mapToInt(Int2D::getX).min().getAsInt(),
+                        entry.getValue().stream().mapToInt(Int2D::getX).max().getAsInt(),
+                        entry.getValue().stream().mapToInt(Int2D::getY).min().getAsInt(),
+                        entry.getValue().stream().mapToInt(Int2D::getY).max().getAsInt()
+                    )
+                )
+                .collect(toImmutableList());
+
     }
 
     @Override
-    public MapExtent getMapExtent() {
-        return map.getMapExtent();
+    public Collection<Region> getRegions() {
+        return regions;
     }
 
-    @Override public Collection<Region> getRegions() { return regions; }
-
-    @Override public Region getRegion(int gridX, int gridY) {
+    private int getRegionIndex(final Int2D gridXY) {
         final int n = numberOfDivisions;
-        final double regionWidth = (double) map.getWidth() / n;
-        final double regionHeight = (double) map.getHeight() / n;
-        final int x = (int) floor(gridX / regionWidth);
-        final int y = (int) floor(gridY / regionHeight);
-        return regions.get(x + y * n);
+        final double regionWidth = (double) getMapExtent().getGridWidth() / n;
+        final double regionHeight = (double) getMapExtent().getGridHeight() / n;
+        final int x = (int) floor(gridXY.x / regionWidth);
+        final int y = (int) floor(gridXY.y / regionHeight);
+        return (x + y * n);
     }
 
 }

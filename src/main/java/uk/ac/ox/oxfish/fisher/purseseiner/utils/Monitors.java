@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.model.data.monitors.*;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.TwoByTwoRegionalDivision;
-import uk.ac.ox.oxfish.model.data.monitors.regions.WestSoutheastNortheastRegionalDivision;
 
 import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Mass;
@@ -60,10 +59,12 @@ public class Monitors {
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
+
     public Monitors(final FishState fishState) {
 
-        regionalDivision = WestSoutheastNortheastRegionalDivision
-            .from(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT);
+        regionalDivision = new TwoByTwoRegionalDivision(
+            new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT
+        );
 
         final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
 
