@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -15,14 +16,17 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.stream.Collectors.collectingAndThen;
+import static com.google.common.base.Suppliers.memoize;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.shufflingCollector;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFad<B, F>> {
@@ -56,10 +60,11 @@ public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFa
      */
     private Stream<B> getFadBiologiesAt(
         final SeaTile tile,
-        final FadMap<B, F> fadMap
+        final FadMap<B, F> fadMap,
+        final MersenneTwisterFast rng
     ) {
         final Stream<AbstractFad<B, F>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
-        return fadsOnTile.map(AbstractFad::getBiology);
+        return fadsOnTile.map(AbstractFad::getBiology).collect(shufflingCollector(rng)).stream();
     }
 
     private Stream<B> filterBiologies(final Stream<LocalBiology> biologies) {
@@ -70,57 +75,57 @@ public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFa
 
     private Stream<B> getTileBiologiesInRange(
         final SeaTile tile,
-        final NauticalMap nauticalMap
+        final NauticalMap nauticalMap,
+        final MersenneTwisterFast rng
     ) {
         final Stream<B> tileBiology = filterBiologies(Stream.of(tile.getBiology()));
         return rangeInSeaTiles > 0
-            ? Stream.concat(tileBiology, getNeighbourBiologies(tile, nauticalMap))
+            ? Stream.concat(tileBiology, getNeighbourBiologies(tile, nauticalMap, rng).stream())
             : tileBiology;
     }
 
     @NotNull
-    private Stream<B> getNeighbourBiologies(
+    private List<B> getNeighbourBiologies(
         final SeaTile tile,
-        final NauticalMap nauticalMap
+        final NauticalMap nauticalMap,
+        final MersenneTwisterFast rng
     ) {
         final Stream<SeaTile> mooreNeighbors = bagToStream(nauticalMap.getMooreNeighbors(tile, rangeInSeaTiles));
-        return filterBiologies(mooreNeighbors.map(SeaTile::getBiology));
+        return filterBiologies(mooreNeighbors.map(SeaTile::getBiology)).collect(shufflingCollector(rng));
     }
 
-    public List<B> grabTargetBiologies(
+    private List<B> grabTargetBiologies(
         final SeaTile location,
         final Fisher fisher
     ) {
         final FishState fishState = fisher.grabState();
+        final MersenneTwisterFast rng = fisher.grabRandomizer();
         final NauticalMap nauticalMap = fishState.getMap();
-        final Stream<B> tileBiologiesInRange =
-            getTileBiologiesInRange(location, nauticalMap);
+        final Stream<B> tileBiologiesInRange = getTileBiologiesInRange(location, nauticalMap, rng);
 
         @SuppressWarnings("unchecked") final Stream<B> targetBiologies =
             canPoachFromFads
-                ? Stream.concat(tileBiologiesInRange, getFadBiologiesAt(location, (FadMap<B, F>) fishState.getFadMap()))
+                ? Stream.concat(tileBiologiesInRange, getFadBiologiesAt(location, (FadMap<B, F>) fishState.getFadMap(), rng))
                 : tileBiologiesInRange;
 
-        return targetBiologies.collect(collectingAndThen(
-            Collectors.toCollection(ArrayList::new),
-            list -> {
-                Collections.shuffle(list, new Random(fisher.grabRandomizer().nextLong()));
-                return list;
-            }
-        ));
+        return targetBiologies.collect(toImmutableList());
     }
 
     /**
-     * grabs local biology or local biologies of all the surrounding areas and aggregate them; this way it can
-     * target larger stocks in a wider area
+     * In order to allow school sets to meet their empirical targets, we need to give them access to more biologies,
+     * so we provide a list of biologies that can include neighbouring cell biologies and FAD biologies. We also
+     * provide a way to aggregate all those biologies into a single one, but since that's an expensive operation
+     * that we don't need all the time, we wrap this bit in a supplier.
      */
-    public Entry<B, List<B>> grabTargetBiologiesAndAggregateThem(
+    public Entry<List<B>, Supplier<B>> grabTargetBiologiesAndAggregator(
         final SeaTile location,
         final Fisher fisher
     ) {
-        final List<B> targetBiologies = grabTargetBiologies(location, fisher);
-        final B aggregatedBiology = aggregator.apply(fisher.grabState().getBiology(), targetBiologies);
-        return entry(aggregatedBiology, targetBiologies);
+        final List<B> targetBiologies =
+            grabTargetBiologies(location, fisher);
+        final Supplier<B> aggregatedBiologySupplier =
+            memoize(() -> aggregator.apply(fisher.grabState().getBiology(), targetBiologies));
+        return entry(targetBiologies, aggregatedBiologySupplier);
     }
 
 }

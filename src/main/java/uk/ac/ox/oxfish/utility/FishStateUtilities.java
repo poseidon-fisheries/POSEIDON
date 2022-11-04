@@ -52,42 +52,22 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Array;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.DoubleSummaryStatistics;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static com.google.common.collect.Streams.zip;
+import static java.util.stream.Collectors.collectingAndThen;
 
 /**
  * Just a collector of all the utilities function i need
@@ -1409,6 +1389,26 @@ public class FishStateUtilities {
         }
         return true;
     }
+
+    public static <T> Collector<T, ?, List<T>> shufflingCollector(
+        final MersenneTwisterFast rng
+    ) {
+        return shufflingCollector(ArrayList::new, rng);
+    }
+
+    public static <T, C extends List<T>> Collector<T, ?, C> shufflingCollector(
+        final Supplier<C> collectionSupplier,
+        final MersenneTwisterFast rng
+    ) {
+        return collectingAndThen(
+            Collectors.toCollection(collectionSupplier),
+            collection -> {
+                Collections.shuffle(collection, new Random(rng.nextLong()));
+                return collection;
+            }
+        );
+    }
+
 
 }
 

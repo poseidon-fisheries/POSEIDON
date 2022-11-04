@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
@@ -423,10 +424,10 @@ public interface PlannedAction {
 
         @SuppressWarnings("unchecked")
         private Action turnToAction(final Fisher fisher) {
-            final Entry<?, ?> entry =
-                getTargetBiologiesGrabber().grabTargetBiologiesAndAggregateThem(getLocation(), fisher);
-            final LocalBiology potentialCatch = (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getKey());
-            final List<LocalBiology> targetBiologies = (List<LocalBiology>) entry.getValue();
+            final Entry<? extends List<? extends LocalBiology>, ? extends Supplier<? extends LocalBiology>> entry =
+                getTargetBiologiesGrabber().grabTargetBiologiesAndAggregator(getLocation(), fisher);
+            final LocalBiology potentialCatch = (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
+            final List<LocalBiology> targetBiologies = (List<LocalBiology>) entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);
         }
 
