@@ -96,10 +96,10 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
     private boolean purgeIllegalActionsImmediately = true;
 
-    private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(-1);
+    private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(0);
 
 
-    private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(-1);
+    private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(0);
 
     private boolean uniqueCatchSamplerForEachStrategy = false;
 

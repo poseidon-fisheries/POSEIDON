@@ -11,6 +11,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.util.List;
+import java.util.Map.Entry;
+
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
  * It is described by where it should take place, how much it takes in time, and the type of action
@@ -316,7 +319,7 @@ public interface PlannedAction {
 
         private final double setDurationInHours;
 
-        private final TargetBiologiesGrabber targetBiologiesGrabber;
+        private final TargetBiologiesGrabber<? extends LocalBiology, ? extends AbstractFad<?, ?>> targetBiologiesGrabber;
 
         public AbstractSetWithCatchSampler(
             final SeaTile position,
@@ -351,7 +354,11 @@ public interface PlannedAction {
             this.searchTimeInHours = delayInHours;
             this.setDurationInHours = setDurationInHours;
             this.catchMaker = catchMaker;
-            this.targetBiologiesGrabber = new TargetBiologiesGrabber(canPoachFromFads, rangeInSeaTiles);
+            this.targetBiologiesGrabber = new TargetBiologiesGrabber(
+                canPoachFromFads,
+                rangeInSeaTiles,
+                position.getBiology().getClass()
+            );
         }
 
         @Override
@@ -359,7 +366,7 @@ public interface PlannedAction {
             return position;
         }
 
-        public TargetBiologiesGrabber getTargetBiologiesGrabber() {
+        public TargetBiologiesGrabber<? extends LocalBiology, ? extends AbstractFad<?, ?>> getTargetBiologiesGrabber() {
             return targetBiologiesGrabber;
         }
 
@@ -386,11 +393,12 @@ public interface PlannedAction {
         }
 
         abstract protected <B extends LocalBiology> AbstractSetAction<B> createSet(
-            B potentialCatch,
-            Fisher fisher,
-            double fishingTime,
-            SeaTile location,
-            CatchMaker catchMaker
+            final B potentialCatch,
+            final List<B> targetBiologies,
+            final Fisher fisher,
+            final double fishingTime,
+            final SeaTile location,
+            final CatchMaker catchMaker
         );
 
         /**
@@ -413,11 +421,13 @@ public interface PlannedAction {
 
         }
 
+        @SuppressWarnings("unchecked")
         private Action turnToAction(final Fisher fisher) {
-            @SuppressWarnings("unchecked") final LocalBiology potentialCatch =
-                (LocalBiology) howMuchWeCanFishOutGenerator.
-                    apply(getTargetBiologiesGrabber().getLocalBiologiesAndAggregateThem(getLocation(), fisher));
-            return createSet(potentialCatch, fisher, setDurationInHours, getLocation(), catchMaker);
+            final Entry<?, ?> entry =
+                getTargetBiologiesGrabber().grabTargetBiologiesAndAggregateThem(getLocation(), fisher);
+            final LocalBiology potentialCatch = (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getKey());
+            final List<LocalBiology> targetBiologies = (List<LocalBiology>) entry.getValue();
+            return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);
         }
 
         @Override
@@ -509,6 +519,7 @@ public interface PlannedAction {
         @Override
         protected <B extends LocalBiology> AbstractSetAction<B> createSet(
             final B potentialCatch,
+            final List<B> targetBiologies,
             final Fisher fisher,
             final double fishingTime,
             final SeaTile location,
@@ -518,7 +529,7 @@ public interface PlannedAction {
                 potentialCatch,
                 fisher,
                 fishingTime,
-                getTargetBiologiesGrabber().buildListOfCatchableAreas(getLocation(), fisher),
+                targetBiologies,
                 catchMaker
             );
         }
@@ -558,6 +569,7 @@ public interface PlannedAction {
         @Override
         protected <B extends LocalBiology> AbstractSetAction<B> createSet(
             final B potentialCatch,
+            final List<B> targetBiologies,
             final Fisher fisher,
             final double fishingTime,
             final SeaTile location,
@@ -567,7 +579,7 @@ public interface PlannedAction {
                 potentialCatch,
                 fisher,
                 fishingTime,
-                getTargetBiologiesGrabber().buildListOfCatchableAreas(getLocation(), fisher),
+                targetBiologies,
                 catchMaker
             );
         }
