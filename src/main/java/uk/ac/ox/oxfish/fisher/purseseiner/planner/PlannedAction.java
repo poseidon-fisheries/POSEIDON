@@ -22,8 +22,20 @@ import java.util.function.Supplier;
  */
 public interface PlannedAction {
 
-    SeaTile getLocation();
+    static boolean isActionAllowed(
+        final Fisher fisher,
+        final SeaTile location,
+        final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager,
+        final Class<? extends PurseSeinerAction> actionClass
+    ) {
+        return fisher.isAllowedAtSea() &&
+            //fad setting ought not to be banned
+            !fadManager.getActionSpecificRegulations().isForbidden(actionClass, fisher) &&
+            //we should be allowed to fish here
+            fisher.isAllowedToFishHere(location, fisher.grabState());
+    }
 
+    SeaTile getLocation();
 
     double hoursItTake();
 
@@ -39,7 +51,6 @@ public interface PlannedAction {
      */
     //todo
     boolean isAllowedNow(Fisher fisher);
-
 
     class Deploy implements PlannedAction {
 
@@ -78,8 +89,7 @@ public interface PlannedAction {
         public Action[] actuate(final Fisher fisher) {
             return delayInHours <= 0 ?
                 new Action[]{new FadDeploymentAction(fisher)} :
-                new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)}
-                ;
+                new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)};
         }
 
         @Override
@@ -104,13 +114,8 @@ public interface PlannedAction {
             final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager,
             final AbstractFad set
         ) {
-            return fisher.isAllowedAtSea() &&
-                //the fad has not since been destroyed
-                !set.isLost() &&
-                //fad setting ought not to be banned
-                !fadManager.getActionSpecificRegulations().isForbidden(FadSetAction.class, fisher) &&
-                //we should be allowed to fish here
-                fisher.isAllowedToFishHere(set.getLocation(), fisher.grabState());
+            return !set.isLost() && //the fad has not since been destroyed
+                isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);
         }
 
         @Override
@@ -186,16 +191,12 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
-            final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager = FadManager
-                .getFadManager(fisher);
-            return //you must be allowed at sea
-                fisher.isAllowedAtSea() &&
-
-                    //fad setting ought not to be banned
-                    !fadManager.getActionSpecificRegulations().isForbidden(OpportunisticFadSetAction.class, fisher) &&
-                    //we should be allowed to fish here
-                    fisher.isAllowedToFishHere(getLocation(), fisher.grabState())
-                ;
+            return isActionAllowed(
+                fisher,
+                getLocation(),
+                FadManager.getFadManager(fisher),
+                OpportunisticFadSetAction.class
+            );
         }
 
         @Override
@@ -380,17 +381,12 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
-
-            final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager =
-                FadManager.getFadManager(fisher);
-            return //you must be allowed at sea
-                fisher.isAllowedAtSea() &&
-                    //fad setting ought not to be banned
-                    !fadManager.getActionSpecificRegulations().
-                        isForbidden(getTypeOfActionPlanned(), fisher) &&
-                    //we should be allowed to fish here
-                    fisher.isAllowedToFishHere(getLocation(), fisher.grabState());
-
+            return isActionAllowed(
+                fisher,
+                getLocation(),
+                FadManager.getFadManager(fisher),
+                getTypeOfActionPlanned()
+            );
         }
 
         abstract protected <B extends LocalBiology> AbstractSetAction<B> createSet(
@@ -426,8 +422,10 @@ public interface PlannedAction {
         private Action turnToAction(final Fisher fisher) {
             final Entry<? extends List<? extends LocalBiology>, ? extends Supplier<? extends LocalBiology>> entry =
                 getTargetBiologiesGrabber().grabTargetBiologiesAndAggregator(getLocation(), fisher);
-            final LocalBiology potentialCatch = (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
-            final List<LocalBiology> targetBiologies = (List<LocalBiology>) entry.getKey();
+            final LocalBiology potentialCatch =
+                (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
+            final List<LocalBiology> targetBiologies =
+                (List<LocalBiology>) entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);
         }
 
