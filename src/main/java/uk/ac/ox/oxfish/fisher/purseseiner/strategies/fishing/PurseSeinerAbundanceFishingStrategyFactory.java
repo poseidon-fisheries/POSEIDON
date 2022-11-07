@@ -18,26 +18,23 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceAggregator;
-import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
 public class PurseSeinerAbundanceFishingStrategyFactory
     extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    private final AbundanceAggregator biologyAggregator = new AbundanceAggregator();
     private boolean ageBasedSetDecisions = false;
 
     public PurseSeinerAbundanceFishingStrategyFactory() {
@@ -76,11 +73,6 @@ public class PurseSeinerAbundanceFishingStrategyFactory
                 movingThreshold
             );
         }
-    }
-
-    @Override
-    Aggregator<AbundanceLocalBiology> getBiologyAggregator() {
-        return biologyAggregator;
     }
 
     @Override

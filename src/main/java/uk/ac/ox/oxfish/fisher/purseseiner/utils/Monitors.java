@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.model.data.monitors.*;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.TwoByTwoRegionalDivision;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Mass;
@@ -62,9 +63,7 @@ public class Monitors {
 
     public Monitors(final FishState fishState) {
 
-        regionalDivision = new TwoByTwoRegionalDivision(
-            new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT
-        );
+        regionalDivision = EpoScenario.REGIONAL_DIVISION;
 
         final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
 
