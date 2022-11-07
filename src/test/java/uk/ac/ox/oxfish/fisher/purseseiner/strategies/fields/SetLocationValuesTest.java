@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
@@ -94,7 +93,7 @@ public class SetLocationValuesTest {
             new OpportunisticFadSetLocationValues(__ -> initialValues, 0.5);
         final DeploymentLocationValues dplValues =
             new DeploymentLocationValues(__ -> initialValues, 1.0);
-        final ImmutableList<SetLocationValues<? extends AbstractSetAction>> locationValues =
+        final ImmutableList<SetLocationValues> locationValues =
             ImmutableList.of(delValues, noaValues, ofsValues, dplValues);
 
         locationValues.forEach(values -> {

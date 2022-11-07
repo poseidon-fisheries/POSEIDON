@@ -50,7 +50,7 @@ public class SchoolSetOpportunityGenerator<
     private final UnaryOperator<B> targetBiologyMaker;
     private final SchoolSetActionMaker<B, A> actionMaker;
     private final Map<Species, Double> weights;
-    private final TargetBiologiesGrabber<B, ?> targetBiologiesGrabber;
+    private final TargetBiologiesGrabber<B> targetBiologiesGrabber;
 
     public SchoolSetOpportunityGenerator(
         final DoubleUnaryOperator probabilityFunction,
@@ -59,7 +59,7 @@ public class SchoolSetOpportunityGenerator<
         final SchoolSetActionMaker<B, A> actionMaker,
         final ActiveOpportunities activeOpportunities,
         final DoubleSupplier durationSampler,
-        final TargetBiologiesGrabber<B, ?> targetBiologiesGrabber
+        final TargetBiologiesGrabber<B> targetBiologiesGrabber
     ) {
         super(durationSampler);
         this.probabilityFunction = probabilityFunction;

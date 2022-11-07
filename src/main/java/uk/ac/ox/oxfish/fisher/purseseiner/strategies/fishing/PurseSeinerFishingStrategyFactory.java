@@ -465,7 +465,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
 
         final CatchMaker<B> catchMaker = getCatchMaker(fishState.getBiology());
 
-        final TargetBiologiesGrabber<B, ?> noaBiologyGrabber = new TargetBiologiesGrabber<>(
+        final TargetBiologiesGrabber<B> noaBiologyGrabber = new TargetBiologiesGrabber<>(
             noaSetsCanPoachFads,
             noaSetsRangeInSeaTiles,
             biologyClass
@@ -483,7 +483,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                 noaBiologyGrabber
             );
 
-        final TargetBiologiesGrabber<B, ?> delBiologyGrabber = new TargetBiologiesGrabber<>(
+        final TargetBiologiesGrabber<B> delBiologyGrabber = new TargetBiologiesGrabber<>(
             delSetsCanPoachFads,
             delSetsRangeInSeaTiles,
             biologyClass

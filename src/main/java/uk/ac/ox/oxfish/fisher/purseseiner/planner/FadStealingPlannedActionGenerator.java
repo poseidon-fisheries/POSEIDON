@@ -1,13 +1,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
-public class FadStealingPlannedActionGenerator extends
-        DrawFromLocationValuePlannedActionGenerator<PlannedAction.OpportunisticFadSet> {
+public class FadStealingPlannedActionGenerator<B extends LocalBiology> extends
+    DrawFromLocationValuePlannedActionGenerator<PlannedAction.OpportunisticFadSet, B> {
 
     /**
      * the time it takes to set if something is found
@@ -21,11 +20,13 @@ public class FadStealingPlannedActionGenerator extends
 
     private final double minimumFadValueToSteal;
 
-    public FadStealingPlannedActionGenerator(OpportunisticFadSetLocationValues originalLocationValues,
-                                             NauticalMap map, MersenneTwisterFast random,
-                                             double hoursItTakesToSet,
-                                             double hoursWastedIfNoFadAround,
-                                             double minimumFadValueToSteal) {
+    public FadStealingPlannedActionGenerator(
+        final OpportunisticFadSetLocationValues originalLocationValues,
+        final NauticalMap map, final MersenneTwisterFast random,
+        final double hoursItTakesToSet,
+        final double hoursWastedIfNoFadAround,
+        final double minimumFadValueToSteal
+    ) {
         super(originalLocationValues, map, random);
         this.hoursItTakesToSet = hoursItTakesToSet;
         this.hoursWastedIfNoFadAround = hoursWastedIfNoFadAround;
@@ -35,10 +36,10 @@ public class FadStealingPlannedActionGenerator extends
     @Override
     public PlannedAction.OpportunisticFadSet drawNewPlannedAction() {
         return new PlannedAction.OpportunisticFadSet(
-                drawNewLocation(),
-                hoursItTakesToSet,
-                hoursWastedIfNoFadAround,
-                minimumFadValueToSteal
+            drawNewLocation(),
+            hoursItTakesToSet,
+            hoursWastedIfNoFadAround,
+            minimumFadValueToSteal
         );
     }
 }

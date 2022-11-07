@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
@@ -32,7 +33,8 @@ import java.util.function.Function;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public abstract class SetLocationValues<A extends AbstractSetAction> extends MutableLocationValues<A> {
+public abstract class SetLocationValues<A extends AbstractSetAction>
+    extends MutableLocationValues<A> {
 
     SetLocationValues(
         final Class<A> observedClass,

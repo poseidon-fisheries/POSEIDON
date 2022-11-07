@@ -21,12 +21,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 
 import java.util.Map;
 import java.util.function.Function;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 
-public class NonAssociatedSetLocationValues extends SetLocationValues<NonAssociatedSetAction> {
+@SuppressWarnings("rawtypes")
+public class NonAssociatedSetLocationValues extends SetLocationValues {
 
     public NonAssociatedSetLocationValues(
         final Function<Fisher, Map<Int2D, Double>> loadValues,

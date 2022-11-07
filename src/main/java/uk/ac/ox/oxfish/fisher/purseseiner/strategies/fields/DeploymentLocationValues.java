@@ -30,6 +30,7 @@ import java.util.function.Function;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
+@SuppressWarnings("rawtypes")
 public class DeploymentLocationValues extends SetLocationValues<FadSetAction> {
 
     public DeploymentLocationValues(
@@ -39,7 +40,8 @@ public class DeploymentLocationValues extends SetLocationValues<FadSetAction> {
         super(FadSetAction.class, valueLoader, decayRate);
     }
 
-    @Override Optional<Entry<Int2D, Double>> observeValue(
+    @Override
+    Optional<Entry<Int2D, Double>> observeValue(
         final FadSetAction fadSetAction
     ) {
         // extract the value of the set but remap the location to the original deployment location

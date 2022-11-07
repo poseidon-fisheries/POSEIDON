@@ -29,7 +29,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.shufflingCollector;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
-public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFad<B, F>> {
+public class TargetBiologiesGrabber<B extends LocalBiology> {
 
     private static final Map<Class<? extends LocalBiology>, Aggregator<?>> AGGREGATORS =
         ImmutableMap.of(
@@ -60,10 +60,10 @@ public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFa
      */
     private Stream<B> getFadBiologiesAt(
         final SeaTile tile,
-        final FadMap<B, F> fadMap,
+        final FadMap<B, ?> fadMap,
         final MersenneTwisterFast rng
     ) {
-        final Stream<AbstractFad<B, F>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
+        final Stream<AbstractFad<B, ?>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
         return fadsOnTile.map(AbstractFad::getBiology).collect(shufflingCollector(rng)).stream();
     }
 
@@ -105,7 +105,10 @@ public class TargetBiologiesGrabber<B extends LocalBiology, F extends AbstractFa
 
         @SuppressWarnings("unchecked") final Stream<B> targetBiologies =
             canPoachFromFads
-                ? Stream.concat(tileBiologiesInRange, getFadBiologiesAt(location, (FadMap<B, F>) fishState.getFadMap(), rng))
+                ? Stream.concat(
+                tileBiologiesInRange,
+                getFadBiologiesAt(location, (FadMap<B, ?>) fishState.getFadMap(), rng)
+            )
                 : tileBiologiesInRange;
 
         return targetBiologies.collect(toImmutableList());

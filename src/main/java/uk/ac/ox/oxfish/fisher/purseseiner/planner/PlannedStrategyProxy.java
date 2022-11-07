@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -38,26 +39,20 @@ import java.util.function.ToDoubleFunction;
  */
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
 
-    private PlannedStrategy delegate;
-
-
     /**
      * object used to draw catches for DEL and NOA
      */
     private final Map<Class<? extends AbstractSetAction<?>>,
-            ? extends CatchSampler<? extends LocalBiology>> catchSamplers;
-
+        ? extends CatchSampler<? extends LocalBiology>> catchSamplers;
     /**
      * probability of any of these actions taking place next in a plan
      */
     private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>>
-            attractionWeightsPerFisher;
-
+        attractionWeightsPerFisher;
     /**
      * function that returns max travel time
      */
     private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
-
     /**
      * hours wasted after each DEL set
      */
@@ -70,47 +65,35 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * hours wasted after every NOA
      */
     private final double additionalHourlyDelayNonAssociatedSets;
-
     /**
      * a multiplier to the data-read action weight for own fad
      */
     private final double ownFadActionWeightBias;
-
     /**
      * a multiplier to the DPL actions weight (makes it more or less common than what the data may suggest)
      */
     private final double deploymentBias;
-
     /**
      * a multiplier to the NOA actions weight (makes it more or less common than what the data may suggest)
      */
     private final double nonAssociatedBias;
-
     /**
-     *  $ a fad needs to have accumulated before we even try to target it when stealing in
-     *  an area
+     * $ a fad needs to have accumulated before we even try to target it when stealing in
+     * an area
      */
     private final double minimumValueOpportunisticFadSets;
-
-
-
-
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
     private final double hoursWastedOnFailedSearches;
-
-
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
     private final double planningHorizonInHours;
-
     /**
      * the trip duration will be uniformly distributed between data max_trip_duration and max_trip_duration * this parameter (which is expected to be less or = 1)
      */
     private final double minimumPercentageOfTripDurationAllowed;
-
     /**
      * when this is set to true, NOA sets can "steal" biomass from under the fad
      */
@@ -121,35 +104,39 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * then, they will trigger a replan
      */
     private final boolean doNotWaitToPurgeIllegalActions;
-
     /**
      * if this is is above 0, NOA sets can fish out of the seatile they actually happen in
      */
     private final int noaSetsRangeInSeatiles;
-
     /**
      * if this is is above 0, DEL sets can fish out
      */
     private final int delSetsRangeInSeatiles;
-
-
     private final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule;
+    private PlannedStrategy delegate;
 
 
     public PlannedStrategyProxy(
-            Map<Class<? extends AbstractSetAction<?>>,
-                    ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
-            Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeightsPerFisher,
-            ToDoubleFunction<Fisher> maxTravelTimeLoader,
-            double additionalHourlyDelayDolphinSets,
-            double additionalHourlyDelayDeployment,
-            double additionalHourlyDelayNonAssociatedSets,
-            double ownFadActionWeightBias, double deploymentBias, double nonAssociatedBias,
-            double minimumValueOpportunisticFadSets,
-            double hoursWastedOnFailedSearches,
-            double planningHorizonInHours, double minimumPercentageOfTripDurationAllowed,
-            boolean noaSetsCanPoachFads, boolean doNotWaitToPurgeIllegalActions,
-            int noaSetsRangeInSeatiles, int delSetsRangeInSeatiles, AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule) {
+        final Map<Class<? extends AbstractSetAction<?>>,
+            ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
+        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeightsPerFisher,
+        final ToDoubleFunction<Fisher> maxTravelTimeLoader,
+        final double additionalHourlyDelayDolphinSets,
+        final double additionalHourlyDelayDeployment,
+        final double additionalHourlyDelayNonAssociatedSets,
+        final double ownFadActionWeightBias,
+        final double deploymentBias,
+        final double nonAssociatedBias,
+        final double minimumValueOpportunisticFadSets,
+        final double hoursWastedOnFailedSearches,
+        final double planningHorizonInHours,
+        final double minimumPercentageOfTripDurationAllowed,
+        final boolean noaSetsCanPoachFads,
+        final boolean doNotWaitToPurgeIllegalActions,
+        final int noaSetsRangeInSeatiles,
+        final int delSetsRangeInSeatiles,
+        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule
+    ) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
@@ -163,180 +150,200 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
-        this.noaSetsCanPoachFads=noaSetsCanPoachFads;
+        this.noaSetsCanPoachFads = noaSetsCanPoachFads;
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
         this.fadPlanningModule = fadPlanningModule;
-        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed>=0);
-        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed<=1);
+        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed >= 0);
+        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed <= 1);
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
-        Preconditions.checkState(delegate==null, "Already started!");
-        Map<ActionType, Double> plannableActionWeights = new HashMap<>();
-        HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
+    public void start(final FishState model, final Fisher fisher) {
+        Preconditions.checkState(delegate == null, "Already started!");
+        final Map<ActionType, Double> plannableActionWeights = new HashMap<>();
+        final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
+
+        // Initializing these here locks us into abundance biology, which is not likely to be
+        // a problem any time soon, but should eventually be made configurable
+        final AbundanceCatchMaker catchMaker = new AbundanceCatchMaker(model.getBiology());
+        final Class<? extends LocalBiology> localBiologyClass = AbundanceLocalBiology.class;
 
         //grab location values
-        PurseSeineGear<? extends LocalBiology,
-                ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>> gear =
-                ((PurseSeineGear<? extends LocalBiology,
-                        ? extends AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>>) fisher.getGear());
-        HashMap<Class<? extends LocationValues>,LocationValues> locationValues = new HashMap<>();
-        for (AttractionField attractionField : gear.getAttractionFields()) {
-            attractionField.start(model,fisher);
-            locationValues.put(attractionField.getLocationValues().getClass(),
-                    attractionField.getLocationValues());
+        final PurseSeineGear<? extends LocalBiology,
+            ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> gear =
+            ((PurseSeineGear<? extends LocalBiology,
+                ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>>) fisher.getGear());
+        final HashMap<Class<? extends LocationValues>, LocationValues> locationValues = new HashMap<>();
+        for (final AttractionField attractionField : gear.getAttractionFields()) {
+            attractionField.start(model, fisher);
+            locationValues.put(
+                attractionField.getLocationValues().getClass(),
+                attractionField.getLocationValues()
+            );
 
         }
 
 
-
-
         //(1) build planners
-        Map<Class<? extends PurseSeinerAction>, Double> fileAttractionWeights =
-                attractionWeightsPerFisher.apply(fisher);
-        for (Map.Entry<Class<? extends PurseSeinerAction>, Double> actionWeight : fileAttractionWeights.entrySet()) {
-            if (actionWeight.getValue()<=0)
+        final Map<Class<? extends PurseSeinerAction>, Double> fileAttractionWeights =
+            attractionWeightsPerFisher.apply(fisher);
+        for (final Map.Entry<Class<? extends PurseSeinerAction>, Double> actionWeight : fileAttractionWeights.entrySet()) {
+            if (actionWeight.getValue() <= 0)
                 continue;
             //big elif; this could have easily been cleaned up a bit with some
             //common factory method, but it works for now
             //DEL
-            if(actionWeight.getKey().equals(DolphinSetAction.class)){
+            if (actionWeight.getKey().equals(DolphinSetAction.class)) {
                 //add
-                DolphinSetLocationValues locations =
-                        (DolphinSetLocationValues) locationValues.get(DolphinSetLocationValues.class);
-                if(locations.getValues().size()==0)
+                final DolphinSetLocationValues locations =
+                    (DolphinSetLocationValues) locationValues.get(DolphinSetLocationValues.class);
+                if (locations.getValues().size() == 0)
                     System.out.println(fisher + " failed to create DEL location values, in spite of having" +
-                                               "a weight of " + actionWeight.getValue());
-                plannableActionWeights.put(ActionType.DolphinSets,
-                        actionWeight.getValue());
-                planModules.put(ActionType.DolphinSets,
-                        new DolphinSetFromLocationValuePlanningModule(
-                                locations,
-                                model.getMap(),
-                                model.getRandom(),
-                                additionalHourlyDelayDolphinSets,
-                                catchSamplers.get(DolphinSetAction.class),
-                                model.getBiology(),
-                                delSetsRangeInSeatiles)
+                        "a weight of " + actionWeight.getValue());
+                plannableActionWeights.put(
+                    ActionType.DolphinSets,
+                    actionWeight.getValue()
+                );
+                planModules.put(
+                    ActionType.DolphinSets,
+                    new DolphinSetFromLocationValuePlanningModule(
+                        locations,
+                        model.getMap(),
+                        model.getRandom(),
+                        additionalHourlyDelayDolphinSets,
+                        catchSamplers.get(DolphinSetAction.class),
+                        catchMaker,
+                        model.getBiology(),
+                        localBiologyClass, delSetsRangeInSeatiles
+                    )
                 );
             }
             //DPL
-            else if(actionWeight.getKey().equals(FadDeploymentAction.class))
-            {
+            else if (actionWeight.getKey().equals(FadDeploymentAction.class)) {
 
-                DeploymentLocationValues locations =
-                        (DeploymentLocationValues) locationValues.get(DeploymentLocationValues.class);
-                if(locations.getValues().size()==0)
+                final DeploymentLocationValues locations =
+                    (DeploymentLocationValues) locationValues.get(DeploymentLocationValues.class);
+                if (locations.getValues().size() == 0)
                     System.out.println(fisher + " failed to create DPL location values, in spite of having" +
-                                               "a weight of " + actionWeight.getValue());
-                plannableActionWeights.put(ActionType.DeploymentAction,
-                        actionWeight.getValue()*deploymentBias);
-                planModules.put(ActionType.DeploymentAction,
-                        new DeploymentFromLocationValuePlanningModule(
-                                locations,
-                                model.getMap(),
-                                model.getRandom(),
-                                additionalHourlyDelayDeployment
-                        )
+                        "a weight of " + actionWeight.getValue());
+                plannableActionWeights.put(
+                    ActionType.DeploymentAction,
+                    actionWeight.getValue() * deploymentBias
+                );
+                planModules.put(
+                    ActionType.DeploymentAction,
+                    new DeploymentFromLocationValuePlanningModule(
+                        locations,
+                        model.getMap(),
+                        model.getRandom(),
+                        additionalHourlyDelayDeployment
+                    )
                 );
             }
             //NOA
-            else if(actionWeight.getKey().equals(NonAssociatedSetAction.class))
-            {
+            else if (actionWeight.getKey().equals(NonAssociatedSetAction.class)) {
 
-                NonAssociatedSetLocationValues locations =
-                        (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetLocationValues.class);
-                plannableActionWeights.put(ActionType.NonAssociatedSets,
-                        actionWeight.getValue() * nonAssociatedBias);
-                planModules.put(ActionType.NonAssociatedSets,
-                        new NonAssociatedSetFromLocationValuePlanningModule(
-                                locations,
-                                model.getMap(),
-                                model.getRandom(),
-                                additionalHourlyDelayNonAssociatedSets,
-                                catchSamplers.get(NonAssociatedSetAction.class),
-                                model.getBiology(),
-                                noaSetsCanPoachFads,
-                                noaSetsRangeInSeatiles
-                        )
+                final NonAssociatedSetLocationValues locations =
+                    (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetLocationValues.class);
+                plannableActionWeights.put(
+                    ActionType.NonAssociatedSets,
+                    actionWeight.getValue() * nonAssociatedBias
+                );
+                planModules.put(
+                    ActionType.NonAssociatedSets,
+                    new NonAssociatedSetFromLocationValuePlanningModule(
+                        locations,
+                        model.getMap(),
+                        model.getRandom(),
+                        additionalHourlyDelayNonAssociatedSets,
+                        catchSamplers.get(NonAssociatedSetAction.class),
+                        catchMaker,
+                        model.getBiology(),
+                        localBiologyClass,
+                        noaSetsCanPoachFads,
+                        noaSetsRangeInSeatiles
+                    )
                 );
             }
             //FAD
-            else if(actionWeight.getKey().equals(FadSetAction.class))
-            {
-                plannableActionWeights.put(ActionType.SetOwnFadAction,
-                        actionWeight.getValue()*ownFadActionWeightBias);
-                planModules.put(ActionType.SetOwnFadAction,
-                        fadPlanningModule.apply(model)
+            else if (actionWeight.getKey().equals(FadSetAction.class)) {
+                plannableActionWeights.put(
+                    ActionType.SetOwnFadAction,
+                    actionWeight.getValue() * ownFadActionWeightBias
+                );
+                planModules.put(
+                    ActionType.SetOwnFadAction,
+                    fadPlanningModule.apply(model)
                 );
             }
             //OFS
-            else if(actionWeight.getKey().equals(OpportunisticFadSetAction.class)){
+            else if (actionWeight.getKey().equals(OpportunisticFadSetAction.class)) {
                 //add
-                OpportunisticFadSetLocationValues locations =
-                        (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetLocationValues.class);
-                if(locations.getValues().size()==0) {
+                final OpportunisticFadSetLocationValues locations =
+                    (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetLocationValues.class);
+                if (locations.getValues().size() == 0) {
                     System.out.println(fisher + " failed to create OFS location values, in spite of having" +
-                            "a weight of " + actionWeight.getValue());
+                        "a weight of " + actionWeight.getValue());
                     continue;
                 }
-                plannableActionWeights.put(ActionType.OpportunisticFadSets,
-                        actionWeight.getValue());
-                planModules.put(ActionType.OpportunisticFadSets,
-                        new FadStealingFromLocationValuePlanningModule(
-                                locations,
-                                model.getMap(),
-                                model.getRandom(),
-                                2.779,
-                                hoursWastedOnFailedSearches,
-                                minimumValueOpportunisticFadSets
-                        )
+                plannableActionWeights.put(
+                    ActionType.OpportunisticFadSets,
+                    actionWeight.getValue()
                 );
+                planModules.put(
+                    ActionType.OpportunisticFadSets,
+                    new FadStealingFromLocationValuePlanningModule(
+                        locations,
+                        model.getMap(),
+                        model.getRandom(),
+                        2.779,
+                        hoursWastedOnFailedSearches,
+                        minimumValueOpportunisticFadSets
+                    )
+                );
+            } else {
             }
-            else{}
 
         }
 
-        DrawThenCheapestInsertionPlanner planner =
-                new DrawThenCheapestInsertionPlanner(
-                        new UniformDoubleParameter(
-                                minimumPercentageOfTripDurationAllowed * maxTravelTimeLoader.applyAsDouble(fisher),
-                                maxTravelTimeLoader.applyAsDouble(fisher)
-                        ),
-                        plannableActionWeights,
-                        planModules,
-                        doNotWaitToPurgeIllegalActions);
+        final DrawThenCheapestInsertionPlanner planner =
+            new DrawThenCheapestInsertionPlanner(
+                new UniformDoubleParameter(
+                    minimumPercentageOfTripDurationAllowed * maxTravelTimeLoader.applyAsDouble(fisher),
+                    maxTravelTimeLoader.applyAsDouble(fisher)
+                ),
+                plannableActionWeights,
+                planModules,
+                doNotWaitToPurgeIllegalActions
+            );
         //(2) create the delegate
         delegate = new PlannedStrategy(
-                planner,planningHorizonInHours);
+            planner, planningHorizonInHours);
 
         delegate.start(model, fisher);
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
     }
 
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
+    public ActionResult act(final FishState model, final Fisher agent, final Regulation regulation, final double hoursLeft) {
         return delegate.act(model, agent, regulation, hoursLeft);
     }
 
     @Override
-    public SeaTile chooseDestination(Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+    public SeaTile chooseDestination(final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
-    public boolean shouldFish(Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+    public boolean shouldFish(final Fisher fisher, final MersenneTwisterFast random, final FishState model, final TripRecord currentTrip) {
         return delegate.shouldFish(fisher, random, model, currentTrip);
     }
-
-
 
 
 }

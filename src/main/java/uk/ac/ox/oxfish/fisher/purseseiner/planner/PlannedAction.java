@@ -25,7 +25,7 @@ public interface PlannedAction {
     static boolean isActionAllowed(
         final Fisher fisher,
         final SeaTile location,
-        final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager,
+        final FadManager<?, ?> fadManager,
         final Class<? extends PurseSeinerAction> actionClass
     ) {
         return fisher.isAllowedAtSea() &&
@@ -50,6 +50,7 @@ public interface PlannedAction {
      * @param fisher the fisher
      */
     //todo
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean isAllowedNow(Fisher fisher);
 
     class Deploy implements PlannedAction {
@@ -88,8 +89,8 @@ public interface PlannedAction {
         @Override
         public Action[] actuate(final Fisher fisher) {
             return delayInHours <= 0 ?
-                new Action[]{new FadDeploymentAction(fisher)} :
-                new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)};
+                new Action[]{new FadDeploymentAction<>(fisher)} :
+                new Action[]{new FadDeploymentAction<>(fisher), new Delaying(delayInHours)};
         }
 
         @Override
@@ -100,19 +101,18 @@ public interface PlannedAction {
         }
     }
 
-    class FadSet implements PlannedAction {
+    class FadSet<B extends LocalBiology, F extends AbstractFad<B, F>> implements PlannedAction {
 
+        private final F fadWePlanToSetOn;
 
-        private final AbstractFad fadWePlanToSetOn;
-
-        public FadSet(final AbstractFad fadWePlanToSetOn) {
+        public FadSet(final F fadWePlanToSetOn) {
             this.fadWePlanToSetOn = fadWePlanToSetOn;
         }
 
         public static boolean isFadSetAllowed(
             final Fisher fisher,
-            final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager,
-            final AbstractFad set
+            final FadManager<?, ?> fadManager,
+            final AbstractFad<?, ?> set
         ) {
             return !set.isLost() && //the fad has not since been destroyed
                 isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);
@@ -130,16 +130,13 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
-            final FadManager<? extends LocalBiology, ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> fadManager = FadManager
-                .getFadManager(fisher);
-            return isFadSetAllowed(fisher, fadManager, fadWePlanToSetOn);
+            return isFadSetAllowed(fisher, FadManager.getFadManager(fisher), fadWePlanToSetOn);
         }
 
         @Override
         public Action[] actuate(final Fisher fisher) {
-            //noinspection unchecked
             return new Action[]{
-                new FadSetAction(
+                new FadSetAction<>(
                     fadWePlanToSetOn,
                     fisher,
                     hoursItTake()
@@ -214,6 +211,7 @@ public interface PlannedAction {
 
     //very simple class, used to define the beginning and ending of a trip
     //in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     class Arrival implements PlannedAction {
 
         private final SeaTile position;
@@ -307,13 +305,14 @@ public interface PlannedAction {
 
     //some of the purse seine gear stuff has "fit to data" catches per event
     //this is what we are using now
-    abstract class AbstractSetWithCatchSampler implements PlannedAction {
+    abstract class AbstractSetWithCatchSampler<B extends LocalBiology>
+        implements PlannedAction {
 
         protected final static double DEFAULT_SET_DURATION = 2.69;
 
-        private final CatchSampler howMuchWeCanFishOutGenerator;
+        private final CatchSampler<B> howMuchWeCanFishOutGenerator;
 
-        private final CatchMaker catchMaker;
+        private final CatchMaker<B> catchMaker;
 
         private final SeaTile position;
 
@@ -321,45 +320,27 @@ public interface PlannedAction {
 
         private final double setDurationInHours;
 
-        private final TargetBiologiesGrabber<? extends LocalBiology, ? extends AbstractFad<?, ?>> targetBiologiesGrabber;
+        private final TargetBiologiesGrabber<B> targetBiologiesGrabber;
 
         public AbstractSetWithCatchSampler(
             final SeaTile position,
-            final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker
-        ) {
-
-            this(position,
-                howMuchWeCanFishOutGenerator, catchMaker,
-                DEFAULT_SET_DURATION, 0d, false, -1
-            );
-        }
-
-        public AbstractSetWithCatchSampler(
-            final SeaTile position,
-            final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker, final double delayInHours
-        ) {
-            this(position, howMuchWeCanFishOutGenerator, catchMaker,
-                DEFAULT_SET_DURATION, delayInHours, false, -1
-            );
-        }
-
-        public AbstractSetWithCatchSampler(
-            final SeaTile position,
-            final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker, final double setDurationInHours,
-            final double delayInHours, final boolean canPoachFromFads, final int rangeInSeaTiles
+            final CatchSampler<B> howMuchWeCanFishOutGenerator,
+            final CatchMaker<B> catchMaker,
+            final double setDurationInHours,
+            final double delayInHours,
+            final boolean canPoachFromFads,
+            final int rangeInSeaTiles,
+            final Class<B> localBiologyClass
         ) {
             this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
             this.position = position;
             this.searchTimeInHours = delayInHours;
             this.setDurationInHours = setDurationInHours;
             this.catchMaker = catchMaker;
-            this.targetBiologiesGrabber = new TargetBiologiesGrabber(
+            this.targetBiologiesGrabber = new TargetBiologiesGrabber<>(
                 canPoachFromFads,
                 rangeInSeaTiles,
-                position.getBiology().getClass()
+                localBiologyClass
             );
         }
 
@@ -368,10 +349,11 @@ public interface PlannedAction {
             return position;
         }
 
-        public TargetBiologiesGrabber<? extends LocalBiology, ? extends AbstractFad<?, ?>> getTargetBiologiesGrabber() {
+        public TargetBiologiesGrabber<B> getTargetBiologiesGrabber() {
             return targetBiologiesGrabber;
         }
 
+        @SuppressWarnings("rawtypes")
         abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
 
         @Override
@@ -389,13 +371,13 @@ public interface PlannedAction {
             );
         }
 
-        abstract protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+        abstract protected AbstractSetAction<B> createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
             final Fisher fisher,
             final double fishingTime,
             final SeaTile location,
-            final CatchMaker catchMaker
+            final CatchMaker<B> catchMaker
         );
 
         /**
@@ -407,25 +389,22 @@ public interface PlannedAction {
 
             if (searchTimeInHours <= 0) {
                 return new Action[]{
-                    new PotentialSetAction(this, fisher)
+                    new PotentialSetAction<>(this, fisher)
                 };
             } else {
                 return new Action[]{
-                    new PotentialSetAction(this, fisher),
+                    new PotentialSetAction<>(this, fisher),
                     new Delaying(searchTimeInHours)
                 };
             }
 
         }
 
-        @SuppressWarnings("unchecked")
         private Action turnToAction(final Fisher fisher) {
-            final Entry<? extends List<? extends LocalBiology>, ? extends Supplier<? extends LocalBiology>> entry =
+            final Entry<List<B>, Supplier<B>> entry =
                 getTargetBiologiesGrabber().grabTargetBiologiesAndAggregator(getLocation(), fisher);
-            final LocalBiology potentialCatch =
-                (LocalBiology) howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
-            final List<LocalBiology> targetBiologies =
-                (List<LocalBiology>) entry.getKey();
+            final B potentialCatch = howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
+            final List<B> targetBiologies = entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);
         }
 
@@ -444,13 +423,13 @@ public interface PlannedAction {
      * an object that prepares itself to use a catch sampler to fish stuff out but
      * has not sampled yet (avoiding spoiling the sampler for sets that may end up not happening)
      */
-    class PotentialSetAction implements Action {
+    class PotentialSetAction<B extends LocalBiology> implements Action {
 
-        private final PlannedAction.AbstractSetWithCatchSampler generator;
+        private final PlannedAction.AbstractSetWithCatchSampler<B> generator;
 
         private final Fisher fisher;
 
-        public PotentialSetAction(final AbstractSetWithCatchSampler generator, final Fisher fisher) {
+        public PotentialSetAction(final AbstractSetWithCatchSampler<B> generator, final Fisher fisher) {
             this.generator = generator;
             this.fisher = fisher;
         }
@@ -469,60 +448,44 @@ public interface PlannedAction {
     //this is not the only way to do dolphin sets, in fact it is sort of improvised
     //but basically you decide you will go to a location and then you will draw
     //some catches and hope for the best
-    class DolphinSet extends AbstractSetWithCatchSampler {
-
-        public DolphinSet(
-            final SeaTile position, final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker
-        ) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker);
-        }
-
-        public DolphinSet(
-            final SeaTile position, final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker, final double delayInHours
-        ) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours);
-        }
+    class DolphinSet<B extends LocalBiology>
+        extends AbstractSetWithCatchSampler<B> {
 
         public DolphinSet(
             final SeaTile position,
-            final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker,
-            final double setDurationInHours,
-            final double delayInHours
-        ) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, setDurationInHours, delayInHours,
-                false, -1
-            );
-        }
-
-        public DolphinSet(
-            final SeaTile position,
-            final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker,
+            final CatchSampler<B> howMuchWeCanFishOutGenerator,
+            final CatchMaker<B> catchMaker,
             final double delayInHours,
             final boolean canPoachFromFads,
-            final int rangeInSeatiles
+            final int rangeInSeatiles,
+            final Class<B> localBiologyClass
         ) {
-            super(position, howMuchWeCanFishOutGenerator, catchMaker, DEFAULT_SET_DURATION, delayInHours,
-                canPoachFromFads, rangeInSeatiles
+            super(
+                position,
+                howMuchWeCanFishOutGenerator,
+                catchMaker,
+                DEFAULT_SET_DURATION,
+                delayInHours,
+                canPoachFromFads,
+                rangeInSeatiles,
+                localBiologyClass
             );
         }
 
         @Override
+        @SuppressWarnings("rawtypes")
         protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
             return DolphinSetAction.class;
         }
 
         @Override
-        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+        protected AbstractSetAction<B> createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
             final Fisher fisher,
             final double fishingTime,
             final SeaTile location,
-            final CatchMaker catchMaker
+            final CatchMaker<B> catchMaker
         ) {
             return new DolphinSetAction<>(
                 potentialCatch,
@@ -534,20 +497,16 @@ public interface PlannedAction {
         }
     }
 
-    class NonAssociatedSet extends AbstractSetWithCatchSampler {
+    class NonAssociatedSet<B extends LocalBiology>
+        extends AbstractSetWithCatchSampler<B> {
 
         public NonAssociatedSet(
-            final SeaTile position, final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker, final double delayInHours
-        ) {
-            this(position, howMuchWeCanFishOutGenerator, catchMaker, delayInHours, false, -1);
-        }
-
-        public NonAssociatedSet(
-            final SeaTile position, final CatchSampler<? extends LocalBiology> howMuchWeCanFishOutGenerator,
-            final CatchMaker<? extends LocalBiology> catchMaker, final double delayInHours,
+            final SeaTile position,
+            final CatchSampler<B> howMuchWeCanFishOutGenerator,
+            final CatchMaker<B> catchMaker, final double delayInHours,
             final boolean canPoachFromFads,
-            final int rangeInSeaTiles
+            final int rangeInSeaTiles,
+            final Class<B> localBiologyClass
         ) {
             super(
                 position,
@@ -556,23 +515,25 @@ public interface PlannedAction {
                 DEFAULT_SET_DURATION,
                 delayInHours,
                 canPoachFromFads,
-                rangeInSeaTiles
+                rangeInSeaTiles,
+                localBiologyClass
             );
         }
 
+        @SuppressWarnings("rawtypes")
         @Override
         protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
             return NonAssociatedSetAction.class;
         }
 
         @Override
-        protected <B extends LocalBiology> AbstractSetAction<B> createSet(
+        protected AbstractSetAction<B> createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
             final Fisher fisher,
             final double fishingTime,
             final SeaTile location,
-            final CatchMaker catchMaker
+            final CatchMaker<B> catchMaker
         ) {
             return new NonAssociatedSetAction<>(
                 potentialCatch,
