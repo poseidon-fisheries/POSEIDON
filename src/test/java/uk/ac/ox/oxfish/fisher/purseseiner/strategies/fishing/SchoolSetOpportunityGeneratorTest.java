@@ -19,6 +19,26 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
+import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
+import org.junit.Test;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.TargetBiologiesGrabber;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
+
+import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.stream.DoubleStream;
+
 import static java.lang.Double.MAX_VALUE;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -29,47 +49,11 @@ import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-import com.google.common.collect.ImmutableMap;
-import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.UnaryOperator;
-import java.util.stream.DoubleStream;
-import org.junit.Test;
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
-
 public class SchoolSetOpportunityGeneratorTest {
 
     private static final double exponent = 10;
     private static final double coefficient = 1;
     private static final MersenneTwisterFast rng = new MersenneTwisterFast();
-
-    @Test
-    public void test() {
-        final double expected = 0.6321205588285577;
-        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
-        assertTrue(expected > getP(0, 1, 0, 1).getKey());
-        assertTrue(expected < getP(2, 1, 2, 1).getKey());
-
-        assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
-        assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
-
-    }
 
     @SuppressWarnings("unchecked")
     private static Entry<Double, Optional<NonAssociatedSetAction<BiomassLocalBiology>>> getP(
@@ -96,13 +80,11 @@ public class SchoolSetOpportunityGeneratorTest {
                 globalBiology.getSpecie(0), weight0,
                 globalBiology.getSpecie(1), weight1
             ),
-            BiomassLocalBiology.class,
             UnaryOperator.identity(),
             (__, ___, ____, _____) -> nonAssociatedSetAction,
             new ActiveOpportunities(),
             () -> 1.0,
-            new BiomassAggregator(),
-            false
+            new TargetBiologiesGrabber(false, 0, BiomassLocalBiology.class)
         );
         final FishState fishState = mock(FishState.class);
         final Fisher fisher = mock(Fisher.class);
@@ -118,6 +100,23 @@ public class SchoolSetOpportunityGeneratorTest {
             setOpportunityGenerator.probabilityOfOpportunity(biology),
             setOpportunityGenerator.apply(fisher).stream().findAny()
         );
+    }
+
+    @Test
+    public void test() {
+        final double expected = 0.6321205588285577;
+        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
+        assertTrue(expected > getP(0, 1, 0, 1).getKey());
+        assertTrue(expected < getP(2, 1, 2, 1).getKey());
+
+        assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
+        assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
+
     }
 
 }

@@ -19,12 +19,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import static com.google.common.base.Suppliers.memoize;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-
 import com.google.common.collect.ImmutableList;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.TargetBiologiesGrabber;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,21 +36,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
-import sim.util.Bag;
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.tuna.Aggregator;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.SchoolSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.MasonUtils;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
 public class SchoolSetOpportunityGenerator<
     B extends LocalBiology,
@@ -57,31 +48,24 @@ public class SchoolSetOpportunityGenerator<
     private final DoubleUnaryOperator probabilityFunction;
     private final ActiveOpportunities activeOpportunities;
     private final UnaryOperator<B> targetBiologyMaker;
-    private final Aggregator<B> biologyAggregator;
     private final SchoolSetActionMaker<B, A> actionMaker;
     private final Map<Species, Double> weights;
-    private final Class<B> biologyClass;
-
-    private final boolean fishUnderFadsAvailable;
+    private final TargetBiologiesGrabber<B, ?> targetBiologiesGrabber;
 
     public SchoolSetOpportunityGenerator(
         final DoubleUnaryOperator probabilityFunction,
         final Map<Species, Double> weights,
-        final Class<B> biologyClass,
         final UnaryOperator<B> targetBiologyMaker,
         final SchoolSetActionMaker<B, A> actionMaker,
         final ActiveOpportunities activeOpportunities,
         final DoubleSupplier durationSampler,
-        final Aggregator<B> biologyAggregator,
-        final boolean fishUnderFadsAvailable
+        final TargetBiologiesGrabber<B, ?> targetBiologiesGrabber
     ) {
         super(durationSampler);
         this.probabilityFunction = probabilityFunction;
         this.activeOpportunities = activeOpportunities;
-        this.biologyClass = biologyClass;
         this.targetBiologyMaker = targetBiologyMaker;
-        this.biologyAggregator = biologyAggregator;
-        this.fishUnderFadsAvailable = fishUnderFadsAvailable;
+        this.targetBiologiesGrabber = targetBiologiesGrabber;
 
         // make sure all weights are >= 0 and at least one is > 0
         checkArgument(weights.values().stream().allMatch(w -> w >= 0));
@@ -98,61 +82,40 @@ public class SchoolSetOpportunityGenerator<
     @Override
     public Collection<A> apply(final Fisher fisher) {
 
-        final List<B> sourceBiologies = sourceBiologies(fisher);
-        final Supplier<B> biology = memoize(() ->
-            // this is costly, and we may or may not need it
-            biologyAggregator.apply(fisher.grabState().getBiology(), sourceBiologies)
-        );
+        final Entry<List<B>, Supplier<B>> targetBiologiesAndAggregator =
+            targetBiologiesGrabber.grabTargetBiologiesAndAggregator(fisher.getLocation(), fisher);
+        final List<B> sourceBiologies = targetBiologiesAndAggregator.getKey();
+        final Supplier<B> aggregator = targetBiologiesAndAggregator.getValue();
+
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
         final int step = fisher.grabState().getStep();
+
+        // We are trying to see if there is a set opportunity in the cell, and we have
+        // the notion of "active opportunities, where there will be opportunities for a
+        // while after a previous opportunity has occurred, so the first thing to do is
+        // to check if there is such an active opportunity.
         final boolean opportunity;
         if (activeOpportunities.hasOpportunity(gridLocation, step)) {
             opportunity = true;
         } else {
-            final double p = probabilityOfOpportunity(biology.get());
+            // If there isn't an active opportunity, then we see if we should generate one
+            // based on a probability relative to how much fish is available.
+            final double p = probabilityOfOpportunity(aggregator.get());
             opportunity = fisher.grabRandomizer().nextBoolean(p);
             if (opportunity) {
-                final int duration = 1;
-                activeOpportunities.addOpportunity(gridLocation, step, duration);
+                // If we did generate an opportunity, then it becomes active for the next day.
+                final int opportunityDuration = 1;
+                activeOpportunities.addOpportunity(gridLocation, step, opportunityDuration);
             }
         }
         if (opportunity) {
-            final B targetBiology = targetBiologyMaker.apply(biology.get());
-            final double duration = getDurationSampler().getAsDouble();
-            final A action = actionMaker.make(targetBiology, fisher, duration, sourceBiologies);
+            final B targetBiology = targetBiologyMaker.apply(aggregator.get());
+            final double setDuration = getDurationSampler().getAsDouble();
+            final A action = actionMaker.make(targetBiology, fisher, setDuration, sourceBiologies);
             return ImmutableList.of(action);
         } else {
             return ImmutableList.of();
         }
-    }
-
-    private List<B> sourceBiologies(final Fisher fisher) {
-        final SeaTile seaTile = fisher.getLocation();
-        final FishState fishState = fisher.grabState();
-        final B tileBiology = seaTileBiology(seaTile);
-        if (fishUnderFadsAvailable) {
-            return Stream
-                .concat(Stream.of(tileBiology), fadBiologies(seaTile, fishState))
-                .collect(toImmutableList());
-        } else {
-            return ImmutableList.of(tileBiology);
-        }
-    }
-
-    private B seaTileBiology(final SeaTile seaTile) {
-        final LocalBiology biology = seaTile.getBiology();
-        if (biologyClass.isInstance(biology)) {
-            return biologyClass.cast(biology);
-        } else {
-            throw new IllegalArgumentException("Wrong type of tile biology.");
-        }
-    }
-
-    @NotNull
-    private Stream<B> fadBiologies(final SeaTile seaTile, final FishState fishState) {
-        final Bag fads = fishState.getFadMap().fadsAt(seaTile);
-        fads.shuffle(fishState.getRandom());
-        return MasonUtils.<Fad<B, ?>>bagToStream(fads).map(AbstractFad::getBiology);
     }
 
     double probabilityOfOpportunity(final LocalBiology biology) {

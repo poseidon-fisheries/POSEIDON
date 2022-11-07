@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
@@ -81,10 +80,13 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
     private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
+    private final boolean noaSetsCanPoachFads = true;
+    private final boolean delSetsCanPoachFads = false;
+    private final int noaSetsRangeInSeaTiles = 0;
+    private final int delSetsRangeInSeaTiles = 0;
     private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
-
     // use default values from:
     // https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
     private double searchBonus = 0.1;
@@ -118,7 +120,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
         new LogisticFunctionFactory(1E-6, 10);
-    private boolean fishUnderFadsAvailableForSchoolSets = true;
     private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
 
     PurseSeinerFishingStrategyFactory(
@@ -130,7 +131,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
-        Path attractionWeightsFile
+        final Path attractionWeightsFile
     ) {
         return fisher -> stream(ActionClass.values())
             .map(ActionClass::getActionClass)
@@ -146,6 +147,26 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
+    public boolean isNoaSetsCanPoachFads() {
+        return noaSetsCanPoachFads;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isDelSetsCanPoachFads() {
+        return delSetsCanPoachFads;
+    }
+
+    @SuppressWarnings("unused")
+    public int getNoaSetsRangeInSeaTiles() {
+        return noaSetsRangeInSeaTiles;
+    }
+
+    @SuppressWarnings("unused")
+    public int getDelSetsRangeInSeaTiles() {
+        return delSetsRangeInSeaTiles;
+    }
+
+    @SuppressWarnings("unused")
     public Path getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
@@ -153,16 +174,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     @SuppressWarnings("unused")
     public void setMaxCurrentSpeedsFile(final Path maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public boolean isFishUnderFadsAvailableForSchoolSets() {
-        return fishUnderFadsAvailableForSchoolSets;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFishUnderFadsAvailableForSchoolSets(final boolean fishUnderFadsAvailableForSchoolSets) {
-        this.fishUnderFadsAvailableForSchoolSets = fishUnderFadsAvailableForSchoolSets;
     }
 
     @SuppressWarnings("unused")
@@ -374,10 +385,10 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
      * difference is small enough to ignore and doing thing the right way would massively complicate things.
      */
     @NotNull
-    private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(NauticalMap nauticalMap) {
+    private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(final NauticalMap nauticalMap) {
         final Coordinate coordinate = new Coordinate(0, 0);
         final MapExtent mapExtent = nauticalMap.getMapExtent();
-        final PurseSeinerActionClassToDouble maxCurrentSpeeds = PurseSeinerActionClassToDouble
+        return PurseSeinerActionClassToDouble
             .fromFile(maxCurrentSpeedsFile, "action", "speed")
             .mapValues(speed ->
                 metrePerSecondToXyPerDaysVector(
@@ -386,7 +397,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                     mapExtent
                 ).length()
             );
-        return maxCurrentSpeeds;
     }
 
     @NotNull
@@ -454,32 +464,40 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             );
 
         final CatchMaker<B> catchMaker = getCatchMaker(fishState.getBiology());
+
+        final TargetBiologiesGrabber<B, ?> noaBiologyGrabber = new TargetBiologiesGrabber<>(
+            noaSetsCanPoachFads,
+            noaSetsRangeInSeaTiles,
+            biologyClass
+        );
+
         final SchoolSetOpportunityGenerator<B, NonAssociatedSetAction<B>>
             nonAssociatedSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
                 nonAssociatedSetGeneratorFunction.apply(fishState),
                 setCompositionWeights.get(NonAssociatedSetAction.class),
-                biologyClass,
                 catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
                 new NonAssociatedSetActionMaker<>(catchMaker),
                 activeNonAssociatedSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(NonAssociatedSetAction.class),
-                getBiologyAggregator(),
-                fishUnderFadsAvailableForSchoolSets
+                noaBiologyGrabber
             );
 
+        final TargetBiologiesGrabber<B, ?> delBiologyGrabber = new TargetBiologiesGrabber<>(
+            delSetsCanPoachFads,
+            delSetsRangeInSeaTiles,
+            biologyClass
+        );
         final SchoolSetOpportunityGenerator<B, DolphinSetAction<B>>
             dolphinSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
                 dolphinSetGeneratorFunction.apply(fishState),
                 setCompositionWeights.get(DolphinSetAction.class),
-                biologyClass,
                 catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
                 new DolphinSetActionMaker<>(catchMaker),
                 activeDolphinSetOpportunitiesCache.get(fishState),
                 durationSamplers.get(DolphinSetAction.class),
-                getBiologyAggregator(),
-                fishUnderFadsAvailableForSchoolSets
+                delBiologyGrabber
             );
 
         return new SetOpportunityDetector<>(
@@ -493,8 +511,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             searchBonus
         );
     }
-
-    abstract Aggregator<B> getBiologyAggregator();
 
     abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
 
