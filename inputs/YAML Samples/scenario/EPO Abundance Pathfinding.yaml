@@ -1,0 +1,236 @@
+EPO Abundance Pathfinding:
+  abundanceFiltersFactory:
+    selectivityFilePath: inputs/epo_inputs/abundance/selectivity.csv
+  abundanceInitializerFactory:
+    Abundance Initializer Factory:
+      binsFilePath: inputs/epo_inputs/abundance/bins.csv
+  abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+    mortalityFile: inputs/epo_inputs/abundance/mortality.csv
+    sources:
+    - natural
+    - obj_class_1_5
+    - noa_class_1_5
+    - longline
+    speciesCodes: null
+  abundancePurseSeineGearFactory:
+    actionDistanceExponent: 10.0
+    actionSpecificRegulations:
+    - Active FAD limits:
+        limitClass1: 70
+        limitClass2: 70
+        limitClass3: 70
+        limitClass4: 120
+        limitClass5: 120
+        limitClass6a: 300
+        limitClass6b: 450
+    allSetsObservers: !!set {
+      }
+    biomassLostMonitor: null
+    decayRateOfDeploymentLocationValues: 1.1709955387012643
+    decayRateOfDolphinSetLocationValues: 1.2499749999999998
+    decayRateOfNonAssociatedSetLocationValues: 0.0
+    decayRateOfOpportunisticFadSetLocationValues: 0.6563603233600155
+    destinationDistanceExponent: 2.0
+    dolphinSetObservers: !!set {
+      }
+    dolphinSetTimeSinceLastVisitModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 72.28852668100924
+        relativeSteepness: true
+        steepness: 5.0
+    fadDeploymentObservers: !!set {
+      }
+    fadDeploymentPctActiveFadsLimitModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.817463635675281
+        relativeSteepness: true
+        steepness: 5.0
+    fadInitializerFactory: null
+    fadSetObservers: !!set {
+      }
+    locationValuesFile: inputs/epo_inputs/location_values.csv
+    maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+    nonAssociatedSetObservers: !!set {
+      }
+    nonAssociatedSetTimeSinceLastVisitModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 51.91162666081563
+        relativeSteepness: true
+        steepness: 5.0
+    numFadsInStockModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 465.76938287575837
+        relativeSteepness: true
+        steepness: 5.0
+    opportunisticFadSetTimeSinceLastVisitModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 73.32224086132372
+        relativeSteepness: true
+        steepness: 5.0
+    pctHoldSpaceLeftModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.15670573908905225
+        relativeSteepness: true
+        steepness: 5.0
+    pctSetsRemainingModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.01
+        relativeSteepness: true
+        steepness: 10.0
+    pctTravelTimeLeftModulationFunction:
+      Logistic Function:
+        maximum: 1.0
+        midpoint: 0.10183241937374361
+        relativeSteepness: true
+        steepness: 5.0
+    successfulSetProbability: '0.9231701'
+  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
+    biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
+  abundanceRestorerFactory:
+    schedule:
+      0: 365
+  additionalStartables: [
+    ]
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
+  catchSamplersFactory: null
+  costsFile: inputs/epo_inputs/costs.csv
+  destinationStrategy:
+    additionalHourlyDelayDeployment: '0.1'
+    additionalHourlyDelayDolphinSets: '5.0'
+    additionalHourlyDelayNonAssociatedSets: '5.0'
+    attractionWeightsFile: inputs/epo_inputs/location_values.csv
+    catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
+      abundanceFilters: null
+      catchSamplesFile: inputs/epo_inputs/set_samples.csv
+      yearlyReset: false
+    delSetsRangeInSeatiles: '0.0'
+    deploymentBias: '1.0'
+    fadModule:
+      Centroid FAD Planning:
+        badReadingsProbability: '0.0'
+        bannedXCoordinateBounds: -1,75
+        bannedYCoordinateBounds: 47, 51
+        discretization:
+          Squared Discretization:
+            horizontalSplits: '6.0'
+            verticalSplits: '3.0'
+        distancePenalty: '1.0'
+        minimumValueFadSets: '5000.0'
+    hoursWastedOnFailedSearches: '20.0'
+    maxTripDurationFile: inputs/epo_inputs/boats.csv
+    minimumPercentageOfTripDurationAllowed: '1.0'
+    minimumValueOpportunisticFadSets: '5000.0'
+    noaBias: '1.0'
+    noaSetsCanPoachFads: false
+    noaSetsRangeInSeatiles: '0.0'
+    ownFadActionWeightBias: '1.0'
+    planningHorizonInHours: '168.0'
+    purgeIllegalActionsImmediately: true
+    uniqueCatchSamplerForEachStrategy: false
+  fadInitializerFactory: !!uk.ac.ox.oxfish.geography.fads.LastMomentAbundanceFadInitalizerFactory
+    daysInWaterBeforeAttraction: '10.0'
+    daysItTakeToFillUp: '35.0'
+    dudProbability: '0.1'
+    maxCatchabilitiesPerSpecies: {
+      }
+    rangeInSeaTiles: '0.0'
+    selectivityFilters: {
+      }
+  fadMapFactory: null
+  fishingStrategyFactory: Default to Destination Strategy
+  gearStrategy:
+    FAD Refill:
+      fadCost: 1000.0
+      maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
+      targetYear: 2017
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
+  mapInitializerFactory:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo_inputs/depth.csv
+      mapPaddingInDegrees: '0.5'
+  marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
+    priceFilePath: inputs/epo_inputs/prices.csv
+    speciesCodes: null
+  purseSeineGearFactory: null
+  recruitmentProcessesFactory:
+    recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
+  regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
+    closureAReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '281.0'
+        inactiveDelegate: Anarchy
+        startDay: '210.0'
+    closureBReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '19.0'
+        inactiveDelegate: Anarchy
+        startDay: '313.0'
+    elCorralitoReg:
+      Temporary Regulation:
+        delegate:
+          Specific MPA from Coordinates:
+            eastLongitude: -96.0
+            name: null
+            northLatitude: 4.0
+            southLatitude: -3.0
+            westLongitude: -110.0
+        endDay: '312.0'
+        inactiveDelegate: Anarchy
+        startDay: '282.0'
+    protectedAreasFromFolderFactory:
+      shapefilesFolder: inputs/epo_inputs/regions
+      tagsFile: region_tags.csv
+  scheduledAbundanceProcessesFactory:
+    abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+      mortalityFile: inputs/epo_inputs/abundance/mortality.csv
+      sources:
+      - natural
+      - obj_class_1_5
+      - noa_class_1_5
+      - longline
+      speciesCodes: null
+    biologicalProcessesDates:
+    - '2017-01-01'
+    - '2017-04-01'
+    - '2017-07-01'
+    - '2017-10-01'
+    recruitmentProcesses: null
+  vesselsFilePath: inputs/epo_inputs/boats.csv
+  weightGroupsFactory:
+    weightGroupCutoffsPerSpecies:
+      Bigeye tuna:
+      - 12.0
+      - 15.0
+      Skipjack tuna:
+      - 11.5016
+      - 11.5019
+      Yellowfin tuna:
+      - 12.0
+      - 15.0
+    weightGroupNamesPerSpecies:
+      Skipjack tuna:
+      - small
+      - medium
+      - large
+      Yellowfin tuna:
+      - small
+      - medium
+      - large
+      Bigeye tuna:
+      - small
+      - medium
+      - large
+  zapper: false
+  zapperAge: false

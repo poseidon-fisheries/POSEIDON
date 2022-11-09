@@ -1,0 +1,239 @@
+EPO Biomass:
+  additionalStartables: [
+    ]
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
+  biomassReallocatorFactory: Scheduled Biomass Processes
+  biomassReallocatorInitializerFactory:
+    Biomass Initializer Factory:
+      biomassReallocator: null
+      schaeferParamsFile: inputs/epo_inputs/biomass/schaefer_params.csv
+  catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory
+    catchSamplesFile: inputs/epo_inputs/set_samples.csv
+    yearlyReset: false
+  costsFile: inputs/epo_inputs/costs.csv
+  fadInitializerFactory:
+    Biomass FAD Initializer:
+      attractableBiomassCoefficients:
+        Bigeye tuna: '1.0184011081061861'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.7138646301498129'
+      biomassInteractionsCoefficients:
+        Bigeye tuna: '9.557509707646096'
+        Yellowfin tuna: '10.419783885948643'
+        Skipjack tuna: '9.492481930328207'
+      compressionExponents:
+        Bigeye tuna: '0.7697766896339598'
+        Yellowfin tuna: '1.1292389959739901'
+        Skipjack tuna: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
+      growthRates:
+        Bigeye tuna: '0.688914118975473'
+        Yellowfin tuna: '0.30133562299610883'
+        Skipjack tuna: '1.25'
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory
+    currentFiles:
+      Y2016: inputs/epo_inputs/currents/currents_2016.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
+      Y2018: inputs/epo_inputs/currents/currents_2018.csv
+    inputIsMetersPerSecond: true
+  fadMortalityIncludedInExogenousCatches: true
+  fishingStrategyFactory:
+    Purse Seiner Biomass Fishing Strategy:
+      attractionWeightsFile: null
+      catchSamplersFactory: null
+      dolphinSetActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 1.0E-6
+          relativeSteepness: true
+          steepness: 10.0
+      dolphinSetDetectionProbability: 0.7136840195385347
+      dolphinSetGeneratorFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.01
+          relativeSteepness: true
+          steepness: 10.0
+      fadDeploymentActionDecayConstant: 0.7228626294613664
+      fadDeploymentActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 7338176.765769132
+          relativeSteepness: true
+          steepness: 10.0
+      fadSetActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.01
+          relativeSteepness: true
+          steepness: 10.0
+      maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+      movingThreshold: 0.0
+      nonAssociatedSetActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 555715.859646539
+          relativeSteepness: true
+          steepness: 10.0
+      nonAssociatedSetDetectionProbability: 1.0
+      nonAssociatedSetGeneratorFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 15392.989688872976
+          relativeSteepness: true
+          steepness: 10.0
+      opportunisticFadSetActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.01
+          relativeSteepness: true
+          steepness: 10.0
+      opportunisticFadSetDetectionProbability: 0.007275362250433118
+      searchActionDecayConstant: 7.912472944827373
+      searchActionValueFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 7081017.137484187
+          relativeSteepness: true
+          steepness: 10.0
+      searchBonus: 0.1
+      setCompositionWeightsPath: inputs/epo_inputs/set_compositions.csv
+  gasPricePerLiter: '0.01'
+  gearStrategy:
+    FAD Refill:
+      fadCost: 1000.0
+      maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
+      targetYear: 2017
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
+  mapFile: inputs/epo_inputs/depth.csv
+  mapInitializer:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo_inputs/depth.csv
+      mapPaddingInDegrees: '0.5'
+  marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
+    priceFilePath: inputs/epo_inputs/prices.csv
+    speciesCodes: null
+  multiSpeciesBiomassRestorerFactory:
+    Biomass Restorer:
+      biomassReallocator: null
+      schedule:
+        0: 364
+  purseSeineGearFactory:
+    Biomass Purse Seine Gear:
+      actionDistanceExponent: 10.0
+      actionSpecificRegulations:
+      - Active FAD limits:
+          limitClass1: 70
+          limitClass2: 70
+          limitClass3: 70
+          limitClass4: 120
+          limitClass5: 120
+          limitClass6a: 300
+          limitClass6b: 450
+      allSetsObservers: !!set {
+        }
+      biomassLostMonitor: null
+      decayRateOfDeploymentLocationValues: 1.1709955387012643
+      decayRateOfDolphinSetLocationValues: 1.2499749999999998
+      decayRateOfNonAssociatedSetLocationValues: 0.0
+      decayRateOfOpportunisticFadSetLocationValues: 0.6563603233600155
+      destinationDistanceExponent: 2.0
+      dolphinSetObservers: !!set {
+        }
+      dolphinSetTimeSinceLastVisitModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 72.28852668100924
+          relativeSteepness: true
+          steepness: 5.0
+      fadDeploymentObservers: !!set {
+        }
+      fadDeploymentPctActiveFadsLimitModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.817463635675281
+          relativeSteepness: true
+          steepness: 5.0
+      fadInitializerFactory: null
+      fadSetObservers: !!set {
+        }
+      locationValuesFile: inputs/epo_inputs/location_values.csv
+      maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+      nonAssociatedSetObservers: !!set {
+        }
+      nonAssociatedSetTimeSinceLastVisitModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 51.91162666081563
+          relativeSteepness: true
+          steepness: 5.0
+      numFadsInStockModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 465.76938287575837
+          relativeSteepness: true
+          steepness: 5.0
+      opportunisticFadSetTimeSinceLastVisitModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 73.32224086132372
+          relativeSteepness: true
+          steepness: 5.0
+      pctHoldSpaceLeftModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.15670573908905225
+          relativeSteepness: true
+          steepness: 5.0
+      pctSetsRemainingModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.01
+          relativeSteepness: true
+          steepness: 10.0
+      pctTravelTimeLeftModulationFunction:
+        Logistic Function:
+          maximum: 1.0
+          midpoint: 0.10183241937374361
+          relativeSteepness: true
+          steepness: 5.0
+      successfulSetProbability: '0.9231701'
+  regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
+    closureAReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '281.0'
+        inactiveDelegate: Anarchy
+        startDay: '210.0'
+    closureBReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '19.0'
+        inactiveDelegate: Anarchy
+        startDay: '313.0'
+    elCorralitoReg:
+      Temporary Regulation:
+        delegate:
+          Specific MPA from Coordinates:
+            eastLongitude: -96.0
+            name: null
+            northLatitude: 4.0
+            southLatitude: -3.0
+            westLongitude: -110.0
+        endDay: '312.0'
+        inactiveDelegate: Anarchy
+        startDay: '282.0'
+    protectedAreasFromFolderFactory:
+      shapefilesFolder: inputs/epo_inputs/regions
+      tagsFile: region_tags.csv
+  vesselsFilePath: inputs/epo_inputs/boats.csv
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'

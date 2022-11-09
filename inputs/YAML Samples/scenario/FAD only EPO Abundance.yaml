@@ -1,0 +1,171 @@
+FAD only EPO Abundance:
+  abundanceFiltersFactory:
+    selectivityFilePath: inputs/epo_inputs/abundance/selectivity.csv
+  abundanceInitializerFactory:
+    Abundance Initializer Factory:
+      binsFilePath: inputs/epo_inputs/abundance/bins.csv
+  abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
+    biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
+  abundanceRestorerFactory:
+    schedule:
+      0: 365
+  additionalStartables: [
+    ]
+  attractionWeightsFile: inputs/epo_inputs/action_weights.csv
+  catchSamplersFactory: null
+  costsFile: inputs/epo_inputs/costs.csv
+  fadInitializerFactory:
+    Abundance FAD Initializer:
+      attractableBiomassCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      biomassInteractionsCoefficients:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      compressionExponents:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      fadDudRate: '0.0'
+      fishReleaseProbabilityInPercent: '2.0'
+      growthRates:
+        Bigeye tuna: '0.0'
+        Yellowfin tuna: '0.0'
+        Skipjack tuna: '0.0'
+      selectivityFilters: &id001 {
+        }
+      speciesCodes: null
+      totalCarryingCapacity: '445000.0'
+  fadMakerFactory:
+    Exogenous Fad Maker CSV:
+      fadInitializer:
+        Abundance FAD Initializer:
+          attractableBiomassCoefficients:
+            Bigeye tuna: '0.7697766896339598'
+            Yellowfin tuna: '1.1292389959739901'
+            Skipjack tuna: '0.0'
+          biomassInteractionsCoefficients:
+            Bigeye tuna: '1.0184011081061861'
+            Yellowfin tuna: '0.0'
+            Skipjack tuna: '0.7138646301498129'
+          compressionExponents:
+            Bigeye tuna: '9.557509707646096'
+            Yellowfin tuna: '10.419783885948643'
+            Skipjack tuna: '9.492481930328207'
+          fadDudRate: '0.0'
+          fishReleaseProbabilityInPercent: '2.0'
+          growthRates:
+            Bigeye tuna: '0.688914118975473'
+            Yellowfin tuna: '0.30133562299610883'
+            Skipjack tuna: '1.25'
+          selectivityFilters: *id001
+          speciesCodes: null
+          totalCarryingCapacity: '445000.0'
+      pathToFile: inputs/epo_inputs/calibration/fad_deployments.csv
+  fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory
+    currentFiles:
+      Y2016: inputs/epo_inputs/currents/currents_2016.csv
+      Y2017: inputs/epo_inputs/currents/currents_2017.csv
+      Y2018: inputs/epo_inputs/currents/currents_2018.csv
+    inputIsMetersPerSecond: true
+  fadSetterFactory:
+    Exogenous Fad Setter CSV:
+      dataInTonnes: true
+      isDataInTonnes: true
+      keepLog: false
+      missingFadError: '10000.0'
+      neighborhoodSearchSize: '0.0'
+      pathToFile: inputs/epo_inputs/calibration/fad_sets.csv
+  fadSettingActive: true
+  fishingStrategyFactory:
+    Fish Until Full:
+      minimumPercentageFull: '1.0'
+  gearStrategy:
+    FAD Refill:
+      fadCost: 1000.0
+      maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
+      targetYear: 2017
+  locationValuesFilePath: inputs/epo_inputs/location_values.csv
+  mapInitializerFactory:
+    From File Map:
+      gridWidthInCell: '101.0'
+      header: true
+      latLong: true
+      mapFile: inputs/epo_inputs/depth.csv
+      mapPaddingInDegrees: '0.5'
+  marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
+    priceFilePath: inputs/epo_inputs/prices.csv
+    speciesCodes: null
+  purseSeineGearFactory: null
+  recruitmentProcessesFactory:
+    recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
+  regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory
+    closureAReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '281.0'
+        inactiveDelegate: Anarchy
+        startDay: '210.0'
+    closureBReg:
+      Temporary Regulation:
+        delegate: No Fishing
+        endDay: '19.0'
+        inactiveDelegate: Anarchy
+        startDay: '313.0'
+    elCorralitoReg:
+      Temporary Regulation:
+        delegate:
+          Specific MPA from Coordinates:
+            eastLongitude: -96.0
+            name: null
+            northLatitude: 4.0
+            southLatitude: -3.0
+            westLongitude: -110.0
+        endDay: '312.0'
+        inactiveDelegate: Anarchy
+        startDay: '282.0'
+    protectedAreasFromFolderFactory:
+      shapefilesFolder: inputs/epo_inputs/regions
+      tagsFile: region_tags.csv
+  scheduledAbundanceProcessesFactory:
+    abundanceMortalityProcessFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceMortalityProcessFromFileFactory
+      mortalityFile: inputs/epo_inputs/abundance/mortality.csv
+      sources:
+      - natural
+      - obj_class_1_5
+      - noa_class_1_5
+      - longline
+      speciesCodes: null
+    biologicalProcessesDates:
+    - '2017-01-01'
+    - '2017-04-01'
+    - '2017-07-01'
+    - '2017-10-01'
+    recruitmentProcesses: null
+  vesselsFilePath: inputs/epo_inputs/boats.csv
+  weightGroupsFactory:
+    weightGroupCutoffsPerSpecies:
+      Bigeye tuna:
+      - 2.5
+      - 15.0
+      Skipjack tuna:
+      - 2.5
+      - 11.5016
+      Yellowfin tuna:
+      - 2.5
+      - 15.0
+    weightGroupNamesPerSpecies:
+      Skipjack tuna:
+      - small
+      - medium
+      - large
+      Yellowfin tuna:
+      - small
+      - medium
+      - large
+      Bigeye tuna:
+      - small
+      - medium
+      - large

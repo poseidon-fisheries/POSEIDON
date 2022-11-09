@@ -1,0 +1,10 @@
+Logistic Function:
+  maximum: 1.0
+  midpoint: 0.5
+  relativeSteepness: true
+  steepness: 1.0
+-------
+Compressed Exponential Function:
+  coefficient: 0.0
+  exponent: 0.0
+-------

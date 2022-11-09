@@ -61,7 +61,6 @@ Purse Seiner Biomass Fishing Strategy:
       midpoint: 0.01
       relativeSteepness: true
       steepness: 10.0
-  fishUnderFadsAvailableForSchoolSets: true
   maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
   movingThreshold: 0.0
   nonAssociatedSetActionValueFunction:
@@ -126,7 +125,6 @@ Purse Seiner Abundance Fishing Strategy:
       midpoint: 0.01
       relativeSteepness: true
       steepness: 10.0
-  fishUnderFadsAvailableForSchoolSets: true
   maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
   movingThreshold: 0.0
   nonAssociatedSetActionValueFunction:

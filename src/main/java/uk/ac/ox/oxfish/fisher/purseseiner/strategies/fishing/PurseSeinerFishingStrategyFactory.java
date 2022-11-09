@@ -80,7 +80,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
     private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
-    private final boolean noaSetsCanPoachFads = true;
+    private final boolean noaSetsCanPoachFads = false;
     private final boolean delSetsCanPoachFads = false;
     private final int noaSetsRangeInSeaTiles = 0;
     private final int delSetsRangeInSeaTiles = 0;

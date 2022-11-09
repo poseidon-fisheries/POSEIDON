@@ -138,7 +138,7 @@ Json Output Manager:
     typeId: 0
   scenarioDescription: Scenario description
   scenarioTitle: Scenario title
-  startDate: '2022-10-25'
+  startDate: '2022-11-09'
   vesselsBuilderFactory:
     vesselClassifier: {
       }
