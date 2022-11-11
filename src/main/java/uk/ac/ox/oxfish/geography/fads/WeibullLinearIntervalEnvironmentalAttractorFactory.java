@@ -22,7 +22,9 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -34,6 +36,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -43,6 +46,32 @@ import java.util.function.Predicate;
  */
 public class WeibullLinearIntervalEnvironmentalAttractorFactory
         extends WeibullLinearIntervalAttractorFactory {
+
+    public WeibullLinearIntervalEnvironmentalAttractorFactory() {}
+
+    public WeibullLinearIntervalEnvironmentalAttractorFactory(
+        final DoubleParameter fadDudRate,
+        final DoubleParameter fishReleaseProbabilityInPercent,
+        final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
+        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
+        final DoubleParameter daysInWaterBeforeAttraction,
+        final DoubleParameter daysItTakesToFillUp,
+        final DoubleParameter minAbundanceThreshold,
+        final LinkedList<AdditionalMapFactory> environmentalMaps,
+        final LinkedList<DoubleParameter> environmentalThresholds
+    ) {
+        super(
+            fadDudRate,
+            fishReleaseProbabilityInPercent,
+            carryingCapacityShapeParameters,
+            carryingCapacityScaleParameters,
+            daysInWaterBeforeAttraction,
+            daysItTakesToFillUp,
+            minAbundanceThreshold
+        );
+        this.environmentalMaps = environmentalMaps;
+        this.environmentalThresholds = environmentalThresholds;
+    }
 
     private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
 

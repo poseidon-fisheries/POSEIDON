@@ -32,6 +32,31 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttract
 public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory implements
         AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
+    public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory() {}
+
+    public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
+        final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
+        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
+        final LinkedHashMap<String, Double> catchabilities,
+        final DoubleParameter fadDudRate,
+        final DoubleParameter daysInWaterBeforeAttraction,
+        final DoubleParameter maximumDaysAttractions,
+        final DoubleParameter fishReleaseProbabilityInPercent,
+        final LinkedList<AdditionalMapFactory> environmentalMaps,
+        final LinkedList<DoubleParameter> environmentalThresholds,
+        final LinkedList<DoubleParameter> environmentalPenalties
+    ) {
+        this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
+        this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
+        this.catchabilities = catchabilities;
+        this.fadDudRate = fadDudRate;
+        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        this.maximumDaysAttractions = maximumDaysAttractions;
+        this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
+        this.environmentalMaps = environmentalMaps;
+        this.environmentalThresholds = environmentalThresholds;
+        this.environmentalPenalties = environmentalPenalties;
+    }
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 

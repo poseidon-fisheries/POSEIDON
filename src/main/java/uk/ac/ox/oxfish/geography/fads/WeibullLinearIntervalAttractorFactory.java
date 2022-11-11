@@ -42,6 +42,25 @@ import java.util.function.Supplier;
 public class WeibullLinearIntervalAttractorFactory implements
         AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
+    public WeibullLinearIntervalAttractorFactory() {}
+
+    public WeibullLinearIntervalAttractorFactory(
+        final DoubleParameter fadDudRate,
+        final DoubleParameter fishReleaseProbabilityInPercent,
+        final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
+        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
+        final DoubleParameter daysInWaterBeforeAttraction,
+        final DoubleParameter daysItTakesToFillUp,
+        final DoubleParameter minAbundanceThreshold
+    ) {
+        this.fadDudRate = fadDudRate;
+        this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
+        this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
+        this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
+        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        this.daysItTakesToFillUp = daysItTakesToFillUp;
+        this.minAbundanceThreshold = minAbundanceThreshold;
+    }
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 

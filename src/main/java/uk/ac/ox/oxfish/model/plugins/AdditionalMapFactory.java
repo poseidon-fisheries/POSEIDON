@@ -43,6 +43,10 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
     public AdditionalMapFactory() {
     }
 
+    public AdditionalMapFactory(String mapVariableName, String pathToGridFile) {
+        this(mapVariableName, pathToGridFile, 365);
+    }
+
     public AdditionalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
         this.mapVariableName = mapVariableName;
         this.pathToGridFile = pathToGridFile;
