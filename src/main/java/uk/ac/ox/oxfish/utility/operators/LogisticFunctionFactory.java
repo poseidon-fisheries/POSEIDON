@@ -21,17 +21,19 @@ package uk.ac.ox.oxfish.utility.operators;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import static java.lang.Math.min;
+
 public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunction> {
 
     private double midpoint = 0.5;
     private double steepness = 1.0;
     private double maximum = 1.0;
+    private double maximumSteepness = 1E6; // to avoid infinite steepness when (relativeSteepness && midpoint == 0)
     private boolean relativeSteepness = true;
 
     public LogisticFunctionFactory(final double midpoint, final double steepness) {
         this(midpoint, steepness, 1.0, true);
     }
-
     public LogisticFunctionFactory(
         final double midpoint,
         final double steepness,
@@ -48,10 +50,22 @@ public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunctio
     public LogisticFunctionFactory() {
     }
 
+    @SuppressWarnings("unused")
+    public double getMaximumSteepness() {
+        return maximumSteepness;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMaximumSteepness(final double maximumSteepness) {
+        this.maximumSteepness = maximumSteepness;
+    }
+
+    @SuppressWarnings("unused")
     public boolean isRelativeSteepness() {
         return relativeSteepness;
     }
 
+    @SuppressWarnings("unused")
     public void setRelativeSteepness(final boolean relativeSteepness) {
         this.relativeSteepness = relativeSteepness;
     }
@@ -86,7 +100,7 @@ public class LogisticFunctionFactory implements AlgorithmFactory<LogisticFunctio
     public LogisticFunction apply(final FishState fishState) {
         return new LogisticFunction(
             midpoint,
-            relativeSteepness ? steepness / midpoint : steepness,
+            relativeSteepness ? min(steepness / midpoint, maximumSteepness) : steepness,
             maximum
         );
     }
