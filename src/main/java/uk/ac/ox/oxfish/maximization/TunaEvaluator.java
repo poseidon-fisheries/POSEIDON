@@ -48,17 +48,17 @@ public class TunaEvaluator implements Runnable {
     //  count(ves_no, action_type) |>
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
-    private static final Set<String> boatsToTrack = ImmutableSet.of("1779", "453", "1552");
+    private static final Set<String> boatsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna", "calibration", "results",
-        "cenv0729", "2022-09-11_08.27.13_global_calibration"
+        "cenv0729", "2022-11-11_17.58.21_catchability_global"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
 
-    private int numRuns = getRuntime().availableProcessors() + 1;
+    private int numRuns = 8; //getRuntime().availableProcessors() + 1;
     private int numYearsToRuns = 3;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
