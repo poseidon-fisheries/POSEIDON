@@ -20,8 +20,8 @@ package uk.ac.ox.oxfish.maximization;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 
 import java.util.Collection;
@@ -34,7 +34,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 class YearlyResultsRowProvider implements RowProvider {
 
     private final FishState fishState;
-    private final GenericOptimization optimization;
 
     private final List<String> HEADERS = ImmutableList.of(
         "target_name",
@@ -43,11 +42,9 @@ class YearlyResultsRowProvider implements RowProvider {
     );
 
     YearlyResultsRowProvider(
-        final FishState fishState,
-        final GenericOptimization optimization
+        final FishState fishState
     ) {
         this.fishState = fishState;
-        this.optimization = optimization;
     }
 
     @Override
@@ -70,12 +67,12 @@ class YearlyResultsRowProvider implements RowProvider {
     @Override
     public Iterable<? extends Collection<?>> getRows() {
         final int startYear = fishState.getStartDate().getYear();
-        return optimization
-            .getTargets()
+        return fishState
+            .getYearlyDataSet()
+            .getColumns()
             .stream()
-            .filter(target -> target instanceof FixedDataTarget)
-            .map(target -> (FixedDataTarget) target)
-            .flatMap(target -> getYearlyValues(startYear, target.getColumnName()))
+            .map(DataColumn::getName)
+            .flatMap(columnName -> getYearlyValues(startYear, columnName))
             .collect(toImmutableList());
     }
 

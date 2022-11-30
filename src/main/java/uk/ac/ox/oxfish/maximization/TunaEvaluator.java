@@ -52,13 +52,15 @@ public class TunaEvaluator implements Runnable {
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
-        "workspace", "tuna", "calibration", "results",
-        "cenv0729", "2022-11-11_17.58.21_catchability_global"
+        "workspace", "tuna",
+        //"brp", "calibrations", "cenv0729", "2022-11-15_12.35.12_local_Catchability_centroid"
+        "calibration/results/ernesto/2022-10-29_15.43.20_local/"
+
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
 
-    private int numRuns = 8; //getRuntime().availableProcessors() + 1;
+    private int numRuns = getRuntime().availableProcessors() + 1;
     private int numYearsToRuns = 3;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
@@ -77,7 +79,7 @@ public class TunaEvaluator implements Runnable {
             calibrationFilePath.getParent()
         ).registerRowProvider(
             "yearly_results.csv",
-            fishState -> new YearlyResultsRowProvider(fishState, optimization)
+            YearlyResultsRowProvider::new
         );
         runner.setParallel(true);
 
@@ -90,16 +92,16 @@ public class TunaEvaluator implements Runnable {
         runner = new Runner<Scenario>(
             () -> {
                 try {
-                    FishYAML yaml = new FishYAML();
+                    final FishYAML yaml = new FishYAML();
                     return yaml.loadAs(new FileReader(alreadyCalibratedScenario.toFile()), EpoScenario.class);
-                } catch (FileNotFoundException e) {
+                } catch (final FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             },
             alreadyCalibratedScenario.getParent()
         ).registerRowProvider(
             "yearly_results.csv",
-            fishState -> new YearlyResultsRowProvider(fishState, optimization)
+            YearlyResultsRowProvider::new
         );
         runner.setParallel(false);
     }
@@ -136,8 +138,8 @@ public class TunaEvaluator implements Runnable {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private static Path findCalibrationFile(Path folder) {
-        try (Stream<Path> paths = Files.list(folder)) {
+    private static Path findCalibrationFile(final Path folder) {
+        try (final Stream<Path> paths = Files.list(folder)) {
             final ImmutableList<Path> calibrationFiles = paths
                 .filter(path -> getFileExtension(path.toString()).equals("yaml"))
                 .filter(TunaEvaluator::isCalibrationFile)
@@ -145,25 +147,25 @@ public class TunaEvaluator implements Runnable {
             checkState(!calibrationFiles.isEmpty(), "No calibration files found in %s", folder);
             checkState(calibrationFiles.size() == 1, "More than one calibration files found in %s", folder);
             return calibrationFiles.get(0);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private static boolean isCalibrationFile(Path path) {
+    private static boolean isCalibrationFile(final Path path) {
         try {
             return Files.lines(path)
                 .findFirst()
                 .filter(line -> line.equals("!!uk.ac.ox.oxfish.maximization.GenericOptimization"))
                 .isPresent();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @SuppressWarnings("UnstableApiUsage")
     @NotNull
-    private static double[] extractSolution(Path logFilePath) {
+    private static double[] extractSolution(final Path logFilePath) {
         final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
         try (final Stream<String> lines = Files.lines(logFilePath)) {
             findLast(lines).ifPresent(lastLine -> {
@@ -201,7 +203,7 @@ public class TunaEvaluator implements Runnable {
     }
 
     @SuppressWarnings("unused")
-    public void setNumYearsToRuns(int numYearsToRuns) {
+    public void setNumYearsToRuns(final int numYearsToRuns) {
         this.numYearsToRuns = numYearsToRuns;
     }
 
@@ -218,11 +220,11 @@ public class TunaEvaluator implements Runnable {
                 .forEach(fadManager ->
                     fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
                 );
-            if(completeOutput) {
+            if (completeOutput) {
                 ImmutableMap.of(
-                        "fad_attraction_events.csv", observer.getEventLogger(),
-                        "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
-                        "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
+                    "fad_attraction_events.csv", observer.getEventLogger(),
+                    "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
+                    "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
                 ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
             }
         });
@@ -279,7 +281,7 @@ public class TunaEvaluator implements Runnable {
         return parallel;
     }
 
-    public void setParallel(boolean parallel) {
+    public void setParallel(final boolean parallel) {
         this.parallel = parallel;
     }
 
@@ -287,7 +289,7 @@ public class TunaEvaluator implements Runnable {
         return completeOutput;
     }
 
-    public void setCompleteOutput(boolean completeOutput) {
+    public void setCompleteOutput(final boolean completeOutput) {
         this.completeOutput = completeOutput;
     }
 }

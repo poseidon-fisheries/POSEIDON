@@ -38,23 +38,25 @@ import java.nio.file.Paths;
 
 public class SampleTunaRun {
 
-    private static final int NUM_YEARS_TO_RUN = 2;
+    private static final int NUM_YEARS_TO_RUN = 1;
     private static final int NUM_RUNS_PER_POLICY = 1;
 
-    private static final Path basePath =
-        Paths.get(System.getProperty("user.home"), "Desktop", "tuna_tmp");
-
     private static final Path scenarioPath =
-        basePath.resolve(Paths.get("tuna.yaml"));
+        Paths.get(
+            System.getProperty("user.home"),
+            "workspace", "tuna", "calibration", "results",
+            "cenv0729", "2022-11-11_17.58.21_catchability_global",
+            "calibrated_scenario.yaml"
+        );
 
     private static final Path outputPath = scenarioPath.getParent();
 
     public static void main(final String[] args) {
         new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
             .setAfterStartConsumer(state -> System.out.println(state.getModel().getMap().asASCII()))
-            .requestYearlyData()
-            .requestFisherYearlyData()
-            .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
+//            .requestYearlyData()
+//            .requestFisherYearlyData()
+//            .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
 //            .registerRowProviders("heatmap_data.csv", SampleTunaRun::makeHeatmapProviders)
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
