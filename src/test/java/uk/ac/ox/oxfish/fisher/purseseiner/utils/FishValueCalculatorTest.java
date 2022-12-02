@@ -22,16 +22,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -44,7 +41,7 @@ public class FishValueCalculatorTest {
         marketMap.addMarket(biology.getSpecie(0), new FixedPriceMarket(1));
         marketMap.addMarket(biology.getSpecie(1), new FixedPriceMarket(2));
 
-        final FishValueCalculator fishValueCalculator = new FishValueCalculator(marketMap, biology);
+        final FishValueCalculator fishValueCalculator = new ReliableFishValueCalculator(marketMap, biology);
 
         assertEquals(
             5.0,

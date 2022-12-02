@@ -20,11 +20,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,7 +49,7 @@ public abstract class SetLocationValues<A extends AbstractSetAction>
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
         return setAction
             .getCatchesKept()
-            .map(catchesKept -> new FishValueCalculator(fisher).valueOf((Catch) catchesKept))
+            .map(catchesKept -> new ReliableFishValueCalculator(fisher).valueOf((Catch) catchesKept))
             .map(valueOfCatch -> entry(gridLocation, valueOfCatch));
     }
 
