@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
@@ -40,7 +41,7 @@ public class BiomassFadInitializerTest {
                 BiomassFad.class
             );
         final FadManager<BiomassLocalBiology, BiomassFad> fadManager =
-            new FadManager<>(fadMap, fadInitializer);
+            new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final SeaTile seaTile = mock(SeaTile.class);
         when(seaTile.getGridX()).thenReturn(0);
         when(seaTile.getGridY()).thenReturn(0);

@@ -7,6 +7,7 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -31,23 +32,23 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
      */
     public static final StepOrder EXOGENOUS_FAD_MAKER_STEPORDER = StepOrder.DAWN;
     /**
-     * the object that keeps track of how many fads are in the water due to us
-     */
-    private FadManager<B,F> fadManager;
-
-    /**
      * contains the rules on the nature of the fad we need to create
      */
-    private final FadInitializer<B,F> fadInitializer;
-
+    private final FadInitializer<B, F> fadInitializer;
     /**
      * an object that is given a reference to the fishState and called each step to
      * returns a list of seatiles to dump fads in at that step
      */
-    private final Function<FishState,List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep;
+    private final Function<FishState, List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep;
+    /**
+     * the object that keeps track of how many fads are in the water due to us
+     */
+    private FadManager<B, F> fadManager;
 
-    public ExogenousFadMaker(FadInitializer<B, F> fadInitializer,
-                             Function<FishState, List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep) {
+    public ExogenousFadMaker(
+        final FadInitializer<B, F> fadInitializer,
+        final Function<FishState, List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep
+    ) {
         this.fadInitializer = fadInitializer;
         this.generatorForFadDeploymentPositionsAtEachStep = generatorForFadDeploymentPositionsAtEachStep;
     }
@@ -55,35 +56,36 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
     /**
      * generates an exogenous map maper that reads from a mapping day--->list of coordinates
      * where to deploy new fads each step
-     * @param fadInitializer object that builds fads for you and place them in the water
-     * @param dayToCoordinatesMap  a mapping that returns for each simulated day, a list of coordinates to dump stuff in.
+     *
+     * @param fadInitializer      object that builds fads for you and place them in the water
+     * @param dayToCoordinatesMap a mapping that returns for each simulated day, a list of coordinates to dump stuff in.
      */
-    public ExogenousFadMaker(FadInitializer<B, F> fadInitializer,
-                             Map<Integer, Collection<Double2D>> dayToCoordinatesMap) {
-        this(fadInitializer,new Function<FishState, List<SeaTile>>() {
-            @Override
-            public List<SeaTile> apply(FishState state) {
+    public ExogenousFadMaker(
+        final FadInitializer<B, F> fadInitializer,
+        final Map<Integer, Collection<Double2D>> dayToCoordinatesMap
+    ) {
+        this(fadInitializer, state -> {
 
-                List<SeaTile> toReturn = new LinkedList<>();
-                int simulatedDay = state.getDay();
-                Collection<Double2D> coordinatesToDumpNewFadsIn = dayToCoordinatesMap.get(simulatedDay);
-                if(coordinatesToDumpNewFadsIn != null)
-                    for (Double2D coordinate : coordinatesToDumpNewFadsIn) {
-                        toReturn.add(state.getMap().getSeaTile(new Coordinate(coordinate.getX(), coordinate.getY())));
-                    }
+            final List<SeaTile> toReturn = new LinkedList<>();
+            final int simulatedDay = state.getDay();
+            final Collection<Double2D> coordinatesToDumpNewFadsIn = dayToCoordinatesMap.get(simulatedDay);
+            if (coordinatesToDumpNewFadsIn != null)
+                for (final Double2D coordinate : coordinatesToDumpNewFadsIn) {
+                    toReturn.add(state.getMap().getSeaTile(new Coordinate(coordinate.getX(), coordinate.getY())));
+                }
 
-                return toReturn;
-            }
+            return toReturn;
         });
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         //create the fad manager
         fadManager = new FadManager(
-                model.getFadMap(),
-                fadInitializer
+            model.getFadMap(),
+            fadInitializer,
+            new ReliableFishValueCalculator(model.getBiology())
         );
 
         //schedule yourself every day
@@ -92,17 +94,19 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
-        List<SeaTile> deployments = generatorForFadDeploymentPositionsAtEachStep.apply(model);
-        if(deployments != null)
-            for (SeaTile tile : deployments) {
-                if(tile.isWater()) {
+        final FishState model = (FishState) simState;
+        final List<SeaTile> deployments = generatorForFadDeploymentPositionsAtEachStep.apply(model);
+        if (deployments != null)
+            for (final SeaTile tile : deployments) {
+                if (tile.isWater()) {
                     fadManager.setNumFadsInStock(1);
 
-                    fadManager.deployFad(tile,
-                            model.getRandom());
+                    fadManager.deployFad(
+                        tile,
+                        model.getRandom()
+                    );
 
                 }
             }

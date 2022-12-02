@@ -20,52 +20,26 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.model.market.MarketMap;
 
 public class ReliableFishValueCalculator implements FishValueCalculator {
 
-    private final MarketMap marketMap;
     private final GlobalBiology globalBiology;
 
-    public ReliableFishValueCalculator(final Fisher fisher) {
-        this(
-            fisher.getHomePort().getMarketMap(fisher),
-            fisher.grabState().getBiology()
-        );
-    }
-
-    public ReliableFishValueCalculator(
-        final MarketMap marketMap,
-        final GlobalBiology globalBiology
-    ) {
-        this.marketMap = marketMap;
+    public ReliableFishValueCalculator(final GlobalBiology globalBiology) {
         this.globalBiology = globalBiology;
     }
 
     @Override
-    public double valueOf(final Catch catchesKept) {
-        return valueOf(catchesKept.getBiomassArray());
-    }
-
-    @Override
-    public double valueOf(final double[] biomass) {
+    public double valueOf(final double[] biomasses, final double[] prices) {
         double sum = 0.0;
-        for (int i = 0; i < biomass.length; i++) {
-            sum += biomass[i] * marketMap.getMarket(i).getMarginalPrice();
+        for (int i = 0; i < biomasses.length; i++) {
+            sum += biomasses[i] * prices[i];
         }
         return sum;
     }
 
     @Override
-    public double valueOf(final LocalBiology biology) {
-        final double[] biomass =
-            globalBiology.getSpecies().stream()
-                .mapToDouble(biology::getBiomass)
-                .toArray();
-        return valueOf(biomass);
+    public GlobalBiology getGlobalBiology() {
+        return globalBiology;
     }
-
 }

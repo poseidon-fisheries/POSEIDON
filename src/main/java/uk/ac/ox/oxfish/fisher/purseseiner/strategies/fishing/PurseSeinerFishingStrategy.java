@@ -35,9 +35,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -95,6 +93,50 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         this.movingThreshold = movingThreshold;
     }
 
+    private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
+        final double sumOfWeights =
+            weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        return weightMap.entrySet().stream()
+            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
+    }
+
+    private static Double2D getCurrentVector(final Fisher fisher) {
+        final Int2D gridLocation = fisher.getLocation().getGridLocation();
+        final int step = fisher.grabState().getStep();
+        return getFadManager(fisher)
+            .getFadMap()
+            .getDriftingObjectsMap()
+            .getCurrentVectors()
+            .getVector(step, gridLocation);
+    }
+
+    private static boolean isSafe(
+        final PurseSeinerAction actionObject,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return isSafe(actionObject.getClass(), safeActionClasses);
+    }
+
+    private static boolean isSafe(
+        final Class<? extends PurseSeinerAction> actionClass,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return safeActionClasses
+            .stream()
+            .anyMatch(safeActionClass -> safeActionClass.isAssignableFrom(actionClass));
+    }
+
+    private static double valueOfLocationBasedAction(
+        final int previousActionsHere,
+        final double locationValue,
+        final DoubleUnaryOperator valueFunction,
+        final double decayConstant
+    ) {
+        final double value = valueFunction.applyAsDouble(locationValue);
+        final double decay = exp(-decayConstant * previousActionsHere);
+        return value * decay;
+    }
+
     @Override
     public void start(final FishState model, final Fisher fisher) {
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
@@ -109,13 +151,6 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
                     ActionAttractionField::getActionClass,
                     identity()
                 ));
-    }
-
-    private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
-        final double sumOfWeights =
-            weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        return weightMap.entrySet().stream()
-            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
     }
 
     @Override
@@ -191,16 +226,16 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             getFadManager(fisher).getNumFadsInStock() < 1
                 ? Stream.empty()
                 : Stream.of(WeightedAction.from(
-                    new FadDeploymentAction(fisher),
-                    attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
-                    v -> valueOfLocationBasedAction(
-                        actionCounts.count(FadDeploymentAction.class),
-                        v,
-                        actionValueFunctions.get(FadDeploymentAction.class),
-                        fadDeploymentActionDecayConstant
-                    ),
-                    actionWeights
-                ));
+                new FadDeploymentAction(fisher),
+                attractionFields.get(FadDeploymentAction.class).getActionValueAt(gridLocation),
+                v -> valueOfLocationBasedAction(
+                    actionCounts.count(FadDeploymentAction.class),
+                    v,
+                    actionValueFunctions.get(FadDeploymentAction.class),
+                    fadDeploymentActionDecayConstant
+                ),
+                actionWeights
+            ));
 
         final ImmutableList<WeightedAction<?>> actionsAvailable = Streams
             .concat(
@@ -223,16 +258,6 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             .collect(toImmutableList());
     }
 
-    private static Double2D getCurrentVector(final Fisher fisher) {
-        final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        final int step = fisher.grabState().getStep();
-        return getFadManager(fisher)
-            .getFadMap()
-            .getDriftingObjectsMap()
-            .getCurrentVectors()
-            .getVector(step, gridLocation);
-    }
-
     private ImmutableSet<Class<? extends PurseSeinerAction>> safeActionClasses(
         final Double2D currentVector
     ) {
@@ -241,22 +266,6 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             .stream()
             .filter(entry -> currentSpeed <= maxCurrentSpeeds.applyAsDouble(entry))
             .collect(toImmutableSet());
-    }
-
-    private static boolean isSafe(
-        final PurseSeinerAction actionObject,
-        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
-    ) {
-        return isSafe(actionObject.getClass(), safeActionClasses);
-    }
-
-    private static boolean isSafe(
-        final Class<? extends PurseSeinerAction> actionClass,
-        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
-    ) {
-        return safeActionClasses
-            .stream()
-            .anyMatch(safeActionClass -> safeActionClass.isAssignableFrom(actionClass));
     }
 
     double valueOfSetAction(
@@ -268,7 +277,8 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         if (totalBiomass == 0) {
             return 0; // avoids div by 0 when calculating catchableProportion
         } else {
-            final Hold hold = action.getFisher().getHold();
+            final Fisher fisher = action.getFisher();
+            final Hold hold = fisher.getHold();
             final double capacity = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
             final double catchableProportion = min(1, capacity / totalBiomass);
             final double[] biomass = species.stream()
@@ -278,19 +288,9 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             for (int i = 0; i < potentialCatch.length; i++) {
                 potentialCatch[i] *= catchableProportion;
             }
-            return new ReliableFishValueCalculator(action.getFisher()).valueOf(potentialCatch);
+            final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
+            return getFadManager(fisher).getFishValueCalculator().valueOf(potentialCatch, prices);
         }
-    }
-
-    private static double valueOfLocationBasedAction(
-        final int previousActionsHere,
-        final double locationValue,
-        final DoubleUnaryOperator valueFunction,
-        final double decayConstant
-    ) {
-        final double value = valueFunction.applyAsDouble(locationValue);
-        final double decay = exp(-decayConstant * previousActionsHere);
-        return value * decay;
     }
 
     @Override

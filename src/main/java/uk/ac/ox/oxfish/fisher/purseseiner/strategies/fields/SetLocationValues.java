@@ -47,9 +47,11 @@ public abstract class SetLocationValues<A extends AbstractSetAction>
     Optional<Entry<Int2D, Double>> observeValue(final A setAction) {
         final Fisher fisher = setAction.getFisher();
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        return setAction
-            .getCatchesKept()
-            .map(catchesKept -> new ReliableFishValueCalculator(fisher).valueOf((Catch) catchesKept))
+        final ReliableFishValueCalculator fishValueCalculator =
+            new ReliableFishValueCalculator(fisher.grabState().getBiology());
+        final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
+        return ((Optional<Catch>) setAction.getCatchesKept())
+            .map(catchesKept -> fishValueCalculator.valueOf(catchesKept, prices))
             .map(valueOfCatch -> entry(gridLocation, valueOfCatch));
     }
 

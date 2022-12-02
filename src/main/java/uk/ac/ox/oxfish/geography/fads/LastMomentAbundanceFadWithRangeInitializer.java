@@ -35,8 +35,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Map;
 
-public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology, F extends AbstractFad<B, F>>
-        implements FadInitializer<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> {
+public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
+    implements FadInitializer<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> {
 
     private final int daysItTakeToFillUp;
     private final int daysInWaterBeforeAttraction;
@@ -51,10 +51,14 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology, 
     private final int rangeInSeatiles;
 
     public LastMomentAbundanceFadWithRangeInitializer(
-            int daysItTakeToFillUp, int daysInWaterBeforeAttraction,
-            Map<Species, NonMutatingArrayFilter> selectivityFilters, double dudProbability,
-            double[] maxCatchabilityPerSpecies,
-            GlobalBiology biology, int rangeInSeatiles) {
+        final int daysItTakeToFillUp,
+        final int daysInWaterBeforeAttraction,
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters,
+        final double dudProbability,
+        final double[] maxCatchabilityPerSpecies,
+        final GlobalBiology biology,
+        final int rangeInSeatiles
+    ) {
         this.daysItTakeToFillUp = daysItTakeToFillUp;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.selectivityFilters = selectivityFilters;
@@ -66,21 +70,23 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology, 
 
     @Override
     public LastMomentAbundanceFadWithRange makeFad(
-            @NotNull FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> fadManager,
-            @Nullable Fisher owner, @NotNull SeaTile initialLocation) {
+        @NotNull final FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> fadManager,
+        @Nullable final Fisher owner, @NotNull final SeaTile initialLocation
+    ) {
         return new LastMomentAbundanceFadWithRange(
-                owner != null ? owner.getCurrentTrip() : null,
-                owner.grabState().getStep(),
-                initialLocation.getGridLocation(),
-                0d,
-                fadManager,
-                daysItTakeToFillUp,
-                daysInWaterBeforeAttraction,
-                maxCatchabilityPerSpecies,
-                owner.grabRandomizer().nextBoolean(dudProbability),
-                rangeInSeatiles,
-                selectivityFilters,
-                biology);
+            owner != null ? owner.getCurrentTrip() : null,
+            owner.grabState().getStep(),
+            initialLocation.getGridLocation(),
+            0d,
+            fadManager,
+            daysItTakeToFillUp,
+            daysInWaterBeforeAttraction,
+            maxCatchabilityPerSpecies,
+            owner.grabRandomizer().nextBoolean(dudProbability),
+            rangeInSeatiles,
+            selectivityFilters,
+            biology
+        );
     }
 
 

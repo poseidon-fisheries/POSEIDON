@@ -19,22 +19,19 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.lang.StrictMath.max;
-import static java.lang.StrictMath.min;
-import static java.util.function.Function.identity;
+import org.jetbrains.annotations.NotNull;
+import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import org.jetbrains.annotations.NotNull;
-import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.lang.StrictMath.max;
+import static java.lang.StrictMath.min;
+import static java.util.function.Function.identity;
 
 public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
 
@@ -119,10 +116,10 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
         final BiomassLocalBiology seaTileBiology,
         final GlobalBiology globalBiology
     ) {
-        WeightedObject<BiomassLocalBiology> attracted = attractFish(seaTileBiology);
+        final WeightedObject<BiomassLocalBiology> attracted = attractFish(seaTileBiology);
         double[] catches = attracted != null ?
             attracted.getObjectBeingWeighted().getCurrentBiomass() : null;
-        if(catches == null)
+        if (catches == null)
             catches = new double[globalBiology.getSize()];
         final double[] fadBiomass =
             this.getBiology().getCurrentBiomass();

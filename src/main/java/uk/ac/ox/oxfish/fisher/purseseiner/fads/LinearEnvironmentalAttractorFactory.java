@@ -22,9 +22,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -42,172 +45,154 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * fads attract linearly, but can be penalized by environmental factors which are read as additional maps
  */
-public class LinearEnvironmentalAttractorFactory  implements
-        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+public class LinearEnvironmentalAttractorFactory implements
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
-
-
+    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
+        new Locker<>();
     private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
+    private LinkedList<DoubleParameter> environmentalThresholds = new LinkedList<>();
+    private LinkedList<DoubleParameter> environmentalPenalties = new LinkedList<>();
+    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
-    private LinkedList<DoubleParameter>  environmentalThresholds = new LinkedList<>();
-
-    private LinkedList<DoubleParameter>  environmentalPenalties = new LinkedList<>();
+    private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
+    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
+    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
+    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
+    private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
 
     {
-        AdditionalMapFactory e = new AdditionalMapFactory();
+        final AdditionalMapFactory e = new AdditionalMapFactory();
         environmentalMaps.add(e);
         environmentalThresholds.add(new FixedDoubleParameter(0.15));
         environmentalPenalties.add(new FixedDoubleParameter(2));
     }
 
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
-
-
-    private LinkedHashMap<String,Double> maximumCarryingCapacities = new LinkedHashMap<>();
     {
-        maximumCarryingCapacities.put("Skipjack tuna",135000d);
-        maximumCarryingCapacities.put("Yellowfin tuna",40000d);
-        maximumCarryingCapacities.put("Bigeye tuna",60000d);
+        maximumCarryingCapacities.put("Skipjack tuna", 135000d);
+        maximumCarryingCapacities.put("Yellowfin tuna", 40000d);
+        maximumCarryingCapacities.put("Bigeye tuna", 60000d);
     }
 
-    private LinkedHashMap<String,Double> catchabilities = new LinkedHashMap<>();
     {
         catchabilities.put("Species 0", 0.001d);
     }
 
-    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-
-
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-
-    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
-
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
-
-    private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
-
-
-    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
-            new Locker<>();
-
-
-    @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(FishState fishState) {
-        return oneAttractorPerStateLocker.presentKey(
-                fishState,
-                new Supplier<AbundanceFadInitializer>() {
-                    @Override
-                    public AbundanceFadInitializer get() {
-                        //make sure the lists are all of the same size!
-                        Preconditions.checkArgument(environmentalMaps.size()>0);
-                        Preconditions.checkArgument(environmentalMaps.size()==environmentalPenalties.size());
-                        Preconditions.checkArgument(environmentalMaps.size()==environmentalThresholds.size());
-
-
-
-                        //attractor:
-                        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
-                        DoubleSupplier capacityGenerator;
-                        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
-                            capacityGenerator = () -> Double.MAX_VALUE;
-                        else
-                            capacityGenerator = () -> {
-                                if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
-                                    return 0;
-                                else
-                                    return Double.MAX_VALUE;
-                            };
-
-                        DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
-                        for (Species species : fishState.getBiology().getSpecies()) {
-                            carryingCapacities[species.getIndex()] =
-                                    maximumCarryingCapacities.containsKey(species.getName()) ?
-                                            new FixedDoubleParameter(
-                                                    maximumCarryingCapacities.get(species.getName()) *
-                                                            carryingCapacityMultiplier.apply(fishState.getRandom())
-
-                                            ) :
-                                            new FixedDoubleParameter(-1);
-
-
-                        }
-                        final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
-                                environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
-
-                        Function<AbstractFad,double[]> catchabilitySupplier = abstractFad -> {
-
-                            double[] cachability = new double[fishState.getBiology().getSize()];
-                            SeaTile fadLocation = abstractFad.getLocation();
-                            double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
-                            if(penaltyHere <= 0 || !Double.isFinite(penaltyHere))
-                                return cachability;
-
-                            for (Species species : fishState.getBiology().getSpecies())
-                                cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(),0d) *
-                                        penaltyHere;
-                            return cachability;
-                        };
-
-
-                        return new AbundanceFadInitializer(
-                                fishState.getBiology(),
-                                capacityGenerator,
-                                new CatchabilitySelectivityFishAttractor(
-                                        carryingCapacities,
-                                        catchabilitySupplier,
-                                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                                        maximumDaysAttractions.apply(fishState.getRandom()).intValue(),
-                                        fishState,
-                                        selectivityFilters
-
-                                ),
-                                fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                                fishState::getStep
-                        );
-                    }
-                }
-
-        );
-
-
-    }
-
     public static Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
-            LinkedList<AdditionalMapFactory> environmentalMaps,
-            LinkedList<DoubleParameter> environmentalPenalties,
-            LinkedList<DoubleParameter> environmentalThresholds,
-            FishState fishState) {
+        final LinkedList<AdditionalMapFactory> environmentalMaps,
+        final LinkedList<DoubleParameter> environmentalPenalties,
+        final LinkedList<DoubleParameter> environmentalThresholds,
+        final FishState fishState
+    ) {
         Function<SeaTile, Double> catchabilityPenaltyFunction = null;
         //start the map
         for (int environmental = 0; environmental < environmentalMaps.size(); environmental++) {
 
-            AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
+            final AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
             fishState.registerStartable(newMap);
             final String mapName = environmentalMaps.get(environmental).mapVariableName;
             final double threshold = environmentalThresholds.get(environmental).apply(fishState.getRandom());
             final double penalty = environmentalPenalties.get(environmental).apply(fishState.getRandom());
 
             final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
-                double currentHere = fishState.getMap().getAdditionalMaps().get(
-                        mapName).get().get(
-                        seaTile.getGridX(),
-                        seaTile.getGridY()
+                final double currentHere = fishState.getMap().getAdditionalMaps().get(
+                    mapName).get().get(
+                    seaTile.getGridX(),
+                    seaTile.getGridY()
                 );
                 return Math.pow(Math.min(1d, currentHere / threshold), penalty);
             };
-            if(catchabilityPenaltyFunction == null) catchabilityPenaltyFunction = penaltyMultiplier;
+            if (catchabilityPenaltyFunction == null) catchabilityPenaltyFunction = penaltyMultiplier;
             else {
-                Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
+                final Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
                 catchabilityPenaltyFunction = seaTile -> oldPenalty.apply(seaTile) * penaltyMultiplier.apply(seaTile);
             }
 
         }
         return catchabilityPenaltyFunction;
+    }
+
+    @Override
+    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+        return oneAttractorPerStateLocker.presentKey(
+            fishState,
+            () -> {
+                //make sure the lists are all of the same size!
+                Preconditions.checkArgument(environmentalMaps.size() > 0);
+                Preconditions.checkArgument(environmentalMaps.size() == environmentalPenalties.size());
+                Preconditions.checkArgument(environmentalMaps.size() == environmentalThresholds.size());
+
+                //attractor:
+                final MersenneTwisterFast rng = fishState.getRandom();
+                final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+                final DoubleSupplier capacityGenerator;
+                if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
+                    capacityGenerator = () -> Double.MAX_VALUE;
+                else
+                    capacityGenerator = () -> {
+                        if (rng.nextFloat() <= probabilityOfFadBeingDud)
+                            return 0;
+                        else
+                            return Double.MAX_VALUE;
+                    };
+
+                final GlobalBiology globalBiology = fishState.getBiology();
+                final DoubleParameter[] carryingCapacities = new DoubleParameter[globalBiology.getSize()];
+                for (final Species species : globalBiology.getSpecies()) {
+                    carryingCapacities[species.getIndex()] =
+                        maximumCarryingCapacities.containsKey(species.getName()) ?
+                            new FixedDoubleParameter(
+                                maximumCarryingCapacities.get(species.getName()) *
+                                    carryingCapacityMultiplier.apply(rng)
+
+                            ) :
+                            new FixedDoubleParameter(-1);
+
+
+                }
+                final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+                    environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
+
+                final Function<AbstractFad, double[]> catchabilitySupplier = abstractFad -> {
+
+                    final double[] cachability = new double[globalBiology.getSize()];
+                    final SeaTile fadLocation = abstractFad.getLocation();
+                    final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
+                    if (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
+                        return cachability;
+
+                    for (final Species species : globalBiology.getSpecies())
+                        cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(), 0d) *
+                            penaltyHere;
+                    return cachability;
+                };
+
+
+                return new AbundanceFadInitializer(
+                    globalBiology,
+                    capacityGenerator,
+                    new CatchabilitySelectivityFishAttractor(
+                        carryingCapacities,
+                        catchabilitySupplier,
+                        daysInWaterBeforeAttraction.apply(rng).intValue(),
+                        maximumDaysAttractions.apply(rng).intValue(),
+                        fishState,
+                        selectivityFilters
+                    ),
+                    fishReleaseProbabilityInPercent.apply(rng) / 100d,
+                    fishState::getStep
+                );
+            }
+
+        );
+
+
     }
 
     public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
@@ -216,7 +201,8 @@ public class LinearEnvironmentalAttractorFactory  implements
 
     @Override
     public void setSelectivityFilters(
-            Map<Species, NonMutatingArrayFilter> selectivityFilters) {
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters
+    ) {
         this.selectivityFilters = selectivityFilters;
     }
 
@@ -225,7 +211,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return catchabilities;
     }
 
-    public void setCatchabilities(LinkedHashMap<String, Double> catchabilities) {
+    public void setCatchabilities(final LinkedHashMap<String, Double> catchabilities) {
         this.catchabilities = catchabilities;
     }
 
@@ -233,7 +219,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return daysInWaterBeforeAttraction;
     }
 
-    public void setDaysInWaterBeforeAttraction(DoubleParameter daysInWaterBeforeAttraction) {
+    public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
     }
 
@@ -241,7 +227,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return maximumDaysAttractions;
     }
 
-    public void setMaximumDaysAttractions(DoubleParameter maximumDaysAttractions) {
+    public void setMaximumDaysAttractions(final DoubleParameter maximumDaysAttractions) {
         this.maximumDaysAttractions = maximumDaysAttractions;
     }
 
@@ -250,7 +236,8 @@ public class LinearEnvironmentalAttractorFactory  implements
     }
 
     public void setFishReleaseProbabilityInPercent(
-            DoubleParameter fishReleaseProbabilityInPercent) {
+        final DoubleParameter fishReleaseProbabilityInPercent
+    ) {
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
@@ -258,7 +245,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return fadDudRate;
     }
 
-    public void setFadDudRate(DoubleParameter fadDudRate) {
+    public void setFadDudRate(final DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
     }
 
@@ -267,7 +254,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return maximumCarryingCapacities;
     }
 
-    public void setMaximumCarryingCapacities(LinkedHashMap<String, Double> maximumCarryingCapacities) {
+    public void setMaximumCarryingCapacities(final LinkedHashMap<String, Double> maximumCarryingCapacities) {
         this.maximumCarryingCapacities = maximumCarryingCapacities;
     }
 
@@ -275,7 +262,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return carryingCapacityMultiplier;
     }
 
-    public void setCarryingCapacityMultiplier(DoubleParameter carryingCapacityMultiplier) {
+    public void setCarryingCapacityMultiplier(final DoubleParameter carryingCapacityMultiplier) {
         this.carryingCapacityMultiplier = carryingCapacityMultiplier;
     }
 
@@ -283,7 +270,7 @@ public class LinearEnvironmentalAttractorFactory  implements
         return environmentalMaps;
     }
 
-    public void setEnvironmentalMaps(LinkedList<AdditionalMapFactory> environmentalMaps) {
+    public void setEnvironmentalMaps(final LinkedList<AdditionalMapFactory> environmentalMaps) {
         this.environmentalMaps = environmentalMaps;
     }
 
@@ -292,7 +279,8 @@ public class LinearEnvironmentalAttractorFactory  implements
     }
 
     public void setEnvironmentalThresholds(
-            LinkedList<DoubleParameter> environmentalThresholds) {
+        final LinkedList<DoubleParameter> environmentalThresholds
+    ) {
         this.environmentalThresholds = environmentalThresholds;
     }
 
@@ -301,7 +289,8 @@ public class LinearEnvironmentalAttractorFactory  implements
     }
 
     public void setEnvironmentalPenalties(
-            LinkedList<DoubleParameter> environmentalPenalties) {
+        final LinkedList<DoubleParameter> environmentalPenalties
+    ) {
         this.environmentalPenalties = environmentalPenalties;
     }
 }

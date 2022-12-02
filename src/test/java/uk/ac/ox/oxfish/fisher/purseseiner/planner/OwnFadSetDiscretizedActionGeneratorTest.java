@@ -24,15 +24,20 @@ import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
@@ -40,14 +45,14 @@ import java.util.List;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class OwnFadSetDiscretizedActionGeneratorTest {
-
 
 
     @Test
@@ -57,70 +62,84 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
-                mock(PurseSeineGear.class);
+            mock(PurseSeineGear.class);
         @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
-                fadManager = mock(FadManager.class);
+            fadManager = mock(FadManager.class);
         @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
-                mock(FadMap.class);
+            mock(FadMap.class);
         when(fadManager.getFadMap()).thenReturn(fadMap);
+        when(fadManager.getFisher()).thenReturn(fisher);
         when(gear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
 
+        final MarketMap marketMap = mock(MarketMap.class);
+        when(marketMap.getPrices()).thenReturn(new double[]{1.0});
+        final Port port = mock(Port.class);
+        when(port.getMarketMap(any())).thenReturn(marketMap);
+        when(fisher.getHomePort()).thenReturn(port);
+
+        final GlobalBiology globalBiology = genericListOfSpecies(1);
+        final FishValueCalculator fishValueCalculator = mock(FishValueCalculator.class);
+        when(fishValueCalculator.valueOf(any(LocalBiology.class), any())).thenAnswer(invocationOnMock ->
+            invocationOnMock.getArgument(0, LocalBiology.class).getBiomass(globalBiology.getSpecie(0))
+        );
+        when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
+
         final List<BiomassFad> fads = range(0, 3)
-                .mapToObj(index -> {
-                    final BiomassFad fad = mock(BiomassFad.class);
-                    when(fad.valueOfFishFor(any())).thenReturn((double)index);
-                    when(fad.getLocation()).thenReturn(map.getSeaTile(index,index));
-                    return fad;
-                })
-                .collect(toImmutableList());
+            .mapToObj(index -> {
+                final BiomassFad fad = mock(BiomassFad.class);
+                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
+                when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                return fad;
+            })
+            .collect(toImmutableList());
 
         when(fadManager.getDeployedFads())
-                .thenReturn(ImmutableSet.copyOf(fads));
+            .thenReturn(ImmutableSet.copyOf(fads));
 
         //discretized map split into 2x2
-        MapDiscretization discretization = new MapDiscretization(
-                new SquaresMapDiscretizer(1,1)
+        final MapDiscretization discretization = new MapDiscretization(
+            new SquaresMapDiscretizer(1, 1)
         );
         discretization.discretize(map);
-        OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
-                discretization,
-                -100
+        final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
+            discretization,
+            -100
         );
 
-        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
+        generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
         //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
-        assertTrue(initialOptions.get(0).getSecond()==0 );
-        assertTrue(initialOptions.get(1).getSecond()==3);
+        assertTrue(initialOptions.get(0).getSecond() == 0);
+        assertTrue(initialOptions.get(1).getSecond() == 3);
 
         Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> firstGuess = initialOptions.get(0);
         Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> secondGuess = initialOptions.get(1);
 
         //you should have only chosen the best!
-        assertEquals(firstGuess.getFirst().getSecond(),1.0);
-        assertEquals(secondGuess.getFirst().getSecond(),2.0);
+        assertEquals(firstGuess.getFirst().getSecond(), 1.0);
+        assertEquals(secondGuess.getFirst().getSecond(), 2.0);
 
         //if I pick one option, next time I choose it shouldn't be present anymore
-        PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
-        assertEquals(plannedFadSet.getLocation(),firstGuess.getFirst().getFirst().getLocation());
+        final PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
+        assertEquals(plannedFadSet.getLocation(), firstGuess.getFirst().getFirst().getLocation());
 
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();
         firstGuess = newOptions.get(0);
         secondGuess = newOptions.get(1);
 
         //the 1$ fad should have gone
-        assertEquals(firstGuess.getFirst().getSecond(),0.0);
-        assertEquals(secondGuess.getFirst().getSecond(),2.0);
+        assertEquals(firstGuess.getFirst().getSecond(), 0.0);
+        assertEquals(secondGuess.getFirst().getSecond(), 2.0);
 
         //if you empty a queue, the group won't appear again
         generator.chooseFad(0);
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
-        assertEquals(finalOptions.size(),1);
-        assertTrue(finalOptions.get(0).getSecond()==3);
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
+        assertEquals(finalOptions.size(), 1);
+        assertTrue(finalOptions.get(0).getSecond() == 3);
 
     }
 
@@ -130,43 +149,57 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
-                mock(PurseSeineGear.class);
+            mock(PurseSeineGear.class);
         @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
-                fadManager = mock(FadManager.class);
+            fadManager = mock(FadManager.class);
         @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
-                mock(FadMap.class);
+            mock(FadMap.class);
         when(fadManager.getFadMap()).thenReturn(fadMap);
+        when(fadManager.getFisher()).thenReturn(fisher);
         when(gear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
 
+        final MarketMap marketMap = mock(MarketMap.class);
+        when(marketMap.getPrices()).thenReturn(new double[]{1.0});
+        final Port port = mock(Port.class);
+        when(port.getMarketMap(any())).thenReturn(marketMap);
+        when(fisher.getHomePort()).thenReturn(port);
+
+        final GlobalBiology globalBiology = genericListOfSpecies(1);
+        final FishValueCalculator fishValueCalculator = mock(FishValueCalculator.class);
+        when(fishValueCalculator.valueOf(any(LocalBiology.class), any())).thenAnswer(invocationOnMock ->
+            invocationOnMock.getArgument(0, LocalBiology.class).getBiomass(globalBiology.getSpecie(0))
+        );
+        when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
+
         final List<BiomassFad> fads = range(0, 3)
-                .mapToObj(index -> {
-                    final BiomassFad fad = mock(BiomassFad.class);
-                    when(fad.valueOfFishFor(any())).thenReturn((double)index);
-                    when(fad.getLocation()).thenReturn(map.getSeaTile(index,index));
-                    return fad;
-                })
-                .collect(toImmutableList());
+            .mapToObj(index -> {
+                final BiomassFad fad = mock(BiomassFad.class);
+                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
+                when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                return fad;
+            })
+            .collect(toImmutableList());
 
         when(fadManager.getDeployedFads())
-                .thenReturn(ImmutableSet.copyOf(fads));
+            .thenReturn(ImmutableSet.copyOf(fads));
 
         //discretized map split into 2x2
-        MapDiscretization discretization = new MapDiscretization(
-                new SquaresMapDiscretizer(1,1)
+        final MapDiscretization discretization = new MapDiscretization(
+            new SquaresMapDiscretizer(1, 1)
         );
         discretization.discretize(map);
-        OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
-                discretization,
-                2
+        final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
+            discretization,
+            2
         );
 
-        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
-        assertEquals(initialOptions.size(),1);
-        assertTrue(initialOptions.get(0).getSecond()==3);
+        generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
+        assertEquals(initialOptions.size(), 1);
+        assertTrue(initialOptions.get(0).getSecond() == 3);
     }
 
 
@@ -176,46 +209,61 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
-                mock(PurseSeineGear.class);
+            mock(PurseSeineGear.class);
         @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
-                fadManager = mock(FadManager.class);
+            fadManager = mock(FadManager.class);
         @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
-                mock(FadMap.class);
+            mock(FadMap.class);
         when(fadManager.getFadMap()).thenReturn(fadMap);
+        when(fadManager.getFisher()).thenReturn(fisher);
         when(gear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
 
+        final MarketMap marketMap = mock(MarketMap.class);
+        when(marketMap.getPrices()).thenReturn(new double[]{1.0});
+        final Port port = mock(Port.class);
+        when(port.getMarketMap(any())).thenReturn(marketMap);
+        when(fisher.getHomePort()).thenReturn(port);
+
+        final GlobalBiology globalBiology = genericListOfSpecies(1);
+        final FishValueCalculator fishValueCalculator = mock(FishValueCalculator.class);
+        when(fishValueCalculator.valueOf(any(LocalBiology.class), any())).thenAnswer(invocationOnMock ->
+            invocationOnMock.getArgument(0, LocalBiology.class).getBiomass(globalBiology.getSpecie(0))
+        );
+        when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
+
         final List<BiomassFad> fads = range(0, 3)
-                .mapToObj(index -> {
-                    final BiomassFad fad = mock(BiomassFad.class);
-                    when(fad.valueOfFishFor(any())).thenReturn((double)index);
-                    when(fad.getLocation()).thenReturn(map.getSeaTile(index,index));
-                    return fad;
-                })
-                .collect(toImmutableList());
+            .mapToObj(index -> {
+                final BiomassFad fad = mock(BiomassFad.class);
+                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
+                when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                return fad;
+            })
+            .collect(toImmutableList());
 
         when(fadManager.getDeployedFads())
-                .thenReturn(ImmutableSet.copyOf(fads));
+            .thenReturn(ImmutableSet.copyOf(fads));
 
         //discretized map split into 2x2
-        MapDiscretization discretization = new MapDiscretization(
-                new SquaresMapDiscretizer(1,1)
+        final MapDiscretization discretization = new MapDiscretization(
+            new SquaresMapDiscretizer(1, 1)
         );
         discretization.discretize(map);
-        OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
-                discretization,
-                0
+        final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
+            discretization,
+            0
         );
 
-        generator.setBannedGridBounds(new double[]{-100,1},new double[]{-100,1});
+        generator.setBannedGridBounds(new double[]{-100, 1}, new double[]{-100, 1});
         //only 3,3 will do
 
 
-        generator.startOrReset(fadManager,new MersenneTwisterFast(),mock(NauticalMap.class));
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
-        assertEquals(initialOptions.size(),1);
-        assertTrue(initialOptions.get(0).getSecond()==3);
+        generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions =
+            generator.generateBestFadOpportunities();
+        assertEquals(initialOptions.size(), 1);
+        assertTrue(initialOptions.get(0).getSecond() == 3);
     }
 }

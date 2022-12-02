@@ -2,8 +2,10 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -16,6 +18,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -111,6 +114,15 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
     private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
+    private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
+
+    public DoubleParameter getFishValueCalculatorStandardDeviation() {
+        return fishValueCalculatorStandardDeviation;
+    }
+
+    public void setFishValueCalculatorStandardDeviation(final DoubleParameter fishValueCalculatorStandardDeviation) {
+        this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
+    }
 
     public Path getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
@@ -351,6 +363,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
                 .collect(toList())
         );
 
+        final MersenneTwisterFast rng = fishState.getRandom();
+        final GlobalBiology globalBiology = fishState.getBiology();
         @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
             (FadMap<B, F>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
@@ -360,7 +374,8 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             nonAssociatedSetObserversCache.get(fishState),
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
-            actionSpecificRegulations
+            actionSpecificRegulations,
+            new UnreliableFishValueCalculator(globalBiology, rng, fishValueCalculatorStandardDeviation.apply(rng))
         );
         return fadManager;
     }

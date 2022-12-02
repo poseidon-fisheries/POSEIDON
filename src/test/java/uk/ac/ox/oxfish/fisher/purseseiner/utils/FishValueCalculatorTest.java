@@ -41,16 +41,17 @@ public class FishValueCalculatorTest {
         marketMap.addMarket(biology.getSpecie(0), new FixedPriceMarket(1));
         marketMap.addMarket(biology.getSpecie(1), new FixedPriceMarket(2));
 
-        final FishValueCalculator fishValueCalculator = new ReliableFishValueCalculator(marketMap, biology);
+        final FishValueCalculator fishValueCalculator = new ReliableFishValueCalculator(biology);
+
 
         assertEquals(
             5.0,
-            fishValueCalculator.valueOf(new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2})),
+            fishValueCalculator.valueOf(new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2}), marketMap.getPrices()),
             EPSILON
         );
         assertEquals(
             11.0,
-            fishValueCalculator.valueOf(new Catch(new double[]{3, 4})),
+            fishValueCalculator.valueOf(new Catch(new double[]{3, 4}), marketMap.getPrices()),
             EPSILON
         );
 

@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
@@ -67,7 +68,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         final FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
-        final FadManager fadManager = new FadManager(null, fadInitializer);
+        final FadManager fadManager = new FadManager(null, fadInitializer, new ReliableFishValueCalculator(fishState.getBiology()));
         fadManager.setActionSpecificRegulations(Stream.of(setLimits));
         fadManager.setFisher(fisher);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

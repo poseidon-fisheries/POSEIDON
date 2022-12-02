@@ -17,8 +17,8 @@ import java.util.function.DoubleSupplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class  AbstractAbundanceFadInitializerFactory
-        extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> implements PluggableSelectivity {
+public abstract class AbstractAbundanceFadInitializerFactory
+    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> implements PluggableSelectivity {
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
@@ -41,11 +41,11 @@ public abstract class  AbstractAbundanceFadInitializerFactory
         final DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);
 
         return new AbundanceFadInitializer(
-                fishState.getBiology(),
-                capacityGenerator,
-                makeFishAttractor(fishState, rng),
-                getFishReleaseProbabilityInPercent().apply(rng) / 100d,
-                fishState::getStep
+            fishState.getBiology(),
+            capacityGenerator,
+            makeFishAttractor(fishState, rng),
+            getFishReleaseProbabilityInPercent().apply(rng) / 100d,
+            fishState::getStep
         );
     }
 
@@ -63,28 +63,34 @@ public abstract class  AbstractAbundanceFadInitializerFactory
             );
         final double[] attractableBiomassCoefficients =
             processParameterMap(
-            getAttractableBiomassCoefficients(),
-            fishState.getBiology(),
-            rng
-        );
+                getAttractableBiomassCoefficients(),
+                fishState.getBiology(),
+                rng
+            );
         final double[] biomassInteractionCoefficients =
             processParameterMap(
-            getBiomassInteractionsCoefficients(),
-            fishState.getBiology(),
-            rng
-        );
+                getBiomassInteractionsCoefficients(),
+                fishState.getBiology(),
+                rng
+            );
         final double[] attractionRates =
             processParameterMap(getGrowthRates(), fishState.getBiology(), rng);
-        return makeFishAttractor(fishState, compressionExponents, attractableBiomassCoefficients, biomassInteractionCoefficients, attractionRates);
+        return makeFishAttractor(
+            fishState,
+            compressionExponents,
+            attractableBiomassCoefficients,
+            biomassInteractionCoefficients,
+            attractionRates
+        );
     }
 
     @NotNull
     FishAbundanceAttractor makeFishAttractor(
-        FishState fishState,
-        double[] compressionExponents,
-        double[] attractableBiomassCoefficients,
-        double[] biomassInteractionCoefficients,
-        double[] attractionRates
+        final FishState fishState,
+        final double[] compressionExponents,
+        final double[] attractableBiomassCoefficients,
+        final double[] biomassInteractionCoefficients,
+        final double[] attractionRates
     ) {
         return new LogisticFishAbundanceAttractor(
             fishState.getBiology().getSpecies(),

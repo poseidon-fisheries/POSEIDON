@@ -37,7 +37,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * like the lastmoment fad with abundance, but this fad doesn't sample only its own cell but those around it too.
@@ -58,82 +59,100 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
      * here we store the (temporary) mapping linking back the local biology we have extracted (and that could potentially
      * be caught)
      */
-    private HashMap<AbundanceLocalBiology,SeaTile> catchPerTile;
+    private HashMap<AbundanceLocalBiology, SeaTile> catchPerTile;
 
     public LastMomentAbundanceFadWithRange(
-            TripRecord tripDeployed, int stepDeployed, Int2D locationDeployed,
-            double fishReleaseProbability, FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> owner,
-            int daysItTakesToFillUp, int daysInWaterBeforeAttraction, double[] maxCatchabilityPerSpecies,
-            boolean isDud, int rangeInSeatiles, Map<Species, NonMutatingArrayFilter> selectivityFilters,
-            GlobalBiology biology) {
-        super(tripDeployed, stepDeployed, locationDeployed, fishReleaseProbability, owner, daysItTakesToFillUp,
-              daysInWaterBeforeAttraction, maxCatchabilityPerSpecies, isDud);
+        final TripRecord tripDeployed,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final double fishReleaseProbability,
+        final FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> owner,
+        final int daysItTakesToFillUp,
+        final int daysInWaterBeforeAttraction,
+        final double[] maxCatchabilityPerSpecies,
+        final boolean isDud,
+        final int rangeInSeatiles,
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters,
+        final GlobalBiology biology
+    ) {
+        super(
+            tripDeployed,
+            stepDeployed,
+            locationDeployed,
+            fishReleaseProbability,
+            owner,
+            daysItTakesToFillUp,
+            daysInWaterBeforeAttraction,
+            maxCatchabilityPerSpecies,
+            isDud
+        );
         this.selectivityFilters = selectivityFilters;
         this.biology = biology;
 
-        Preconditions.checkArgument(rangeInSeatiles>=1);
+        Preconditions.checkArgument(rangeInSeatiles >= 1);
         this.rangeInSeatiles = rangeInSeatiles;
     }
 
     @Override
     public AbundanceLocalBiology getBiology() {
         //empty local biology
-        FishState state = super.getFishState();
-        if(state == null) {
+        final FishState state = super.getFishState();
+        if (state == null) {
             catchPerTile = null;
             return new AbundanceLocalBiology(biology);
         }
-        double[] catchability = getCurrentCatchabilityPerSpecies(state);
-        if(catchability == null) {
+        final double[] catchability = getCurrentCatchabilityPerSpecies();
+        if (catchability == null) {
             catchPerTile = null;
             return new AbundanceLocalBiology(biology);
         }
 
         catchPerTile = new HashMap<>();
         //get all neighbors
-        Bag mooreNeighbors = state.getMap().getMooreNeighbors(getLocation(), rangeInSeatiles);
-        for (Object mooreNeighbor : mooreNeighbors) {
-            LocalBiology neighborBiology = ((SeaTile) mooreNeighbor).getBiology();
-            if(AbundanceLocalBiology.class.isAssignableFrom(neighborBiology.getClass()))
-            {
-                AbundanceLocalBiology catchableBiology = LastMomentAbundanceFad.extractFadBiologyFromLocalBiology(
-                        state,
-                        catchability,
-                        neighborBiology,
-                        selectivityFilters
+        final Bag mooreNeighbors = state.getMap().getMooreNeighbors(getLocation(), rangeInSeatiles);
+        for (final Object mooreNeighbor : mooreNeighbors) {
+            final LocalBiology neighborBiology = ((SeaTile) mooreNeighbor).getBiology();
+            if (AbundanceLocalBiology.class.isAssignableFrom(neighborBiology.getClass())) {
+                final AbundanceLocalBiology catchableBiology = LastMomentAbundanceFad.extractFadBiologyFromLocalBiology(
+                    state,
+                    catchability,
+                    neighborBiology,
+                    selectivityFilters
                 );
                 catchPerTile.put(catchableBiology, (SeaTile) mooreNeighbor);
             }
         }
         //add the origin!
         catchPerTile.put(LastMomentAbundanceFad.extractFadBiologyFromLocalBiology(
-                state,
-                catchability,
-                getLocation().getBiology(),
-                selectivityFilters
-        ),getLocation());
+            state,
+            catchability,
+            getLocation().getBiology(),
+            selectivityFilters
+        ), getLocation());
 
 
-        return AGGREGATOR.apply(biology,catchPerTile.keySet());
+        return AGGREGATOR.apply(biology, catchPerTile.keySet());
 
     }
 
 
     @Override
-    public void reactToBeingFished(FishState state, Fisher fisher, SeaTile location) {
+    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
 
-        for (Map.Entry<AbundanceLocalBiology, SeaTile> catches : catchPerTile.entrySet()) {
-            AbundanceLocalBiology catchHere = catches.getKey();
-            Map.Entry<Catch, AbundanceLocalBiology> caughtHere = getCatchMaker().apply(catchHere,
-                                                                                  catchHere);//all of it is caught all the time
+        for (final Map.Entry<AbundanceLocalBiology, SeaTile> catches : catchPerTile.entrySet()) {
+            final AbundanceLocalBiology catchHere = catches.getKey();
+            final Map.Entry<Catch, AbundanceLocalBiology> caughtHere = getCatchMaker().apply(
+                catchHere,
+                catchHere
+            );//all of it is caught all the time
             catches.getValue().reactToThisAmountOfBiomassBeingFished(
-                    caughtHere.getKey(),caughtHere.getKey(),biology
+                caughtHere.getKey(), caughtHere.getKey(), biology
             );
         }
     }
 
     @Override
-    public void reactToStep(FishState fishState) {
+    public void reactToStep(final FishState fishState) {
         super.reactToStep(fishState);
         catchPerTile = null;
     }

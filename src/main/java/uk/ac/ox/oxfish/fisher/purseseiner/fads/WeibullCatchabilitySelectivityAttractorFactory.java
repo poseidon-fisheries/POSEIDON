@@ -21,9 +21,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
@@ -40,95 +43,87 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class WeibullCatchabilitySelectivityAttractorFactory implements
-        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
 
+    private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
+    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
+    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
+    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
+    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
 
-    private LinkedHashMap<String,Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
     {
         carryingCapacityShapeParameters.put("Species 0", 0.5d);
     }
-    private LinkedHashMap<String,Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+
     {
         carryingCapacityScaleParameters.put("Species 0", 100000d);
     }
 
-    private LinkedHashMap<String,Double> catchabilities = new LinkedHashMap<>();
     {
         catchabilities.put("Species 0", 0.001d);
     }
 
-    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-
-
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-
-    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
-
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
-
-
-    private Locker<FishState, AbundanceFadInitializer > oneAttractorPerStateLocker = new Locker<>();
-
-
-
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
-                fishState,
-                new Supplier<AbundanceFadInitializer>() {
-                    @Override
-                    public AbundanceFadInitializer get() {
-                        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
-                        DoubleSupplier capacityGenerator;
-                        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
-                            capacityGenerator = () -> Double.MAX_VALUE;
-                        else
-                            capacityGenerator = () -> {
-                                if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
-                                    return 0;
-                                else
-                                    return Double.MAX_VALUE;
-                            };
+            fishState,
+            new Supplier<AbundanceFadInitializer>() {
+                @Override
+                public AbundanceFadInitializer get() {
+                    final MersenneTwisterFast rng = fishState.getRandom();
+                    final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+                    final DoubleSupplier capacityGenerator;
+                    if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
+                        capacityGenerator = () -> Double.MAX_VALUE;
+                    else
+                        capacityGenerator = () -> {
+                            if (rng.nextFloat() <= probabilityOfFadBeingDud)
+                                return 0;
+                            else
+                                return Double.MAX_VALUE;
+                        };
 
-                        DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
-                        double[] catchabilitiesHere = new double[fishState.getBiology().getSize()];
+                    final GlobalBiology globalBiology = fishState.getBiology();
+                    final DoubleParameter[] carryingCapacities = new DoubleParameter[globalBiology.getSize()];
+                    final double[] catchabilitiesHere = new double[globalBiology.getSize()];
 
-                        for (Species species : fishState.getBiology().getSpecies()) {
-                            carryingCapacities[species.getIndex()] =
-                                    carryingCapacityScaleParameters.containsKey(species.getName()) ?
-                                            new WeibullDoubleParameter(
-                                                    carryingCapacityShapeParameters.get(species.getName()),
-                                                    carryingCapacityScaleParameters.get(species.getName())
-                                            ) : new FixedDoubleParameter(-1);
+                    for (final Species species : globalBiology.getSpecies()) {
+                        carryingCapacities[species.getIndex()] =
+                            carryingCapacityScaleParameters.containsKey(species.getName()) ?
+                                new WeibullDoubleParameter(
+                                    carryingCapacityShapeParameters.get(species.getName()),
+                                    carryingCapacityScaleParameters.get(species.getName())
+                                ) : new FixedDoubleParameter(-1);
 
-                            catchabilitiesHere[species.getIndex()] =
-                                    catchabilities.getOrDefault(species.getName(),0d);
+                        catchabilitiesHere[species.getIndex()] =
+                            catchabilities.getOrDefault(species.getName(), 0d);
 
-                        }
-
-
-                        return new AbundanceFadInitializer(
-                                fishState.getBiology(),
-                                capacityGenerator,
-                                new CatchabilitySelectivityFishAttractor(
-                                        carryingCapacities,
-                                        catchabilitiesHere,
-                                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                                        maximumDaysAttractions.apply(fishState.getRandom()).intValue(),
-                                        fishState,
-                                        selectivityFilters
-
-                                ),
-                                fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                                fishState::getStep
-                        );
                     }
+
+
+                    return new AbundanceFadInitializer(
+                        globalBiology,
+                        capacityGenerator,
+                        new CatchabilitySelectivityFishAttractor(
+                            carryingCapacities,
+                            catchabilitiesHere,
+                            daysInWaterBeforeAttraction.apply(rng).intValue(),
+                            maximumDaysAttractions.apply(rng).intValue(),
+                            fishState,
+                            selectivityFilters
+                        ),
+                        fishReleaseProbabilityInPercent.apply(rng) / 100d,
+                        fishState::getStep
+                    );
                 }
+            }
 
         );
-
 
 
     }
@@ -140,7 +135,8 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
 
     @Override
     public void setSelectivityFilters(
-            Map<Species, NonMutatingArrayFilter> selectivityFilters) {
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters
+    ) {
         this.selectivityFilters = selectivityFilters;
     }
 
@@ -149,7 +145,8 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
     }
 
     public void setCarryingCapacityShapeParameters(
-            LinkedHashMap<String, Double> carryingCapacityShapeParameters) {
+        final LinkedHashMap<String, Double> carryingCapacityShapeParameters
+    ) {
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
     }
 
@@ -158,7 +155,8 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
     }
 
     public void setCarryingCapacityScaleParameters(
-            LinkedHashMap<String, Double> carryingCapacityScaleParameters) {
+        final LinkedHashMap<String, Double> carryingCapacityScaleParameters
+    ) {
         this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
     }
 
@@ -166,7 +164,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         return catchabilities;
     }
 
-    public void setCatchabilities(LinkedHashMap<String, Double> catchabilities) {
+    public void setCatchabilities(final LinkedHashMap<String, Double> catchabilities) {
         this.catchabilities = catchabilities;
     }
 
@@ -174,7 +172,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         return daysInWaterBeforeAttraction;
     }
 
-    public void setDaysInWaterBeforeAttraction(DoubleParameter daysInWaterBeforeAttraction) {
+    public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
     }
 
@@ -182,7 +180,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         return maximumDaysAttractions;
     }
 
-    public void setMaximumDaysAttractions(DoubleParameter maximumDaysAttractions) {
+    public void setMaximumDaysAttractions(final DoubleParameter maximumDaysAttractions) {
         this.maximumDaysAttractions = maximumDaysAttractions;
     }
 
@@ -191,7 +189,8 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
     }
 
     public void setFishReleaseProbabilityInPercent(
-            DoubleParameter fishReleaseProbabilityInPercent) {
+        final DoubleParameter fishReleaseProbabilityInPercent
+    ) {
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
@@ -199,7 +198,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         return fadDudRate;
     }
 
-    public void setFadDudRate(DoubleParameter fadDudRate) {
+    public void setFadDudRate(final DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
     }
 }

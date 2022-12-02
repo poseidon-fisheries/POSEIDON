@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -79,7 +80,7 @@ public class FadMapTest {
         fishState.schedule = schedule;
 
         final FadManager<BiomassLocalBiology, BiomassFad> fadManager =
-            new FadManager<>(fadMap, fadInitializer);
+            new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         when(fisher.grabState()).thenReturn(fishState);

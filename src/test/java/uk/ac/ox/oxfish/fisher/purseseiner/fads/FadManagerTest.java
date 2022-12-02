@@ -51,7 +51,7 @@ public class FadManagerTest extends TestCase {
         final FadMap fadMap = mock(FadMap.class);
 
         final FadManager<BiomassLocalBiology, BiomassFad> fadManager =
-            new FadManager(fadMap, fadInitializer);
+            new FadManager(fadMap, fadInitializer, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

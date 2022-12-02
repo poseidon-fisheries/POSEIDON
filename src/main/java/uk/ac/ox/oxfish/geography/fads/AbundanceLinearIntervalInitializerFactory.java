@@ -16,57 +16,55 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 public class AbundanceLinearIntervalInitializerFactory implements
-        AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
 
     private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
 
-    private LinkedHashMap<String,Double> carryingCapacityPerSpecies = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> carryingCapacityPerSpecies = new LinkedHashMap<>();
+    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
+    private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
+    private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
+
     {
         carryingCapacityPerSpecies.put("Species 0", 100000d);
     }
 
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-
-    private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
-
-    private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
-
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
-        DoubleSupplier capacityGenerator;
-        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud==0)
+        final DoubleSupplier capacityGenerator;
+        if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
             capacityGenerator = () -> Double.MAX_VALUE;
         else
             capacityGenerator = () -> {
-                if(fishState.getRandom().nextFloat()<=probabilityOfFadBeingDud)
+                if (fishState.getRandom().nextFloat() <= probabilityOfFadBeingDud)
                     return 0;
                 else
                     return Double.MAX_VALUE;
             };
 
-        double[] carryingCapacities = new double[fishState.getBiology().getSize()];
-        for (Map.Entry<String, Double> carrying : carryingCapacityPerSpecies.entrySet()) {
+        final double[] carryingCapacities = new double[fishState.getBiology().getSize()];
+        for (final Map.Entry<String, Double> carrying : carryingCapacityPerSpecies.entrySet()) {
             carryingCapacities[fishState.getSpecies(carrying.getKey()).getIndex()] = carrying.getValue();
         }
 
         return new AbundanceFadInitializer(
-                fishState.getBiology(),
-                capacityGenerator,
-                new AbundanceLinearIntervalAttractor(
-                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                        daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
-                        carryingCapacities,
-                        minAbundanceThreshold.apply(fishState.getRandom()),
-                        selectivityFilters,
-                        fishState
+            fishState.getBiology(),
+            capacityGenerator,
+            new AbundanceLinearIntervalAttractor(
+                daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
+                daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
+                carryingCapacities,
+                minAbundanceThreshold.apply(fishState.getRandom()),
+                selectivityFilters,
+                fishState
 
-                        ),
-                fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                fishState::getStep
+            ),
+            fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+            fishState::getStep
         );
     }
 
@@ -74,7 +72,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return selectivityFilters;
     }
 
-    public void setSelectivityFilters(Map<Species, NonMutatingArrayFilter> selectivityFilters) {
+    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
         this.selectivityFilters = selectivityFilters;
     }
 
@@ -82,7 +80,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return fadDudRate;
     }
 
-    public void setFadDudRate(DoubleParameter fadDudRate) {
+    public void setFadDudRate(final DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
     }
 
@@ -90,7 +88,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return fishReleaseProbabilityInPercent;
     }
 
-    public void setFishReleaseProbabilityInPercent(DoubleParameter fishReleaseProbabilityInPercent) {
+    public void setFishReleaseProbabilityInPercent(final DoubleParameter fishReleaseProbabilityInPercent) {
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
@@ -98,7 +96,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return carryingCapacityPerSpecies;
     }
 
-    public void setCarryingCapacityPerSpecies(LinkedHashMap<String, Double> carryingCapacityPerSpecies) {
+    public void setCarryingCapacityPerSpecies(final LinkedHashMap<String, Double> carryingCapacityPerSpecies) {
         this.carryingCapacityPerSpecies = carryingCapacityPerSpecies;
     }
 
@@ -106,7 +104,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return daysInWaterBeforeAttraction;
     }
 
-    public void setDaysInWaterBeforeAttraction(DoubleParameter daysInWaterBeforeAttraction) {
+    public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
     }
 
@@ -114,7 +112,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return daysItTakesToFillUp;
     }
 
-    public void setDaysItTakesToFillUp(DoubleParameter daysItTakesToFillUp) {
+    public void setDaysItTakesToFillUp(final DoubleParameter daysItTakesToFillUp) {
         this.daysItTakesToFillUp = daysItTakesToFillUp;
     }
 
@@ -122,7 +120,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
         return minAbundanceThreshold;
     }
 
-    public void setMinAbundanceThreshold(DoubleParameter minAbundanceThreshold) {
+    public void setMinAbundanceThreshold(final DoubleParameter minAbundanceThreshold) {
         this.minAbundanceThreshold = minAbundanceThreshold;
     }
 }

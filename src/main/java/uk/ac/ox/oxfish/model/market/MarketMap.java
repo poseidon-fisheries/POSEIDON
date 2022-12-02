@@ -39,43 +39,41 @@ public class MarketMap {
 
     private final Market[] marketList;
 
-    public MarketMap(GlobalBiology biology)
-    {
+    public MarketMap(final GlobalBiology biology) {
         marketList = new Market[biology.getSize()];
     }
 
-    public void addMarket(Species species, Market market)
-    {
-        Preconditions.checkArgument( marketList[species.getIndex()]==null);
-        marketList[species.getIndex()]=market;
+    public void addMarket(final Species species, final Market market) {
+        Preconditions.checkArgument(marketList[species.getIndex()] == null);
+        marketList[species.getIndex()] = market;
         market.setSpecies(species);
     }
 
-    public Market getMarket(Species species)
-    {
+    public Market getMarket(final Species species) {
         return marketList[species.getIndex()];
     }
 
-    public Market getMarket(int speciesIndex) { return marketList[speciesIndex]; }
+    public Market getMarket(final int speciesIndex) {
+        return marketList[speciesIndex];
+    }
 
     public TradeInfo sellFish(
-            Hold hold, Species species, Fisher fisher,
-            Regulation regulation, FishState state)
-    {
+        final Hold hold, final Species species, final Fisher fisher,
+        final Regulation regulation, final FishState state
+    ) {
         return marketList[species.getIndex()].sellFish(hold, fisher, regulation, state, species);
-
-    }
-    
-    public double getSpeciesPrice(int speciesIndex){
-    	return marketList[speciesIndex].getMarginalPrice();
     }
 
+    public double getSpeciesPrice(final int speciesIndex) {
+        return marketList[speciesIndex].getMarginalPrice();
+    }
 
-    public Collection<Market> getMarkets()
-    {
+    public double[] getPrices() {
+        return Arrays.stream(marketList).mapToDouble(Market::getMarginalPrice).toArray();
+    }
+
+    public Collection<Market> getMarkets() {
         return Arrays.asList(marketList);
     }
-
-
 
 }

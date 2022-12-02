@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -43,7 +44,6 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends A
 
     private final double totalCarryingCapacity;
 
-
     public Fad(
         final FadManager<B, F> owner,
         final B biology,
@@ -53,19 +53,20 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends A
         final Int2D locationDeployed,
         final double totalCarryingCapacity
     ) {
-        super(owner.getFisher() != null ? owner.getFisher().getCurrentTrip() : null,
-              stepDeployed,
-              locationDeployed,
-              fishReleaseProbability,
-              owner,
-              totalCarryingCapacity<=0
-           );
+        super(
+            owner.getFisher() != null ? owner.getFisher().getCurrentTrip() : null,
+            stepDeployed,
+            locationDeployed,
+            fishReleaseProbability,
+            owner,
+            totalCarryingCapacity <= 0
+        );
         this.biology = biology;
         this.fishAttractor = fishAttractor;
         this.totalCarryingCapacity = totalCarryingCapacity;
     }
 
-    protected WeightedObject<B> attractFish(B seaTileBiology){
+    protected WeightedObject<B> attractFish(final B seaTileBiology) {
         return fishAttractor.attract(seaTileBiology, (F) this);
     }
 
@@ -109,9 +110,8 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends A
     public abstract double[] getBiomass();
 
 
-
     @Override
-    public void reactToBeingFished(FishState state, Fisher fisher, SeaTile location){
+    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
 
     }
 

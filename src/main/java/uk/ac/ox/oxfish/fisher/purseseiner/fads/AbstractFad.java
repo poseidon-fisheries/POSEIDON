@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -53,6 +52,7 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     final private Int2D locationDeployed;
     final private double fishReleaseProbability;
     private final FadManager<B, F> owner;
+
     /**
      * if this is set to anything more than 0, it means it'll stop attracting fish after this many days
      */
@@ -154,10 +154,6 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public FadManager<B, F> getOwner() {
         return owner;
-    }
-
-    public double valueOfFishFor(final Fisher fisher) {
-        return new ReliableFishValueCalculator(fisher).valueOf(getBiology());
     }
 
     public abstract B getBiology();

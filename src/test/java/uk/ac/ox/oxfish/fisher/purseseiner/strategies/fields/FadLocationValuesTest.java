@@ -19,29 +19,35 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.IntStream.range;
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.collect.ImmutableSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class FadLocationValuesTest {
 
@@ -63,11 +69,21 @@ public class FadLocationValuesTest {
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
 
+        final MarketMap marketMap = mock(MarketMap.class);
+        final Port port = mock(Port.class);
+        when(port.getMarketMap(any())).thenReturn(marketMap);
+        when(fisher.getHomePort()).thenReturn(port);
+
+        final FishValueCalculator fishValueCalculator = mock(FishValueCalculator.class);
+        when(fishValueCalculator.valueOf(any(LocalBiology.class), any())).thenReturn(1.0);
+        when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
+
+        final BiomassLocalBiology biomassLocalBiology = mock(BiomassLocalBiology.class);
         final List<BiomassFad> fads = range(0, 3)
             .mapToObj(__ -> {
-                final BiomassFad fad = mock(BiomassFad.class);
-                when(fad.valueOfFishFor(fisher)).thenReturn(1.0);
-                return fad;
+                final BiomassFad biomassFad = mock(BiomassFad.class);
+                when(biomassFad.getBiology()).thenReturn(biomassLocalBiology);
+                return biomassFad;
             })
             .collect(toImmutableList());
 

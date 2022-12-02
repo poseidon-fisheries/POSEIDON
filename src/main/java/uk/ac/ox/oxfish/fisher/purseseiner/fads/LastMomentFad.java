@@ -39,6 +39,7 @@ import java.util.Map;
  * this is a FAD that doesn't "store" fish in itself. It creates local biologies "on the fly" by attracting whatever
  * it finds under the particular cell it is in at that moment. <br>
  * Instead of loading up on fish, what it does is simply increasing its catchability
+ *
  * @param <B>
  * @param <F>
  */
@@ -53,76 +54,73 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
 
 
     private final double[] maxCatchabilityPerSpecies;
+    private FishState state;
 
     public LastMomentFad(
-            TripRecord tripDeployed, int stepDeployed, Int2D locationDeployed,
-            double fishReleaseProbability, FadManager<B, F> owner,
-            int daysItTakesToFillUp,
-            int daysInWaterBeforeAttraction,
-            double[] maxCatchabilityPerSpecies,
-            boolean isDud) {
-        super(tripDeployed, stepDeployed, locationDeployed, fishReleaseProbability, owner,isDud);
+        final TripRecord tripDeployed, final int stepDeployed, final Int2D locationDeployed,
+        final double fishReleaseProbability, final FadManager<B, F> owner,
+        final int daysItTakesToFillUp,
+        final int daysInWaterBeforeAttraction,
+        final double[] maxCatchabilityPerSpecies,
+        final boolean isDud
+    ) {
+        super(tripDeployed, stepDeployed, locationDeployed, fishReleaseProbability, owner, isDud);
         this.daysItTakesToFillUp = daysItTakesToFillUp;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maxCatchabilityPerSpecies = maxCatchabilityPerSpecies;
     }
 
-    private FishState state;
-
-
-
     @Override
-    public void aggregateFish(B seaTileBiology, GlobalBiology globalBiology, int currentStep) {
+    public void aggregateFish(final B seaTileBiology, final GlobalBiology globalBiology, final int currentStep) {
         //ignored
     }
 
     @Override
-    public void releaseFish(Collection<Species> allSpecies, LocalBiology seaTileBiology) {
+    public void releaseFish(final Collection<Species> allSpecies, final LocalBiology seaTileBiology) {
         //nothing to release
     }
 
     @Override
-    public void releaseFish(Collection<Species> allSpecies) {
+    public void releaseFish(final Collection<Species> allSpecies) {
         //nothing to release
     }
 
     @Override
-    public void reactToBeingFished(FishState state, Fisher fisher, SeaTile location) {
+    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
 
         //basically everything that is in the biology needs to be turned into a catch and then destroyed
-        B fishUnderTheFad = getBiology();
-        Map.Entry<Catch, B> caught = getCatchMaker().apply(fishUnderTheFad, fishUnderTheFad);
-        location.reactToThisAmountOfBiomassBeingFished(caught.getKey(),caught.getKey(),state.getBiology());
+        final B fishUnderTheFad = getBiology();
+        final Map.Entry<Catch, B> caught = getCatchMaker().apply(fishUnderTheFad, fishUnderTheFad);
+        location.reactToThisAmountOfBiomassBeingFished(caught.getKey(), caught.getKey(), state.getBiology());
     }
 
     protected abstract CatchMaker<B> getCatchMaker();
 
     @Override
-    public void reactToStep(FishState fishState) {
+    public void reactToStep(final FishState fishState) {
         super.reactToStep(fishState);
         this.state = fishState; //hang on to this link if possible
     }
 
     @Nullable
-    protected double[] getCurrentCatchabilityPerSpecies(FishState fishState){
+    protected double[] getCurrentCatchabilityPerSpecies() {
 
         double multiplier = 0;
-        if(this.state != null) //you must have at least step once!
+        if (this.state != null) //you must have at least step once!
         {
-            int soakTimeInDays = super.soakTimeInDays(state);
-            if (soakTimeInDays >= daysInWaterBeforeAttraction)
-            {
-                if (soakTimeInDays >= daysInWaterBeforeAttraction+daysItTakesToFillUp)
+            final int soakTimeInDays = super.soakTimeInDays(state);
+            if (soakTimeInDays >= daysInWaterBeforeAttraction) {
+                if (soakTimeInDays >= daysInWaterBeforeAttraction + daysItTakesToFillUp)
                     multiplier = 1;
                 else
-                    multiplier = (soakTimeInDays -daysInWaterBeforeAttraction)/((double)daysItTakesToFillUp);
+                    multiplier = (soakTimeInDays - daysInWaterBeforeAttraction) / ((double) daysItTakesToFillUp);
             }
 
         }
-        if(multiplier==0)
+        if (multiplier == 0)
             return null;
 
-        double[] currentCatchabilities = new double[maxCatchabilityPerSpecies.length];
+        final double[] currentCatchabilities = new double[maxCatchabilityPerSpecies.length];
         for (int i = 0; i < currentCatchabilities.length; i++) {
             currentCatchabilities[i] = maxCatchabilityPerSpecies[i] * multiplier;
         }
@@ -135,7 +133,7 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
         this.state = null;
     }
 
-    protected FishState getFishState(){
+    protected FishState getFishState() {
         return state;
     }
 }

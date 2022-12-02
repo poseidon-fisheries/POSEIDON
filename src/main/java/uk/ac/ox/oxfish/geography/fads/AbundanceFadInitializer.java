@@ -18,23 +18,33 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 public class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLocalBiology, AbundanceFad> {
 
 
-    public AbundanceFadInitializer(GlobalBiology globalBiology, DoubleSupplier carryingCapacityGenerator,
-                                   FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
-                                   double fishReleaseProbability,
-                                   IntSupplier timeStepSupplier) {
-        super(globalBiology, carryingCapacityGenerator, fishAttractor, fishReleaseProbability, timeStepSupplier);
+    public AbundanceFadInitializer(
+        final GlobalBiology globalBiology, final DoubleSupplier carryingCapacityGenerator,
+        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
+        final double fishReleaseProbability,
+        final IntSupplier timeStepSupplier
+    ) {
+        super(
+            globalBiology,
+            carryingCapacityGenerator,
+            fishAttractor,
+            fishReleaseProbability,
+            timeStepSupplier
+        );
     }
 
     @Override

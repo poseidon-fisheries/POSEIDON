@@ -18,8 +18,6 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.util.function.IntSupplier;
-import java.util.stream.DoubleStream;
 import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -27,6 +25,9 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+
+import java.util.function.IntSupplier;
+import java.util.stream.DoubleStream;
 
 public class BiomassFadInitializer extends AbstractFadInitializer<BiomassLocalBiology, BiomassFad> {
 
