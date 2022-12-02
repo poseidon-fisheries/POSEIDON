@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -56,7 +56,7 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     /**
      * if this is set to anything more than 0, it means it'll stop attracting fish after this many days
      */
-    private int daysBeforeTurningOff=-1;
+    private int daysBeforeTurningOff = -1;
     /**
      * as long as it is active and the totalCarryingCapacity is above 0, this will attract fish
      */
@@ -66,8 +66,13 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     private Integer stepOfFirstAttraction = null;
 
     public AbstractFad(
-            TripRecord tripDeployed, int stepDeployed, Int2D locationDeployed, double fishReleaseProbability,
-            FadManager<B, F> owner, boolean isDud) {
+        final TripRecord tripDeployed,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final double fishReleaseProbability,
+        final FadManager<B, F> owner,
+        final boolean isDud
+    ) {
         this.tripDeployed = tripDeployed;
         this.stepDeployed = stepDeployed;
         this.locationDeployed = locationDeployed;
@@ -119,7 +124,6 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     public abstract void releaseFish(final Collection<Species> allSpecies);
 
 
-
     private Double2D getGridLocation() {
         return getOwner().getFadMap().getFadLocation(this).orElse(null);
     }
@@ -144,8 +148,8 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public SeaTile getLocation() {
         return getOwner().getFadMap()
-                .getFadTile(this)
-                .orElse(null);
+            .getFadTile(this)
+            .orElse(null);
     }
 
     public FadManager<B, F> getOwner() {
@@ -153,7 +157,7 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
     }
 
     public double valueOfFishFor(final Fisher fisher) {
-        return new FishValueCalculator(fisher).valueOf(getBiology());
+        return new ReliableFishValueCalculator(fisher).valueOf(getBiology());
     }
 
     public abstract B getBiology();
@@ -163,7 +167,6 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
         GlobalBiology globalBiology,
         int currentStep
     );
-
 
 
     /**
@@ -188,12 +191,10 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     /**
      * checks for expiration
-     *
-     * @param fishState
      */
-    public void reactToStep(FishState fishState) {
-        if(isActive && daysBeforeTurningOff >0){
-            if((fishState.getDay() - this.stepDeployed/fishState.getStepsPerDay())> daysBeforeTurningOff)
+    public void reactToStep(final FishState fishState) {
+        if (isActive && daysBeforeTurningOff > 0) {
+            if ((fishState.getDay() - this.stepDeployed / fishState.getStepsPerDay()) > daysBeforeTurningOff)
                 isActive = false;
         }
     }
@@ -211,26 +212,21 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
 
     public abstract void reactToBeingFished(FishState state, Fisher fisher, SeaTile location);
 
+    @SuppressWarnings("unused")
     public int getDaysBeforeTurningOff() {
         return daysBeforeTurningOff;
     }
 
-    public void setDaysBeforeTurningOff(int daysBeforeTurningOff) {
+    public void setDaysBeforeTurningOff(final int daysBeforeTurningOff) {
         this.daysBeforeTurningOff = daysBeforeTurningOff;
     }
 
-    public int soakTimeInDays(FishState model){
-        return (model.getStep()-this.getStepDeployed())/ model.getStepsPerDay();
+    public int soakTimeInDays(final FishState model) {
+        return (model.getStep() - this.getStepDeployed()) / model.getStepsPerDay();
     }
 
     Integer getStepOfFirstAttraction() {
         return stepOfFirstAttraction;
-    }
-
-    public Integer getStepsBeforeFirstAttraction() {
-        return stepOfFirstAttraction != null
-            ? stepOfFirstAttraction - getStepDeployed()
-            : null;
     }
 
     void setStepOfFirstAttraction(final Integer stepOfFirstAttraction) {
@@ -239,6 +235,12 @@ public abstract class AbstractFad<B extends LocalBiology, F extends AbstractFad<
             "Step of first attraction can only be set once."
         );
         this.stepOfFirstAttraction = checkNotNull(stepOfFirstAttraction);
+    }
+
+    public Integer getStepsBeforeFirstAttraction() {
+        return stepOfFirstAttraction != null
+            ? stepOfFirstAttraction - getStepDeployed()
+            : null;
     }
 
 }
