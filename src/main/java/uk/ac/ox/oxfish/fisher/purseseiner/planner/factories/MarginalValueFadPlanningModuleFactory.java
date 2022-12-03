@@ -50,9 +50,6 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
     private String bannedYCoordinateBounds = "";
 
 
-    private DoubleParameter badReadingsProbability = new FixedDoubleParameter(0d);
-
-
     @Override
     public MarginalValueFadPlanningModule apply(FishState state) {
 
@@ -76,8 +73,6 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
                 optionsGenerator.setBannedGridBounds(bannedY,bannedX);
             }
         }
-        optionsGenerator.setBadReadingsProbability(badReadingsProbability.apply(state.getRandom()));
-
 
         return new MarginalValueFadPlanningModule(
                 optionsGenerator
@@ -117,11 +112,4 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
         this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
-    public DoubleParameter getBadReadingsProbability() {
-        return badReadingsProbability;
-    }
-
-    public void setBadReadingsProbability(DoubleParameter badReadingsProbability) {
-        this.badReadingsProbability = badReadingsProbability;
-    }
 }

@@ -30,8 +30,6 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
     private String bannedXCoordinateBounds = "";
     private String bannedYCoordinateBounds = "";
 
-    private DoubleParameter badReadingsProbability = new FixedDoubleParameter(0d);
-
     @Override
     public DiscretizedOwnFadCentroidPlanningModule apply(FishState state) {
 
@@ -55,7 +53,6 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
                 optionsGenerator.setBannedGridBounds(bannedY,bannedX);
             }
         }
-        optionsGenerator.setBadReadingsProbability(badReadingsProbability.apply(state.getRandom()));
         return new DiscretizedOwnFadCentroidPlanningModule(
                 optionsGenerator,
                 distancePenalty.apply(state.getRandom())
@@ -104,11 +101,4 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
         this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
-    public DoubleParameter getBadReadingsProbability() {
-        return badReadingsProbability;
-    }
-
-    public void setBadReadingsProbability(DoubleParameter badReadingsProbability) {
-        this.badReadingsProbability = badReadingsProbability;
-    }
 }

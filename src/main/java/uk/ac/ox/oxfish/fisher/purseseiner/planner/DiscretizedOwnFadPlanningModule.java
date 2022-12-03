@@ -118,14 +118,4 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     }
 
-
-    public double getBadReadingsProbability() {
-        return optionsGenerator.getBadReadingsProbability();
-    }
-
-    public void setBadReadingsProbability(double badReadingsProbability) {
-        optionsGenerator.setBadReadingsProbability(badReadingsProbability);
-    }
-
-
 }
