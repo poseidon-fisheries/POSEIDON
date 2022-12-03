@@ -23,11 +23,13 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 public abstract class AbstractFadSetAction<B extends LocalBiology, F extends AbstractFad<B, F>>
     extends AbstractSetAction<B> implements FadRelatedAction {
@@ -49,6 +51,14 @@ public abstract class AbstractFadSetAction<B extends LocalBiology, F extends Abs
 
     public F getFad() {
         return fad;
+    }
+
+    @Override
+    public ActionResult act(
+        FishState fishState, Fisher fisher, Regulation regulation, double hoursLeft
+    ) {
+        assert fisher.getLocation() == fad.getLocation();
+        return super.act(fishState, fisher, regulation, hoursLeft);
     }
 
     @Override
