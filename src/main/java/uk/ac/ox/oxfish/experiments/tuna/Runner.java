@@ -94,6 +94,13 @@ public final class Runner<S extends Scenario> {
 
     public Runner(
         final Class<S> scenarioClass,
+        final Path scenarioPath
+    ) {
+        this(scenarioClass, scenarioPath, scenarioPath.getParent());
+    }
+
+    public Runner(
+        final Class<S> scenarioClass,
         final Path scenarioPath,
         final Path outputPath
     ) {

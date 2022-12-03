@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.*;
+import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
@@ -42,10 +43,9 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -125,21 +125,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
      * Just runs the scenario for a year.
      */
     public static void main(final String[] args) {
-        final FishState fishState = new FishState();
-        final Scenario scenario = new EpoAbundanceScenario();
-        try {
-            final File scenarioFile =
-                    INPUT_PATH.resolve("abundance").resolve("scenario.yaml").toFile();
-            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        fishState.setScenario(scenario);
-        fishState.start();
-        while (fishState.getStep() < 365) {
-            System.out.println("Step: " + fishState.getStep());
-            fishState.schedule.step(fishState);
-        }
+        final Path scenarioPath = Paths.get(
+            System.getProperty("user.home"),
+            "tmp", "calibrated_scenario.yaml"
+        );
+        new Runner<>(EpoScenarioPathfinding.class, scenarioPath).run(1, 1);
     }
 
     @SuppressWarnings("unused")
