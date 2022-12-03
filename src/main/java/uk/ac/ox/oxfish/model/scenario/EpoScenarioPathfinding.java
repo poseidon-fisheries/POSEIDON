@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LocalizedActionCounter;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -39,11 +38,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -57,52 +52,52 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private final SpeciesCodesFromFileFactory speciesCodesFactory =
-            new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
-            new RecruitmentProcessesFactory(
-                    INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
-            );
+        new RecruitmentProcessesFactory(
+            INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
+        );
     private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-            new AbundanceMortalityProcessFromFileFactory(
-                    INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-                    ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
-            );
+        new AbundanceMortalityProcessFromFileFactory(
+            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
+            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+        );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
-            new ScheduledAbundanceProcessesFactory(
-                    ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
-            );
+        new ScheduledAbundanceProcessesFactory(
+            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
+        );
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
-            new AbundanceReallocatorFactory(
-                    INPUT_PATH.resolve("abundance").resolve("grids.csv"),
-                    365
-            );
+        new AbundanceReallocatorFactory(
+            INPUT_PATH.resolve("abundance").resolve("grids.csv"),
+            365
+        );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
-            new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
+        new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
     private AbundanceRestorerFactory abundanceRestorerFactory =
-            new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
+        new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
-            new FromFileMapInitializerFactory(
-                    INPUT_PATH.resolve("depth.csv"),
-                    101,
-                    0.5
-            );
+        new FromFileMapInitializerFactory(
+            INPUT_PATH.resolve("depth.csv"),
+            101,
+            0.5
+        );
     private AbundanceFiltersFactory abundanceFiltersFactory =
-            new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
+        new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
 
     private DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory =
-            new DefaultToDestinationStrategyFishingStrategyFactory();
+        new DefaultToDestinationStrategyFishingStrategyFactory();
     private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
-            new AbundancePurseSeineGearFactory();
+        new AbundancePurseSeineGearFactory();
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
-            new LastMomentAbundanceFadInitalizerFactory();
+        new LastMomentAbundanceFadInitalizerFactory();
 //            new AbundanceFadInitializerFactory(
 //                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
 //            );
 
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
-            new StandardIattcRegulationsFactory();
+        new StandardIattcRegulationsFactory();
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
         speciesCodesFactory.get().getSpeciesNames().stream().collect(
@@ -119,7 +114,13 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private boolean zapper = false;
     private boolean zapperAge = false;
 
-   // private boolean galapagosZapper = false;
+    // private boolean galapagosZapper = false;
+    private EPOPlannedStrategyFlexibleFactory destinationStrategy =
+        new EPOPlannedStrategyFlexibleFactory();
+
+    public EpoScenarioPathfinding() {
+
+    }
 
     /**
      * Just runs the scenario for a year.
@@ -169,7 +170,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setAbundancePurseSeineGearFactory(
-            final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
+        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
     ) {
         this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
     }
@@ -184,12 +185,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-
     public DefaultToDestinationStrategyFishingStrategyFactory getFishingStrategyFactory() {
         return fishingStrategyFactory;
     }
 
-    public void setFishingStrategyFactory(DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory) {
+    public void setFishingStrategyFactory(final DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory) {
         this.fishingStrategyFactory = fishingStrategyFactory;
     }
 
@@ -200,7 +200,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setAbundanceInitializerFactory(
-            final AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory
+        final AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory
     ) {
         this.abundanceInitializerFactory = abundanceInitializerFactory;
     }
@@ -212,7 +212,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setAbundanceRestorerFactory(
-            final AbundanceRestorerFactory abundanceRestorerFactory
+        final AbundanceRestorerFactory abundanceRestorerFactory
     ) {
         this.abundanceRestorerFactory = abundanceRestorerFactory;
     }
@@ -221,10 +221,10 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     public void useDummyData(final Path testPath) {
         super.useDummyData(testPath);
         setAttractionWeightsFile(
-                testPath.resolve("dummy_action_weights.csv")
+            testPath.resolve("dummy_action_weights.csv")
         );
         setLocationValuesFilePath(
-                testPath.resolve("dummy_location_values.csv")
+            testPath.resolve("dummy_location_values.csv")
         );
     }
 
@@ -235,7 +235,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setAbundanceReallocatorFactory(
-            final AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory
+        final AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory
     ) {
         this.abundanceReallocatorFactory = abundanceReallocatorFactory;
     }
@@ -247,7 +247,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setRecruitmentProcessesFactory(
-            final RecruitmentProcessesFactory recruitmentProcessesFactory
+        final RecruitmentProcessesFactory recruitmentProcessesFactory
     ) {
         this.recruitmentProcessesFactory = recruitmentProcessesFactory;
     }
@@ -259,7 +259,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setScheduledAbundanceProcessesFactory(
-            final ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory
+        final ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory
     ) {
         this.scheduledAbundanceProcessesFactory = scheduledAbundanceProcessesFactory;
     }
@@ -273,29 +273,29 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();
 
         final NauticalMap nauticalMap =
-                mapInitializerFactory
-                        .apply(fishState)
-                        .makeMap(fishState.random, null, fishState);
+            mapInitializerFactory
+                .apply(fishState)
+                .makeMap(fishState.random, null, fishState);
 
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
-                (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
+            (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
         final AbundanceReallocator reallocator =
-                this.abundanceReallocatorFactory.apply(fishState);
+            this.abundanceReallocatorFactory.apply(fishState);
 
         abundanceRestorerFactory.setAbundanceReallocator(reallocator);
 
         final AbundanceInitializerFactory abundanceInitializerFactory =
-                (AbundanceInitializerFactory) this.abundanceInitializerFactory;
+            (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
         abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
         abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
-                this.abundanceInitializerFactory.apply(fishState);
+            this.abundanceInitializerFactory.apply(fishState);
 
         final GlobalBiology globalBiology =
-                abundanceInitializer.generateGlobal(rng, fishState);
+            abundanceInitializer.generateGlobal(rng, fishState);
 
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
         nauticalMap.initializeBiology(abundanceInitializer, rng, globalBiology);
@@ -304,61 +304,54 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         recruitmentProcessesFactory.setSpeciesCodes(speciesCodes);
         recruitmentProcessesFactory.setGlobalBiology(globalBiology);
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
-                recruitmentProcessesFactory.apply(fishState);
+            recruitmentProcessesFactory.apply(fishState);
 
         abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
         scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
-                abundanceMortalityProcessFactory
+            abundanceMortalityProcessFactory
         );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
-    private EPOPlannedStrategyFlexibleFactory destinationStrategy =
-            new EPOPlannedStrategyFlexibleFactory();
-
-    public EpoScenarioPathfinding() {
-
-    }
-
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         super.setFishingStrategyFactory(fishingStrategyFactory);
-        LocalizedActionCounter calzone1 = new LocalizedActionCounter(
-                abstractFadSetAction -> {
-                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                    return coordinates.x <= -140;
-                },
-                "calzone1"
+        final LocalizedActionCounter calzone1 = new LocalizedActionCounter(
+            abstractFadSetAction -> {
+                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                return coordinates.x <= -140;
+            },
+            "calzone1"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(calzone1);
-        LocalizedActionCounter calzone2 = new LocalizedActionCounter(
-                abstractFadSetAction -> {
-                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                    return coordinates.x <= -90 & coordinates.x >= -130 & coordinates.y >0;
-                },
-                "calzone2"
+        final LocalizedActionCounter calzone2 = new LocalizedActionCounter(
+            abstractFadSetAction -> {
+                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                return coordinates.x <= -90 & coordinates.x >= -130 & coordinates.y > 0;
+            },
+            "calzone2"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(calzone2);
 
         //filter(lon_n>-140 & lon_n<=-110 & lat_n< 0)
-        LocalizedActionCounter thegap = new LocalizedActionCounter(
-                abstractFadSetAction -> {
-                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                    return coordinates.x <=-110 & coordinates.x > -140 & coordinates.y < 0;
-                },
-                "thegap"
+        final LocalizedActionCounter thegap = new LocalizedActionCounter(
+            abstractFadSetAction -> {
+                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                return coordinates.x <= -110 & coordinates.x > -140 & coordinates.y < 0;
+            },
+            "thegap"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(thegap);
         //filter(lon_n>= -90 & lat_n <= -10)
-        LocalizedActionCounter calzone3 = new LocalizedActionCounter(
-                abstractFadSetAction -> {
-                    Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                    return coordinates.x >= -90  & coordinates.y <= -10;
-                },
-                "calzone3"
+        final LocalizedActionCounter calzone3 = new LocalizedActionCounter(
+            abstractFadSetAction -> {
+                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
+                return coordinates.x >= -90 & coordinates.y <= -10;
+            },
+            "calzone3"
         );
         abundancePurseSeineGearFactory.getFadSetObservers().add(calzone3);
 
@@ -373,13 +366,13 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-                abundanceFilters = abundanceFiltersFactory.apply(fishState);
+            abundanceFilters = abundanceFiltersFactory.apply(fishState);
 
-        AbundanceCatchSamplersFactory abundanceSamplerFactory = (AbundanceCatchSamplersFactory) getCatchSamplersFactory();
+        final AbundanceCatchSamplersFactory abundanceSamplerFactory = (AbundanceCatchSamplersFactory) getCatchSamplersFactory();
         abundanceSamplerFactory.setAbundanceFilters(abundanceFilters);
 
 
-        if(fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
+        if (fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
             ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
@@ -392,37 +385,38 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         destinationStrategy.setCatchSamplersFactory(abundanceSamplerFactory);
         destinationStrategy.setAttractionWeightsFile(attractionWeightsFile);
         final FisherFactory fisherFactory = makeFisherFactory(
-                fishState,
-                regulationsFactory,
-                abundancePurseSeineGearFactory,
-                destinationStrategy,
-                fishingStrategyFactory,
-                new PurseSeinerDepartingStrategyFactory(false)
+            fishState,
+            regulationsFactory,
+            abundancePurseSeineGearFactory,
+            destinationStrategy,
+            fishingStrategyFactory,
+            new PurseSeinerDepartingStrategyFactory(false)
         );
 
         final List<Fisher> fishers =
-                new PurseSeineVesselReader(
-                        getVesselsFilePath(),
-                        TARGET_YEAR,
-                        fisherFactory,
-                        buildPorts(fishState)).
-                        apply(fishState);
+            new PurseSeineVesselReader(
+                getVesselsFilePath(),
+                TARGET_YEAR,
+                fisherFactory,
+                buildPorts(fishState)
+            ).
+                apply(fishState);
 
         ImmutableList.of(
-                scheduledAbundanceProcessesFactory,
-                abundanceRestorerFactory
+            scheduledAbundanceProcessesFactory,
+            abundanceRestorerFactory
         ).forEach(startableFactory ->
-                          fishState.registerStartable(startableFactory.apply(fishState))
+            fishState.registerStartable(startableFactory.apply(fishState))
         );
 
-        if(zapper) {
-            Predicate<AbstractFad> predicate = zapperAge?
-                    fad -> fad.getLocation().getGridX() <= 20 :
-                    fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
+        if (zapper) {
+            final Predicate<AbstractFad> predicate = zapperAge ?
+                fad -> fad.getLocation().getGridX() <= 20 :
+                fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
             fishState.registerStartable(
-                    new FadZapper(
-                            predicate
-                    )
+                new FadZapper(
+                    predicate
+                )
             );
         }
         scenarioPopulation.getPopulation().addAll(fishers);
@@ -456,7 +450,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     @SuppressWarnings("unused")
     public void setMapInitializerFactory(
-            final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
+        final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
     ) {
         this.mapInitializerFactory = mapInitializerFactory;
     }
@@ -465,7 +459,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         return destinationStrategy;
     }
 
-    public void setDestinationStrategy(EPOPlannedStrategyFlexibleFactory destinationStrategy) {
+    public void setDestinationStrategy(final EPOPlannedStrategyFlexibleFactory destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
     }
 
@@ -473,7 +467,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         return zapper;
     }
 
-    public void setZapper(boolean zapper) {
+    public void setZapper(final boolean zapper) {
         this.zapper = zapper;
     }
 
@@ -481,7 +475,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         return zapperAge;
     }
 
-    public void setZapperAge(boolean zapperAge) {
+    public void setZapperAge(final boolean zapperAge) {
         this.zapperAge = zapperAge;
     }
 
@@ -491,7 +485,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     }
 
     @SuppressWarnings("unused")
-    public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
+    public void setWeightGroupsFactory(final WeightGroupsFactory weightGroupsFactory) {
         this.weightGroupsFactory = weightGroupsFactory;
     }
 
