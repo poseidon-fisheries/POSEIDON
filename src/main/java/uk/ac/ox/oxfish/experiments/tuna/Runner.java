@@ -92,7 +92,7 @@ public final class Runner<S extends Scenario> {
         this.outputPath = outputPath;
     }
 
-    Runner(
+    public Runner(
         final Class<S> scenarioClass,
         final Path scenarioPath,
         final Path outputPath
