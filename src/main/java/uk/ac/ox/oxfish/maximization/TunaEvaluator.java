@@ -53,14 +53,12 @@ public class TunaEvaluator implements Runnable {
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna",
-        //"brp", "calibrations", "cenv0729", "2022-11-15_12.35.12_local_Catchability_centroid"
-        "calibration/results/ernesto/2022-10-29_15.43.20_local/"
-
+        "brp", "calibrations", "cenv0729"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
 
-    private int numRuns = getRuntime().availableProcessors() + 1;
+    private int numRuns = Math.min(8, getRuntime().availableProcessors());
     private int numYearsToRuns = 3;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
@@ -124,17 +122,29 @@ public class TunaEvaluator implements Runnable {
     public static void main(final String[] args) {
 
         // Finds the first argument that is a folder name and uses it as the calibration folder
-        final Path calibrationFolder = getCalibrationFolder(args);
+        //final Path calibrationFolder = getCalibrationFolder(args);
 
-        System.out.println("Using " + calibrationFolder + " as the calibration folder.");
+        ImmutableList.of(
+            "2022-11-14_11.47.11_global",
+            "2022-11-14_11.53.22_global",
+            "2022-11-14_11.53.36_global",
+            "2022-11-14_11.53.48_global",
+            "2022-11-14_11.57.38_global",
+            "2022-11-14_11.57.45_global",
+            "2022-11-14_11.57.51_global"
+        ).forEach(folderName -> {
+            final Path calibrationFolder = DEFAULT_CALIBRATION_FOLDER.resolve(folderName);
 
-        final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
-        final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
+            System.out.println("Using " + calibrationFolder + " as the calibration folder.");
 
-        final double[] solution = extractSolution(logFilePath);
-        final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
-        tunaEvaluator.setParallel(true);
-        tunaEvaluator.run();
+            final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
+            final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
+
+            final double[] solution = extractSolution(logFilePath);
+            final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
+            tunaEvaluator.setParallel(true);
+            tunaEvaluator.run();
+        });
     }
 
     @SuppressWarnings("UnstableApiUsage")
