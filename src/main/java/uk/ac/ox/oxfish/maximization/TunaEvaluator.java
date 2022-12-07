@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.maximization;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.ImmutableDoubleArray;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
@@ -26,19 +25,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.findLast;
 import static com.google.common.io.Files.getFileExtension;
+import static java.lang.Double.parseDouble;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static java.util.Comparator.comparingDouble;
 
 public class TunaEvaluator implements Runnable {
 
@@ -175,21 +175,17 @@ public class TunaEvaluator implements Runnable {
 
     @SuppressWarnings("UnstableApiUsage")
     @NotNull
-    private static double[] extractSolution(final Path logFilePath) {
-        final ImmutableDoubleArray.Builder solutionBuilder = ImmutableDoubleArray.builder();
+    static double[] extractSolution(final Path logFilePath) {
         try (final Stream<String> lines = Files.lines(logFilePath)) {
-            findLast(lines).ifPresent(lastLine -> {
-                final String solutionString = substringBetween(lastLine, "{", "}").trim();
-                try (final Scanner scanner = new Scanner(solutionString).useDelimiter(", ?")) {
-                    while (scanner.hasNextDouble()) {
-                        solutionBuilder.add(scanner.nextDouble());
-                    }
-                }
-            });
+            final Pattern p = Pattern.compile("^\\| \\d+ \\| ([\\d.]+) \\|.*\\{(.*)}.*$");
+            return lines.map(p::matcher)
+                .filter(Matcher::matches)
+                .min(comparingDouble(m -> parseDouble(m.group(1))))
+                .map(m -> Stream.of(m.group(2).split(",")).mapToDouble(Double::parseDouble).toArray())
+                .orElseThrow(() -> new IllegalStateException("Best solution not found in " + logFilePath));
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-        return solutionBuilder.build().toArray();
     }
 
     private static Path getCalibrationFolder(final String[] args) {
