@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-class YearlyResultsRowProvider implements RowProvider {
+public class YearlyResultsRowProvider implements RowProvider {
 
     private final FishState fishState;
 
@@ -41,7 +41,7 @@ class YearlyResultsRowProvider implements RowProvider {
         "output_value"
     );
 
-    YearlyResultsRowProvider(
+    public YearlyResultsRowProvider(
         final FishState fishState
     ) {
         this.fishState = fishState;

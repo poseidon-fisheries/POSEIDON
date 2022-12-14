@@ -69,7 +69,7 @@ public class NinePolicies {
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<EpoBiomassScenario>> makePolicies() {
+    private ImmutableList<Policy<? super EpoBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();

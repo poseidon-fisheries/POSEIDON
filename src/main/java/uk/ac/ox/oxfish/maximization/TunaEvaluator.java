@@ -53,7 +53,7 @@ public class TunaEvaluator implements Runnable {
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
         "workspace", "tuna",
-        "brp", "calibrations", "cenv0729"
+        "np/calibrations/pathfinding"
     );
     private final GenericOptimization optimization;
     private final Runner<Scenario> runner;
@@ -125,13 +125,15 @@ public class TunaEvaluator implements Runnable {
         //final Path calibrationFolder = getCalibrationFolder(args);
 
         ImmutableList.of(
-            "2022-11-14_11.47.11_global",
-            "2022-11-14_11.53.22_global",
-            "2022-11-14_11.53.36_global",
-            "2022-11-14_11.53.48_global",
-            "2022-11-14_11.57.38_global",
-            "2022-11-14_11.57.45_global",
-            "2022-11-14_11.57.51_global"
+            "calibration_LCWCC_MVT/cenv0729/2022-12-06_05.40.52_local",
+            "calibration_WLI_MVT/cenv0729/2022-12-06_08.03.09_local",
+            "calibration_LCWCC_WFA/cenv0729/2022-12-06_05.24.23_local",
+            "calibration_LCWCC_WMI/cenv0729/2022-12-07_01.32.39_local",
+            "calibration_WLI_WMI/cenv0729/2022-12-06_05.14.26_local",
+            "calibration_WLI_WFA/cenv0729/2022-12-06_07.29.03_local",
+            "calibration_WLI_VPS/cenv0729/2022-12-06_05.59.15_local",
+            "calibration_LCWCC_VPS/cenv0729/2022-12-06_04.48.10_local"
+
         ).forEach(folderName -> {
             final Path calibrationFolder = DEFAULT_CALIBRATION_FOLDER.resolve(folderName);
 

@@ -216,7 +216,7 @@ public final class Runner<S extends Scenario> {
         final LocalDateTime startTime = LocalDateTime.now();
         final S scenario = scenarioSupplier.get();
         policy.getScenarioConsumer().accept(scenario);
-        final FishState fishState = new FishState();
+        final FishState fishState = new FishState(System.currentTimeMillis() + runNumber);
         fishState.setScenario(scenario);
         return new State(scenario, policy, fishState, runNumber, numRuns, numYearsToRun, startTime);
     }
@@ -310,7 +310,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    public Runner<S> setPolicies(final Iterable<Policy<S>> policies) {
+    public Runner<S> setPolicies(final Iterable<Policy<? super S>> policies) {
         this.policies = ImmutableList.copyOf(policies);
         return this;
     }

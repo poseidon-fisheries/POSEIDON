@@ -89,7 +89,7 @@ public final class WebVizExporter {
     private final AlgorithmFactory<? extends ActionSpecificRegulation> smallerFadLimits =
         new ActiveFadLimitsFactory(0, 0, 75, 115);
 
-    private final ImmutableList<Policy<EpoBiomassScenario>> policies = ImmutableList.of(
+    private final ImmutableList<Policy<? super EpoBiomassScenario>> policies = ImmutableList.of(
         makePolicy(
             "Tuna - Business as usual",
             "Current IATTC regulations: limits on active FAD (300 FADs for class 6A vessels and 450 for class 6B), El Corralito and seasonal closures.",

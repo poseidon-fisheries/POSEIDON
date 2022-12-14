@@ -72,7 +72,7 @@ public class SetLimitsVsActiveFadsSweep {
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<EpoBiomassScenario>> makePolicies() {
+    private ImmutableList<Policy<? super EpoBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();
@@ -108,7 +108,7 @@ public class SetLimitsVsActiveFadsSweep {
                     )
             ));
 
-        final ImmutableList.Builder<Policy<EpoBiomassScenario>> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Policy<? super EpoBiomassScenario>> builder = ImmutableList.builder();
 
         setLimitsFactories.forEach((i, setLimitsFactory) ->
             closureFactories.forEach((j, closureFactory) ->

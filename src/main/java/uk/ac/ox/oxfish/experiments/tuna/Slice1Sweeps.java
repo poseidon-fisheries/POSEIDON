@@ -80,7 +80,7 @@ public class Slice1Sweeps {
                 opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
             ));
 
-        ImmutableList.Builder<Policy<EpoBiomassScenario>> policies = ImmutableList.builder();
+        ImmutableList.Builder<Policy<? super EpoBiomassScenario>> policies = ImmutableList.builder();
         fadLimits.forEach((activeFadLimits, fadLimitsName) ->
             setLimits.forEach((generalSetLimits, setLimitsName) ->
                 policies.add(makePolicy(
