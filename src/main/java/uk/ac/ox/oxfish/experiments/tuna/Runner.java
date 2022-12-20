@@ -242,6 +242,8 @@ public final class Runner<S extends Scenario> {
         final boolean isFinalStep
     ) {
         rowProviders.asMap().forEach((outputPath, providers) -> {
+            //noinspection ResultOfMethodCallIgnored
+            outputPath.getParent().toFile().mkdirs();
             final Collection<RowProvider> activeProviders = isFinalStep
                 ? providers
                 : providers.stream()

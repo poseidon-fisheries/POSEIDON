@@ -45,6 +45,15 @@ public class Policy<S extends Scenario> {
         this.scenarioConsumer = scenarioConsumer;
     }
 
+    public Policy(
+        final String name,
+        final Consumer<S> scenarioConsumer
+    ) {
+        this.name = name;
+        this.description = name;
+        this.scenarioConsumer = scenarioConsumer;
+    }
+
     public String getName() { return name; }
 
     public String getDescription() { return description; }
