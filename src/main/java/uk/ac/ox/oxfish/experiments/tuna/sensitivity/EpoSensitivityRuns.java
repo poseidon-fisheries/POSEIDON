@@ -46,8 +46,8 @@ public class EpoSensitivityRuns {
         ImmutableMap.of(
 //            "bet_avoidance", noBetAvoidancePolicies(),
 //            "temperature", noTemperatureLayerPolicies(),
-//            "fad_limits", fadLimitPolicies(),
-            "spatial_closures", spatialClosurePolicies()
+            "fad_limits", fadLimitPolicies()//,
+            //"spatial_closures", spatialClosurePolicies()
         )
             .entrySet()
             .stream()
@@ -60,7 +60,7 @@ public class EpoSensitivityRuns {
                     .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                     .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
                     .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
-                    .run(3, 64);
+                    .run(3, 16);
             });
     }
 
@@ -104,7 +104,7 @@ public class EpoSensitivityRuns {
 
     private static List<Policy<? super EpoScenarioPathfinding>> fadLimitPolicies() {
         return makePolicyList(
-            Stream.of(0.75, 0.50, 0.25)
+            Stream.of(0.50, 0.25, 0.01)
                 .map(pctOfRegularLimit -> {
                     final String name = String.format(
                         "%d%% of regular active FAD limits",

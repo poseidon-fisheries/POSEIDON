@@ -48,7 +48,7 @@ public class TunaEvaluator implements Runnable {
     //  count(ves_no, action_type) |>
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
-    private static final Set<String> boatsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
+    private static final Set<String> boatsToTrack = ImmutableSet.of("1779", "453", "1552");
 
     private static final Path DEFAULT_CALIBRATION_FOLDER = Paths.get(
         System.getProperty("user.home"),
@@ -125,13 +125,13 @@ public class TunaEvaluator implements Runnable {
         //final Path calibrationFolder = getCalibrationFolder(args);
 
         ImmutableList.of(
-            "calibration_LCWCC_MVT/cenv0729/2022-12-06_05.40.52_local",
-            "calibration_WLI_MVT/cenv0729/2022-12-06_08.03.09_local",
-            "calibration_LCWCC_WFA/cenv0729/2022-12-06_05.24.23_local",
-            "calibration_LCWCC_WMI/cenv0729/2022-12-07_01.32.39_local",
-            "calibration_WLI_WMI/cenv0729/2022-12-06_05.14.26_local",
-            "calibration_WLI_WFA/cenv0729/2022-12-06_07.29.03_local",
-            "calibration_WLI_VPS/cenv0729/2022-12-06_05.59.15_local",
+//            "calibration_LCWCC_MVT/cenv0729/2022-12-06_05.40.52_local",
+//            "calibration_WLI_MVT/cenv0729/2022-12-06_08.03.09_local",
+//            "calibration_LCWCC_WFA/cenv0729/2022-12-06_05.24.23_local",
+//            "calibration_LCWCC_WMI/cenv0729/2022-12-07_01.32.39_local",
+//            "calibration_WLI_WMI/cenv0729/2022-12-06_05.14.26_local",
+//            "calibration_WLI_WFA/cenv0729/2022-12-06_07.29.03_local",
+//            "calibration_WLI_VPS/cenv0729/2022-12-06_05.59.15_local",
             "calibration_LCWCC_VPS/cenv0729/2022-12-06_04.48.10_local"
 
         ).forEach(folderName -> {
