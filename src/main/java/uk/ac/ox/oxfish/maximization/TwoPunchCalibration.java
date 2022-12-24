@@ -26,7 +26,7 @@ public class TwoPunchCalibration {
         firstStep.setPopulationSize(200);
         firstStep.setMaxProcessorsToUse(nProcs);
         firstStep.setNumberOfRunsPerSettingOverride(1);
-        firstStep.setMaxFitnessCalls(5000);
+        firstStep.setMaxFitnessCalls(10000);
         firstStep.setParameterRange(15);
         firstStep.setRunNickName("global");
         firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
@@ -48,7 +48,7 @@ public class TwoPunchCalibration {
         secondStep.setPopulationSize(50);
         secondStep.setMaxProcessorsToUse(nProcs);
         secondStep.setNumberOfRunsPerSettingOverride(2);
-        secondStep.setMaxFitnessCalls(10000);
+        secondStep.setMaxFitnessCalls(15000);
         secondStep.setParameterRange(17);
         secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
         secondStep.setRunNickName("local");
