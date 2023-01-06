@@ -45,6 +45,7 @@ public class FadManagerTest extends TestCase {
                 final BiomassFad fad = mock(BiomassFad.class);
                 when(fad.getOwner()).thenReturn(fadManager);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[] {0}));
+                when(fad.getLocation()).thenReturn(initialLocation);
                 return fad;
             };
 
