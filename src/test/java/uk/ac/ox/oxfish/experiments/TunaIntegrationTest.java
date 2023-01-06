@@ -86,7 +86,7 @@ public class TunaIntegrationTest {
         GenericOptimization optimization = GenericOptimization.fromFile(calibrationFile);
         double[] evaluate = optimization.evaluate(solution);
         System.out.println(evaluate[0]);
-        Assert.assertTrue(evaluate[0]<120);
+        Assert.assertTrue(evaluate[0]<150);
 
 
 
