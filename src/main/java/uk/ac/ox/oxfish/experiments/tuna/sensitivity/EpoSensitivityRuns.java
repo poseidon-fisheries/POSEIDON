@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.Month.AUGUST;
@@ -46,7 +46,13 @@ public class EpoSensitivityRuns {
         ImmutableMap.of(
 //            "bet_avoidance", noBetAvoidancePolicies(),
 //            "temperature", noTemperatureLayerPolicies(),
-            "fad_limits", fadLimitPolicies()//,
+            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
+            "fad_limits_fine", fadLimitPolicies(
+                IntStream.concat(
+                    IntStream.rangeClosed(1, 20),
+                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
+                )
+            )
             //"spatial_closures", spatialClosurePolicies()
         )
             .entrySet()
@@ -54,13 +60,17 @@ public class EpoSensitivityRuns {
             .parallel()
             .forEach(entry -> {
                 final Path outputFolder = baseOutputFolder.resolve(entry.getKey());
-                new Runner<>(EpoScenarioPathfinding.class, baseScenario, outputFolder)
-                    .setPolicies(entry.getValue())
-                    .setParallel(true)
-                    .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
-                    .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
-                    .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
-                    .run(3, 16);
+                final Runner<EpoScenarioPathfinding> runner =
+                    new Runner<>(EpoScenarioPathfinding.class, baseScenario, outputFolder)
+                        .setPolicies(entry.getValue())
+                        .setParallel(true)
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
+                if (!entry.getKey().equals("fad_limits_fine")) {
+                    runner
+                        .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
+                        .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+                }
+                runner.run(3, 4);
             });
     }
 
@@ -102,22 +112,21 @@ public class EpoSensitivityRuns {
         );
     }
 
-    private static List<Policy<? super EpoScenarioPathfinding>> fadLimitPolicies() {
-        return makePolicyList(
-            Stream.of(0.50, 0.25, 0.01)
-                .map(pctOfRegularLimit -> {
-                    final String name = String.format(
-                        "%d%% of regular active FAD limits",
-                        (int) (pctOfRegularLimit * 100)
-                    );
-                    return new Policy<EpoScenarioPathfinding>(
-                        name,
-                        name,
-                        scenario -> setActiveFadLimits(scenario, pctOfRegularLimit)
-                    );
-                })
-                .collect(toImmutableList())
-        );
+    private static List<Policy<? super EpoScenarioPathfinding>> fadLimitPolicies(final IntStream limits) {
+        return limits
+            .mapToDouble(i -> i / 100.0)
+            .mapToObj(pctOfRegularLimit -> {
+                final String name = String.format(
+                    "%d%% of regular active FAD limits",
+                    (int) (pctOfRegularLimit * 100)
+                );
+                return new Policy<EpoScenarioPathfinding>(
+                    name,
+                    name,
+                    scenario -> setActiveFadLimits(scenario, pctOfRegularLimit)
+                );
+            })
+            .collect(toImmutableList());
     }
 
     private static List<Policy<? super EpoScenarioPathfinding>> spatialClosurePolicies() {
