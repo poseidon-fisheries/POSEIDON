@@ -39,21 +39,24 @@ public class EpoSensitivityRuns {
     public static void main(final String[] args) {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
         final Path baseScenario = baseFolder.resolve(Paths.get(
-            "calibrations", "pathfinding", "calibration_LCWCC_VPS",
-            "cenv0729", "2022-12-06_04.48.10_local", "calibrated_scenario.yaml"
+            "calibrations",
+            //"pathfinding", "calibration_LCWCC_VPS", "cenv0729", "2022-12-06_04.48.10_local"
+            "vps_holiday_runs", "without_betavoid_with_temp", "cenv0729", "2022-12-25_20.45.38_local",
+            "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("sensitivity"));
         ImmutableMap.of(
-//            "bet_avoidance", noBetAvoidancePolicies(),
 //            "temperature", noTemperatureLayerPolicies(),
-            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
-            "fad_limits_fine", fadLimitPolicies(
-                IntStream.concat(
-                    IntStream.rangeClosed(1, 20),
-                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
-                )
-            )
-            //"spatial_closures", spatialClosurePolicies()
+//            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
+//            "fad_limits_fine", fadLimitPolicies(
+//                IntStream.concat(
+//                    IntStream.rangeClosed(1, 20),
+//                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
+//                )
+//            ),
+//            "spatial_closures", spatialClosurePolicies()
+            "skj_minus_bet", betAvoidancePolicies()//,
+            //"southern_spatial_closure", southernSpatialClosurePolicies()
         )
             .entrySet()
             .stream()
@@ -70,17 +73,17 @@ public class EpoSensitivityRuns {
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 }
-                runner.run(3, 4);
+                runner.run(3, 16);
             });
     }
 
     @NotNull
-    private static List<Policy<? super EpoScenarioPathfinding>> noBetAvoidancePolicies() {
+    private static List<Policy<? super EpoScenarioPathfinding>> betAvoidancePolicies() {
         return makePolicyList(
             new Policy<>(
-                "No BET avoidance",
-                "BET avoidance layer turned off",
-                scenario -> setLayerThreshold(scenario, "SKJMINUSBET", 0)
+                "With SKJ-BET layer",
+                "SKJ-BET layer turned on",
+                scenario -> setLayerThreshold(scenario, "SKJMINUSBET", 0.2258513514917878)
             )
         );
     }
@@ -127,6 +130,21 @@ public class EpoSensitivityRuns {
                 );
             })
             .collect(toImmutableList());
+    }
+
+    private static List<Policy<? super EpoScenarioPathfinding>> southernSpatialClosurePolicies() {
+        final SpecificProtectedAreaFromCoordinatesFactory spatialClosureFactory =
+            new SpecificProtectedAreaFromCoordinatesFactory(
+                -2, -135, -10, -85
+            );
+        return makePolicyList(
+            ImmutableList.of(
+                new Policy<>(
+                    "Southern spatial closure",
+                    scenario -> addRegulation(scenario, spatialClosureFactory)
+                )
+            )
+        );
     }
 
     private static List<Policy<? super EpoScenarioPathfinding>> spatialClosurePolicies() {
