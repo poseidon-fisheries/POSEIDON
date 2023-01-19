@@ -37,6 +37,8 @@ import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
 public class EpoSensitivityRuns {
 
+    private static final int YEARS_BEFORE_POLICIES_KICK_IN = 1;
+
     public static void main(final String[] args) {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
         final Path baseScenario = baseFolder.resolve(Paths.get(
@@ -128,7 +130,7 @@ public class EpoSensitivityRuns {
                     name,
                     ImmutableList.of(makeFadLimitsFactory(pctOfRegularLimit)),
                     null,
-                    2
+                    YEARS_BEFORE_POLICIES_KICK_IN
                 );
             })
             .collect(toImmutableList());
@@ -172,13 +174,13 @@ public class EpoSensitivityRuns {
                     "Annual western spatial closure",
                     null,
                     scenario -> spatialClosureFactory,
-                    2
+                    YEARS_BEFORE_POLICIES_KICK_IN
                 ),
                 makeDelayedRegulationsPolicy(
                     "Third quarter western spatial closure",
                     null,
                     scenario -> q3SpatialClosureFactory,
-                    2
+                    YEARS_BEFORE_POLICIES_KICK_IN
                 )
             )
         );
