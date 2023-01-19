@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.time.Month.AUGUST;
 import static java.time.Month.JUNE;
+import static uk.ac.ox.oxfish.experiments.tuna.Policy.makeDelayedRegulationsPolicy;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
 
@@ -47,15 +48,15 @@ public class EpoSensitivityRuns {
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("sensitivity"));
         ImmutableMap.of(
 //            "temperature", noTemperatureLayerPolicies(),
-//            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
+            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
 //            "fad_limits_fine", fadLimitPolicies(
 //                IntStream.concat(
 //                    IntStream.rangeClosed(1, 20),
 //                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
 //                )
 //            ),
-//            "spatial_closures", spatialClosurePolicies()
-            "skj_minus_bet", betAvoidancePolicies()//,
+            "spatial_closures", spatialClosurePolicies()
+//            "skj_minus_bet", betAvoidancePolicies(),
             //"southern_spatial_closure", southernSpatialClosurePolicies()
         )
             .entrySet()
@@ -123,13 +124,21 @@ public class EpoSensitivityRuns {
                     "%d%% of regular active FAD limits",
                     (int) (pctOfRegularLimit * 100)
                 );
-                return new Policy<EpoScenarioPathfinding>(
+                return makeDelayedRegulationsPolicy(
                     name,
-                    name,
-                    scenario -> setActiveFadLimits(scenario, pctOfRegularLimit)
+                    ImmutableList.of(makeFadLimitsFactory(pctOfRegularLimit)),
+                    null,
+                    2
                 );
             })
             .collect(toImmutableList());
+    }
+
+    private static ActiveFadLimitsFactory makeFadLimitsFactory(final double pctOfRegularLimit) {
+        final ActiveFadLimitsFactory fadLimitsFactory = new ActiveFadLimitsFactory();
+        fadLimitsFactory.setLimitClass6a((int) (fadLimitsFactory.getLimitClass6a() * pctOfRegularLimit));
+        fadLimitsFactory.setLimitClass6b((int) (fadLimitsFactory.getLimitClass6b() * pctOfRegularLimit));
+        return fadLimitsFactory;
     }
 
     private static List<Policy<? super EpoScenarioPathfinding>> southernSpatialClosurePolicies() {
@@ -159,13 +168,17 @@ public class EpoSensitivityRuns {
             );
         return makePolicyList(
             ImmutableList.of(
-                new Policy<>(
+                makeDelayedRegulationsPolicy(
                     "Annual western spatial closure",
-                    scenario -> addRegulation(scenario, spatialClosureFactory)
+                    null,
+                    scenario -> spatialClosureFactory,
+                    2
                 ),
-                new Policy<>(
+                makeDelayedRegulationsPolicy(
                     "Third quarter western spatial closure",
-                    scenario -> addRegulation(scenario, q3SpatialClosureFactory)
+                    null,
+                    scenario -> q3SpatialClosureFactory,
+                    2
                 )
             )
         );
@@ -185,21 +198,6 @@ public class EpoSensitivityRuns {
                 )
             )
         );
-    }
-
-    private static void setActiveFadLimits(
-        final EpoScenarioPathfinding scenario,
-        final double pctOfRegularLimit
-    ) {
-        scenario.getAbundancePurseSeineGearFactory()
-            .getActionSpecificRegulations()
-            .stream()
-            .filter(factory -> factory instanceof ActiveFadLimitsFactory)
-            .forEach(algorithmFactory -> {
-                final ActiveFadLimitsFactory fadLimits = (ActiveFadLimitsFactory) algorithmFactory;
-                fadLimits.setLimitClass6a((int) (fadLimits.getLimitClass6a() * pctOfRegularLimit));
-                fadLimits.setLimitClass6b((int) (fadLimits.getLimitClass6b() * pctOfRegularLimit));
-            });
     }
 
     private static void setLayerThreshold(

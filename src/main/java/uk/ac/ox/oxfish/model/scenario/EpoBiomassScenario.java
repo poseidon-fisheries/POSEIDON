@@ -63,7 +63,6 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
  */
 public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
-    private final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private final BiomassReallocatorFactory biomassReallocatorFactory =
         new BiomassReallocatorFactory(
             INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
@@ -208,10 +207,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(model);
         scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);
 
-        plugins.add(scheduledBiomassProcessesFactory);
+        getAdditionalStartables().add(scheduledBiomassProcessesFactory);
 
         biomassRestorerFactory.setBiomassReallocator(biomassReallocator);
-        plugins.add(biomassRestorerFactory);
+        getAdditionalStartables().add(biomassRestorerFactory);
 
         biomassInitializerFactory.setBiomassReallocator(biomassReallocator);
 
@@ -230,15 +229,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
-    }
-
-    @SuppressWarnings("unused")
-    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() {
-        return Collections.unmodifiableList(plugins);
-    }
-
-    public void addPlugin(final AlgorithmFactory<? extends AdditionalStartable> plugin) {
-        plugins.add(plugin);
     }
 
     @SuppressWarnings("unused")

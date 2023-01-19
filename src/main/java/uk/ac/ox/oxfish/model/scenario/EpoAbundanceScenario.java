@@ -333,6 +333,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             fishState.registerStartable(startableFactory.apply(fishState))
         );
 
+        plugins.forEach(plugin -> fishState.registerStartable(plugin.apply(fishState)));
+
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
     }

@@ -58,10 +58,10 @@ public abstract class PurseSeinerAction implements Action, Locatable {
         return Optional.ofNullable(time);
     }
 
-    public void setTime(double hoursLeftInTheDay) {
-        final int SECONDS_PER_DAY = 60 * 60 * 24;
-        final double seconds = ((24 - hoursLeftInTheDay) / 24) * SECONDS_PER_DAY;
-        this.setTime(LocalTime.ofSecondOfDay((long) seconds));
+    public void setTime(final double hoursLeftInTheDay) {
+        final int LAST_SECOND_OF_DAY = (60 * 60 * 24) - 1;
+        final double second = ((24 - hoursLeftInTheDay) / 24) * LAST_SECOND_OF_DAY;
+        this.setTime(LocalTime.ofSecondOfDay((long) second));
     }
 
     public void setTime(LocalTime time) {

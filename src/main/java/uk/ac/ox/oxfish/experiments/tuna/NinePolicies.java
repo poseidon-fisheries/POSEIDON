@@ -21,10 +21,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
@@ -40,8 +36,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.time.Month.*;
@@ -163,29 +157,16 @@ public class NinePolicies {
     }
 
     private Policy<EpoBiomassScenario> makePolicy(
-        String policyName,
-        Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        final String policyName,
+        final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
+        final Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<EpoBiomassScenario> scenarioConsumer = scenario -> {
-            final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
-                Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
-            Steppable setRegulations = simState -> {
-                final FishState fishState = (FishState) simState;
-                System.out.println("Setting regulations to " + policyName + " for all fishers at day " + simState.schedule
-                    .getSteps());
-                fishState.getFishers().forEach(fisher -> {
-                    generalRegulationFactory.map(factory -> factory.apply(fishState)).ifPresent(fisher::setRegulation);
-                    ((PurseSeineGear) fisher.getGear()).getFadManager().setActionSpecificRegulations(
-                        actionSpecificRegulationFactories.stream().map(factory -> factory.apply(fishState))
-                    );
-                });
-            };
-            scenario.addPlugin(__ -> fishState ->
-                fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, POLICY_KICK_IN_YEAR)
-            );
-        };
-        return new Policy<>(policyName, policyName, scenarioConsumer);
+        return Policy.makeDelayedRegulationsPolicy(
+            policyName,
+            actionSpecificRegulationFactories,
+            makeGeneralRegulationFactory,
+            POLICY_KICK_IN_YEAR
+        );
     }
 
 }

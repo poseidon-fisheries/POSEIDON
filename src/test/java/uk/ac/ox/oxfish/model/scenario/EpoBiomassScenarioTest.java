@@ -50,7 +50,7 @@ public class EpoBiomassScenarioTest {
         scenario.setMarketMapFactory(new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR));
 
         final Regulation regulation = new FishingSeason(true, 100);
-        scenario.addPlugin(state -> model -> {
+        scenario.getAdditionalStartables().add(state -> model -> {
                 model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
                 state.scheduleEveryYear(simState -> {
                     final FishStateYearlyTimeSeries yearlyDataSet =

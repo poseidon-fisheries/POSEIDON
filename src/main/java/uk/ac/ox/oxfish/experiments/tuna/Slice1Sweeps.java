@@ -128,7 +128,7 @@ public class Slice1Sweeps {
             );
         };
         return new Policy<>(policyName, "", scenario ->
-            scenario.addPlugin(fishState ->
+            scenario.getAdditionalStartables().add(fishState ->
                 __ -> fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, 1)
             )
         );

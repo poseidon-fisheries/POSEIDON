@@ -142,7 +142,7 @@ public class SetLimitsVsActiveFadsSweep {
                     );
                 });
             };
-            scenario.addPlugin(__ -> fishState ->
+            scenario.getAdditionalStartables().add(__ -> fishState ->
                 fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, POLICY_KICK_IN_YEAR)
             );
         };
