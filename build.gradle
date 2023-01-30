@@ -155,7 +155,7 @@ task fatJar(type: ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_executable.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -175,7 +175,7 @@ task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJ
     mergeServiceFiles()
     archiveFileName = 'maximizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -188,7 +188,7 @@ task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.
     mergeServiceFiles()
     archiveFileName = 'console_optimizer.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -198,12 +198,11 @@ task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.
 }
 
 
-
 task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'indirectInference.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -219,7 +218,7 @@ task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
     mergeServiceFiles()
     archiveFileName = 'yamler.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -241,7 +240,7 @@ task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJa
     mergeServiceFiles()
     archiveFileName = 'oxfish_batch.jar'
     from sourceSets.main.output //tells the task to include the project code
-        project.configurations.implementation.canBeResolved = true
+    project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
 
     //tells the task to shadow in the jars files in the 'runtime' scope
@@ -252,7 +251,7 @@ task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJa
 
 task fatJarMeraSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
-        archiveFileName = 'oxfish_meraslice1.jar'
+    archiveFileName = 'oxfish_meraslice1.jar'
     from sourceSets.main.output //tells the task to include the project code
     project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
@@ -274,7 +273,7 @@ task fatJarSalehBay(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shado
     }
 }
 
-task  q(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+task q(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveFileName = 'oxfish_nodata718slice7.jar'
     from sourceSets.main.output //tells the task to include the project code
@@ -322,7 +321,6 @@ task fatJarTunaTwoPunchCalibrator(type: com.github.jengelman.gradle.plugins.shad
         attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.TwoPunchCalibration'
     }
 }
-
 
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
