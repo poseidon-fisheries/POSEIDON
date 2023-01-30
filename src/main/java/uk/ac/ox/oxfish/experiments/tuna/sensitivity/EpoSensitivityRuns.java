@@ -50,14 +50,14 @@ public class EpoSensitivityRuns {
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("sensitivity"));
         ImmutableMap.of(
 //            "temperature", noTemperatureLayerPolicies(),
-            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
-//            "fad_limits_fine", fadLimitPolicies(
-//                IntStream.concat(
-//                    IntStream.rangeClosed(1, 20),
-//                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
-//                )
-//            ),
-            "spatial_closures", spatialClosurePolicies()
+//            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
+            "fad_limits_fine", fadLimitPolicies(
+                IntStream.concat(
+                    IntStream.rangeClosed(1, 20),
+                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
+                )
+            )//,
+//            "spatial_closures", spatialClosurePolicies()
 //            "skj_minus_bet", betAvoidancePolicies(),
             //"southern_spatial_closure", southernSpatialClosurePolicies()
         )

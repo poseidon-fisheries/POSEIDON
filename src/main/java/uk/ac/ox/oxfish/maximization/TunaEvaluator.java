@@ -125,17 +125,7 @@ public class TunaEvaluator implements Runnable {
         //final Path calibrationFolder = getCalibrationFolder(args);
 
         ImmutableList.of(
-//            "calibration_LCWCC_MVT/cenv0729/2022-12-06_05.40.52_local",
-//            "calibration_WLI_MVT/cenv0729/2022-12-06_08.03.09_local",
-//            "calibration_LCWCC_WFA/cenv0729/2022-12-06_05.24.23_local",
-//            "calibration_LCWCC_WMI/cenv0729/2022-12-07_01.32.39_local",
-//            "calibration_WLI_WMI/cenv0729/2022-12-06_05.14.26_local",
-//            "calibration_WLI_WFA/cenv0729/2022-12-06_07.29.03_local",
-//            "calibration_WLI_VPS/cenv0729/2022-12-06_05.59.15_local",
-            //"pathfinding/calibration_LCWCC_VPS/cenv0729/2022-12-06_04.48.10_local"
-            "vps_holiday_runs/without_betavoid_with_temp/cenv0729/2022-12-25_20.45.38_local",
-            "vps_holiday_runs/with_betavoid_with_temp/cenv0729/2022-12-25_11.58.57_local",
-            "vps_holiday_runs/without_betavoid_without_temp/cenv0729/2022-12-25_08.36.45_local"
+            "pre_jan23_meeting/nicolas/2023-01-20_11.42.32_global"
         ).forEach(folderName -> {
             final Path calibrationFolder = DEFAULT_CALIBRATION_FOLDER.resolve(folderName);
 
