@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id 'java'
+    id 'java-library'
     id 'idea'
     id 'application'
     id 'jacoco'
@@ -41,17 +41,14 @@ sourceSets {
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
 dependencies {
     //mason libraries. They aren't on maven so we have to lug their jars around
-    implementation fileTree(dir: 'libs/mason', include: '*.jar')
-    implementation fileTree(dir: 'libs/geomason', include: '*.jar')
+    api fileTree(dir: 'libs/mason', include: '*.jar')
+    api fileTree(dir: 'libs/geomason', include: '*.jar')
     //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
     implementation fileTree(dir: 'libs/osmose', include: '*.jar')
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
 
-    //metawidget + apache binders. Useful for the gui
-    implementation "org.metawidget.modules:metawidget-all:4.1"
-    implementation "commons-beanutils:commons-beanutils:1.8.3"
 
     //csv helper
     implementation "com.opencsv:opencsv:3.8"

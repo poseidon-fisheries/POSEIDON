@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.metawidget.util.ArrayUtils;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
@@ -17,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
+
+import static org.apache.commons.lang3.ArrayUtils.indexOf;
 
 public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousFadSetterFromData> {
 
@@ -68,14 +69,14 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         String[] header = Arrays.stream(linesInCSV.next()).
                 map(s -> s.toLowerCase(Locale.ROOT).trim()).
                 toArray(String[]::new);
-        final int dayColumn = ArrayUtils.indexOf(header,"day");
-        final int xColumn = ArrayUtils.indexOf(header,"x");
-        final int yColumn = ArrayUtils.indexOf(header,"y");
+        final int dayColumn = indexOf(header,"day");
+        final int xColumn = indexOf(header,"x");
+        final int yColumn = indexOf(header,"y");
         //find each species column
         final int[] speciesColumn = new int[state.getSpecies().size()];
         for (Species species : state.getSpecies()) {
 
-            speciesColumn[species.getIndex()] = ArrayUtils.indexOf(header,
+            speciesColumn[species.getIndex()] = indexOf(header,
                     species.getName().toLowerCase(Locale.ROOT).trim());
             Preconditions.checkState(speciesColumn[species.getIndex()]>=0,
                     "Missing column for "+species);

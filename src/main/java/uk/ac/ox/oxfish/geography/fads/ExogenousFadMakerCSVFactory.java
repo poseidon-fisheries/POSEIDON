@@ -10,11 +10,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
-import org.metawidget.util.ArrayUtils;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import static org.apache.commons.lang3.ArrayUtils.indexOf;
 
 /**
  * reads csv file, with column "day" for what day each fad gets dropped
@@ -58,9 +59,9 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
         String[] header = Arrays.stream(linesInCSV.next()).
                 map(s -> s.toLowerCase(Locale.ROOT).trim()).
                 toArray(String[]::new);
-        final int dayColumn = ArrayUtils.indexOf(header,"day");
-        final int xColumn = ArrayUtils.indexOf(header,"x");
-        final int yColumn = ArrayUtils.indexOf(header,"y");
+        final int dayColumn = indexOf(header,"day");
+        final int xColumn = indexOf(header,"x");
+        final int yColumn = indexOf(header,"y");
 
         final HashMap<Integer, Collection<Double2D>> dayToCoordinatesMap = new HashMap<>();
         while(linesInCSV.hasNext()){

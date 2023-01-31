@@ -19,15 +19,12 @@ import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.*;
-import uk.ac.ox.oxfish.gui.drawing.BoatPortrayalFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.event.MixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.SimpleExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -36,13 +33,13 @@ import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.BoatColors;
 import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.SimplePortAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -186,7 +183,7 @@ public class FlexibleScenario implements Scenario {
                 model,
                 new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom))
         );
-        Iterator<String> colorIterator = BoatPortrayalFactory.BOAT_COLORS.keySet().iterator();
+        Iterator<String> colorIterator = BoatColors.BOAT_COLORS.keySet().iterator();
         for(Port port : ports) {
             portColorTags.put(port,
                     colorIterator.next());
@@ -268,7 +265,7 @@ public class FlexibleScenario implements Scenario {
 
 
                             //do not over-write given color tags!
-                            if(!BoatPortrayalFactory.hasColorTag(fisher))
+                            if(!BoatColors.hasColorTag(fisher))
                                 fisher.getTags().add(
                                         portColorTags.get(fisher.getHomePort())
                                 );

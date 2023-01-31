@@ -20,14 +20,9 @@
 
 package uk.ac.ox.oxfish.model.regs.mpa;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
 
 /**
  * A simple MPA rectangle to be constructed
@@ -53,16 +48,20 @@ public class StartingMPA {
         this.height = height;
     }
 
-    public MasonGeometry buildMPA(NauticalMap map){
+    public static void quicklyAddMPAToSeaTile(SeaTile tile) {
+        tile.assignMpa(NauticalMap.MPA_SINGLETON);
+    }
+
+    public MasonGeometry buildMPA(NauticalMap map) {
 
 
         MasonGeometry geometry = NauticalMap.MPA_SINGLETON;
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
-            if(seaTile.getGridX()>= topLeftX &&
-                    seaTile.getGridX()<=topLeftX+width &&
-                    seaTile.getGridY()>=topLeftY &&
-                    seaTile.getGridY()<=topLeftY+height)
+            if (seaTile.getGridX() >= topLeftX &&
+                seaTile.getGridX() <= topLeftX + width &&
+                seaTile.getGridY() >= topLeftY &&
+                seaTile.getGridY() <= topLeftY + height)
                 seaTile.assignMpa(geometry);
         }
 
@@ -99,9 +98,5 @@ public class StartingMPA {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public static void quicklyAddMPAToSeaTile(SeaTile tile){
-        tile.assignMpa(NauticalMap.MPA_SINGLETON);
     }
 }

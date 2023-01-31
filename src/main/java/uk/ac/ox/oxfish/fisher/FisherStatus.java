@@ -24,8 +24,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.metawidget.inspector.annotation.UiHidden;
-
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
@@ -100,7 +98,6 @@ public class FisherStatus implements Serializable {
     /**
      * randomizer
      */
-    @UiHidden
     private final MersenneTwisterFast random;
 
     public MersenneTwisterFast getRandom() {

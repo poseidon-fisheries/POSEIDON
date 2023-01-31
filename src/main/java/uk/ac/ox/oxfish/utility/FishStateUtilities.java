@@ -1409,6 +1409,5 @@ public class FishStateUtilities {
         );
     }
 
-
 }
 
