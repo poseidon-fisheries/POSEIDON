@@ -9,6 +9,12 @@ plugins {
     id "com.github.spotbugs" version "4.7.2"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
 application {
     mainClass = 'uk.ac.ox.oxfish.Main'
     applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx2048m"]
