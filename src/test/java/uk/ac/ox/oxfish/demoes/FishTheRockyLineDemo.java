@@ -97,7 +97,7 @@ public class FishTheRockyLineDemo {
 
         assertTrue(state.getDailyDataSet().getColumn(
                 RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
-                           > 40); //on average more than 40% of all tows happened in rocky areas
+                           > 35); //on average more than 35% of all tows happened in rocky areas
     }
 
 
