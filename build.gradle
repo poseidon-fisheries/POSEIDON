@@ -107,7 +107,7 @@ dependencies {
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    implementation "com.google.guava:guava:30.1.1-jre"
+    implementation "com.google.guava:guava:31.1-jre"
 
     // Reference implementation of JSR-385 for units of measure
     implementation 'si.uom:si-quantity:2.1'
