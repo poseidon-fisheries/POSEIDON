@@ -170,7 +170,7 @@ public final class Runner<S extends Scenario> {
     }
 
     @SuppressWarnings("SameParameterValue")
-    void run(final int numYearsToRun) {
+    public void run(final int numYearsToRun) {
         run(numYearsToRun, 1);
     }
 
@@ -295,7 +295,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    Runner<S> requestYearlyData() {
+    public Runner<S> requestYearlyData() {
         return registerRowProvider(YEARLY_DATA_FILENAME, fishState ->
             new TidyYearlyData(fishState.getYearlyDataSet())
         );

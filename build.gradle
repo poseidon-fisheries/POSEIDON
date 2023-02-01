@@ -60,9 +60,6 @@ dependencies {
     implementation "com.opencsv:opencsv:3.8"
     implementation "com.univocity:univocity-parsers:2.9.1"
 
-    // Google's JSON library
-    implementation 'com.google.code.gson:gson:2.8.5'
-
     //logger:
     implementation "com.esotericsoftware:minlog:1.3.0"
 
@@ -111,9 +108,6 @@ dependencies {
 
     //guava. Useful for PreConditions and sometimes specialized collections
     implementation "com.google.guava:guava:30.1.1-jre"
-
-    //json test
-    testImplementation "com.google.code.gson:gson:2.8.7"
 
     // Reference implementation of JSR-385 for units of measure
     implementation 'si.uom:si-quantity:2.1'

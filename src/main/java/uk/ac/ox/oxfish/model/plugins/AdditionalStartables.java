@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFact
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
-import uk.ac.ox.oxfish.model.data.webviz.JsonOutputManagerFactory;
 import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.*;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
@@ -54,7 +53,6 @@ public class AdditionalStartables {
         NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class, "Full-time Seasonal Retired Data Collectors");
         NAMES.put(BiomassDepletionGathererFactory.class, "Biomass Depletion Data Collectors");
         NAMES.put(TowLongLoggerFactory.class, "Tow Long Logger");
-        NAMES.put(JsonOutputManagerFactory.class, "Json Output Manager");
         NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
         NAMES.put(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors");
         NAMES.put(CatchAtBinFactory.class, "Catch at bin Collectors");

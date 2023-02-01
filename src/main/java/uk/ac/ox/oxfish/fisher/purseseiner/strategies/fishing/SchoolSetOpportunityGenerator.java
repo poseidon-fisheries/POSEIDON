@@ -37,8 +37,8 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
 public class SchoolSetOpportunityGenerator<
     B extends LocalBiology,
