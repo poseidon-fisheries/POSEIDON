@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.demoes;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.field.grid.IntGrid2D;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -39,11 +40,6 @@ import java.nio.file.Paths;
 public class FishTheLineDemo {
 
 
-
-
-
-
-
     //create an MPA, after people fish everything else there is to fish, they'll mostly fish just at the border of
     //the MPA
     @Test
@@ -53,27 +49,25 @@ public class FishTheLineDemo {
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
             Paths.get("inputs", "first_paper").resolve("mpa.yaml")));
-        Scenario scenario =  yaml.loadAs(scenarioYaml, Scenario.class);
+        Scenario scenario = yaml.loadAs(scenarioYaml, Scenario.class);
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
 
         state.start();
-        double[][] theGrid = new double[state.getMap().getWidth()][state.getMap().getHeight()];
+        final NauticalMap map = state.getMap();
+        double[][] theGrid = new double[map.getWidth()][map.getHeight()];
 
-        while(state.getYear()<20)
-        {
+        while (state.getYear() < 20) {
             state.schedule.step(state);
-            IntGrid2D trawls = state.getMap().getDailyTrawlsMap();
-            for(int x =0; x<state.getMap().getWidth(); x++)
-            {
-                for (int y = 0; y < state.getMap().getHeight(); y++)
-                {
-                    theGrid[x][state.getMap().getHeight()-y-1] += trawls.get(x, y);
+            IntGrid2D trawls = map.getDailyTrawlsMap();
+            for (int x = 0; x < map.getWidth(); x++) {
+                for (int y = 0; y < map.getHeight(); y++) {
+                    theGrid[x][map.getHeight() - y - 1] += trawls.get(x, y);
                 }
             }
         }
 
-        int mpaWidth= 15;
+        int mpaWidth = 15;
         int topLeftX = 15;
         int topLeftY = 10;
         int height = 30;
@@ -81,32 +75,28 @@ public class FishTheLineDemo {
         //now check the hotspots
         double allHotspots = 0;
         double onTheLine = 0;
-        IntGrid2D hotspots = state.getMap().getDailyTrawlsMap();
-        for(int x =0; x<state.getMap().getWidth(); x++)
-        {
-            for (int y = 0; y < state.getMap().getHeight(); y++)
-            {
+        IntGrid2D hotspots = map.getDailyTrawlsMap();
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
                 double hotspot = hotspots.get(x, y);
                 allHotspots += hotspot;
-                if(x >=  topLeftX - 1 && x <= topLeftX + 1 + mpaWidth && y>= topLeftY-1  && y<=topLeftY + 1 + height)
-                    onTheLine+= hotspot;
+                if (x >= topLeftX - 1 && x <= topLeftX + 1 + mpaWidth && y >= topLeftY - 1 && y <= topLeftY + 1 + height)
+                    onTheLine += hotspot;
                 //also hotspot should be 0 in the MPA itself
-                if(x >=  topLeftX && x <= topLeftX + mpaWidth && y>= topLeftY  && y<=topLeftY  + height)
-                    Assert.assertEquals(0,hotspot,.0001);
+                if (x >= topLeftX && x <= topLeftX + mpaWidth && y >= topLeftY && y <= topLeftY + height)
+                    Assert.assertEquals(0, hotspot, .0001);
             }
 
         }
 
         //on the line fishing make up at least 40% of all recent fishing (since exploration is pretty aggressive anyway)
         System.out.println(allHotspots + " --- " + onTheLine);
-        System.out.println("percentage fished on the line : " + onTheLine/allHotspots);
+        System.out.println("percentage fished on the line : " + onTheLine / allHotspots);
         Assert.assertTrue(allHotspots * .40 <= onTheLine);
         Assert.assertTrue(onTheLine > 0);
 
 
     }
-
-
 
 
 }
