@@ -23,13 +23,13 @@ package uk.ac.ox.oxfish.demoes;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.field.grid.IntGrid2D;
-import uk.ac.ox.oxfish.experiments.FirstPaper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * I write here in unit-test format the results of the demoes I show on the website. This will help make sure
@@ -52,7 +52,7 @@ public class FishTheLineDemo {
 
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
-                FirstPaper.INPUT_FOLDER.resolve("mpa.yaml")));
+            Paths.get("inputs", "first_paper").resolve("mpa.yaml")));
         Scenario scenario =  yaml.loadAs(scenarioYaml, Scenario.class);
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);

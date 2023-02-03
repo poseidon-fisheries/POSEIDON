@@ -58,7 +58,6 @@ public class BiologyInitializers {
         NAMES.put(HalfBycatchFactory.class, "Half Bycatch");
         NAMES.put(SplitInitializerFactory.class, "Split in Half");
         NAMES.put(WellMixedBiologyFactory.class, "Well-Mixed");
-        NAMES.put(OsmoseBiologyFactory.class, "Osmose Biology");
         NAMES.put(TwoSpeciesBoxFactory.class, "Two Species Box");
         NAMES.put(SingleSpeciesBiomassFactory.class, "Single Species Biomass");
         NAMES.put(SingleSpeciesBiomassNormalizedFactory.class, "Single Species Biomass Normalized");
@@ -80,4 +79,13 @@ public class BiologyInitializers {
     }
 
     private BiologyInitializers() {}
+
+    public static void add(
+        final String name,
+        Class<? extends AlgorithmFactory> factoryClass
+    ) {
+        NAMES.put(factoryClass, name);
+        CONSTRUCTORS.put(name, Constructors.getSupplier(factoryClass));
+    }
+
 }

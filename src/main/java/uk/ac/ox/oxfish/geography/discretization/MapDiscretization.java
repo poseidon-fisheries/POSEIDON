@@ -21,13 +21,13 @@
 package uk.ac.ox.oxfish.geography.discretization;
 
 import com.google.common.base.Preconditions;
+import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -146,6 +146,28 @@ public class MapDiscretization {
     public List<SeaTile> getGroup(int groupIndex)
     {
         return groups[groupIndex];
+    }
+
+    public static MapDiscretization createDiscretization(FishState state, String centroidFile) {
+        CsvColumnsToLists reader = new CsvColumnsToLists(
+            centroidFile,
+            ',',
+            new String[]{"eastings", "northings"}
+        );
+
+        LinkedList<Double>[] lists = reader.readColumns();
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
+        for (int i = 0; i < lists[0].size(); i++)
+            coordinates.add(new Coordinate(lists[0].get(i),
+                lists[1].get(i),
+                0));
+
+        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+            coordinates);
+        MapDiscretization discretization = new MapDiscretization(
+            discretizer);
+        discretization.discretize(state.getMap());
+        return discretization;
     }
 
 }

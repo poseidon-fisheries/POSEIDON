@@ -26,13 +26,14 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.nio.file.Paths;
 import java.util.LinkedList;
+
+import static uk.ac.ox.oxfish.geography.discretization.MapDiscretization.createDiscretization;
 
 /**
  * Steve saul's stuff, initialized here.
@@ -85,7 +86,7 @@ public class FloridaLogitDestinationFactory implements
     public LogitDestinationStrategy apply(FishState state) {
 
         MapDiscretization discretization = discretizationLocker.
-                presentKey(state.getHopefullyUniqueID(), () -> OsmoseWFSScenario.createDiscretization(state, centroidFile)
+                presentKey(state.getHopefullyUniqueID(), () -> createDiscretization(state, centroidFile)
                 );
 
         CsvColumnsToLists reader = new CsvColumnsToLists(

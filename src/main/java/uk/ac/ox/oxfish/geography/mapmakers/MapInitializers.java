@@ -46,8 +46,6 @@ public class MapInitializers {
     static {
         NAMES.put(SimpleMapInitializerFactory.class, "Simple Map");
         NAMES.put(TwoSidedMapFactory.class, "Two Sided Map");
-        NAMES.put(OsmoseMapInitializerFactory.class, "OSMOSE Map");
-        NAMES.put(OsmoseBoundedMapInitializerFactory.class, "OSMOSE Bounded Map");
         NAMES.put(MapWithFarOffPortsInitializerFactory.class, "Map with far-off ports");
         NAMES.put(FromFileMapInitializerFactory.class, "From File Map");
         NAMES.put(FromFileMapInitializerWithOverridesFactory.class, "From File Map With Overrides");
@@ -55,4 +53,12 @@ public class MapInitializers {
     }
 
     private MapInitializers() { }
+
+    public static void add(
+        final String name,
+        Class<? extends AlgorithmFactory> factoryClass
+    ) {
+        NAMES.put(factoryClass, name);
+        CONSTRUCTORS.put(name, Constructors.getSupplier(factoryClass));
+    }
 }

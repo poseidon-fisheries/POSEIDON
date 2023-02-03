@@ -63,10 +63,6 @@ public class Scenarios {
         SCENARIOS.put("Abstract 2 Populations",TwoPopulationsScenario::new);
         DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
 
-
-        SCENARIOS.put("OSMOSE WFS",OsmoseWFSScenario::new);
-        DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
-
 //
 //        SCENARIOS.put("Policy California",SimpleCaliforniaScenario::new);
 //        DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
@@ -92,5 +88,14 @@ public class Scenarios {
         DESCRIPTIONS.put("EPO Abundance Pathfinding",
                 "Like EPO Abundance but using an alternative decision process");
 
+    }
+
+    public static void add(
+        final String name,
+        final String description,
+        final Supplier<Scenario> scenarioSupplier
+    ) {
+        SCENARIOS.put(name, scenarioSupplier);
+        DESCRIPTIONS.put(name, description);
     }
 }

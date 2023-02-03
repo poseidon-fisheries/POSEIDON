@@ -42,7 +42,7 @@ public class Constructors {
     /**
      * Given a class object, returns a Supplier based on either its constructor or a getInstance method.
      */
-    private static <T> Supplier<AlgorithmFactory<? extends T>> getSupplier(Class<? extends AlgorithmFactory> classObject) {
+    public static <T> Supplier<AlgorithmFactory<? extends T>> getSupplier(Class<? extends AlgorithmFactory> classObject) {
         try {
             // First try to access a possibly provided `getInstance` method
             final Method getInstance = classObject.getMethod("getInstance");

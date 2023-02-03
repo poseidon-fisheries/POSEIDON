@@ -49,8 +49,6 @@ dependencies {
     //mason libraries. They aren't on maven so we have to lug their jars around
     api fileTree(dir: 'libs/mason', include: '*.jar')
     api fileTree(dir: 'libs/geomason', include: '*.jar')
-    //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
-    implementation fileTree(dir: 'libs/osmose', include: '*.jar')
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
