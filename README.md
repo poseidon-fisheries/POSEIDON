@@ -1,7 +1,7 @@
 POSEIDON
 ========
 
-[![tests](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml/badge.svg)](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/poseidon-fisheries/POSEIDON/branch/master/graph/badge.svg)](https://codecov.io/gh/poseidon-fisheries/POSEIDON)
+[![tests](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml/badge.svg)](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/poseidon-fisheries/POSEIDON/branch/main/graph/badge.svg)](https://codecov.io/gh/poseidon-fisheries/POSEIDON)
 
 This is the code for POSEIDON, a fishery agent-based model; currently under review but open-source under GPL.
 For all intents and purposes please consider this code pre-alpha.   
