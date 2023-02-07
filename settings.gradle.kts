@@ -1,5 +1,9 @@
 rootProject.name = "poseidon"
-include("simulation:api")
-include("simulation:adaptors")
+include("simulations:api")
+include("simulations:adaptors")
+include("datasets:api")
+include("datasets:core")
+include("datasets:adaptors")
+include("common")
 include("POSEIDON")
 include("poseidon-r")
