@@ -255,7 +255,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             new GravityDestinationStrategyFactory();
         gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
-        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFilePath());
+        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFile().get());
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
@@ -276,7 +276,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
         final List<Fisher> fishers =
             new PurseSeineVesselReader(
-                getVesselsFilePath(),
+                getVesselsFile().get(),
                 TARGET_YEAR,
                 fisherFactory,
                 buildPorts(fishState)

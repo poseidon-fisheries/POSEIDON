@@ -175,7 +175,7 @@ parameters:
   minimum: 56.326
   rawNumber: false
 runsPerSetting: 1
-scenarioFile: inputs/tests/tunabacksliding/base_scenario.yaml
+scenarioFile: inputs/tests/tunabacksliding/base_scenario_1.yaml
 simulatedYears: 2
 targets:
 - !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget

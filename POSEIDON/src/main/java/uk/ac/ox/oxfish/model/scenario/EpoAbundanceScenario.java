@@ -309,7 +309,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
             new GravityDestinationStrategyFactory();
         gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
-        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFilePath());
+        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFile().get());
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
@@ -319,7 +319,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final List<Fisher> fishers =
             new PurseSeineVesselReader(
-                getVesselsFilePath(),
+                getVesselsFile().get(),
                 TARGET_YEAR,
                 fisherFactory,
                 buildPorts(fishState)

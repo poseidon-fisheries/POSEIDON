@@ -5,7 +5,12 @@ import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -13,12 +18,18 @@ public class ScenarioUpdater {
 
     public static void updateScenario(
         final Path inputScenario,
-        final Path outputScenario
+        final Path outputScenario,
+        final Consumer<EpoScenario<?, ?>> scenarioConsumer
     ) {
-        try (final FileInputStream fileInputStream = new FileInputStream(inputScenario.toFile())) {
-            final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, UTF_8);
+        try (final Stream<String> scenarioLines = Files.lines(inputScenario)) {
+
+            final String scenarioYaml = scenarioLines
+                .filter(line -> !line.matches(".*vesselsFilePath:.*"))
+                .collect(Collectors.joining("\n"));
+
             final FishYAML fishYAML = new FishYAML();
-            final EpoScenario<?, ?> scenario = fishYAML.loadAs(inputStreamReader, EpoScenario.class);
+            final EpoScenario<?, ?> scenario = fishYAML.loadAs(scenarioYaml, EpoScenario.class);
+            scenarioConsumer.accept(scenario);
             scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
             try (final FileOutputStream fileOutputStream = new FileOutputStream(outputScenario.toFile())) {
                 final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);

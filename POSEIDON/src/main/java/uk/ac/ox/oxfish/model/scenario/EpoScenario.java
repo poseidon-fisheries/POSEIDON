@@ -124,7 +124,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private Path vesselsFilePath = INPUT_PATH.resolve("boats.csv");
+    private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
@@ -134,6 +134,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+
+    public InputFile getVesselsFile() {
+        return vesselsFile;
+    }
+
+    public void setVesselsFile(final InputFile vesselsFile) {
+        this.vesselsFile = vesselsFile;
+    }
 
     public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
@@ -361,20 +369,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public Path getVesselsFilePath() {
-        return vesselsFilePath;
-    }
-
-    public void setVesselsFilePath(final Path vesselsFilePath) {
-        this.vesselsFilePath = vesselsFilePath;
-    }
-
     @Override
     public void useDummyData(final Path testPath) {
         getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         setCostsFile(testPath.resolve("no_costs.csv"));
-        setVesselsFilePath(
-            testPath.resolve("dummy_boats.csv")
+        setVesselsFile(
+            new InputFile(new InputFolder(testPath), "dummy_boats.csv")
         );
         getGearStrategy().setMaxFadDeploymentsFile(
             testPath.resolve("dummy_max_deployments.csv")

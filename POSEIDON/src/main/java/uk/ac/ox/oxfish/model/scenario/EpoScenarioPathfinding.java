@@ -377,7 +377,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
 
         destinationStrategy.setAttractionWeightsFile(getAttractionWeightsFile());
-        destinationStrategy.setMaxTripDurationFile(getVesselsFilePath());
+        destinationStrategy.setMaxTripDurationFile(getVesselsFile().get());
 
         destinationStrategy.setCatchSamplersFactory(abundanceSamplerFactory);
         destinationStrategy.setAttractionWeightsFile(attractionWeightsFile);
@@ -392,7 +392,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
         final List<Fisher> fishers =
             new PurseSeineVesselReader(
-                getVesselsFilePath(),
+                getVesselsFile().get(),
                 TARGET_YEAR,
                 fisherFactory,
                 buildPorts(fishState)
