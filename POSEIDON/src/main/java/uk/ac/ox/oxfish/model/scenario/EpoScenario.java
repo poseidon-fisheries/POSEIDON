@@ -127,7 +127,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
-    private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
@@ -187,7 +186,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             getPurseSeineGearFactory().getDolphinSetObservers()
                 .addAll(monitors.getDolphinSetMonitors());
             getPurseSeineGearFactory().setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-            getPurseSeineGearFactory().setLocationValuesFile(getLocationValuesFilePath());
         }
 
         if (marketMapFactory instanceof SpeciesCodeAware) {
@@ -227,14 +225,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setAttractionWeightsFile(final Path attractionWeightsFile) {
         this.attractionWeightsFile = attractionWeightsFile;
-    }
-
-    public Path getLocationValuesFilePath() {
-        return locationValuesFilePath;
-    }
-
-    public void setLocationValuesFilePath(final Path locationValuesFilePath) {
-        this.locationValuesFilePath = locationValuesFilePath;
     }
 
     public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {
@@ -382,8 +372,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         setAttractionWeightsFile(
             testPath.resolve("dummy_action_weights.csv")
         );
-        setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
+        getPurseSeineGearFactory().setLocationValuesFile(
+            new InputFile(new InputFolder(testPath), "dummy_location_values.csv")
         );
     }
 

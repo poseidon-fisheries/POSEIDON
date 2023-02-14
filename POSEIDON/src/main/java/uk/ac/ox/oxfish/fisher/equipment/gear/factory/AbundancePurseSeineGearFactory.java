@@ -23,9 +23,17 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 public class AbundancePurseSeineGearFactory
     extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
+
+    public AbundancePurseSeineGearFactory() {
+    }
+
+    public AbundancePurseSeineGearFactory(final InputFile locationValuesFile) {
+        super(locationValuesFile);
+    }
 
     @Override
     public PurseSeineGear<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {

@@ -12,70 +12,6 @@ EPO Abundance Pathfinding:
     - noa_class_1_5
     - longline
     speciesCodes: null
-  abundancePurseSeineGearFactory:
-    actionDistanceExponent: 1.0
-    actionSpecificRegulations:
-    - Active FAD limits:
-        limitClass1: 70
-        limitClass2: 70
-        limitClass3: 70
-        limitClass4: 120
-        limitClass5: 120
-        limitClass6a: 300
-        limitClass6b: 450
-    allSetsObservers: !!set {
-      }
-    biomassLostMonitor: null
-    decayRateOfDeploymentLocationValues: 0.01
-    decayRateOfDolphinSetLocationValues: 0.01
-    decayRateOfNonAssociatedSetLocationValues: 0.01
-    decayRateOfOpportunisticFadSetLocationValues: 0.01
-    destinationDistanceExponent: 1.0
-    dolphinSetObservers: !!set {
-      }
-    dolphinSetTimeSinceLastVisitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    fadDeploymentObservers: !!set {
-      }
-    fadDeploymentPctActiveFadsLimitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    fadInitializerFactory: null
-    fadSetObservers: !!set {
-      }
-    fishValueCalculatorStandardDeviation: '0.0'
-    locationValuesFile: inputs/epo_inputs/location_values.csv
-    maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
-    nonAssociatedSetObservers: !!set {
-      }
-    nonAssociatedSetTimeSinceLastVisitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    numFadsInStockModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    opportunisticFadSetTimeSinceLastVisitModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    pctHoldSpaceLeftModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    pctSetsRemainingModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    pctTravelTimeLeftModulationFunction:
-      Compressed Exponential Function:
-        coefficient: 1.0E-6
-        exponent: 2.0
-    successfulSetProbability: '0.9231701'
   abundanceReallocatorFactory: !!uk.ac.ox.oxfish.biology.tuna.AbundanceReallocatorFactory
     biomassDistributionsFilePath: inputs/epo_inputs/abundance/grids.csv
   abundanceRestorerFactory:
@@ -167,7 +103,6 @@ EPO Abundance Pathfinding:
       maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
       targetYear: 2017
   inputFolder: *id001
-  locationValuesFilePath: inputs/epo_inputs/location_values.csv
   mapInitializerFactory:
     From File Map:
       gridWidthInCell: '101.0'
@@ -178,7 +113,72 @@ EPO Abundance Pathfinding:
   marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
     priceFilePath: inputs/epo_inputs/prices.csv
     speciesCodes: null
-  purseSeineGearFactory: null
+  purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory
+    actionDistanceExponent: 1.0
+    actionSpecificRegulations:
+    - Active FAD limits:
+        limitClass1: 70
+        limitClass2: 70
+        limitClass3: 70
+        limitClass4: 120
+        limitClass5: 120
+        limitClass6a: 300
+        limitClass6b: 450
+    allSetsObservers: !!set {
+      }
+    biomassLostMonitor: null
+    decayRateOfDeploymentLocationValues: 0.01
+    decayRateOfDolphinSetLocationValues: 0.01
+    decayRateOfNonAssociatedSetLocationValues: 0.01
+    decayRateOfOpportunisticFadSetLocationValues: 0.01
+    destinationDistanceExponent: 1.0
+    dolphinSetObservers: !!set {
+      }
+    dolphinSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    fadDeploymentObservers: !!set {
+      }
+    fadDeploymentPctActiveFadsLimitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    fadInitializerFactory: null
+    fadSetObservers: !!set {
+      }
+    fishValueCalculatorStandardDeviation: '0.0'
+    locationValuesFile:
+      inputFolder: *id001
+      path: tests/backsliding/location_values.csv
+    maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
+    nonAssociatedSetObservers: !!set {
+      }
+    nonAssociatedSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    numFadsInStockModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    opportunisticFadSetTimeSinceLastVisitModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctHoldSpaceLeftModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctSetsRemainingModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    pctTravelTimeLeftModulationFunction:
+      Compressed Exponential Function:
+        coefficient: 1.0E-6
+        exponent: 2.0
+    successfulSetProbability: '0.9231701'
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
   regulationsFactory: !!uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory

@@ -51,7 +51,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
-    private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
@@ -85,8 +84,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     private DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory =
         new DefaultToDestinationStrategyFishingStrategyFactory();
-    private AbundancePurseSeineGearFactory abundancePurseSeineGearFactory =
-        new AbundancePurseSeineGearFactory();
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
         new LastMomentAbundanceFadInitalizerFactory();
 //            new AbundanceFadInitializerFactory(
@@ -116,7 +113,9 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         new EPOPlannedStrategyFlexibleFactory();
 
     public EpoScenarioPathfinding() {
-
+        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
+            new InputFile(getInputFolder(), "location_values.csv")
+        ));
     }
 
     /**
@@ -158,18 +157,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @SuppressWarnings("unused")
     public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundancePurseSeineGearFactory getAbundancePurseSeineGearFactory() {
-        return abundancePurseSeineGearFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundancePurseSeineGearFactory(
-        final AbundancePurseSeineGearFactory abundancePurseSeineGearFactory
-    ) {
-        this.abundancePurseSeineGearFactory = abundancePurseSeineGearFactory;
     }
 
     @SuppressWarnings("unused")
@@ -219,9 +206,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         super.useDummyData(testPath);
         setAttractionWeightsFile(
             testPath.resolve("dummy_action_weights.csv")
-        );
-        setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
         );
     }
 
@@ -323,7 +307,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             },
             "calzone1"
         );
-        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone1);
+        getPurseSeineGearFactory().getFadSetObservers().add(calzone1);
         final LocalizedActionCounter calzone2 = new LocalizedActionCounter(
             abstractFadSetAction -> {
                 final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
@@ -331,7 +315,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             },
             "calzone2"
         );
-        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone2);
+        getPurseSeineGearFactory().getFadSetObservers().add(calzone2);
 
         //filter(lon_n>-140 & lon_n<=-110 & lat_n< 0)
         final LocalizedActionCounter thegap = new LocalizedActionCounter(
@@ -341,7 +325,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             },
             "thegap"
         );
-        abundancePurseSeineGearFactory.getFadSetObservers().add(thegap);
+       getPurseSeineGearFactory().getFadSetObservers().add(thegap);
         //filter(lon_n>= -90 & lat_n <= -10)
         final LocalizedActionCounter calzone3 = new LocalizedActionCounter(
             abstractFadSetAction -> {
@@ -350,7 +334,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             },
             "calzone3"
         );
-        abundancePurseSeineGearFactory.getFadSetObservers().add(calzone3);
+        getPurseSeineGearFactory().getFadSetObservers().add(calzone3);
 
 
         fishState.registerStartable(calzone1);
@@ -358,7 +342,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         fishState.registerStartable(calzone3);
         fishState.registerStartable(thegap);
 
-        super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         abundanceFiltersFactory.setSpeciesCodes(speciesCodesSupplier.get());
@@ -373,7 +356,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesSupplier.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
-        abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);
+        getPurseSeineGearFactory().setFadInitializerFactory(fadInitializerFactory);
 
 
         destinationStrategy.setAttractionWeightsFile(getAttractionWeightsFile());
@@ -384,7 +367,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
             regulationsFactory,
-            abundancePurseSeineGearFactory,
+            getPurseSeineGearFactory(),
             destinationStrategy,
             fishingStrategyFactory,
             new PurseSeinerDepartingStrategyFactory(false)
@@ -418,16 +401,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         }
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Path getLocationValuesFilePath() {
-        return locationValuesFilePath;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setLocationValuesFilePath(final Path locationValuesFilePath) {
-        this.locationValuesFilePath = locationValuesFilePath;
     }
 
     @SuppressWarnings("WeakerAccess")

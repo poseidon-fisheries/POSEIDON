@@ -357,9 +357,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         setAttractionWeightsFile(
                 testPath.resolve("dummy_action_weights.csv")
         );
-        setLocationValuesFilePath(
-                testPath.resolve("dummy_location_values.csv")
-        );
     }
 
     @SuppressWarnings("unused")

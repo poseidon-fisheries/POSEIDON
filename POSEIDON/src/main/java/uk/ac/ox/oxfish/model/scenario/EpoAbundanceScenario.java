@@ -117,7 +117,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory(getSpeciesCodesSupplier()));
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
+        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
+            new InputFile(getInputFolder(), "location_values.csv")
+        ));
     }
 
     /**
@@ -357,9 +359,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         super.useDummyData(testPath);
         setAttractionWeightsFile(
             testPath.resolve("dummy_action_weights.csv")
-        );
-        setLocationValuesFilePath(
-            testPath.resolve("dummy_location_values.csv")
         );
     }
 

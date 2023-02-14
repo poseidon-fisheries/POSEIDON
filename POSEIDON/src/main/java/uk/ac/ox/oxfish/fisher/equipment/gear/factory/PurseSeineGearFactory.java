@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -85,7 +86,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         ImmutableList.of(new ActiveFadLimitsFactory());
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-    private Path locationValuesFile = INPUT_PATH.resolve("location_values.csv");
+    private InputFile locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
@@ -115,6 +116,20 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     private double destinationDistanceExponent = 2;
     private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
     private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
+    public PurseSeineGearFactory() {
+    }
+
+    public PurseSeineGearFactory(final InputFile locationValuesFile) {
+        this.locationValuesFile = locationValuesFile;
+    }
+
+    public InputFile getLocationValuesFile() {
+        return locationValuesFile;
+    }
+
+    public void setLocationValuesFile(final InputFile locationValuesFile) {
+        this.locationValuesFile = locationValuesFile;
+    }
 
     public DoubleParameter getFishValueCalculatorStandardDeviation() {
         return fishValueCalculatorStandardDeviation;
@@ -272,7 +287,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.dolphinSetObservers = dolphinSetObservers;
     }
-
 
     @SuppressWarnings("unused")
     public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
@@ -473,7 +487,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         final Class<? extends PurseSeinerAction> actionClass
     ) {
         return locationValuesCache.getLocationValues(
-            locationValuesFile,
+            locationValuesFile.get(),
             TARGET_YEAR,
             fisher,
             actionClass
@@ -524,14 +538,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         final double decayRateOfDeploymentLocationValues
     ) {
         this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
-    }
-
-    public Path getLocationValuesFile() {
-        return locationValuesFile;
-    }
-
-    public void setLocationValuesFile(final Path locationValuesFile) {
-        this.locationValuesFile = locationValuesFile;
     }
 
 }
