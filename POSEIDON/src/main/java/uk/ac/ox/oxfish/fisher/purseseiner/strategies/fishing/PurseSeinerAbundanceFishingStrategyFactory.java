@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
@@ -30,6 +31,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 public class PurseSeinerAbundanceFishingStrategyFactory
@@ -39,6 +41,10 @@ public class PurseSeinerAbundanceFishingStrategyFactory
 
     public PurseSeinerAbundanceFishingStrategyFactory() {
         super(AbundanceLocalBiology.class, AbundanceFad.class);
+    }
+
+    public PurseSeinerAbundanceFishingStrategyFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        super(AbundanceLocalBiology.class, AbundanceFad.class, speciesCodesSupplier);
     }
 
     @NotNull

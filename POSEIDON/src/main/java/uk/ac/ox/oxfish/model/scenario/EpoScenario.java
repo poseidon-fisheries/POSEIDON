@@ -70,7 +70,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -105,22 +104,23 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
     public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
-
-    public static final SpeciesCodesFromFileFactory speciesCodesSupplier =
-        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private static final Path currentsFolder = INPUT_PATH.resolve("currents");
     static final ImmutableMap<CurrentPattern, Path> currentFiles = new ImmutableMap.Builder<CurrentPattern, Path>()
         .put(Y2016, currentsFolder.resolve("currents_2016.csv"))
         .put(Y2017, currentsFolder.resolve("currents_2017.csv"))
         .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
         .build();
-    protected final SpeciesCodesFromFileFactory speciesCodesFactory =
-        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private final PortInitializer portInitializer =
         new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
+    private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
+    public final SpeciesCodesFromFileFactory speciesCodesSupplier =
+        new SpeciesCodesFromFileFactory(
+            inputFolder,
+            Paths.get("species_codes.csv")
+        );
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
@@ -134,6 +134,20 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+
+    public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public InputFolder getInputFolder() {
+        return inputFolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setInputFolder(final InputFolder inputFolder) {
+        this.inputFolder = inputFolder;
+    }
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
@@ -169,7 +183,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         }
 
         if (marketMapFactory instanceof SpeciesCodeAware) {
-            ((SpeciesCodeAware) marketMapFactory).setSpeciesCodes(grabSpeciesCodesFactory().get());
+            ((SpeciesCodeAware) marketMapFactory).setSpeciesCodes(speciesCodesSupplier.get());
         }
 
         additionalStartables.stream()
@@ -384,10 +398,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @Override
     public LocalDate getStartDate() {
         return START_DATE;
-    }
-
-    public SpeciesCodesFromFileFactory grabSpeciesCodesFactory() {
-        return speciesCodesFactory;
     }
 
     public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {

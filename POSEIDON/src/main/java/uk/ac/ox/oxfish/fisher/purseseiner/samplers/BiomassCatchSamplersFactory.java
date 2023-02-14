@@ -20,10 +20,21 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Collection;
+import java.util.function.Supplier;
+
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
 public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
+
+    @SuppressWarnings("unused")
+    public BiomassCatchSamplersFactory() {
+    }
+
+    public BiomassCatchSamplersFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        super(speciesCodesSupplier);
+    }
 
     @Override
     CatchSampler<BiomassLocalBiology> makeCatchSampler(

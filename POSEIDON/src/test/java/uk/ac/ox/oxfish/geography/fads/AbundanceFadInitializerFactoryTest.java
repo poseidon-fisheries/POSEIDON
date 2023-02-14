@@ -16,8 +16,11 @@ import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFolder;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.nio.file.Paths;
 
 public class AbundanceFadInitializerFactoryTest {
 
@@ -64,7 +67,7 @@ public class AbundanceFadInitializerFactoryTest {
         FishYAML yaml = new FishYAML();
         AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor,AbundanceFadInitializerFactory.class);
         SpeciesCodesFromFileFactory speciesCodesFactory =
-                new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
+                new SpeciesCodesFromFileFactory(new InputFolder(INPUT_PATH), Paths.get("species_codes.csv"));
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();
         factory.setSpeciesCodes(speciesCodes);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));

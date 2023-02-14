@@ -7,7 +7,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
@@ -51,8 +50,6 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-    private final SpeciesCodesFromFileFactory speciesCodesFactory =
-        new SpeciesCodesFromFileFactory(INPUT_PATH.resolve("species_codes.csv"));
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private Path locationValuesFilePath = INPUT_PATH.resolve("location_values.csv");
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
@@ -100,7 +97,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         new StandardIattcRegulationsFactory();
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        speciesCodesFactory.get().getSpeciesNames().stream().collect(
+        speciesCodesSupplier.get().getSpeciesNames().stream().collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(
@@ -270,7 +267,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        final SpeciesCodes speciesCodes = speciesCodesFactory.get();
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
 
         final NauticalMap nauticalMap =
             mapInitializerFactory
@@ -364,7 +361,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         super.setPurseSeineGearFactory(abundancePurseSeineGearFactory);
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        abundanceFiltersFactory.setSpeciesCodes(speciesCodesFactory.get());
+        abundanceFiltersFactory.setSpeciesCodes(speciesCodesSupplier.get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
             abundanceFilters = abundanceFiltersFactory.apply(fishState);
 
@@ -373,7 +370,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
 
         if (fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
-            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesFactory.get());
+            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesSupplier.get());
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
 
         abundancePurseSeineGearFactory.setFadInitializerFactory(fadInitializerFactory);

@@ -20,15 +20,23 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+
+import java.util.function.Supplier;
 
 public class PurseSeinerBiomassFishingStrategyFactory
     extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology, BiomassFad> {
 
     public PurseSeinerBiomassFishingStrategyFactory() {
         super(BiomassLocalBiology.class, BiomassFad.class);
+    }
+
+    public PurseSeinerBiomassFishingStrategyFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        super(BiomassLocalBiology.class, BiomassFad.class, speciesCodesSupplier);
     }
 
     @Override

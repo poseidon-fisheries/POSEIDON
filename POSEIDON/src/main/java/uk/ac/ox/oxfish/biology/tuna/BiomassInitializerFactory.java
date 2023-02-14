@@ -18,6 +18,24 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.NoMovement;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
@@ -28,23 +46,6 @@ import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.NoMovement;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerInitializer;
-import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
-import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
 /**
  * A factory for a {@link BiomassInitializer} that reads the Schaefer parameters from a CSV file.
  */
@@ -52,8 +53,24 @@ public class BiomassInitializerFactory
     implements AlgorithmFactory<BiomassInitializer> {
 
     private BiomassReallocator biomassReallocator;
-    private SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private Path schaeferParamsFile = INPUT_PATH.resolve("biomass").resolve("schaefer_params.csv");
+
+    public BiomassInitializerFactory() {
+    }
+    public BiomassInitializerFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
 
     @SuppressWarnings("unused")
     public BiomassReallocator getBiomassReallocator() {
@@ -62,11 +79,6 @@ public class BiomassInitializerFactory
 
     public void setBiomassReallocator(final BiomassReallocator biomassReallocator) {
         this.biomassReallocator = biomassReallocator;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
     }
 
     @SuppressWarnings("unused")
@@ -98,7 +110,7 @@ public class BiomassInitializerFactory
                 ));
 
         final List<SingleSpeciesBiomassInitializer> biomassInitializers =
-            makeBiomassInitializers(initialAllocators, speciesCodes);
+            makeBiomassInitializers(initialAllocators, speciesCodesSupplier.get());
 
         return new BiomassInitializer(biomassInitializers);
     }

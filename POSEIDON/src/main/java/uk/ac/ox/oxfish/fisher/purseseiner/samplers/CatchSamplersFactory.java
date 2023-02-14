@@ -19,6 +19,26 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
+import com.google.common.collect.Ordering;
+import com.univocity.parsers.common.record.Record;
+import ec.util.MersenneTwisterFast;
+import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -29,34 +49,28 @@ import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-import com.google.common.collect.Ordering;
-import com.univocity.parsers.common.record.Record;
-import ec.util.MersenneTwisterFast;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
 public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
-    private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
-    private Path catchSamplesFile = INPUT_PATH.resolve("set_samples.csv");
+    public CatchSamplersFactory() {}
 
+    public CatchSamplersFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
+    private Path catchSamplesFile = INPUT_PATH.resolve("set_samples.csv");
     private boolean yearlyReset = false;
+
+    @SuppressWarnings("unused")
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
 
     @SuppressWarnings("unused")
     public Path getCatchSamplesFile() {
@@ -82,8 +96,8 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             .collect(toImmutableMap(
                 Entry::getKey,
                 entry -> {
-                    CatchSampler<B> instance = makeCatchSampler(entry.getKey(), entry.getValue(), rng);
-                    if(yearlyReset)
+                    final CatchSampler<B> instance = makeCatchSampler(entry.getKey(), entry.getValue(), rng);
+                    if (yearlyReset)
                         fishState.scheduleEveryYear((Steppable) simState -> instance.reset(), StepOrder.DAWN);
                     return instance;
                 }
@@ -102,6 +116,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
         final GlobalBiology globalBiology
     ) {
         final String[] columnNames = record.getMetaData().headers();
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return Arrays.stream(columnNames)
             .filter(columnName -> !"set_type".equals(columnName))
             .flatMap(columnName -> stream(
@@ -109,8 +124,8 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
                     .of(speciesCodes.getSpeciesName(columnName.toUpperCase()))
                     .map(globalBiology::getSpecie)
                     .map(species -> entry(
-                        species.getIndex(),
-                        record.getDouble(columnName) * 1000 // convert tonnes to kg
+                            species.getIndex(),
+                            record.getDouble(columnName) * 1000 // convert tonnes to kg
                         )
                     )
             ))
@@ -119,11 +134,13 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
 
+    @SuppressWarnings("unused")
     public boolean isYearlyReset() {
         return yearlyReset;
     }
 
-    public void setYearlyReset(boolean yearlyReset) {
+    @SuppressWarnings("unused")
+    public void setYearlyReset(final boolean yearlyReset) {
         this.yearlyReset = yearlyReset;
     }
 }

@@ -40,7 +40,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
@@ -49,6 +48,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -79,11 +79,11 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         setDurationSamplersCache = new CacheByFishState<>(setDurationSamplers);
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
-    private final SpeciesCodes speciesCodes = EpoScenario.speciesCodesSupplier.get();
     private final boolean noaSetsCanPoachFads = false;
     private final boolean delSetsCanPoachFads = false;
     private final int noaSetsRangeInSeaTiles = 0;
     private final int delSetsRangeInSeaTiles = 0;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private Path attractionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
@@ -124,6 +124,15 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
+        final Class<F> fadClass,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
+    ) {
+        this(biologyClass, fadClass);
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
+    PurseSeinerFishingStrategyFactory(
+        final Class<B> biologyClass,
         final Class<F> fadClass
     ) {
         this.fadClass = fadClass;
@@ -144,6 +153,16 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                     actionClass
                 )
             ));
+    }
+
+    @SuppressWarnings("unused")
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -533,6 +552,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final FishState fishState,
         final Collection<Record> records
     ) {
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return
             records.stream().collect(toImmutableMap(
                 r -> {

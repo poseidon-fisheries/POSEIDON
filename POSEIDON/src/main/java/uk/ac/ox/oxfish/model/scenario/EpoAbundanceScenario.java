@@ -40,7 +40,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -84,7 +83,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        grabSpeciesCodesFactory().get().getSpeciesNames().stream().collect(
+        getSpeciesCodesSupplier().get().getSpeciesNames().stream().collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(
@@ -116,8 +115,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     public EpoAbundanceScenario() {
         setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
-        setCatchSamplersFactory(new AbundanceCatchSamplersFactory());
-        setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
+        setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
+        setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory(getSpeciesCodesSupplier()));
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
@@ -237,7 +236,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        final SpeciesCodes speciesCodes = grabSpeciesCodesFactory().get();
+        final SpeciesCodes speciesCodes = getSpeciesCodesSupplier().get();
 
         final NauticalMap nauticalMap =
             mapInitializerFactory
@@ -290,7 +289,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        abundanceFiltersFactory.setSpeciesCodes(grabSpeciesCodesFactory().get());
+        abundanceFiltersFactory.setSpeciesCodes(getSpeciesCodesSupplier().get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
             abundanceFilters = abundanceFiltersFactory.apply(fishState);
         if (getCatchSamplersFactory() instanceof AbundanceCatchSamplersFactory) {
@@ -300,7 +299,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
-                .setSpeciesCodes(grabSpeciesCodesFactory().get());
+                .setSpeciesCodes(getSpeciesCodesSupplier().get());
         }
         ((PluggableSelectivity) fadInitializerFactory)
             .setSelectivityFilters(abundanceFilters.get(FadSetAction.class));

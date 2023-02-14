@@ -1,14 +1,16 @@
 package uk.ac.ox.oxfish.biology;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.model.scenario.InputFolder;
+
+import java.nio.file.Path;
+import java.util.function.Supplier;
+
 import static com.google.common.cache.CacheLoader.from;
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
-import java.nio.file.Path;
-import java.util.function.Supplier;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Builds a SpeciesCodes map from a CSV file. The CSV file columns must be:
@@ -21,10 +23,19 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
 
     private static final LoadingCache<Path, SpeciesCodes> cache =
         CacheBuilder.newBuilder().build(from(SpeciesCodesFromFileFactory::getSpeciesCodes));
-    private Path speciesCodeFilePath;
+    private InputFolder inputsFolder;
+    private Path speciesCodeFile;
 
-    public SpeciesCodesFromFileFactory(final Path speciesCodeFilePath) {
-        this.speciesCodeFilePath = speciesCodeFilePath;
+    @SuppressWarnings("unused")
+    public SpeciesCodesFromFileFactory() {
+    }
+
+    public SpeciesCodesFromFileFactory(
+        final InputFolder inputsFolder,
+        final Path speciesCodeFile
+    ) {
+        this.inputsFolder = inputsFolder;
+        this.speciesCodeFile = speciesCodeFile;
     }
 
     @NotNull
@@ -38,17 +49,27 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
     }
 
     @SuppressWarnings("unused")
-    public Path getSpeciesCodeFilePath() {
-        return speciesCodeFilePath;
+    public InputFolder getInputsFolder() {
+        return inputsFolder;
     }
 
     @SuppressWarnings("unused")
-    public void setSpeciesCodeFilePath(final Path speciesCodeFilePath) {
-        this.speciesCodeFilePath = speciesCodeFilePath;
+    public void setInputsFolder(final InputFolder inputsFolder) {
+        this.inputsFolder = inputsFolder;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getSpeciesCodeFile() {
+        return speciesCodeFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSpeciesCodeFile(final Path speciesCodeFile) {
+        this.speciesCodeFile = speciesCodeFile;
     }
 
     @Override
     public SpeciesCodes get() {
-        return cache.getUnchecked(speciesCodeFilePath);
+        return cache.getUnchecked(inputsFolder.resolve(speciesCodeFile));
     }
 }

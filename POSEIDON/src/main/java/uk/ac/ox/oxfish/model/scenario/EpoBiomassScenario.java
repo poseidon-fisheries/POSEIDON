@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
@@ -41,7 +40,6 @@ import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
@@ -52,8 +50,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
@@ -82,7 +78,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory();
+    private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory(speciesCodesSupplier);
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
@@ -113,8 +109,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     public EpoBiomassScenario() {
         setFadMapFactory(new BiomassFadMapFactory(currentFiles));
-        setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory());
-        setCatchSamplersFactory(new BiomassCatchSamplersFactory());
+        setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory(getSpeciesCodesSupplier()));
+        setCatchSamplersFactory(new BiomassCatchSamplersFactory(getSpeciesCodesSupplier()));
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
     }
 

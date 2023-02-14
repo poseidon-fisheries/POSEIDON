@@ -46,7 +46,9 @@ EPO Abundance Pathfinding:
     fadInitializerFactory: null
     fadSetObservers: !!set {
       }
+    fishValueCalculatorStandardDeviation: '0.0'
     locationValuesFile: inputs/epo_inputs/location_values.csv
+    maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
     nonAssociatedSetObservers: !!set {
       }
     nonAssociatedSetTimeSinceLastVisitModulationFunction:
@@ -79,39 +81,52 @@ EPO Abundance Pathfinding:
   abundanceRestorerFactory:
     schedule:
       0: 365
+  additionalStartables:
+  - IATTC Closure Period Randomizer:
+      proportionOfBoatsInClosureA: '0.5'
   attractionWeightsFile: inputs/epo_inputs/action_weights.csv
   catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
     abundanceFilters: null
     catchSamplesFile: inputs/epo_inputs/set_samples.csv
+    speciesCodesSupplier: &id002 !!uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory
+      inputsFolder: &id001
+        path: inputs/epo_inputs
+      speciesCodeFile: species_codes.csv
+    yearlyReset: false
   costsFile: inputs/epo_inputs/costs.csv
   destinationStrategy:
     additionalHourlyDelayDeployment: '0.0'
     additionalHourlyDelayDolphinSets: '15.990692562369254'
     additionalHourlyDelayNonAssociatedSets: '6.174315160373708'
-    attractionWeightsFile: 'inputs/epo_inputs/location_values.csv'
+    attractionWeightsFile: inputs/epo_inputs/location_values.csv
     catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
       abundanceFilters: null
       catchSamplesFile: inputs/epo_inputs/set_samples.csv
+      speciesCodesSupplier: null
+      yearlyReset: false
+    delSetsRangeInSeatiles: '0.0'
     deploymentBias: '11.291191913413678'
-    hoursWastedOnFailedSearches: '5.02110682183951'
     fadModule:
       Centroid FAD Planning:
         bannedXCoordinateBounds: ''
         bannedYCoordinateBounds: ''
         discretization:
           Squared Discretization:
-            horizontalSplits: '5'
-            verticalSplits: '3'
+            horizontalSplits: '5.0'
+            verticalSplits: '3.0'
         distancePenalty: '9.819280341'
         minimumValueFadSets: '6971.021459999999'
-    maxTripDurationFile: 'inputs/epo_inputs/boats.csv'
+    hoursWastedOnFailedSearches: '5.02110682183951'
+    maxTripDurationFile: inputs/epo_inputs/boats.csv
     minimumPercentageOfTripDurationAllowed: '1.0'
     minimumValueOpportunisticFadSets: '0.0'
     noaBias: '0.4620536789957029'
     noaSetsCanPoachFads: true
     noaSetsRangeInSeatiles: '3.0'
+    ownFadActionWeightBias: '1.0'
     planningHorizonInHours: '168.0'
     purgeIllegalActionsImmediately: true
+    uniqueCatchSamplerForEachStrategy: false
   fadInitializerFactory:
     Abundance FAD Beta Initializer With Expiration:
       attractableBiomassCoefficients:
@@ -144,7 +159,14 @@ EPO Abundance Pathfinding:
       Y2016: inputs/epo_inputs/currents/currents_2016_dead_cells.csv
       Y2017: inputs/epo_inputs/currents/currents_2017_dead_cells.csv
       Y2018: inputs/epo_inputs/currents/currents_2018_dead_cells.csv
+    inputIsMetersPerSecond: true
   fishingStrategyFactory: Default to Destination Strategy
+  gearStrategy:
+    FAD Refill:
+      fadCost: 1000.0
+      maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
+      targetYear: 2017
+  inputFolder: *id001
   locationValuesFilePath: inputs/epo_inputs/location_values.csv
   mapInitializerFactory:
     From File Map:
@@ -153,6 +175,9 @@ EPO Abundance Pathfinding:
       latLong: true
       mapFile: inputs/epo_inputs/depth.csv
       mapPaddingInDegrees: '0.5'
+  marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
+    priceFilePath: inputs/epo_inputs/prices.csv
+    speciesCodes: null
   purseSeineGearFactory: null
   recruitmentProcessesFactory:
     recruitmentParametersFilePath: inputs/epo_inputs/abundance/recruitment_parameters.csv
@@ -173,10 +198,11 @@ EPO Abundance Pathfinding:
       Temporary Regulation:
         delegate:
           Specific MPA from Coordinates:
-            eastLongitude: '-96.0'
-            northLatitude: '4.0'
-            southLatitude: '-3.0'
-            westLongitude: '-110.0'
+            eastLongitude: -96.0
+            name: null
+            northLatitude: 4.0
+            southLatitude: -3.0
+            westLongitude: -110.0
         endDay: '312.0'
         inactiveDelegate: Anarchy
         startDay: '282.0'
@@ -198,9 +224,31 @@ EPO Abundance Pathfinding:
     - '2017-07-01'
     - '2017-10-01'
     recruitmentProcesses: null
+  speciesCodesSupplier: *id002
   vesselsFilePath: inputs/epo_inputs/boats.csv
+  weightGroupsFactory:
+    weightGroupCutoffsPerSpecies:
+      Bigeye tuna:
+      - 12.0
+      - 15.0
+      Skipjack tuna:
+      - 11.5016
+      - 11.5019
+      Yellowfin tuna:
+      - 12.0
+      - 15.0
+    weightGroupNamesPerSpecies:
+      Skipjack tuna:
+      - small
+      - medium
+      - large
+      Yellowfin tuna:
+      - small
+      - medium
+      - large
+      Bigeye tuna:
+      - small
+      - medium
+      - large
   zapper: true
   zapperAge: false
-  additionalStartables:
-    - IATTC Closure Period Randomizer:
-        proportionOfBoatsInClosureA: 0.5
