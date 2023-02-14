@@ -88,10 +88,6 @@ EPO Abundance Pathfinding:
   catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
     abundanceFilters: null
     catchSamplesFile: inputs/epo_inputs/set_samples.csv
-    speciesCodesSupplier: &id002 !!uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory
-      inputsFolder: &id001
-        path: inputs/epo_inputs
-      speciesCodeFile: species_codes.csv
     yearlyReset: false
   costsFile: inputs/epo_inputs/costs.csv
   destinationStrategy:
@@ -102,7 +98,6 @@ EPO Abundance Pathfinding:
     catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
       abundanceFilters: null
       catchSamplesFile: inputs/epo_inputs/set_samples.csv
-      speciesCodesSupplier: null
       yearlyReset: false
     delSetsRangeInSeatiles: '0.0'
     deploymentBias: '11.291191913413678'
@@ -166,7 +161,6 @@ EPO Abundance Pathfinding:
       fadCost: 1000.0
       maxFadDeploymentsFile: inputs/epo_inputs/max_deployments.csv
       targetYear: 2017
-  inputFolder: *id001
   locationValuesFilePath: inputs/epo_inputs/location_values.csv
   mapInitializerFactory:
     From File Map:
@@ -224,7 +218,6 @@ EPO Abundance Pathfinding:
     - '2017-07-01'
     - '2017-10-01'
     recruitmentProcesses: null
-  speciesCodesSupplier: *id002
   vesselsFilePath: inputs/epo_inputs/boats.csv
   weightGroupsFactory:
     weightGroupCutoffsPerSpecies:

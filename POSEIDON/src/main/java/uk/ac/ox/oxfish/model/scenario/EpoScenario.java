@@ -116,10 +116,9 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
     private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
-    public final SpeciesCodesFromFileFactory speciesCodesSupplier =
+    public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
-            inputFolder,
-            Paths.get("species_codes.csv")
+            new InputFile(inputFolder, Paths.get("species_codes.csv"))
         );
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory(
@@ -146,6 +145,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
+    }
+
+    public void setSpeciesCodesSupplier(final SpeciesCodesFromFileFactory speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")

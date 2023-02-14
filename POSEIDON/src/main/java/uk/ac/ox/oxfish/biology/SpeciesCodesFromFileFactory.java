@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.model.scenario.InputFolder;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -23,18 +23,15 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
 
     private static final LoadingCache<Path, SpeciesCodes> cache =
         CacheBuilder.newBuilder().build(from(SpeciesCodesFromFileFactory::getSpeciesCodes));
-    private InputFolder inputsFolder;
-    private Path speciesCodeFile;
+    private InputFile speciesCodeFile;
 
     @SuppressWarnings("unused")
     public SpeciesCodesFromFileFactory() {
     }
 
     public SpeciesCodesFromFileFactory(
-        final InputFolder inputsFolder,
-        final Path speciesCodeFile
+        final InputFile speciesCodeFile
     ) {
-        this.inputsFolder = inputsFolder;
         this.speciesCodeFile = speciesCodeFile;
     }
 
@@ -49,27 +46,17 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
     }
 
     @SuppressWarnings("unused")
-    public InputFolder getInputsFolder() {
-        return inputsFolder;
-    }
-
-    @SuppressWarnings("unused")
-    public void setInputsFolder(final InputFolder inputsFolder) {
-        this.inputsFolder = inputsFolder;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getSpeciesCodeFile() {
+    public InputFile getSpeciesCodeFile() {
         return speciesCodeFile;
     }
 
     @SuppressWarnings("unused")
-    public void setSpeciesCodeFile(final Path speciesCodeFile) {
+    public void setSpeciesCodeFile(final InputFile speciesCodeFile) {
         this.speciesCodeFile = speciesCodeFile;
     }
 
     @Override
     public SpeciesCodes get() {
-        return cache.getUnchecked(inputsFolder.resolve(speciesCodeFile));
+        return cache.getUnchecked(speciesCodeFile.get());
     }
 }

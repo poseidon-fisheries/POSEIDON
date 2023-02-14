@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import junit.framework.TestCase;
+import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.InputFile;
 
@@ -26,7 +27,17 @@ public class ScenarioUpdaterTest extends TestCase {
             .map(line -> line.replace("abundancePurseSeineGearFactory:", "purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory"))
             .collect(Collectors.joining("\n"));
 
+        final Consumer<EpoScenario<?, ?>> scenarioConsumer = (scenario) -> {
+            scenario.setSpeciesCodesSupplier(
+                new SpeciesCodesFromFileFactory(
+                    new InputFile(scenario.getInputFolder(), "species_codes.csv")
+                )
+            );
+            scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
+        };
+
         final Consumer<EpoScenario<?, ?>> baseScenarioConsumer = (scenario) -> {
+            scenarioConsumer.accept(scenario);
             scenario.getVesselsFile().setPath(Paths.get("tests/backsliding/boats.csv"));
             scenario.getPurseSeineGearFactory().setLocationValuesFile(
                 new InputFile(scenario.getInputFolder(), Paths.get("tests/backsliding/location_values_all2017.csv"))
@@ -37,6 +48,7 @@ public class ScenarioUpdaterTest extends TestCase {
         };
 
         final Consumer<EpoScenario<?, ?>> otherScenarioConsumer = (scenario) -> {
+            scenarioConsumer.accept(scenario);
             scenario.getPurseSeineGearFactory().setLocationValuesFile(
                 new InputFile(scenario.getInputFolder(), Paths.get("location_values.csv"))
             );

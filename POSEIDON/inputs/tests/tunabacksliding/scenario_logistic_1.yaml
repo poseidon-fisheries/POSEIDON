@@ -25,9 +25,10 @@ EPO Abundance Pathfinding:
     abundanceFilters: null
     catchSamplesFile: inputs/epo_inputs/set_samples.csv
     speciesCodesSupplier: &id002 !!uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory
-      inputsFolder: &id001
-        path: inputs/epo_inputs
-      speciesCodeFile: species_codes.csv
+      speciesCodeFile:
+        inputFolder: &id001
+          path: inputs/epo_inputs
+        path: species_codes.csv
     yearlyReset: false
   costsFile: inputs/epo_inputs/costs.csv
   destinationStrategy:
@@ -228,8 +229,7 @@ EPO Abundance Pathfinding:
     recruitmentProcesses: null
   speciesCodesSupplier: *id002
   vesselsFile:
-    inputFolder:
-      path: inputs/epo_inputs
+    inputFolder: *id001
     path: boats.csv
   weightGroupsFactory:
     weightGroupCutoffsPerSpecies:
