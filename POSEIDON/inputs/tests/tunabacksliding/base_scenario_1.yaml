@@ -100,7 +100,9 @@ EPO Abundance Pathfinding:
   gearStrategy:
     FAD Refill:
       fadCost: 1000.0
-      maxFadDeploymentsFile: inputs/epo_inputs/tests/backsliding/max_deployments.csv
+      maxFadDeploymentsFile:
+        inputFolder: *id001
+        path: tests/backsliding/max_deployments.csv
       targetYear: 2017
   inputFolder: *id001
   mapInitializerFactory:
@@ -150,7 +152,7 @@ EPO Abundance Pathfinding:
     fishValueCalculatorStandardDeviation: '0.0'
     locationValuesFile:
       inputFolder: *id001
-      path: tests/backsliding/location_values.csv
+      path: tests/backsliding/location_values_all2017.csv
     maxCurrentSpeedsFile: inputs/epo_inputs/max_current_speeds.csv
     nonAssociatedSetObservers: !!set {
       }

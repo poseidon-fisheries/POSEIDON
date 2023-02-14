@@ -189,7 +189,7 @@ parameters:
   minimum: 0.750928
   rawNumber: false
 runsPerSetting: 1
-scenarioFile: inputs/tests/tunabacksliding/scenario_logistic.yaml
+scenarioFile: inputs/tests/tunabacksliding/scenario_logistic_1.yaml
 simulatedYears: 2
 targets:
 - !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget

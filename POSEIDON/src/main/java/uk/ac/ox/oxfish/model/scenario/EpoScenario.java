@@ -122,7 +122,9 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             Paths.get("species_codes.csv")
         );
     private FadMapFactory<B, F> fadMapFactory;
-    private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory();
+    private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory(
+        new InputFile(inputFolder, "max_deployments.csv")
+    );
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
     private Path costsFile = INPUT_PATH.resolve("costs.csv");
@@ -363,17 +365,18 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public void useDummyData(final Path testPath) {
         getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         setCostsFile(testPath.resolve("no_costs.csv"));
+        final InputFolder testInputFolder = new InputFolder(testPath);
         setVesselsFile(
-            new InputFile(new InputFolder(testPath), "dummy_boats.csv")
+            new InputFile(testInputFolder, "dummy_boats.csv")
         );
         getGearStrategy().setMaxFadDeploymentsFile(
-            testPath.resolve("dummy_max_deployments.csv")
+            new InputFile(testInputFolder, "dummy_max_deployments.csv")
         );
         setAttractionWeightsFile(
             testPath.resolve("dummy_action_weights.csv")
         );
         getPurseSeineGearFactory().setLocationValuesFile(
-            new InputFile(new InputFolder(testPath), "dummy_location_values.csv")
+            new InputFile(testInputFolder, "dummy_location_values.csv")
         );
     }
 

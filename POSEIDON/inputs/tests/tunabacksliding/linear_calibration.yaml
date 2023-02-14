@@ -160,7 +160,7 @@ parameters:
   minimum: 0.04344000078552002
   rawNumber: false
 - !!uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter
-  addressToModify: abundancePurseSeineGearFactory.successfulSetProbability
+  addressToModify: purseSeineGearFactory.successfulSetProbability
   alwaysPositive: true
   hardMaximum: 1.0
   hardMinimum: 0.8
@@ -168,7 +168,7 @@ parameters:
   minimum: 0.747976
   rawNumber: false
 runsPerSetting: 1
-scenarioFile: inputs/tests/tunabacksliding/linear.yaml
+scenarioFile: inputs/tests/tunabacksliding/linear_1.yaml
 simulatedYears: 2
 targets:
 - !!uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget
