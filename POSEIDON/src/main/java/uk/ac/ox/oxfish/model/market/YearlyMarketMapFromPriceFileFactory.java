@@ -5,24 +5,28 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.SpeciesCodeAware;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class YearlyMarketMapFromPriceFileFactory
-    implements AlgorithmFactory<MarketMap>, SpeciesCodeAware {
+    implements AlgorithmFactory<MarketMap> {
 
     private InputFile priceFile;
-    private SpeciesCodes speciesCodes;
 
-    public YearlyMarketMapFromPriceFileFactory(final InputFile priceFile) {
+    public YearlyMarketMapFromPriceFileFactory(
+        final InputFile priceFile,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
+    ) {
         this.priceFile = priceFile;
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
+
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     /**
      * Empty constructor needed to use as factory
@@ -31,14 +35,12 @@ public class YearlyMarketMapFromPriceFileFactory
     public YearlyMarketMapFromPriceFileFactory() {
     }
 
-    @Override
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
     }
 
-    @Override
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -53,8 +55,8 @@ public class YearlyMarketMapFromPriceFileFactory
 
     @Override
     public MarketMap apply(final FishState fishState) {
-        checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         final GlobalBiology globalBiology = fishState.getBiology();
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         final Map<Species, FixedYearlyPricesBiomassMarket> prices =
             recordStream(priceFile.get()).collect(
                 groupingBy(

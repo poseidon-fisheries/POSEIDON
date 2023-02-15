@@ -117,7 +117,7 @@ EPO Abundance Pathfinding:
     priceFile:
       inputFolder: *id001
       path: prices.csv
-    speciesCodes: null
+    speciesCodesSupplier: *id002
   portInitializer: !!uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer
     portFile:
       inputFolder: *id001

@@ -118,7 +118,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         );
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(
-            new InputFile(inputFolder, Paths.get("prices.csv"))
+            new InputFile(inputFolder, Paths.get("prices.csv")),
+            speciesCodesSupplier
         );
     private PortInitializer portInitializer =
         new FromSimpleFilePortInitializer(

@@ -21,11 +21,13 @@ public class ScenarioUpdaterTest extends TestCase {
         final Path folder = Paths.get("inputs/tests/tunabacksliding/");
 
         final Function<Stream<String>, String> lineProcessor = lines -> lines
+            .filter(line -> !line.matches(".*speciesCodes:.*"))
             .filter(line -> !line.matches(".*vesselsFilePath.*"))
             .filter(line -> !line.matches(".*locationValuesFile.*"))
             .filter(line -> !line.matches(".*purseSeineGearFactory.*"))
             .filter(line -> !line.matches(".*maxFadDeploymentsFile.*"))
             .filter(line -> !line.matches(".*priceFilePath.*"))
+            .filter(line -> !line.matches(".*marketMapFactory.*"))
             .map(line -> line.replace("abundancePurseSeineGearFactory:", "purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory"))
             .collect(Collectors.joining("\n"));
 
@@ -36,9 +38,8 @@ public class ScenarioUpdaterTest extends TestCase {
                 )
             );
             scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
-            ((YearlyMarketMapFromPriceFileFactory) scenario.getMarketMapFactory()).setPriceFile(
-                new InputFile(scenario.getInputFolder(), Paths.get("prices.csv"))
-            );
+            final YearlyMarketMapFromPriceFileFactory marketMapFactory = (YearlyMarketMapFromPriceFileFactory) scenario.getMarketMapFactory();
+            marketMapFactory.setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
         };
 
         final Consumer<EpoScenario<?, ?>> baseScenarioConsumer = (scenario) -> {
