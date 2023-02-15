@@ -382,13 +382,15 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         getGearStrategy().setMaxFadDeploymentsFile(
             new InputFile(testInputFolder, "dummy_max_deployments.csv")
         );
-        ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
-            .setActionWeightsFile(
-                new InputFile(testInputFolder, "dummy_action_weights.csv")
+        if (getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory<?, ?>)
+            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
+                .setActionWeightsFile(
+                    new InputFile(testInputFolder, "dummy_action_weights.csv")
+                );
+        if (getPurseSeineGearFactory() != null)
+            getPurseSeineGearFactory().setLocationValuesFile(
+                new InputFile(testInputFolder, "dummy_location_values.csv")
             );
-        getPurseSeineGearFactory().setLocationValuesFile(
-            new InputFile(testInputFolder, "dummy_location_values.csv")
-        );
     }
 
     public FadRefillGearStrategyFactory getGearStrategy() {

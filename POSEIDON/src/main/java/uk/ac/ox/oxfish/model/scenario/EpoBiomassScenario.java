@@ -329,5 +329,15 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
+    @Override
+    public void useDummyData(final Path testPath) {
+        super.useDummyData(testPath);
+        this.gravityDestinationStrategyFactory.setActionWeightsFile(
+            new InputFile(new InputFolder(testPath), "dummy_action_weights.csv")
+        );
+        this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
+            new InputFile(new InputFolder(testPath), "dummy_boats.csv")
+        );
+    }
 
 }

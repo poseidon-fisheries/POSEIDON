@@ -373,6 +373,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
             new InputFile(new InputFolder(testPath), "dummy_action_weights.csv")
         );
+        this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
+            new InputFile(new InputFolder(testPath), "dummy_boats.csv")
+        );
     }
 
     @SuppressWarnings("unused")
