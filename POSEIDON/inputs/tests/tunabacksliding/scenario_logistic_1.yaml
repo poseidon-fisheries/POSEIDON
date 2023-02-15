@@ -116,6 +116,11 @@ EPO Abundance Pathfinding:
   marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
     priceFilePath: inputs/epo_inputs/prices.csv
     speciesCodes: null
+  portInitializer: !!uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer
+    portFile:
+      inputFolder: *id001
+      path: ports.csv
+    targetYear: 2017
   purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory
     actionDistanceExponent: 1.0
     actionSpecificRegulations:

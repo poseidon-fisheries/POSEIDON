@@ -111,14 +111,17 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
         .build();
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
-    private final PortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(TARGET_YEAR, INPUT_PATH.resolve("ports.csv"));
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
     private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
             new InputFile(inputFolder, Paths.get("species_codes.csv"))
+        );
+    private PortInitializer portInitializer =
+        new FromSimpleFilePortInitializer(
+            TARGET_YEAR,
+            new InputFile(inputFolder, Paths.get("ports.csv"))
         );
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory(
@@ -134,6 +137,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+
+    public PortInitializer getPortInitializer() {
+        return portInitializer;
+    }
+
+    public void setPortInitializer(final PortInitializer portInitializer) {
+        this.portInitializer = portInitializer;
+    }
 
     public InputFile getVesselsFile() {
         return vesselsFile;
