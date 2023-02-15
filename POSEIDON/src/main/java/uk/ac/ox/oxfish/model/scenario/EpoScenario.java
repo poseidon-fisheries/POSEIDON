@@ -111,12 +111,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
         .build();
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
-    AlgorithmFactory<? extends MarketMap> marketMapFactory =
-        new YearlyMarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"));
     private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
             new InputFile(inputFolder, Paths.get("species_codes.csv"))
+        );
+    AlgorithmFactory<? extends MarketMap> marketMapFactory =
+        new YearlyMarketMapFromPriceFileFactory(
+            new InputFile(inputFolder, Paths.get("prices.csv"))
         );
     private PortInitializer portInitializer =
         new FromSimpleFilePortInitializer(

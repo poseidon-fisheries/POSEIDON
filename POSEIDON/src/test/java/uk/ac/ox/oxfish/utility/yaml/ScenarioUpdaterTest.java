@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.InputFile;
 
@@ -24,6 +25,7 @@ public class ScenarioUpdaterTest extends TestCase {
             .filter(line -> !line.matches(".*locationValuesFile.*"))
             .filter(line -> !line.matches(".*purseSeineGearFactory.*"))
             .filter(line -> !line.matches(".*maxFadDeploymentsFile.*"))
+            .filter(line -> !line.matches(".*priceFilePath.*"))
             .map(line -> line.replace("abundancePurseSeineGearFactory:", "purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory"))
             .collect(Collectors.joining("\n"));
 
@@ -34,6 +36,9 @@ public class ScenarioUpdaterTest extends TestCase {
                 )
             );
             scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
+            ((YearlyMarketMapFromPriceFileFactory) scenario.getMarketMapFactory()).setPriceFile(
+                new InputFile(scenario.getInputFolder(), Paths.get("prices.csv"))
+            );
         };
 
         final Consumer<EpoScenario<?, ?>> baseScenarioConsumer = (scenario) -> {

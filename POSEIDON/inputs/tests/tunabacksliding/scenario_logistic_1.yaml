@@ -114,7 +114,9 @@ EPO Abundance Pathfinding:
       mapFile: inputs/epo_inputs/depth.csv
       mapPaddingInDegrees: '0.5'
   marketMapFactory: !!uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory
-    priceFilePath: inputs/epo_inputs/prices.csv
+    priceFile:
+      inputFolder: *id001
+      path: prices.csv
     speciesCodes: null
   portInitializer: !!uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer
     portFile:
