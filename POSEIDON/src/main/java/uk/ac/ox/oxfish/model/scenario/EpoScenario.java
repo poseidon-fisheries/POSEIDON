@@ -132,8 +132,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     );
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
-    private InputFile costsFile = new InputFile(inputFolder,"costs.csv");
-    private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
+    private InputFile costsFile = new InputFile(inputFolder, "costs.csv");
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
@@ -141,10 +140,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
 
+    @SuppressWarnings("unused")
     public PortInitializer getPortInitializer() {
         return portInitializer;
     }
 
+    @SuppressWarnings("unused")
     public void setPortInitializer(final PortInitializer portInitializer) {
         this.portInitializer = portInitializer;
     }
@@ -188,8 +189,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             && getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory) {
             ((PurseSeinerFishingStrategyFactory<B, F>) getFishingStrategyFactory())
                 .setCatchSamplersFactory(getCatchSamplersFactory());
-            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
-                .setAttractionWeightsFile(getAttractionWeightsFile());
         }
 
         if (getPurseSeineGearFactory() != null) {
@@ -238,14 +237,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
-    }
-
     public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {
         return purseSeineGearFactory;
     }
@@ -258,11 +249,11 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return this.fadMapFactory;
     }
 
-    public void setFadMapFactory(FadMapFactory<B, F> fadMapFactory) {
+    public void setFadMapFactory(final FadMapFactory<B, F> fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
     }
 
-    List<Port> buildPorts(FishState fishState) {
+    List<Port> buildPorts(final FishState fishState) {
         final MarketMap marketMap = getMarketMapFactory().apply(fishState);
         portInitializer.buildPorts(
             fishState.getMap(),
@@ -304,7 +295,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         final PurseSeineGearFactory<B, F> purseSeineGearFactory,
         final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory,
-        PurseSeinerDepartingStrategyFactory departingStrategy
+        final PurseSeinerDepartingStrategyFactory departingStrategy
     ) {
         final FisherFactory fisherFactory = new FisherFactory(
             null,
@@ -391,9 +382,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         getGearStrategy().setMaxFadDeploymentsFile(
             new InputFile(testInputFolder, "dummy_max_deployments.csv")
         );
-        setAttractionWeightsFile(
-            testPath.resolve("dummy_action_weights.csv")
-        );
+        ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
+            .setActionWeightsFile(
+                new InputFile(testInputFolder, "dummy_action_weights.csv")
+            );
         getPurseSeineGearFactory().setLocationValuesFile(
             new InputFile(testInputFolder, "dummy_location_values.csv")
         );
@@ -416,7 +408,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return marketMapFactory;
     }
 
-    public void setMarketMapFactory(AlgorithmFactory<? extends MarketMap> marketMapFactory) {
+    public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
         this.marketMapFactory = marketMapFactory;
     }
 
@@ -436,7 +428,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public void setAdditionalStartables(List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
+    public void setAdditionalStartables(final List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
         this.additionalStartables = additionalStartables;
 
     }

@@ -106,10 +106,20 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             "Skipjack tuna", 1.25
         )
     );
+    private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+        new GravityDestinationStrategyFactory(
+            new InputFile(getInputFolder(), "action_weights.csv"),
+            getVesselsFile()
+        );
 
     public EpoBiomassScenario() {
         setFadMapFactory(new BiomassFadMapFactory(currentFiles));
-        setFishingStrategyFactory(new PurseSeinerBiomassFishingStrategyFactory(getSpeciesCodesSupplier()));
+        setFishingStrategyFactory(
+            new PurseSeinerBiomassFishingStrategyFactory(
+                getSpeciesCodesSupplier(),
+                new InputFile(getInputFolder(), "action_weights.csv")
+            )
+        );
         setCatchSamplersFactory(new BiomassCatchSamplersFactory(getSpeciesCodesSupplier()));
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
     }
@@ -123,6 +133,14 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public static int dayOfYear(final Month month, final int dayOfMonth) {
         return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
             .getDayOfYear();
+    }
+
+    public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
+        return gravityDestinationStrategyFactory;
+    }
+
+    public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
+        this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
     }
 
     @SuppressWarnings("unused")
@@ -251,11 +269,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-            new GravityDestinationStrategyFactory();
-        gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
-        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFile().get());
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,

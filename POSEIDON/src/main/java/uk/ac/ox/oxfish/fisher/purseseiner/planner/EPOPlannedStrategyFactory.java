@@ -137,7 +137,7 @@ public class EPOPlannedStrategyFactory implements AlgorithmFactory<PlannedStrate
                         catchSamplerLocker.presentKey(state,
                                 () -> catchSamplersFactory.apply(state))
                 ,
-                PurseSeinerFishingStrategyFactory.loadAttractionWeights(attractionWeightsFile),
+                PurseSeinerFishingStrategyFactory.loadActionWeights(attractionWeightsFile),
                 GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile),
                 additionalHourlyDelayDolphinSets.apply(state.getRandom()),
                 additionalHourlyDelayDeployment.apply(state.getRandom()),

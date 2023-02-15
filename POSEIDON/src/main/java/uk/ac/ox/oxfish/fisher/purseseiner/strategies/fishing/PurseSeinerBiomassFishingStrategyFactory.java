@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 import java.util.function.Supplier;
 
@@ -35,8 +36,11 @@ public class PurseSeinerBiomassFishingStrategyFactory
         super(BiomassLocalBiology.class, BiomassFad.class);
     }
 
-    public PurseSeinerBiomassFishingStrategyFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        super(BiomassLocalBiology.class, BiomassFad.class, speciesCodesSupplier);
+    public PurseSeinerBiomassFishingStrategyFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile actionWeightsFile
+    ) {
+        super(BiomassLocalBiology.class, BiomassFad.class, speciesCodesSupplier, actionWeightsFile);
     }
 
     @Override

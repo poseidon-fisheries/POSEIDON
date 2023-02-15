@@ -40,6 +40,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
@@ -84,7 +85,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final int noaSetsRangeInSeaTiles = 0;
     private final int delSetsRangeInSeaTiles = 0;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private Path attractionWeightsFile;
+    private InputFile actionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private Path setCompositionWeightsPath = INPUT_PATH.resolve("set_compositions.csv");
     // use default values from:
@@ -125,10 +126,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile actionWeightsFile
     ) {
         this(biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
+        this.actionWeightsFile = actionWeightsFile;
     }
 
     PurseSeinerFishingStrategyFactory(
@@ -139,7 +142,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         this.biologyClass = biologyClass;
     }
 
-    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadAttractionWeights(
+    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
         final Path attractionWeightsFile
     ) {
         return fisher -> stream(ActionClass.values())
@@ -294,12 +297,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
+    public InputFile getActionWeightsFile() {
+        return actionWeightsFile;
     }
 
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
+    public void setActionWeightsFile(final InputFile actionWeightsFile) {
+        this.actionWeightsFile = actionWeightsFile;
     }
 
     @SuppressWarnings("unused")
@@ -383,10 +386,10 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     @Override
     public PurseSeinerFishingStrategy<B> apply(final FishState fishState) {
         checkNotNull(catchSamplersFactory);
-        checkNotNull(attractionWeightsFile);
+        checkNotNull(actionWeightsFile);
         checkNotNull(maxCurrentSpeedsFile);
         return callConstructor(
-            this::loadAttractionWeights,
+            this::loadActionWeights,
             this::makeSetOpportunityDetector,
             makeActionValueFunctions(fishState),
             getMaxCurrentSpeeds(fishState.getMap()),
@@ -439,7 +442,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         );
     }
 
-    private Map<Class<? extends PurseSeinerAction>, Double> loadAttractionWeights(
+    private Map<Class<? extends PurseSeinerAction>, Double> loadActionWeights(
         final Fisher fisher
     ) {
         return stream(ActionClass.values())
@@ -447,7 +450,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             .collect(toImmutableMap(
                 identity(),
                 actionClass -> ActionWeightsCache.INSTANCE.get(
-                    attractionWeightsFile,
+                    actionWeightsFile.get(),
                     TARGET_YEAR,
                     fisher,
                     actionClass

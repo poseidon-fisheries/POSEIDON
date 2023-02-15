@@ -351,14 +351,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
-    @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
-        setAttractionWeightsFile(
-                testPath.resolve("dummy_action_weights.csv")
-        );
-    }
-
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;

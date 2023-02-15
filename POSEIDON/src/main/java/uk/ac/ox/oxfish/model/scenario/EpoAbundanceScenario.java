@@ -112,11 +112,21 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new LinearAbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
+    private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
+        new GravityDestinationStrategyFactory(
+            new InputFile(getInputFolder(), "action_weights.csv"),
+            getVesselsFile()
+        );
 
     public EpoAbundanceScenario() {
         setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
-        setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory(getSpeciesCodesSupplier()));
+        setFishingStrategyFactory(
+            new PurseSeinerAbundanceFishingStrategyFactory(
+                getSpeciesCodesSupplier(),
+                new InputFile(getInputFolder(), "action_weights.csv")
+            )
+        );
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
             new InputFile(getInputFolder(), "location_values.csv")
         ));
@@ -150,6 +160,14 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         } catch (final IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
+        return gravityDestinationStrategyFactory;
+    }
+
+    public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
+        this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
     }
 
     @SuppressWarnings("unused")
@@ -308,11 +326,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         getPurseSeineGearFactory().setFadInitializerFactory(fadInitializerFactory);
 
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-            new GravityDestinationStrategyFactory();
-        gravityDestinationStrategyFactory.setAttractionWeightsFile(getAttractionWeightsFile());
-        gravityDestinationStrategyFactory.setMaxTripDurationFile(getVesselsFile().get());
-
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
             getRegulationsFactory(),
@@ -357,8 +370,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @Override
     public void useDummyData(final Path testPath) {
         super.useDummyData(testPath);
-        setAttractionWeightsFile(
-            testPath.resolve("dummy_action_weights.csv")
+        this.gravityDestinationStrategyFactory.setActionWeightsFile(
+            new InputFile(new InputFolder(testPath), "dummy_action_weights.csv")
         );
     }
 
