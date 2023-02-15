@@ -26,11 +26,11 @@ import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,7 +42,6 @@ import static java.util.stream.Collectors.toList;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
@@ -54,12 +53,27 @@ public class BiomassInitializerFactory
 
     private BiomassReallocator biomassReallocator;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private Path schaeferParamsFile = INPUT_PATH.resolve("biomass").resolve("schaefer_params.csv");
+    private InputFile schaeferParamsFile;
 
+    @SuppressWarnings("unused")
     public BiomassInitializerFactory() {
     }
-    public BiomassInitializerFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+
+    public BiomassInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile schaeferParamsFile
+    ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
+        this.schaeferParamsFile = schaeferParamsFile;
+    }
+
+    public InputFile getSchaeferParamsFile() {
+        return schaeferParamsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSchaeferParamsFile(final InputFile schaeferParamsFile) {
+        this.schaeferParamsFile = schaeferParamsFile;
     }
 
     @SuppressWarnings("unused")
@@ -79,16 +93,6 @@ public class BiomassInitializerFactory
 
     public void setBiomassReallocator(final BiomassReallocator biomassReallocator) {
         this.biomassReallocator = biomassReallocator;
-    }
-
-    @SuppressWarnings("unused")
-    public Path getSchaeferParamsFile() {
-        return schaeferParamsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSchaeferParamsFile(final Path schaeferParamsFile) {
-        this.schaeferParamsFile = schaeferParamsFile;
     }
 
     @Override
@@ -126,7 +130,7 @@ public class BiomassInitializerFactory
         final Map<String, ? extends GridAllocator> initialAllocators,
         final SpeciesCodes speciesCodes
     ) {
-        return recordStream(schaeferParamsFile)
+        return recordStream(schaeferParamsFile.get())
             .map(r -> {
                 final String speciesName = speciesCodes.getSpeciesName(r.getString("species_code"));
                 final Double logisticGrowthRate = r.getDouble("logistic_growth_rate");

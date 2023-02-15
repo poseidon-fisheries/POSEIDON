@@ -48,6 +48,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -78,7 +79,11 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    private BiomassInitializerFactory biomassInitializerFactory = new BiomassInitializerFactory(speciesCodesSupplier);
+    private BiomassInitializerFactory biomassInitializerFactory =
+        new BiomassInitializerFactory(
+            speciesCodesSupplier,
+            new InputFile(getInputFolder(), Paths.get("biomass", "schaefer_params.csv"))
+        );
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
         scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
@@ -256,12 +261,12 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     }
 
     @SuppressWarnings("unused")
-    public BiomassInitializerFactory getBiomassReallocatorInitializerFactory() {
+    public BiomassInitializerFactory getBiomassInitializerFactory() {
         return biomassInitializerFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setBiomassReallocatorInitializerFactory(final BiomassInitializerFactory biomassInitializerFactory) {
+    public void setBiomassInitializerFactory(final BiomassInitializerFactory biomassInitializerFactory) {
         this.biomassInitializerFactory = biomassInitializerFactory;
     }
 
