@@ -21,14 +21,11 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.geography.currents.BiasedCurrentVectors;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.nio.file.Path;
-import java.util.Map;
 
 @SuppressWarnings("unused")
 public class BiasedFadMapFactory extends GenericFadMapFactory {
@@ -42,8 +39,8 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     private DoubleParameter gridYMaximum = new FixedDoubleParameter(0);
 
     @SuppressWarnings("unused")
-    public BiasedFadMapFactory(Map<CurrentPattern, Path> currentFiles) {
-        super(currentFiles);
+    public BiasedFadMapFactory(final CurrentPatternMapSupplier currentPatternMapSupplier) {
+        super(currentPatternMapSupplier);
     }
 
     @SuppressWarnings("unused")
@@ -51,7 +48,7 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     }
 
     @Override
-    protected CurrentVectors buildCurrentVectors(FishState fishState) {
+    protected CurrentVectors buildCurrentVectors(final FishState fishState) {
         return
             new BiasedCurrentVectors(
                 super.buildCurrentVectors(fishState),
@@ -69,7 +66,7 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     }
 
     @SuppressWarnings("unused")
-    public void setBiasY(DoubleParameter biasY) {
+    public void setBiasY(final DoubleParameter biasY) {
         this.biasY = biasY;
     }
 
@@ -79,7 +76,7 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     }
 
     @SuppressWarnings("unused")
-    public void setBiasX(DoubleParameter biasX) {
+    public void setBiasX(final DoubleParameter biasX) {
         this.biasX = biasX;
     }
 
@@ -89,7 +86,7 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     }
 
     @SuppressWarnings("unused")
-    public void setGridYMinimum(DoubleParameter gridYMinimum) {
+    public void setGridYMinimum(final DoubleParameter gridYMinimum) {
         this.gridYMinimum = gridYMinimum;
     }
 
@@ -99,7 +96,7 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
     }
 
     @SuppressWarnings("unused")
-    public void setGridYMaximum(DoubleParameter gridYMaximum) {
+    public void setGridYMaximum(final DoubleParameter gridYMaximum) {
         this.gridYMaximum = gridYMaximum;
     }
 }

@@ -115,7 +115,7 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
             );
 
     public EpoAbundanceScenarioBioOnly() {
-        setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
+        setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());

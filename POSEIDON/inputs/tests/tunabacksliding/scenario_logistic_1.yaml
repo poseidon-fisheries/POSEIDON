@@ -24,7 +24,7 @@ EPO Abundance Pathfinding:
   catchSamplersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
     abundanceFilters: null
     catchSamplesFile: inputs/epo_inputs/set_samples.csv
-    speciesCodesSupplier: &id002 !!uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory
+    speciesCodesSupplier: &id003 !!uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory
       speciesCodeFile:
         inputFolder: &id001
           path: inputs/epo_inputs
@@ -33,6 +33,12 @@ EPO Abundance Pathfinding:
   costsFile:
     inputFolder: *id001
     path: costs.csv
+  currentPatternMapSupplier: &id002
+    currentFiles:
+      Y2016: currents/currents_2016.csv
+      Y2017: currents/currents_2017.csv
+      Y2018: currents/currents_2018.csv
+    inputFolder: *id001
   destinationStrategy:
     additionalHourlyDelayDeployment: '0.0'
     additionalHourlyDelayDolphinSets: '15.990692562369254'
@@ -94,10 +100,7 @@ EPO Abundance Pathfinding:
       speciesCodes: null
       totalCarryingCapacity: '313955.9902017746'
   fadMapFactory: !!uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory
-    currentFiles:
-      Y2016: inputs/epo_inputs/currents/currents_2016_dead_cells.csv
-      Y2017: inputs/epo_inputs/currents/currents_2017_dead_cells.csv
-      Y2018: inputs/epo_inputs/currents/currents_2018_dead_cells.csv
+    currentPatternMapSupplier: *id002
     inputIsMetersPerSecond: true
   fishingStrategyFactory: Default to Destination Strategy
   gearStrategy:
@@ -119,7 +122,7 @@ EPO Abundance Pathfinding:
     priceFile:
       inputFolder: *id001
       path: prices.csv
-    speciesCodesSupplier: *id002
+    speciesCodesSupplier: *id003
   portInitializer: !!uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer
     portFile:
       inputFolder: *id001
@@ -236,7 +239,7 @@ EPO Abundance Pathfinding:
     - '2017-07-01'
     - '2017-10-01'
     recruitmentProcesses: null
-  speciesCodesSupplier: *id002
+  speciesCodesSupplier: *id003
   vesselsFile:
     inputFolder: *id001
     path: boats.csv

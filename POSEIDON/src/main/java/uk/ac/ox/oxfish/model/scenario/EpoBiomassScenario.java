@@ -113,7 +113,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
 
     public EpoBiomassScenario() {
-        setFadMapFactory(new BiomassFadMapFactory(currentFiles));
+        setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
         setFishingStrategyFactory(
             new PurseSeinerBiomassFishingStrategyFactory(
                 getSpeciesCodesSupplier(),

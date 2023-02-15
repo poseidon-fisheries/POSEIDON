@@ -23,6 +23,7 @@ import java.util.Map;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
 public class AbundanceFadMapFactory extends FadMapFactory<AbundanceLocalBiology, AbundanceFad> {
 
@@ -32,8 +33,8 @@ public class AbundanceFadMapFactory extends FadMapFactory<AbundanceLocalBiology,
     }
 
     public AbundanceFadMapFactory(
-        final Map<CurrentPattern, Path> currentFiles
+        final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
-        super(AbundanceLocalBiology.class, AbundanceFad.class, currentFiles);
+        super(AbundanceLocalBiology.class, AbundanceFad.class, currentPatternMapSupplier);
     }
 }

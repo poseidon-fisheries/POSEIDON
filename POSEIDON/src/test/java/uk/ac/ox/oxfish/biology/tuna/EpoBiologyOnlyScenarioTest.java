@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.ArrayUtils;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.*;
 
@@ -17,7 +18,7 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
         ((AbundanceMortalityProcessFromFileFactory) scenario.getScheduledAbundanceProcessesFactory().getAbundanceMortalityProcessFactory()).setMortalityFile(EpoScenario.INPUT_PATH.resolve("tests").resolve("mortality_BP.csv"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
-        scenario.getFadMapFactory().setCurrentFiles(ImmutableMap.of());
+        scenario.getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
 
         double[] partialF = {0.132763,0.00484204,3.12056E-05,0.0296353,0.00197554,0.00632267,0.00559769,0.0555887,0.00258933};
 

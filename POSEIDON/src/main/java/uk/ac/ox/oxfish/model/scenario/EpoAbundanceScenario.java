@@ -119,7 +119,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
 
     public EpoAbundanceScenario() {
-        setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
+        setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
         setFishingStrategyFactory(
             new PurseSeinerAbundanceFishingStrategyFactory(

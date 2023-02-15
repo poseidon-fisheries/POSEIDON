@@ -1,18 +1,13 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -21,20 +16,18 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
 
     private final Class<B> localBiologyClass;
     private final Class<F> fadClass;
-    private Map<CurrentPattern, Path> currentFiles;
-
-
+    private CurrentPatternMapSupplier currentPatternMapSupplier;
     private boolean inputIsMetersPerSecond = true;
-
 
     FadMapFactory(
         final Class<B> localBiologyClass,
         final Class<F> fadClass,
-        final Map<CurrentPattern, Path> currentFiles
+        final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
         this(localBiologyClass, fadClass);
-        this.currentFiles = ImmutableMap.copyOf(currentFiles);
+        this.currentPatternMapSupplier = currentPatternMapSupplier;
     }
+
 
     FadMapFactory(
         final Class<B> localBiologyClass,
@@ -45,13 +38,13 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public Map<CurrentPattern, Path> getCurrentFiles() {
-        return Collections.unmodifiableMap(currentFiles);
+    public CurrentPatternMapSupplier getCurrentPatternMapSupplier() {
+        return currentPatternMapSupplier;
     }
 
     @SuppressWarnings("unused")
-    public void setCurrentFiles(final Map<CurrentPattern, Path> currentFiles) {
-        this.currentFiles = ImmutableMap.copyOf(currentFiles);
+    public void setCurrentPatternMapSupplier(final CurrentPatternMapSupplier currentPatternMapSupplier) {
+        this.currentPatternMapSupplier = currentPatternMapSupplier;
     }
 
     @Override
@@ -71,10 +64,10 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         );
     }
 
-    CurrentVectors buildCurrentVectors(FishState fishState) {
+    CurrentVectors buildCurrentVectors(final FishState fishState) {
         return CurrentVectorsFactory.INSTANCE.getCurrentVectors(
             fishState.getMap().getMapExtent(),
-            currentFiles,
+            currentPatternMapSupplier.get(),
             inputIsMetersPerSecond
         );
     }
@@ -84,7 +77,7 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
         return inputIsMetersPerSecond;
     }
 
-    public void setInputIsMetersPerSecond(boolean inputIsMetersPerSecond) {
+    public void setInputIsMetersPerSecond(final boolean inputIsMetersPerSecond) {
         this.inputIsMetersPerSecond = inputIsMetersPerSecond;
     }
 }

@@ -22,16 +22,14 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
-
-import java.nio.file.Path;
-import java.util.Map;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
 public class GenericFadMapFactory extends FadMapFactory {
 
     public GenericFadMapFactory(
-            Map<CurrentPattern, Path> currentFiles) {
-        super(LocalBiology.class, AbstractFad.class, currentFiles);
+        final CurrentPatternMapSupplier currentPatternMapSupplier
+    ) {
+        super(LocalBiology.class, AbstractFad.class, currentPatternMapSupplier);
     }
 
     public GenericFadMapFactory() {

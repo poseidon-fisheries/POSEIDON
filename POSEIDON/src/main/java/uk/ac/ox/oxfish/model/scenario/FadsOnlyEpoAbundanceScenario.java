@@ -200,7 +200,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     }
 
     public FadsOnlyEpoAbundanceScenario() {
-        this.setFadMapFactory(new AbundanceFadMapFactory(currentFiles));
+        this.setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         this.setFishingStrategyFactory(new FishUntilFullFactory());
     }
 

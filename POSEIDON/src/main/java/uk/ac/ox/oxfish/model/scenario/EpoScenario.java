@@ -46,7 +46,7 @@ import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
@@ -104,12 +104,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
     public static final Path INPUT_PATH = Paths.get("inputs", "epo_inputs");
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
-    private static final Path currentsFolder = INPUT_PATH.resolve("currents");
-    static final ImmutableMap<CurrentPattern, Path> currentFiles = new ImmutableMap.Builder<CurrentPattern, Path>()
-        .put(Y2016, currentsFolder.resolve("currents_2016.csv"))
-        .put(Y2017, currentsFolder.resolve("currents_2017.csv"))
-        .put(Y2018, currentsFolder.resolve("currents_2018.csv"))
-        .build();
+
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
@@ -121,6 +116,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             new InputFile(inputFolder, Paths.get("prices.csv")),
             speciesCodesSupplier
         );
+    private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
+        inputFolder,
+        ImmutableMap.of(
+            Y2016, Paths.get("currents", "currents_2016.csv"),
+            Y2017, Paths.get("currents", "currents_2017.csv"),
+            Y2018, Paths.get("currents", "currents_2018.csv")
+        )
+    );
     private PortInitializer portInitializer =
         new FromSimpleFilePortInitializer(
             TARGET_YEAR,
@@ -139,6 +142,16 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+
+    @SuppressWarnings("unused")
+    public CurrentPatternMapSupplier getCurrentPatternMapSupplier() {
+        return currentPatternMapSupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCurrentPatternMapSupplier(final CurrentPatternMapSupplier currentPatternMapSupplier) {
+        this.currentPatternMapSupplier = currentPatternMapSupplier;
+    }
 
     @SuppressWarnings("unused")
     public PortInitializer getPortInitializer() {
@@ -371,8 +384,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("unused")
     @Override
     public void useDummyData(final Path testPath) {
-        getFadMapFactory().setCurrentFiles(ImmutableMap.of());
         final InputFolder testInputFolder = new InputFolder(testPath);
+        getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
         setCostsFile(
             new InputFile(testInputFolder, "no_costs.csv")
         );
