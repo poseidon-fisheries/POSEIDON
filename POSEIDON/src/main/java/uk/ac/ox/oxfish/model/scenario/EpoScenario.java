@@ -132,7 +132,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     );
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
-    private Path costsFile = INPUT_PATH.resolve("costs.csv");
+    private InputFile costsFile = new InputFile(inputFolder,"costs.csv");
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
@@ -352,7 +352,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("UnstableApiUsage")
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            recordStream(costsFile).collect(toImmutableRangeMap(
+            recordStream(costsFile.get()).collect(toImmutableRangeMap(
                 r -> Range.openClosed(
                     getQuantity(r.getInt("lower_capacity"), TONNE),
                     getQuantity(r.getInt("upper_capacity"), TONNE)
@@ -369,11 +369,11 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public Path getCostsFile() {
+    public InputFile getCostsFile() {
         return costsFile;
     }
 
-    public void setCostsFile(final Path costsFile) {
+    public void setCostsFile(final InputFile costsFile) {
         this.costsFile = costsFile;
     }
 
@@ -381,8 +381,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @Override
     public void useDummyData(final Path testPath) {
         getFadMapFactory().setCurrentFiles(ImmutableMap.of());
-        setCostsFile(testPath.resolve("no_costs.csv"));
         final InputFolder testInputFolder = new InputFolder(testPath);
+        setCostsFile(
+            new InputFile(testInputFolder, "no_costs.csv")
+        );
         setVesselsFile(
             new InputFile(testInputFolder, "dummy_boats.csv")
         );

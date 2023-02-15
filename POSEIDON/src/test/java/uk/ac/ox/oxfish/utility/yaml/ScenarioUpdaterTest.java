@@ -28,6 +28,7 @@ public class ScenarioUpdaterTest extends TestCase {
             .filter(line -> !line.matches(".*maxFadDeploymentsFile.*"))
             .filter(line -> !line.matches(".*priceFilePath.*"))
             .filter(line -> !line.matches(".*marketMapFactory.*"))
+            .filter(line -> !line.matches(".*costsFile.*"))
             .map(line -> line.replace("abundancePurseSeineGearFactory:", "purseSeineGearFactory: !!uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory"))
             .collect(Collectors.joining("\n"));
 
@@ -40,6 +41,7 @@ public class ScenarioUpdaterTest extends TestCase {
             scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
             final YearlyMarketMapFromPriceFileFactory marketMapFactory = (YearlyMarketMapFromPriceFileFactory) scenario.getMarketMapFactory();
             marketMapFactory.setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
+            scenario.setCostsFile(new InputFile(scenario.getInputFolder(), "costs.csv"));
         };
 
         final Consumer<EpoScenario<?, ?>> baseScenarioConsumer = (scenario) -> {

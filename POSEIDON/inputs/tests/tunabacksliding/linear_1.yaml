@@ -30,7 +30,9 @@ EPO Abundance Pathfinding:
           path: inputs/epo_inputs
         path: species_codes.csv
     yearlyReset: true
-  costsFile: inputs/epo_inputs/costs.csv
+  costsFile:
+    inputFolder: *id001
+    path: costs.csv
   destinationStrategy:
     additionalHourlyDelayDeployment: '0.16007117399999998'
     additionalHourlyDelayDolphinSets: '13.923288015'
