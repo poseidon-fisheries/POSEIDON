@@ -357,13 +357,13 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     }
 
     @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
+    public void useDummyData() {
+        super.useDummyData();
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            new InputFile(new InputFolder(testPath), "dummy_action_weights.csv")
+            new InputFile(testFolder, "dummy_action_weights.csv")
         );
         this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            new InputFile(new InputFolder(testPath), "dummy_boats.csv")
+            new InputFile(testFolder, "dummy_boats.csv")
         );
     }
 

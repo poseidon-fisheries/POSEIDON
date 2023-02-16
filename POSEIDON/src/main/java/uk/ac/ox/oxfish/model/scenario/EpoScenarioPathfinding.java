@@ -203,10 +203,10 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     }
 
     @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
+    public void useDummyData() {
+        super.useDummyData();
         getDestinationStrategy().setActionWeightsFile(
-            new InputFile(new InputFolder(testPath), "dummy_action_weights.csv")
+            new InputFile(testFolder, "dummy_action_weights.csv")
         );
     }
 

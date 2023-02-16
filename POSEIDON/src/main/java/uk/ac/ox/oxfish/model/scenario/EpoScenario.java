@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -106,7 +105,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
 
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
-    private InputFolder inputFolder = new InputFolder(Paths.get("inputs", "epo_inputs"));
+    private InputFolder inputFolder = new RootFolder(Paths.get("inputs", "epo_inputs"));
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
             new InputFile(inputFolder, Paths.get("species_codes.csv"))
@@ -116,6 +115,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             new InputFile(inputFolder, Paths.get("prices.csv")),
             speciesCodesSupplier
         );
+    InputFolder testFolder = new Subfolder(inputFolder, Paths.get("tests"));
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
@@ -368,26 +368,25 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     @SuppressWarnings("unused")
     @Override
-    public void useDummyData(final Path testPath) {
-        final InputFolder testInputFolder = new InputFolder(testPath);
+    public void useDummyData() {
         getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
         setCostsFile(
-            new InputFile(testInputFolder, "no_costs.csv")
+            new InputFile(testFolder, "no_costs.csv")
         );
         setVesselsFile(
-            new InputFile(testInputFolder, "dummy_boats.csv")
+            new InputFile(testFolder, "dummy_boats.csv")
         );
         getGearStrategy().setMaxFadDeploymentsFile(
-            new InputFile(testInputFolder, "dummy_max_deployments.csv")
+            new InputFile(testFolder, "dummy_max_deployments.csv")
         );
         if (getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory<?, ?>)
             ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
                 .setActionWeightsFile(
-                    new InputFile(testInputFolder, "dummy_action_weights.csv")
+                    new InputFile(testFolder, "dummy_action_weights.csv")
                 );
         if (getPurseSeineGearFactory() != null)
             getPurseSeineGearFactory().setLocationValuesFile(
-                new InputFile(testInputFolder, "dummy_location_values.csv")
+                new InputFile(testFolder, "dummy_location_values.csv")
             );
     }
 

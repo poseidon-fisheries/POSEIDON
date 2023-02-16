@@ -59,7 +59,7 @@ public class ScenarioTestUtils {
         try (final FileReader fileReader = new FileReader(scenarioFile)) {
             final FishYAML fishYAML = new FishYAML();
             final S scenario = fishYAML.loadAs(fileReader, scenarioClass);
-            scenario.useDummyData(testFolder);
+            scenario.useDummyData();
             final FishState fishState = new FishState();
             fishState.setScenario(scenario);
             fishState.start();

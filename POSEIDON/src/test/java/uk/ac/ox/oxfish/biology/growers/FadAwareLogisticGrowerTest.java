@@ -46,7 +46,7 @@ public class FadAwareLogisticGrowerTest {
         );
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        scenario.useDummyData(EpoScenario.TESTS_INPUT_PATH);
+        scenario.useDummyData();
         scenario.setMarketMapFactory(new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR));
         scenario.getExogenousCatchesFactory()
             .setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));

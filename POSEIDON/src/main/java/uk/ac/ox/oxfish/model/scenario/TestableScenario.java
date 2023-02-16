@@ -18,14 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
-
-import java.nio.file.Path;
 import uk.ac.ox.oxfish.model.FishState;
 
 public interface TestableScenario extends Scenario {
-
-    void useDummyData(final Path dummyDataPath);
 
     static FishState startTestableScenario(
         final Class<? extends TestableScenario> scenarioClass
@@ -36,11 +31,13 @@ public interface TestableScenario extends Scenario {
         } catch (final InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
-        scenario.useDummyData(TESTS_INPUT_PATH);
+        scenario.useDummyData();
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         fishState.start();
         return fishState;
     }
+
+    void useDummyData();
 
 }

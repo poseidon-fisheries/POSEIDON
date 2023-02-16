@@ -46,7 +46,7 @@ public class EpoBiomassScenarioTest {
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
-        scenario.useDummyData(TESTS_INPUT_PATH);
+        scenario.useDummyData();
         scenario.setMarketMapFactory(new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR));
 
         final Regulation regulation = new FishingSeason(true, 100);

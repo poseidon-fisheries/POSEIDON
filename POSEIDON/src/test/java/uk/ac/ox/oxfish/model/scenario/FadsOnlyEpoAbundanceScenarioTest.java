@@ -43,7 +43,7 @@ public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
 
     public void testRunTwoYearsWithoutCrashing() {
         final FadsOnlyEpoAbundanceScenario scenario = new FadsOnlyEpoAbundanceScenario();
-        scenario.useDummyData(TESTS_INPUT_PATH);
+        scenario.useDummyData();
         final FishState fishState = new FishState();
         initFadRemovalLog();
         fishState.setScenario(scenario);

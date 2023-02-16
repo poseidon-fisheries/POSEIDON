@@ -101,7 +101,7 @@ public class AbundanceAggregatorTest extends TestCase {
 
     public void testWithEpoAbundanceScenario() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-        scenario.useDummyData(TESTS_INPUT_PATH);
+        scenario.useDummyData();
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         fishState.start();

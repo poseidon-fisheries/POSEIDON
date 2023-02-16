@@ -301,13 +301,13 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     }
 
     @Override
-    public void useDummyData(final Path testPath) {
-        super.useDummyData(testPath);
+    public void useDummyData() {
+        super.useDummyData();
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
-            testPath.resolve("dummy_fad_deployments.csv").toString()
+            testFolder.resolve("dummy_fad_deployments.csv").toString()
         );
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
-            testPath.resolve("dummy_fad_sets.csv").toString()
+            testFolder.resolve("dummy_fad_sets.csv").toString()
         );
     }
 
