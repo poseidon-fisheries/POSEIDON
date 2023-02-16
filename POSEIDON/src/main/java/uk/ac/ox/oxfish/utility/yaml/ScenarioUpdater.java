@@ -23,6 +23,7 @@ public class ScenarioUpdater {
         final Function<Stream<String>, String> lineProcessor,
         final Consumer<EpoScenario<?, ?>> scenarioConsumer
     ) {
+        System.out.print("===\n" + inputScenario + "\n===\n");
         try (final Stream<String> scenarioLines = Files.lines(inputScenario)) {
 
             final String scenarioYaml = lineProcessor.apply(scenarioLines);
@@ -30,7 +31,7 @@ public class ScenarioUpdater {
             final FishYAML fishYAML = new FishYAML();
             final EpoScenario<?, ?> scenario = fishYAML.loadAs(scenarioYaml, EpoScenario.class);
             scenarioConsumer.accept(scenario);
-            scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
+            //scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
             try (final FileOutputStream fileOutputStream = new FileOutputStream(outputScenario.toFile())) {
                 final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
                 fishYAML.dump(scenario, outputStreamWriter);

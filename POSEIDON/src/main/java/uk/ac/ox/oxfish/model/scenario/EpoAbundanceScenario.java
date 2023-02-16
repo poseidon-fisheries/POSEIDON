@@ -30,10 +30,8 @@ import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
@@ -105,8 +103,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             0.5
         );
 
-    private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
         new LinearAbundanceFadInitializerFactory(
@@ -120,11 +116,14 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     public EpoAbundanceScenario() {
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        setCatchSamplersFactory(new AbundanceCatchSamplersFactory(getSpeciesCodesSupplier()));
         setFishingStrategyFactory(
             new PurseSeinerAbundanceFishingStrategyFactory(
                 getSpeciesCodesSupplier(),
-                new InputFile(getInputFolder(), "action_weights.csv")
+                new InputFile(getInputFolder(), "action_weights.csv"),
+                new AbundanceCatchSamplersFactory(
+                    getSpeciesCodesSupplier(),
+                    new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"))
+                )
             )
         );
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
@@ -178,16 +177,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @SuppressWarnings("unused")
     public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
         this.weightGroupsFactory = weightGroupsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     @SuppressWarnings("unused")
@@ -309,20 +298,17 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        abundanceFiltersFactory.setSpeciesCodes(getSpeciesCodesSupplier().get());
-        final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-            abundanceFilters = abundanceFiltersFactory.apply(fishState);
-        if (getCatchSamplersFactory() instanceof AbundanceCatchSamplersFactory) {
-            ((AbundanceCatchSamplersFactory) getCatchSamplersFactory())
-                .setAbundanceFilters(abundanceFilters);
-        }
-
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
                 .setSpeciesCodes(getSpeciesCodesSupplier().get());
         }
-        ((PluggableSelectivity) fadInitializerFactory)
-            .setSelectivityFilters(abundanceFilters.get(FadSetAction.class));
+        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(
+            ((AbundanceCatchSamplersFactory) ((PurseSeinerAbundanceFishingStrategyFactory)
+                getFishingStrategyFactory()).getCatchSamplersFactory())
+                .getAbundanceFiltersFactory()
+                .apply(fishState)
+                .get(FadSetAction.class)
+        );
 
         getPurseSeineGearFactory().setFadInitializerFactory(fadInitializerFactory);
 

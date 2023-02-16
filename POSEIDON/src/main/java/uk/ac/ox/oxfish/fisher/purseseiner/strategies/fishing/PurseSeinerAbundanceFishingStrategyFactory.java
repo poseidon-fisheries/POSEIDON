@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 import java.util.Map;
@@ -46,9 +48,16 @@ public class PurseSeinerAbundanceFishingStrategyFactory
 
     public PurseSeinerAbundanceFishingStrategyFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile actionWeightsFile
+        final InputFile actionWeightsFile,
+        final AbundanceCatchSamplersFactory catchSamplersFactory
     ) {
-        super(AbundanceLocalBiology.class, AbundanceFad.class, speciesCodesSupplier, actionWeightsFile);
+        super(
+            AbundanceLocalBiology.class,
+            AbundanceFad.class,
+            speciesCodesSupplier,
+            actionWeightsFile,
+            catchSamplersFactory
+        );
     }
 
     @NotNull

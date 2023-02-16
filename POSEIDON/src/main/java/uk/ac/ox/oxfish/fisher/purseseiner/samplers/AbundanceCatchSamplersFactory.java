@@ -19,47 +19,50 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.Supplier;
-
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<AbundanceLocalBiology> {
+
+    private AbundanceFiltersFactory abundanceFiltersFactory;
 
     public AbundanceCatchSamplersFactory() {
     }
 
-    public AbundanceCatchSamplersFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        super(speciesCodesSupplier);
-    }
-
-    private Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-        abundanceFilters;
-
-    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> getAbundanceFilters() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return abundanceFilters;
-    }
-
-    public void setAbundanceFilters(
-        final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> abundanceFilters
+    public AbundanceCatchSamplersFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.abundanceFilters = abundanceFilters;
+        super(speciesCodesSupplier);
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     @Override
     CatchSampler<AbundanceLocalBiology> makeCatchSampler(
+        final FishState fishState,
         final Class<? extends AbstractSetAction<?>> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {
-        return new AbundanceCatchSampler(sample, rng, abundanceFilters.get(actionClass));
+        return new AbundanceCatchSampler(sample, rng, abundanceFiltersFactory.apply(fishState).get(actionClass));
     }
 
 }

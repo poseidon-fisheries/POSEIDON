@@ -96,7 +96,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             .collect(toImmutableMap(
                 Entry::getKey,
                 entry -> {
-                    final CatchSampler<B> instance = makeCatchSampler(entry.getKey(), entry.getValue(), rng);
+                    final CatchSampler<B> instance = makeCatchSampler(fishState, entry.getKey(), entry.getValue(), rng);
                     if (yearlyReset)
                         fishState.scheduleEveryYear((Steppable) simState -> instance.reset(), StepOrder.DAWN);
                     return instance;
@@ -105,6 +105,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     abstract CatchSampler<B> makeCatchSampler(
+        final FishState fishState,
         final Class<? extends AbstractSetAction<?>> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng

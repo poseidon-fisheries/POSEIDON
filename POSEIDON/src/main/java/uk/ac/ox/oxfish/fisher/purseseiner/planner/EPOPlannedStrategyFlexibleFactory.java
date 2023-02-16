@@ -2,45 +2,31 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.DiscretizedOwnFadPlanningFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.nio.file.Path;
 import java.util.Map;
-
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy> {
 
-
-
+    private final Locker<FishState, Map> catchSamplerLocker = new Locker<>();
     /**
      * object used to draw catches for DEL and NOA
      */
-//    private final Map<Class<? extends AbstractSetAction<?>>,
-//            CatchSampler<? extends LocalBiology>> catchSamplers;
-    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory = new AbundanceCatchSamplersFactory();
+    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory;
     /**
      * probability of any of these actions taking place next in a plan
      */
-    private Path attractionWeightsFile = INPUT_PATH.resolve("location_values.csv");
-    // PurseSeinerFishingStrategyFactory.loadAttractionWeights(..)
-
-    /**
-     * function that returns max travel time
-     */
-//    private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
-    private Path maxTripDurationFile = EpoScenario.INPUT_PATH.resolve("boats.csv");
-
+    private InputFile actionWeightsFile;
+    private InputFile maxTripDurationFile; // boats.csv
     /**
      * hours wasted after each DEL set
      */
@@ -53,95 +39,106 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after every NOA
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets = new FixedDoubleParameter(5);
-
-
     /**
-     *  $ a stolen fad needs to have accumulated before we even try to target it
+     * $ a stolen fad needs to have accumulated before we even try to target it
      */
     private DoubleParameter minimumValueOpportunisticFadSets = new FixedDoubleParameter(5000);
-
-
-
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
     private DoubleParameter hoursWastedOnFailedSearches = new FixedDoubleParameter(20);
-
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
-    private DoubleParameter planningHorizonInHours = new FixedDoubleParameter(24*7 );
-
+    private DoubleParameter planningHorizonInHours = new FixedDoubleParameter(24 * 7);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
-    private DoubleParameter ownFadActionWeightBias = new FixedDoubleParameter(1 );
-
+    private DoubleParameter ownFadActionWeightBias = new FixedDoubleParameter(1);
     /**
      * a multiplier applied to the action weight of DPL
      */
-    private DoubleParameter deploymentBias = new FixedDoubleParameter(1 );
-
+    private DoubleParameter deploymentBias = new FixedDoubleParameter(1);
     /**
      * a multiplier applied to the action weight of DPL
      */
-    private DoubleParameter noaBias = new FixedDoubleParameter(1 );
+    private DoubleParameter noaBias = new FixedDoubleParameter(1);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
-    private DoubleParameter minimumPercentageOfTripDurationAllowed = new FixedDoubleParameter(1 );
-
+    private DoubleParameter minimumPercentageOfTripDurationAllowed = new FixedDoubleParameter(1);
     private boolean noaSetsCanPoachFads = false;
-
     private boolean purgeIllegalActionsImmediately = true;
-
     private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(0);
-
-
     private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(0);
-
     private boolean uniqueCatchSamplerForEachStrategy = false;
-
-    private Locker<FishState, Map> catchSamplerLocker = new Locker<>();
-
-
-
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule = new DiscretizedOwnFadPlanningFactory();
+
     {
         //old default values
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setDiscretization( new SquaresMapDiscretizerFactory(6,3));
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setDistancePenalty(  new FixedDoubleParameter(1));
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setMinimumValueFadSets(  new FixedDoubleParameter(5000));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setDiscretization(new SquaresMapDiscretizerFactory(6, 3));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setDistancePenalty(new FixedDoubleParameter(1));
+        ((DiscretizedOwnFadPlanningFactory) fadModule).setMinimumValueFadSets(new FixedDoubleParameter(5000));
         ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedXCoordinateBounds("-1,75");
         ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedYCoordinateBounds("47, 51");
     }
+    public EPOPlannedStrategyFlexibleFactory() {
+    }
+    public EPOPlannedStrategyFlexibleFactory(
+        final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
+        final InputFile actionWeightsFile,
+        final InputFile maxTripDurationFile
+    ) {
+        this.catchSamplersFactory = catchSamplersFactory;
+        this.actionWeightsFile = actionWeightsFile;
+        this.maxTripDurationFile = maxTripDurationFile;
+    }
+
+    public InputFile getActionWeightsFile() {
+        return actionWeightsFile;
+    }
+
+    public void setActionWeightsFile(final InputFile actionWeightsFile) {
+        this.actionWeightsFile = actionWeightsFile;
+    }
+
+    public InputFile getMaxTripDurationFile() {
+        return maxTripDurationFile;
+    }
+
+    public void setMaxTripDurationFile(final InputFile maxTripDurationFile) {
+        this.maxTripDurationFile = maxTripDurationFile;
+    }
 
     @Override
-    public PlannedStrategyProxy apply(FishState state) {
+    public PlannedStrategyProxy apply(final FishState state) {
 
 
-        PlannedStrategyProxy proxy = new PlannedStrategyProxy(
-                uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
-                        catchSamplerLocker.presentKey(state,
-                                () -> catchSamplersFactory.apply(state))
-                ,
-                PurseSeinerFishingStrategyFactory.loadActionWeights(attractionWeightsFile),
-                GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile),
-                additionalHourlyDelayDolphinSets.apply(state.getRandom()),
-                additionalHourlyDelayDeployment.apply(state.getRandom()),
-                additionalHourlyDelayNonAssociatedSets.apply(state.getRandom()),
-                ownFadActionWeightBias.apply(state.getRandom()),
-                deploymentBias.apply(state.getRandom()),
-                noaBias.apply(state.getRandom()),
-                minimumValueOpportunisticFadSets.apply(state.getRandom()),
-                hoursWastedOnFailedSearches.apply(state.getRandom()),
-                planningHorizonInHours.apply(state.getRandom()),
-                minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
-                noaSetsCanPoachFads,
-                purgeIllegalActionsImmediately,
-                noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
-                delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
-                fadModule);
+        final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
+            uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
+                catchSamplerLocker.presentKey(
+                    state,
+                    () -> catchSamplersFactory.apply(state)
+                )
+            ,
+            PurseSeinerFishingStrategyFactory.loadActionWeights(actionWeightsFile.get()),
+            GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile.get()),
+            additionalHourlyDelayDolphinSets.apply(state.getRandom()),
+            additionalHourlyDelayDeployment.apply(state.getRandom()),
+            additionalHourlyDelayNonAssociatedSets.apply(state.getRandom()),
+            ownFadActionWeightBias.apply(state.getRandom()),
+            deploymentBias.apply(state.getRandom()),
+            noaBias.apply(state.getRandom()),
+            minimumValueOpportunisticFadSets.apply(state.getRandom()),
+            hoursWastedOnFailedSearches.apply(state.getRandom()),
+            planningHorizonInHours.apply(state.getRandom()),
+            minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
+            noaSetsCanPoachFads,
+            purgeIllegalActionsImmediately,
+            noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
+            delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
+            fadModule
+        );
 
         return proxy;
     }
@@ -150,29 +147,16 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return catchSamplersFactory;
     }
 
-    public void setCatchSamplersFactory(CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
+    public void setCatchSamplersFactory(final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
 
-
-
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    public void setAttractionWeightsFile(Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
-    }
-
-    public Path getMaxTripDurationFile() {
-        return maxTripDurationFile;
-    }
 
     public DoubleParameter getAdditionalHourlyDelayDolphinSets() {
         return additionalHourlyDelayDolphinSets;
     }
 
-    public void setAdditionalHourlyDelayDolphinSets(DoubleParameter additionalHourlyDelayDolphinSets) {
+    public void setAdditionalHourlyDelayDolphinSets(final DoubleParameter additionalHourlyDelayDolphinSets) {
         this.additionalHourlyDelayDolphinSets = additionalHourlyDelayDolphinSets;
     }
 
@@ -180,7 +164,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return additionalHourlyDelayDeployment;
     }
 
-    public void setAdditionalHourlyDelayDeployment(DoubleParameter additionalHourlyDelayDeployment) {
+    public void setAdditionalHourlyDelayDeployment(final DoubleParameter additionalHourlyDelayDeployment) {
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
     }
 
@@ -188,7 +172,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return additionalHourlyDelayNonAssociatedSets;
     }
 
-    public void setAdditionalHourlyDelayNonAssociatedSets(DoubleParameter additionalHourlyDelayNonAssociatedSets) {
+    public void setAdditionalHourlyDelayNonAssociatedSets(final DoubleParameter additionalHourlyDelayNonAssociatedSets) {
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
     }
 
@@ -197,7 +181,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return hoursWastedOnFailedSearches;
     }
 
-    public void setHoursWastedOnFailedSearches(DoubleParameter hoursWastedOnFailedSearches) {
+    public void setHoursWastedOnFailedSearches(final DoubleParameter hoursWastedOnFailedSearches) {
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
     }
 
@@ -205,19 +189,15 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return planningHorizonInHours;
     }
 
-    public void setPlanningHorizonInHours(DoubleParameter planningHorizonInHours) {
+    public void setPlanningHorizonInHours(final DoubleParameter planningHorizonInHours) {
         this.planningHorizonInHours = planningHorizonInHours;
-    }
-
-    public void setMaxTripDurationFile(Path maxTripDurationFile) {
-        this.maxTripDurationFile = maxTripDurationFile;
     }
 
     public DoubleParameter getMinimumValueOpportunisticFadSets() {
         return minimumValueOpportunisticFadSets;
     }
 
-    public void setMinimumValueOpportunisticFadSets(DoubleParameter minimumValueOpportunisticFadSets) {
+    public void setMinimumValueOpportunisticFadSets(final DoubleParameter minimumValueOpportunisticFadSets) {
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
     }
 
@@ -225,7 +205,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return ownFadActionWeightBias;
     }
 
-    public void setOwnFadActionWeightBias(DoubleParameter ownFadActionWeightBias) {
+    public void setOwnFadActionWeightBias(final DoubleParameter ownFadActionWeightBias) {
         this.ownFadActionWeightBias = ownFadActionWeightBias;
     }
 
@@ -233,7 +213,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return deploymentBias;
     }
 
-    public void setDeploymentBias(DoubleParameter deploymentBias) {
+    public void setDeploymentBias(final DoubleParameter deploymentBias) {
         this.deploymentBias = deploymentBias;
     }
 
@@ -241,7 +221,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return minimumPercentageOfTripDurationAllowed;
     }
 
-    public void setMinimumPercentageOfTripDurationAllowed(DoubleParameter minimumPercentageOfTripDurationAllowed) {
+    public void setMinimumPercentageOfTripDurationAllowed(final DoubleParameter minimumPercentageOfTripDurationAllowed) {
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
     }
 
@@ -249,7 +229,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return noaSetsCanPoachFads;
     }
 
-    public void setNoaSetsCanPoachFads(boolean noaSetsCanPoachFads) {
+    public void setNoaSetsCanPoachFads(final boolean noaSetsCanPoachFads) {
         this.noaSetsCanPoachFads = noaSetsCanPoachFads;
     }
 
@@ -257,7 +237,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return purgeIllegalActionsImmediately;
     }
 
-    public void setPurgeIllegalActionsImmediately(boolean purgeIllegalActionsImmediately) {
+    public void setPurgeIllegalActionsImmediately(final boolean purgeIllegalActionsImmediately) {
         this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
     }
 
@@ -265,7 +245,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return noaSetsRangeInSeatiles;
     }
 
-    public void setNoaSetsRangeInSeatiles(DoubleParameter noaSetsRangeInSeatiles) {
+    public void setNoaSetsRangeInSeatiles(final DoubleParameter noaSetsRangeInSeatiles) {
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
     }
 
@@ -273,7 +253,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return noaBias;
     }
 
-    public void setNoaBias(DoubleParameter noaBias) {
+    public void setNoaBias(final DoubleParameter noaBias) {
         this.noaBias = noaBias;
     }
 
@@ -281,7 +261,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return delSetsRangeInSeatiles;
     }
 
-    public void setDelSetsRangeInSeatiles(DoubleParameter delSetsRangeInSeatiles) {
+    public void setDelSetsRangeInSeatiles(final DoubleParameter delSetsRangeInSeatiles) {
         this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
     }
 
@@ -289,7 +269,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return uniqueCatchSamplerForEachStrategy;
     }
 
-    public void setUniqueCatchSamplerForEachStrategy(boolean uniqueCatchSamplerForEachStrategy) {
+    public void setUniqueCatchSamplerForEachStrategy(final boolean uniqueCatchSamplerForEachStrategy) {
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 
@@ -297,7 +277,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return fadModule;
     }
 
-    public void setFadModule(AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule) {
+    public void setFadModule(final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule) {
         this.fadModule = fadModule;
     }
 }

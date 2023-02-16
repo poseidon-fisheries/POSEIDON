@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
 
@@ -38,7 +39,7 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
 
     @Override
     CatchSampler<BiomassLocalBiology> makeCatchSampler(
-        Class<? extends AbstractSetAction<?>> actionClass,
+        FishState fishState, Class<? extends AbstractSetAction<?>> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {

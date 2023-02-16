@@ -136,7 +136,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
     private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
     private InputFile costsFile = new InputFile(inputFolder, "costs.csv");
-    private CatchSamplersFactory<B> catchSamplersFactory;
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();
@@ -198,12 +197,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
 
-        if (getFishingStrategyFactory() != null
-            && getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory) {
-            ((PurseSeinerFishingStrategyFactory<B, F>) getFishingStrategyFactory())
-                .setCatchSamplersFactory(getCatchSamplersFactory());
-        }
-
         if (getPurseSeineGearFactory() != null) {
             getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
             getPurseSeineGearFactory().getFadDeploymentObservers()
@@ -240,14 +233,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setFishingStrategyFactory(final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory) {
         this.fishingStrategyFactory = fishingStrategyFactory;
-    }
-
-    public CatchSamplersFactory<B> getCatchSamplersFactory() {
-        return catchSamplersFactory;
-    }
-
-    public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
-        this.catchSamplersFactory = catchSamplersFactory;
     }
 
     public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {

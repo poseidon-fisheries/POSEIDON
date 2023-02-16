@@ -127,11 +127,13 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final Class<B> biologyClass,
         final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile actionWeightsFile
+        final InputFile actionWeightsFile,
+        final CatchSamplersFactory<B> catchSamplersFactory
     ) {
         this(biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
+        this.catchSamplersFactory = catchSamplersFactory;
     }
 
     PurseSeinerFishingStrategyFactory(
