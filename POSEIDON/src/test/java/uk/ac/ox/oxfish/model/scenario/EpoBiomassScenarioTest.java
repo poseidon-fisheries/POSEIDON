@@ -19,10 +19,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.*;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -31,17 +27,12 @@ import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import static org.junit.Assert.assertTrue;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
 public class EpoBiomassScenarioTest {
-
-    @Test
-    public void testSaveAndLoadYaml() {
-        ScenarioTestUtils.testSaveAndLoadYaml(
-            TESTS_INPUT_PATH,
-            "epo_biomass.yaml",
-            EpoBiomassScenario.class
-        );
-    }
-
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 

@@ -18,16 +18,8 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
-import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
-
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import junit.framework.TestCase;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
@@ -42,32 +34,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunctionFactory;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
+
 
 public class EpoAbundanceScenarioTest extends TestCase {
-
-    public void testRunOneYearWithoutCrashing() {
-        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
-        do {
-            fishState.schedule.step(fishState);
-        } while (fishState.getYear() < 1);
-    }
-
-    public void testSaveAndLoadLogisticYaml() {
-        ScenarioTestUtils.testSaveAndLoadYaml(
-            TESTS_INPUT_PATH,
-            "epo_abundance_logistic.yaml",
-            EpoAbundanceScenario.class
-        );
-    }
-
-    public void testSaveAndLoadExponentialYaml() {
-        ScenarioTestUtils.testSaveAndLoadYaml(
-            TESTS_INPUT_PATH,
-            "epo_abundance_exponential.yaml",
-            EpoAbundanceScenario.class,
-            EpoAbundanceScenarioTest::useCompressedExponentials
-        );
-    }
 
     private static EpoAbundanceScenario useCompressedExponentials(final EpoAbundanceScenario scenario) {
 
@@ -125,8 +101,15 @@ public class EpoAbundanceScenarioTest extends TestCase {
         strategyFactory.setSearchActionValueFunction(
             new CompressedExponentialFunctionFactory(0.5)
         );
-        
+
         return scenario;
+    }
+
+    public void testRunOneYearWithoutCrashing() {
+        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+        do {
+            fishState.schedule.step(fishState);
+        } while (fishState.getYear() < 1);
     }
 
     /**

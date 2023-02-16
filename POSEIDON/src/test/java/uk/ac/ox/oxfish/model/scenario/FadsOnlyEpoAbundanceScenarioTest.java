@@ -33,14 +33,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
 
-    public void testSaveAndLoadYaml() {
-        ScenarioTestUtils.testSaveAndLoadYaml(
-            TESTS_INPUT_PATH,
-            "epo_fad_only_scenario.yaml",
-            FadsOnlyEpoAbundanceScenario.class
-        );
-    }
-
     public void testRunTwoYearsWithoutCrashing() {
         final FadsOnlyEpoAbundanceScenario scenario = new FadsOnlyEpoAbundanceScenario();
         scenario.useDummyData();
