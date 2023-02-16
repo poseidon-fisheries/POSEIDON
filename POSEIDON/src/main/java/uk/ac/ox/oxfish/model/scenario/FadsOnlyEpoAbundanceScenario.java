@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -100,7 +101,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             0.5
         );
     private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
+        new AbundanceFiltersFactory(
+            new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+            getSpeciesCodesSupplier()
+        );
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
         new AbundanceFadInitializerFactory(
@@ -264,7 +268,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        abundanceFiltersFactory.setSpeciesCodes(getSpeciesCodesSupplier().get());
         final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
             abundanceFilters =
             abundanceFiltersFactory.apply(fishState);

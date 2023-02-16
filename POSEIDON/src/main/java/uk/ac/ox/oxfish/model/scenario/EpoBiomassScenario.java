@@ -123,7 +123,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             new PurseSeinerBiomassFishingStrategyFactory(
                 getSpeciesCodesSupplier(),
                 new InputFile(getInputFolder(), "action_weights.csv"),
-                new BiomassCatchSamplersFactory()
+                new BiomassCatchSamplersFactory(getSpeciesCodesSupplier())
             )
         );
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());

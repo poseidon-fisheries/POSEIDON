@@ -104,8 +104,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
             0.5
         );
 
-    private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
         new LinearAbundanceFadInitializerFactory(
@@ -156,16 +154,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
     @SuppressWarnings("unused")
     public void setWeightGroupsFactory(WeightGroupsFactory weightGroupsFactory) {
         this.weightGroupsFactory = weightGroupsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     @SuppressWarnings("unused")

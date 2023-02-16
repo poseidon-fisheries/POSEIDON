@@ -1,19 +1,16 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ScenarioUpdater {
 

@@ -122,7 +122,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 new InputFile(getInputFolder(), "action_weights.csv"),
                 new AbundanceCatchSamplersFactory(
                     getSpeciesCodesSupplier(),
-                    new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"))
+                    new AbundanceFiltersFactory(
+                        new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+                        getSpeciesCodesSupplier()
+                    )
                 )
             )
         );

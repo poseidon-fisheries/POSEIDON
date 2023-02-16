@@ -77,7 +77,10 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             0.5
         );
     private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFactory(INPUT_PATH.resolve("abundance").resolve("selectivity.csv"));
+        new AbundanceFiltersFactory(
+            new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+            getSpeciesCodesSupplier()
+        );
 
     private DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory =
         new DefaultToDestinationStrategyFishingStrategyFactory();

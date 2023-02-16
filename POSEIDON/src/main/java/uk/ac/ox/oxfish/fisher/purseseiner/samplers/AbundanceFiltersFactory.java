@@ -18,62 +18,83 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.ImmutableList;
+import com.univocity.parsers.common.record.Record;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-import com.google.common.collect.ImmutableList;
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
 public class AbundanceFiltersFactory implements AlgorithmFactory<
     Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
     > {
 
-    private SpeciesCodes speciesCodes;
-    private Path selectivityFilePath;
+    private InputFile selectivityFile;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
+
+    @SuppressWarnings("unused")
+    public AbundanceFiltersFactory(
+        final InputFile selectivityFile,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
+    ) {
+        this.selectivityFile = selectivityFile;
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
 
     /**
      * Empty constructor for YAML loading
      */
+    @SuppressWarnings("unused")
     public AbundanceFiltersFactory() {
     }
 
-    public AbundanceFiltersFactory(final Path selectivityFilePath) {
-        this.selectivityFilePath = selectivityFilePath;
+    private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {
+        final List<Double> selectivities = records
+            .stream()
+            .map(r -> r.getDouble("selectivity"))
+            .collect(toImmutableList());
+        return new NonMutatingArrayFilter(ImmutableList.of(selectivities, selectivities));
     }
 
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    @SuppressWarnings("unused")
+    public InputFile getSelectivityFile() {
+        return selectivityFile;
     }
 
-    public Path getSelectivityFilePath() {
-        return selectivityFilePath;
+    @SuppressWarnings("unused")
+    public void setSelectivityFile(final InputFile selectivityFile) {
+        this.selectivityFile = selectivityFile;
     }
 
-    public void setSelectivityFilePath(final Path selectivityFilePath) {
-        this.selectivityFilePath = selectivityFilePath;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @Override
     public Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> apply(
         final FishState fishState
     ) {
-        checkNotNull(speciesCodes);
-        return recordStream(selectivityFilePath)
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        return recordStream(selectivityFile.get())
             .collect(groupingBy(
                 r -> getSetActionClass(r.getString("set_type")),
                 groupingBy(
@@ -96,13 +117,5 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
                         entry2 -> makeFilter(entry2.getValue())
                     ))
             ));
-    }
-
-    private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {
-        final List<Double> selectivities = records
-            .stream()
-            .map(r -> r.getDouble("selectivity"))
-            .collect(toImmutableList());
-        return new NonMutatingArrayFilter(ImmutableList.of(selectivities, selectivities));
     }
 }
