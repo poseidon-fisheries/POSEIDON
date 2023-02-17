@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactor
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -126,7 +127,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 new BiomassCatchSamplersFactory(
                     getSpeciesCodesSupplier(),
                     new InputFile(getInputFolder(), "set_samples.csv")
-                )
+                ),
+                new SetDurationSamplersFactory(new InputFile(getInputFolder(), "set_durations.csv"))
             )
         );
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(

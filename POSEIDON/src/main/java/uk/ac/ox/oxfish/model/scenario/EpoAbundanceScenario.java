@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -128,6 +129,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                         getSpeciesCodesSupplier()
                     ),
                     new InputFile(getInputFolder(), "set_samples.csv")
+                ),
+                new SetDurationSamplersFactory(
+                    new InputFile(getInputFolder(), "set_durations.csv")
                 )
             )
         );

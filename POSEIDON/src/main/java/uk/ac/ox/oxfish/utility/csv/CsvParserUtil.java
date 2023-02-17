@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.utility.csv;
 
-import com.univocity.parsers.common.AbstractParser;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.ResultIterator;
 import com.univocity.parsers.common.record.Record;
@@ -17,10 +16,10 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Just a bunch of utility methods to facilitate the use of the Univocity CSV parsers.
@@ -37,7 +36,7 @@ public class CsvParserUtil {
         defaultParserSettings.setReadInputOnSeparateThread(false);
     }
 
-    public static Stream<Record> recordStream(Path inputFilePath) {
+    public static Stream<Record> recordStream(final Path inputFilePath) {
         final CsvParser csvParser = getCsvParser();
         final Reader reader = getReader(inputFilePath);
         final ResultIterator<Record, ParsingContext> iterator = csvParser.iterateRecords(reader).iterator();
@@ -45,41 +44,55 @@ public class CsvParserUtil {
         return StreamSupport.stream(spliterator, false).onClose(csvParser::stopParsing);
     }
 
+    public static List<Record> recordList(final Path inputFilePath) {
+        return recordStream(inputFilePath).collect(toImmutableList());
+    }
+
     public static CsvParser getCsvParser() {
         return new CsvParser(defaultParserSettings);
     }
 
-    public static Reader getReader(Path inputFilePath) {
+    public static Reader getReader(final Path inputFilePath) {
         return getReader(inputFilePath.normalize().toString());
     }
 
-    private static Reader getReader(String inputFileName) {
+    private static Reader getReader(final String inputFileName) {
         try {
             return new FileReader(inputFileName);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(
                 "Failed to read " + inputFileName + " with exception: " + e
             );
         }
     }
 
-    public static LocalDate getLocalDate(Record record, String headerName) {
+    public static LocalDate getLocalDate(final Record record, final String headerName) {
         return getLocalDate(record, headerName, defaultDtmFormat, defaultZoneId);
     }
 
-    public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat) {
+    public static LocalDate getLocalDate(final Record record, final String headerName, final String dtmFormat) {
         return getLocalDate(record, headerName, dtmFormat, defaultZoneId);
     }
 
-    public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat, ZoneId zoneId) {
+    public static LocalDate getLocalDate(
+        final Record record,
+        final String headerName,
+        final String dtmFormat,
+        final ZoneId zoneId
+    ) {
         return record.getDate(headerName, dtmFormat).toInstant().atZone(zoneId).toLocalDate();
     }
 
-    public static LocalDateTime getLocalDateTime(Record record, String headerName) {
+    public static LocalDateTime getLocalDateTime(final Record record, final String headerName) {
         return getLocalDateTime(record, headerName, defaultDtmFormat, defaultZoneId);
     }
 
-    public static LocalDateTime getLocalDateTime(Record record, String headerName, String dtmFormat, ZoneId zoneId) {
+    public static LocalDateTime getLocalDateTime(
+        final Record record,
+        final String headerName,
+        final String dtmFormat,
+        final ZoneId zoneId
+    ) {
         return record.getDate(headerName, dtmFormat).toInstant().atZone(zoneId).toLocalDateTime();
     }
 }

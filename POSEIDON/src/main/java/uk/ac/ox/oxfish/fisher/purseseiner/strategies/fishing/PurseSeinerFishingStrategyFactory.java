@@ -75,15 +75,13 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private static final CacheByFishState<ActiveOpportunities>
         activeNonAssociatedSetOpportunitiesCache =
         new CacheByFishState<>(activeOpportunitiesFactory);
-    private final SetDurationSamplersFactory setDurationSamplers = new SetDurationSamplersFactory();
-    private final CacheByFishState<Map<Class<? extends AbstractSetAction<?>>, DurationSampler>>
-        setDurationSamplersCache = new CacheByFishState<>(setDurationSamplers);
     private final Class<F> fadClass;
     private final Class<B> biologyClass;
     private final boolean noaSetsCanPoachFads = false;
     private final boolean delSetsCanPoachFads = false;
     private final int noaSetsRangeInSeaTiles = 0;
     private final int delSetsRangeInSeaTiles = 0;
+    private SetDurationSamplersFactory setDurationSamplersFactory;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputFile actionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
@@ -122,20 +120,20 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         dolphinSetActionValueFunction =
         new LogisticFunctionFactory(1E-6, 10);
     private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
-
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputFile actionWeightsFile,
-        final CatchSamplersFactory<B> catchSamplersFactory
+        final CatchSamplersFactory<B> catchSamplersFactory,
+        final SetDurationSamplersFactory setDurationSamplersFactory
     ) {
         this(biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
         this.catchSamplersFactory = catchSamplersFactory;
+        this.setDurationSamplersFactory = setDurationSamplersFactory;
     }
-
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass
@@ -158,6 +156,16 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                     actionClass
                 )
             ));
+    }
+
+    @SuppressWarnings("unused")
+    public SetDurationSamplersFactory getSetDurationSamplersFactory() {
+        return setDurationSamplersFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setSetDurationSamplersFactory(final SetDurationSamplersFactory setDurationSamplersFactory) {
+        this.setDurationSamplersFactory = setDurationSamplersFactory;
     }
 
     @SuppressWarnings("unused")
@@ -312,6 +320,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return catchSamplersFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setCatchSamplersFactory(final CatchSamplersFactory<B> catchSamplersFactory) {
         this.catchSamplersFactory = catchSamplersFactory;
     }
@@ -468,7 +477,8 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
             setCompositionWeights = loadSetCompositionWeights(fishState);
 
         final Map<Class<? extends AbstractSetAction<?>>, DurationSampler> durationSamplers =
-            setDurationSamplersCache.get(fishState);
+            setDurationSamplersFactory.apply(fishState);
+
         final FadSetOpportunityGenerator<B, F, FadSetAction<B, F>>
             fadSetOpportunityGenerator =
             new FadSetOpportunityGenerator<>(

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.ImmutableList;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -35,16 +34,27 @@ public class EpoScenarioTest extends TestCase {
         } catch (final IOException | InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
-
     }
 
-    public void testSaveAndLoadScenarios() {
-        ImmutableList.of(
-            EpoAbundanceScenario.class,
-            EpoBiomassScenario.class,
-            FadsOnlyEpoAbundanceScenario.class,
-            EpoAbundanceScenarioBioOnly.class,
-            EpoScenarioPathfinding.class
-        ).forEach(this::saveAndLoadYaml);
+    public void testSaveAndLoadEpoAbundanceScenario() {
+        saveAndLoadYaml(EpoAbundanceScenario.class);
     }
+
+    public void testSaveAndLoadEpoBiomassScenario() {
+        saveAndLoadYaml(EpoBiomassScenario.class);
+    }
+
+    public void testSaveAndLoadFadsOnlyEpoAbundanceScenario() {
+        saveAndLoadYaml(FadsOnlyEpoAbundanceScenario.class);
+    }
+
+    public void testSaveAndLoadEpoAbundanceScenarioBioOnly() {
+        saveAndLoadYaml(EpoAbundanceScenarioBioOnly.class);
+    }
+
+    public void tesSaveAndLoadEpoScenarioPathfinding() {
+        saveAndLoadYaml(EpoScenarioPathfinding.class);
+    }
+
+
 }
