@@ -18,40 +18,37 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.plugins;
+package uk.ac.ox.oxfish.environment;
 
 import com.google.common.base.Supplier;
 import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.tuna.AllocationGrids;
-import uk.ac.ox.oxfish.biology.tuna.SimpleAllocationGridsSupplier;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
 
-public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartable> {
+public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
     public String mapVariableName = "Clorophill"; //just a placeholder
     private String pathToGridFile = "inputs/tests/clorophill.csv"; //just a placeholder
 
     private int mapPeriod = 365;
 
-    public AdditionalMapFactory() {
+    public EnvironmentalMapFactory() {
     }
 
-    public AdditionalMapFactory(String mapVariableName, String pathToGridFile) {
+    public EnvironmentalMapFactory(String mapVariableName, String pathToGridFile) {
         this(mapVariableName, pathToGridFile, 365);
     }
 
-    public AdditionalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
+    public EnvironmentalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
         this.mapVariableName = mapVariableName;
         this.pathToGridFile = pathToGridFile;
         this.mapPeriod = mapPeriod;
     }
 
-    public AdditionalMapFactory(String pathToGridFile) {
+    public EnvironmentalMapFactory(String pathToGridFile) {
         this.pathToGridFile = pathToGridFile;
     }
 
@@ -62,7 +59,7 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
 
             @Override
             public void start(FishState model) {
-                SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
+                SimpleGridsSupplier supplier = new SimpleGridsSupplier(
                         Paths.get(pathToGridFile),
                         model.getMap().getMapExtent(),
                         mapPeriod,
@@ -70,7 +67,7 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
                         mapVariableName
                 );
 
-                AllocationGrids<String> grids = supplier.get();
+                GenericGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
                         mapVariableName,
                         (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)

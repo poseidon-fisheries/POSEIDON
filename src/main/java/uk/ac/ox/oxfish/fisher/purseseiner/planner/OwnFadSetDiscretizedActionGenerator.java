@@ -34,6 +34,8 @@ public class OwnFadSetDiscretizedActionGenerator {
             return -Double.compare(o1.getSecond(), o2.getSecond());
         }
     };
+
+    private NauticalMap map;
     private final MapDiscretization discretization;
     /**
      * if a FAD has less than this in value, just ignore it!
@@ -55,6 +57,8 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private boolean filterOutCurrentlyInvalidFads = false;
 
+    private double maxAllowableShear = 0.5;
+
     //todo add minimum soaktime
 
     public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
@@ -73,6 +77,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         NauticalMap map
     ) {
 
+        this.map = map;
         //if you haven't, discretize!
         if (!discretization.isActive())
             discretization.discretize(map);
@@ -97,12 +102,21 @@ public class OwnFadSetDiscretizedActionGenerator {
             double value = fadManager.getFishValueCalculator().valueOf(deployedFad.getBiology(), prices);
 
             SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
-            if (bannedGridYBounds != null &&
+
+/*            if (bannedGridYBounds != null &&
                 location.getGridY() >= bannedGridYBounds[0] &&
                 location.getGridY() <= bannedGridYBounds[1] &&
                 location.getGridX() >= bannedGridXBounds[0] &&
                 location.getGridX() <= bannedGridXBounds[1])
                 continue;
+*/
+            //If the shear at this location is too high then skip the FAD
+            if(map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY()) > maxAllowableShear){
+//                double shearAtLocation = map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY());
+//                System.out.println("max shear too high");
+              continue;
+            }
+
             if (value >= minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                     add(new ValuedFad(deployedFad, value));

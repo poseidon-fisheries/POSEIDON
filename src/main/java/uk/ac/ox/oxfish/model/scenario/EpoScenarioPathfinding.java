@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.*;
+import uk.ac.ox.oxfish.environment.EnvironmentalLayer;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
@@ -95,6 +96,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 //            new AbundanceFadInitializerFactory(
 //                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
 //            );
+    private EnvironmentalLayer environmentalLayer =
+        new EnvironmentalLayer();
 
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();

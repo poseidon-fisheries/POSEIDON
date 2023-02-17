@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import java.util.LinkedHashMap;
 import java.util.function.Predicate;
 
-public class SprAgentBuilderSelectiveSampling {
+public class SprAgentBuilderSelectiveSampling2 {
 
 
     @Test
