@@ -5,27 +5,27 @@ import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 public class InputFile implements Supplier<Path> {
-    private InputFolder inputFolder;
+    private Folder folder;
     private Path path;
 
     public InputFile() {
     }
 
-    public InputFile(final InputFolder inputFolder, final String path) {
-        this(inputFolder, Paths.get(path));
+    public InputFile(final Folder folder, final String path) {
+        this(folder, Paths.get(path));
     }
 
-    public InputFile(final InputFolder inputFolder, final Path path) {
-        this.inputFolder = inputFolder;
+    public InputFile(final Folder folder, final Path path) {
+        this.folder = folder;
         this.path = path;
     }
 
-    public InputFolder getInputFolder() {
-        return inputFolder;
+    public Folder getFolder() {
+        return folder;
     }
 
-    public void setInputFolder(final InputFolder inputFolder) {
-        this.inputFolder = inputFolder;
+    public void setFolder(final Folder folder) {
+        this.folder = folder;
     }
 
     public Path getPath() {
@@ -38,6 +38,6 @@ public class InputFile implements Supplier<Path> {
 
     @Override
     public Path get() {
-        return inputFolder.resolve(path);
+        return folder.resolve(path);
     }
 }

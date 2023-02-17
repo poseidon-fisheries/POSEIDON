@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.model.scenario.InputFolder;
+import uk.ac.ox.oxfish.model.scenario.Folder;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -15,26 +15,26 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
     public static final CurrentPatternMapSupplier EMPTY =
         new CurrentPatternMapSupplier(null, ImmutableMap.of());
 
-    private InputFolder inputFolder;
+    private Folder folder;
     private Map<CurrentPattern, Path> currentFiles;
 
     @SuppressWarnings("unused")
     public CurrentPatternMapSupplier() {
     }
 
-    public CurrentPatternMapSupplier(final InputFolder inputFolder, final Map<CurrentPattern, Path> currentFiles) {
-        this.inputFolder = inputFolder;
+    public CurrentPatternMapSupplier(final Folder folder, final Map<CurrentPattern, Path> currentFiles) {
+        this.folder = folder;
         this.currentFiles = currentFiles;
     }
 
     @SuppressWarnings("unused")
-    public InputFolder getInputFolder() {
-        return inputFolder;
+    public Folder getInputFolder() {
+        return folder;
     }
 
     @SuppressWarnings("unused")
-    public void setInputFolder(final InputFolder inputFolder) {
-        this.inputFolder = inputFolder;
+    public void setInputFolder(final Folder folder) {
+        this.folder = folder;
     }
 
     public Map<CurrentPattern, Path> getCurrentFiles() {
@@ -49,7 +49,7 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
     public Map<CurrentPattern, Path> get() {
         return currentFiles.entrySet().stream().collect(toImmutableMap(
             Entry::getKey,
-            entry -> inputFolder.resolve(entry.getValue())
+            entry -> folder.resolve(entry.getValue())
         ));
     }
 }

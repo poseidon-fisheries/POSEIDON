@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import java.nio.file.Path;
 
-public class RootFolder implements InputFolder {
+public class RootFolder implements Folder {
 
     private Path path;
 

@@ -105,19 +105,19 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public static final Path TESTS_INPUT_PATH = INPUT_PATH.resolve("tests");
 
     protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
-    private InputFolder inputFolder = new RootFolder(Paths.get("inputs", "epo_inputs"));
+    private Folder folder = new RootFolder(Paths.get("inputs", "epo_inputs"));
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
-            new InputFile(inputFolder, Paths.get("species_codes.csv"))
+            new InputFile(folder, Paths.get("species_codes.csv"))
         );
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(
-            new InputFile(inputFolder, Paths.get("prices.csv")),
+            new InputFile(folder, Paths.get("prices.csv")),
             speciesCodesSupplier
         );
-    private final InputFolder testFolder = new Subfolder(inputFolder, Paths.get("tests"));
+    private final Folder testFolder = new Subfolder(folder, Paths.get("tests"));
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
-        inputFolder,
+        folder,
         ImmutableMap.of(
             Y2016, Paths.get("currents", "currents_2016.csv"),
             Y2017, Paths.get("currents", "currents_2017.csv"),
@@ -127,22 +127,22 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private PortInitializer portInitializer =
         new FromSimpleFilePortInitializer(
             TARGET_YEAR,
-            new InputFile(inputFolder, Paths.get("ports.csv"))
+            new InputFile(folder, Paths.get("ports.csv"))
         );
     private FadMapFactory<B, F> fadMapFactory;
     private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory(
-        new InputFile(inputFolder, "max_deployments.csv")
+        new InputFile(folder, "max_deployments.csv")
     );
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private InputFile vesselsFile = new InputFile(inputFolder, "boats.csv");
-    private InputFile costsFile = new InputFile(inputFolder, "costs.csv");
+    private InputFile vesselsFile = new InputFile(folder, "boats.csv");
+    private InputFile costsFile = new InputFile(folder, "costs.csv");
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
 
-    public InputFolder testFolder() {
+    public Folder testFolder() {
         return testFolder;
     }
 
@@ -183,13 +183,13 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public InputFolder getInputFolder() {
-        return inputFolder;
+    public Folder getInputFolder() {
+        return folder;
     }
 
     @SuppressWarnings("unused")
-    public void setInputFolder(final InputFolder inputFolder) {
-        this.inputFolder = inputFolder;
+    public void setInputFolder(final Folder folder) {
+        this.folder = folder;
     }
 
     @Override

@@ -2,15 +2,15 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import java.nio.file.Path;
 
-public class Subfolder implements InputFolder {
+public class Subfolder implements Folder {
 
-    InputFolder parentFolder;
+    Folder parentFolder;
     private Path subfolderPath;
 
     public Subfolder() {
     }
 
-    public Subfolder(final InputFolder parentFolder, final Path subfolderPath) {
+    public Subfolder(final Folder parentFolder, final Path subfolderPath) {
         this.parentFolder = parentFolder;
         this.subfolderPath = subfolderPath;
     }
@@ -23,11 +23,11 @@ public class Subfolder implements InputFolder {
         this.subfolderPath = subfolderPath;
     }
 
-    public InputFolder getParentFolder() {
+    public Folder getParentFolder() {
         return parentFolder;
     }
 
-    public void setParentFolder(final InputFolder parentFolder) {
+    public void setParentFolder(final Folder parentFolder) {
         this.parentFolder = parentFolder;
     }
 
