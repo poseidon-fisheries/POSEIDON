@@ -118,6 +118,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     public EpoAbundanceScenario() {
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
+        final InputFile maxCurrentSpeedsFile = new InputFile(getInputFolder(), "max_current_speeds.csv");
         setFishingStrategyFactory(
             new PurseSeinerAbundanceFishingStrategyFactory(
                 getSpeciesCodesSupplier(),
@@ -132,12 +133,13 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 ),
                 new SetDurationSamplersFactory(
                     new InputFile(getInputFolder(), "set_durations.csv")
-                )
+                ),
+                maxCurrentSpeedsFile
             )
         );
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
             new InputFile(getInputFolder(), "location_values.csv"),
-            new InputFile(getInputFolder(), "max_current_speeds.csv")
+            maxCurrentSpeedsFile
         ));
     }
 

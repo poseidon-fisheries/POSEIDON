@@ -120,6 +120,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     public EpoBiomassScenario() {
         setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
+        final InputFile maxCurrentSpeedsFile = new InputFile(getInputFolder(), "max_current_speeds.csv");
         setFishingStrategyFactory(
             new PurseSeinerBiomassFishingStrategyFactory(
                 getSpeciesCodesSupplier(),
@@ -128,12 +129,13 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                     getSpeciesCodesSupplier(),
                     new InputFile(getInputFolder(), "set_samples.csv")
                 ),
-                new SetDurationSamplersFactory(new InputFile(getInputFolder(), "set_durations.csv"))
+                new SetDurationSamplersFactory(new InputFile(getInputFolder(), "set_durations.csv")),
+                maxCurrentSpeedsFile
             )
         );
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(
             new InputFile(getInputFolder(), "location_values.csv"),
-            new InputFile(getInputFolder(), "max_current_speeds.csv")
+            maxCurrentSpeedsFile
         ));
     }
 

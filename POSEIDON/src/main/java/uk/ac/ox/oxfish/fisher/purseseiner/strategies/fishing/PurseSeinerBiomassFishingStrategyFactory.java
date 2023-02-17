@@ -42,7 +42,8 @@ public class PurseSeinerBiomassFishingStrategyFactory
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputFile actionWeightsFile,
         final BiomassCatchSamplersFactory catchSamplersFactory,
-        final SetDurationSamplersFactory setDurationSamplersFactory
+        final SetDurationSamplersFactory setDurationSamplersFactory,
+        final InputFile maxCurrentSpeedsFile
     ) {
         super(
             BiomassLocalBiology.class,
@@ -50,7 +51,8 @@ public class PurseSeinerBiomassFishingStrategyFactory
             speciesCodesSupplier,
             actionWeightsFile,
             catchSamplersFactory,
-            setDurationSamplersFactory
+            setDurationSamplersFactory,
+            maxCurrentSpeedsFile
         );
     }
 

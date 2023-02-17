@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.scenario.InputFile;
 
@@ -51,7 +50,8 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputFile actionWeightsFile,
         final AbundanceCatchSamplersFactory catchSamplersFactory,
-        final SetDurationSamplersFactory setDurationSamplersFactory
+        final SetDurationSamplersFactory setDurationSamplersFactory,
+        final InputFile maxCurrentSpeedsFile
     ) {
         super(
             AbundanceLocalBiology.class,
@@ -59,7 +59,8 @@ public class PurseSeinerAbundanceFishingStrategyFactory
             speciesCodesSupplier,
             actionWeightsFile,
             catchSamplersFactory,
-            setDurationSamplersFactory
+            setDurationSamplersFactory,
+            maxCurrentSpeedsFile
         );
     }
 

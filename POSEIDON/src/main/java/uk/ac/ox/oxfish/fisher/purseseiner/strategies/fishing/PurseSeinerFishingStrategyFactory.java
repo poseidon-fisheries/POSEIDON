@@ -119,20 +119,24 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
         new LogisticFunctionFactory(1E-6, 10);
-    private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
+    private InputFile maxCurrentSpeedsFile; // = INPUT_PATH.resolve("max_current_speeds.csv");
+
+
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputFile actionWeightsFile,
         final CatchSamplersFactory<B> catchSamplersFactory,
-        final SetDurationSamplersFactory setDurationSamplersFactory
+        final SetDurationSamplersFactory setDurationSamplersFactory,
+        final InputFile maxCurrentSpeedsFile
     ) {
         this(biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
         this.catchSamplersFactory = catchSamplersFactory;
         this.setDurationSamplersFactory = setDurationSamplersFactory;
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
@@ -199,12 +203,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public Path getMaxCurrentSpeedsFile() {
+    public InputFile getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setMaxCurrentSpeedsFile(final Path maxCurrentSpeedsFile) {
+    public void setMaxCurrentSpeedsFile(final InputFile maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
@@ -422,7 +426,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final Coordinate coordinate = new Coordinate(0, 0);
         final MapExtent mapExtent = nauticalMap.getMapExtent();
         return PurseSeinerActionClassToDouble
-            .fromFile(maxCurrentSpeedsFile, "action", "speed")
+            .fromFile(maxCurrentSpeedsFile.get(), "action", "speed")
             .mapValues(speed ->
                 metrePerSecondToXyPerDaysVector(
                     new Double2D(speed, 0),
