@@ -22,11 +22,12 @@ package uk.ac.ox.oxfish.geography.mapmakers;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.RootFolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -35,12 +36,10 @@ import java.nio.file.Paths;
 public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileMapInitializer> {
 
 
-    private Path  mapFile =  Paths.get("inputs","indonesia","indonesia_latlong.csv");
-
-
-    private DoubleParameter gridWidthInCell = new FixedDoubleParameter(100);
-
     public static double DEFAULT_MAP_PADDING_IN_DEGREES = 0.000001;
+    private InputFile mapFile =
+        new InputFile(new RootFolder(Paths.get("inputs", "indonesia")), "indonesia_latlong.csv");
+    private DoubleParameter gridWidthInCell = new FixedDoubleParameter(100);
     private DoubleParameter mapPaddingInDegrees = new FixedDoubleParameter(DEFAULT_MAP_PADDING_IN_DEGREES);
 
     private boolean header = true;
@@ -50,7 +49,11 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public FromFileMapInitializerFactory() {
     }
 
-    public FromFileMapInitializerFactory(final Path mapFile, final double gridWidthInCells, final double mapPaddingInDegrees) {
+    public FromFileMapInitializerFactory(
+        final InputFile mapFile,
+        final double gridWidthInCells,
+        final double mapPaddingInDegrees
+    ) {
         this.mapFile = mapFile;
         this.gridWidthInCell = new FixedDoubleParameter(gridWidthInCells);
         this.mapPaddingInDegrees = new FixedDoubleParameter(mapPaddingInDegrees);
@@ -64,10 +67,10 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      * @return the function result
      */
     @Override
-    public FromFileMapInitializer apply(FishState state) {
+    public FromFileMapInitializer apply(final FishState state) {
         final MersenneTwisterFast rng = state.getRandom();
         return new FromFileMapInitializer(
-            mapFile,
+            mapFile.get(),
             gridWidthInCell.apply(rng).intValue(),
             mapPaddingInDegrees.apply(rng),
             header,
@@ -80,7 +83,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @return Value for property 'mapFile'.
      */
-    public Path getMapFile() {
+    public InputFile getMapFile() {
         return mapFile;
     }
 
@@ -89,7 +92,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @param mapFile Value to set for property 'mapFile'.
      */
-    public void setMapFile(Path mapFile) {
+    public void setMapFile(final InputFile mapFile) {
         this.mapFile = mapFile;
     }
 
@@ -107,13 +110,15 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @param gridWidthInCell Value to set for property 'gridWidthInCell'.
      */
-    public void setGridWidthInCell(DoubleParameter gridWidthInCell) {
+    public void setGridWidthInCell(final DoubleParameter gridWidthInCell) {
         this.gridWidthInCell = gridWidthInCell;
     }
 
-    public DoubleParameter getMapPaddingInDegrees() { return mapPaddingInDegrees; }
+    public DoubleParameter getMapPaddingInDegrees() {
+        return mapPaddingInDegrees;
+    }
 
-    public void setMapPaddingInDegrees(DoubleParameter mapPaddingInDegrees) {
+    public void setMapPaddingInDegrees(final DoubleParameter mapPaddingInDegrees) {
         this.mapPaddingInDegrees = mapPaddingInDegrees;
     }
 
@@ -131,7 +136,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @param header Value to set for property 'header'.
      */
-    public void setHeader(boolean header) {
+    public void setHeader(final boolean header) {
         this.header = header;
     }
 
@@ -149,10 +154,9 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @param latLong Value to set for property 'latLong'.
      */
-    public void setLatLong(boolean latLong) {
+    public void setLatLong(final boolean latLong) {
         this.latLong = latLong;
     }
-
 
 
 }

@@ -67,7 +67,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             365
         );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
-    private Path mapFile = INPUT_PATH.resolve("depth.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -75,8 +74,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             TARGET_YEAR,
             fadMortalityIncludedInExogenousCatches
         );
-    private FromFileMapInitializerFactory mapInitializer =
-        new FromFileMapInitializerFactory(mapFile, 101, 0.5);
+
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
@@ -180,28 +178,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.scheduledBiomassProcessesFactory = scheduledBiomassProcessesFactory;
     }
 
-    @SuppressWarnings("unused")
-    public Path getMapFile() {
-        return mapFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMapFile(final Path mapFile) {
-        this.mapFile = mapFile;
-    }
-
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;
-    }
-
-    public FromFileMapInitializerFactory getMapInitializer() {
-        return mapInitializer;
-    }
-
-    public void setMapInitializer(
-        final FromFileMapInitializerFactory mapInitializer
-    ) {
-        this.mapInitializer = mapInitializer;
     }
 
     @SuppressWarnings("unused")
@@ -230,7 +208,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         System.out.println("Starting model...");
 
         final NauticalMap nauticalMap =
-            mapInitializer.apply(model).makeMap(model.random, null, model);
+            getMapInitializerFactory().apply(model).makeMap(model.random, null, model);
 
         final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         biomassReallocatorFactory.setSpeciesCodes(speciesCodes);

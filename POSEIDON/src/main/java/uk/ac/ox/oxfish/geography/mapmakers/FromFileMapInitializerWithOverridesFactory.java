@@ -37,7 +37,7 @@ public class FromFileMapInitializerWithOverridesFactory extends FromFileMapIniti
         }
 
         return new FromFileMapInitializer(
-                getMapFile(),
+                getMapFile().get(),
                 getGridWidthInCell().apply(rng).intValue(),
                 getMapPaddingInDegrees().apply(rng),
                 isHeader(),

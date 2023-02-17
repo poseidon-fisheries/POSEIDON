@@ -95,12 +95,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
-    private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
-        new FromFileMapInitializerFactory(
-            INPUT_PATH.resolve("depth.csv"),
-            101,
-            0.5
-        );
+
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(
             new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
@@ -219,7 +214,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final SpeciesCodes speciesCodes = getSpeciesCodesSupplier().get();
 
         final NauticalMap nauticalMap =
-            mapInitializerFactory
+            getMapInitializerFactory()
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
@@ -303,18 +298,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
             testFolder().resolve("dummy_fad_sets.csv").toString()
         );
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
-        return mapInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMapInitializerFactory(
-        final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
-    ) {
-        this.mapInitializerFactory = mapInitializerFactory;
     }
 
     @SuppressWarnings("unused")

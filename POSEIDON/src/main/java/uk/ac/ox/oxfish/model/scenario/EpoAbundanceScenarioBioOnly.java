@@ -97,12 +97,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
-    private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
-        new FromFileMapInitializerFactory(
-            INPUT_PATH.resolve("depth.csv"),
-            101,
-            0.5
-        );
 
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
@@ -225,7 +219,7 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         final SpeciesCodes speciesCodes = getSpeciesCodesSupplier().get();
 
         final NauticalMap nauticalMap =
-            mapInitializerFactory
+            getMapInitializerFactory()
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
@@ -290,18 +284,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
-        return mapInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMapInitializerFactory(
-        final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory
-    ) {
-        this.mapInitializerFactory = mapInitializerFactory;
     }
 
 }

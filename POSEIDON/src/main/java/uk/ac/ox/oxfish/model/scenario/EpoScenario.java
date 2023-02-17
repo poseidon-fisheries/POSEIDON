@@ -49,6 +49,8 @@ import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
@@ -141,6 +143,20 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+    private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
+        new FromFileMapInitializerFactory(
+            new InputFile(getInputFolder(), "depth.csv"),
+            101,
+            0.5
+        );
+
+    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
+        return mapInitializerFactory;
+    }
+
+    public void setMapInitializerFactory(final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
+        this.mapInitializerFactory = mapInitializerFactory;
+    }
 
     public Folder testFolder() {
         return testFolder;
