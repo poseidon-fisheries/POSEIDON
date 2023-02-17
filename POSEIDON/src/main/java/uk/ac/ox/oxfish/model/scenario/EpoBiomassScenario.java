@@ -338,10 +338,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public void useDummyData() {
         super.useDummyData();
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            new InputFile(testFolder, "dummy_action_weights.csv")
+            new InputFile(testFolder(), "dummy_action_weights.csv")
         );
         this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            new InputFile(testFolder, "dummy_boats.csv")
+            new InputFile(testFolder(), "dummy_boats.csv")
         );
     }
 

@@ -18,29 +18,29 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
-
 import com.google.common.collect.ImmutableList;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.*;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class AbundanceMortalityProcessFromFileFactory
     implements AlgorithmFactory<AbundanceMortalityProcess> {
 
-    private Path mortalityFile;
+    private InputFile mortalityFile;
     private List<String> sources;
-    private SpeciesCodes speciesCodes;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private final CacheByFishState<Map<Species, Map<String, List<List<Double>>>>> cache =
         new CacheByFishState<>(this::load);
 
@@ -49,20 +49,30 @@ public class AbundanceMortalityProcessFromFileFactory
     }
 
     public AbundanceMortalityProcessFromFileFactory(
-        final Path mortalityFile,
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile mortalityFile,
         final Iterable<String> sources
     ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
         this.mortalityFile = checkNotNull(mortalityFile);
         this.sources = ImmutableList.copyOf(sources);
     }
 
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
     @SuppressWarnings("unused")
-    public Path getMortalityFile() {
+    public InputFile getMortalityFile() {
         return mortalityFile;
     }
 
     @SuppressWarnings("unused")
-    public void setMortalityFile(final Path mortalityFile) {
+    public void setMortalityFile(final InputFile mortalityFile) {
         this.mortalityFile = mortalityFile;
     }
 
@@ -76,24 +86,16 @@ public class AbundanceMortalityProcessFromFileFactory
         this.sources = sources;
     }
 
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
-    }
-
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
-    }
-
     @Override
     public AbundanceMortalityProcess apply(final FishState fishState) {
         return new AbundanceMortalityProcess(cache.get(fishState));
     }
 
     private Map<Species, Map<String, List<List<Double>>>> load(final FishState fishState) {
-        checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         checkNotNull(sources);
         checkNotNull(mortalityFile);
-        return recordStream(mortalityFile)
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        return recordStream(mortalityFile.get())
             .filter(r -> sources.contains(r.getString("source")))
             .collect(groupingBy(
                 r -> speciesCodes.getSpeciesFromCode(

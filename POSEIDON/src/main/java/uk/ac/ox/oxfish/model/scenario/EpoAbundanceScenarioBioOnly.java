@@ -65,14 +65,12 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
         );
-    /*  private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-              new AbundanceMortalityProcessFromFileFactory(
-                      INPUT_PATH.resolve("abundance").resolve("mortality_BP.csv"),
-                      ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
-              );*/
+
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
-            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
+            getSpeciesCodesSupplier(),
+            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
+            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
         );
 
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
@@ -260,12 +258,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
 
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
-            instanceof AbundanceMortalityProcessFromFileFactory) {
-            ((AbundanceMortalityProcessFromFileFactory)
-                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
-                .setSpeciesCodes(speciesCodes);
-        }
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }

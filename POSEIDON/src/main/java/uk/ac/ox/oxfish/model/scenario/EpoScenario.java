@@ -115,7 +115,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             new InputFile(inputFolder, Paths.get("prices.csv")),
             speciesCodesSupplier
         );
-    InputFolder testFolder = new Subfolder(inputFolder, Paths.get("tests"));
+    private final InputFolder testFolder = new Subfolder(inputFolder, Paths.get("tests"));
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
@@ -141,6 +141,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new StandardIattcRegulationsFactory();
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
+
+    public InputFolder testFolder() {
+        return testFolder;
+    }
 
     @SuppressWarnings("unused")
     public CurrentPatternMapSupplier getCurrentPatternMapSupplier() {

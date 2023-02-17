@@ -52,14 +52,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         new RecruitmentProcessesFactory(
             INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
         );
-    private AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory =
-        new AbundanceMortalityProcessFromFileFactory(
-            INPUT_PATH.resolve("abundance").resolve("mortality.csv"),
-            ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
-        );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
-            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
+            getSpeciesCodesSupplier(),
+            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
+            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
         );
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
@@ -138,16 +135,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcessFactory() {
-        return abundanceMortalityProcessFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceMortalityProcessFactory(final AbundanceMortalityProcessFromFileFactory abundanceMortalityProcessFactory) {
-        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
-    }
-
-    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
         return regulationsFactory;
     }
@@ -213,10 +200,10 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     public void useDummyData() {
         super.useDummyData();
         getDestinationStrategy().setActionWeightsFile(
-            new InputFile(testFolder, "dummy_action_weights.csv")
+            new InputFile(testFolder(), "dummy_action_weights.csv")
         );
         getDestinationStrategy().setMaxTripDurationFile(
-            new InputFile(testFolder, "dummy_boats.csv")
+            new InputFile(testFolder(), "dummy_boats.csv")
         );
     }
 
@@ -298,12 +285,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
 
-        abundanceMortalityProcessFactory.setSpeciesCodes(speciesCodes);
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
-            abundanceMortalityProcessFactory
-        );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }

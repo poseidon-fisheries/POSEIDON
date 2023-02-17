@@ -15,7 +15,10 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
     public void testRunBiologyOnlyScenario(){
         final EpoAbundanceScenarioBioOnly scenario = new EpoAbundanceScenarioBioOnly();
 
-        ((AbundanceMortalityProcessFromFileFactory) scenario.getScheduledAbundanceProcessesFactory().getAbundanceMortalityProcessFactory()).setMortalityFile(EpoScenario.INPUT_PATH.resolve("tests").resolve("mortality_BP.csv"));
+        ((AbundanceMortalityProcessFromFileFactory) scenario
+            .getScheduledAbundanceProcessesFactory()
+            .getAbundanceMortalityProcessFactory())
+            .setMortalityFile(new InputFile(scenario.testFolder(), "mortality_BP.csv"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         scenario.getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);

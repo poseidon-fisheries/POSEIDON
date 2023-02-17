@@ -83,8 +83,11 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
-            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
+            getSpeciesCodesSupplier(),
+            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
+            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
         );
+
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
             INPUT_PATH.resolve("abundance").resolve("grids.csv"),
@@ -253,12 +256,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
-            instanceof AbundanceMortalityProcessFromFileFactory) {
-            ((AbundanceMortalityProcessFromFileFactory)
-                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
-                .setSpeciesCodes(speciesCodes);
-        }
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
@@ -304,10 +301,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     public void useDummyData() {
         super.useDummyData();
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
-            testFolder.resolve("dummy_fad_deployments.csv").toString()
+            testFolder().resolve("dummy_fad_deployments.csv").toString()
         );
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
-            testFolder.resolve("dummy_fad_sets.csv").toString()
+            testFolder().resolve("dummy_fad_sets.csv").toString()
         );
     }
 

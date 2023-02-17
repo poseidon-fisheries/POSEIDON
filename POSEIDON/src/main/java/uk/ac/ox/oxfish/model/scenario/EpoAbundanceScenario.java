@@ -52,7 +52,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
-            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01")
+            getSpeciesCodesSupplier(),
+            ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
+            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
         );
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
@@ -286,13 +287,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         scheduledAbundanceProcessesFactory.setRecruitmentProcesses(recruitmentProcesses);
         scheduledAbundanceProcessesFactory.setAbundanceReallocator(reallocator);
-        if (scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory()
-            instanceof AbundanceMortalityProcessFromFileFactory) {
-            ((AbundanceMortalityProcessFromFileFactory)
-                scheduledAbundanceProcessesFactory.getAbundanceMortalityProcessFactory())
-                .setSpeciesCodes(speciesCodes);
-        }
-
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
@@ -360,10 +354,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     public void useDummyData() {
         super.useDummyData();
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            new InputFile(testFolder, "dummy_action_weights.csv")
+            new InputFile(testFolder(), "dummy_action_weights.csv")
         );
         this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            new InputFile(testFolder, "dummy_boats.csv")
+            new InputFile(testFolder(), "dummy_boats.csv")
         );
     }
 

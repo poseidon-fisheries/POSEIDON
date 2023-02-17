@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.*;
+import java.nio.file.Paths;
 
 public class EpoScenarioTest extends TestCase {
 
@@ -14,8 +15,8 @@ public class EpoScenarioTest extends TestCase {
     ) {
         try {
             final S constructedScenario = scenarioClass.newInstance();
-            final File scenarioFile = constructedScenario.testFolder
-                .resolve(scenarioClass.getSimpleName() + ".yaml")
+            final File scenarioFile = constructedScenario.testFolder()
+                .resolve(Paths.get("scenarios", scenarioClass.getSimpleName() + ".yaml"))
                 .toFile();
             new FishYAML().dump(constructedScenario, new FileWriter(scenarioFile));
             // Try to read it back and start it
