@@ -433,7 +433,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("unused")
     public void setAdditionalStartables(final List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
         this.additionalStartables = additionalStartables;
-
     }
 
 }

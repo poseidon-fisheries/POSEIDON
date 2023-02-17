@@ -19,12 +19,16 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Streams.stream;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
+import uk.ac.ox.oxfish.model.BatchRunner;
+import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
+import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
+import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,20 +37,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
-import uk.ac.ox.oxfish.model.BatchRunner;
-import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Streams.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1SweepsWithAltExoCatches {
 
-    private static final Path exoCatchesPath = EpoScenario.INPUT_PATH.resolve("biomass").resolve("exogenous_catches.csv");
+    private static final Path exoCatchesPath =
+        Paths.get("inputs", "epo_inputs", "biomass", "exogenous_catches.csv");
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath =
