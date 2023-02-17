@@ -18,15 +18,14 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -44,12 +43,10 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class AbundanceInitializerFactory
     implements AlgorithmFactory<AbundanceInitializer> {
 
-    private final LoadingCache<Path, Map<String, List<Bin>>> binsCache =
-        CacheBuilder.newBuilder().build(
-            CacheLoader.from(AbundanceInitializerFactory::binsPerSpecies)
-        );
+    private final CacheByFile<Map<String, List<Bin>>> binsCache =
+        new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);
 
-    private Path binsFilePath;
+    private InputFile binsFile;
 
     private AbundanceReallocator abundanceReallocator;
     private SpeciesCodes speciesCodes;
@@ -65,9 +62,9 @@ public class AbundanceInitializerFactory
 
 
     public AbundanceInitializerFactory(
-        final Path binsFilePath
+        final InputFile binsFile
     ) {
-        this.binsFilePath = binsFilePath;
+        this.binsFile = binsFile;
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
@@ -110,13 +107,13 @@ public class AbundanceInitializerFactory
     }
 
     @SuppressWarnings("unused")
-    public Path getBinsFilePath() {
-        return binsFilePath;
+    public InputFile getBinsFile() {
+        return binsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setBinsFilePath(final Path binsFilePath) {
-        this.binsFilePath = binsFilePath;
+    public void setBinsFile(final InputFile binsFile) {
+        this.binsFile = binsFile;
     }
 
     @Override
@@ -126,7 +123,7 @@ public class AbundanceInitializerFactory
         checkNotNull(weightGroupsPerSpecies, "need to call setWeightGroupsPerSpecies() before using");
         return new AbundanceInitializer(
             speciesCodes,
-            binsCache.getUnchecked(this.binsFilePath),
+            binsCache.apply(this.binsFile.get()),
             weightGroupsPerSpecies,
             abundanceReallocator
         );

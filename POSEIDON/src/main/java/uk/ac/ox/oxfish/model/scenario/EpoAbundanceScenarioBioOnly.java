@@ -92,7 +92,9 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
 
     );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
-        new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
+        new AbundanceInitializerFactory(
+            new InputFile(getInputFolder(), Paths.get("abundance", "bins.csv"))
+        );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =

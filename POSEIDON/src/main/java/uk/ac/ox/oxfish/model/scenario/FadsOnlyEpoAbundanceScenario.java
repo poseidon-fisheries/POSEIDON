@@ -18,16 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-
-import java.nio.file.Paths;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -43,13 +36,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -58,6 +45,13 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.nio.file.Paths;
+import java.util.Map;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -96,7 +90,9 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             365
         );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
-        new AbundanceInitializerFactory(INPUT_PATH.resolve("abundance").resolve("bins.csv"));
+        new AbundanceInitializerFactory(
+            new InputFile(getInputFolder(), Paths.get("abundance", "bins.csv"))
+        );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
@@ -127,6 +123,11 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         )
 
     );
+
+    public FadsOnlyEpoAbundanceScenario() {
+        this.setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
+        this.setFishingStrategyFactory(new FishUntilFullFactory());
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {
@@ -208,11 +209,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.scheduledAbundanceProcessesFactory = scheduledAbundanceProcessesFactory;
     }
 
-    public FadsOnlyEpoAbundanceScenario() {
-        this.setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        this.setFishingStrategyFactory(new FishUntilFullFactory());
-    }
-
     @Override
     public ScenarioEssentials start(final FishState fishState) {
 
@@ -281,7 +277,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         fishState.registerStartable(scheduledAbundanceProcessesFactory.apply(fishState));
         fishState.registerStartable(abundanceRestorerFactory.apply(fishState));
         fishState.registerStartable(fadMakerFactory.apply(fishState));
-        if(fadSettingActive)
+        if (fadSettingActive)
             fishState.registerStartable(fadSetterFactory.apply(fishState));
 
         return scenarioPopulation;
