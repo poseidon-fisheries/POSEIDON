@@ -108,12 +108,19 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     // private boolean galapagosZapper = false;
     private EPOPlannedStrategyFlexibleFactory destinationStrategy =
         new EPOPlannedStrategyFlexibleFactory(
-            new AbundanceCatchSamplersFactory(),
+            new AbundanceCatchSamplersFactory(
+                getSpeciesCodesSupplier(),
+                new AbundanceFiltersFactory(
+                    new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+                    getSpeciesCodesSupplier()
+                )
+            ),
             new InputFile(getInputFolder(), "action_weights.csv"),
             getVesselsFile()
         );
 
     public EpoScenarioPathfinding() {
+        setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
             new InputFile(getInputFolder(), "location_values.csv")
         ));
@@ -207,6 +214,9 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         super.useDummyData();
         getDestinationStrategy().setActionWeightsFile(
             new InputFile(testFolder, "dummy_action_weights.csv")
+        );
+        getDestinationStrategy().setMaxTripDurationFile(
+            new InputFile(testFolder, "dummy_boats.csv")
         );
     }
 
