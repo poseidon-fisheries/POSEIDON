@@ -131,7 +131,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             )
         );
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
-            new InputFile(getInputFolder(), "location_values.csv")
+            new InputFile(getInputFolder(), "location_values.csv"),
+            new InputFile(getInputFolder(), "max_current_speeds.csv")
         ));
     }
 

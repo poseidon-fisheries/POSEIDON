@@ -31,8 +31,11 @@ public class AbundancePurseSeineGearFactory
     public AbundancePurseSeineGearFactory() {
     }
 
-    public AbundancePurseSeineGearFactory(final InputFile locationValuesFile) {
-        super(locationValuesFile);
+    public AbundancePurseSeineGearFactory(
+        final InputFile locationValuesFile,
+        final InputFile maxCurrentSpeedFile
+    ) {
+        super(locationValuesFile, maxCurrentSpeedFile);
     }
 
     @Override

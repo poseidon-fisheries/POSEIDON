@@ -126,7 +126,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 new BiomassCatchSamplersFactory(getSpeciesCodesSupplier())
             )
         );
-        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
+        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(
+            new InputFile(getInputFolder(), "location_values.csv"),
+            new InputFile(getInputFolder(), "max_current_speeds.csv")
+        ));
     }
 
     public static String getBoatId(final Fisher fisher) {

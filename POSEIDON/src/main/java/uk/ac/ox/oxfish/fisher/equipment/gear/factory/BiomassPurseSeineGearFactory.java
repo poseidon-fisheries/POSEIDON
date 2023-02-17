@@ -23,9 +23,20 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 public class BiomassPurseSeineGearFactory
     extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
+
+    public BiomassPurseSeineGearFactory() {
+    }
+
+    public BiomassPurseSeineGearFactory(
+        final InputFile locationValuesFile,
+        final InputFile maxCurrentSpeedsFile
+    ) {
+        super(locationValuesFile, maxCurrentSpeedsFile);
+    }
 
     @Override
     public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {

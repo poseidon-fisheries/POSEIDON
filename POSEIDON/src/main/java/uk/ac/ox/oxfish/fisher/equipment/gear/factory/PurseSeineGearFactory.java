@@ -34,7 +34,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.quantity.Mass;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Stream;
@@ -42,7 +41,6 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 @SuppressWarnings("unused")
@@ -114,13 +112,18 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
-    private Path maxCurrentSpeedsFile = INPUT_PATH.resolve("max_current_speeds.csv");
+    private InputFile maxCurrentSpeedsFile;
     private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
+
     public PurseSeineGearFactory() {
     }
 
-    public PurseSeineGearFactory(final InputFile locationValuesFile) {
+    public PurseSeineGearFactory(
+        final InputFile locationValuesFile,
+        final InputFile maxCurrentSpeedsFile
+    ) {
         this.locationValuesFile = locationValuesFile;
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
     public InputFile getLocationValuesFile() {
@@ -139,11 +142,11 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
     }
 
-    public Path getMaxCurrentSpeedsFile() {
+    public InputFile getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
 
-    public void setMaxCurrentSpeedsFile(Path maxCurrentSpeedsFile) {
+    public void setMaxCurrentSpeedsFile(final InputFile maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
@@ -398,7 +401,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
         final PurseSeinerActionClassToDouble maxCurrentSpeed =
             PurseSeinerActionClassToDouble.fromFile(
-                getMaxCurrentSpeedsFile(), "action", "speed"
+                getMaxCurrentSpeedsFile().get(), "action", "speed"
             );
 
         final GlobalSetAttractionModulator globalSetAttractionModulator =

@@ -119,7 +119,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     public EpoScenarioPathfinding() {
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
-            new InputFile(getInputFolder(), "location_values.csv")
+            new InputFile(getInputFolder(), "location_values.csv"),
+            new InputFile(getInputFolder(), "max_current_speeds.csv")
         ));
     }
 
