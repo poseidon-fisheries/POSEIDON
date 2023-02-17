@@ -110,7 +110,8 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                 new AbundanceFiltersFactory(
                     new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
                     getSpeciesCodesSupplier()
-                )
+                ),
+                new InputFile(getInputFolder(), "set_samples.csv")
             ),
             new InputFile(getInputFolder(), "action_weights.csv"),
             getVesselsFile()

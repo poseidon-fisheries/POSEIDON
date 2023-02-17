@@ -29,9 +29,9 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -45,22 +45,24 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
-    public CatchSamplersFactory() {}
-
-    public CatchSamplersFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
-    }
-
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private Path catchSamplesFile = INPUT_PATH.resolve("set_samples.csv");
+    private InputFile catchSamplesFile;
     private boolean yearlyReset = false;
+    public CatchSamplersFactory() {
+    }
+    public CatchSamplersFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile catchSamplesFile
+    ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+        this.catchSamplesFile = catchSamplesFile;
+    }
 
     @SuppressWarnings("unused")
     public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
@@ -73,19 +75,19 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     @SuppressWarnings("unused")
-    public Path getCatchSamplesFile() {
+    public InputFile getCatchSamplesFile() {
         return catchSamplesFile;
     }
 
     @SuppressWarnings("unused")
-    public void setCatchSamplesFile(final Path selectivityFilePath) {
+    public void setCatchSamplesFile(final InputFile selectivityFilePath) {
         this.catchSamplesFile = selectivityFilePath;
     }
 
     @Override
     public Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
-        return recordStream(catchSamplesFile)
+        return recordStream(catchSamplesFile.get())
             .collect(toImmutableListMultimap(
                 r -> getSetActionClass(r.getString("set_type")),
                 r -> getBiomasses(r, fishState.getBiology())

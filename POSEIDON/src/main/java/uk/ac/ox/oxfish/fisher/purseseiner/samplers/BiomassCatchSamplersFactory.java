@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 
 public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
 
@@ -33,8 +34,11 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
     public BiomassCatchSamplersFactory() {
     }
 
-    public BiomassCatchSamplersFactory(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        super(speciesCodesSupplier);
+    public BiomassCatchSamplersFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile catchSamplesFile
+    ) {
+        super(speciesCodesSupplier, catchSamplesFile);
     }
 
     @Override
