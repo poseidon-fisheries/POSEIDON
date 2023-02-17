@@ -38,15 +38,18 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 public class ScheduledBiomassProcessesFactoryTest extends TestCase {
 
     public void testBuildBiomassGrids() {
+
+        final RootFolder inputFolder = new RootFolder(Paths.get("inputs", "epo_inputs"));
+
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
-            EpoBiomassScenario.INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
+            new InputFile(inputFolder, Paths.get("biomass", "biomass_distributions.csv")),
             365
         );
 
         biomassReallocatorFactory.setSpeciesCodes(
             new SpeciesCodesFromFileFactory(
                 new InputFile(
-                    new RootFolder(EpoBiomassScenario.INPUT_PATH),
+                    inputFolder,
                     Paths.get("species_codes.csv")
                 )
             ).get()

@@ -80,7 +80,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
-            INPUT_PATH.resolve("abundance").resolve("grids.csv"),
+            new InputFile(getInputFolder(), Paths.get("abundance", "grids.csv")),
             365
         );
 

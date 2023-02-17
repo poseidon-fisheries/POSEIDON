@@ -63,7 +63,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     private final BiomassReallocatorFactory biomassReallocatorFactory =
         new BiomassReallocatorFactory(
-            INPUT_PATH.resolve("biomass").resolve("biomass_distributions.csv"),
+            new InputFile(getInputFolder(), Paths.get("biomass", "biomass_distributions.csv")),
             365
         );
     private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");

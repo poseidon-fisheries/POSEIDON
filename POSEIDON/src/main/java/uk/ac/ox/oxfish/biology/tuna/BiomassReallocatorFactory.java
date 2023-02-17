@@ -18,10 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.nio.file.Path;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This will create a {@link BiomassReallocator}. It will use allocation grids based on the biomass
@@ -37,7 +37,7 @@ public class BiomassReallocatorFactory extends ReallocatorFactory<BiomassRealloc
     }
 
     public BiomassReallocatorFactory(
-        final Path biomassDistributionsFilePath,
+        final InputFile biomassDistributionsFilePath,
         final int period
     ) {
         super(biomassDistributionsFilePath, period);
@@ -50,7 +50,7 @@ public class BiomassReallocatorFactory extends ReallocatorFactory<BiomassRealloc
         final AllocationGrids<String> grids =
             new AllocationGridsSupplier(
                 getSpeciesCodes(),
-                getBiomassDistributionsFilePath(),
+                getBiomassDistributionsFile().get(),
                 getMapExtent(),
                 getPeriod()
             ).get();

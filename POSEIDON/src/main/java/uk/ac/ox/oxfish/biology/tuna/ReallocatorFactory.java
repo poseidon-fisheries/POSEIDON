@@ -18,9 +18,9 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.nio.file.Path;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
@@ -28,7 +28,7 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
 
     private MapExtent mapExtent;
     private SpeciesCodes speciesCodes;
-    private Path biomassDistributionsFilePath;
+    private InputFile biomassDistributionsFile;
     private Integer period;
 
     /**
@@ -38,10 +38,10 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
     }
 
     ReallocatorFactory(
-        final Path biomassDistributionsFilePath,
+        final InputFile biomassDistributionsFile,
         final Integer period
     ) {
-        this.biomassDistributionsFilePath = biomassDistributionsFilePath;
+        this.biomassDistributionsFile = biomassDistributionsFile;
         this.period = period;
     }
 
@@ -71,13 +71,13 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Path getBiomassDistributionsFilePath() {
-        return biomassDistributionsFilePath;
+    public InputFile getBiomassDistributionsFile() {
+        return biomassDistributionsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setBiomassDistributionsFilePath(final Path biomassDistributionsFilePath) {
-        this.biomassDistributionsFilePath = biomassDistributionsFilePath;
+    public void setBiomassDistributionsFile(final InputFile biomassDistributionsFile) {
+        this.biomassDistributionsFile = biomassDistributionsFile;
     }
 
 }
