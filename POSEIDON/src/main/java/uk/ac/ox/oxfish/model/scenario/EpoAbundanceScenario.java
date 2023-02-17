@@ -134,7 +134,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 new SetDurationSamplersFactory(
                     new InputFile(getInputFolder(), "set_durations.csv")
                 ),
-                maxCurrentSpeedsFile
+                maxCurrentSpeedsFile,
+                new InputFile(getInputFolder(), "set_compositions.csv")
             )
         );
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(

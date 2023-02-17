@@ -51,7 +51,8 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         final InputFile actionWeightsFile,
         final AbundanceCatchSamplersFactory catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,
-        final InputFile maxCurrentSpeedsFile
+        final InputFile maxCurrentSpeedsFile,
+        final InputFile setCompositionWeightsFile
     ) {
         super(
             AbundanceLocalBiology.class,
@@ -60,7 +61,8 @@ public class PurseSeinerAbundanceFishingStrategyFactory
             actionWeightsFile,
             catchSamplersFactory,
             setDurationSamplersFactory,
-            maxCurrentSpeedsFile
+            maxCurrentSpeedsFile,
+            setCompositionWeightsFile
         );
     }
 

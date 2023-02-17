@@ -130,7 +130,9 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                     new InputFile(getInputFolder(), "set_samples.csv")
                 ),
                 new SetDurationSamplersFactory(new InputFile(getInputFolder(), "set_durations.csv")),
-                maxCurrentSpeedsFile
+                maxCurrentSpeedsFile,
+                new InputFile(getInputFolder(), "set_compositions.csv")
+
             )
         );
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(
