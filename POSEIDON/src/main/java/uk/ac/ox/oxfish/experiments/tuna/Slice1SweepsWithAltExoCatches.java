@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.RootFolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.FileWriter;
@@ -46,8 +48,11 @@ import static java.util.stream.Stream.concat;
 @SuppressWarnings("UnstableApiUsage")
 public class Slice1SweepsWithAltExoCatches {
 
-    private static final Path exoCatchesPath =
-        Paths.get("inputs", "epo_inputs", "biomass", "exogenous_catches.csv");
+    private static final InputFile exoCatchesPath =
+        new InputFile(
+            new RootFolder(Paths.get("inputs", "epo_inputs")),
+            Paths.get("biomass", "exogenous_catches.csv")
+        );
     private static final Path basePath =
         Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
     private static final Path scenarioPath =

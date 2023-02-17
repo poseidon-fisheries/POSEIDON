@@ -3,13 +3,13 @@ package uk.ac.ox.oxfish.model.event;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toCollection;
 import static si.uom.NonSI.TONNE;
@@ -22,42 +22,53 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     implements AlgorithmFactory<BiomassDrivenTimeSeriesExogenousCatches> {
 
     private int startingYear = 2000;
-    private Path catchesFile = Paths.get("inputs", "tuna", "exogenous_catches.csv");
-    private SpeciesCodes speciesCodes;
+    private InputFile catchesFile; // = Paths.get("inputs", "tuna", "exogenous_catches.csv");
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private boolean fadMortality = false;
 
     @SuppressWarnings("unused")
-    public BiomassDrivenTimeSeriesExogenousCatchesFactory() {}
+    public BiomassDrivenTimeSeriesExogenousCatchesFactory() {
+    }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
-        Path catchesFile,
-        int startingYear,
-        boolean fadMortalityIncluded
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputFile catchesFile,
+        final int startingYear,
+        final boolean fadMortalityIncluded
     ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
         this.catchesFile = catchesFile;
         this.startingYear = startingYear;
         this.fadMortality = fadMortalityIncluded;
     }
 
     @SuppressWarnings("unused")
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
     }
 
-    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
-    public int getStartingYear() { return startingYear; }
+    public int getStartingYear() {
+        return startingYear;
+    }
 
     @SuppressWarnings("unused")
-    public void setStartingYear(int startingYear) { this.startingYear = startingYear; }
+    public void setStartingYear(final int startingYear) {
+        this.startingYear = startingYear;
+    }
 
     @SuppressWarnings("unused")
-    public Path getCatchesFile() { return catchesFile; }
+    public InputFile getCatchesFile() {
+        return catchesFile;
+    }
 
-    public void setCatchesFile(Path catchesFile) { this.catchesFile = catchesFile; }
+    public void setCatchesFile(final InputFile catchesFile) {
+        this.catchesFile = catchesFile;
+    }
 
     /**
      * Reads from catchesFile to build the map of exogenous catches tobe passed to the
@@ -66,21 +77,23 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
      * main map and then convert the properly ordered values of these inner maps to linked lists of catches.
      */
     @Override
-    public BiomassDrivenTimeSeriesExogenousCatches apply(FishState fishState) {
-        Map<Species, SortedMap<Integer, Quantity<Mass>>> catchesBySpecies = new HashMap<>();
-        recordStream(catchesFile).forEach(record -> {
+    public BiomassDrivenTimeSeriesExogenousCatches apply(final FishState fishState) {
+        final Map<Species, SortedMap<Integer, Quantity<Mass>>> catchesBySpecies = new HashMap<>();
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        recordStream(catchesFile.get()).forEach(record -> {
             final Integer year = record.getInt("year");
             if (year >= startingYear) {
-                String speciesName = speciesCodes.getSpeciesName(record.getString("species_code"));
-                Species species = fishState.getSpecies(speciesName);
+                final String speciesName = speciesCodes.getSpeciesName(record.getString("species_code"));
+                final Species species = fishState.getSpecies(speciesName);
                 catchesBySpecies
                     .computeIfAbsent(species, __ -> new TreeMap<>())
                     .put(year, getQuantity(record.getDouble("catches_in_tonnes"), TONNE));
             }
         });
-        LinkedHashMap<Species, Queue<Double>> catchesTimeSeries = new LinkedHashMap<>();
+        final LinkedHashMap<Species, Queue<Double>> catchesTimeSeries = new LinkedHashMap<>();
         catchesBySpecies.forEach((species, catches) ->
-            catchesTimeSeries.put(species,
+            catchesTimeSeries.put(
+                species,
                 catches.values().stream().map(q -> asDouble(q, KILOGRAM)).collect(toCollection(LinkedList::new))
             )
         );
@@ -103,7 +116,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
      * @param fadMortality Value to set for property 'fadMortality'.
      */
     @SuppressWarnings("unused")
-    public void setFadMortality(boolean fadMortality) {
+    public void setFadMortality(final boolean fadMortality) {
         this.fadMortality = fadMortality;
     }
 }

@@ -67,7 +67,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
-            INPUT_PATH.resolve("biomass").resolve("exogenous_catches.csv"),
+            getSpeciesCodesSupplier(),
+            new InputFile(getInputFolder(), Paths.get("biomass", "exogenous_catches.csv")),
             TARGET_YEAR,
             fadMortalityIncludedInExogenousCatches
         );
@@ -287,7 +288,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 buildPorts(fishState)
             ).apply(fishState);
 
-        exogenousCatchesFactory.setSpeciesCodes(speciesCodesSupplier.get());
         final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(fishState);
         fishState.registerStartable(exogenousCatches);
 

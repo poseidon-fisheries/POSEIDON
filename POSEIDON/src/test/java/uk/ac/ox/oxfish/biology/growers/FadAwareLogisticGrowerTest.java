@@ -19,20 +19,22 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
-import static org.apache.logging.log4j.Level.DEBUG;
-import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
-
-import java.nio.file.Paths;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.RootFolder;
+
+import java.nio.file.Paths;
+
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.junit.Assert.assertEquals;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 public class FadAwareLogisticGrowerTest {
 
@@ -49,7 +51,12 @@ public class FadAwareLogisticGrowerTest {
         scenario.useDummyData();
         scenario.setMarketMapFactory(new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR));
         scenario.getExogenousCatchesFactory()
-            .setCatchesFile(Paths.get("inputs", "tests", "exogenous_catches.csv"));
+            .setCatchesFile(
+                new InputFile(
+                    new RootFolder(Paths.get("inputs", "tests")),
+                    "exogenous_catches.csv"
+                )
+            );
         scenario.setRegulationsFactory(new NoFishingFactory());
 
         final FishState state = new FishState();
