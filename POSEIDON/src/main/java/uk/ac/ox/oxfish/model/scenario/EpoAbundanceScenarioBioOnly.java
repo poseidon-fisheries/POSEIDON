@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
@@ -63,7 +62,8 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
-            INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
+            getSpeciesCodesSupplier(),
+            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
         );
 
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
@@ -251,7 +251,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         nauticalMap.initializeBiology(abundanceInitializer, rng, globalBiology);
         abundanceInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
 
-        recruitmentProcessesFactory.setSpeciesCodes(speciesCodes);
         recruitmentProcessesFactory.setGlobalBiology(globalBiology);
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);

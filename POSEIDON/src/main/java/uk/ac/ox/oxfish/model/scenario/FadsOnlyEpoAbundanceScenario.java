@@ -25,7 +25,7 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.nio.file.Path;
+
 import java.nio.file.Paths;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -79,8 +79,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
-            INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
+            getSpeciesCodesSupplier(),
+            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
         );
+
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             getSpeciesCodesSupplier(),
@@ -249,7 +251,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         nauticalMap.initializeBiology(abundanceInitializer, rng, globalBiology);
         abundanceInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
 
-        recruitmentProcessesFactory.setSpeciesCodes(speciesCodes);
         recruitmentProcessesFactory.setGlobalBiology(globalBiology);
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);

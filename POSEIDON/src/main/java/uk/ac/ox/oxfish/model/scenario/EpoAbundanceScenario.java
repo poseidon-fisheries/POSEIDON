@@ -68,8 +68,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
-            INPUT_PATH.resolve("abundance").resolve("recruitment_parameters.csv")
+            getSpeciesCodesSupplier(),
+            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
         );
+
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             getSpeciesCodesSupplier(),
@@ -289,7 +291,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         nauticalMap.initializeBiology(abundanceInitializer, rng, globalBiology);
         abundanceInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
 
-        recruitmentProcessesFactory.setSpeciesCodes(speciesCodes);
         recruitmentProcessesFactory.setGlobalBiology(globalBiology);
         final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses =
             recruitmentProcessesFactory.apply(fishState);
