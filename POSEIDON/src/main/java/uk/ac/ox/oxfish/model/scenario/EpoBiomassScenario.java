@@ -39,7 +39,6 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
@@ -48,7 +47,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
@@ -66,7 +64,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             new InputFile(getInputFolder(), Paths.get("biomass", "biomass_distributions.csv")),
             365
         );
-    private Path attractionWeightsFile = INPUT_PATH.resolve("action_weights.csv");
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
@@ -298,16 +295,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Path getAttractionWeightsFile() {
-        return attractionWeightsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAttractionWeightsFile(final Path attractionWeightsFile) {
-        this.attractionWeightsFile = attractionWeightsFile;
     }
 
     @SuppressWarnings("unused")

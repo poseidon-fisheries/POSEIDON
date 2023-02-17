@@ -385,7 +385,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
     }
-    
+
     public EPOPlannedStrategyFlexibleFactory getDestinationStrategy() {
         return destinationStrategy;
     }
