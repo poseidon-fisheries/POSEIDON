@@ -11,13 +11,11 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
+import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
+import uk.ac.ox.oxfish.model.scenario.Subfolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -51,16 +49,16 @@ public class EpoSensitivityRuns {
         ImmutableMap.of(
 //            "temperature", noTemperatureLayerPolicies(),
 //            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
-            "fad_limits_fine", fadLimitPolicies(
-                IntStream.concat(
-                    IntStream.rangeClosed(1, 20),
-                    IntStream.rangeClosed(3, 10).map(i -> i * 10)
-                )
-            )//,
+                "fad_limits_fine", fadLimitPolicies(
+                    IntStream.concat(
+                        IntStream.rangeClosed(1, 20),
+                        IntStream.rangeClosed(3, 10).map(i -> i * 10)
+                    )
+                )//,
 //            "spatial_closures", spatialClosurePolicies()
 //            "skj_minus_bet", betAvoidancePolicies(),
-            //"southern_spatial_closure", southernSpatialClosurePolicies()
-        )
+                //"southern_spatial_closure", southernSpatialClosurePolicies()
+            )
             .entrySet()
             .stream()
             .parallel()
@@ -193,7 +191,12 @@ public class EpoSensitivityRuns {
         scenario.setRegulationsFactory(
             new CompositeMultipleRegulationsFactory(
                 ImmutableList.of(
-                    new StandardIattcRegulationsFactory(),
+                    new StandardIattcRegulationsFactory(
+                        new ProtectedAreasFromFolderFactory(
+                            new Subfolder(scenario.getInputFolder(), "regions"),
+                            "region_tags.csv"
+                        )
+                    ),
                     new MultipleRegulationsFactory(
                         ImmutableMap.of(regulationFactory, TAG_FOR_ALL)
                     )

@@ -22,13 +22,7 @@ public class RootFolder implements Folder {
     }
 
     @Override
-    public Path resolve(final Path other) {
-        return path.resolve(other);
+    public Path get() {
+        return path;
     }
-
-    @Override
-    public Path resolve(final String other) {
-        return path.resolve(other);
-    }
-
 }

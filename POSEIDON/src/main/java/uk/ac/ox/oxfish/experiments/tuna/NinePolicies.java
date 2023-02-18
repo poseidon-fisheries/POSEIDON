@@ -22,15 +22,13 @@ package uk.ac.ox.oxfish.experiments.tuna;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
+import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
+import uk.ac.ox.oxfish.model.scenario.Subfolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -108,7 +106,10 @@ public class NinePolicies {
                 scenario ->
                     new CompositeMultipleRegulationsFactory(
                         ImmutableList.of(
-                            StandardIattcRegulationsFactory.PROTECTED_AREAS_FROM_FOLDER_FACTORY,
+                            new ProtectedAreasFromFolderFactory(
+                                new Subfolder(scenario.getInputFolder(), "regions"),
+                                "region_tags.csv"
+                            ),
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
@@ -131,7 +132,10 @@ public class NinePolicies {
                 scenario ->
                     new CompositeMultipleRegulationsFactory(
                         ImmutableList.of(
-                            StandardIattcRegulationsFactory.PROTECTED_AREAS_FROM_FOLDER_FACTORY,
+                            new ProtectedAreasFromFolderFactory(
+                                new Subfolder(scenario.getInputFolder(), "regions"),
+                                "region_tags.csv"
+                            ),
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(

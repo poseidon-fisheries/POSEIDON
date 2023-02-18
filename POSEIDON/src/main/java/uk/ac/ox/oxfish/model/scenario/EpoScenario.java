@@ -64,6 +64,7 @@ import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.quantity.Mass;
@@ -140,7 +141,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private InputFile costsFile = new InputFile(inputsFolder, "costs.csv");
     private PurseSeineGearFactory<B, F> purseSeineGearFactory;
     private AlgorithmFactory<? extends Regulation> regulationsFactory =
-        new StandardIattcRegulationsFactory();
+        new StandardIattcRegulationsFactory(
+            new ProtectedAreasFromFolderFactory(
+                new Subfolder(getInputFolder(), "regions"),
+                "region_tags.csv"
+            )
+        );
     private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
         new LinkedList<>();
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =

@@ -1,12 +1,13 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.scenario.Folder;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.cache.CacheLoader.from;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.io.MoreFiles.getFileExtension;
 import static com.google.common.io.MoreFiles.getNameWithoutExtension;
@@ -26,21 +26,27 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<MultipleRegulations> {
 
-    final LoadingCache<Path, Map<String, AlgorithmFactory<? extends Regulation>>> factoriesCache =
-        CacheBuilder.newBuilder().build(from(this::loadShapeFiles));
-    private Path shapefilesFolder;
-    private Path tagsFile;
+    final CacheByFile<Map<String, AlgorithmFactory<? extends Regulation>>> factoriesCache =
+        new CacheByFile<>(this::loadShapeFiles);
+    private Folder shapefilesFolder;
+    private InputFile tagsFile;
 
     @SuppressWarnings("unused")
     public ProtectedAreasFromFolderFactory() {
     }
 
-    public ProtectedAreasFromFolderFactory(Path shapefilesFolder, Path tagsFile) {
+    public ProtectedAreasFromFolderFactory(final Folder shapefilesFolder, final String tagsFile) {
+        this(shapefilesFolder, new InputFile(shapefilesFolder, tagsFile));
+    }
+
+    public ProtectedAreasFromFolderFactory(final Folder shapefilesFolder, final InputFile tagsFile) {
         this.shapefilesFolder = shapefilesFolder;
         this.tagsFile = tagsFile;
     }
 
-    private ImmutableMap<String, AlgorithmFactory<? extends Regulation>> loadShapeFiles(Path shapefilesFolder) {
+    private ImmutableMap<String, AlgorithmFactory<? extends Regulation>> loadShapeFiles(
+        final Path shapefilesFolder
+    ) {
         try {
             //noinspection UnstableApiUsage
             return Files.list(shapefilesFolder)
@@ -49,37 +55,37 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
                     path -> getNameWithoutExtension(path.getFileName()),
                     SpecificProtectedAreaFromShapeFileFactory::new
                 ));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public Path getShapefilesFolder() {
+    public Folder getShapefilesFolder() {
         return shapefilesFolder;
     }
 
     @SuppressWarnings("unused")
-    public void setShapefilesFolder(Path shapefilesFolder) {
+    public void setShapefilesFolder(final Folder shapefilesFolder) {
         this.shapefilesFolder = shapefilesFolder;
     }
 
-    public Path getTagsFile() {
+    public InputFile getTagsFile() {
         return tagsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setTagsFile(Path tagsFile) {
+    public void setTagsFile(final InputFile tagsFile) {
         this.tagsFile = tagsFile;
     }
 
     @Override
-    public MultipleRegulations apply(FishState fishState) {
+    public MultipleRegulations apply(final FishState fishState) {
 
         final Map<String, AlgorithmFactory<? extends Regulation>> factoriesByName =
-            factoriesCache.getUnchecked(getShapefilesFolder());
+            factoriesCache.apply(getShapefilesFolder().get());
 
         final Map<String, List<AlgorithmFactory<? extends Regulation>>> factoriesByTag =
-            recordStream(getShapefilesFolder().resolve(getTagsFile()))
+            recordStream(getTagsFile().get())
                 .collect(groupingBy(
                     record -> record.getString("tag"),
                     mapping(

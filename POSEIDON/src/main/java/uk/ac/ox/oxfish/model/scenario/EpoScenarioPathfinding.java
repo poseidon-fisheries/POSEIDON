@@ -81,9 +81,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
         new LastMomentAbundanceFadInitalizerFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulationsFactory =
-        new StandardIattcRegulationsFactory();
-
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
         speciesCodesSupplier.get().getSpeciesNames().stream().collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
@@ -131,16 +128,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             "tmp", "calibrated_scenario.yaml"
         );
         new Runner<>(EpoScenarioPathfinding.class, scenarioPath).run(1, 1);
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")
@@ -349,7 +336,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,
-            regulationsFactory,
+            getRegulationsFactory(),
             getPurseSeineGearFactory(),
             destinationStrategy,
             fishingStrategyFactory,

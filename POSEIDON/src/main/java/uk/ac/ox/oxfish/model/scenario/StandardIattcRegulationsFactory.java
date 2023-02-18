@@ -49,15 +49,18 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
             dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
             new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
         );
-    public static final ProtectedAreasFromFolderFactory PROTECTED_AREAS_FROM_FOLDER_FACTORY =
-        new ProtectedAreasFromFolderFactory(
-            EpoScenario.INPUT_PATH.resolve("regions"),
-            Paths.get("region_tags.csv")
-        );
+
     private AlgorithmFactory<TemporaryRegulation> closureAReg = CLOSURE_A_REG;
     private AlgorithmFactory<TemporaryRegulation> closureBReg = CLOSURE_B_REG;
     private AlgorithmFactory<TemporaryRegulation> elCorralitoReg = EL_CORRALITO_REG;
-    private ProtectedAreasFromFolderFactory protectedAreasFromFolderFactory = PROTECTED_AREAS_FROM_FOLDER_FACTORY;
+    private ProtectedAreasFromFolderFactory protectedAreasFromFolderFactory;
+
+    StandardIattcRegulationsFactory() {
+    }
+
+    public StandardIattcRegulationsFactory(final ProtectedAreasFromFolderFactory protectedAreasFromFolderFactory) {
+        this.protectedAreasFromFolderFactory = protectedAreasFromFolderFactory;
+    }
 
     public AlgorithmFactory<TemporaryRegulation> getClosureAReg() {
         return closureAReg;
