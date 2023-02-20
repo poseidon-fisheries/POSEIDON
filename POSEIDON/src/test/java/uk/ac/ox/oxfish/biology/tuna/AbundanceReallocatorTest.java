@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -38,7 +39,7 @@ public class AbundanceReallocatorTest {
 
         Map<String, String> sCodes = new HashMap<>();
         sCodes.put("SP1", species1.getName());
-        SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
+        Supplier<SpeciesCodes> speciesCodesSupplier = () -> new SpeciesCodes(sCodes);
 
         final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
             (species, bin) -> bin == 0 ? SMALL : LARGE;
@@ -54,7 +55,7 @@ public class AbundanceReallocatorTest {
         );
 
         AllocationGrids<Entry<String, SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
-                speciesCodes,
+                speciesCodesSupplier,
                 TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
                 nauticalMap.getMapExtent(),
                 365).get();

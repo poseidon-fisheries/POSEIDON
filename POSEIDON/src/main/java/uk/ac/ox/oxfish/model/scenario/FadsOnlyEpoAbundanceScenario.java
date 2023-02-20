@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
@@ -208,7 +207,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        final SpeciesCodes speciesCodes = getSpeciesCodesSupplier().get();
 
         final NauticalMap nauticalMap =
             getMapInitializerFactory()
@@ -218,7 +216,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
             (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
+        abundanceReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         final AbundanceReallocator reallocator =
             this.abundanceReallocatorFactory.apply(fishState);
 
@@ -227,7 +225,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         final AbundanceInitializerFactory abundanceInitializerFactory =
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
-        abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
@@ -260,7 +258,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
-                .setSpeciesCodes(getSpeciesCodesSupplier().get());
+                .setSpeciesCodesSupplier(getSpeciesCodesSupplier());
         }
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(
             FadSetAction.class));

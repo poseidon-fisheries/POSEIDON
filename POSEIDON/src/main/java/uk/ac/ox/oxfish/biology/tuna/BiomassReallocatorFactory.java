@@ -45,11 +45,10 @@ public class BiomassReallocatorFactory extends ReallocatorFactory<BiomassRealloc
 
     @Override
     public BiomassReallocator apply(final FishState fishState) {
-        checkNotNull(getSpeciesCodes(), "Need to call setSpeciesCodes() before using");
         checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
         final AllocationGrids<String> grids =
             new AllocationGridsSupplier(
-                getSpeciesCodes(),
+                getSpeciesCodesSupplier(),
                 getBiomassDistributionsFile().get(),
                 getMapExtent(),
                 getPeriod()

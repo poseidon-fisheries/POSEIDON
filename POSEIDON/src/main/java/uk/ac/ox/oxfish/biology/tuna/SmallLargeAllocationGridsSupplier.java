@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Supplier;
+
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -44,12 +46,12 @@ class SmallLargeAllocationGridsSupplier
 
     @SuppressWarnings("SameParameterValue")
     SmallLargeAllocationGridsSupplier(
-        final SpeciesCodes speciesCodes,
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period
     ) {
-        super(speciesCodes, gridsFilePath, mapExtent, period, true);
+        super(speciesCodesSupplier, gridsFilePath, mapExtent, period, true);
     }
 
     @Override

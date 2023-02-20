@@ -23,11 +23,13 @@ import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import java.util.function.Supplier;
+
 abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
     implements AlgorithmFactory<T> {
 
     private MapExtent mapExtent;
-    private SpeciesCodes speciesCodes;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath biomassDistributionsFile;
     private Integer period;
 
@@ -45,12 +47,12 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
         this.period = period;
     }
 
-    SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
+    Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
     }
 
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     Integer getPeriod() {

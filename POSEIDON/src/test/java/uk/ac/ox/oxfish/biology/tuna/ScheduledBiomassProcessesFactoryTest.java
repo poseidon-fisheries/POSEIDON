@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
@@ -45,10 +44,10 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
             365
         );
 
-        biomassReallocatorFactory.setSpeciesCodes(
+        biomassReallocatorFactory.setSpeciesCodesSupplier(
             new SpeciesCodesFromFileFactory(
                 inputFolder.path("species_codes.csv")
-            ).get()
+            )
         );
 
         final Path depthFile = Paths.get("inputs", "epo_inputs", "depth.csv");

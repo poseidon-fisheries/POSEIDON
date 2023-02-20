@@ -20,18 +20,20 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
 import java.nio.file.Path;
+import java.util.function.Supplier;
+
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 class AllocationGridsSupplier extends AbstractAllocationGridsSupplier<String> {
 
     AllocationGridsSupplier(
-        final SpeciesCodes speciesCodes,
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period
     ) {
-        super(speciesCodes, gridsFilePath, mapExtent, period, true);
+        super(speciesCodesSupplier, gridsFilePath, mapExtent, period, true);
     }
 
     @Override

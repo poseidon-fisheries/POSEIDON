@@ -264,7 +264,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
             (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
+        abundanceReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         final AbundanceReallocator reallocator =
             this.abundanceReallocatorFactory.apply(fishState);
 
@@ -273,7 +273,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         final AbundanceInitializerFactory abundanceInitializerFactory =
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
-        abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
@@ -301,7 +301,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
         if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
             ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
-                .setSpeciesCodes(getSpeciesCodesSupplier().get());
+                .setSpeciesCodesSupplier(getSpeciesCodesSupplier());
         }
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(
             ((AbundanceCatchSamplersFactory) ((PurseSeinerAbundanceFishingStrategyFactory)

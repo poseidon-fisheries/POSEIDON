@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -49,7 +50,7 @@ public class AbundanceInitializerFactory
     private InputPath binsFile;
 
     private AbundanceReallocator abundanceReallocator;
-    private SpeciesCodes speciesCodes;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private Map<String, WeightGroups> weightGroupsPerSpecies;
 
     /**
@@ -102,8 +103,8 @@ public class AbundanceInitializerFactory
         this.weightGroupsPerSpecies = weightGroupsPerSpecies;
     }
 
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -118,11 +119,10 @@ public class AbundanceInitializerFactory
 
     @Override
     public AbundanceInitializer apply(final FishState fishState) {
-        checkNotNull(speciesCodes, "need to call setSpeciesCodes() before using");
         checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator() before using");
         checkNotNull(weightGroupsPerSpecies, "need to call setWeightGroupsPerSpecies() before using");
         return new AbundanceInitializer(
-            speciesCodes,
+            speciesCodesSupplier.get(),
             binsCache.apply(this.binsFile.get()),
             weightGroupsPerSpecies,
             abundanceReallocator

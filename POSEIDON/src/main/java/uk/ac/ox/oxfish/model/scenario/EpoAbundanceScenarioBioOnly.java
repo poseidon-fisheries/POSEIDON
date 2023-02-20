@@ -224,7 +224,7 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
             (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
+        abundanceReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         final AbundanceReallocator reallocator =
             this.abundanceReallocatorFactory.apply(fishState);
 
@@ -233,7 +233,7 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
         final AbundanceInitializerFactory abundanceInitializerFactory =
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
-        abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);

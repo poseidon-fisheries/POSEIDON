@@ -35,7 +35,7 @@ public abstract class AbstractAbundanceFadInitializerFactory
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         checkNotNull(selectivityFilters);
-        checkNotNull(getSpeciesCodes());
+        checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
         final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
         final DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);

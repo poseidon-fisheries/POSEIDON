@@ -18,17 +18,8 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -36,6 +27,16 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fad<B, F>>
     implements AlgorithmFactory<FadInitializer<B, F>> {
@@ -46,7 +47,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     private Map<String, DoubleParameter> attractableBiomassCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> biomassInteractionsCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
-    private SpeciesCodes speciesCodes;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     FadInitializerFactory(final String... speciesNames) {
 
@@ -194,12 +195,12 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         this.growthRates = growthRates;
     }
 
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
     }
 
-    public void setSpeciesCodes(final SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
 }

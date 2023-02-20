@@ -64,7 +64,7 @@ public class AbundanceFadInitializerFactoryTest {
         SpeciesCodesFromFileFactory speciesCodesFactory =
             new SpeciesCodesFromFileFactory(InputPath.of("inputs", "epo_inputs", "species_codes.csv"));
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();
-        factory.setSpeciesCodes(speciesCodes);
+        factory.setSpeciesCodesSupplier(speciesCodesFactory);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));
         FishState fakeModel = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(fakeModel.getRandom()).thenReturn(new MersenneTwisterFast());

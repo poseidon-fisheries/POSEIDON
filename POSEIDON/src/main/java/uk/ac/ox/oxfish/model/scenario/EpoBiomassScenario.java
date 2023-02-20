@@ -207,8 +207,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         final NauticalMap nauticalMap =
             getMapInitializerFactory().apply(model).makeMap(model.random, null, model);
 
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
-        biomassReallocatorFactory.setSpeciesCodes(speciesCodes);
+        biomassReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(model);
         scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);

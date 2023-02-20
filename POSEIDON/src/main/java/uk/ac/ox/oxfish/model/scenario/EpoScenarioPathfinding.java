@@ -6,7 +6,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
@@ -232,7 +231,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final MersenneTwisterFast rng = fishState.getRandom();
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
 
         final NauticalMap nauticalMap =
             getMapInitializerFactory()
@@ -242,7 +240,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final AbundanceReallocatorFactory abundanceReallocatorFactory =
             (AbundanceReallocatorFactory) this.abundanceReallocatorFactory;
         abundanceReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        abundanceReallocatorFactory.setSpeciesCodes(speciesCodes);
+        abundanceReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         final AbundanceReallocator reallocator =
             this.abundanceReallocatorFactory.apply(fishState);
 
@@ -251,7 +249,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final AbundanceInitializerFactory abundanceInitializerFactory =
             (AbundanceInitializerFactory) this.abundanceInitializerFactory;
         abundanceInitializerFactory.setAbundanceReallocator(reallocator);
-        abundanceInitializerFactory.setSpeciesCodes(speciesCodes);
+        abundanceInitializerFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
         abundanceInitializerFactory.assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final AbundanceInitializer abundanceInitializer =
             this.abundanceInitializerFactory.apply(fishState);
@@ -321,7 +319,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         if (fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
-            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodes(speciesCodesSupplier.get());
+            ((AbstractAbundanceFadInitializerFactory) fadInitializerFactory).setSpeciesCodesSupplier(speciesCodesSupplier);
         ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(
             ((AbundanceCatchSamplersFactory) getDestinationStrategy().getCatchSamplersFactory())
                 .getAbundanceFiltersFactory()

@@ -57,12 +57,11 @@ public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceRea
 
     @Override
     public AbundanceReallocator apply(final FishState fishState) {
-        checkNotNull(getSpeciesCodes(), "Need to call setSpeciesCodes() before using");
         checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
 
         final AllocationGrids<Entry<String, SizeGroup>> grids =
             new SmallLargeAllocationGridsSupplier(
-                getSpeciesCodes(),
+                getSpeciesCodesSupplier(),
                 getBiomassDistributionsFile().get(),
                 getMapExtent(),
                 365

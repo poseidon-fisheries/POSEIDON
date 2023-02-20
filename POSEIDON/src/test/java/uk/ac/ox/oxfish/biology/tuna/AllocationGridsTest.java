@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
@@ -24,11 +25,11 @@ public class AllocationGridsTest {
 
         Map<String, String> sCodes = new HashMap<>();
         sCodes.put("SP1", species1.getName());
-        SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
+        Supplier<SpeciesCodes> speciesCodesSupplier = () -> new SpeciesCodes(sCodes);
         final NauticalMap nauticalMap = makeMap(3, 3);
 
         AllocationGrids<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
-                speciesCodes,
+                speciesCodesSupplier,
                 TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
                 nauticalMap.getMapExtent(),
                 365).get();

@@ -18,6 +18,23 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.univocity.parsers.common.record.Record;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.geography.MapExtent;
+
+import javax.annotation.Nullable;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
@@ -27,28 +44,11 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-import com.google.common.base.Supplier;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.geography.MapExtent;
-
-import javax.annotation.Nullable;
-
 abstract class AbstractAllocationGridsSupplier<K>
     implements Supplier<AllocationGrids<K>> {
 
     @Nullable
-    private final SpeciesCodes speciesCodes;
+    private final Supplier<SpeciesCodes> speciesCodesSupplier;
     private final Path gridsFilePath;
     private final MapExtent mapExtent;
     private final int period;
@@ -59,14 +59,13 @@ abstract class AbstractAllocationGridsSupplier<K>
         CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
 
     AbstractAllocationGridsSupplier(
-            @Nullable
-
-            final SpeciesCodes speciesCodes,
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period,
-        boolean toNormalize) {
-        this.speciesCodes = speciesCodes;
+        final boolean toNormalize
+    ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
         this.gridsFilePath = gridsFilePath;
         this.mapExtent = mapExtent;
         this.period = period;
@@ -96,11 +95,43 @@ abstract class AbstractAllocationGridsSupplier<K>
         return cache.getUnchecked(this);
     }
 
+    private static DoubleGrid2D makeGrid(
+            final MapExtent mapExtent,
+            final Iterable<? extends Record> records, final boolean normalize
+    ) {
+        final DoubleGrid2D grid = new DoubleGrid2D(
+            mapExtent.getGridWidth(),
+            mapExtent.getGridHeight()
+        );
+        records.forEach(record -> {
+            final double lon = record.getDouble("lon");
+            final double lat = record.getDouble("lat");
+            final int x = mapExtent.toGridX(lon);
+            final int y = mapExtent.toGridY(lat);
+            if (x < grid.getWidth() && y < grid.getHeight() &&
+                x >= 0 && y >= 0) {
+                grid.set(
+                    x,
+                    y,
+                    record.getDouble("value")
+                );
+            } else {
+                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
+            }
+        });
+        if(normalize){
+        return normalize(grid);}
+        return grid;
+    }
+
+    abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
+
     private AllocationGrids<K> readGridsFromFile() {
 
         checkNotNull(this.gridsFilePath);
         checkNotNull(this.mapExtent);
 
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         final Map<LocalDate, Map<K, List<Record>>> recordsByDateAndKey =
             recordStream(gridsFilePath)
                 .collect(groupingBy(
@@ -130,37 +161,6 @@ abstract class AbstractAllocationGridsSupplier<K>
                 )),
             period
         );
-    }
-
-    abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
-
-    private static DoubleGrid2D makeGrid(
-            final MapExtent mapExtent,
-            final Iterable<? extends Record> records, final boolean normalize
-    ) {
-        final DoubleGrid2D grid = new DoubleGrid2D(
-            mapExtent.getGridWidth(),
-            mapExtent.getGridHeight()
-        );
-        records.forEach(record -> {
-            final double lon = record.getDouble("lon");
-            final double lat = record.getDouble("lat");
-            int x = mapExtent.toGridX(lon);
-            int y = mapExtent.toGridY(lat);
-            if(x<grid.getWidth() && y<grid.getHeight() &&
-            x>=0 && y>=0) {
-            grid.set(
-                    x,
-                    y,
-                record.getDouble("value")
-            );}
-            else {
-                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
-            }
-        });
-        if(normalize){
-        return normalize(grid);}
-        return grid;
     }
 
     /**
