@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.mock;
@@ -50,7 +51,7 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
             ).get()
         );
 
-        final Path depthFile = EpoBiomassScenario.INPUT_PATH.resolve("depth.csv");
+        final Path depthFile = Paths.get("inputs", "epo_inputs", "depth.csv");
         final MapInitializer mapInitializer =
             new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);

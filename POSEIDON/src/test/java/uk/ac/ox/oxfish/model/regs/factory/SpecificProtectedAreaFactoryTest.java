@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import java.util.Set;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.getLast;
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
@@ -49,7 +49,7 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
     public void testEEZPoints() {
 
         final Map<String, List<TestPoint>> testPoints =
-            recordStream(INPUT_PATH.resolve("tests")
+            recordStream(Paths.get("inputs", "epo_inputs", "tests")
                 .resolve("regions_test_points.csv"))
                 .collect(
                     groupingBy(
@@ -96,10 +96,10 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
         final Coordinate coordinate;
 
         private TestPoint(
-            String eezName,
-            String flag,
-            boolean shouldBeAllowed,
-            Coordinate coordinate
+            final String eezName,
+            final String flag,
+            final boolean shouldBeAllowed,
+            final Coordinate coordinate
         ) {
             this.eezName = eezName;
             this.flag = flag;

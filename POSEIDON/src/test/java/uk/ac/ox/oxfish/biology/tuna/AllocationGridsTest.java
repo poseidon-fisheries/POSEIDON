@@ -2,25 +2,19 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import org.junit.Test;
 import sim.field.grid.DoubleGrid2D;
-import sim.field.grid.Grid2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import static org.junit.Assert.*;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class AllocationGridsTest {
 
