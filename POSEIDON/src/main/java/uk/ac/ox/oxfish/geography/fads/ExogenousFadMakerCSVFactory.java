@@ -1,17 +1,13 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.opencsv.CSVReader;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.*;
-
-import static org.apache.commons.lang3.ArrayUtils.indexOf;
+import static java.util.stream.Collectors.*;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 /**
  * reads csv file, with column "day" for what day each fad gets dropped
@@ -41,46 +37,16 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
 
     @Override
     public AdditionalStartable apply(final FishState state) {
-        //read the file now (don't delay the error from not having the file ready)
-        final CSVReader reader;
-        try {
-            reader = new CSVReader(
-                new FileReader(
-                    deploymentsFile.get().toFile()
-                )
-            );
-        } catch (final FileNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException("failed to read " + deploymentsFile);
-        }
-        //read header and lowercase it
-        final Iterator<String[]> linesInCSV = reader.iterator();
-        final String[] header = Arrays.stream(linesInCSV.next()).
-            map(s -> s.toLowerCase(Locale.ROOT).trim()).
-            toArray(String[]::new);
-        final int dayColumn = indexOf(header, "day");
-        final int xColumn = indexOf(header, "x");
-        final int yColumn = indexOf(header, "y");
-
-        final HashMap<Integer, Collection<Double2D>> dayToCoordinatesMap = new HashMap<>();
-        while (linesInCSV.hasNext()) {
-            final String[] line = linesInCSV.next();
-            final int day = Integer.parseInt(line[dayColumn]);
-            //if first FAD of the day, create container
-            dayToCoordinatesMap.computeIfAbsent(day, integer -> new LinkedList<>()).
-                //then add
-                    add(new Double2D(
-                    Double.parseDouble(line[xColumn]),
-                    Double.parseDouble(line[yColumn])
-                ));
-        }
-
-
         return model -> {
             final ExogenousFadMaker maker = new ExogenousFadMaker(
                 fadInitializerFactory.apply(model),
-                dayToCoordinatesMap
-
+                recordStream(deploymentsFile.get()).collect(groupingBy(
+                    record -> record.getInt("day"),
+                    mapping(
+                        record -> new Double2D(record.getDouble("x"), record.getDouble("y")),
+                        toList()
+                    )
+                ))
             );
             maker.start(model);
         };

@@ -18,10 +18,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
@@ -30,7 +28,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
@@ -39,8 +36,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy> {
 
     private InputPath maxFadDeploymentsFile;
-    private final LoadingCache<Path, Map<Integer, ImmutableMap<String, Integer>>> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));
+    private final CacheByFile<Map<Integer, ImmutableMap<String, Integer>>> cache = new CacheByFile<>(this::readValues);
     private int targetYear = EpoScenario.TARGET_YEAR;
     private double fadCost = 1000;
 
@@ -72,8 +68,8 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
         this.fadCost = fadCost;
     }
 
-    private Map<Integer, ImmutableMap<String, Integer>> readValues() {
-        return recordStream(maxFadDeploymentsFile.get())
+    private Map<Integer, ImmutableMap<String, Integer>> readValues(final Path maxFadDeploymentsFile) {
+        return recordStream(maxFadDeploymentsFile)
             .collect(
                 groupingBy(
                     record -> record.getInt("year"),
@@ -96,13 +92,9 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
 
     @Override
     public GearStrategy apply(final FishState fishState) {
-        try {
-            return new FadRefillGearStrategy(
-                cache.get(maxFadDeploymentsFile.get()).get(targetYear),
-                fadCost
-            );
-        } catch (final ExecutionException e) {
-            throw new IllegalStateException(e);
-        }
+        return new FadRefillGearStrategy(
+            cache.apply(maxFadDeploymentsFile.get()).get(targetYear),
+            fadCost
+        );
     }
 }

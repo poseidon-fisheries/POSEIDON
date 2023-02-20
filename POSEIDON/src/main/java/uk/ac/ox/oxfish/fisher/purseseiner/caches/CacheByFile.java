@@ -22,9 +22,16 @@ public class CacheByFile<T> implements Function<Path, T> {
     @Override
     public T apply(final Path path) {
         try {
-            final Object fileKey = Files.readAttributes(path, BasicFileAttributes.class).fileKey();
-            return cache.get(fileKey, () -> readFunction.apply(path));
-        } catch (final ExecutionException | IOException e) {
+            return cache.get(fileKey(path), () -> readFunction.apply(path));
+        } catch (final ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object fileKey(final Path path) {
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class).fileKey();
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }

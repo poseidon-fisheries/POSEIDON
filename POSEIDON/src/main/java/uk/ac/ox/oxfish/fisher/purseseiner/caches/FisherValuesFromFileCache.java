@@ -19,9 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.nio.file.Path;
@@ -43,8 +40,7 @@ import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.getBoatId;
  */
 public abstract class FisherValuesFromFileCache<T> {
 
-    private final LoadingCache<Path, Map<Integer, Map<String, T>>> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));
+    private final CacheByFile<Map<Integer, Map<String, T>>> cache = new CacheByFile<>(this::readValues);
 
     protected abstract Map<Integer, Map<String, T>> readValues(final Path valuesFile);
 
@@ -53,7 +49,7 @@ public abstract class FisherValuesFromFileCache<T> {
         final int targetYear,
         final Fisher fisher
     ) {
-        final T value = cache.getUnchecked(valuesFile)
+        final T value = cache.apply(valuesFile)
             .getOrDefault(targetYear, emptyMap())
             .get(getBoatId(fisher));
         return Optional.ofNullable(value);

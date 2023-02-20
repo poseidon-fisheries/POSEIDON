@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
@@ -21,8 +22,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
  */
 public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
 
-    private static final LoadingCache<Path, SpeciesCodes> cache =
-        CacheBuilder.newBuilder().build(from(SpeciesCodesFromFileFactory::getSpeciesCodes));
+    private static final CacheByFile<SpeciesCodes> cache =
+        new CacheByFile<>(SpeciesCodesFromFileFactory::getSpeciesCodes);
     private InputPath speciesCodeFile;
 
     @SuppressWarnings("unused")
@@ -57,6 +58,6 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
 
     @Override
     public SpeciesCodes get() {
-        return cache.getUnchecked(speciesCodeFile.get());
+        return cache.apply(speciesCodeFile.get());
     }
 }

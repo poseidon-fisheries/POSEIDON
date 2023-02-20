@@ -22,26 +22,25 @@ package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 import static junit.framework.TestCase.assertEquals;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
+import static uk.ac.ox.oxfish.utility.FishStateUtilitiesTest.writeTempFile;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class FisherValuesByActionFromFileCacheTest {
 
     private final List<Fisher> fishers = new FisherMocker().mockFishers(2);
-    private final Path path = Paths.get("A");
 
     private final FisherValuesByActionFromFileCache<String> cache =
         new FisherValuesByActionFromFileCache<String>(() -> "") {
@@ -50,37 +49,45 @@ public class FisherValuesByActionFromFileCacheTest {
             ) {
                 return ImmutableMap.of(
                     2017,
-                    ImmutableMap.of(
-                        "Fisher0", ImmutableMap.of(
-                            FAD.getActionClass(), "FAD1",
-                            NOA.getActionClass(), "NOA1",
-                            DPL.getActionClass(), "DPL1"
-                        ),
-                        "Fisher1", ImmutableMap.of(
-                            DEL.getActionClass(), "DEL2",
-                            OFS.getActionClass(), "OFS2",
-                            DPL.getActionClass(), "DPL2"
-                        )
-                    )
+                    recordStream(valuesFile).collect(
+                        groupingBy(
+                            record -> record.getString("ves_no"),
+                            toMap(
+                                record -> ActionClass.valueOf(record.getString("action_class")).getActionClass(),
+                                record -> record.getString("value")
+                            )
+                        ))
                 );
             }
         };
 
     @Test
-    public void test() {
-        check("FAD1", 0, FAD);
-        check("NOA1", 0, NOA);
-        check("DPL1", 0, DPL);
-        check("", 0, DEL);
-        check("", 0, OFS);
-        check("DEL2", 1, DEL);
-        check("OFS2", 1, OFS);
-        check("DPL2", 1, DPL);
-        check("", 1, FAD);
-        check("", 1, NOA);
+    public void test() throws IOException {
+
+        final Path path = writeTempFile(
+            "ves_no,action_class,value\n" +
+                "Fisher0,FAD,FAD1\n" +
+                "Fisher0,NOA,NOA1\n" +
+                "Fisher0,DPL,DPL1\n" +
+                "Fisher1,DEL,DEL2\n" +
+                "Fisher1,OFS,OFS2\n" +
+                "Fisher1,DPL,DPL2",
+            "csv"
+        );
+
+        check("FAD1", 0, FAD, path);
+        check("NOA1", 0, NOA, path);
+        check("DPL1", 0, DPL, path);
+        check("", 0, DEL, path);
+        check("", 0, OFS, path);
+        check("DEL2", 1, DEL, path);
+        check("OFS2", 1, OFS, path);
+        check("DPL2", 1, DPL, path);
+        check("", 1, FAD, path);
+        check("", 1, NOA, path);
     }
 
-    private void check(String result, int fisherId, ActionClass actionClass) {
+    private void check(final String result, final int fisherId, final ActionClass actionClass, final Path path) {
         assertEquals(
             result,
             cache.get(path, 2017, fishers.get(fisherId), actionClass.getActionClass())

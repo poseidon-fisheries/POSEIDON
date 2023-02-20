@@ -24,6 +24,9 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,28 +34,38 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 import static junit.framework.TestCase.assertEquals;
+import static uk.ac.ox.oxfish.utility.FishStateUtilitiesTest.writeTempFile;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class FisherValuesFromFileCacheTest {
-
-    private final Path pathA = Paths.get("A");
-    private final Path pathB = Paths.get("B");
 
     private final FisherValuesFromFileCache<Integer> cache =
         new FisherValuesFromFileCache<Integer>() {
             @Override protected Map<Integer, Map<String, Integer>> readValues(
                 final Path valuesFile
             ) {
-                return valuesFile.equals(pathA)
-                    ? ImmutableMap.of(2017, ImmutableMap.of("Fisher0", 0, "Fisher1", 1))
-                    : ImmutableMap.of(2017, ImmutableMap.of("Fisher1", 2, "Fisher2", 3));
+                return recordStream(valuesFile).collect(
+                    groupingBy(
+                        record -> record.getInt("year"),
+                        toMap(
+                            record -> record.getString("ves_no"),
+                            record -> record.getInt("value")
+                        )
+                    ));
             }
         };
 
     private final List<Fisher> fishers = new FisherMocker().mockFishers(3);
 
     @Test
-    public void test() {
+    public void test() throws IOException {
+
+        final Path pathA = writeTempFile("year,ves_no,value\n2017,Fisher0,0\n2017,Fisher1,1", "csv");
+        final Path pathB = writeTempFile("year,ves_no,value\n2017,Fisher1,2\n2017,Fisher2,3", "csv");
+
         ImmutableMap.of(
             0, Optional.of(0),
             1, Optional.of(1),
@@ -66,7 +79,7 @@ public class FisherValuesFromFileCacheTest {
         ).forEach(check(pathB));
     }
 
-    private BiConsumer<Integer, Optional<Integer>> check(Path path) {
+    private BiConsumer<Integer, Optional<Integer>> check(final Path path) {
         return (i, result) -> assertEquals(result, cache.get(path, 2017, fishers.get(i)));
     }
 

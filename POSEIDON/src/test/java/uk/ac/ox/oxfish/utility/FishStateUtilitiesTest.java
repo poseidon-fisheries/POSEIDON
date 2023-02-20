@@ -31,7 +31,10 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.awt.geom.Point2D;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -242,14 +245,25 @@ public class FishStateUtilitiesTest {
 
     }
 
+    public static Path writeTempFile(final String content, final String extension) throws IOException {
+        final Path path = Files.createTempFile(
+            Paths.get("inputs", "tests"), null, "." + extension
+        );
+        path.toFile().deleteOnExit();
+        try (final FileWriter writer = new FileWriter(path.toFile())) {
+            writer.write(content);
+        }
+        return path;
+    }
 
     @Test
     public void weightedAverage() {
 
-        double[] observations = new double[]{100,200,300};
-        double[] weight = new double[]{1,1,10};
+        double[] observations = new double[]{100, 200, 300};
+        double[] weight = new double[]{1, 1, 10};
         double average = FishStateUtilities.getWeightedAverage(observations, weight);
-        assertEquals(275,average,.0001);
+        assertEquals(275, average, .0001);
 
     }
+
 }
