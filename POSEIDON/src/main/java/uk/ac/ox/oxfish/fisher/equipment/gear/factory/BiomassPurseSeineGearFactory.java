@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 public class BiomassPurseSeineGearFactory
     extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
@@ -32,8 +32,8 @@ public class BiomassPurseSeineGearFactory
     }
 
     public BiomassPurseSeineGearFactory(
-        final InputFile locationValuesFile,
-        final InputFile maxCurrentSpeedsFile
+        final InputPath locationValuesFile,
+        final InputPath maxCurrentSpeedsFile
     ) {
         super(locationValuesFile, maxCurrentSpeedsFile);
     }

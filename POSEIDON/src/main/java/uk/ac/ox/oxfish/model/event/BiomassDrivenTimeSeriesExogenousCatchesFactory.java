@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.event;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
@@ -22,7 +22,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     implements AlgorithmFactory<BiomassDrivenTimeSeriesExogenousCatches> {
 
     private int startingYear = 2000;
-    private InputFile catchesFile; // = Paths.get("inputs", "tuna", "exogenous_catches.csv");
+    private InputPath catchesFile; // = Paths.get("inputs", "tuna", "exogenous_catches.csv");
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private boolean fadMortality = false;
 
@@ -32,7 +32,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile catchesFile,
+        final InputPath catchesFile,
         final int startingYear,
         final boolean fadMortalityIncluded
     ) {
@@ -62,11 +62,11 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getCatchesFile() {
+    public InputPath getCatchesFile() {
         return catchesFile;
     }
 
-    public void setCatchesFile(final InputFile catchesFile) {
+    public void setCatchesFile(final InputPath catchesFile) {
         this.catchesFile = catchesFile;
     }
 

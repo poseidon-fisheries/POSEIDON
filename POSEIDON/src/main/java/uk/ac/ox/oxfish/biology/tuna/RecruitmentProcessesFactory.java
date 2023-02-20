@@ -25,7 +25,7 @@ import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
@@ -47,7 +47,7 @@ public class RecruitmentProcessesFactory
 
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private GlobalBiology globalBiology;
-    private InputFile recruitmentParametersFile;
+    private InputPath recruitmentParametersFile;
     /**
      * Empty constructor for YAML construction
      */
@@ -55,7 +55,7 @@ public class RecruitmentProcessesFactory
     }
     public RecruitmentProcessesFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile recruitmentParametersFile
+        final InputPath recruitmentParametersFile
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.recruitmentParametersFile = checkNotNull(recruitmentParametersFile);
@@ -74,12 +74,12 @@ public class RecruitmentProcessesFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getRecruitmentParametersFile() {
+    public InputPath getRecruitmentParametersFile() {
         return recruitmentParametersFile;
     }
 
     @SuppressWarnings("unused")
-    public void setRecruitmentParametersFile(final InputFile recruitmentParametersFile) {
+    public void setRecruitmentParametersFile(final InputPath recruitmentParametersFile) {
         this.recruitmentParametersFile = recruitmentParametersFile;
     }
 

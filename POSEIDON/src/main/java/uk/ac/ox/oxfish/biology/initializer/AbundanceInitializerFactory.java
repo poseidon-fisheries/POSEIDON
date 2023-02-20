@@ -25,7 +25,7 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -46,7 +46,7 @@ public class AbundanceInitializerFactory
     private final CacheByFile<Map<String, List<Bin>>> binsCache =
         new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);
 
-    private InputFile binsFile;
+    private InputPath binsFile;
 
     private AbundanceReallocator abundanceReallocator;
     private SpeciesCodes speciesCodes;
@@ -62,7 +62,7 @@ public class AbundanceInitializerFactory
 
 
     public AbundanceInitializerFactory(
-        final InputFile binsFile
+        final InputPath binsFile
     ) {
         this.binsFile = binsFile;
     }
@@ -107,12 +107,12 @@ public class AbundanceInitializerFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getBinsFile() {
+    public InputPath getBinsFile() {
         return binsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setBinsFile(final InputFile binsFile) {
+    public void setBinsFile(final InputPath binsFile) {
         this.binsFile = binsFile;
     }
 

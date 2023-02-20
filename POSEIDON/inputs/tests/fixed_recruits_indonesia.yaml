@@ -683,7 +683,7 @@ Flexible:
       header: true
       latLong: true
       mapFile:
-        folder: !!uk.ac.ox.oxfish.model.scenario.RootFolder
+        parent:
           path: inputs/indonesia
         path: 712/712_map.csv
   mapMakerDedicatedRandomSeed: null

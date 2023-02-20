@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -38,17 +37,23 @@ public class EpoBiomassScenarioTest {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
         scenario.useDummyData();
-        scenario.setMarketMapFactory(new MarketMapFromPriceFileFactory(INPUT_PATH.resolve("prices.csv"), TARGET_YEAR));
+        scenario.setMarketMapFactory(
+            new MarketMapFromPriceFileFactory(
+                scenario.getSpeciesCodesSupplier(),
+                scenario.getInputFolder().path("prices.csv"),
+                TARGET_YEAR
+            )
+        );
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.getAdditionalStartables().add(state -> model -> {
-                model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
-                state.scheduleEveryYear(simState -> {
-                    final FishStateYearlyTimeSeries yearlyDataSet =
-                        ((FishState) simState).getYearlyDataSet();
-                    final double catches =
-                        yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
-                    final double landings =
+            model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
+            state.scheduleEveryYear(simState -> {
+                final FishStateYearlyTimeSeries yearlyDataSet =
+                    ((FishState) simState).getYearlyDataSet();
+                final double catches =
+                    yearlyDataSet.getColumn("Skipjack tuna Catches (kg)").getLatest();
+                final double landings =
                         yearlyDataSet.getColumn("Skipjack tuna Landings").getLatest();
                     System.out.printf("Catches:    %.2f%n", catches);
                     System.out.printf("Landings:   %.2f%n", landings);

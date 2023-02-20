@@ -36,8 +36,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
-import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
@@ -63,19 +61,19 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             getSpeciesCodesSupplier(),
-            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
+            getInputFolder().path("abundance", "recruitment_parameters.csv")
         );
 
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             getSpeciesCodesSupplier(),
             ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
-            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
+            getInputFolder().path("abundance", "mortality.csv")
         );
 
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "grids.csv")),
+            getInputFolder().path("abundance", "grids.csv"),
             365
         );
 
@@ -93,7 +91,7 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
     );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "bins.csv"))
+            getInputFolder().path("abundance", "bins.csv")
         );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));

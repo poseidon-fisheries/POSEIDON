@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Arrays;
@@ -52,13 +52,13 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
 
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private InputFile catchSamplesFile;
+    private InputPath catchSamplesFile;
     private boolean yearlyReset = false;
     public CatchSamplersFactory() {
     }
     public CatchSamplersFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile catchSamplesFile
+        final InputPath catchSamplesFile
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.catchSamplesFile = catchSamplesFile;
@@ -75,12 +75,12 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     @SuppressWarnings("unused")
-    public InputFile getCatchSamplesFile() {
+    public InputPath getCatchSamplesFile() {
         return catchSamplesFile;
     }
 
     @SuppressWarnings("unused")
-    public void setCatchSamplesFile(final InputFile selectivityFilePath) {
+    public void setCatchSamplesFile(final InputPath selectivityFilePath) {
         this.catchSamplesFile = selectivityFilePath;
     }
 

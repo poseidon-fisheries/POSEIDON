@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class AbundanceMortalityProcessFromFileFactory
     implements AlgorithmFactory<AbundanceMortalityProcess> {
 
-    private InputFile mortalityFile;
+    private InputPath mortalityFile;
     private List<String> sources;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private final CacheByFishState<Map<Species, Map<String, List<List<Double>>>>> cache =
@@ -50,7 +50,7 @@ public class AbundanceMortalityProcessFromFileFactory
 
     public AbundanceMortalityProcessFromFileFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile mortalityFile,
+        final InputPath mortalityFile,
         final Iterable<String> sources
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
@@ -67,12 +67,12 @@ public class AbundanceMortalityProcessFromFileFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getMortalityFile() {
+    public InputPath getMortalityFile() {
         return mortalityFile;
     }
 
     @SuppressWarnings("unused")
-    public void setMortalityFile(final InputFile mortalityFile) {
+    public void setMortalityFile(final InputPath mortalityFile) {
         this.mortalityFile = mortalityFile;
     }
 

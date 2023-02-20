@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -38,16 +38,17 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy> {
 
-    private InputFile maxFadDeploymentsFile;
+    private InputPath maxFadDeploymentsFile;
     private final LoadingCache<Path, Map<Integer, ImmutableMap<String, Integer>>> cache =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::readValues));
     private int targetYear = EpoScenario.TARGET_YEAR;
     private double fadCost = 1000;
 
+    @SuppressWarnings("unused")
     public FadRefillGearStrategyFactory() {
     }
 
-    public FadRefillGearStrategyFactory(final InputFile maxFadDeploymentsFile) {
+    public FadRefillGearStrategyFactory(final InputPath maxFadDeploymentsFile) {
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }
 
@@ -85,11 +86,11 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     }
 
     @SuppressWarnings("unused")
-    public InputFile getMaxFadDeploymentsFile() {
+    public InputPath getMaxFadDeploymentsFile() {
         return maxFadDeploymentsFile;
     }
 
-    public void setMaxFadDeploymentsFile(final InputFile maxFadDeploymentsFile) {
+    public void setMaxFadDeploymentsFile(final InputPath maxFadDeploymentsFile) {
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }
 

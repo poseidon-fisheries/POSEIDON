@@ -3,23 +3,28 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.SpeciesCodeAware;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap>, SpeciesCodeAware {
+public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap> {
 
-    private Path priceFilePath;
+    private InputPath priceFile;
     private int targetYear;
-    private SpeciesCodes speciesCodes;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
-    public MarketMapFromPriceFileFactory(Path priceFilePath, int targetYear) {
-        this.priceFilePath = priceFilePath;
+    public MarketMapFromPriceFileFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final InputPath priceFile,
+        final int targetYear
+    ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+        this.priceFile = priceFile;
         this.targetYear = targetYear;
     }
 
@@ -27,16 +32,15 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
      * Empty constructor needed to use as factory
      */
     @SuppressWarnings("unused")
-    public MarketMapFromPriceFileFactory() { }
-
-    @Override
-    public SpeciesCodes getSpeciesCodes() {
-        return speciesCodes;
+    public MarketMapFromPriceFileFactory() {
     }
 
-    @Override
-    public void setSpeciesCodes(SpeciesCodes speciesCodes) {
-        this.speciesCodes = speciesCodes;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -45,23 +49,23 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
     }
 
     @SuppressWarnings("unused")
-    public void setTargetYear(int targetYear) {
+    public void setTargetYear(final int targetYear) {
         this.targetYear = targetYear;
     }
 
     @SuppressWarnings("unused")
-    public Path getPriceFilePath() {
-        return priceFilePath;
+    public InputPath getPriceFile() {
+        return priceFile;
     }
 
     @SuppressWarnings("unused")
-    public void setPriceFilePath(Path priceFilePath) {
-        this.priceFilePath = priceFilePath;
+    public void setPriceFile(final InputPath priceFile) {
+        this.priceFile = priceFile;
     }
 
     @Override
-    public MarketMap apply(FishState fishState) {
-        Map<String, Double> prices = recordStream(priceFilePath)
+    public MarketMap apply(final FishState fishState) {
+        final Map<String, Double> prices = recordStream(priceFile.get())
             .filter(
                 r -> r.getInt("year") == targetYear
             )
@@ -69,8 +73,9 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
                 r -> r.getString("species"),
                 r -> r.getDouble("price") / 1000.0 // convert price / tonne to price / kg
             ));
-        GlobalBiology globalBiology = fishState.getBiology();
+        final GlobalBiology globalBiology = fishState.getBiology();
         final MarketMap marketMap = new MarketMap(globalBiology);
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         globalBiology.getSpecies().forEach(species -> {
             final String speciesCode = speciesCodes.getSpeciesCode(species.getName());
             marketMap.addMarket(species, new FixedPriceMarket(prices.get(speciesCode)));

@@ -4,12 +4,11 @@ import com.opencsv.CSVReader;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static org.apache.commons.lang3.ArrayUtils.indexOf;
@@ -20,7 +19,7 @@ import static org.apache.commons.lang3.ArrayUtils.indexOf;
  */
 public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    private InputFile deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
+    private InputPath deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
 
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
         new BiomassFadInitializerFactory("Species 0");
@@ -33,7 +32,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
 
 
     public ExogenousFadMakerCSVFactory(
-        final InputFile deploymentsFile,
+        final InputPath deploymentsFile,
         @SuppressWarnings("rawtypes") final FadInitializerFactory fadInitializerFactory
     ) {
         this.deploymentsFile = deploymentsFile;
@@ -87,11 +86,11 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
         };
     }
 
-    public InputFile getDeploymentsFile() {
+    public InputPath getDeploymentsFile() {
         return deploymentsFile;
     }
 
-    public void setDeploymentsFile(final InputFile deploymentsFile) {
+    public void setDeploymentsFile(final InputPath deploymentsFile) {
         this.deploymentsFile = deploymentsFile;
     }
 

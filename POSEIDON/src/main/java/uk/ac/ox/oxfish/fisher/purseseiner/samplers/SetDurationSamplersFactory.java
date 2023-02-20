@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
 
@@ -20,7 +20,7 @@ public class SetDurationSamplersFactory
 
     private final CacheByFile<List<Record>> recordCache =
         new CacheByFile<>(CsvParserUtil::recordList);
-    private InputFile setDurationsFile;
+    private InputPath setDurationsFile;
     private final CacheByFishState<Map<Class<? extends AbstractSetAction<?>>, DurationSampler>> samplersCache =
         new CacheByFishState<>(
             fishState -> recordCache.apply(setDurationsFile.get()).stream()
@@ -38,7 +38,7 @@ public class SetDurationSamplersFactory
     }
 
     @SuppressWarnings("unused")
-    public SetDurationSamplersFactory(final InputFile setDurationsFile) {
+    public SetDurationSamplersFactory(final InputPath setDurationsFile) {
         this.setDurationsFile = setDurationsFile;
     }
 
@@ -48,12 +48,12 @@ public class SetDurationSamplersFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getSetDurationsFile() {
+    public InputPath getSetDurationsFile() {
         return setDurationsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setSetDurationsFile(final InputFile setDurationsFile) {
+    public void setSetDurationsFile(final InputPath setDurationsFile) {
         this.setDurationsFile = setDurationsFile;
     }
 }

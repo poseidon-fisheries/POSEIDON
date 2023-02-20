@@ -40,7 +40,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
@@ -82,9 +82,9 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final int delSetsRangeInSeaTiles = 0;
     private SetDurationSamplersFactory setDurationSamplersFactory;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private InputFile actionWeightsFile;
+    private InputPath actionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
-    private InputFile setCompositionWeightsFile;
+    private InputPath setCompositionWeightsFile;
     // use default values from:
     // https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
     private double searchBonus = 0.1;
@@ -118,18 +118,18 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
         new LogisticFunctionFactory(1E-6, 10);
-    private InputFile maxCurrentSpeedsFile;
+    private InputPath maxCurrentSpeedsFile;
 
 
     PurseSeinerFishingStrategyFactory(
         final Class<B> biologyClass,
         final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile actionWeightsFile,
+        final InputPath actionWeightsFile,
         final CatchSamplersFactory<B> catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,
-        final InputFile maxCurrentSpeedsFile,
-        final InputFile setCompositionWeightsFile
+        final InputPath maxCurrentSpeedsFile,
+        final InputPath setCompositionWeightsFile
     ) {
         this(biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
@@ -204,12 +204,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public InputFile getMaxCurrentSpeedsFile() {
+    public InputPath getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setMaxCurrentSpeedsFile(final InputFile maxCurrentSpeedsFile) {
+    public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
@@ -312,11 +312,11 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public InputFile getActionWeightsFile() {
+    public InputPath getActionWeightsFile() {
         return actionWeightsFile;
     }
 
-    public void setActionWeightsFile(final InputFile actionWeightsFile) {
+    public void setActionWeightsFile(final InputPath actionWeightsFile) {
         this.actionWeightsFile = actionWeightsFile;
     }
 
@@ -616,12 +616,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public InputFile getSetCompositionWeightsFile() {
+    public InputPath getSetCompositionWeightsFile() {
         return setCompositionWeightsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setSetCompositionWeightsFile(final InputFile setCompositionWeightsFile) {
+    public void setSetCompositionWeightsFile(final InputPath setCompositionWeightsFile) {
         this.setCompositionWeightsFile = setCompositionWeightsFile;
     }
 

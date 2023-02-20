@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -63,11 +63,13 @@ public class GravityDestinationStrategyFactory
     //  be made configurable.
     private final Predicate<SeaTile> isValidDestination =
         seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
-    private InputFile actionWeightsFile;
-    private InputFile maxTripDurationFile;
+    private InputPath actionWeightsFile;
+    private InputPath maxTripDurationFile;
+
     public GravityDestinationStrategyFactory() {
     }
-    public GravityDestinationStrategyFactory(final InputFile actionWeightsFile, final InputFile maxTripDurationFile) {
+
+    public GravityDestinationStrategyFactory(final InputPath actionWeightsFile, final InputPath maxTripDurationFile) {
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
     }
@@ -84,20 +86,20 @@ public class GravityDestinationStrategyFactory
 
     }
 
-    public InputFile getActionWeightsFile() {
+    public InputPath getActionWeightsFile() {
         return actionWeightsFile;
     }
 
-    public void setActionWeightsFile(final InputFile actionWeightsFile) {
+    public void setActionWeightsFile(final InputPath actionWeightsFile) {
         this.actionWeightsFile = actionWeightsFile;
     }
 
     @SuppressWarnings("unused")
-    public InputFile getMaxTripDurationFile() {
+    public InputPath getMaxTripDurationFile() {
         return maxTripDurationFile;
     }
 
-    public void setMaxTripDurationFile(final InputFile maxTripDurationFile) {
+    public void setMaxTripDurationFile(final InputPath maxTripDurationFile) {
         this.maxTripDurationFile = maxTripDurationFile;
     }
 

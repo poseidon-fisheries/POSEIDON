@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,7 +37,7 @@ public class BiomassReallocatorFactory extends ReallocatorFactory<BiomassRealloc
     }
 
     public BiomassReallocatorFactory(
-        final InputFile biomassDistributionsFilePath,
+        final InputPath biomassDistributionsFilePath,
         final int period
     ) {
         super(biomassDistributionsFilePath, period);

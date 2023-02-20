@@ -6,8 +6,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.scenario.Folder;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.IOException;
@@ -28,19 +27,19 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
 
     final CacheByFile<Map<String, AlgorithmFactory<? extends Regulation>>> factoriesCache =
         new CacheByFile<>(this::loadShapeFiles);
-    private Folder shapefilesFolder;
-    private InputFile tagsFile;
+    private InputPath shapefilesInputPath;
+    private InputPath tagsFile;
 
     @SuppressWarnings("unused")
     public ProtectedAreasFromFolderFactory() {
     }
 
-    public ProtectedAreasFromFolderFactory(final Folder shapefilesFolder, final String tagsFile) {
-        this(shapefilesFolder, new InputFile(shapefilesFolder, tagsFile));
+    public ProtectedAreasFromFolderFactory(final InputPath shapefilesInputPath, final String tagsFile) {
+        this(shapefilesInputPath, shapefilesInputPath.path(tagsFile));
     }
 
-    public ProtectedAreasFromFolderFactory(final Folder shapefilesFolder, final InputFile tagsFile) {
-        this.shapefilesFolder = shapefilesFolder;
+    public ProtectedAreasFromFolderFactory(final InputPath shapefilesInputPath, final InputPath tagsFile) {
+        this.shapefilesInputPath = shapefilesInputPath;
         this.tagsFile = tagsFile;
     }
 
@@ -60,21 +59,21 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
         }
     }
 
-    public Folder getShapefilesFolder() {
-        return shapefilesFolder;
+    public InputPath getShapefilesFolder() {
+        return shapefilesInputPath;
     }
 
     @SuppressWarnings("unused")
-    public void setShapefilesFolder(final Folder shapefilesFolder) {
-        this.shapefilesFolder = shapefilesFolder;
+    public void setShapefilesFolder(final InputPath shapefilesInputPath) {
+        this.shapefilesInputPath = shapefilesInputPath;
     }
 
-    public InputFile getTagsFile() {
+    public InputPath getTagsFile() {
         return tagsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setTagsFile(final InputFile tagsFile) {
+    public void setTagsFile(final InputPath tagsFile) {
         this.tagsFile = tagsFile;
     }
 

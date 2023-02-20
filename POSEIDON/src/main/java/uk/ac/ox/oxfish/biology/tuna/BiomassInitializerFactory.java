@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
@@ -53,7 +53,7 @@ public class BiomassInitializerFactory
 
     private BiomassReallocator biomassReallocator;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private InputFile schaeferParamsFile;
+    private InputPath schaeferParamsFile;
 
     @SuppressWarnings("unused")
     public BiomassInitializerFactory() {
@@ -61,18 +61,18 @@ public class BiomassInitializerFactory
 
     public BiomassInitializerFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile schaeferParamsFile
+        final InputPath schaeferParamsFile
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.schaeferParamsFile = schaeferParamsFile;
     }
 
-    public InputFile getSchaeferParamsFile() {
+    public InputPath getSchaeferParamsFile() {
         return schaeferParamsFile;
     }
 
     @SuppressWarnings("unused")
-    public void setSchaeferParamsFile(final InputFile schaeferParamsFile) {
+    public void setSchaeferParamsFile(final InputPath schaeferParamsFile) {
         this.schaeferParamsFile = schaeferParamsFile;
     }
 

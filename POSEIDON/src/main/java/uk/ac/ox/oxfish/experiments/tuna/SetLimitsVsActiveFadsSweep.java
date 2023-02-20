@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
-import uk.ac.ox.oxfish.model.scenario.Subfolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -88,7 +87,7 @@ public class SetLimitsVsActiveFadsSweep {
                     new CompositeMultipleRegulationsFactory(
                         ImmutableList.of(
                             new ProtectedAreasFromFolderFactory(
-                                new Subfolder(scenario.getInputFolder(), "regions"),
+                                scenario.getInputFolder().path("regions"),
                                 "region_tags.csv"
                             ),
                             new MultipleRegulationsFactory(ImmutableMap.of(

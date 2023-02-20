@@ -5,7 +5,7 @@ import com.opencsv.CSVReader;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -30,7 +30,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
 
     public boolean isDataInTonnes = true;
-    private InputFile setsFile; // = "./inputs/tests/fad_dummmy_sets.csv";
+    private InputPath setsFile; // = "./inputs/tests/fad_dummmy_sets.csv";
     private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
     private DoubleParameter missingFadError = new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
     private boolean keepLog = false;
@@ -41,7 +41,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
     public ExogenousFadSetterCSVFactory() {
     }
 
-    public ExogenousFadSetterCSVFactory(final InputFile setsFile, final boolean isDataInTonnes) {
+    public ExogenousFadSetterCSVFactory(final InputPath setsFile, final boolean isDataInTonnes) {
         this.setsFile = setsFile;
         this.isDataInTonnes = isDataInTonnes;
     }
@@ -116,11 +116,11 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
     }
 
 
-    public InputFile getSetsFile() {
+    public InputPath getSetsFile() {
         return setsFile;
     }
 
-    public void setSetsFile(final InputFile setsFile) {
+    public void setSetsFile(final InputPath setsFile) {
         this.setsFile = setsFile;
     }
 

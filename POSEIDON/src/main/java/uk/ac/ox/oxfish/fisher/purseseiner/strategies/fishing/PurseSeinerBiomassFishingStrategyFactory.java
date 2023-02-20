@@ -21,13 +21,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.util.function.Supplier;
 
@@ -40,11 +39,11 @@ public class PurseSeinerBiomassFishingStrategyFactory
 
     public PurseSeinerBiomassFishingStrategyFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final InputFile actionWeightsFile,
+        final InputPath actionWeightsFile,
         final BiomassCatchSamplersFactory catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,
-        final InputFile maxCurrentSpeedsFile,
-        final InputFile setCompositionWeightsFile
+        final InputPath maxCurrentSpeedsFile,
+        final InputPath setCompositionWeightsFile
     ) {
         super(
             BiomassLocalBiology.class,

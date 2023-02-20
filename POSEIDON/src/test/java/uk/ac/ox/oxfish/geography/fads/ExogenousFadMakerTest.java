@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Collection;
@@ -99,7 +99,7 @@ public class ExogenousFadMakerTest {
         //assume a current that pushes you diagonally towards top-left
         fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
-        fadDemo.setPathToFile(new InputFile("inputs", "tests", "fad_dummy_deploy.csv"));
+        fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy.csv"));
         ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put(
             "Species 0",
             new FixedDoubleParameter(0.1)

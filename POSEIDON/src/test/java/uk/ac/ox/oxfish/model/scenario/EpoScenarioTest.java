@@ -14,7 +14,7 @@ public class EpoScenarioTest extends TestCase {
     ) {
         try {
             final S constructedScenario = scenarioClass.newInstance();
-            final File scenarioFile = constructedScenario.testFolder()
+            final File scenarioFile = constructedScenario.testFolder().get()
                 .resolve(Paths.get("scenarios", scenarioClass.getSimpleName() + ".yaml"))
                 .toFile();
             new FishYAML().dump(constructedScenario, new FileWriter(scenarioFile));

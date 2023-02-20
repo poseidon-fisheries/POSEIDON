@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.time.LocalDate;
@@ -65,7 +65,7 @@ public class ScheduledAbundanceProcessesFactory
     public ScheduledAbundanceProcessesFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Collection<String> biologicalProcessesDates,
-        final InputFile mortalityFile
+        final InputPath mortalityFile
     ) {
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
         this.abundanceMortalityProcessFactory =

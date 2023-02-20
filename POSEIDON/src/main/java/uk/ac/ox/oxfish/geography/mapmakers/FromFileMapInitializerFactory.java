@@ -22,13 +22,10 @@ package uk.ac.ox.oxfish.geography.mapmakers;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.RootFolder;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.nio.file.Paths;
 
 /**
  * Created by carrknight on 6/30/17.
@@ -37,8 +34,8 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
 
 
     public static double DEFAULT_MAP_PADDING_IN_DEGREES = 0.000001;
-    private InputFile mapFile =
-        new InputFile(new RootFolder(Paths.get("inputs", "indonesia")), "indonesia_latlong.csv");
+    private InputPath mapFile =
+        InputPath.of("inputs", "indonesia", "indonesia_latlong.csv");
     private DoubleParameter gridWidthInCell = new FixedDoubleParameter(100);
     private DoubleParameter mapPaddingInDegrees = new FixedDoubleParameter(DEFAULT_MAP_PADDING_IN_DEGREES);
 
@@ -50,7 +47,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     }
 
     public FromFileMapInitializerFactory(
-        final InputFile mapFile,
+        final InputPath mapFile,
         final double gridWidthInCells,
         final double mapPaddingInDegrees
     ) {
@@ -83,7 +80,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @return Value for property 'mapFile'.
      */
-    public InputFile getMapFile() {
+    public InputPath getMapFile() {
         return mapFile;
     }
 
@@ -92,7 +89,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      *
      * @param mapFile Value to set for property 'mapFile'.
      */
-    public void setMapFile(final InputFile mapFile) {
+    public void setMapFile(final InputPath mapFile) {
         this.mapFile = mapFile;
     }
 

@@ -13,8 +13,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.RootFolder;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
@@ -195,7 +194,7 @@ public class ExogenousFadSetterFromDataTest {
     @Test
     public void fadsAreDroppedAndSetInActualScenario() {
         final FishState state = generateAndRunOneYearOfAbstractFadScenario(
-            new InputFile("inputs", "tests", "fad_dummy_sets.csv"),
+            InputPath.of("inputs", "tests", "fad_dummy_sets.csv"),
             0,
             2
         );
@@ -234,7 +233,7 @@ public class ExogenousFadSetterFromDataTest {
     @Test
     public void fadsAreDroppedButMissedInActualScenario() {
         final FishState state = generateAndRunOneYearOfAbstractFadScenario(
-            new InputFile("inputs", "tests", "fad_dummy_sets2.csv"),
+            InputPath.of("inputs", "tests", "fad_dummy_sets2.csv"),
             0,
             4
         );
@@ -272,7 +271,7 @@ public class ExogenousFadSetterFromDataTest {
     @Test
     public void fadsAreDroppedAndNotMissedBecauseOfNeighborhoodRangeInActualScenario() {
         final FishState state = generateAndRunOneYearOfAbstractFadScenario(
-            new InputFile("inputs", "tests", "fad_dummy_sets2.csv"),
+            InputPath.of("inputs", "tests", "fad_dummy_sets2.csv"),
             1,
             2
         );
@@ -311,7 +310,7 @@ public class ExogenousFadSetterFromDataTest {
 
     @NotNull
     private FishState generateAndRunOneYearOfAbstractFadScenario(
-        final InputFile setterFile,
+        final InputPath setterFile,
         final int neighborhoodSearchSize,
         final int expectedFadsRemainingAfter10Steps
     ) {
@@ -327,7 +326,7 @@ public class ExogenousFadSetterFromDataTest {
         //assume a current that pushes you diagonally towards top-left
         fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
-        fadDemo.setPathToFile(new InputFile(new RootFolder("inputs", "tests"), "fad_dummy_deploy2.csv"));
+        fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy2.csv"));
         //they will all be empty!
         ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put(
             "Species 0",

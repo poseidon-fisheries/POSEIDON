@@ -25,11 +25,9 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.RootFolder;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.mock;
@@ -39,19 +37,16 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
 
     public void testBuildBiomassGrids() {
 
-        final RootFolder inputFolder = new RootFolder(Paths.get("inputs", "epo_inputs"));
+        final InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
 
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
-            new InputFile(inputFolder, Paths.get("biomass", "biomass_distributions.csv")),
+            inputFolder.path("biomass", "biomass_distributions.csv"),
             365
         );
 
         biomassReallocatorFactory.setSpeciesCodes(
             new SpeciesCodesFromFileFactory(
-                new InputFile(
-                    inputFolder,
-                    Paths.get("species_codes.csv")
-                )
+                inputFolder.path("species_codes.csv")
             ).get()
         );
 

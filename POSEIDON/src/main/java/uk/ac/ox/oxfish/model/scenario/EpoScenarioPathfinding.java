@@ -27,13 +27,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LocalizedActionCounter;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
-import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
-import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -51,28 +48,28 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             getSpeciesCodesSupplier(),
-            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
+            getInputFolder().path("abundance", "recruitment_parameters.csv")
         );
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             getSpeciesCodesSupplier(),
             ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
-            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
+            getInputFolder().path("abundance", "mortality.csv")
         );
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "grids.csv")),
+            getInputFolder().path("abundance", "grids.csv"),
             365
         );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "bins.csv"))
+            getInputFolder().path("abundance", "bins.csv")
         );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+            getInputFolder().path("abundance", "selectivity.csv"),
             getSpeciesCodesSupplier()
         );
 
@@ -102,20 +99,20 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             new AbundanceCatchSamplersFactory(
                 getSpeciesCodesSupplier(),
                 new AbundanceFiltersFactory(
-                    new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+                    getInputFolder().path("abundance", "selectivity.csv"),
                     getSpeciesCodesSupplier()
                 ),
-                new InputFile(getInputFolder(), "set_samples.csv")
+                getInputFolder().path("set_samples.csv")
             ),
-            new InputFile(getInputFolder(), "action_weights.csv"),
+            getInputFolder().path("action_weights.csv"),
             getVesselsFile()
         );
 
     public EpoScenarioPathfinding() {
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
-            new InputFile(getInputFolder(), "location_values.csv"),
-            new InputFile(getInputFolder(), "max_current_speeds.csv")
+            getInputFolder().path("location_values.csv"),
+            getInputFolder().path("max_current_speeds.csv")
         ));
     }
 
@@ -186,10 +183,10 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     public void useDummyData() {
         super.useDummyData();
         getDestinationStrategy().setActionWeightsFile(
-            new InputFile(testFolder(), "dummy_action_weights.csv")
+            testFolder().path("dummy_action_weights.csv")
         );
         getDestinationStrategy().setMaxTripDurationFile(
-            new InputFile(testFolder(), "dummy_boats.csv")
+            testFolder().path("dummy_boats.csv")
         );
     }
 

@@ -44,7 +44,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -60,43 +59,43 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
-            new InputFile(getInputFolder(), "calibration", "fad_deployments.csv"),
+            getInputFolder().path("calibration", "fad_deployments.csv"),
             new AbundanceFadInitializerFactory()
         );
 
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
         new ExogenousFadSetterCSVFactory(
-            new InputFile(getInputFolder(), "calibration", "fad_sets.csv"), true
+            getInputFolder().path("calibration", "fad_sets.csv"), true
         );
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             getSpeciesCodesSupplier(),
-            new InputFile(getInputFolder(), "abundance", "recruitment_parameters.csv")
+            getInputFolder().path("abundance", "recruitment_parameters.csv")
         );
 
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
         new ScheduledAbundanceProcessesFactory(
             getSpeciesCodesSupplier(),
             ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
-            new InputFile(getInputFolder(), Paths.get("abundance", "mortality.csv"))
+            getInputFolder().path("abundance", "mortality.csv")
         );
 
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "grids.csv")),
+            getInputFolder().path("abundance", "grids.csv"),
             365
         );
     private AlgorithmFactory<? extends AbundanceInitializer> abundanceInitializerFactory =
         new AbundanceInitializerFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "bins.csv"))
+            getInputFolder().path("abundance", "bins.csv")
         );
     private AbundanceRestorerFactory abundanceRestorerFactory =
         new AbundanceRestorerFactory(ImmutableMap.of(0, 365));
 
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFactory(
-            new InputFile(getInputFolder(), Paths.get("abundance", "selectivity.csv")),
+            getInputFolder().path("abundance", "selectivity.csv"),
             getSpeciesCodesSupplier()
         );
     private AlgorithmFactory<? extends FadInitializer>
@@ -291,10 +290,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     public void useDummyData() {
         super.useDummyData();
         ((ExogenousFadMakerCSVFactory) fadMakerFactory).setDeploymentsFile(
-            new InputFile(testFolder(), "dummy_fad_deployments.csv")
+            testFolder().path("dummy_fad_deployments.csv")
         );
         ((ExogenousFadSetterCSVFactory) fadSetterFactory).setSetsFile(
-            new InputFile(testFolder(), "dummy_fad_sets.csv")
+            testFolder().path("dummy_fad_sets.csv")
         );
     }
 

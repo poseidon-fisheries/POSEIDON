@@ -1,13 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import static java.util.stream.IntStream.range;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.INPUT_PATH;
-
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -16,12 +8,14 @@ import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.RootFolder;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.nio.file.Paths;
+import static java.util.stream.IntStream.range;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class AbundanceFadInitializerFactoryTest {
 
@@ -66,9 +60,9 @@ public class AbundanceFadInitializerFactoryTest {
                         "  speciesCodes: null\n" +
                         "  totalCarryingCapacity: '445000.0'";
         FishYAML yaml = new FishYAML();
-        AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor,AbundanceFadInitializerFactory.class);
+        AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor, AbundanceFadInitializerFactory.class);
         SpeciesCodesFromFileFactory speciesCodesFactory =
-                new SpeciesCodesFromFileFactory(new InputFile(new RootFolder(INPUT_PATH), Paths.get("species_codes.csv")));
+            new SpeciesCodesFromFileFactory(InputPath.of("inputs", "epo_inputs", "species_codes.csv"));
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();
         factory.setSpeciesCodes(speciesCodes);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));

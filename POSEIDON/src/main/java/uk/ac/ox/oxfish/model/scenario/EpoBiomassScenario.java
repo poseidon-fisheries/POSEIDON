@@ -47,7 +47,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -61,14 +60,14 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     private final BiomassReallocatorFactory biomassReallocatorFactory =
         new BiomassReallocatorFactory(
-            new InputFile(getInputFolder(), Paths.get("biomass", "biomass_distributions.csv")),
+            getInputFolder().path("biomass", "biomass_distributions.csv"),
             365
         );
     private boolean fadMortalityIncludedInExogenousCatches = true;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             getSpeciesCodesSupplier(),
-            new InputFile(getInputFolder(), Paths.get("biomass", "exogenous_catches.csv")),
+            getInputFolder().path("biomass", "exogenous_catches.csv"),
             TARGET_YEAR,
             fadMortalityIncludedInExogenousCatches
         );
@@ -79,7 +78,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private BiomassInitializerFactory biomassInitializerFactory =
         new BiomassInitializerFactory(
             speciesCodesSupplier,
-            new InputFile(getInputFolder(), Paths.get("biomass", "schaefer_params.csv"))
+            getInputFolder().path("biomass", "schaefer_params.csv")
         );
     private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
     private ScheduledBiomassProcessesFactory
@@ -110,29 +109,29 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     );
     private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
         new GravityDestinationStrategyFactory(
-            new InputFile(getInputFolder(), "action_weights.csv"),
+            getInputFolder().path("action_weights.csv"),
             getVesselsFile()
         );
 
     public EpoBiomassScenario() {
         setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
-        final InputFile maxCurrentSpeedsFile = new InputFile(getInputFolder(), "max_current_speeds.csv");
+        final InputPath maxCurrentSpeedsFile = getInputFolder().path("max_current_speeds.csv");
         setFishingStrategyFactory(
             new PurseSeinerBiomassFishingStrategyFactory(
                 getSpeciesCodesSupplier(),
-                new InputFile(getInputFolder(), "action_weights.csv"),
+                getInputFolder().path("action_weights.csv"),
                 new BiomassCatchSamplersFactory(
                     getSpeciesCodesSupplier(),
-                    new InputFile(getInputFolder(), "set_samples.csv")
+                    getInputFolder().path("set_samples.csv")
                 ),
-                new SetDurationSamplersFactory(new InputFile(getInputFolder(), "set_durations.csv")),
+                new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
                 maxCurrentSpeedsFile,
-                new InputFile(getInputFolder(), "set_compositions.csv")
+                getInputFolder().path("set_compositions.csv")
 
             )
         );
         setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(
-            new InputFile(getInputFolder(), "location_values.csv"),
+            getInputFolder().path("location_values.csv"),
             maxCurrentSpeedsFile
         ));
     }
@@ -315,10 +314,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public void useDummyData() {
         super.useDummyData();
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            new InputFile(testFolder(), "dummy_action_weights.csv")
+            testFolder().path("dummy_action_weights.csv")
         );
         this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            new InputFile(testFolder(), "dummy_boats.csv")
+            testFolder().path("dummy_boats.csv")
         );
     }
 

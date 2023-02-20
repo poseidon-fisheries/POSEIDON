@@ -25,7 +25,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Collection;
@@ -44,12 +44,12 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
     Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
     > {
 
-    private InputFile selectivityFile;
+    private InputPath selectivityFile;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     @SuppressWarnings("unused")
     public AbundanceFiltersFactory(
-        final InputFile selectivityFile,
+        final InputPath selectivityFile,
         final Supplier<SpeciesCodes> speciesCodesSupplier
     ) {
         this.selectivityFile = selectivityFile;
@@ -72,12 +72,12 @@ public class AbundanceFiltersFactory implements AlgorithmFactory<
     }
 
     @SuppressWarnings("unused")
-    public InputFile getSelectivityFile() {
+    public InputPath getSelectivityFile() {
         return selectivityFile;
     }
 
     @SuppressWarnings("unused")
-    public void setSelectivityFile(final InputFile selectivityFile) {
+    public void setSelectivityFile(final InputPath selectivityFile) {
         this.selectivityFile = selectivityFile;
     }
 

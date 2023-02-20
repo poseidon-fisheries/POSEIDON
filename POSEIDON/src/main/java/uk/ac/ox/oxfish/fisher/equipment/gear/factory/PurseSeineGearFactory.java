@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -84,7 +84,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         ImmutableList.of(new ActiveFadLimitsFactory());
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-    private InputFile locationValuesFile;
+    private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
@@ -112,25 +112,25 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
-    private InputFile maxCurrentSpeedsFile;
+    private InputPath maxCurrentSpeedsFile;
     private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final InputFile locationValuesFile,
-        final InputFile maxCurrentSpeedsFile
+        final InputPath locationValuesFile,
+        final InputPath maxCurrentSpeedsFile
     ) {
         this.locationValuesFile = locationValuesFile;
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
-    public InputFile getLocationValuesFile() {
+    public InputPath getLocationValuesFile() {
         return locationValuesFile;
     }
 
-    public void setLocationValuesFile(final InputFile locationValuesFile) {
+    public void setLocationValuesFile(final InputPath locationValuesFile) {
         this.locationValuesFile = locationValuesFile;
     }
 
@@ -142,11 +142,11 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
     }
 
-    public InputFile getMaxCurrentSpeedsFile() {
+    public InputPath getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
 
-    public void setMaxCurrentSpeedsFile(final InputFile maxCurrentSpeedsFile) {
+    public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 

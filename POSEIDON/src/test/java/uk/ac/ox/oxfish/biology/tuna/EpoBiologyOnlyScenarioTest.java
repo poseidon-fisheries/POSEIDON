@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
-import com.google.common.collect.ImmutableMap;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.ArrayUtils;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.*;
+import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenarioBioOnly;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
         ((AbundanceMortalityProcessFromFileFactory) scenario
             .getScheduledAbundanceProcessesFactory()
             .getAbundanceMortalityProcessFactory())
-            .setMortalityFile(new InputFile(scenario.testFolder(), "mortality_BP.csv"));
+            .setMortalityFile(scenario.testFolder().path("mortality_BP.csv"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         scenario.getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);

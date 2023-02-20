@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -32,13 +32,13 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class FromSimpleFilePortInitializer implements PortInitializer {
 
     private int targetYear;
-    private InputFile portFile;
+    private InputPath portFile;
 
     @SuppressWarnings("unused")
     public FromSimpleFilePortInitializer() {
     }
 
-    public FromSimpleFilePortInitializer(final int targetYear, final InputFile portFile) {
+    public FromSimpleFilePortInitializer(final int targetYear, final InputPath portFile) {
         this.targetYear = targetYear;
         this.portFile = portFile;
     }
@@ -62,12 +62,12 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
     }
 
     @SuppressWarnings("unused")
-    public InputFile getPortFile() {
+    public InputPath getPortFile() {
         return portFile;
     }
 
     @SuppressWarnings("unused")
-    public void setPortFile(final InputFile portFile) {
+    public void setPortFile(final InputPath portFile) {
         this.portFile = portFile;
     }
 

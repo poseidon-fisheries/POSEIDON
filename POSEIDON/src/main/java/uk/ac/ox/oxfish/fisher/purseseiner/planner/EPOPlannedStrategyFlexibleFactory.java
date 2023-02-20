@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -25,8 +25,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     /**
      * probability of any of these actions taking place next in a plan
      */
-    private InputFile actionWeightsFile;
-    private InputFile maxTripDurationFile; // boats.csv
+    private InputPath actionWeightsFile;
+    private InputPath maxTripDurationFile; // boats.csv
     /**
      * hours wasted after each DEL set
      */
@@ -86,27 +86,27 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     }
     public EPOPlannedStrategyFlexibleFactory(
         final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
-        final InputFile actionWeightsFile,
-        final InputFile maxTripDurationFile
+        final InputPath actionWeightsFile,
+        final InputPath maxTripDurationFile
     ) {
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
     }
 
-    public InputFile getActionWeightsFile() {
+    public InputPath getActionWeightsFile() {
         return actionWeightsFile;
     }
 
-    public void setActionWeightsFile(final InputFile actionWeightsFile) {
+    public void setActionWeightsFile(final InputPath actionWeightsFile) {
         this.actionWeightsFile = actionWeightsFile;
     }
 
-    public InputFile getMaxTripDurationFile() {
+    public InputPath getMaxTripDurationFile() {
         return maxTripDurationFile;
     }
 
-    public void setMaxTripDurationFile(final InputFile maxTripDurationFile) {
+    public void setMaxTripDurationFile(final InputPath maxTripDurationFile) {
         this.maxTripDurationFile = maxTripDurationFile;
     }
 

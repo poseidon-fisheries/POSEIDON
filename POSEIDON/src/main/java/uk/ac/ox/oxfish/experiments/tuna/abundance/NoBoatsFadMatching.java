@@ -4,8 +4,7 @@ import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FadsOnlyEpoAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
-import uk.ac.ox.oxfish.model.scenario.RootFolder;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -36,10 +35,10 @@ public class NoBoatsFadMatching {
         try (final FileWriter writer = new FileWriter(mainPath.resolve("matches-newcurrents.csv").toFile())) {
             writer.write("range,path,matches,failed_matches");
             writer.write("\n");
-            final RootFolder rootFolder = new RootFolder(mainPath);
+            final InputPath rootFolder = InputPath.of(mainPath);
             for (int range = 0; range < 10; range++) {
                 for (final String deploymentFile : allowedDeploymentFiles) {
-                    final FishState model = runModel(range, new InputFile(rootFolder, deploymentFile));
+                    final FishState model = runModel(range, rootFolder.path(deploymentFile));
                     writer.write(Integer.toString(range));
                     writer.write(",");
                     writer.write("'");
@@ -64,7 +63,7 @@ public class NoBoatsFadMatching {
 
     static private FishState runModel(
         final int searchRange,
-        final InputFile deploymentPath
+        final InputPath deploymentPath
     ) throws FileNotFoundException {
 
         final FishYAML yaml = new FishYAML();

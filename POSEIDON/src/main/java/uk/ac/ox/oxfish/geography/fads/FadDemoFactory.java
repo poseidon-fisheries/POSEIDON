@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -68,11 +68,11 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         map.setBiomassOnly(biomassOnly);
     }
 
-    public InputFile getPathToFile() {
+    public InputPath getPathToFile() {
         return exogenousFadMaker.getDeploymentsFile();
     }
 
-    public void setPathToFile(final InputFile pathToFile) {
+    public void setPathToFile(final InputPath pathToFile) {
         exogenousFadMaker.setDeploymentsFile(pathToFile);
     }
 

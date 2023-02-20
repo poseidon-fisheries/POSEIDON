@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
@@ -16,10 +16,10 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class YearlyMarketMapFromPriceFileFactory
     implements AlgorithmFactory<MarketMap> {
 
-    private InputFile priceFile;
+    private InputPath priceFile;
 
     public YearlyMarketMapFromPriceFileFactory(
-        final InputFile priceFile,
+        final InputPath priceFile,
         final Supplier<SpeciesCodes> speciesCodesSupplier
     ) {
         this.priceFile = priceFile;
@@ -44,12 +44,12 @@ public class YearlyMarketMapFromPriceFileFactory
     }
 
     @SuppressWarnings("unused")
-    public InputFile getPriceFile() {
+    public InputPath getPriceFile() {
         return priceFile;
     }
 
     @SuppressWarnings("unused")
-    public void setPriceFile(final InputFile priceFile) {
+    public void setPriceFile(final InputPath priceFile) {
         this.priceFile = priceFile;
     }
 

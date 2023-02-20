@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
-import uk.ac.ox.oxfish.model.scenario.Subfolder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -193,7 +192,7 @@ public class EpoSensitivityRuns {
                 ImmutableList.of(
                     new StandardIattcRegulationsFactory(
                         new ProtectedAreasFromFolderFactory(
-                            new Subfolder(scenario.getInputFolder(), "regions"),
+                            scenario.getInputFolder().path("regions"),
                             "region_tags.csv"
                         )
                     ),
