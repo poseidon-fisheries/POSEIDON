@@ -57,7 +57,6 @@ public class AbundanceFadInitializerFactoryTest {
                         "    Skipjack tuna: '1.2084595864666523'\n" +
                         "  selectivityFilters: {\n" +
                         "    }\n" +
-                        "  speciesCodes: null\n" +
                         "  totalCarryingCapacity: '445000.0'";
         FishYAML yaml = new FishYAML();
         AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor, AbundanceFadInitializerFactory.class);
