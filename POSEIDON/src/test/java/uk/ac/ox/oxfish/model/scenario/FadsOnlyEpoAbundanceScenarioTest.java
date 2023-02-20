@@ -18,18 +18,10 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
 
 public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
 

@@ -9,9 +9,9 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 public class AbundanceReallocatorTest {
 
@@ -55,10 +54,11 @@ public class AbundanceReallocatorTest {
         );
 
         AllocationGrids<Entry<String, SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
-                speciesCodesSupplier,
-                TESTS_INPUT_PATH.resolve("mock_grids.csv")   ,
-                nauticalMap.getMapExtent(),
-                365).get();
+            speciesCodesSupplier,
+            Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
+            nauticalMap.getMapExtent(),
+            365
+        ).get();
 
         AbundanceReallocator reallocator = new AbundanceReallocator(
                 allocationGrids,

@@ -17,11 +17,10 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 
 public class GravityModelCalibrations {
     public static void main(final String[] args) {
@@ -106,7 +105,7 @@ public class GravityModelCalibrations {
         fadInitializerFactories.forEach((scenarioName, fadInitializerFactory) -> {
             final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
             scenario.setFadInitializerFactory(fadInitializerFactory);
-            final File scenarioFile = TESTS_INPUT_PATH.resolve(scenarioName + ".yaml").toFile();
+            final File scenarioFile = Paths.get("inputs", "epo_inputs", "tests", scenarioName + ".yaml").toFile();
             try {
                 new FishYAML().dump(scenario, new FileWriter(scenarioFile));
             } catch (final IOException e) {

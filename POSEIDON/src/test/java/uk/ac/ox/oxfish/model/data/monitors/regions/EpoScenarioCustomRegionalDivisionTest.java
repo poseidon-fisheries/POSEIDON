@@ -13,12 +13,12 @@ import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TESTS_INPUT_PATH;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
 public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
@@ -82,7 +82,7 @@ public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
             )
             .collect(toImmutableList());
 
-        final File outputFile = TESTS_INPUT_PATH.resolve("regions.csv").toFile();
+        final File outputFile = Paths.get("inputs", "epo_inputs", "tests", "regions.csv").toFile();
         try (final Writer fileWriter = new FileWriter(outputFile)) {
             final CsvWriter csvWriter =
                 new CsvWriter(new BufferedWriter(fileWriter), new CsvWriterSettings());
