@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.experiments.tuna.abundance;
 
-import org.w3c.dom.ranges.Range;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FadsOnlyEpoAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
+import uk.ac.ox.oxfish.model.scenario.RootFolder;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -22,23 +22,24 @@ import java.nio.file.Paths;
 public class NoBoatsFadMatching {
 
 
-    private final static Path mainPath = Paths.get("docs",
-            "20220208 noboats_tuna",
-            "matchcounting");
+    private final static Path mainPath = Paths.get(
+        "docs",
+        "20220208 noboats_tuna",
+        "matchcounting"
+    );
 
     private static final String[] allowedDeploymentFiles = new String[]{
-            "fad_deployments_6mo_2016.csv","fad_deployments_3mo_2016.csv"};
+        "fad_deployments_6mo_2016.csv", "fad_deployments_3mo_2016.csv"};
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
-        try (FileWriter writer = new FileWriter(mainPath.resolve("matches-newcurrents.csv").toFile()))
-        {
+        try (final FileWriter writer = new FileWriter(mainPath.resolve("matches-newcurrents.csv").toFile())) {
             writer.write("range,path,matches,failed_matches");
             writer.write("\n");
+            final RootFolder rootFolder = new RootFolder(mainPath);
             for (int range = 0; range < 10; range++) {
-
-                for (String deploymentFile : allowedDeploymentFiles) {
-                    FishState model = runModel(range, mainPath.resolve(deploymentFile).toString());
+                for (final String deploymentFile : allowedDeploymentFiles) {
+                    final FishState model = runModel(range, new InputFile(rootFolder, deploymentFile));
                     writer.write(Integer.toString(range));
                     writer.write(",");
                     writer.write("'");
@@ -61,16 +62,20 @@ public class NoBoatsFadMatching {
     }
 
 
-    static private FishState runModel(int searchRange,
-                                      String deploymentPath) throws FileNotFoundException {
+    static private FishState runModel(
+        final int searchRange,
+        final InputFile deploymentPath
+    ) throws FileNotFoundException {
 
-        FishYAML yaml = new FishYAML();
-        FadsOnlyEpoAbundanceScenario scenario = yaml.loadAs(new FileReader(
-                        mainPath.resolve("fad_only_scenario.yaml").toFile()),
-                FadsOnlyEpoAbundanceScenario.class);
-        ((ExogenousFadMakerCSVFactory) scenario.getFadMakerFactory()).setPathToFile(deploymentPath);
+        final FishYAML yaml = new FishYAML();
+        final FadsOnlyEpoAbundanceScenario scenario = yaml.loadAs(
+            new FileReader(
+                mainPath.resolve("fad_only_scenario.yaml").toFile()),
+            FadsOnlyEpoAbundanceScenario.class
+        );
+        ((ExogenousFadMakerCSVFactory) scenario.getFadMakerFactory()).setDeploymentsFile(deploymentPath);
         ((ExogenousFadSetterCSVFactory) scenario.getFadSetterFactory()).
-                setNeighborhoodSearchSize(new FixedDoubleParameter(searchRange));
+            setNeighborhoodSearchSize(new FixedDoubleParameter(searchRange));
 
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
@@ -79,7 +84,7 @@ public class NoBoatsFadMatching {
             fishState.schedule.step(fishState);
             System.out.println("Step " + fishState.getStep());
             System.out.println(
-                    fishState.getFadMap().getDriftingObjectsMap().getField().allObjects.numObjs
+                fishState.getFadMap().getDriftingObjectsMap().getField().allObjects.numObjs
             );
         } while (fishState.getYear() < 2);
         return fishState;

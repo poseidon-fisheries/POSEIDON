@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -20,24 +21,25 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
     @Override
-    public AdditionalStartable apply(FishState state) {
+    public AdditionalStartable apply(final FishState state) {
 
         //we are going to put the fad map in right as soon as this is initialized
         //since usually fad maps are needed by many strategies/objects
         //when they start
-        FadMap fadMap = map.apply(state);
-        Preconditions.checkState(state.getFadMap()==null,
-                "There is already a FAD map in the model");
-       state.setFadMap(fadMap);
-        AdditionalStartable fadMaker = exogenousFadMaker.apply(state);
+        final FadMap fadMap = map.apply(state);
+        Preconditions.checkState(
+            state.getFadMap() == null,
+            "There is already a FAD map in the model"
+        );
+        state.setFadMap(fadMap);
+        final AdditionalStartable fadMaker = exogenousFadMaker.apply(state);
         return new AdditionalStartable() {
-           @Override
-           public void start(FishState model) {
-               fadMaker.start(model);
-               fadMap.start(state);
-           }
-       };
-
+            @Override
+            public void start(final FishState model) {
+                fadMaker.start(model);
+                fadMap.start(state);
+            }
+        };
 
 
     }
@@ -46,7 +48,7 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         return map.getFixedXCurrent();
     }
 
-    public void setFixedXCurrent(DoubleParameter fixedXCurrent) {
+    public void setFixedXCurrent(final DoubleParameter fixedXCurrent) {
         map.setFixedXCurrent(fixedXCurrent);
     }
 
@@ -54,7 +56,7 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         return map.getFixedYCurrent();
     }
 
-    public void setFixedYCurrent(DoubleParameter fixedYCurrent) {
+    public void setFixedYCurrent(final DoubleParameter fixedYCurrent) {
         map.setFixedYCurrent(fixedYCurrent);
     }
 
@@ -62,23 +64,23 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         return map.isBiomassOnly();
     }
 
-    public void setBiomassOnly(boolean biomassOnly) {
+    public void setBiomassOnly(final boolean biomassOnly) {
         map.setBiomassOnly(biomassOnly);
     }
 
-    public String getPathToFile() {
-        return exogenousFadMaker.getPathToFile();
+    public InputFile getPathToFile() {
+        return exogenousFadMaker.getDeploymentsFile();
     }
 
-    public void setPathToFile(String pathToFile) {
-        exogenousFadMaker.setPathToFile(pathToFile);
+    public void setPathToFile(final InputFile pathToFile) {
+        exogenousFadMaker.setDeploymentsFile(pathToFile);
     }
 
     public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
         return exogenousFadMaker.getFadInitializer();
     }
 
-    public void setFadInitializer(FadInitializerFactory fadInitializer) {
+    public void setFadInitializer(final FadInitializerFactory fadInitializer) {
         exogenousFadMaker.setFadInitializer(fadInitializer);
     }
 }

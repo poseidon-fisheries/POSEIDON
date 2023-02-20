@@ -682,7 +682,10 @@ Flexible:
       gridWidthInCell: '100.0'
       header: true
       latLong: true
-      mapFile: ./inputs/indonesia/712/712_map.csv
+      mapFile:
+        folder: !!uk.ac.ox.oxfish.model.scenario.RootFolder
+          path: inputs/indonesia
+        path: 712/712_map.csv
   mapMakerDedicatedRandomSeed: null
   market:
     Multiple Three Prices Markets:

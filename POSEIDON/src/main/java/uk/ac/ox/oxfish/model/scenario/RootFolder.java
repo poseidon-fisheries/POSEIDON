@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class RootFolder implements Folder {
 
@@ -11,6 +12,10 @@ public class RootFolder implements Folder {
 
     public RootFolder(final Path path) {
         this.path = path;
+    }
+
+    public RootFolder(String first, String... more) {
+        this(Paths.get(first, more));
     }
 
     public Path getPath() {

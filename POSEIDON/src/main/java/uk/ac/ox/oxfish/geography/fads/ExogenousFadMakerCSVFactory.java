@@ -1,19 +1,16 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.opencsv.CSVReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Locale;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.apache.commons.lang3.ArrayUtils.indexOf;
 
@@ -23,91 +20,86 @@ import static org.apache.commons.lang3.ArrayUtils.indexOf;
  */
 public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    /** Empty constructor for YAML initialization */
-    public ExogenousFadMakerCSVFactory() {};
+    private InputFile deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
+
+    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
+        new BiomassFadInitializerFactory("Species 0");
+
+    /**
+     * Empty constructor for YAML initialization
+     */
+    public ExogenousFadMakerCSVFactory() {
+    }
+
 
     public ExogenousFadMakerCSVFactory(
-        final String pathToFile,
+        final InputFile deploymentsFile,
         @SuppressWarnings("rawtypes") final FadInitializerFactory fadInitializerFactory
     ) {
-        this.pathToFile = pathToFile;
+        this.deploymentsFile = deploymentsFile;
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
-    private String pathToFile = "./inputs/tests/fad_dummy_deploy.csv";
-
-
-    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
-            new BiomassFadInitializerFactory("Species 0");
-
     @Override
-    public AdditionalStartable apply(FishState state) {
+    public AdditionalStartable apply(final FishState state) {
         //read the file now (don't delay the error from not having the file ready)
-        CSVReader reader;
+        final CSVReader reader;
         try {
             reader = new CSVReader(
-                    new FileReader(
-                            Paths.get(pathToFile).toFile()
-                    )
+                new FileReader(
+                    deploymentsFile.get().toFile()
+                )
             );
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             e.printStackTrace();
-            throw new RuntimeException("failed to read " + pathToFile);
+            throw new RuntimeException("failed to read " + deploymentsFile);
         }
         //read header and lowercase it
-        Iterator<String[]> linesInCSV = reader.iterator();
-        String[] header = Arrays.stream(linesInCSV.next()).
-                map(s -> s.toLowerCase(Locale.ROOT).trim()).
-                toArray(String[]::new);
-        final int dayColumn = indexOf(header,"day");
-        final int xColumn = indexOf(header,"x");
-        final int yColumn = indexOf(header,"y");
+        final Iterator<String[]> linesInCSV = reader.iterator();
+        final String[] header = Arrays.stream(linesInCSV.next()).
+            map(s -> s.toLowerCase(Locale.ROOT).trim()).
+            toArray(String[]::new);
+        final int dayColumn = indexOf(header, "day");
+        final int xColumn = indexOf(header, "x");
+        final int yColumn = indexOf(header, "y");
 
         final HashMap<Integer, Collection<Double2D>> dayToCoordinatesMap = new HashMap<>();
-        while(linesInCSV.hasNext()){
-            String[] line = linesInCSV.next();
-            int day = Integer.parseInt(line[dayColumn]);
+        while (linesInCSV.hasNext()) {
+            final String[] line = linesInCSV.next();
+            final int day = Integer.parseInt(line[dayColumn]);
             //if first FAD of the day, create container
             dayToCoordinatesMap.computeIfAbsent(day, integer -> new LinkedList<>()).
-                    //then add
+                //then add
                     add(new Double2D(
-                            Double.parseDouble(line[xColumn]),
-                            Double.parseDouble(line[yColumn])
-                    ));
+                    Double.parseDouble(line[xColumn]),
+                    Double.parseDouble(line[yColumn])
+                ));
         }
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                ExogenousFadMaker maker = new ExogenousFadMaker(
-                        fadInitializerFactory.apply(model),
-                        dayToCoordinatesMap
+        return model -> {
+            final ExogenousFadMaker maker = new ExogenousFadMaker(
+                fadInitializerFactory.apply(model),
+                dayToCoordinatesMap
 
-                );
-                maker.start(model);
-
-
-            }
+            );
+            maker.start(model);
         };
-
-
-
     }
 
-    public String getPathToFile() {
-        return pathToFile;
+    public InputFile getDeploymentsFile() {
+        return deploymentsFile;
     }
 
-    public void setPathToFile(String pathToFile) {
-        this.pathToFile = pathToFile;
+    public void setDeploymentsFile(final InputFile deploymentsFile) {
+        this.deploymentsFile = deploymentsFile;
     }
 
     public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializer(AlgorithmFactory<? extends FadInitializer> fadInitializer) {
+    public void setFadInitializer(final AlgorithmFactory<? extends FadInitializer> fadInitializer) {
         this.fadInitializerFactory = fadInitializer;
     }
 }

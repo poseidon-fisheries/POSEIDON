@@ -37,8 +37,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
-import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
-import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -62,19 +60,19 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
 
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
-            INPUT_PATH.resolve("calibration").resolve("fad_deployments.csv").toString(),
+            new InputFile(getInputFolder(), "calibration", "fad_deployments.csv"),
             new AbundanceFadInitializerFactory()
         );
 
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
         new ExogenousFadSetterCSVFactory(
-            INPUT_PATH.resolve("calibration").resolve("fad_sets.csv").toString(), true
+            new InputFile(getInputFolder(), "calibration", "fad_sets.csv"), true
         );
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory =
         new RecruitmentProcessesFactory(
             getSpeciesCodesSupplier(),
-            new InputFile(getInputFolder(), Paths.get("abundance", "recruitment_parameters.csv"))
+            new InputFile(getInputFolder(), "abundance", "recruitment_parameters.csv")
         );
 
     private ScheduledAbundanceProcessesFactory scheduledAbundanceProcessesFactory =
@@ -292,11 +290,11 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @Override
     public void useDummyData() {
         super.useDummyData();
-        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setPathToFile(
-            testFolder().resolve("dummy_fad_deployments.csv").toString()
+        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setDeploymentsFile(
+            new InputFile(testFolder(), "dummy_fad_deployments.csv")
         );
-        ((ExogenousFadSetterCSVFactory) fadSetterFactory).setPathToFile(
-            testFolder().resolve("dummy_fad_sets.csv").toString()
+        ((ExogenousFadSetterCSVFactory) fadSetterFactory).setSetsFile(
+            new InputFile(testFolder(), "dummy_fad_sets.csv")
         );
     }
 

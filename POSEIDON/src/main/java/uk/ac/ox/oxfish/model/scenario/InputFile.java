@@ -11,8 +11,12 @@ public class InputFile implements Supplier<Path> {
     public InputFile() {
     }
 
-    public InputFile(final Folder folder, final String path) {
-        this(folder, Paths.get(path));
+    public InputFile(final Folder folder, final String first, final String... more) {
+        this(folder, Paths.get(first, more));
+    }
+
+    public InputFile(final String first, final String... more) {
+        this(new RootFolder("."), Paths.get(first, more));
     }
 
     public InputFile(final Folder folder, final Path path) {

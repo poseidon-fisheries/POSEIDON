@@ -3,17 +3,15 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.base.Preconditions;
 import com.opencsv.CSVReader;
 import com.vividsolutions.jts.geom.Coordinate;
-import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputFile;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 
@@ -27,107 +25,110 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
      * it is probably more numerically stable to deal with tonnes rather than kg (at the cost of rounding errors).
      * This is called to take simulated fad biomass and turn it from kg to tonnes for comparison purposes
      */
-    private final static Function<Double,Double> DEFAULT_SIMULATED_TO_DATA_SCALER = simulatedBiomass ->
-            simulatedBiomass/1000;
+    private final static Function<Double, Double> DEFAULT_SIMULATED_TO_DATA_SCALER = simulatedBiomass ->
+        simulatedBiomass / 1000;
 
 
     public boolean isDataInTonnes = true;
+    private InputFile setsFile; // = "./inputs/tests/fad_dummmy_sets.csv";
+    private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
+    private DoubleParameter missingFadError = new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
+    private boolean keepLog = false;
 
-    /** Empty constructor for YAML loading */
-    public ExogenousFadSetterCSVFactory() {};
+    /**
+     * Empty constructor for YAML loading
+     */
+    public ExogenousFadSetterCSVFactory() {
+    }
 
-    public ExogenousFadSetterCSVFactory(final String pathToFile, final boolean isDataInTonnes) {
-        this.pathToFile = pathToFile;
+    public ExogenousFadSetterCSVFactory(final InputFile setsFile, final boolean isDataInTonnes) {
+        this.setsFile = setsFile;
         this.isDataInTonnes = isDataInTonnes;
     }
 
-    private String pathToFile = "./inputs/tests/fad_dummmy_sets.csv";
-
-
-    private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
-
-    private DoubleParameter missingFadError = new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
-
-    private boolean keepLog = false;
-
     @Override
-    public ExogenousFadSetterFromData apply(FishState state) {
+    public ExogenousFadSetterFromData apply(final FishState state) {
         //read the file now (don't delay the error from not having the file ready)
-        CSVReader reader;
+        final CSVReader reader;
         try {
             reader = new CSVReader(
-                    new FileReader(
-                            Paths.get(pathToFile).toFile()
-                    )
+                new FileReader(
+                    setsFile.get().toFile()
+                )
             );
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             e.printStackTrace();
-            throw new RuntimeException("failed to read " + pathToFile);
+            throw new RuntimeException("failed to read " + setsFile);
         }
         //read header and lowercase it
-        Iterator<String[]> linesInCSV = reader.iterator();
-        String[] header = Arrays.stream(linesInCSV.next()).
-                map(s -> s.toLowerCase(Locale.ROOT).trim()).
-                toArray(String[]::new);
-        final int dayColumn = indexOf(header,"day");
-        final int xColumn = indexOf(header,"x");
-        final int yColumn = indexOf(header,"y");
+        final Iterator<String[]> linesInCSV = reader.iterator();
+        final String[] header = Arrays.stream(linesInCSV.next()).
+            map(s -> s.toLowerCase(Locale.ROOT).trim()).
+            toArray(String[]::new);
+        final int dayColumn = indexOf(header, "day");
+        final int xColumn = indexOf(header, "x");
+        final int yColumn = indexOf(header, "y");
         //find each species column
         final int[] speciesColumn = new int[state.getSpecies().size()];
-        for (Species species : state.getSpecies()) {
+        for (final Species species : state.getSpecies()) {
 
-            speciesColumn[species.getIndex()] = indexOf(header,
-                    species.getName().toLowerCase(Locale.ROOT).trim());
-            Preconditions.checkState(speciesColumn[species.getIndex()]>=0,
-                    "Missing column for "+species);
+            speciesColumn[species.getIndex()] = indexOf(
+                header,
+                species.getName().toLowerCase(Locale.ROOT).trim()
+            );
+            Preconditions.checkState(
+                speciesColumn[species.getIndex()] >= 0,
+                "Missing column for " + species
+            );
         }
         final HashMap<Integer, List<FadSetObservation>> dayToCoordinatesMap = new HashMap<>();
-        while(linesInCSV.hasNext()){
-            String[] line = linesInCSV.next();
-            int day = Integer.parseInt(line[dayColumn]);
+        while (linesInCSV.hasNext()) {
+            final String[] line = linesInCSV.next();
+            final int day = Integer.parseInt(line[dayColumn]);
             //if first FAD of the day, create container
             //start with the biomass to put in
-            double[] biomassLanded = new double[speciesColumn.length];
+            final double[] biomassLanded = new double[speciesColumn.length];
             for (int i = 0; i < biomassLanded.length; i++) {
                 biomassLanded[i] = Double.parseDouble(line[speciesColumn[i]]);
             }
             dayToCoordinatesMap.computeIfAbsent(day, integer -> new LinkedList<>()).
-                    //then add
-                            add(new FadSetObservation(
-                                    new Coordinate(
-                            Double.parseDouble(line[xColumn]),
-                            Double.parseDouble(line[yColumn])),
-                            biomassLanded,
-                            day
+                //then add
+                    add(new FadSetObservation(
+                    new Coordinate(
+                        Double.parseDouble(line[xColumn]),
+                        Double.parseDouble(line[yColumn])
+                    ),
+                    biomassLanded,
+                    day
 
-                    ));
+                ));
         }
-        ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dayToCoordinatesMap);
-        if(isDataInTonnes)
+        final ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dayToCoordinatesMap);
+        if (isDataInTonnes)
             setter.setSimulatedToDataScaler(DEFAULT_SIMULATED_TO_DATA_SCALER);
-        int range = neighborhoodSearchSize.apply(state.getRandom()).intValue();
+        final int range = neighborhoodSearchSize.apply(state.getRandom()).intValue();
         setter.setNeighborhoodSearchSize(range);
         setter.setMissingFadError(getMissingFadError().apply(state.getRandom()));
-        if(keepLog)
+        if (keepLog)
             setter.startOrResetLogger(state);
         return setter;
 
     }
 
 
-    public String getPathToFile() {
-        return pathToFile;
+    public InputFile getSetsFile() {
+        return setsFile;
     }
 
-    public void setPathToFile(String pathToFile) {
-        this.pathToFile = pathToFile;
+    public void setSetsFile(final InputFile setsFile) {
+        this.setsFile = setsFile;
     }
 
     public boolean isDataInTonnes() {
         return isDataInTonnes;
     }
 
-    public void setDataInTonnes(boolean dataInTonnes) {
+    public void setDataInTonnes(final boolean dataInTonnes) {
         isDataInTonnes = dataInTonnes;
     }
 
@@ -135,7 +136,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         return neighborhoodSearchSize;
     }
 
-    public void setNeighborhoodSearchSize(DoubleParameter neighborhoodSearchSize) {
+    public void setNeighborhoodSearchSize(final DoubleParameter neighborhoodSearchSize) {
         this.neighborhoodSearchSize = neighborhoodSearchSize;
     }
 
@@ -143,7 +144,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         return missingFadError;
     }
 
-    public void setMissingFadError(DoubleParameter missingFadError) {
+    public void setMissingFadError(final DoubleParameter missingFadError) {
         this.missingFadError = missingFadError;
     }
 
@@ -151,7 +152,7 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         return keepLog;
     }
 
-    public void setKeepLog(boolean keepLog) {
+    public void setKeepLog(final boolean keepLog) {
         this.keepLog = keepLog;
     }
 }
