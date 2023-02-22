@@ -13,11 +13,12 @@ public class YamlScenarioLoader {
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
         final Path scenarioPath =
-            Paths.get("/", "home", "nicolas",
-                "workspace", "tuna", "np", "calibrations",
-                "vps_holiday_runs", "without_betavoid_with_temp",
-                "cenv0729", "2022-12-24_18.13.45_global", "calibrated_scenario.yaml"
-            );
+            Paths.get("inputs", "epo_inputs", "tests", "scenarios", "EpoScenarioPathfinding.yaml");
+//            Paths.get("/", "home", "nicolas",
+//                "workspace", "tuna", "np", "calibrations",
+//                "vps_holiday_runs", "without_betavoid_with_temp",
+//                "cenv0729", "2022-12-24_18.13.45_global", "calibrated_scenario.yaml"
+//            );
         final Scenario scenario = new YamlScenarioLoader().load(scenarioPath);
         final Simulation simulation = scenario.newSimulation();
         simulation.step();

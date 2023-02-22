@@ -21,7 +21,7 @@ public class EpoScenarioTest extends TestCase {
             // Try to read it back and start it
             try (final FileReader fileReader = new FileReader(scenarioFile)) {
                 final FishYAML fishYAML = new FishYAML();
-                final S loadedScenario = fishYAML.loadAs(fileReader, scenarioClass);
+                final EpoScenario<?, ?> loadedScenario = fishYAML.loadAs(fileReader, EpoScenario.class);
                 loadedScenario.useDummyData();
                 final FishState fishState = new FishState();
                 fishState.setScenario(loadedScenario);
@@ -52,7 +52,7 @@ public class EpoScenarioTest extends TestCase {
         saveAndLoadYaml(EpoAbundanceScenarioBioOnly.class);
     }
 
-    public void tesSaveAndLoadEpoScenarioPathfinding() {
+    public void testSaveAndLoadEpoScenarioPathfinding() {
         saveAndLoadYaml(EpoScenarioPathfinding.class);
     }
 
