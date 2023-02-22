@@ -168,7 +168,7 @@ public class FromFileMapInitializer implements MapInitializer {
 
         } catch (IOException | ClassNotFoundException e)
         {
-            throw new RuntimeException("Failed to initialize the map!");
+            throw new IllegalStateException("Failed to initialize the map!", e);
         }
     }
 
