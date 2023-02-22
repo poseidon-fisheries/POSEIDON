@@ -44,6 +44,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -103,7 +104,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        getSpeciesCodesSupplier().get().getSpeciesNames().stream().collect(
+        Stream.of("Bigeye tuna", "Skipjack tuna", "Yellowfin tuna").collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(

@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -83,7 +84,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        getSpeciesCodesSupplier().get().getSpeciesNames().stream().collect(
+        Stream.of("Bigeye tuna", "Skipjack tuna", "Yellowfin tuna").collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(

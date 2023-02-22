@@ -36,6 +36,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
 import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -78,7 +80,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         new LastMomentAbundanceFadInitalizerFactory();
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
-        speciesCodesSupplier.get().getSpeciesNames().stream().collect(
+        Stream.of("Bigeye tuna", "Skipjack tuna", "Yellowfin tuna").collect(
             toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
         ),
         ImmutableMap.of(
