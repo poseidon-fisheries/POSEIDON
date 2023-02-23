@@ -1,9 +1,9 @@
-package uk.ac.ox.poseidon.datasets.adaptors;
+package uk.ac.ox.poseidon.datasets.adaptors.timeseries;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-public class DailyFishStateTimeSeriesDatasetFactory extends FishStateTimeSeriesDatasetFactory {
+public class DailyTimeSeriesDatasetFactory extends TimeSeriesDatasetFactory {
     @Override
     TimeSeries<?> getTimeSeries(final FishState fishState) {
         return fishState.getDailyDataSet();
