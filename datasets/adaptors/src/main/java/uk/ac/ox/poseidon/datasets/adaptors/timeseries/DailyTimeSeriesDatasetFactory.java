@@ -15,7 +15,7 @@ public class DailyTimeSeriesDatasetFactory extends TimeSeriesDatasetFactory {
     }
 
     @Override
-    String getDatasetName() {
+    public String getDatasetName() {
         return "Daily time series";
     }
 }

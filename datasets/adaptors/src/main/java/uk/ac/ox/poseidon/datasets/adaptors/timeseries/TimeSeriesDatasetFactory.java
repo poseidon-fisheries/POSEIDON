@@ -16,8 +16,6 @@ public abstract class TimeSeriesDatasetFactory implements DatasetFactory {
 
     abstract String getIndexColumnName();
 
-    abstract String getDatasetName();
-
     @Override
     public Entry<String, Dataset> apply(final Object o) {
         checkArgument(test(o));

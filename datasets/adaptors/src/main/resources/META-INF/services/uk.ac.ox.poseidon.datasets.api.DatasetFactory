@@ -1,2 +1,3 @@
 uk.ac.ox.poseidon.datasets.adaptors.timeseries.DailyTimeSeriesDatasetFactory
 uk.ac.ox.poseidon.datasets.adaptors.timeseries.YearlyTimeSeriesDatasetFactory
+uk.ac.ox.poseidon.datasets.adaptors.rowproviders.PurseSeinerEventsDatasetFactory

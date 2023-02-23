@@ -8,4 +8,5 @@ public interface DatasetFactory extends
     Predicate<Object>,
     Function<Object, Entry<String, Dataset>> {
     boolean isAutoRegistered();
+    String getDatasetName();
 }

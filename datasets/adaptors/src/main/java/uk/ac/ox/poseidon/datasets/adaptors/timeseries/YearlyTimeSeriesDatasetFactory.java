@@ -15,7 +15,7 @@ public class YearlyTimeSeriesDatasetFactory extends TimeSeriesDatasetFactory {
     }
 
     @Override
-    String getDatasetName() {
+    public String getDatasetName() {
         return "Yearly time series";
     }
 }
