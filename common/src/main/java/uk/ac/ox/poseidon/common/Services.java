@@ -1,8 +1,12 @@
 package uk.ac.ox.poseidon.common;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Predicate;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 
 public class Services {
     public static <S> S loadFirst(final Class<S> service, final Predicate<S> predicate) {
@@ -23,5 +27,12 @@ public class Services {
             "No service provider matching the predicate found for %s",
             service.getCanonicalName()
         ));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static <S> List<S> loadAll(final Class<S> service, final Predicate<S> predicate) {
+        return stream(ServiceLoader.load(service).iterator())
+            .filter(predicate)
+            .collect(toImmutableList());
     }
 }

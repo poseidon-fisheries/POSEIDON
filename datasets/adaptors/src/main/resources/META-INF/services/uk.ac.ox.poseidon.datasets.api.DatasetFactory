@@ -1,0 +1,2 @@
+uk.ac.ox.poseidon.datasets.adaptors.DailyFishStateTimeSeriesDatasetFactory
+uk.ac.ox.poseidon.datasets.adaptors.YearlyFishStateTimeSeriesDatasetFactory

@@ -3,10 +3,13 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.poseidon.common.Services;
 import uk.ac.ox.poseidon.datasets.api.Dataset;
-import uk.ac.ox.poseidon.datasets.api.DatasetsFactory;
+import uk.ac.ox.poseidon.datasets.api.DatasetFactory;
 import uk.ac.ox.poseidon.simulations.api.Simulation;
 
 import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.stream.Collectors.toMap;
 
 public class FishStateAdaptor implements Simulation {
 
@@ -15,11 +18,14 @@ public class FishStateAdaptor implements Simulation {
 
     FishStateAdaptor(final FishState fishState) {
         this.fishState = fishState;
-        this.datasets =
-            Services.loadFirst(
-                DatasetsFactory.class,
-                datasetsFactory -> datasetsFactory.test(fishState)
-            ).apply(fishState);
+        this.datasets = Services
+            .loadAll(
+                DatasetFactory.class,
+                datasetFactory -> datasetFactory.isAutoRegistered() && datasetFactory.test(fishState)
+            )
+            .stream()
+            .map(datasetFactory -> datasetFactory.apply(fishState))
+            .collect(toMap(Entry::getKey, Entry::getValue));
     }
 
     @Override
