@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.environment.EnvironmentalLayer;
+import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
@@ -35,6 +36,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -315,6 +317,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         scheduledAbundanceProcessesFactory.setAbundanceMortalityProcessFactory(
             abundanceMortalityProcessFactory
         );
+
+        environmentalLayer.addEnvironmentalMap(new EnvironmentalMapFactory("maxShear","inputs/epo_inputs/currents/maxShear.csv"));
+        AdditionalStartable shearMap = environmentalLayer.getEnvironmentalMap("maxShear").apply(fishState);
+        fishState.registerStartable(shearMap);
+
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
