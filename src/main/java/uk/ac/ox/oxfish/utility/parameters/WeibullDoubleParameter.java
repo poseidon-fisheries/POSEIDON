@@ -29,12 +29,13 @@ public class WeibullDoubleParameter implements DoubleParameter {
 
     private double shape;
     private double scale;
+    private final double epsilon = 0.0001;
 
     private WeibullDistribution distribution;
 
     public WeibullDoubleParameter(double shape, double scale)
     {
-        this.shape = Math.max(shape,0.0000001); //Cannot be zero
+        this.shape = Math.max(shape,epsilon); //Cannot be zero
         this.scale = scale;
     }
 
@@ -63,7 +64,7 @@ public class WeibullDoubleParameter implements DoubleParameter {
     }
 
     public void setShape(double shape) {
-        this.shape = shape;
+        this.shape = Math.max(shape, epsilon);
         distribution=null;
     }
 
