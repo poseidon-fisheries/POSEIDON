@@ -54,6 +54,9 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
 
     private DoubleParameter slope = new FixedDoubleParameter(1d);
 
+    //Keep this at -1 to use the "old" intercept/slope method
+    private DoubleParameter dampen = new FixedDoubleParameter( -1d);
+
     @Override
     public ValuePerSetFadModule apply(FishState state) {
 
@@ -78,12 +81,18 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
             }
         }
 
-
-        return new ValuePerSetFadModule(
-                optionsGenerator,
-                intercept.apply(state.getRandom()).doubleValue(),
-                slope.apply(state.getRandom()).doubleValue()
-        );
+        if(dampen.equals(-1)){
+            return new ValuePerSetFadModule(
+                    optionsGenerator,
+                    intercept.apply(state.getRandom()).doubleValue(),
+                    slope.apply(state.getRandom()).doubleValue()
+            );
+        } else {
+            return new ValuePerSetFadModule(
+                    optionsGenerator,
+                    dampen.apply(state.getRandom()).doubleValue()
+            );
+        }
     }
 
     public AlgorithmFactory<? extends MapDiscretizer> getDiscretization() {
@@ -128,5 +137,7 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
         this.slope = slope;
     }
 
+    public DoubleParameter getDampen(){return dampen;}
+    public void setDampen(DoubleParameter dampen){this.dampen=dampen;}
 
 }

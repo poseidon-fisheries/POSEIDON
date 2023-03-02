@@ -44,10 +44,10 @@ public class EpoScenarioPathfindingTest extends TestCase {
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
 
-        EnvironmentalLayer environmentalLayer = new EnvironmentalLayer();
-        environmentalLayer.addEnvironmentalMap(new EnvironmentalMapFactory("maxShear","inputs/epo_inputs/currents/maxShear.csv"));
-        AdditionalStartable shearMap = environmentalLayer.getEnvironmentalMap("maxShear").apply(fishState);
-        fishState.registerStartable(shearMap);
+//        EnvironmentalLayer environmentalLayer = new EnvironmentalLayer();
+//        environmentalLayer.addEnvironmentalMap(new EnvironmentalMapFactory("maxShear","inputs/epo_inputs/currents/maxShear.csv"));
+//        AdditionalStartable shearMap = environmentalLayer.getEnvironmentalMap("maxShear").apply(fishState);
+//        fishState.registerStartable(shearMap);
 //        shearMap.start(fishState);
         fishState.start();
 
@@ -60,6 +60,7 @@ public class EpoScenarioPathfindingTest extends TestCase {
                 DoubleGrid2D shearGrid = fishState.getMap().getAdditionalMaps().get("maxShear").get();
 
  //               System.out.println("break");
+
 
             }*/
         } while (fishState.getYear() < 1);

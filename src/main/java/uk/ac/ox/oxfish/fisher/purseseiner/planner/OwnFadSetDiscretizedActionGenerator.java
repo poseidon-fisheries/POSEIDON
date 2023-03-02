@@ -117,6 +117,9 @@ public class OwnFadSetDiscretizedActionGenerator {
               continue;
             }
 
+            //This is where we want to artificially inflate the value to minimumFadValue
+            //if they make a bad reading. Why was this removed before?
+
             if (value >= minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                     add(new ValuedFad(deployedFad, value));

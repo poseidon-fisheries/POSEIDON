@@ -20,11 +20,11 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import java.util.function.IntUnaryOperator;
 
-class PeriodicStepMapper implements IntUnaryOperator {
+public class PeriodicStepMapper implements IntUnaryOperator {
 
     private final int period;
 
-    PeriodicStepMapper(final int period) {
+    public PeriodicStepMapper(final int period) {
         this.period = period;
     }
 

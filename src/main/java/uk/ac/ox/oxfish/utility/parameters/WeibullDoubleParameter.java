@@ -28,14 +28,13 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 public class WeibullDoubleParameter implements DoubleParameter {
 
     private double shape;
-
     private double scale;
 
     private WeibullDistribution distribution;
 
     public WeibullDoubleParameter(double shape, double scale)
     {
-        this.shape = shape;
+        this.shape = Math.max(shape,0.0000001); //Cannot be zero
         this.scale = scale;
     }
 
