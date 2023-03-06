@@ -43,11 +43,12 @@ public class ActiveFadLimits implements ActionSpecificRegulation {
     @Override
     public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() { return applicableActions; }
 
-    @Override public boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher) {
-        if(applicableActions.contains(action.getClass())) {
-            return getFadManager(fisher).getNumDeployedFads() >= getLimit(fisher);
-        }
-        return false;
+    @Override public boolean isForbidden(
+        final Class<? extends PurseSeinerAction> actionClass,
+        final Fisher fisher
+    ) {
+        return applicableActions.contains(actionClass) &&
+            getFadManager(fisher).getNumDeployedFads() >= getLimit(fisher);
     }
 
     public int getLimit(final Fisher fisher) { return limits.getLimit(fisher); }
