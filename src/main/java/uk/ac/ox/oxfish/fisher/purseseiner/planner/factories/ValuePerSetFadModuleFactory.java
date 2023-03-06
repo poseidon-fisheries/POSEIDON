@@ -51,11 +51,12 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
 
 
     private DoubleParameter intercept = new FixedDoubleParameter(0);
-
     private DoubleParameter slope = new FixedDoubleParameter(1d);
 
     //Keep this at -1 to use the "old" intercept/slope method
     private DoubleParameter dampen = new FixedDoubleParameter( -1d);
+    //0 gives no bias to the western waters. Increase this to increase the western bias
+    private DoubleParameter westernBias = new FixedDoubleParameter(0);
 
     @Override
     public ValuePerSetFadModule apply(FishState state) {
@@ -90,7 +91,10 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
         } else {
             return new ValuePerSetFadModule(
                     optionsGenerator,
-                    dampen.apply(state.getRandom()).doubleValue()
+                    0,1,
+                    dampen.apply(state.getRandom()).doubleValue(),
+                    westernBias.apply(state.getRandom()).doubleValue()
+
             );
         }
     }
@@ -139,5 +143,9 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
 
     public DoubleParameter getDampen(){return dampen;}
     public void setDampen(DoubleParameter dampen){this.dampen=dampen;}
+
+    public DoubleParameter getWesternBias(){return westernBias;}
+    public void setWesternBias(DoubleParameter westernBias){this.westernBias=westernBias;}
+
 
 }

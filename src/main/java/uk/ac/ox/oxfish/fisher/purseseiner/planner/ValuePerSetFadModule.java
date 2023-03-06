@@ -48,6 +48,7 @@ public class ValuePerSetFadModule
     private final double slope;
 
     private final double dampen;
+    private final double westernBias;
 
 
     public ValuePerSetFadModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, double intercept, double slope) {
@@ -55,13 +56,15 @@ public class ValuePerSetFadModule
         this.intercept = intercept;
         this.slope = slope;
         this.dampen = -1;
+        this.westernBias=0;
         Preconditions.checkArgument(optionsGenerator.getMinimumFadValue()<=0,
                                     "by setting minimum value fad set >0 you bias the value per set computation!");
     }
 
-    public ValuePerSetFadModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, double dampen) {
+    public ValuePerSetFadModule(OwnFadSetDiscretizedActionGenerator optionsGenerator,double intercept, double slope, double dampen, double westernBias) {
         super(optionsGenerator);
         this.dampen = dampen;
+        this.westernBias=westernBias;
         this.intercept = 0;
         this.slope=1;
         Preconditions.checkArgument(optionsGenerator.getMinimumFadValue()<=0,
@@ -95,18 +98,23 @@ public class ValuePerSetFadModule
 
             double totalValueOfOption = 0;
             double numberOfOptions = 0;
-
+            double avgGridX = 0;
             //sum up the raw $ amount you expect to make
             for (OwnFadSetDiscretizedActionGenerator.ValuedFad fadInGroup : option.getFirst()) {
-                if(Double.isFinite(fadInGroup.getSecond()))
+                if(Double.isFinite(fadInGroup.getSecond())) {
+                    //int x=fadInGroup.getFirst().getLocation().getGridX();
+                    //int width = model.getMap().getWidth();
+                    avgGridX += fadInGroup.getFirst().getLocation().getGridX();
                     totalValueOfOption += fadInGroup.getSecond();
+                }
                 numberOfOptions++;
             }
-
+            avgGridX *= 1/numberOfOptions;
+            double westernProportion = Math.pow(2-avgGridX/model.getMap().getWidth(),westernBias);
             double probability;
             if(dampen>-1){
                 //The actual "probability" variation is dampened to be more like uniform at random
-                probability = dampen*1 + (1-dampen)*totalValueOfOption / numberOfOptions;
+                probability = westernProportion * (dampen + (1-dampen)*totalValueOfOption / numberOfOptions);
             } else {
                 //the actual "probability" is proportional to intercept + slope * SUM_OF_VALUE/NUMBER_OF_FADS
                 probability = intercept + slope * totalValueOfOption / numberOfOptions;

@@ -20,7 +20,9 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import cern.jet.random.engine.MersenneTwister;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -30,8 +32,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttrac
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
+import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
@@ -122,6 +126,9 @@ public class WeibullLinearIntervalAttractorFactory implements
     @NotNull
     protected HeterogeneousLinearIntervalAttractor generateFishAttractor(final FishState fishState) {
         final DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
+
+        //If we want to add correlation, this is the place to do it. I think -BP
+
         for (final Species species : fishState.getBiology().getSpecies()) {
             carryingCapacities[species.getIndex()] = new WeibullDoubleParameter(
                 carryingCapacityShapeParameters.get(species.getName()),

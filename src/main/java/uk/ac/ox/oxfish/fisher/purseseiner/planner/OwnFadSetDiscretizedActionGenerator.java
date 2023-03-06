@@ -57,7 +57,8 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private boolean filterOutCurrentlyInvalidFads = false;
 
-    private double maxAllowableShear = 0.5;
+    //Set this value higher to allow vessels to set closer to the equator
+    private double maxAllowableShear = 0.90;
 
     //todo add minimum soaktime
 
@@ -112,8 +113,6 @@ public class OwnFadSetDiscretizedActionGenerator {
 */
             //If the shear at this location is too high then skip the FAD
             if(map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY()) > maxAllowableShear){
-//                double shearAtLocation = map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY());
-//                System.out.println("max shear too high");
               continue;
             }
 
@@ -210,6 +209,10 @@ public class OwnFadSetDiscretizedActionGenerator {
         this.bannedGridXBounds = bannedGridXBounds;
     }
 
+    public void setMaxAllowableShear(double maxAllowableShear){
+        this.maxAllowableShear=maxAllowableShear;
+    }
+    public double getMaxAllowableShear(){return maxAllowableShear;}
     public double[] getBannedGridXBounds() {
         return bannedGridXBounds;
     }

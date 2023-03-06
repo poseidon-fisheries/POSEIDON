@@ -23,10 +23,10 @@ public class TwoPunchCalibrationMini {
         final TunaCalibrationConsole firstStep = new TunaCalibrationConsole();
         firstStep.setLocalSearch(false);
         firstStep.setPSO(false);
-        firstStep.setPopulationSize(50); //Not 200, lowering it to 50, because "Mini!"
+        firstStep.setPopulationSize(100); //Not 200, lowering it because "Mini!"
         firstStep.setMaxProcessorsToUse(nProcs);
         firstStep.setNumberOfRunsPerSettingOverride(1);
-        firstStep.setMaxFitnessCalls(100); //Not 2000, lowering it to 100, also because "mini!"
+        firstStep.setMaxFitnessCalls(1000); //Not 2000, lowering it also because "mini!"
         firstStep.setParameterRange(15);
         firstStep.setRunNickName("global");
         firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
@@ -45,10 +45,10 @@ public class TwoPunchCalibrationMini {
         secondStep.setBestGuessesTextFile(
                 calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
         );
-        secondStep.setPopulationSize(15); //Lowered from 50
+        secondStep.setPopulationSize(50); //Lowered from 50
         secondStep.setMaxProcessorsToUse(nProcs);
         secondStep.setNumberOfRunsPerSettingOverride(2);
-        secondStep.setMaxFitnessCalls(100);  //Lowered from 5000
+        secondStep.setMaxFitnessCalls(1000);  //Lowered from 5000
         secondStep.setParameterRange(17);
         secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
         secondStep.setRunNickName("local");

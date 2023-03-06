@@ -36,7 +36,7 @@ public class WeibullDoubleParameter implements DoubleParameter {
     public WeibullDoubleParameter(double shape, double scale)
     {
         this.shape = Math.max(shape,epsilon); //Cannot be zero
-        this.scale = scale;
+        this.scale = Math.max(scale,epsilon);
     }
 
     @Override
@@ -55,7 +55,6 @@ public class WeibullDoubleParameter implements DoubleParameter {
                     shape,scale);
 
         return distribution.sample();
-
     }
 
 
@@ -69,13 +68,15 @@ public class WeibullDoubleParameter implements DoubleParameter {
     }
 
     public double getScale() {
-
         return scale;
     }
 
     public void setScale(double scale) {
         distribution=null;
+        this.scale = Math.max(scale,epsilon);
+    }
 
-        this.scale = scale;
+    public double inverseCDF(double probability){
+        return(scale*Math.pow(-Math.log(1-probability),1/shape));
     }
 }
