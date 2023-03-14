@@ -2,13 +2,18 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections15.list.UnmodifiableList;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.IterativeAgerageBackAndForth;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.*;
 
 public class Plan {
 
@@ -124,5 +129,12 @@ public class Plan {
      */
     public void addHoursEstimatedItWillTake(double additionalHoursSpent){
         hoursEstimatedThisPlanWillTake+=additionalHoursSpent;
+    }
+
+    Map<Class<? extends PlannedAction>, Integer> getActionCounts() {
+        return plannedActions.stream().collect(groupingBy(
+            PlannedAction::getClass,
+            collectingAndThen(toList(), List::size)
+        ));
     }
 }

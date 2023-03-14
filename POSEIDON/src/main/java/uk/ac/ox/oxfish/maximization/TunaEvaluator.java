@@ -10,10 +10,8 @@ import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.*;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -78,7 +76,7 @@ public class TunaEvaluator implements Runnable {
         ).registerRowProvider(
             "yearly_results.csv",
             YearlyResultsRowProvider::new
-        );
+        ).requestFisherYearlyData();
         runner.setParallel(true);
 
     }
@@ -100,7 +98,7 @@ public class TunaEvaluator implements Runnable {
         ).registerRowProvider(
             "yearly_results.csv",
             YearlyResultsRowProvider::new
-        );
+        ).requestFisherYearlyData();
         runner.setParallel(false);
     }
 
@@ -125,7 +123,7 @@ public class TunaEvaluator implements Runnable {
         //final Path calibrationFolder = getCalibrationFolder(args);
 
         ImmutableList.of(
-            "pre_jan23_meeting/nicolas/2023-01-20_11.42.32_global"
+            "vps_holiday_runs/without_betavoid_with_temp/cenv0729/2022-12-25_20.45.38_local"
         ).forEach(folderName -> {
             final Path calibrationFolder = DEFAULT_CALIBRATION_FOLDER.resolve(folderName);
 
@@ -136,7 +134,7 @@ public class TunaEvaluator implements Runnable {
 
             final double[] solution = extractSolution(logFilePath);
             final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
-            tunaEvaluator.setNumRuns(64);
+            tunaEvaluator.setNumRuns(8);
             tunaEvaluator.setParallel(true);
             tunaEvaluator.run();
         });

@@ -208,12 +208,6 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
         fad.lose();
     }
 
-    public F deployFad(final SeaTile seaTile) {
-        final F newFad = initFad(seaTile);
-        fadMap.deployFad(newFad, seaTile);
-        return newFad;
-    }
-
     private F initFad(final SeaTile tile) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
@@ -222,8 +216,20 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
             fisher,
             tile
         );
+//        final int limit = getActionSpecificRegulations().getActiveFadLimits()
+//            .map(afl -> afl.getLimit(fisher))
+//            .get();
+//        System.out.println(fisher.getID() + ": " + getNumDeployedFads() + " / " + limit);
+//        if (getNumDeployedFads() >= limit) {
+//            System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
+//        }
         deployedFads.add(newFad);
         return newFad;
+    }
+
+    public F deployFad(final SeaTile seaTile) {
+        final Double2D location = new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5);
+        return deployFad(seaTile, location);
     }
 
     /**
@@ -234,11 +240,14 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
         );
+        return deployFad(seaTile, location);
+    }
+
+    public F deployFad(final SeaTile seaTile, final Double2D location) {
         final F newFad = initFad(seaTile);
         fadMap.deployFad(newFad, location);
         return newFad;
     }
-
 
     public ActiveActionRegulations getActionSpecificRegulations() {
         return actionSpecificRegulations;

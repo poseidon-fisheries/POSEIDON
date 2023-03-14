@@ -52,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherDailyData;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyYearlyData;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -63,6 +64,7 @@ public final class Runner<S extends Scenario> {
     private static final String YEARLY_DATA_FILENAME = "yearly_data.csv";
 
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
+    private static final String FISHER_DAILY_DATA_FILENAME = "fisher_daily_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
 
     private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
@@ -275,11 +277,22 @@ public final class Runner<S extends Scenario> {
         }
     }
 
-    Runner<S> requestFisherYearlyData() {
+    public Runner<S> requestFisherYearlyData() {
         return registerRowProviders(FISHER_YEARLY_DATA_FILENAME, fishState ->
             fishState.getFishers().stream()
                 .map(fisher -> new TidyFisherYearlyData(
                     fisher.getYearlyData(),
+                    fisher.getTags().get(0)
+                ))
+                .collect(toImmutableList())
+        );
+    }
+
+    public Runner<S> requestFisherDailyData() {
+        return registerRowProviders(FISHER_DAILY_DATA_FILENAME, fishState ->
+            fishState.getFishers().stream()
+                .map(fisher -> new TidyFisherDailyData(
+                    fisher.getDailyData(),
                     fisher.getTags().get(0)
                 ))
                 .collect(toImmutableList())

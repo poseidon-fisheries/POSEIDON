@@ -11,7 +11,10 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.*;
+import uk.ac.ox.oxfish.model.regs.factory.CompositeMultipleRegulationsFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
+import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
@@ -47,17 +50,14 @@ public class EpoSensitivityRuns {
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("sensitivity"));
         ImmutableMap.of(
 //            "temperature", noTemperatureLayerPolicies(),
-//            "fad_limits", fadLimitPolicies(IntStream.of(5, 25, 100)),
-                "fad_limits_fine", fadLimitPolicies(
-                    IntStream.concat(
-                        IntStream.rangeClosed(1, 20),
-                        IntStream.rangeClosed(3, 10).map(i -> i * 10)
-                    )
-                )//,
-//            "spatial_closures", spatialClosurePolicies()
+            "fad_limits", fadLimitPolicies(IntStream.of(100))//,
+//            "fad_limits_fine", fadLimitPolicies(
+//                    IntStream.rangeClosed(1, 20).map(i -> i * 5)
+//            )//,
+//            "spatial_closures", spatialClosurePolicies(),
 //            "skj_minus_bet", betAvoidancePolicies(),
-                //"southern_spatial_closure", southernSpatialClosurePolicies()
-            )
+//            "southern_spatial_closure", southernSpatialClosurePolicies()
+        )
             .entrySet()
             .stream()
             .parallel()
@@ -67,7 +67,9 @@ public class EpoSensitivityRuns {
                     new Runner<>(EpoScenarioPathfinding.class, baseScenario, outputFolder)
                         .setPolicies(entry.getValue())
                         .setParallel(true)
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
+                        .requestFisherDailyData()
+                        .requestFisherYearlyData();
                 if (!entry.getKey().equals("fad_limits_fine")) {
                     runner
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)

@@ -74,6 +74,11 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
             return flow;
         }}, Double.NaN);
 
+        registerGatherer(
+            NumberOfActiveFadsGatherer.COLUMN_NAME,
+            new NumberOfActiveFadsGatherer(),
+            0
+        );
 
         for(Species species : state.getSpecies())
         {
