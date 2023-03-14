@@ -216,13 +216,6 @@ public class FadManager<B extends LocalBiology, F extends AbstractFad<B, F>> {
             fisher,
             tile
         );
-//        final int limit = getActionSpecificRegulations().getActiveFadLimits()
-//            .map(afl -> afl.getLimit(fisher))
-//            .get();
-//        System.out.println(fisher.getID() + ": " + getNumDeployedFads() + " / " + limit);
-//        if (getNumDeployedFads() >= limit) {
-//            System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
-//        }
         deployedFads.add(newFad);
         return newFad;
     }

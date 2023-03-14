@@ -50,14 +50,14 @@ public class EpoSensitivityRuns {
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("sensitivity"));
         ImmutableMap.of(
 //            "temperature", noTemperatureLayerPolicies(),
-            "fad_limits", fadLimitPolicies(IntStream.of(100))//,
-//            "fad_limits_fine", fadLimitPolicies(
+                "fad_limits", fadLimitPolicies(IntStream.of(100)) //5, 25, 100)),
+//                "fad_limits_fine", fadLimitPolicies(
 //                    IntStream.rangeClosed(1, 20).map(i -> i * 5)
-//            )//,
+//                )//,
 //            "spatial_closures", spatialClosurePolicies(),
 //            "skj_minus_bet", betAvoidancePolicies(),
 //            "southern_spatial_closure", southernSpatialClosurePolicies()
-        )
+            )
             .entrySet()
             .stream()
             .parallel()
@@ -68,10 +68,10 @@ public class EpoSensitivityRuns {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
-                        .requestFisherDailyData()
                         .requestFisherYearlyData();
                 if (!entry.getKey().equals("fad_limits_fine")) {
                     runner
+                        .requestFisherDailyData()
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 }

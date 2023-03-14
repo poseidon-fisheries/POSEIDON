@@ -88,9 +88,17 @@ public interface PlannedAction {
 
         @Override
         public Action[] actuate(final Fisher fisher) {
-            return delayInHours <= 0 ?
-                new Action[]{new FadDeploymentAction<>(fisher)} :
-                new Action[]{new FadDeploymentAction<>(fisher), new Delaying(delayInHours)};
+            if (isAllowedNow(fisher)) {
+                return delayInHours <= 0
+                    ? new Action[]{new FadDeploymentAction<>(fisher)}
+                    : new Action[]{new FadDeploymentAction<>(fisher), new Delaying(delayInHours)};
+            } else {
+                // Sometimes a deployment that we planned for is not allowed anymore
+                // when we actually get to it. If that's the case, we just don't take
+                // the action. There should be a smarter way to do this but we are,
+                // again, just patching things up before a deadline.
+                return new Action[]{};
+            }
         }
 
         @Override
