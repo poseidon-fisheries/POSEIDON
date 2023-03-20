@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
 
-public class LocationValuesFactory
+public class LocationValuesSupplier
     implements Supplier<Map<Class<? extends PurseSeinerAction>, LocationValues>> {
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
@@ -21,9 +21,9 @@ public class LocationValuesFactory
     private double decayRateOfNonAssociatedSetLocationValues;
     private double decayRateOfDolphinSetLocationValues;
     private double decayRateOfDeploymentLocationValues;
-    public LocationValuesFactory() {
+    public LocationValuesSupplier() {
     }
-    public LocationValuesFactory(final InputPath locationValuesFile) {
+    public LocationValuesSupplier(final InputPath locationValuesFile) {
         this.locationValuesFile = locationValuesFile;
     }
 

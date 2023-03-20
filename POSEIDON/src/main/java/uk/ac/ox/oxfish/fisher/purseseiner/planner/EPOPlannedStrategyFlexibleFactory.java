@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.DiscretizedOwnFadPlanningFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -84,17 +84,17 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedYCoordinateBounds("47, 51");
     }
 
-    private LocationValuesFactory locationValuesFactory;
+    private LocationValuesSupplier locationValuesSupplier;
 
     public EPOPlannedStrategyFlexibleFactory() {
     }
     public EPOPlannedStrategyFlexibleFactory(
-        final LocationValuesFactory locationValuesFactory,
+        final LocationValuesSupplier locationValuesSupplier,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
-        this.locationValuesFactory = locationValuesFactory;
+        this.locationValuesSupplier = locationValuesSupplier;
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
@@ -144,7 +144,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
             delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
             fadModule,
-            locationValuesFactory.get()
+            locationValuesSupplier.get()
         );
 
         return proxy;
@@ -288,12 +288,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.fadModule = fadModule;
     }
 
-    public LocationValuesFactory getLocationValuesFactory() {
-        return locationValuesFactory;
+    public LocationValuesSupplier getLocationValuesFactory() {
+        return locationValuesSupplier;
     }
 
     @SuppressWarnings("unused")
-    public void setLocationValuesFactory(final LocationValuesFactory locationValuesFactory) {
-        this.locationValuesFactory = locationValuesFactory;
+    public void setLocationValuesFactory(final LocationValuesSupplier locationValuesSupplier) {
+        this.locationValuesSupplier = locationValuesSupplier;
     }
 }
