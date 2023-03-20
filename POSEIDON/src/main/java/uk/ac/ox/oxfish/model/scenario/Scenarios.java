@@ -43,54 +43,71 @@ public class Scenarios {
      */
     final public static LinkedHashMap<String, String> DESCRIPTIONS = new LinkedHashMap<>();
 
-    static
-    {
-        SCENARIOS.put("Abstract",PrototypeScenario::new);
-        DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
+    static {
 
-        SCENARIOS.put("Flexible",FlexibleScenario::new);
-        DESCRIPTIONS.put("Flexible", "The conceptual model, with multiple populations");
-
-        SCENARIOS.put("Generalized",GeneralizedScenario::new);
-        DESCRIPTIONS.put("Generalized", "Extension of the Abstract Scenario, implementing communal restrictions");
-
-
-        SCENARIOS.put("California Map Scenario", CaliforniaAbundanceScenario::new);
-        DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +
-                "from bathymetry data");
-
-
-        SCENARIOS.put("Abstract 2 Populations",TwoPopulationsScenario::new);
-        DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
-
-//
-//        SCENARIOS.put("Policy California",SimpleCaliforniaScenario::new);
-//        DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
-//
-        SCENARIOS.put("Simple California",DerisoCaliforniaScenario::new);
-        DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
-
-
-        SCENARIOS.put("Indonesia",IndonesiaScenario::new);
-        DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
-
-        SCENARIOS.put("EPO Biomass", EpoBiomassScenario::new);
-        DESCRIPTIONS.put("EPO Biomass", "A biomass-based scenario for purse-seine fishing in the Eastern Pacific Ocean.");
-
-        SCENARIOS.put("EPO Abundance", EpoAbundanceScenario::new);
-        DESCRIPTIONS.put("EPO Abundance", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
-
-        SCENARIOS.put("FAD only EPO Abundance", FadsOnlyEpoAbundanceScenario::new);
-        DESCRIPTIONS.put("FAD only Abundance", "A vessel-less scenario for FAD parameter calibration purposes.");
-
-
-        SCENARIOS.put("EPO Abundance Pathfinding", EpoScenarioPathfinding::new);
-        DESCRIPTIONS.put("EPO Abundance Pathfinding",
-                "Like EPO Abundance but using an alternative decision process");
-
+        add(
+            "Abstract",
+            "The current model, modular and ready to use.",
+            PrototypeScenario::new
+        );
+        add(
+            "Flexible",
+            "The conceptual model, with multiple populations",
+            FlexibleScenario::new
+        );
+        add(
+            "Generalized",
+            "Extension of the Abstract Scenario, implementing communal restrictions",
+            GeneralizedScenario::new
+        );
+        add(
+            "California Map Scenario",
+            "A simple test on how well does the model read and construct a world from bathymetry data",
+            CaliforniaAbundanceScenario::new
+        );
+        add(
+            "Abstract 2 Populations",
+            "The current model, modular and using two populations",
+            TwoPopulationsScenario::new
+        );
+        add(
+            "Simple California",
+            "California Scenario with DS biology",
+            DerisoCaliforniaScenario::new
+        );
+        add(
+            "Indonesia",
+            "Minimum Working Model of Indonesia",
+            IndonesiaScenario::new
+        );
+        add(
+            "EPO Biomass",
+            "A biomass-based scenario for purse-seine fishing in the Eastern Pacific Ocean.",
+            EpoBiomassScenario::new
+        );
+        add(
+            "EPO Abundance",
+            "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.",
+            EpoAbundanceScenario::new
+        );
+        add(
+            "FAD only Abundance",
+            "A vessel-less scenario for FAD parameter calibration purposes.",
+            FadsOnlyEpoAbundanceScenario::new
+        );
+        add(
+            "EPO Abundance Pathfinding",
+            "Like EPO Abundance but using an alternative decision process",
+            EpoScenarioPathfinding::new
+        );
+        add(
+            "EPO Abundance Biology Only",
+            "A biology-only scenario for testing purposes",
+            EpoAbundanceScenarioBioOnly::new
+        );
     }
 
-    public static void add(
+    private static void add(
         final String name,
         final String description,
         final Supplier<Scenario> scenarioSupplier
