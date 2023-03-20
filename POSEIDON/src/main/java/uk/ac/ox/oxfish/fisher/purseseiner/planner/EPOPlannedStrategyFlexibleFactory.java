@@ -288,12 +288,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.fadModule = fadModule;
     }
 
-    public LocationValuesSupplier getLocationValuesFactory() {
+    public LocationValuesSupplier getLocationValuesSupplier() {
         return locationValuesSupplier;
     }
 
     @SuppressWarnings("unused")
-    public void setLocationValuesFactory(final LocationValuesSupplier locationValuesSupplier) {
+    public void setLocationValuesSupplier(final LocationValuesSupplier locationValuesSupplier) {
         this.locationValuesSupplier = locationValuesSupplier;
     }
 }

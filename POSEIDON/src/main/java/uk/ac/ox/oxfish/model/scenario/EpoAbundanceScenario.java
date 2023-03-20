@@ -38,6 +38,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
@@ -107,10 +109,17 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         new LinearAbundanceFadInitializerFactory(
             "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
         );
+
     private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
         new GravityDestinationStrategyFactory(
             getInputFolder().path("action_weights.csv"),
-            getVesselsFile()
+            getVesselsFile(),
+            new AttractionFieldsSupplier(
+                new LocationValuesSupplier(
+                    getInputFolder().path("location_values.csv")
+                ),
+                getInputFolder().path("max_current_speeds.csv")
+            )
         );
 
     public EpoAbundanceScenario() {
@@ -135,10 +144,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getInputFolder().path("set_compositions.csv")
             )
         );
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
-            getInputFolder().path("location_values.csv"),
-            maxCurrentSpeedsFile
-        ));
+        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
     /**
@@ -358,6 +364,10 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @Override
     public void useDummyData() {
         super.useDummyData();
+        this.gravityDestinationStrategyFactory
+            .getAttractionFieldsSupplier()
+            .getLocationValuesSupplier()
+            .setLocationValuesFile(testFolder().path("dummy_location_values.csv"));
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
             testFolder().path("dummy_action_weights.csv")
         );

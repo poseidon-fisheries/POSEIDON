@@ -404,10 +404,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
                 .setActionWeightsFile(
                     testInputFolder.path("dummy_action_weights.csv")
                 );
-        if (getPurseSeineGearFactory() != null)
-            getPurseSeineGearFactory().setLocationValuesFile(
-                testInputFolder.path("dummy_location_values.csv")
-            );
     }
 
     public FadRefillGearStrategyFactory getGearStrategy() {

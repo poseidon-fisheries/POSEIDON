@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.tuna.*;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -33,6 +32,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -107,10 +108,17 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             "Skipjack tuna", 1.25
         )
     );
+
     private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
         new GravityDestinationStrategyFactory(
             getInputFolder().path("action_weights.csv"),
-            getVesselsFile()
+            getVesselsFile(),
+            new AttractionFieldsSupplier(
+                new LocationValuesSupplier(
+                    getInputFolder().path("location_values.csv")
+                ),
+                getInputFolder().path("max_current_speeds.csv")
+            )
         );
 
     public EpoBiomassScenario() {
@@ -130,10 +138,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
             )
         );
-        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory(
-            getInputFolder().path("location_values.csv"),
-            maxCurrentSpeedsFile
-        ));
+        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
     }
 
     public static String getBoatId(final Fisher fisher) {
@@ -312,6 +317,10 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     @Override
     public void useDummyData() {
         super.useDummyData();
+        this.gravityDestinationStrategyFactory
+            .getAttractionFieldsSupplier()
+            .getLocationValuesSupplier()
+            .setLocationValuesFile(testFolder().path("dummy_location_values.csv"));
         this.gravityDestinationStrategyFactory.setActionWeightsFile(
             testFolder().path("dummy_action_weights.csv")
         );

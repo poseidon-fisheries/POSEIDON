@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
-import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -26,16 +25,14 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
 
 public class BiomassPurseSeineGear extends PurseSeineGear<BiomassLocalBiology, BiomassFad> {
 
     public BiomassPurseSeineGear(
         final FadManager<BiomassLocalBiology, BiomassFad> fadManager,
-        final Iterable<AttractionField> attractionFields,
         final double successfulFadSetProbability
     ) {
-        super(fadManager, attractionFields, successfulFadSetProbability);
+        super(fadManager, successfulFadSetProbability);
     }
 
     @Override
@@ -55,7 +52,6 @@ public class BiomassPurseSeineGear extends PurseSeineGear<BiomassLocalBiology, B
     public Gear makeCopy() {
         return new BiomassPurseSeineGear(
             getFadManager(),
-            ImmutableSet.copyOf(getAttractionFields()),
             getSuccessfulFadSetProbability()
         );
     }

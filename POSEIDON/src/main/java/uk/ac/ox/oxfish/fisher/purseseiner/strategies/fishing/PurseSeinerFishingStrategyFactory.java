@@ -42,7 +42,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionSupplier;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -94,30 +94,30 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private double searchActionDecayConstant = 7.912472944827373;
     private double fadDeploymentActionDecayConstant = 0.7228626294613664;
     private double movingThreshold = 0.0;
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+    private Supplier<? extends DoubleUnaryOperator>
         nonAssociatedSetGeneratorFunction =
-        new LogisticFunctionFactory(15392.989688872976, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(15392.989688872976, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         dolphinSetGeneratorFunction =
-        new LogisticFunctionFactory(EPSILON, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(EPSILON, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         searchActionValueFunction =
-        new LogisticFunctionFactory(7081017.137484187, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(7081017.137484187, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         fadDeploymentActionValueFunction =
-        new LogisticFunctionFactory(7338176.765769132, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(7338176.765769132, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         fadSetActionValueFunction =
-        new LogisticFunctionFactory(EPSILON, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(EPSILON, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         opportunisticFadSetActionValueFunction =
-        new LogisticFunctionFactory(EPSILON, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(EPSILON, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         nonAssociatedSetActionValueFunction =
-        new LogisticFunctionFactory(555715.859646539, 10);
-    private AlgorithmFactory<? extends DoubleUnaryOperator>
+        new LogisticFunctionSupplier(555715.859646539, 10);
+    private Supplier<? extends DoubleUnaryOperator>
         dolphinSetActionValueFunction =
-        new LogisticFunctionFactory(1E-6, 10);
+        new LogisticFunctionSupplier(1E-6, 10);
     private InputPath maxCurrentSpeedsFile;
 
 
@@ -214,99 +214,93 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getNonAssociatedSetGeneratorFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getNonAssociatedSetGeneratorFunction() {
         return nonAssociatedSetGeneratorFunction;
     }
 
     @SuppressWarnings("unused")
     public void setNonAssociatedSetGeneratorFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> nonAssociatedSetGeneratorFunction
+        final Supplier<? extends DoubleUnaryOperator> nonAssociatedSetGeneratorFunction
     ) {
         this.nonAssociatedSetGeneratorFunction = nonAssociatedSetGeneratorFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getDolphinSetGeneratorFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getDolphinSetGeneratorFunction() {
         return dolphinSetGeneratorFunction;
     }
 
     @SuppressWarnings("unused")
     public void setDolphinSetGeneratorFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> dolphinSetGeneratorFunction
+        final Supplier<? extends DoubleUnaryOperator> dolphinSetGeneratorFunction
     ) {
         this.dolphinSetGeneratorFunction = dolphinSetGeneratorFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getSearchActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getSearchActionValueFunction() {
         return searchActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public void setSearchActionValueFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> searchActionValueFunction) {
+    public void setSearchActionValueFunction(final Supplier<? extends DoubleUnaryOperator> searchActionValueFunction) {
         this.searchActionValueFunction = searchActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getFadDeploymentActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getFadDeploymentActionValueFunction() {
         return fadDeploymentActionValueFunction;
     }
 
     @SuppressWarnings("unused")
     public void setFadDeploymentActionValueFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> fadDeploymentActionValueFunction
+        final Supplier<? extends DoubleUnaryOperator> fadDeploymentActionValueFunction
     ) {
         this.fadDeploymentActionValueFunction = fadDeploymentActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getFadSetActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getFadSetActionValueFunction() {
         return fadSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public void setFadSetActionValueFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> fadSetActionValueFunction) {
+    public void setFadSetActionValueFunction(final Supplier<? extends DoubleUnaryOperator> fadSetActionValueFunction) {
         this.fadSetActionValueFunction = fadSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getOpportunisticFadSetActionValueFunction() {
         return opportunisticFadSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
     public void setOpportunisticFadSetActionValueFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> opportunisticFadSetActionValueFunction
+        final Supplier<? extends DoubleUnaryOperator> opportunisticFadSetActionValueFunction
     ) {
         this.opportunisticFadSetActionValueFunction = opportunisticFadSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getNonAssociatedSetActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getNonAssociatedSetActionValueFunction() {
         return nonAssociatedSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
     public void setNonAssociatedSetActionValueFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> nonAssociatedSetActionValueFunction
+        final Supplier<? extends DoubleUnaryOperator> nonAssociatedSetActionValueFunction
     ) {
         this.nonAssociatedSetActionValueFunction = nonAssociatedSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getDolphinSetActionValueFunction() {
+    public Supplier<? extends DoubleUnaryOperator> getDolphinSetActionValueFunction() {
         return dolphinSetActionValueFunction;
     }
 
     @SuppressWarnings("unused")
     public void setDolphinSetActionValueFunction(
-        final AlgorithmFactory<?
-            extends DoubleUnaryOperator> dolphinSetActionValueFunction
+        final Supplier<? extends DoubleUnaryOperator> dolphinSetActionValueFunction
     ) {
         this.dolphinSetActionValueFunction = dolphinSetActionValueFunction;
     }
@@ -513,7 +507,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final SchoolSetOpportunityGenerator<B, NonAssociatedSetAction<B>>
             nonAssociatedSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
-                nonAssociatedSetGeneratorFunction.apply(fishState),
+                nonAssociatedSetGeneratorFunction.get(),
                 setCompositionWeights.get(NonAssociatedSetAction.class),
                 catchSamplersFactory.apply(fishState).get(NonAssociatedSetAction.class),
                 new NonAssociatedSetActionMaker<>(catchMaker),
@@ -530,7 +524,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final SchoolSetOpportunityGenerator<B, DolphinSetAction<B>>
             dolphinSetOpportunityGenerator =
             new SchoolSetOpportunityGenerator<>(
-                dolphinSetGeneratorFunction.apply(fishState),
+                dolphinSetGeneratorFunction.get(),
                 setCompositionWeights.get(DolphinSetAction.class),
                 catchSamplersFactory.apply(fishState).get(DolphinSetAction.class),
                 new DolphinSetActionMaker<>(catchMaker),
@@ -590,27 +584,27 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return new ImmutableMap.Builder<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>()
             .put(
                 SearchAction.class,
-                searchActionValueFunction.apply(fishState)
+                searchActionValueFunction.get()
             )
             .put(
                 FadDeploymentAction.class,
-                fadDeploymentActionValueFunction.apply(fishState)
+                fadDeploymentActionValueFunction.get()
             )
             .put(
                 NonAssociatedSetAction.class,
-                nonAssociatedSetActionValueFunction.apply(fishState)
+                nonAssociatedSetActionValueFunction.get()
             )
             .put(
                 DolphinSetAction.class,
-                dolphinSetActionValueFunction.apply(fishState)
+                dolphinSetActionValueFunction.get()
             )
             .put(
                 FadSetAction.class,
-                fadSetActionValueFunction.apply(fishState)
+                fadSetActionValueFunction.get()
             )
             .put(
                 OpportunisticFadSetAction.class,
-                opportunisticFadSetActionValueFunction.apply(fishState)
+                opportunisticFadSetActionValueFunction.get()
             )
             .build();
     }

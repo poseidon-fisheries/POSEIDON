@@ -19,18 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
-import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-import com.google.common.collect.ImmutableList;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import sim.util.Int2D;
@@ -47,6 +35,15 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
 public class PurseSeineGearTest {
 
     private PurseSeineGear purseSeineGear;
@@ -57,7 +54,6 @@ public class PurseSeineGearTest {
         when(fishState.getBiology()).thenReturn(new GlobalBiology());
         purseSeineGear = new BiomassPurseSeineGear(
             mock(FadManager.class),
-            ImmutableList.of(),
             1
         );
     }

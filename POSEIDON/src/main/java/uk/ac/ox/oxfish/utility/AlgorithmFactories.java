@@ -117,7 +117,6 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
-import uk.ac.ox.oxfish.utility.operators.DoubleUnaryOperators;
 
 /**
  * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
@@ -248,13 +247,6 @@ public class AlgorithmFactories {
                 FadPlanningFactories.CONSTRUCTORS);
         NAMES_MAP.put(DiscretizedOwnFadPlanningModule.class,
                 FadPlanningFactories.NAMES);
-
-        CONSTRUCTOR_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.CONSTRUCTORS);
-        NAMES_MAP.put(DoubleUnaryOperator.class, DoubleUnaryOperators.NAMES);
-
-
-
-
     }
 
 

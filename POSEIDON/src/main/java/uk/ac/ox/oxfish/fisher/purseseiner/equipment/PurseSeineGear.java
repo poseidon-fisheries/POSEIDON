@@ -19,12 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
-import com.google.common.collect.ImmutableSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -35,25 +29,25 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
 import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> implements Gear {
 
     private final FadManager<B, F> fadManager;
     private final double successfulFadSetProbability;
-    private final Set<AttractionField> attractionFields;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
         final FadManager<B, F> fadManager,
-        final Iterable<AttractionField> attractionFields,
         final double successfulFadSetProbability
     ) {
         this.fadManager = fadManager;
         this.successfulFadSetProbability = successfulFadSetProbability;
-        this.attractionFields = ImmutableSet.copyOf(attractionFields);
-
     }
 
     public static PurseSeineGear<?, ?> getPurseSeineGear(final Fisher fisher) {
@@ -68,10 +62,6 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
             .ofNullable(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
             .map(gear -> (PurseSeineGear<?, ?>) gear);
-    }
-
-    public Set<AttractionField> getAttractionFields() {
-        return attractionFields;
     }
 
     public double getSuccessfulFadSetProbability() {
@@ -131,7 +121,6 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
         return
             Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0
                 && Objects.equals(fadManager, that.fadManager)
-                && Objects.equals(attractionFields, that.attractionFields)
                 && Objects.equals(lastVisits, that.lastVisits);
     }
 

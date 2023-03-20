@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 public class BiomassPurseSeineGearFactory
     extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
@@ -31,18 +30,10 @@ public class BiomassPurseSeineGearFactory
     public BiomassPurseSeineGearFactory() {
     }
 
-    public BiomassPurseSeineGearFactory(
-        final InputPath locationValuesFile,
-        final InputPath maxCurrentSpeedsFile
-    ) {
-        super(locationValuesFile, maxCurrentSpeedsFile);
-    }
-
     @Override
     public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {
         return new BiomassPurseSeineGear(
             makeFadManager(fishState),
-            attractionFields(fishState)::iterator,
             getSuccessfulSetProbability().apply(fishState.getRandom())
         );
     }

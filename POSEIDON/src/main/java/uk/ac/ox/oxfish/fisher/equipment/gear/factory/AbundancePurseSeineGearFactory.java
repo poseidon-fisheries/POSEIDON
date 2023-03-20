@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 public class AbundancePurseSeineGearFactory
     extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
@@ -31,18 +30,10 @@ public class AbundancePurseSeineGearFactory
     public AbundancePurseSeineGearFactory() {
     }
 
-    public AbundancePurseSeineGearFactory(
-        final InputPath locationValuesFile,
-        final InputPath maxCurrentSpeedFile
-    ) {
-        super(locationValuesFile, maxCurrentSpeedFile);
-    }
-
     @Override
     public PurseSeineGear<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return new AbundancePurseSeineGear(
             makeFadManager(fishState),
-            attractionFields(fishState)::iterator,
             getSuccessfulSetProbability().apply(fishState.getRandom())
         );
     }

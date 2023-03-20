@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -141,16 +142,20 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
     public void start(final FishState model, final Fisher fisher) {
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
         setOpportunityDetector = setOpportunityDetectorProvider.apply(fisher);
-        attractionFields =
-            getPurseSeineGear(fisher)
-                .getAttractionFields()
-                .stream()
-                .filter(field -> field instanceof ActionAttractionField)
-                .map(field -> (ActionAttractionField) field)
-                .collect(toImmutableMap(
-                    ActionAttractionField::getActionClass,
-                    identity()
-                ));
+        attractionFields = Stream
+            .of(fisher.getDestinationStrategy())
+            .filter(destinationStrategy ->
+                destinationStrategy instanceof GravityDestinationStrategy
+            )
+            .flatMap(destinationStrategy ->
+                ((GravityDestinationStrategy) destinationStrategy).getAttractionFields().stream()
+            )
+            .filter(field -> field instanceof ActionAttractionField)
+            .map(field -> (ActionAttractionField) field)
+            .collect(toImmutableMap(
+                ActionAttractionField::getActionClass,
+                identity()
+            ));
     }
 
     @Override

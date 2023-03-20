@@ -19,25 +19,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.lang.Double.isNaN;
-import static java.util.Comparator.comparingDouble;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-
 import ec.util.MersenneTwisterFast;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Stream;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionField;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.PortAttractionField;
@@ -45,6 +31,20 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.lang.Double.isNaN;
+import static java.util.Comparator.comparingDouble;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 public class GravityDestinationStrategy implements DestinationStrategy {
 
@@ -55,17 +55,24 @@ public class GravityDestinationStrategy implements DestinationStrategy {
     private final Predicate<SeaTile> isValidDestination;
     private Map<AttractionField, Double> attractionWeights;
     private SeaTile destination = null;
-    private Set<AttractionField> attractionFields;
-    private double maxTravelTime;
+
+    private final Set<AttractionField> attractionFields;
 
     GravityDestinationStrategy(
         final AttractionWeightLoader attractionWeightLoader,
         final ToDoubleFunction<Fisher> maxTravelTimeLoader,
-        final Predicate<SeaTile> isValidDestination
+        final Predicate<SeaTile> isValidDestination,
+        final Set<AttractionField> attractionFields
     ) {
         this.attractionWeightLoader = attractionWeightLoader;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
         this.isValidDestination = isValidDestination;
+        this.attractionFields = attractionFields;
+    }
+    private double maxTravelTime;
+
+    public Set<AttractionField> getAttractionFields() {
+        return attractionFields;
     }
 
     public double getMaxTravelTime() {
@@ -136,7 +143,6 @@ public class GravityDestinationStrategy implements DestinationStrategy {
 
     @Override
     public void start(final FishState model, final Fisher fisher) {
-        attractionFields = ((PurseSeineGear<?, ?>) fisher.getGear()).getAttractionFields();
         attractionFields.forEach(field -> field.start(model, fisher));
         maxTravelTime = maxTravelTimeLoader.applyAsDouble(fisher);
         initAttractionWeights(fisher);

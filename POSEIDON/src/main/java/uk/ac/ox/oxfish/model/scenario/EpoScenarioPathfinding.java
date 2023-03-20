@@ -99,7 +99,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private EPOPlannedStrategyFlexibleFactory destinationStrategy =
         new EPOPlannedStrategyFlexibleFactory(
             new LocationValuesSupplier(
-                getInputFolder().path("location_values.csv")
+            getInputFolder().path("location_values.csv")
             ),
             new AbundanceCatchSamplersFactory(
                 getSpeciesCodesSupplier(),
@@ -115,10 +115,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
 
     public EpoScenarioPathfinding() {
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory(
-            getInputFolder().path("location_values.csv"),
-            getInputFolder().path("max_current_speeds.csv")
-        ));
+        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
     /**
@@ -187,6 +184,9 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public void useDummyData() {
         super.useDummyData();
+        getDestinationStrategy()
+            .getLocationValuesSupplier()
+            .setLocationValuesFile(testFolder().path("dummy_location_values.csv"));
         getDestinationStrategy().setActionWeightsFile(
             testFolder().path("dummy_action_weights.csv")
         );

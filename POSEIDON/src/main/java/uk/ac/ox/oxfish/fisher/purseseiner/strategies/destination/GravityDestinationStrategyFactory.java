@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -45,6 +46,22 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class GravityDestinationStrategyFactory
     implements AlgorithmFactory<GravityDestinationStrategy> {
+
+    private AttractionFieldsSupplier attractionFieldsSupplier;
+
+    public GravityDestinationStrategyFactory(
+        final InputPath actionWeightsFile,
+        final InputPath maxTripDurationFile,
+        final AttractionFieldsSupplier attractionFieldsSupplier
+    ) {
+        this.actionWeightsFile = actionWeightsFile;
+        this.maxTripDurationFile = maxTripDurationFile;
+        this.attractionFieldsSupplier = attractionFieldsSupplier;
+    }
+
+    public AttractionFieldsSupplier getAttractionFieldsSupplier() {
+        return attractionFieldsSupplier;
+    }
 
     private static final FisherValuesFromFileCache<Double> maxTripDurationCache =
         new FisherValuesFromFileCache<Double>() {
@@ -69,9 +86,8 @@ public class GravityDestinationStrategyFactory
     public GravityDestinationStrategyFactory() {
     }
 
-    public GravityDestinationStrategyFactory(final InputPath actionWeightsFile, final InputPath maxTripDurationFile) {
-        this.actionWeightsFile = actionWeightsFile;
-        this.maxTripDurationFile = maxTripDurationFile;
+    public void setAttractionFieldsSupplier(final AttractionFieldsSupplier attractionFieldsSupplier) {
+        this.attractionFieldsSupplier = attractionFieldsSupplier;
     }
 
     public static ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
@@ -109,7 +125,8 @@ public class GravityDestinationStrategyFactory
         return new GravityDestinationStrategy(
             this::loadActionWeights,
             this::loadMaxTripDuration,
-            this.isValidDestination
+            this.isValidDestination,
+            attractionFieldsSupplier.get()
         );
     }
 
