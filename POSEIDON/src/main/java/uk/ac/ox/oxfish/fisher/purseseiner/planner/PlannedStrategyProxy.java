@@ -9,8 +9,6 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -112,6 +110,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * if this is is above 0, DEL sets can fish out
      */
     private final int delSetsRangeInSeatiles;
+
+    private final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues;
+
     private final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule;
     private PlannedStrategy delegate;
 
@@ -135,7 +136,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final boolean doNotWaitToPurgeIllegalActions,
         final int noaSetsRangeInSeatiles,
         final int delSetsRangeInSeatiles,
-        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule
+        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule,
+        final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues
     ) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
@@ -154,6 +156,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
         this.fadPlanningModule = fadPlanningModule;
+        this.locationValues = locationValues;
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed >= 0);
         Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed <= 1);
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
@@ -170,21 +173,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final AbundanceCatchMaker catchMaker = new AbundanceCatchMaker(model.getBiology());
         final Class<? extends LocalBiology> localBiologyClass = AbundanceLocalBiology.class;
 
-        //grab location values
-        final PurseSeineGear<? extends LocalBiology,
-            ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>> gear =
-            ((PurseSeineGear<? extends LocalBiology,
-                ? extends AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>>) fisher.getGear());
-        final HashMap<Class<? extends LocationValues>, LocationValues> locationValues = new HashMap<>();
-        for (final AttractionField attractionField : gear.getAttractionFields()) {
-            attractionField.start(model, fisher);
-            locationValues.put(
-                attractionField.getLocationValues().getClass(),
-                attractionField.getLocationValues()
-            );
-
-        }
-
+        // Start location value fields
+        locationValues.values().forEach(lv -> lv.start(model, fisher));
 
         //(1) build planners
         final Map<Class<? extends PurseSeinerAction>, Double> fileAttractionWeights =
@@ -198,7 +188,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             if (actionWeight.getKey().equals(DolphinSetAction.class)) {
                 //add
                 final DolphinSetLocationValues locations =
-                    (DolphinSetLocationValues) locationValues.get(DolphinSetLocationValues.class);
+                    (DolphinSetLocationValues) locationValues.get(DolphinSetAction.class);
                 if (locations.getValues().size() == 0)
                     System.out.println(fisher + " failed to create DEL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
@@ -224,7 +214,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             else if (actionWeight.getKey().equals(FadDeploymentAction.class)) {
 
                 final DeploymentLocationValues locations =
-                    (DeploymentLocationValues) locationValues.get(DeploymentLocationValues.class);
+                    (DeploymentLocationValues) locationValues.get(FadDeploymentAction.class);
                 if (locations.getValues().size() == 0)
                     System.out.println(fisher + " failed to create DPL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
@@ -246,7 +236,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             else if (actionWeight.getKey().equals(NonAssociatedSetAction.class)) {
 
                 final NonAssociatedSetLocationValues locations =
-                    (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetLocationValues.class);
+                    (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetAction.class);
                 plannableActionWeights.put(
                     ActionType.NonAssociatedSets,
                     actionWeight.getValue() * nonAssociatedBias
@@ -282,7 +272,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             else if (actionWeight.getKey().equals(OpportunisticFadSetAction.class)) {
                 //add
                 final OpportunisticFadSetLocationValues locations =
-                    (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetLocationValues.class);
+                    (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetAction.class);
                 if (locations.getValues().size() == 0) {
                     System.out.println(fisher + " failed to create OFS location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());

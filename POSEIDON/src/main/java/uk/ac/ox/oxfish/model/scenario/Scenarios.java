@@ -91,7 +91,7 @@ public class Scenarios {
             EpoAbundanceScenario::new
         );
         add(
-            "FAD only Abundance",
+            "FAD only EPO Abundance",
             "A vessel-less scenario for FAD parameter calibration purposes.",
             FadsOnlyEpoAbundanceScenario::new
         );
