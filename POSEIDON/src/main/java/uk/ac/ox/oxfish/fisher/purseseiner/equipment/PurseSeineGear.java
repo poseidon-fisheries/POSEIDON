@@ -65,7 +65,7 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
 
     public static Optional<PurseSeineGear<?, ?>> maybeGetPurseSeineGear(final Fisher fisher) {
         return Optional
-            .of(fisher.getGear())
+            .ofNullable(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
             .map(gear -> (PurseSeineGear<?, ?>) gear);
     }
