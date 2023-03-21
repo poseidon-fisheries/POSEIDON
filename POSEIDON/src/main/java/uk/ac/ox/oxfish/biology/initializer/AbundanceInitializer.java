@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -46,14 +46,14 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 public class AbundanceInitializer implements BiologyInitializer {
 
     private final Map<String, List<Bin>> binsPerSpecies;
-    private final AbundanceReallocator abundanceReallocator;
+    private final Reallocator<?, AbundanceLocalBiology> abundanceReallocator;
     private final Map<String, WeightGroups> weightGroupsPerSpecies;
 
     AbundanceInitializer(
         final SpeciesCodes speciesCodes,
         final Map<String, List<Bin>> binsPerSpecies,
         final Map<String, WeightGroups> weightGroupsPerSpecies,
-        final AbundanceReallocator abundanceReallocator
+        final Reallocator<?, AbundanceLocalBiology> abundanceReallocator
     ) {
         this.binsPerSpecies = binsPerSpecies.entrySet().stream()
             .collect(toImmutableMap(
@@ -64,7 +64,8 @@ public class AbundanceInitializer implements BiologyInitializer {
         this.abundanceReallocator = abundanceReallocator;
     }
 
-    public AbundanceReallocator getAbundanceReallocator() {
+    @SuppressWarnings("unused")
+    public Reallocator<?, AbundanceLocalBiology> getAbundanceReallocator() {
         return abundanceReallocator;
     }
 

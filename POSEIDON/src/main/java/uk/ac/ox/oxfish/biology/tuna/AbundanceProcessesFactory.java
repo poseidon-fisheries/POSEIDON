@@ -2,17 +2,14 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
@@ -33,7 +30,8 @@ public class AbundanceProcessesFactory
             inputFolder,
             speciesCodesSupplier,
             new AbundanceInitializerFactory(
-                inputFolder.path("bins.csv")
+                inputFolder.path("bins.csv"),
+                speciesCodesSupplier
             ),
             new AbundanceReallocatorFactory(
                 inputFolder.path("grids.csv"),
@@ -74,6 +72,8 @@ public class AbundanceProcessesFactory
 
     @Override
     public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {
+        ((AbundanceInitializerFactory) getBiologyInitializerFactory())
+            .assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final Processes processes = super.initProcesses(nauticalMap, fishState);
         recruitmentProcessesFactory.setGlobalBiology(processes.globalBiology);
         ((ScheduledAbundanceProcessesFactory) getScheduledProcessesFactory())

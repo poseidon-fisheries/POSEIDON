@@ -26,8 +26,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
@@ -45,18 +47,22 @@ import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
+import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
+import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -81,12 +87,13 @@ import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
+import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class EpoScenario<K, B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
     public static final MapExtent DEFAULT_MAP_EXTENT =
@@ -111,6 +118,17 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         new SpeciesCodesFromFileFactory(
             inputFolder.path("species_codes.csv")
         );
+
+    private BiologicalProcessesFactory<K, B> biologicalProcessesFactory;
+
+    public BiologicalProcessesFactory<K, B> getBiologicalProcessesFactory() {
+        return biologicalProcessesFactory;
+    }
+
+    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<K, B> biologicalProcessesFactory) {
+        this.biologicalProcessesFactory = biologicalProcessesFactory;
+    }
+
     AlgorithmFactory<? extends MarketMap> marketMapFactory =
         new YearlyMarketMapFromPriceFileFactory(
             inputFolder.path("prices.csv"),
@@ -446,4 +464,26 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.additionalStartables = additionalStartables;
     }
 
+    @Override
+    public ScenarioEssentials start(final FishState fishState) {
+        System.out.println("Starting model...");
+        logCurrentTime(fishState);
+        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
+
+        final NauticalMap nauticalMap =
+            getMapInitializerFactory()
+                .apply(fishState)
+                .makeMap(fishState.random, null, fishState);
+
+        final BiologicalProcessesFactory.Processes biologicalProcesses =
+            biologicalProcessesFactory.initProcesses(nauticalMap, fishState);
+        biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
+        final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
+
+        nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
+        nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, fishState.random, globalBiology);
+        biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, fishState.random, fishState);
+
+        return new ScenarioEssentials(globalBiology, nauticalMap);
+    }
 }

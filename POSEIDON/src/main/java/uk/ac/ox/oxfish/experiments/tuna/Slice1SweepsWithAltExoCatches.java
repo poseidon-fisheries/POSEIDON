@@ -20,6 +20,8 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.model.BatchRunner;
@@ -152,7 +154,9 @@ public class Slice1SweepsWithAltExoCatches {
                 epoBiomassScenario.getPurseSeineGearFactory();
             ((BiomassPurseSeineGearFactory) gearFactory).setActionSpecificRegulations(
                 regulationFactories);
-            epoBiomassScenario.getBiomassProcessesFactory().getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
+            ((BiomassProcessesFactory) epoBiomassScenario.getBiologicalProcessesFactory())
+                .getExogenousCatchesFactory()
+                .setCatchesFile(exoCatchesPath);
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")

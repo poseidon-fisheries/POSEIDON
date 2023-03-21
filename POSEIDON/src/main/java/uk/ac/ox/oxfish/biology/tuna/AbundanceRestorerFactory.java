@@ -37,7 +37,6 @@ public class AbundanceRestorerFactory
     extends RestorerFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
 
     private Map<Integer, Integer> schedule;
-    private AbundanceReallocator abundanceReallocator;
 
     /**
      * Empty constructor for YAML instantiation
@@ -48,10 +47,6 @@ public class AbundanceRestorerFactory
 
     public AbundanceRestorerFactory(final Map<Integer, Integer> schedule) {
         this.schedule = ImmutableMap.copyOf(schedule);
-    }
-
-    public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
-        this.abundanceReallocator = abundanceReallocator;
     }
 
     @SuppressWarnings("unused")
@@ -66,9 +61,9 @@ public class AbundanceRestorerFactory
 
     @Override
     public AbundanceRestorer apply(final FishState fishState) {
-        checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator before using");
+        checkNotNull(getReallocator(), "need to call setAbundanceReallocator before using");
         return new AbundanceRestorer(
-            abundanceReallocator,
+            getReallocator(),
             new AbundanceAggregator(),
             schedule
         );

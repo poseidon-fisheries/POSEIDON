@@ -21,8 +21,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
@@ -34,11 +32,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -51,23 +47,7 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 /**
  * The biomass-based IATTC tuna simulation scenario.
  */
-public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
-
-    private BiomassProcessesFactory biomassProcessesFactory =
-        new BiomassProcessesFactory(
-            getInputFolder().path("biomass"),
-            getSpeciesCodesSupplier(),
-            TARGET_YEAR
-        );
-
-    public BiomassProcessesFactory getBiomassProcessesFactory() {
-        return biomassProcessesFactory;
-    }
-
-    public void setBiomassProcessesFactory(final BiomassProcessesFactory biomassProcessesFactory) {
-        this.biomassProcessesFactory = biomassProcessesFactory;
-    }
-
+public class EpoBiomassScenario extends EpoScenario<String, BiomassLocalBiology, BiomassFad> {
 
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory = new BiomassFadInitializerFactory(
@@ -107,6 +87,13 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
 
     public EpoBiomassScenario() {
+        setBiologicalProcessesFactory(
+            new BiomassProcessesFactory(
+                getInputFolder().path("biomass"),
+                getSpeciesCodesSupplier(),
+                TARGET_YEAR
+            )
+        );
         setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
         final InputPath maxCurrentSpeedsFile = getInputFolder().path("max_current_speeds.csv");
         setFishingStrategyFactory(
@@ -143,26 +130,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
     public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
         this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
-    }
-
-    @Override
-    public ScenarioEssentials start(final FishState model) {
-
-        System.out.println("Starting model...");
-
-        final NauticalMap nauticalMap =
-            getMapInitializerFactory().apply(model).makeMap(model.random, null, model);
-        nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
-
-        final BiologicalProcessesFactory.Processes biologicalProcesses =
-            biomassProcessesFactory.initProcesses(nauticalMap, model);
-        biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
-        final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
-
-        nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, model.random, globalBiology);
-        biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, model.random, model);
-
-        return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
     @Override

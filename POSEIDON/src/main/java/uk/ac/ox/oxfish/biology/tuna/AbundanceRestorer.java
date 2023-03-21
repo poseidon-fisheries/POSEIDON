@@ -30,7 +30,7 @@ public class AbundanceRestorer
     extends Restorer<Entry<String, SizeGroup>, AbundanceLocalBiology> {
 
     AbundanceRestorer(
-        final AbundanceReallocator reallocator,
+        final Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology> reallocator,
         final AbundanceAggregator aggregator,
         final Map<Integer, Integer> schedule
     ) {

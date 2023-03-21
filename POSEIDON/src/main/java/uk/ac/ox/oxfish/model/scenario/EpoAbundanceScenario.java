@@ -18,11 +18,9 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
@@ -35,12 +33,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
-import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -49,16 +43,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
+import java.util.Map.Entry;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
-
-    AbundanceProcessesFactory abundanceProcessesFactory =
-        new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier());
+public class EpoAbundanceScenario extends EpoScenario<Entry<String, SizeGroup>, AbundanceLocalBiology, AbundanceFad> {
 
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =
@@ -79,6 +69,9 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
 
     public EpoAbundanceScenario() {
+        setBiologicalProcessesFactory(
+            new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
+        );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         final InputPath maxCurrentSpeedsFile = getInputFolder().path("max_current_speeds.csv");
         setFishingStrategyFactory(
@@ -139,31 +132,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
 
     public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
         this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
-    }
-
-    @Override
-    public ScenarioEssentials start(final FishState fishState) {
-        logCurrentTime(fishState);
-        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
-
-        final MersenneTwisterFast rng = fishState.getRandom();
-
-        final NauticalMap nauticalMap =
-            getMapInitializerFactory()
-                .apply(fishState)
-                .makeMap(fishState.random, null, fishState);
-
-        final BiologicalProcessesFactory.Processes biologicalProcesses =
-            abundanceProcessesFactory.initProcesses(nauticalMap, fishState);
-        biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
-
-        final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
-
-        nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
-        nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, rng, globalBiology);
-        biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, rng, fishState);
-
-        return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
 import uk.ac.ox.oxfish.biology.tuna.BiologyInitializerFactory;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
@@ -51,7 +50,14 @@ public class AbundanceInitializerFactory
 
     private InputPath binsFile;
 
-    private AbundanceReallocator abundanceReallocator;
+    public AbundanceInitializerFactory(
+        final InputPath binsFile,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
+    ) {
+        this.binsFile = binsFile;
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private Map<String, WeightGroups> weightGroupsPerSpecies;
 
@@ -63,11 +69,8 @@ public class AbundanceInitializerFactory
 
     }
 
-
-    public AbundanceInitializerFactory(
-        final InputPath binsFile
-    ) {
-        this.binsFile = binsFile;
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
@@ -101,7 +104,7 @@ public class AbundanceInitializerFactory
      * This is named `assign` instead of `set` to avoid confusing the GUI and having it try to build
      * a widget for a map it cannot build one for.
      */
-    public void assignWeightGroupsPerSpecies(Map<String, WeightGroups> weightGroupsPerSpecies) {
+    public void assignWeightGroupsPerSpecies(final Map<String, WeightGroups> weightGroupsPerSpecies) {
         this.weightGroupsPerSpecies = weightGroupsPerSpecies;
     }
 
@@ -121,18 +124,14 @@ public class AbundanceInitializerFactory
 
     @Override
     public AbundanceInitializer apply(final FishState fishState) {
-        checkNotNull(abundanceReallocator, "need to call setAbundanceReallocator() before using");
+        checkNotNull(getReallocator(), "need to call setAbundanceReallocator() before using");
         checkNotNull(weightGroupsPerSpecies, "need to call setWeightGroupsPerSpecies() before using");
         return new AbundanceInitializer(
             speciesCodesSupplier.get(),
             binsCache.apply(this.binsFile.get()),
             weightGroupsPerSpecies,
-            abundanceReallocator
+            getReallocator()
         );
-    }
-
-    public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
-        this.abundanceReallocator = abundanceReallocator;
     }
 
 }

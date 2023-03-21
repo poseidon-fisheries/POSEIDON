@@ -51,7 +51,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class BiomassInitializerFactory
     extends BiologyInitializerFactory<String, BiomassLocalBiology> {
 
-    private BiomassReallocator biomassReallocator;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath schaeferParamsFile;
 
@@ -86,23 +85,14 @@ public class BiomassInitializerFactory
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
-    @SuppressWarnings("unused")
-    public BiomassReallocator getBiomassReallocator() {
-        return biomassReallocator;
-    }
-
-    public void setBiomassReallocator(final BiomassReallocator biomassReallocator) {
-        this.biomassReallocator = biomassReallocator;
-    }
-
     @Override
     public BiomassInitializer apply(final FishState fishState) {
         checkNotNull(
-            biomassReallocator,
-            "setBiomassReallocator must be called before using."
+            getReallocator(),
+            "setReallocator must be called before using."
         );
         final Map<String, GridAllocator> initialAllocators =
-            biomassReallocator
+            getReallocator()
                 .getAllocationGrids()
                 .getGrids()
                 .get(0)
