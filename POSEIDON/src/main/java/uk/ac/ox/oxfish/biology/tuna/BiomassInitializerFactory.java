@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.NoMovement;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerInitializer;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -49,7 +49,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
  * A factory for a {@link BiomassInitializer} that reads the Schaefer parameters from a CSV file.
  */
 public class BiomassInitializerFactory
-    implements AlgorithmFactory<BiomassInitializer> {
+    extends BiologyInitializerFactory<String, BiomassLocalBiology> {
 
     private BiomassReallocator biomassReallocator;
     private Supplier<SpeciesCodes> speciesCodesSupplier;

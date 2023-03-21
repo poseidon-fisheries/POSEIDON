@@ -5,16 +5,13 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassLocalBiology> {
-    private BiomassReallocatorFactory biomassReallocatorFactory;
+public class BiomassProcessesFactory extends BiologicalProcessesFactory<String, BiomassLocalBiology> {
     private BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory;
-    private BiomassInitializerFactory biomassInitializerFactory;
-    private BiomassRestorerFactory biomassRestorerFactory;
-    private ScheduledBiomassProcessesFactory scheduledBiomassProcessesFactory;
-    private int targetYear;
 
     @SuppressWarnings("unused")
     public BiomassProcessesFactory() {
@@ -26,13 +23,21 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
         final SpeciesCodesFromFileFactory speciesCodesSupplier,
         final int targetYear
     ) {
-        super(inputFolder, speciesCodesSupplier);
-        this.biomassReallocatorFactory =
+        super(
+            inputFolder,
+            speciesCodesSupplier,
+            new BiomassInitializerFactory(
+                speciesCodesSupplier,
+                inputFolder.path("schaefer_params.csv")
+            ),
             new BiomassReallocatorFactory(
                 inputFolder.path("biomass_distributions.csv"),
                 365,
                 speciesCodesSupplier
-            );
+            ),
+            new BiomassRestorerFactory(),
+            new ScheduledBiomassProcessesFactory()
+        );
         this.exogenousCatchesFactory =
             new BiomassDrivenTimeSeriesExogenousCatchesFactory(
                 speciesCodesSupplier,
@@ -40,13 +45,6 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
                 targetYear,
                 true
             );
-        this.biomassInitializerFactory =
-            new BiomassInitializerFactory(
-                speciesCodesSupplier,
-                inputFolder.path("schaefer_params.csv")
-            );
-        this.biomassRestorerFactory = new BiomassRestorerFactory();
-        this.scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
     }
 
     /**
@@ -55,72 +53,28 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
      * @param fishState   The model.
      * @return The biology initializer and a list of startables.
      */
-    public Processes init(
+    @Override
+    public Processes initProcesses(
         final NauticalMap nauticalMap,
         final FishState fishState
     ) {
-        biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(fishState);
-        scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);
-
-        biomassRestorerFactory.setBiomassReallocator(biomassReallocator);
-        biomassInitializerFactory.setBiomassReallocator(biomassReallocator);
-
+        final Processes processes = super.initProcesses(nauticalMap, fishState);
         return new Processes(
-            biomassInitializerFactory.apply(fishState),
-            ImmutableList.of(
-                scheduledBiomassProcessesFactory,
-                biomassRestorerFactory,
-                exogenousCatchesFactory
-            )
+            processes.biologyInitializer,
+            processes.globalBiology,
+            ImmutableList.<AlgorithmFactory<? extends Startable>>builder()
+                .addAll(processes.startableFactories)
+                .add(exogenousCatchesFactory)
+                .build()
         );
-    }
-
-    public BiomassInitializerFactory getBiomassInitializerFactory() {
-        return biomassInitializerFactory;
-    }
-
-    public void setBiomassInitializerFactory(final BiomassInitializerFactory biomassInitializerFactory) {
-        this.biomassInitializerFactory = biomassInitializerFactory;
-    }
-
-    public BiomassRestorerFactory getBiomassRestorerFactory() {
-        return biomassRestorerFactory;
-    }
-
-    public void setBiomassRestorerFactory(final BiomassRestorerFactory biomassRestorerFactory) {
-        this.biomassRestorerFactory = biomassRestorerFactory;
-    }
-
-    public ScheduledBiomassProcessesFactory getScheduledBiomassProcessesFactory() {
-        return scheduledBiomassProcessesFactory;
-    }
-
-    public void setScheduledBiomassProcessesFactory(final ScheduledBiomassProcessesFactory scheduledBiomassProcessesFactory) {
-        this.scheduledBiomassProcessesFactory = scheduledBiomassProcessesFactory;
     }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
         return exogenousCatchesFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setExogenousCatchesFactory(final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory) {
         this.exogenousCatchesFactory = exogenousCatchesFactory;
-    }
-
-    public BiomassReallocatorFactory getBiomassReallocatorFactory() {
-        return biomassReallocatorFactory;
-    }
-
-    public void setBiomassReallocatorFactory(final BiomassReallocatorFactory biomassReallocatorFactory) {
-        this.biomassReallocatorFactory = biomassReallocatorFactory;
-    }
-
-    public int getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(final int targetYear) {
-        this.targetYear = targetYear;
     }
 }

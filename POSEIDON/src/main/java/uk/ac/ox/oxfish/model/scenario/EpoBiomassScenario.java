@@ -35,7 +35,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupp
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -156,9 +155,9 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
 
         final BiologicalProcessesFactory.Processes biologicalProcesses =
-            biomassProcessesFactory.init(nauticalMap, model);
+            biomassProcessesFactory.initProcesses(nauticalMap, model);
         biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
-        final GlobalBiology globalBiology = biologicalProcesses.biologyInitializer.generateGlobal(model.random, model);
+        final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
 
         nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, model.random, globalBiology);
         biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, model.random, model);

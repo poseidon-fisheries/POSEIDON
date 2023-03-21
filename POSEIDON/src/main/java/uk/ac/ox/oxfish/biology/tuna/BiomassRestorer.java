@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 class BiomassRestorer extends Restorer<String, BiomassLocalBiology> {
 
     BiomassRestorer(
-        final BiomassReallocator reallocator,
+        final Reallocator<String, BiomassLocalBiology> reallocator,
         final Aggregator<BiomassLocalBiology> aggregator,
         final Map<Integer, Integer> schedule
     ) {

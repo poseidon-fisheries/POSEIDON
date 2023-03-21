@@ -47,10 +47,9 @@ import static java.time.temporal.ChronoUnit.DAYS;
  * scheduling a chain of processes that handle mortality, aging, recruitment and reallocation.
  */
 public class ScheduledAbundanceProcessesFactory
-    implements AlgorithmFactory<ScheduledBiologicalProcesses<AbundanceLocalBiology>> {
+    extends ScheduledBiologicalProcessesFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
 
     private List<String> biologicalProcessesDates;
-    private AbundanceReallocator abundanceReallocator;
     private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
 
     private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory;
@@ -109,19 +108,15 @@ public class ScheduledAbundanceProcessesFactory
         this.biologicalProcessesDates = biologicalProcessesDates;
     }
 
-    public void setAbundanceReallocator(final AbundanceReallocator abundanceReallocator) {
-        this.abundanceReallocator = abundanceReallocator;
-    }
-
     @Override
     public ScheduledBiologicalProcesses<AbundanceLocalBiology> apply(final FishState fishState) {
         checkNotNull(
-            abundanceReallocator,
-            "setAbundanceReallocator must be called before using."
+            getReallocator(),
+            "setReallocator must be called before using."
         );
 
         return new ScheduledBiologicalProcesses<>(
-            abundanceReallocator.getAllocationGrids().getStepMapper(),
+            getReallocator().getAllocationGrids().getStepMapper(),
             buildSchedule(fishState)
         );
     }
@@ -137,7 +132,7 @@ public class ScheduledAbundanceProcessesFactory
                 .collect(toImmutableSet());
 
         final AllocationGrids<Entry<String, SizeGroup>> grids =
-            abundanceReallocator.getAllocationGrids();
+            getReallocator().getAllocationGrids();
         checkState(
             grids.getGrids().keySet().containsAll(processSteps),
             "Biological processes should only be scheduled at steps where we have a grid."
@@ -155,13 +150,13 @@ public class ScheduledAbundanceProcessesFactory
                 new AbundanceAggregatorProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),
                 new FadAbundanceExcluderProcess(),
-                abundanceReallocator
+                getReallocator()
             );
 
         final List<BiologicalProcess<AbundanceLocalBiology>> reallocationProcesses =
             ImmutableList.of(
                 new AbundanceExtractorProcess(false, true),
-                abundanceReallocator
+                getReallocator()
             );
 
         grids.getGrids().keySet().forEach(step ->

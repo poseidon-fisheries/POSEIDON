@@ -20,13 +20,15 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceReallocator;
+import uk.ac.ox.oxfish.biology.tuna.BiologyInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -42,7 +44,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class AbundanceInitializerFactory
-    implements AlgorithmFactory<AbundanceInitializer> {
+    extends BiologyInitializerFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
 
     private final CacheByFile<Map<String, List<Bin>>> binsCache =
         new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);

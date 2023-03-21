@@ -18,30 +18,17 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+public class BiomassRestorerFactory extends RestorerFactory<String, BiomassLocalBiology> {
 
-/**
- * A factory for a {@link BiomassRestorer}. The {@link BiomassReallocator} to use must be provided
- * by calling {@link #setBiomassReallocator(BiomassReallocator)}.
- */
-public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer> {
-
-    private BiomassReallocator biomassReallocator;
     private ImmutableMap<Integer, Integer> schedule = ImmutableMap.of(0, 364);
-
-    @SuppressWarnings("unused")
-    public BiomassReallocator getBiomassReallocator() {
-        return biomassReallocator;
-    }
-
-    public void setBiomassReallocator(final BiomassReallocator biomassReallocator) {
-        this.biomassReallocator = biomassReallocator;
-    }
 
     @SuppressWarnings("unused")
     public Map<Integer, Integer> getSchedule() {
@@ -58,11 +45,11 @@ public class BiomassRestorerFactory implements AlgorithmFactory<BiomassRestorer>
         final FishState fishState
     ) {
         checkNotNull(
-            biomassReallocator,
-            "setBiomassReallocator must be called before using."
+            getReallocator(),
+            "setReallocator must be called before using."
         );
         return new BiomassRestorer(
-            biomassReallocator,
+            getReallocator(),
             new BiomassAggregator(),
             schedule
         );

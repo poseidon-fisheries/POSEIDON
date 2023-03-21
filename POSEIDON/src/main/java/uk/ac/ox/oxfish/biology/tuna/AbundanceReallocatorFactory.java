@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
@@ -41,7 +42,8 @@ import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Siz
  * between "small" and "large" is and let the factory build the relevant function. Note that this is very tuna specific.
  * We'd need to make this class a bit more general if it was to be used with different groupings or meristics classes.
  */
-public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceReallocator> {
+public class AbundanceReallocatorFactory
+    extends ReallocatorFactory<AbundanceLocalBiology, Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology>> {
 
     /**
      * Empty constructor needed for YAML.

@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -35,17 +36,14 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * here.
  */
 public class ScheduledBiomassProcessesFactory
-    implements AlgorithmFactory<ScheduledBiologicalProcesses<BiomassLocalBiology>> {
-
-    private BiomassReallocator biomassReallocator;
-
+    extends ScheduledBiologicalProcessesFactory<String, BiomassLocalBiology> {
 
     @Override
     public ScheduledBiologicalProcesses<BiomassLocalBiology> apply(final FishState fishState) {
 
         checkNotNull(
-            biomassReallocator,
-            "setBiomassReallocator must be called before using."
+            getReallocator(),
+            "setReallocator must be called before using."
         );
 
         // The biomass scheduled processes are pretty straightforward:
@@ -54,11 +52,11 @@ public class ScheduledBiomassProcessesFactory
         final Collection<BiologicalProcess<BiomassLocalBiology>> biologicalProcesses =
             ImmutableList.of(
                 new BiomassExtractor(false, true),
-                getBiomassReallocator()
+                getReallocator()
             );
 
         final AllocationGrids<String> grids =
-            getBiomassReallocator().getAllocationGrids();
+            getReallocator().getAllocationGrids();
 
         final Map<Integer, Collection<BiologicalProcess<BiomassLocalBiology>>> schedule =
             grids.getGrids()
@@ -72,11 +70,4 @@ public class ScheduledBiomassProcessesFactory
         );
     }
 
-    private BiomassReallocator getBiomassReallocator() {
-        return biomassReallocator;
-    }
-
-    public void setBiomassReallocator(final BiomassReallocator biomassReallocator) {
-        this.biomassReallocator = biomassReallocator;
-    }
 }
