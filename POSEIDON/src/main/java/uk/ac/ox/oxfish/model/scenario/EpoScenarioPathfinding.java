@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -23,7 +22,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.LocalizedActionCounter;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
@@ -37,9 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
-
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -99,7 +96,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private EPOPlannedStrategyFlexibleFactory destinationStrategy =
         new EPOPlannedStrategyFlexibleFactory(
             new LocationValuesSupplier(
-            getInputFolder().path("location_values.csv")
+                getInputFolder().path("location_values.csv")
             ),
             new AbundanceCatchSamplersFactory(
                 getSpeciesCodesSupplier(),
@@ -280,48 +277,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         super.setFishingStrategyFactory(fishingStrategyFactory);
-        final LocalizedActionCounter calzone1 = new LocalizedActionCounter(
-            abstractFadSetAction -> {
-                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                return coordinates.x <= -140;
-            },
-            "calzone1"
-        );
-        getPurseSeineGearFactory().getFadSetObservers().add(calzone1);
-        final LocalizedActionCounter calzone2 = new LocalizedActionCounter(
-            abstractFadSetAction -> {
-                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                return coordinates.x <= -90 & coordinates.x >= -130 & coordinates.y > 0;
-            },
-            "calzone2"
-        );
-        getPurseSeineGearFactory().getFadSetObservers().add(calzone2);
-
-        //filter(lon_n>-140 & lon_n<=-110 & lat_n< 0)
-        final LocalizedActionCounter thegap = new LocalizedActionCounter(
-            abstractFadSetAction -> {
-                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                return coordinates.x <= -110 & coordinates.x > -140 & coordinates.y < 0;
-            },
-            "thegap"
-        );
-        getPurseSeineGearFactory().getFadSetObservers().add(thegap);
-        //filter(lon_n>= -90 & lat_n <= -10)
-        final LocalizedActionCounter calzone3 = new LocalizedActionCounter(
-            abstractFadSetAction -> {
-                final Coordinate coordinates = fishState.getMap().getCoordinates(abstractFadSetAction.getLocation());
-                return coordinates.x >= -90 & coordinates.y <= -10;
-            },
-            "calzone3"
-        );
-        getPurseSeineGearFactory().getFadSetObservers().add(calzone3);
-
-
-        fishState.registerStartable(calzone1);
-        fishState.registerStartable(calzone2);
-        fishState.registerStartable(calzone3);
-        fishState.registerStartable(thegap);
-
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
         if (fadInitializerFactory instanceof AbstractAbundanceFadInitializerFactory)
