@@ -24,8 +24,6 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
-import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
-import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
@@ -44,8 +42,6 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -72,10 +68,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public void setBiomassProcessesFactory(final BiomassProcessesFactory biomassProcessesFactory) {
         this.biomassProcessesFactory = biomassProcessesFactory;
     }
-
-    private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
-        new ConstantWeatherFactory();
-    private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
 
 
     private AlgorithmFactory<? extends FadInitializer>
@@ -154,26 +146,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
     }
 
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
-        return weatherInitializer;
-    }
-
-    @SuppressWarnings("unused")
-    public void setWeatherInitializer(
-        final AlgorithmFactory<? extends WeatherInitializer> weatherInitializer
-    ) {
-        this.weatherInitializer = weatherInitializer;
-    }
-
-    public DoubleParameter getGasPricePerLiter() {
-        return gasPricePerLiter;
-    }
-
-    public void setGasPricePerLiter(final DoubleParameter gasPricePerLiter) {
-        this.gasPricePerLiter = gasPricePerLiter;
-    }
-
     @Override
     public ScenarioEssentials start(final FishState model) {
 
@@ -188,15 +160,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
         final GlobalBiology globalBiology = biologicalProcesses.biologyInitializer.generateGlobal(model.random, model);
 
-        //this next static method calls biology.initialize, weather.initialize and the like
-        NauticalMapFactory.initializeMap(
-            nauticalMap,
-            model.random,
-            biologicalProcesses.biologyInitializer,
-            this.weatherInitializer.apply(model),
-            globalBiology,
-            model
-        );
+        nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, model.random, globalBiology);
+        biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, model.random, model);
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
