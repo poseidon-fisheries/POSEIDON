@@ -52,7 +52,7 @@ public class FadAwareLogisticGrowerTest {
                 TARGET_YEAR
             )
         );
-        scenario.getExogenousCatchesFactory()
+        scenario.getBiomassProcessesFactory().getExogenousCatchesFactory()
             .setCatchesFile(
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );

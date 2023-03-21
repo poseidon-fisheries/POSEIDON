@@ -22,7 +22,8 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.tuna.*;
+import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -42,8 +43,6 @@ import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
-import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -59,31 +58,26 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
  */
 public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
-    private final BiomassReallocatorFactory biomassReallocatorFactory =
-        new BiomassReallocatorFactory(
-            getInputFolder().path("biomass", "biomass_distributions.csv"),
-            365
-        );
-    private boolean fadMortalityIncludedInExogenousCatches = true;
-    private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
-        new BiomassDrivenTimeSeriesExogenousCatchesFactory(
+    private BiomassProcessesFactory biomassProcessesFactory =
+        new BiomassProcessesFactory(
+            getInputFolder().path("biomass"),
             getSpeciesCodesSupplier(),
-            getInputFolder().path("biomass", "exogenous_catches.csv"),
-            TARGET_YEAR,
-            fadMortalityIncludedInExogenousCatches
+            TARGET_YEAR
         );
+
+    public BiomassProcessesFactory getBiomassProcessesFactory() {
+        return biomassProcessesFactory;
+    }
+
+    public void setBiomassProcessesFactory(final BiomassProcessesFactory biomassProcessesFactory) {
+        this.biomassProcessesFactory = biomassProcessesFactory;
+    }
 
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    private BiomassInitializerFactory biomassInitializerFactory =
-        new BiomassInitializerFactory(
-            speciesCodesSupplier,
-            getInputFolder().path("biomass", "schaefer_params.csv")
-        );
-    private BiomassRestorerFactory biomassRestorerFactory = new BiomassRestorerFactory();
-    private ScheduledBiomassProcessesFactory
-        scheduledBiomassProcessesFactory = new ScheduledBiomassProcessesFactory();
+
+
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory = new BiomassFadInitializerFactory(
         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
@@ -161,30 +155,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     }
 
     @SuppressWarnings("unused")
-    public BiomassRestorerFactory getMultiSpeciesBiomassRestorerFactory() {
-        return biomassRestorerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMultiSpeciesBiomassRestorerFactory(final BiomassRestorerFactory biomassRestorerFactory) {
-        this.biomassRestorerFactory = biomassRestorerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public ScheduledBiomassProcessesFactory getBiomassReallocatorFactory() {
-        return scheduledBiomassProcessesFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setBiomassReallocatorFactory(final ScheduledBiomassProcessesFactory scheduledBiomassProcessesFactory) {
-        this.scheduledBiomassProcessesFactory = scheduledBiomassProcessesFactory;
-    }
-
-    public BiomassDrivenTimeSeriesExogenousCatchesFactory getExogenousCatchesFactory() {
-        return exogenousCatchesFactory;
-    }
-
-    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
         return weatherInitializer;
     }
@@ -211,54 +181,24 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
         final NauticalMap nauticalMap =
             getMapInitializerFactory().apply(model).makeMap(model.random, null, model);
-
-        biomassReallocatorFactory.setSpeciesCodesSupplier(speciesCodesSupplier);
-        biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
-        final BiomassReallocator biomassReallocator = biomassReallocatorFactory.apply(model);
-        scheduledBiomassProcessesFactory.setBiomassReallocator(biomassReallocator);
-
-        getAdditionalStartables().add(scheduledBiomassProcessesFactory);
-
-        biomassRestorerFactory.setBiomassReallocator(biomassReallocator);
-        getAdditionalStartables().add(biomassRestorerFactory);
-
-        biomassInitializerFactory.setBiomassReallocator(biomassReallocator);
-
-        final BiomassInitializer biologyInitializer = biomassInitializerFactory.apply(model);
-        final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
+
+        final BiologicalProcessesFactory.Processes biologicalProcesses =
+            biomassProcessesFactory.init(nauticalMap, model);
+        biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
+        final GlobalBiology globalBiology = biologicalProcesses.biologyInitializer.generateGlobal(model.random, model);
 
         //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(
             nauticalMap,
             model.random,
-            biologyInitializer,
+            biologicalProcesses.biologyInitializer,
             this.weatherInitializer.apply(model),
             globalBiology,
             model
         );
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
-    }
-
-    @SuppressWarnings("unused")
-    public boolean isFadMortalityIncludedInExogenousCatches() {
-        return fadMortalityIncludedInExogenousCatches;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadMortalityIncludedInExogenousCatches(final boolean fadMortalityIncludedInExogenousCatches) {
-        this.fadMortalityIncludedInExogenousCatches = fadMortalityIncludedInExogenousCatches;
-    }
-
-    @SuppressWarnings("unused")
-    public BiomassInitializerFactory getBiomassInitializerFactory() {
-        return biomassInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setBiomassInitializerFactory(final BiomassInitializerFactory biomassInitializerFactory) {
-        this.biomassInitializerFactory = biomassInitializerFactory;
     }
 
     @Override
@@ -290,9 +230,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                 fisherFactory,
                 buildPorts(fishState)
             ).apply(fishState);
-
-        final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(fishState);
-        fishState.registerStartable(exogenousCatches);
 
         plugins.forEach(plugin -> fishState.registerStartable(plugin.apply(fishState)));
 

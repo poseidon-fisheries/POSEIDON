@@ -36,18 +36,20 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
     /**
      * Empty constructor to make instantiable from YAML.
      */
-    ReallocatorFactory() {
+    public ReallocatorFactory() {
     }
 
-    ReallocatorFactory(
+    public ReallocatorFactory(
         final InputPath biomassDistributionsFile,
-        final Integer period
+        final Integer period,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
     ) {
         this.biomassDistributionsFile = biomassDistributionsFile;
         this.period = period;
+        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
-    Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
     }
 
@@ -55,7 +57,7 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
-    Integer getPeriod() {
+    public Integer getPeriod() {
         return period;
     }
 
@@ -64,7 +66,7 @@ abstract class ReallocatorFactory<T extends Reallocator<?, ?>>
         this.period = period;
     }
 
-    MapExtent getMapExtent() {
+    public MapExtent getMapExtent() {
         return mapExtent;
     }
 

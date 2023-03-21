@@ -152,7 +152,7 @@ public class Slice1SweepsWithAltExoCatches {
                 epoBiomassScenario.getPurseSeineGearFactory();
             ((BiomassPurseSeineGearFactory) gearFactory).setActionSpecificRegulations(
                 regulationFactories);
-            epoBiomassScenario.getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
+            epoBiomassScenario.getBiomassProcessesFactory().getExogenousCatchesFactory().setCatchesFile(exoCatchesPath);
         });
         batchRunner.setColumnModifier((writer, model, year) ->
             writer.append(policyName).append(",")

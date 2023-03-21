@@ -41,10 +41,7 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
 
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
             inputFolder.path("biomass", "biomass_distributions.csv"),
-            365
-        );
-
-        biomassReallocatorFactory.setSpeciesCodesSupplier(
+            365,
             new SpeciesCodesFromFileFactory(
                 inputFolder.path("species_codes.csv")
             )

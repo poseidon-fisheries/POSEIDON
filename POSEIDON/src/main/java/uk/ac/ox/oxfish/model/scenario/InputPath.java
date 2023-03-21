@@ -53,4 +53,9 @@ public class InputPath implements Supplier<Path> {
     public Path get() {
         return parent == null ? path : parent.get().resolve(path);
     }
+
+    @Override
+    public String toString() {
+        return get().toString();
+    }
 }

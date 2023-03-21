@@ -56,6 +56,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -68,7 +69,6 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.quantity.Mass;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -145,8 +145,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
                 "region_tags.csv"
             )
         );
-    private List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables =
-        new LinkedList<>();
+    private List<AlgorithmFactory<? extends Startable>> additionalStartables = new LinkedList<>();
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             getInputFolder().path("depth.csv"),
@@ -438,12 +437,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @SuppressWarnings("unused")
-    public List<AlgorithmFactory<? extends AdditionalStartable>> getAdditionalStartables() {
+    public List<AlgorithmFactory<? extends Startable>> getAdditionalStartables() {
         return additionalStartables;
     }
 
     @SuppressWarnings("unused")
-    public void setAdditionalStartables(final List<AlgorithmFactory<? extends AdditionalStartable>> additionalStartables) {
+    public void setAdditionalStartables(final List<AlgorithmFactory<? extends Startable>> additionalStartables) {
         this.additionalStartables = additionalStartables;
     }
 

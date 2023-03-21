@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
@@ -50,9 +52,10 @@ public class AbundanceReallocatorFactory extends ReallocatorFactory<AbundanceRea
 
     public AbundanceReallocatorFactory(
         final InputPath biomassDistributionsFilePath,
-        final int period
+        final int period,
+        final Supplier<SpeciesCodes> speciesCodesSupplier
     ) {
-        super(biomassDistributionsFilePath, period);
+        super(biomassDistributionsFilePath, period, speciesCodesSupplier);
     }
 
     @Override

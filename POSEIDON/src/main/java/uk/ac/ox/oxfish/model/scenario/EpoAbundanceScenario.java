@@ -82,7 +82,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     private AlgorithmFactory<? extends AbundanceReallocator> abundanceReallocatorFactory =
         new AbundanceReallocatorFactory(
             getInputFolder().path("abundance", "grids.csv"),
-            365
+            365,
+            getSpeciesCodesSupplier()
         );
 
     private WeightGroupsFactory weightGroupsFactory = new WeightGroupsFactory(
