@@ -62,16 +62,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
-    /**
-     * Just runs the scenario for a year.
-     */
-    public static void main(final String[] args) {
-        final Path scenarioPath = Paths.get(
-            System.getProperty("user.home"),
-            "tmp", "calibrated_scenario.yaml"
-        );
-        new Runner<>(EpoScenarioPathfinding.class, scenarioPath).run(1, 1);
-    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {

@@ -96,36 +96,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
-    /**
-     * Just runs the scenario for a year.
-     */
-    public static void main(final String[] args) {
-        final FishState fishState = new FishState();
-        final Scenario scenario = new EpoAbundanceScenario();
-
-        try {
-            final File scenarioFile =
-                Paths.get(
-                    System.getProperty("user.home"),
-                    "workspace", "tuna", "calibration", "results",
-                    "cenv0729", "2022-06-01_18.14.02_global_calibration",
-                    "calibrated_scenario.yaml"
-                ).toFile();
-
-            //addCsvLogger(Level.DEBUG, "potential_actions", "action,initial,modulated,weighted");
-            new FishYAML().dump(scenario, new FileWriter(scenarioFile));
-            fishState.setScenario(scenario);
-            fishState.start();
-            while (fishState.getStep() < 365) {
-                System.out.println("Step: " + fishState.getStep());
-                fishState.schedule.step(fishState);
-            }
-            System.out.println("Done.");
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
         return gravityDestinationStrategyFactory;
     }
