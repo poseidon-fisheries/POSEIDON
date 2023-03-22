@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.jetbrains.annotations.NotNull;
@@ -328,9 +329,11 @@ public class ExogenousFadSetterFromDataTest {
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
         fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy2.csv"));
         //they will all be empty!
-        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put(
-            "Species 0",
-            new FixedDoubleParameter(0)
+        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
+            ImmutableMap.of(
+                "Species 0",
+                new FixedDoubleParameter(0)
+            )
         );
         scenario.getPlugins().add(fadDemo);
 

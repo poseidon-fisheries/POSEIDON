@@ -18,39 +18,21 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
-import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer;
-import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.*;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
+import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.*;
-import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -75,13 +57,14 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             getInputFolder().path("abundance", "selectivity.csv"),
             getSpeciesCodesSupplier()
         );
-    private AlgorithmFactory<? extends FadInitializer>
-        fadInitializerFactory =
-        new AbundanceFadInitializerFactory(
-            "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-        );
 
     public FadsOnlyEpoAbundanceScenario() {
+        setFadInitializerFactory(
+            new AbundanceFadInitializerFactory(
+                getSpeciesCodesSupplier(),
+                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+            )
+        );
         setBiologicalProcessesFactory(
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
@@ -118,30 +101,15 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             abundanceFilters =
             abundanceFiltersFactory.apply(fishState);
 
-        if (fadInitializerFactory instanceof AbundanceFadInitializerFactory) {
-            ((FadInitializerFactory<AbundanceLocalBiology, AbundanceFad>) fadInitializerFactory)
-                .setSpeciesCodesSupplier(getSpeciesCodesSupplier());
-        }
-        ((PluggableSelectivity) fadInitializerFactory).setSelectivityFilters(abundanceFilters.get(
+        ((PluggableSelectivity) getFadInitializerFactory()).setSelectivityFilters(abundanceFilters.get(
             FadSetAction.class));
-        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(fadInitializerFactory);
+        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(getFadInitializerFactory());
 
         fishState.registerStartable(fadMakerFactory.apply(fishState));
         if (fadSettingActive)
             fishState.registerStartable(fadSetterFactory.apply(fishState));
 
         return scenarioPopulation;
-    }
-
-    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializerFactory(
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
     }
 
     @Override

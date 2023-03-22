@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
@@ -14,6 +15,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,8 +30,11 @@ public abstract class AbstractAbundanceFadInitializerFactory
     public AbstractAbundanceFadInitializerFactory() {
     }
 
-    public AbstractAbundanceFadInitializerFactory(final String... speciesNames) {
-        super(speciesNames);
+    public AbstractAbundanceFadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
+        super(speciesCodesSupplier, speciesNames);
     }
 
     @Override

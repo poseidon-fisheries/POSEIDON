@@ -49,31 +49,40 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
     private Supplier<SpeciesCodes> speciesCodesSupplier;
 
-    FadInitializerFactory(final String... speciesNames) {
 
-        final Supplier<Map<String, DoubleParameter>> zeros = () ->
-            Arrays.stream(speciesNames).collect(toMap(
-                identity(),
-                __ -> new FixedDoubleParameter(0.0)
-            ));
-
+    FadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
-        setCompressionExponents(zeros.get());
-        setAttractableBiomassCoefficients(zeros.get());
-        setBiomassInteractionsCoefficients(zeros.get());
-        setGrowthRates(zeros.get());
+        this(
+            speciesCodesSupplier,
+            makeZeros(speciesNames),
+            makeZeros(speciesNames),
+            makeZeros(speciesNames),
+            makeZeros(speciesNames)
+        );
     }
 
     FadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Map<String, Double> compressionExponents,
         final Map<String, Double> attractableBiomassCoefficients,
         final Map<String, Double> biomassInteractionsCoefficients,
         final Map<String, Double> growthRates
     ) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
         setCompressionExponents(wrapParameters(compressionExponents));
         setAttractableBiomassCoefficients(wrapParameters(attractableBiomassCoefficients));
         setBiomassInteractionsCoefficients(wrapParameters(biomassInteractionsCoefficients));
         setGrowthRates(wrapParameters(growthRates));
+    }
+
+    private static Map<String, Double> makeZeros(final String[] speciesNames) {
+        return Arrays.stream(speciesNames).collect(toMap(
+            identity(),
+            __ -> 0.0
+        ));
     }
 
     private static ImmutableMap<String, DoubleParameter> wrapParameters(

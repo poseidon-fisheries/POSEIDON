@@ -2,7 +2,10 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
+import java.util.function.Supplier;
+
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
@@ -19,17 +22,22 @@ public class BiomassFadInitializerFactory
     public BiomassFadInitializerFactory() {
     }
 
-    BiomassFadInitializerFactory(final String... speciesNames) {
-        super(speciesNames);
+    public BiomassFadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
+        super(speciesCodesSupplier, speciesNames);
     }
 
     public BiomassFadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Map<String, Double> compressionExponents,
         final Map<String, Double> attractableBiomassCoefficients,
         final Map<String, Double> biomassInteractionsCoefficients,
         final Map<String, Double> growthRates
     ) {
         super(
+            speciesCodesSupplier,
             compressionExponents,
             attractableBiomassCoefficients,
             biomassInteractionsCoefficients,

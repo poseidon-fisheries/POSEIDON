@@ -18,68 +18,32 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.maximization.TunaCalibrator;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
 public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-    private AlgorithmFactory<? extends FadInitializer>
-        fadInitializerFactory =
-        new LinearAbundanceFadInitializerFactory(
-            "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-        );
-
     public EpoAbundanceScenarioBioOnly() {
+        setFadInitializerFactory(
+            new LinearAbundanceFadInitializerFactory(
+                getSpeciesCodesSupplier(),
+                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+            )
+        );
         setBiologicalProcessesFactory(
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
         setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
-    }
-
-    @SuppressWarnings("unused")
-    @Override
-    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    @Override
-    public void setFadInitializerFactory(
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
-    ) {
-        this.fadInitializerFactory = fadInitializerFactory;
     }
 
 }

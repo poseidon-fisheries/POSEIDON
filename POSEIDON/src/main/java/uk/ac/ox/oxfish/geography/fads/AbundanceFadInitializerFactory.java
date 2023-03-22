@@ -20,8 +20,10 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -35,8 +37,11 @@ public class AbundanceFadInitializerFactory
     public AbundanceFadInitializerFactory() {
     }
 
-    public AbundanceFadInitializerFactory(String... speciesNames) {
-        super(speciesNames);
+    public AbundanceFadInitializerFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
+        super(speciesCodesSupplier, speciesNames);
     }
 
     @NotNull

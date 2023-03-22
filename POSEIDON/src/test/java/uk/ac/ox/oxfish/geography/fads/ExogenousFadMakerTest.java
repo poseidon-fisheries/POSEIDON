@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -85,8 +86,6 @@ public class ExogenousFadMakerTest {
         assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(0, 4)).size(), 2);
         assertEquals(state.getFadMap().getDriftingObjectsMap().getField().allObjects.size(), 2);
         assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(1, 1)).size(), 0);
-
-
     }
 
     @Test
@@ -100,9 +99,11 @@ public class ExogenousFadMakerTest {
         fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
         fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy.csv"));
-        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).getGrowthRates().put(
-            "Species 0",
-            new FixedDoubleParameter(0.1)
+        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
+            ImmutableMap.of(
+                "Species 0",
+                new FixedDoubleParameter(0.1)
+            )
         );
         scenario.getPlugins().add(fadDemo);
 

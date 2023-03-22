@@ -96,6 +96,16 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
+    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
+
+    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
+        return fadInitializerFactory;
+    }
+
+    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
+
     public static final MapExtent DEFAULT_MAP_EXTENT =
         MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
 
@@ -299,12 +309,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         );
         return fishState.getMap().getPorts();
     }
-
-    public abstract AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory();
-
-    public abstract void setFadInitializerFactory(
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
-    );
 
     @NotNull
     FisherFactory makeFisherFactory(

@@ -3,11 +3,13 @@ package uk.ac.ox.oxfish.geography.fads;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInitializerFactory {
 
@@ -21,8 +23,11 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
 //        this("Bigeye tuna", "Yellowfin tuna", "Skipjack tuna");
     }
 
-    public AbundanceFadInitializerBetaFactory(String... speciesNames) {
-        super(speciesNames);
+    public AbundanceFadInitializerBetaFactory(
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
+        super(speciesCodesSupplier, speciesNames);
     }
 
     @NotNull
