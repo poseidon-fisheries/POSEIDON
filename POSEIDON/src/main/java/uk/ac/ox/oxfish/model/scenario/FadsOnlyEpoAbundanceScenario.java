@@ -55,7 +55,7 @@ import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class FadsOnlyEpoAbundanceScenario extends EpoScenario<Entry<String, SizeGroup>, AbundanceLocalBiology, AbundanceFad> {
+public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private boolean fadSettingActive = true;
 

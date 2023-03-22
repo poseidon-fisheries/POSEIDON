@@ -25,18 +25,17 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Key;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * A {@link Reallocator} class where the local biology is abundance based. The type of key used to
@@ -46,7 +45,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
  * that associates each bin to the right map.
  */
 public class AbundanceReallocator
-    extends Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends Reallocator<AbundanceLocalBiology> {
 
     private final BiFunction<Species, Integer, SizeGroup> binToSizeGroup;
 
@@ -57,7 +56,7 @@ public class AbundanceReallocator
      * @param binToSizeGroup  A function giving us the size group for a species and bin
      */
     AbundanceReallocator(
-        final AllocationGrids<Entry<String, SizeGroup>> allocationGrids,
+        final AllocationGrids<Key> allocationGrids,
         final BiFunction<Species, Integer, SizeGroup> binToSizeGroup
     ) {
         super(allocationGrids, new AbundanceAggregator());
@@ -66,7 +65,7 @@ public class AbundanceReallocator
 
     @Override
     public void reallocate(
-        final Map<Entry<String, SizeGroup>, DoubleGrid2D> allocationGrids,
+        final Map<? extends SpeciesKey, DoubleGrid2D> allocationGrids,
         final GlobalBiology globalBiology,
         final List<SeaTile> seaTiles,
         final AbundanceLocalBiology aggregatedBiology
@@ -97,12 +96,12 @@ public class AbundanceReallocator
     @NotNull
     private Map<Species, DoubleGrid2D[]> getGrids(
         final GlobalBiology globalBiology,
-        final Map<Entry<String, SizeGroup>, DoubleGrid2D> allocationGrids
+        final Map<?, DoubleGrid2D> allocationGrids
     ) {
         return globalBiology.getSpecies().stream().collect(toImmutableMap(
             identity(),
             species -> range(0, species.getNumberOfBins())
-                .mapToObj(bin -> allocationGrids.get(entry(
+                .mapToObj(bin -> allocationGrids.get(new Key(
                     species.getName(),
                     binToSizeGroup.apply(species, bin)
                 )))

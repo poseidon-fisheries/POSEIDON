@@ -46,14 +46,14 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 public class AbundanceInitializer implements BiologyInitializer {
 
     private final Map<String, List<Bin>> binsPerSpecies;
-    private final Reallocator<?, AbundanceLocalBiology> abundanceReallocator;
+    private final Reallocator<AbundanceLocalBiology> abundanceReallocator;
     private final Map<String, WeightGroups> weightGroupsPerSpecies;
 
     AbundanceInitializer(
         final SpeciesCodes speciesCodes,
         final Map<String, List<Bin>> binsPerSpecies,
         final Map<String, WeightGroups> weightGroupsPerSpecies,
-        final Reallocator<?, AbundanceLocalBiology> abundanceReallocator
+        final Reallocator<AbundanceLocalBiology> abundanceReallocator
     ) {
         this.binsPerSpecies = binsPerSpecies.entrySet().stream()
             .collect(toImmutableMap(
@@ -65,7 +65,7 @@ public class AbundanceInitializer implements BiologyInitializer {
     }
 
     @SuppressWarnings("unused")
-    public Reallocator<?, AbundanceLocalBiology> getAbundanceReallocator() {
+    public Reallocator<AbundanceLocalBiology> getAbundanceReallocator() {
         return abundanceReallocator;
     }
 

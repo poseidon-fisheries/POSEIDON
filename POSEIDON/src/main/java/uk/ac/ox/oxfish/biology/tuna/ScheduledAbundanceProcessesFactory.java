@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -33,7 +32,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -47,7 +45,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
  * scheduling a chain of processes that handle mortality, aging, recruitment and reallocation.
  */
 public class ScheduledAbundanceProcessesFactory
-    extends ScheduledBiologicalProcessesFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> {
 
     private List<String> biologicalProcessesDates;
     private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
@@ -131,7 +129,7 @@ public class ScheduledAbundanceProcessesFactory
                 .map(date -> Math.toIntExact(DAYS.between(startDate, date)))
                 .collect(toImmutableSet());
 
-        final AllocationGrids<Entry<String, SizeGroup>> grids =
+        final AllocationGrids<?> grids =
             getReallocator().getAllocationGrids();
         checkState(
             grids.getGrids().keySet().containsAll(processSteps),

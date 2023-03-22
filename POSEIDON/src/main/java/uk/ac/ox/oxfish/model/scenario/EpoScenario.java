@@ -93,7 +93,7 @@ import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIA
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public abstract class EpoScenario<K, B extends LocalBiology, F extends Fad<B, F>>
+public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
     public static final MapExtent DEFAULT_MAP_EXTENT =
@@ -119,13 +119,13 @@ public abstract class EpoScenario<K, B extends LocalBiology, F extends Fad<B, F>
             inputFolder.path("species_codes.csv")
         );
 
-    private BiologicalProcessesFactory<K, B> biologicalProcessesFactory;
+    private BiologicalProcessesFactory<B> biologicalProcessesFactory;
 
-    public BiologicalProcessesFactory<K, B> getBiologicalProcessesFactory() {
+    public BiologicalProcessesFactory<B> getBiologicalProcessesFactory() {
         return biologicalProcessesFactory;
     }
 
-    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<K, B> biologicalProcessesFactory) {
+    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<B> biologicalProcessesFactory) {
         this.biologicalProcessesFactory = biologicalProcessesFactory;
     }
 

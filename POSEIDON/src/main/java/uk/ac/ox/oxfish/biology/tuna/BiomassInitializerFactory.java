@@ -33,7 +33,6 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,7 +48,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
  * A factory for a {@link BiomassInitializer} that reads the Schaefer parameters from a CSV file.
  */
 public class BiomassInitializerFactory
-    extends BiologyInitializerFactory<String, BiomassLocalBiology> {
+    extends BiologyInitializerFactory<BiomassLocalBiology> {
 
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath schaeferParamsFile;
@@ -99,7 +98,7 @@ public class BiomassInitializerFactory
                 .entrySet()
                 .stream()
                 .collect(toImmutableMap(
-                    Entry::getKey,
+                    entry -> entry.getKey().getSpeciesName(),
                     entry -> new GridAllocator(entry.getValue())
                 ));
 

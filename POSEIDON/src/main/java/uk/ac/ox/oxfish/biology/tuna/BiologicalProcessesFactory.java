@@ -13,21 +13,21 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.List;
 
-public abstract class BiologicalProcessesFactory<K, B extends LocalBiology> {
+public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
     private InputPath inputFolder;
     private SpeciesCodesFromFileFactory speciesCodesSupplier;
-    private BiologyInitializerFactory<K, B> biologyInitializerFactory;
-    private ReallocatorFactory<B, Reallocator<K, B>> reallocatorFactory;
-    private RestorerFactory<K, B> restorerFactory;
-    private ScheduledBiologicalProcessesFactory<K, B> scheduledProcessesFactory;
+    private BiologyInitializerFactory<B> biologyInitializerFactory;
+    private ReallocatorFactory<B, Reallocator<B>> reallocatorFactory;
+    private RestorerFactory<B> restorerFactory;
+    private ScheduledBiologicalProcessesFactory<B> scheduledProcessesFactory;
 
     public BiologicalProcessesFactory(
         final InputPath inputFolder,
         final SpeciesCodesFromFileFactory speciesCodesSupplier,
-        final BiologyInitializerFactory<K, B> biologyInitializerFactory,
-        final ReallocatorFactory<B, Reallocator<K, B>> reallocatorFactory,
-        final RestorerFactory<K, B> restorerFactory,
-        final ScheduledBiologicalProcessesFactory<K, B> scheduledProcessesFactory
+        final BiologyInitializerFactory<B> biologyInitializerFactory,
+        final ReallocatorFactory<B, Reallocator<B>> reallocatorFactory,
+        final RestorerFactory<B> restorerFactory,
+        final ScheduledBiologicalProcessesFactory<B> scheduledProcessesFactory
     ) {
         this.inputFolder = inputFolder;
         this.speciesCodesSupplier = speciesCodesSupplier;
@@ -37,35 +37,35 @@ public abstract class BiologicalProcessesFactory<K, B extends LocalBiology> {
         this.scheduledProcessesFactory = scheduledProcessesFactory;
     }
 
-    public ScheduledBiologicalProcessesFactory<K, B> getScheduledProcessesFactory() {
+    public ScheduledBiologicalProcessesFactory<B> getScheduledProcessesFactory() {
         return scheduledProcessesFactory;
     }
 
-    public void setScheduledProcessesFactory(final ScheduledBiologicalProcessesFactory<K, B> scheduledProcessesFactory) {
+    public void setScheduledProcessesFactory(final ScheduledBiologicalProcessesFactory<B> scheduledProcessesFactory) {
         this.scheduledProcessesFactory = scheduledProcessesFactory;
     }
 
-    public RestorerFactory<K, B> getRestorerFactory() {
+    public RestorerFactory<B> getRestorerFactory() {
         return restorerFactory;
     }
 
-    public void setRestorerFactory(final RestorerFactory<K, B> restorerFactory) {
+    public void setRestorerFactory(final RestorerFactory<B> restorerFactory) {
         this.restorerFactory = restorerFactory;
     }
 
-    public ReallocatorFactory<B, Reallocator<K, B>> getReallocatorFactory() {
+    public ReallocatorFactory<B, Reallocator<B>> getReallocatorFactory() {
         return reallocatorFactory;
     }
 
-    public void setReallocatorFactory(final ReallocatorFactory<B, Reallocator<K, B>> reallocatorFactory) {
+    public void setReallocatorFactory(final ReallocatorFactory<B, Reallocator<B>> reallocatorFactory) {
         this.reallocatorFactory = reallocatorFactory;
     }
 
-    public BiologyInitializerFactory<K, B> getBiologyInitializerFactory() {
+    public BiologyInitializerFactory<B> getBiologyInitializerFactory() {
         return biologyInitializerFactory;
     }
 
-    public void setBiologyInitializerFactory(final BiologyInitializerFactory<K, B> biologyInitializerFactory) {
+    public void setBiologyInitializerFactory(final BiologyInitializerFactory<B> biologyInitializerFactory) {
         this.biologyInitializerFactory = biologyInitializerFactory;
     }
 
@@ -92,7 +92,7 @@ public abstract class BiologicalProcessesFactory<K, B extends LocalBiology> {
     public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {
         getReallocatorFactory().setMapExtent(nauticalMap.getMapExtent());
 
-        final Reallocator<K, B> reallocator = reallocatorFactory.apply(fishState);
+        final Reallocator<B> reallocator = reallocatorFactory.apply(fishState);
         scheduledProcessesFactory.setReallocator(reallocator);
         restorerFactory.setReallocator(reallocator);
         biologyInitializerFactory.setReallocator(reallocator);

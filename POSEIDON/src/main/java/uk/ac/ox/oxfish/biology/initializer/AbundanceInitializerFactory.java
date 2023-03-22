@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class AbundanceInitializerFactory
-    extends BiologyInitializerFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends BiologyInitializerFactory<AbundanceLocalBiology> {
 
     private final CacheByFile<Map<String, List<Bin>>> binsCache =
         new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);

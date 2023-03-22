@@ -17,7 +17,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class AbundanceProcessesFactory
-    extends BiologicalProcessesFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends BiologicalProcessesFactory<AbundanceLocalBiology> {
 
     private RecruitmentProcessesFactory recruitmentProcessesFactory;
     private WeightGroupsFactory weightGroupsFactory;

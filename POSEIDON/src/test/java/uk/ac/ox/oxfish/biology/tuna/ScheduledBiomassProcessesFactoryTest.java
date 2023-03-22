@@ -54,7 +54,7 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
         biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         final BiomassReallocator biomassReallocator =
             biomassReallocatorFactory.apply(mock(FishState.class));
-        final AllocationGrids<String> allocationGrids =
+        final AllocationGrids<?> allocationGrids =
             biomassReallocator.getAllocationGrids();
         assertEquals(12, allocationGrids.size());
         allocationGrids.values().forEach(gridsPerSpecies -> {

@@ -4,6 +4,7 @@ import org.junit.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Key;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
 import java.nio.file.Paths;
@@ -15,51 +16,35 @@ import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class AllocationGridsTest {
 
     @Test
-    public void AllocationGridsTester(){
-        Species species1 = new Species("Piano Tuna");
+    public void AllocationGridsTester() {
+        final Species species1 = new Species("Piano Tuna");
 
-        Map<String, String> sCodes = new HashMap<>();
+        final Map<String, String> sCodes = new HashMap<>();
         sCodes.put("SP1", species1.getName());
-        Supplier<SpeciesCodes> speciesCodesSupplier = () -> new SpeciesCodes(sCodes);
+        final Supplier<SpeciesCodes> speciesCodesSupplier = () -> new SpeciesCodes(sCodes);
         final NauticalMap nauticalMap = makeMap(3, 3);
 
-        AllocationGrids<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> allocationGrids = new SmallLargeAllocationGridsSupplier(
-            speciesCodesSupplier,
-            Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
-            nauticalMap.getMapExtent(),
-            365
-        ).get();
+        final AllocationGrids<Key> allocationGrids =
+            new SmallLargeAllocationGridsSupplier(
+                speciesCodesSupplier,
+                Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
+                nauticalMap.getMapExtent(),
+                365
+            ).get();
 
+        assertEquals(1, allocationGrids.size());
 
-        assertEquals(1,allocationGrids.size());
+        final Map<Key, DoubleGrid2D> grid = allocationGrids.getGrids().get(0);
+        final DoubleGrid2D gridLARGE = grid.get(new Key("Piano Tuna", LARGE));
+        final DoubleGrid2D gridSMALL = grid.get(new Key("Piano Tuna", SMALL));
 
-
- //       allocationGrids.getGrids();
-        Map<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D> grid = allocationGrids.getGrids().get(0);
-//        Object[] objects = grid.keySet().toArray();
-
-//        Set<Map.Entry<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>, DoubleGrid2D>> entries = grid.entrySet();
-
- //       Set<Map.Entry<String, SmallLargeAllocationGridsSupplier.SizeGroup>> gridkeys = grid.keySet();
-
-         DoubleGrid2D gridLARGE = grid.get(entry("Piano Tuna", LARGE));
-        DoubleGrid2D gridSMALL = grid.get(entry("Piano Tuna", SMALL));
- //       System.out.println("breakpoint");
-
-        assertEquals(0.117031221
-                , gridLARGE.get(0,0), .01);
-        assertEquals(0.099199173
-                , gridSMALL.get(0,0), .01);
-        assertEquals(0.137690519
-                , gridSMALL.get(2,0), .01);
-
-   //     System.out.println("break");
-
+        assertEquals(0.117031221, gridLARGE.get(0, 0), .01);
+        assertEquals(0.099199173, gridSMALL.get(0, 0), .01);
+        assertEquals(0.137690519, gridSMALL.get(2, 0), .01);
 
     }
 

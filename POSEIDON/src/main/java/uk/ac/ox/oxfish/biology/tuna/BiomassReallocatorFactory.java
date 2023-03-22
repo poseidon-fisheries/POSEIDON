@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
@@ -32,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * distribution files that are passed to it.
  */
 public class BiomassReallocatorFactory
-    extends ReallocatorFactory<BiomassLocalBiology, Reallocator<String, BiomassLocalBiology>> {
+    extends ReallocatorFactory<BiomassLocalBiology, Reallocator<BiomassLocalBiology>> {
 
     /**
      * Empty constructor needed for YAML.
@@ -52,7 +53,7 @@ public class BiomassReallocatorFactory
     @Override
     public BiomassReallocator apply(final FishState fishState) {
         checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
-        final AllocationGrids<String> grids =
+        final AllocationGrids<SpeciesKey> grids =
             new AllocationGridsSupplier(
                 getSpeciesCodesSupplier(),
                 getBiomassDistributionsFile().get(),

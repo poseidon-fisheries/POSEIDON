@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 public class EpoScenarioTest extends TestCase {
 
-    public <S extends EpoScenario<?, ?, ?>> void saveAndLoadYaml(
+    public <S extends EpoScenario<?, ?>> void saveAndLoadYaml(
         final Class<S> scenarioClass
     ) {
         try {
@@ -21,7 +21,7 @@ public class EpoScenarioTest extends TestCase {
             // Try to read it back and start it
             try (final FileReader fileReader = new FileReader(scenarioFile)) {
                 final FishYAML fishYAML = new FishYAML();
-                final EpoScenario<?, ?, ?> loadedScenario = fishYAML.loadAs(fileReader, EpoScenario.class);
+                final EpoScenario<?, ?> loadedScenario = fishYAML.loadAs(fileReader, EpoScenario.class);
                 loadedScenario.useDummyData();
                 final FishState fishState = new FishState();
                 fishState.setScenario(loadedScenario);

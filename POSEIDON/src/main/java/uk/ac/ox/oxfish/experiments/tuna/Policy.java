@@ -70,7 +70,7 @@ public class Policy<S extends Scenario> {
      * The reason S extends EpoScenario instead of just Scenario is that it's where `addPlugin` is defined.
      * That should be cleaned up, but there is no time for that now. There seldom is. Sigh.
      */
-    public static <S extends EpoScenario<?, ?, ?>> Policy<S> makeDelayedRegulationsPolicy(
+    public static <S extends EpoScenario<?, ?>> Policy<S> makeDelayedRegulationsPolicy(
         final String policyName,
         final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
         final Function<S, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory,

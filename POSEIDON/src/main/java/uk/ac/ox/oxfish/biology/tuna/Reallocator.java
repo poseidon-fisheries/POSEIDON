@@ -19,35 +19,37 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A class that reallocates fish around the map by using allocation grids.
  *
- * @param <K> The type of key used to identify the allocation grid to use.
  * @param <B> The type of local biology operated on.
  */
-public abstract class Reallocator<K, B extends LocalBiology> implements BiologicalProcess<B> {
+public abstract class Reallocator<B extends LocalBiology> implements BiologicalProcess<B> {
 
-    private final AllocationGrids<K> allocationGrids;
+    private final AllocationGrids<? extends SpeciesKey> allocationGrids;
     private final Aggregator<B> aggregator;
 
     Reallocator(
-        final AllocationGrids<K> allocationGrids,
+        final AllocationGrids<? extends SpeciesKey> allocationGrids,
         final Aggregator<B> aggregator
     ) {
         this.allocationGrids = allocationGrids;
         this.aggregator = aggregator;
     }
 
-    public AllocationGrids<K> getAllocationGrids() {
+    public AllocationGrids<? extends SpeciesKey> getAllocationGrids() {
         return allocationGrids;
     }
 
@@ -98,10 +100,40 @@ public abstract class Reallocator<K, B extends LocalBiology> implements Biologic
      * @param aggregatedBiology The summary biology that contains all the fish to be reallocated.
      */
     protected abstract void reallocate(
-        Map<K, DoubleGrid2D> allocationGrids,
+        Map<? extends SpeciesKey, DoubleGrid2D> allocationGrids,
         GlobalBiology globalBiology,
         List<SeaTile> seaTiles,
         final B aggregatedBiology
     );
+
+    static class SpeciesKey {
+
+        private final String speciesName;
+
+        SpeciesKey(final String speciesName) {
+            this.speciesName = speciesName;
+        }
+
+        public String getSpeciesName() {
+            return speciesName;
+        }
+
+        public Species getSpecies(final GlobalBiology biology) {
+            return biology.getSpecie(speciesName);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final SpeciesKey that = (SpeciesKey) o;
+            return speciesName.equals(that.speciesName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(speciesName);
+        }
+    }
 
 }

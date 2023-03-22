@@ -20,21 +20,17 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The factory in charge of creating an {@link AbundanceRestorer}. The {@link
- * #setAbundanceReallocator(AbundanceReallocator)} method needs to be called before {@link
- * #apply(FishState)}.
+ * The factory in charge of creating an {@link AbundanceRestorer}.
  */
 public class AbundanceRestorerFactory
-    extends RestorerFactory<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends RestorerFactory<AbundanceLocalBiology> {
 
     private Map<Integer, Integer> schedule;
 

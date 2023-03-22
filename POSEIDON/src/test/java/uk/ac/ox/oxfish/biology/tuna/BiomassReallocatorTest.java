@@ -18,6 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.collect.ImmutableList;
+import junit.framework.TestCase;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.Double.POSITIVE_INFINITY;
@@ -28,18 +42,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-
-import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.stream.Stream;
-import junit.framework.TestCase;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassReallocatorTest extends TestCase {
 
@@ -72,7 +74,7 @@ public class BiomassReallocatorTest extends TestCase {
                 range(0, grids.size()).boxed().collect(toImmutableMap(
                     identity(),
                     i -> globalBiology.getSpecies().stream().collect(toImmutableMap(
-                        Species::getName,
+                        species -> new SpeciesKey(species.getName()),
                         species -> (species.getIndex() == 0 ? grids : grids.reverse()).get(i)
                     ))
                 )),

@@ -18,24 +18,22 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.univocity.parsers.common.record.Record;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.geography.MapExtent;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 public class SmallLargeAllocationGridsSupplier
-    extends AbstractAllocationGridsSupplier<Entry<String, SizeGroup>> {
+    extends AbstractAllocationGridsSupplier<SmallLargeAllocationGridsSupplier.Key> {
 
     private static final Map<String, SizeGroup> groups = Arrays
         .stream(SizeGroup.values())
@@ -55,13 +53,13 @@ public class SmallLargeAllocationGridsSupplier
     }
 
     @Override
-    Entry<String, SizeGroup> extractKeyFromRecord(
+    Key extractKeyFromRecord(
         final SpeciesCodes speciesCodes,
         final Record record
     ) {
         final String groupCode = record.getString("group");
         final String speciesCode = record.getString("species_code");
-        return entry(
+        return new Key(
             speciesCodes.getSpeciesName(speciesCode),
             Optional.ofNullable(groups.get(groupCode))
                 .orElseThrow(() -> new IllegalStateException("Unknown group code: " + groupCode))
@@ -80,6 +78,30 @@ public class SmallLargeAllocationGridsSupplier
 
         String getCode() {
             return code;
+        }
+    }
+
+    static class Key extends Reallocator.SpeciesKey {
+
+        private final SizeGroup sizeGroup;
+
+        Key(final String speciesName, final SizeGroup sizeGroup) {
+            super(speciesName);
+            this.sizeGroup = sizeGroup;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            final Key key = (Key) o;
+            return sizeGroup == key.sizeGroup;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), sizeGroup);
         }
     }
 

@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -43,7 +42,7 @@ import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Siz
  * We'd need to make this class a bit more general if it was to be used with different groupings or meristics classes.
  */
 public class AbundanceReallocatorFactory
-    extends ReallocatorFactory<AbundanceLocalBiology, Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology>> {
+    extends ReallocatorFactory<AbundanceLocalBiology, Reallocator<AbundanceLocalBiology>> {
 
     /**
      * Empty constructor needed for YAML.
@@ -64,7 +63,7 @@ public class AbundanceReallocatorFactory
     public AbundanceReallocator apply(final FishState fishState) {
         checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
 
-        final AllocationGrids<Entry<String, SizeGroup>> grids =
+        final AllocationGrids<SmallLargeAllocationGridsSupplier.Key> grids =
             new SmallLargeAllocationGridsSupplier(
                 getSpeciesCodesSupplier(),
                 getBiomassDistributionsFile().get(),

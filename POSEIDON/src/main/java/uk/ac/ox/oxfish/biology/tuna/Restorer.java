@@ -42,19 +42,18 @@ import uk.ac.ox.oxfish.utility.FishStateSteppable;
  *      when restoring it.</li>
  * </ul>
  *
- * @param <K> the type of key needed to identify which allocation map to use.
  * @param <B> the type of local biology to work with.
  */
-abstract class Restorer<K, B extends LocalBiology>
+abstract class Restorer<B extends LocalBiology>
     implements AdditionalStartable {
 
     private final Map<Integer, Integer> schedule;
-    private final Reallocator<K, B> reallocator;
+    private final Reallocator<B> reallocator;
     private final Aggregator<B> aggregator;
     private final Extractor<B> extractor;
     private final Excluder<B> excluder;
     Restorer(
-        final Reallocator<K, B> reallocator,
+        final Reallocator<B> reallocator,
         final Aggregator<B> aggregator,
         final Extractor<B> extractor,
         final Excluder<B> excluder,
@@ -71,7 +70,7 @@ abstract class Restorer<K, B extends LocalBiology>
         return extractor;
     }
 
-    public Reallocator<K, B> getReallocator() {
+    public Reallocator<B> getReallocator() {
         return reallocator;
     }
 

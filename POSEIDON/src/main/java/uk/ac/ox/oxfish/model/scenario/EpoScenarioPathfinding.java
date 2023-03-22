@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-public class EpoScenarioPathfinding extends EpoScenario<Entry<String, SizeGroup>, AbundanceLocalBiology, AbundanceFad> {
+public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private DefaultToDestinationStrategyFishingStrategyFactory fishingStrategyFactory =
         new DefaultToDestinationStrategyFishingStrategyFactory();

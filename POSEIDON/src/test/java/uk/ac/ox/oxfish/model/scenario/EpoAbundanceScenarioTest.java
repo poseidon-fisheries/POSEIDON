@@ -65,7 +65,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
                 .findAny()
                 .get();
 
-        final Reallocator<?, ?> reallocator = abundanceRestorer.getReallocator();
+        final Reallocator<?> reallocator = abundanceRestorer.getReallocator();
         final NauticalMap nauticalMap = fishState.getMap();
 
         final Set<Int2D> rightBiologySeaTiles =

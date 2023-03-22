@@ -209,7 +209,7 @@ public class TunaEvaluator implements Runnable {
     private void registerFadAttractionEventProviders() {
         runner.setAfterStartConsumer(state -> {
             final FishState fishState = state.getModel();
-            final EpoScenario<?, ?, ?> scenario = (EpoScenario<?, ?, ?>) state.getScenario();
+            final EpoScenario<?, ?> scenario = (EpoScenario<?, ?>) state.getScenario();
             final SpeciesCodes speciesCodes = scenario.getSpeciesCodesSupplier().get();
             final AbundanceFadAttractionEventObserver observer =
                 new AbundanceFadAttractionEventObserver(fishState, speciesCodes);

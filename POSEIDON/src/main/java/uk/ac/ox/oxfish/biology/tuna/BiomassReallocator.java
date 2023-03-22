@@ -18,21 +18,18 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.collect.ImmutableMap;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.geography.SeaTile;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.geography.SeaTile;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Redistributes the biomass around according to a "schedule" that maps a simulation step to a grid
@@ -42,24 +39,24 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * those should never be mutated, so the class is safe to share between parallel simulations. Note
  * that the {@code reallocate} method mutates the tiles biomass arrays directly.
  */
-public class BiomassReallocator extends Reallocator<String, BiomassLocalBiology> {
+public class BiomassReallocator extends Reallocator<BiomassLocalBiology> {
 
     BiomassReallocator(
-        final AllocationGrids<String> allocationGrids
+        final AllocationGrids<SpeciesKey> allocationGrids
     ) {
         super(allocationGrids, new BiomassAggregator());
     }
 
     @Override
     public void reallocate(
-        final Map<String, DoubleGrid2D> allocationGrids,
+        final Map<? extends SpeciesKey, DoubleGrid2D> allocationGrids,
         final GlobalBiology globalBiology,
         final List<SeaTile> seaTiles,
         final BiomassLocalBiology aggregatedBiology
     ) {
         final Map<Species, DoubleGrid2D> gridsPerSpecies =
             allocationGrids.entrySet().stream().collect(toImmutableMap(
-                entry -> globalBiology.getSpecie(entry.getKey()),
+                entry -> entry.getKey().getSpecies(globalBiology),
                 Entry::getValue
             ));
         final Map<Integer, DoubleGrid2D> indexedBiomassGrids =

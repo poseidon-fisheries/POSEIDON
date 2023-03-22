@@ -47,7 +47,7 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 /**
  * The biomass-based IATTC tuna simulation scenario.
  */
-public class EpoBiomassScenario extends EpoScenario<String, BiomassLocalBiology, BiomassFad> {
+public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory = new BiomassFadInitializerFactory(

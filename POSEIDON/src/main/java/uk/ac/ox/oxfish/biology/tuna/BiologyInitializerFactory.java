@@ -4,15 +4,15 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public abstract class BiologyInitializerFactory<K, B extends LocalBiology>
+public abstract class BiologyInitializerFactory<B extends LocalBiology>
     implements AlgorithmFactory<BiologyInitializer> {
-    private Reallocator<K, B> reallocator;
+    private Reallocator<B> reallocator;
 
-    public Reallocator<K, B> getReallocator() {
+    public Reallocator<B> getReallocator() {
         return reallocator;
     }
 
-    public void setReallocator(final Reallocator<K, B> reallocator) {
+    public void setReallocator(final Reallocator<B> reallocator) {
         this.reallocator = reallocator;
     }
 }

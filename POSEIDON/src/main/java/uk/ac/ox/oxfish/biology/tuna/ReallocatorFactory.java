@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.function.Supplier;
 
-abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<?, B>>
+abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<B>>
     implements AlgorithmFactory<T> {
 
     private MapExtent mapExtent;

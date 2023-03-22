@@ -48,7 +48,7 @@ import java.util.Map.Entry;
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class EpoAbundanceScenario extends EpoScenario<Entry<String, SizeGroup>, AbundanceLocalBiology, AbundanceFad> {
+public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     private AlgorithmFactory<? extends FadInitializer>
         fadInitializerFactory =

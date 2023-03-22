@@ -18,17 +18,16 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-
-import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.Map;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
  * Factory that builds a {@link ScheduledBiologicalProcesses} for {@link BiomassLocalBiology}.
@@ -36,7 +35,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * here.
  */
 public class ScheduledBiomassProcessesFactory
-    extends ScheduledBiologicalProcessesFactory<String, BiomassLocalBiology> {
+    extends ScheduledBiologicalProcessesFactory<BiomassLocalBiology> {
 
     @Override
     public ScheduledBiologicalProcesses<BiomassLocalBiology> apply(final FishState fishState) {
@@ -55,7 +54,7 @@ public class ScheduledBiomassProcessesFactory
                 getReallocator()
             );
 
-        final AllocationGrids<String> grids =
+        final AllocationGrids<?> grids =
             getReallocator().getAllocationGrids();
 
         final Map<Integer, Collection<BiologicalProcess<BiomassLocalBiology>>> schedule =

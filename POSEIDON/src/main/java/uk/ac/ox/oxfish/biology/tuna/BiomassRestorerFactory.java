@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BiomassRestorerFactory extends RestorerFactory<String, BiomassLocalBiology> {
+public class BiomassRestorerFactory extends RestorerFactory<BiomassLocalBiology> {
 
     private ImmutableMap<Integer, Integer> schedule = ImmutableMap.of(0, 364);
 

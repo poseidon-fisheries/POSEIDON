@@ -24,10 +24,10 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 /**
  * This is a {@link Restorer} that works with {@link BiomassLocalBiology}.
  */
-class BiomassRestorer extends Restorer<String, BiomassLocalBiology> {
+class BiomassRestorer extends Restorer<BiomassLocalBiology> {
 
     BiomassRestorer(
-        final Reallocator<String, BiomassLocalBiology> reallocator,
+        final Reallocator<BiomassLocalBiology> reallocator,
         final Aggregator<BiomassLocalBiology> aggregator,
         final Map<Integer, Integer> schedule
     ) {

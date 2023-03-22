@@ -27,10 +27,10 @@ import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
  * This is a {@link Restorer} that works with {@link AbundanceLocalBiology}.
  */
 public class AbundanceRestorer
-    extends Restorer<Entry<String, SizeGroup>, AbundanceLocalBiology> {
+    extends Restorer<AbundanceLocalBiology> {
 
     AbundanceRestorer(
-        final Reallocator<Entry<String, SizeGroup>, AbundanceLocalBiology> reallocator,
+        final Reallocator<AbundanceLocalBiology> reallocator,
         final AbundanceAggregator aggregator,
         final Map<Integer, Integer> schedule
     ) {

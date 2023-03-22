@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactor
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class BiomassProcessesFactory extends BiologicalProcessesFactory<String, BiomassLocalBiology> {
+public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassLocalBiology> {
     private BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory;
 
     @SuppressWarnings("unused")
