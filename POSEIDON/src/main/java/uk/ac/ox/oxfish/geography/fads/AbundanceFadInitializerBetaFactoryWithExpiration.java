@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -39,9 +40,10 @@ public class AbundanceFadInitializerBetaFactoryWithExpiration
 
     public AbundanceFadInitializerBetaFactoryWithExpiration(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final String... speciesNames
     ) {
-        super(speciesCodesSupplier, speciesNames);
+        super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
     @Override

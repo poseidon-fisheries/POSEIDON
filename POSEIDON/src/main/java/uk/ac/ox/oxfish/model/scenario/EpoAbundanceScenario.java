@@ -23,16 +23,17 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.fads.*;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.List;
@@ -42,6 +43,11 @@ import java.util.List;
  */
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
+    private AbundanceFiltersFactory abundanceFiltersFactory =
+        new AbundanceFiltersFromFileFactory(
+            getInputFolder().path("abundance", "selectivity.csv"),
+            getSpeciesCodesSupplier()
+        );
     private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
         new GravityDestinationStrategyFactory(
             getInputFolder().path("action_weights.csv"),
@@ -55,12 +61,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         );
 
     public EpoAbundanceScenario() {
-        setFadInitializerFactory(
-            new LinearAbundanceFadInitializerFactory(
-                getSpeciesCodesSupplier(),
-                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-            )
-        );
         setBiologicalProcessesFactory(
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
@@ -72,10 +72,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getInputFolder().path("action_weights.csv"),
                 new AbundanceCatchSamplersFactory(
                     getSpeciesCodesSupplier(),
-                    new AbundanceFiltersFactory(
-                        getInputFolder().path("abundance", "selectivity.csv"),
-                        getSpeciesCodesSupplier()
-                    ),
+                    abundanceFiltersFactory,
                     getInputFolder().path("set_samples.csv")
                 ),
                 new SetDurationSamplersFactory(
@@ -85,7 +82,23 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
                 getInputFolder().path("set_compositions.csv")
             )
         );
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
+        setPurseSeineGearFactory(
+            new AbundancePurseSeineGearFactory(
+                new LinearAbundanceFadInitializerFactory(
+                    getAbundanceFiltersFactory(),
+                    getSpeciesCodesSupplier(),
+                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+                )
+            )
+        );
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
@@ -100,16 +113,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        ((PluggableSelectivity) getFadInitializerFactory()).setSelectivityFilters(
-            ((AbundanceCatchSamplersFactory) ((PurseSeinerAbundanceFishingStrategyFactory)
-                getFishingStrategyFactory()).getCatchSamplersFactory())
-                .getAbundanceFiltersFactory()
-                .apply(fishState)
-                .get(FadSetAction.class)
-        );
-
-        getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,

@@ -6,14 +6,12 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.TunaEvaluator;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
-import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import javax.annotation.Nullable;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.ToDoubleFunction;
 
 public class QuickAndDirtyTunaSensitivity {
 
@@ -73,20 +70,28 @@ public class QuickAndDirtyTunaSensitivity {
         if(hazardRate != null && Double.isFinite(hazardRate))
         {
             //set the scenario
-            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            AlgorithmFactory<? extends FadInitializer> fadInitializer =
+                scenario
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory();
             //weird but we know the name, not the class!
-            BeanUtils.setProperty(fadInitializer,"fishReleaseProbabilityInPercent",new FixedDoubleParameter(hazardRate));
+            BeanUtils.setProperty(
+                fadInitializer,
+                "fishReleaseProbabilityInPercent",
+                new FixedDoubleParameter(hazardRate)
+            );
             //set the optimization parameter
             OptimizationParameter toRemove = null;
             for (OptimizationParameter parameter : optimization.getParameters()) {
-                if(parameter.getName().equals("fadInitializerFactory.fishReleaseProbabilityInPercent"))
-                {
-                  toRemove = parameter;
-                  break;
+                if (parameter.getName().equals("fadInitializerFactory.fishReleaseProbabilityInPercent")) {
+                    toRemove = parameter;
+                    break;
                 }
             }
-            Preconditions.checkArgument(toRemove != null,
-                    "Couldn't find the fish release probability!");
+            Preconditions.checkArgument(
+                toRemove != null,
+                "Couldn't find the fish release probability!"
+            );
 
             optimization.getParameters().remove(toRemove);
 
@@ -95,24 +100,28 @@ public class QuickAndDirtyTunaSensitivity {
 
 
         // * should I set maximum days attraction at 500? (and therefore remove it from calibration)
-        if(maxAttractionRate){
+        if (maxAttractionRate) {
 
             //set the scenario
-            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            AlgorithmFactory<? extends FadInitializer> fadInitializer =
+                scenario
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory();
             //weird but we know the name, not the class!
-            BeanUtils.setProperty(fadInitializer,"maximumDaysAttractions",
-                    new FixedDoubleParameter(500));
+            BeanUtils.setProperty(fadInitializer, "maximumDaysAttractions",
+                new FixedDoubleParameter(500)
+            );
 
             //set the optimization parameter
             OptimizationParameter toRemove = null;
             for (OptimizationParameter parameter : optimization.getParameters()) {
-                if(parameter.getName().equals("fadInitializerFactory.maximumDaysAttractions"))
-                {
+                if (parameter.getName().equals("fadInitializerFactory.maximumDaysAttractions")) {
                     toRemove = parameter;
                     break;
                 }
             }
-            Preconditions.checkArgument(toRemove != null,
+            Preconditions.checkArgument(
+                toRemove != null,
                     "Couldn't find the fish release probability!");
 
             optimization.getParameters().remove(toRemove);
@@ -128,18 +137,21 @@ public class QuickAndDirtyTunaSensitivity {
 
 //            * should I fix the waiting time to fill to 13 days? (and therefore remove it from calibration)
 
-        if(forceWaitingTime13){
+        if(forceWaitingTime13) {
             //set the scenario
-            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            AlgorithmFactory<? extends FadInitializer> fadInitializer =
+                scenario
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory();
             //weird but we know the name, not the class!
-            BeanUtils.setProperty(fadInitializer,"daysInWaterBeforeAttraction",
-                    new FixedDoubleParameter(13));
+            BeanUtils.setProperty(fadInitializer, "daysInWaterBeforeAttraction",
+                new FixedDoubleParameter(13)
+            );
 
             //set the optimization parameter
             OptimizationParameter toRemove = null;
             for (OptimizationParameter parameter : optimization.getParameters()) {
-                if(parameter.getName().equals("fadInitializerFactory.daysInWaterBeforeAttraction"))
-                {
+                if (parameter.getName().equals("fadInitializerFactory.daysInWaterBeforeAttraction")) {
                     toRemove = parameter;
                     break;
                 }

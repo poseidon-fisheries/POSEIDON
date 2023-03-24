@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnvironmentalAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.WeibullLinearIntervalEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
@@ -21,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Function;
 
 public class GravityModelCalibrations {
     public static void main(final String[] args) {
@@ -73,38 +75,47 @@ public class GravityModelCalibrations {
                 "Yellowfin tuna", 0.02067837393061897
             ));
 
-        final Map<String, AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>> fadInitializerFactories =
+        final Map<String, Function<AbundanceFiltersFactory, AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>>> fadInitializerFactories =
             ImmutableMap.of(
                 "scenario-gravity_weibull_interval",
-                new WeibullLinearIntervalEnvironmentalAttractorFactory(
-                    new FixedDoubleParameter(1E-3),
-                    new FixedDoubleParameter(1),
-                    carryingCapacityShapeParameters,
-                    carryingCapacityScaleParameters,
-                    new FixedDoubleParameter(5.722025419605172),
-                    new FixedDoubleParameter(21.993000000000002),
-                    new FixedDoubleParameter(1.36247134532557),
-                    environmentalMaps,
-                    environmentalThresholds
-                ),
+                abundanceFiltersFactory ->
+                    new WeibullLinearIntervalEnvironmentalAttractorFactory(
+                        abundanceFiltersFactory,
+                        new FixedDoubleParameter(1E-3),
+                        new FixedDoubleParameter(1),
+                        carryingCapacityShapeParameters,
+                        carryingCapacityScaleParameters,
+                        new FixedDoubleParameter(5.722025419605172),
+                        new FixedDoubleParameter(21.993000000000002),
+                        new FixedDoubleParameter(1.36247134532557),
+                        environmentalMaps,
+                        environmentalThresholds
+                    ),
                 "scenario-gravity_weibull_catchability",
-                new WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
-                    carryingCapacityShapeParameters,
-                    carryingCapacityScaleParameters,
-                    catchabilities,
-                    new FixedDoubleParameter(1E-3),
-                    new FixedDoubleParameter(5.722025419605172),
-                    new FixedDoubleParameter(41.6127216390614),
-                    new FixedDoubleParameter(1),
-                    environmentalMaps,
-                    environmentalThresholds,
-                    environmentalPenalties
+                abundanceFiltersFactory ->
+                    new WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
+                        abundanceFiltersFactory,
+                        carryingCapacityShapeParameters,
+                        carryingCapacityScaleParameters,
+                        catchabilities,
+                        new FixedDoubleParameter(1E-3),
+                        new FixedDoubleParameter(5.722025419605172),
+                        new FixedDoubleParameter(41.6127216390614),
+                        new FixedDoubleParameter(1),
+                        environmentalMaps,
+                        environmentalThresholds,
+                        environmentalPenalties
                 )
             );
 
-        fadInitializerFactories.forEach((scenarioName, fadInitializerFactory) -> {
+        fadInitializerFactories.forEach((scenarioName, fadInitializerFactoryMaker) -> {
             final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
-            scenario.setFadInitializerFactory(fadInitializerFactory);
+            final AbundanceFiltersFactory abundanceFiltersFactory = scenario.getAbundanceFiltersFactory();
+            scenario
+                .getPurseSeineGearFactory()
+                .setFadInitializerFactory(
+                    fadInitializerFactoryMaker.apply(abundanceFiltersFactory)
+                );
             final File scenarioFile = Paths.get("inputs", "epo_inputs", "tests", scenarioName + ".yaml").toFile();
             try {
                 new FishYAML().dump(scenario, new FileWriter(scenarioFile));

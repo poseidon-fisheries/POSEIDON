@@ -60,7 +60,7 @@ public class Aug22Calibrations {
 
         if(fixHazardAndWait){
             //set the scenario
-            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getPurseSeineGearFactory().getFadInitializerFactory();
             //weird but we know the name, not the class!
             BeanUtils.setProperty(fadInitializer,"fishReleaseProbabilityInPercent",new FixedDoubleParameter(2.0));
             //set the optimization parameter

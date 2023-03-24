@@ -1,11 +1,10 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceLinearIntervalAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -16,9 +15,27 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 public class AbundanceLinearIntervalInitializerFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public AbundanceLinearIntervalInitializerFactory() {
+    }
+
+    public AbundanceLinearIntervalInitializerFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory
+    ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
 
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
@@ -59,21 +76,13 @@ public class AbundanceLinearIntervalInitializerFactory implements
                 daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
                 carryingCapacities,
                 minAbundanceThreshold.apply(fishState.getRandom()),
-                selectivityFilters,
+                abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
                 fishState
 
             ),
             fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
             fishState::getStep
         );
-    }
-
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        return selectivityFilters;
-    }
-
-    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
-        this.selectivityFilters = selectivityFilters;
     }
 
     public DoubleParameter getFadDudRate() {

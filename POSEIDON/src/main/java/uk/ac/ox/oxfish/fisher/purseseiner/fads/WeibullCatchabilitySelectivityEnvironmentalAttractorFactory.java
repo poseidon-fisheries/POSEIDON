@@ -1,15 +1,15 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -31,12 +31,21 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttract
  * like the linear catchability weibull attractor, but this one sets catchability to 0 whenever clorophill is below a specific value
  */
 public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
     private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
     private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
@@ -71,6 +80,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     }
 
     public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
         final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
         final LinkedHashMap<String, Double> catchabilities,
@@ -82,6 +92,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
         final LinkedList<DoubleParameter> environmentalThresholds,
         final LinkedList<DoubleParameter> environmentalPenalties
     ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
         this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
         this.catchabilities = catchabilities;
@@ -157,8 +168,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
                             daysInWaterBeforeAttraction.apply(rng).intValue(),
                             maximumDaysAttractions.apply(rng).intValue(),
                             fishState,
-                            selectivityFilters
-
+                            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                         ),
                         fishReleaseProbabilityInPercent.apply(rng) / 100d,
                         fishState::getStep
@@ -169,18 +179,6 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
         );
 
 
-    }
-
-
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        return selectivityFilters;
-    }
-
-    @Override
-    public void setSelectivityFilters(
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters
-    ) {
-        this.selectivityFilters = selectivityFilters;
     }
 
     public LinkedHashMap<String, Double> getCarryingCapacityShapeParameters() {

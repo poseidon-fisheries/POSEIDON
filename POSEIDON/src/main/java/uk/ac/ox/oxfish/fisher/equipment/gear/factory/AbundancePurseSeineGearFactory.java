@@ -22,10 +22,18 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class AbundancePurseSeineGearFactory
     extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceFad> {
+
+    public AbundancePurseSeineGearFactory(
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
+    ) {
+        super(fadInitializerFactory);
+    }
 
     public AbundancePurseSeineGearFactory() {
     }

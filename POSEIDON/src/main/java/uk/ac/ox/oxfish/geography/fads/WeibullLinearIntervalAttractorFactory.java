@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
@@ -35,15 +35,24 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class WeibullLinearIntervalAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
@@ -64,6 +73,7 @@ public class WeibullLinearIntervalAttractorFactory implements
     }
 
     public WeibullLinearIntervalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter fadDudRate,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
@@ -72,6 +82,7 @@ public class WeibullLinearIntervalAttractorFactory implements
         final DoubleParameter daysItTakesToFillUp,
         final DoubleParameter minAbundanceThreshold
     ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
         this.fadDudRate = fadDudRate;
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
@@ -134,23 +145,11 @@ public class WeibullLinearIntervalAttractorFactory implements
             daysItTakesToFillUp.apply(
                 fishState.getRandom()).intValue(),
             minAbundanceThreshold.apply(fishState.getRandom()),
-            selectivityFilters,
+            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
             fishState,
             carryingCapacities
 
         );
-    }
-
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        return selectivityFilters;
-    }
-
-    public void setSelectivityFilters(
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters
-    ) {
-        oneAttractorPerStateLocker.reset();
-
-        this.selectivityFilters = selectivityFilters;
     }
 
     public DoubleParameter getFadDudRate() {

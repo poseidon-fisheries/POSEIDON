@@ -5,16 +5,18 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.fads.*;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.FadZapper;
+import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.List;
@@ -28,6 +30,12 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private boolean zapper = false;
     private boolean zapperAge = false;
 
+    private AbundanceFiltersFactory abundanceFiltersFactory =
+        new AbundanceFiltersFromFileFactory(
+            getInputFolder().path("abundance", "selectivity.csv"),
+            getSpeciesCodesSupplier()
+        );
+
     // private boolean galapagosZapper = false;
     private EPOPlannedStrategyFlexibleFactory destinationStrategy =
         new EPOPlannedStrategyFlexibleFactory(
@@ -36,10 +44,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             ),
             new AbundanceCatchSamplersFactory(
                 getSpeciesCodesSupplier(),
-                new AbundanceFiltersFactory(
-                    getInputFolder().path("abundance", "selectivity.csv"),
-                    getSpeciesCodesSupplier()
-                ),
+                abundanceFiltersFactory,
                 getInputFolder().path("set_samples.csv")
             ),
             getInputFolder().path("action_weights.csv"),
@@ -47,17 +52,27 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
         );
 
     public EpoScenarioPathfinding() {
-        setFadInitializerFactory(
-            new LinearAbundanceFadInitializerFactory(
-                getSpeciesCodesSupplier(),
-                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-            )
-        );
         setBiologicalProcessesFactory(
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
+        setPurseSeineGearFactory(
+            new AbundancePurseSeineGearFactory(
+                new LinearAbundanceFadInitializerFactory(
+                    abundanceFiltersFactory,
+                    getSpeciesCodesSupplier(),
+                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+                )
+            )
+        );
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     public DefaultToDestinationStrategyFishingStrategyFactory getFishingStrategyFactory() {
@@ -86,15 +101,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     public ScenarioPopulation populateModel(final FishState fishState) {
         super.setFishingStrategyFactory(fishingStrategyFactory);
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        ((PluggableSelectivity) getFadInitializerFactory()).setSelectivityFilters(
-            ((AbundanceCatchSamplersFactory) getDestinationStrategy().getCatchSamplersFactory())
-                .getAbundanceFiltersFactory()
-                .apply(fishState)
-                .get(FadSetAction.class)
-        );
-
-        getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
 
         final FisherFactory fisherFactory = makeFisherFactory(
             fishState,

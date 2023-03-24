@@ -49,7 +49,6 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -95,16 +94,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
-
-    private AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory;
-
-    public AlgorithmFactory<? extends FadInitializer<B, F>> getFadInitializerFactory() {
-        return fadInitializerFactory;
-    }
-
-    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<B, F>> fadInitializerFactory) {
-        this.fadInitializerFactory = fadInitializerFactory;
-    }
 
     public static final MapExtent DEFAULT_MAP_EXTENT =
         MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
@@ -249,7 +238,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         monitors.getMonitors().forEach(fishState::registerStartable);
 
         if (getPurseSeineGearFactory() != null) {
-            getPurseSeineGearFactory().setFadInitializerFactory(getFadInitializerFactory());
             getPurseSeineGearFactory().getFadDeploymentObservers()
                 .addAll(monitors.getFadDeploymentMonitors());
             getPurseSeineGearFactory().getAllSetsObservers()

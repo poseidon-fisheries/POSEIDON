@@ -32,18 +32,14 @@ import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
     public EpoAbundanceScenarioBioOnly() {
-        setFadInitializerFactory(
-            new LinearAbundanceFadInitializerFactory(
-                getSpeciesCodesSupplier(),
-                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-            )
-        );
         setBiologicalProcessesFactory(
-            new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
+            new AbundanceProcessesFactory(
+                getInputFolder().path("abundance"),
+                getSpeciesCodesSupplier()
+            )
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
         setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
-        setPurseSeineGearFactory(new AbundancePurseSeineGearFactory());
     }
 
 }

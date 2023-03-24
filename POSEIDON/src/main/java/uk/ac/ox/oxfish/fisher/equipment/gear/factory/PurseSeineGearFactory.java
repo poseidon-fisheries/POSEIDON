@@ -81,6 +81,12 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     public PurseSeineGearFactory() {
     }
 
+    public PurseSeineGearFactory(
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
+    ) {
+        this.fadInitializerFactory = fadInitializerFactory;
+    }
+
     public DoubleParameter getFishValueCalculatorStandardDeviation() {
         return fishValueCalculatorStandardDeviation;
     }

@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -55,15 +56,19 @@ public class AbundanceFadInitializerFactoryTest {
                         "    Bigeye tuna: '1.1542113992177854'\n" +
                         "    Yellowfin tuna: '1.0487948686421702'\n" +
                         "    Skipjack tuna: '1.2084595864666523'\n" +
-                        "  selectivityFilters: {\n" +
-                        "    }\n" +
-                        "  totalCarryingCapacity: '445000.0'";
+                        "  totalCarryingCapacity: '445000.0'\n" +
+                        "  abundanceFiltersFactory: !!uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory\n" +
+                        "    selectivityFile:\n" +
+                        "      parent: null\n" +
+                        "      path: inputs/epo_inputs/abundance/selectivity.csv\n";
         FishYAML yaml = new FishYAML();
         AbundanceFadInitializerFactory factory = yaml.loadAs(defaultConstructor, AbundanceFadInitializerFactory.class);
         SpeciesCodesFromFileFactory speciesCodesFactory =
             new SpeciesCodesFromFileFactory(InputPath.of("inputs", "epo_inputs", "species_codes.csv"));
         final SpeciesCodes speciesCodes = speciesCodesFactory.get();
         factory.setSpeciesCodesSupplier(speciesCodesFactory);
+        ((AbundanceFiltersFromFileFactory) factory.getAbundanceFiltersFactory())
+            .setSpeciesCodesSupplier(speciesCodesFactory);
         factory.setFadDudRate(new FixedDoubleParameter(fadDudRate));
         FishState fakeModel = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(fakeModel.getRandom()).thenReturn(new MersenneTwisterFast());

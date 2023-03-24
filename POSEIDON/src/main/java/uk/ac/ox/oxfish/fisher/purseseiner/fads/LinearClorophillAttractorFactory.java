@@ -1,17 +1,15 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -20,7 +18,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,12 +27,28 @@ import java.util.function.Supplier;
  * till it's time to stop
  */
 public class LinearClorophillAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public LinearClorophillAttractorFactory() {
+    }
 
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+
+    public LinearClorophillAttractorFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
@@ -126,8 +139,7 @@ public class LinearClorophillAttractorFactory implements
                             daysInWaterBeforeAttraction.apply(rng).intValue(),
                             maximumDaysAttractions.apply(rng).intValue(),
                             fishState,
-                            selectivityFilters
-
+                            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                         ),
                         fishReleaseProbabilityInPercent.apply(rng) / 100d,
                         fishState::getStep
@@ -139,19 +151,6 @@ public class LinearClorophillAttractorFactory implements
 
 
     }
-
-
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        return selectivityFilters;
-    }
-
-    @Override
-    public void setSelectivityFilters(
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters
-    ) {
-        this.selectivityFilters = selectivityFilters;
-    }
-
 
     public LinkedHashMap<String, Double> getCatchabilities() {
         return catchabilities;

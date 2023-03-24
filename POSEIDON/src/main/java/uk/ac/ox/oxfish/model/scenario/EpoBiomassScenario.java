@@ -60,32 +60,6 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
         );
 
     public EpoBiomassScenario() {
-        setFadInitializerFactory(
-            new BiomassFadInitializerFactory(
-                getSpeciesCodesSupplier(),
-                // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
-                ImmutableMap.of(
-                    "Bigeye tuna", 0.7697766896339598,
-                    "Yellowfin tuna", 1.1292389959739901,
-                    "Skipjack tuna", 0.0
-                ),
-                ImmutableMap.of(
-                    "Bigeye tuna", 1.0184011081061861,
-                    "Yellowfin tuna", 0.0,
-                    "Skipjack tuna", 0.7138646301498129
-                ),
-                ImmutableMap.of(
-                    "Bigeye tuna", 9.557509707646096,
-                    "Yellowfin tuna", 10.419783885948643,
-                    "Skipjack tuna", 9.492481930328207
-                ),
-                ImmutableMap.of(
-                    "Bigeye tuna", 0.688914118975473,
-                    "Yellowfin tuna", 0.30133562299610883,
-                    "Skipjack tuna", 1.25
-                )
-            )
-        );
         setBiologicalProcessesFactory(
             new BiomassProcessesFactory(
                 getInputFolder().path("biomass"),
@@ -109,7 +83,34 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
 
             )
         );
-        setPurseSeineGearFactory(new BiomassPurseSeineGearFactory());
+        setPurseSeineGearFactory(
+            new BiomassPurseSeineGearFactory(
+                new BiomassFadInitializerFactory(
+                    getSpeciesCodesSupplier(),
+                    // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
+                    ImmutableMap.of(
+                        "Bigeye tuna", 0.7697766896339598,
+                        "Yellowfin tuna", 1.1292389959739901,
+                        "Skipjack tuna", 0.0
+                    ),
+                    ImmutableMap.of(
+                        "Bigeye tuna", 1.0184011081061861,
+                        "Yellowfin tuna", 0.0,
+                        "Skipjack tuna", 0.7138646301498129
+                    ),
+                    ImmutableMap.of(
+                        "Bigeye tuna", 9.557509707646096,
+                        "Yellowfin tuna", 10.419783885948643,
+                        "Skipjack tuna", 9.492481930328207
+                    ),
+                    ImmutableMap.of(
+                        "Bigeye tuna", 0.688914118975473,
+                        "Yellowfin tuna", 0.30133562299610883,
+                        "Skipjack tuna", 1.25
+                    )
+                )
+            )
+        );
     }
 
     public static String getBoatId(final Fisher fisher) {

@@ -22,10 +22,18 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class BiomassPurseSeineGearFactory
     extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
+
+    public BiomassPurseSeineGearFactory(
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
+    ) {
+        super(fadInitializerFactory);
+    }
 
     public BiomassPurseSeineGearFactory() {
     }

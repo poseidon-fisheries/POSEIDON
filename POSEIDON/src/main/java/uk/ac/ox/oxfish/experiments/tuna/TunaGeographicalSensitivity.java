@@ -49,17 +49,17 @@ public class TunaGeographicalSensitivity {
                     EpoScenarioPathfinding.class);
 
             if(Double.isFinite(hazardRate))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getFadInitializerFactory()).
-                        setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
+                    setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
 
             scenario.setZapperAge(zapperAge);
 
             if(Double.isFinite(waitTime))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getFadInitializerFactory()).
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
                         setDaysInWaterBeforeAttraction(new FixedDoubleParameter(waitTime));
 
             if(Double.isFinite(catchabilityMultiplier)) {
-                LinkedHashMap<String, Double> catchabilities = ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getFadInitializerFactory()).
+                LinkedHashMap<String, Double> catchabilities = ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
                         getCatchabilities();
                 Set<String> species = catchabilities.keySet();
                 for (String tuna : species) {

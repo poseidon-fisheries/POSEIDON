@@ -21,17 +21,15 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.PluggableSelectivity;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
@@ -42,7 +40,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
@@ -50,14 +47,32 @@ import java.util.function.Function;
  * fads attract linearly, but can be penalized by environmental factors which are read as additional maps
  */
 public class LinearEnvironmentalAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>>, PluggableSelectivity {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
     private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
     private LinkedList<DoubleParameter> environmentalThresholds = new LinkedList<>();
     private LinkedList<DoubleParameter> environmentalPenalties = new LinkedList<>();
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public LinearEnvironmentalAttractorFactory() {
+    }
+
+    public LinearEnvironmentalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory
+    ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
 
     private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
@@ -183,7 +198,7 @@ public class LinearEnvironmentalAttractorFactory implements
                         daysInWaterBeforeAttraction.apply(rng).intValue(),
                         maximumDaysAttractions.apply(rng).intValue(),
                         fishState,
-                        selectivityFilters
+                        abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                     ),
                     fishReleaseProbabilityInPercent.apply(rng) / 100d,
                     fishState::getStep
@@ -194,18 +209,6 @@ public class LinearEnvironmentalAttractorFactory implements
 
 
     }
-
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        return selectivityFilters;
-    }
-
-    @Override
-    public void setSelectivityFilters(
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters
-    ) {
-        this.selectivityFilters = selectivityFilters;
-    }
-
 
     public LinkedHashMap<String, Double> getCatchabilities() {
         return catchabilities;

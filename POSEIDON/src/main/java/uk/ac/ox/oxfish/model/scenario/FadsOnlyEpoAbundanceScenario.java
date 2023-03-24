@@ -18,21 +18,18 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
-import uk.ac.ox.oxfish.geography.fads.*;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
+import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import java.util.Map;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -44,7 +41,14 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
             getInputFolder().path("calibration", "fad_deployments.csv"),
-            new AbundanceFadInitializerFactory()
+            new AbundanceFadInitializerFactory(
+                new AbundanceFiltersFromFileFactory(
+                    getInputFolder().path("abundance", "selectivity.csv"),
+                    getSpeciesCodesSupplier()
+                ),
+                getSpeciesCodesSupplier(),
+                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+            )
         );
 
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
@@ -52,19 +56,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             getInputFolder().path("calibration", "fad_sets.csv"), true
         );
 
-    private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFactory(
-            getInputFolder().path("abundance", "selectivity.csv"),
-            getSpeciesCodesSupplier()
-        );
-
     public FadsOnlyEpoAbundanceScenario() {
-        setFadInitializerFactory(
-            new AbundanceFadInitializerFactory(
-                getSpeciesCodesSupplier(),
-                "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-            )
-        );
         setBiologicalProcessesFactory(
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
@@ -82,28 +74,10 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.fadMakerFactory = fadMakerFactory;
     }
 
-    @SuppressWarnings("unused")
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        final Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
-            abundanceFilters =
-            abundanceFiltersFactory.apply(fishState);
-
-        ((PluggableSelectivity) getFadInitializerFactory()).setSelectivityFilters(abundanceFilters.get(
-            FadSetAction.class));
-        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setFadInitializer(getFadInitializerFactory());
 
         fishState.registerStartable(fadMakerFactory.apply(fishState));
         if (fadSettingActive)

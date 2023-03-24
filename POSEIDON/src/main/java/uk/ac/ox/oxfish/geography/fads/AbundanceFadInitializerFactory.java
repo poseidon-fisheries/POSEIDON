@@ -19,16 +19,17 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 public class AbundanceFadInitializerFactory
-        extends  AbstractAbundanceFadInitializerFactory {
+    extends AbstractAbundanceFadInitializerFactory {
 
 
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
@@ -38,21 +39,25 @@ public class AbundanceFadInitializerFactory
     }
 
     public AbundanceFadInitializerFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
     ) {
-        super(speciesCodesSupplier, speciesNames);
+        super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
     @NotNull
-    protected DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity) {
+    protected DoubleSupplier buildCapacityGenerator(
+        final MersenneTwisterFast rng,
+        final double maximumCarryingCapacity
+    ) {
         final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
-        DoubleSupplier capacityGenerator;
-        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud ==0)
+        final DoubleSupplier capacityGenerator;
+        if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
             capacityGenerator = () -> maximumCarryingCapacity;
         else
             capacityGenerator = () -> {
-                if(rng.nextFloat()<= probabilityOfFadBeingDud)
+                if (rng.nextFloat() <= probabilityOfFadBeingDud)
                     return 0;
                 else
                     return maximumCarryingCapacity;
@@ -66,7 +71,7 @@ public class AbundanceFadInitializerFactory
         return fadDudRate;
     }
 
-    public void setFadDudRate(DoubleParameter fadDudRate) {
+    public void setFadDudRate(final DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
     }
 }

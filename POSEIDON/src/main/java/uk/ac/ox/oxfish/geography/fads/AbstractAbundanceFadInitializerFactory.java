@@ -1,28 +1,39 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractAbundanceFadInitializerFactory
-    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> implements PluggableSelectivity {
+    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
-    private Map<Species, NonMutatingArrayFilter> selectivityFilters = ImmutableMap.of();
+    private AbundanceFiltersFactory abundanceFiltersFactory;
+
+    public AbstractAbundanceFadInitializerFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
+        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final String... speciesNames
+    ) {
+        super(speciesCodesSupplier, speciesNames);
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
 
     /**
      * Empty constructor for YAML
@@ -30,16 +41,12 @@ public abstract class AbstractAbundanceFadInitializerFactory
     public AbstractAbundanceFadInitializerFactory() {
     }
 
-    public AbstractAbundanceFadInitializerFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final String... speciesNames
-    ) {
-        super(speciesCodesSupplier, speciesNames);
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
-        checkNotNull(selectivityFilters);
         checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
         final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
@@ -106,20 +113,9 @@ public abstract class AbstractAbundanceFadInitializerFactory
             ),
             attractionRates,
             fishState.getRandom(),
-            getSelectivityFilters()
+            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
         );
     }
-
-    @SuppressWarnings("WeakerAccess")
-    public Map<Species, NonMutatingArrayFilter> getSelectivityFilters() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return selectivityFilters;
-    }
-
-    public void setSelectivityFilters(final Map<Species, NonMutatingArrayFilter> selectivityFilters) {
-        this.selectivityFilters = ImmutableMap.copyOf(selectivityFilters);
-    }
-
 
 }
 

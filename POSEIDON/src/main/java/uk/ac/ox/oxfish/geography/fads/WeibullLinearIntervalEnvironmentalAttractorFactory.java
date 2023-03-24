@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -50,6 +51,7 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
     public WeibullLinearIntervalEnvironmentalAttractorFactory() {}
 
     public WeibullLinearIntervalEnvironmentalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter fadDudRate,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
@@ -61,6 +63,7 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
         final LinkedList<DoubleParameter> environmentalThresholds
     ) {
         super(
+            abundanceFiltersFactory,
             fadDudRate,
             fishReleaseProbabilityInPercent,
             carryingCapacityShapeParameters,

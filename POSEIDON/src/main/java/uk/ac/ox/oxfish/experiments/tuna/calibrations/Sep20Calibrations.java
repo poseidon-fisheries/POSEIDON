@@ -128,14 +128,16 @@ public class Sep20Calibrations {
 
         if(fixHazardAndWait){
             //set the scenario
-            AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getFadInitializerFactory();
+            AlgorithmFactory<? extends FadInitializer> fadInitializer =
+                scenario
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory();
             //weird but we know the name, not the class!
-            BeanUtils.setProperty(fadInitializer,"fishReleaseProbabilityInPercent",new FixedDoubleParameter(2.0));
+            BeanUtils.setProperty(fadInitializer, "fishReleaseProbabilityInPercent", new FixedDoubleParameter(2.0));
             //set the optimization parameter
             OptimizationParameter toRemove = null;
             for (OptimizationParameter parameter : optimization.getParameters()) {
-                if(parameter.getName().equals("fadInitializerFactory.fishReleaseProbabilityInPercent"))
-                {
+                if (parameter.getName().equals("fadInitializerFactory.fishReleaseProbabilityInPercent")) {
                     toRemove = parameter;
                     break;
                 }
@@ -194,7 +196,7 @@ public class Sep20Calibrations {
 
             //set the gear to linear
             LinearClorophillAttractorFactory fadInitializer = new LinearClorophillAttractorFactory();
-            scenario.setFadInitializerFactory(fadInitializer);
+            scenario.getPurseSeineGearFactory().setFadInitializerFactory(fadInitializer);
             fadInitializer.getCatchabilities().clear();
             fadInitializer.getCatchabilities().put("Skipjack tuna",0d);
             fadInitializer.getCatchabilities().put("Yellowfin tuna",0d);

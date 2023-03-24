@@ -39,7 +39,10 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
     public ExogenousFadSetterCSVFactory() {
     }
 
-    public ExogenousFadSetterCSVFactory(final InputPath setsFile, final boolean isDataInTonnes) {
+    public ExogenousFadSetterCSVFactory(
+        final InputPath setsFile,
+        final boolean isDataInTonnes
+    ) {
         this.setsFile = setsFile;
         this.isDataInTonnes = isDataInTonnes;
     }

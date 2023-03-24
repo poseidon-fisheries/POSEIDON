@@ -209,7 +209,7 @@ public class EpoSensitivityRuns {
         final double threshold
     ) {
         final WeibullCatchabilitySelectivityEnvironmentalAttractorFactory fadInitializerFactory =
-            (WeibullCatchabilitySelectivityEnvironmentalAttractorFactory) scenario.getFadInitializerFactory();
+            (WeibullCatchabilitySelectivityEnvironmentalAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory();
         final int avoidanceMapIndex = fadInitializerFactory
             .getEnvironmentalMaps()
             .stream()

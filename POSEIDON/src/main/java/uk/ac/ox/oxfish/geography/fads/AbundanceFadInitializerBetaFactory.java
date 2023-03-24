@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -24,10 +25,11 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
     }
 
     public AbundanceFadInitializerBetaFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
     ) {
-        super(speciesCodesSupplier, speciesNames);
+        super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
     @NotNull
