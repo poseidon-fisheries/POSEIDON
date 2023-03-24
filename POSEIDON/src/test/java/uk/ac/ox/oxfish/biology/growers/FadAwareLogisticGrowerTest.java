@@ -59,7 +59,7 @@ public class FadAwareLogisticGrowerTest {
             .setCatchesFile(
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );
-        scenario.setRegulationsFactory(new NoFishingFactory());
+        scenario.getPurseSeinerFleetFactory().setRegulationsFactory(new NoFishingFactory());
 
         final FishState state = new FishState();
         state.setScenario(scenario);

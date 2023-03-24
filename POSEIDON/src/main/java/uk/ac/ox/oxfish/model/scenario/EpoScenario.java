@@ -18,34 +18,14 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import org.jetbrains.annotations.NotNull;
-import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
-import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
-import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
@@ -69,28 +49,17 @@ import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import javax.measure.quantity.Mass;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
@@ -148,20 +117,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             inputFolder.path("ports.csv")
         );
     private FadMapFactory<B, F> fadMapFactory;
-    private FadRefillGearStrategyFactory gearStrategy = new FadRefillGearStrategyFactory(
-        inputFolder.path("max_deployments.csv")
-    );
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private InputPath vesselsFile = inputFolder.path("boats.csv");
-    private InputPath costsFile = inputFolder.path("costs.csv");
-    private PurseSeineGearFactory<B, F> purseSeineGearFactory;
-    private AlgorithmFactory<? extends Regulation> regulationsFactory =
-        new StandardIattcRegulationsFactory(
-            new ProtectedAreasFromFolderFactory(
-                getInputFolder().path("regions"),
-                "region_tags.csv"
-            )
-        );
     private List<AlgorithmFactory<? extends Startable>> additionalStartables = new LinkedList<>();
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
@@ -174,6 +129,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return mapInitializerFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setMapInitializerFactory(final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
         this.mapInitializerFactory = mapInitializerFactory;
     }
@@ -202,14 +158,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.portInitializer = portInitializer;
     }
 
-    public InputPath getVesselsFile() {
-        return vesselsFile;
-    }
-
-    public void setVesselsFile(final InputPath vesselsFile) {
-        this.vesselsFile = vesselsFile;
-    }
-
     public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
     }
@@ -234,23 +182,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
 
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
-
-        if (getPurseSeineGearFactory() != null) {
-            getPurseSeineGearFactory().getFadDeploymentObservers()
-                .addAll(monitors.getFadDeploymentMonitors());
-            getPurseSeineGearFactory().getAllSetsObservers()
-                .addAll(monitors.getAllSetsMonitors());
-            getPurseSeineGearFactory().getFadSetObservers()
-                .addAll(monitors.getFadSetMonitors());
-            getPurseSeineGearFactory().getNonAssociatedSetObservers()
-                .addAll(monitors.getNonAssociatedSetMonitors());
-            getPurseSeineGearFactory().getDolphinSetObservers()
-                .addAll(monitors.getDolphinSetMonitors());
-            getPurseSeineGearFactory().setBiomassLostMonitor(monitors.getBiomassLostMonitor());
-        }
-
         additionalStartables.stream()
             .map(additionalStartable -> additionalStartable.apply(fishState))
             .forEach(fishState::registerStartable);
@@ -260,22 +191,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             new SocialNetwork(new EmptyNetworkBuilder()),
             ImmutableMap.of() // no entry in the fishery so no need to pass factory here
         );
-    }
-
-    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategyFactory() {
-        return fishingStrategyFactory;
-    }
-
-    public void setFishingStrategyFactory(final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory) {
-        this.fishingStrategyFactory = fishingStrategyFactory;
-    }
-
-    public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {
-        return purseSeineGearFactory;
-    }
-
-    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B, F> purseSeineGearFactory) {
-        this.purseSeineGearFactory = purseSeineGearFactory;
     }
 
     public FadMapFactory<B, F> getFadMapFactory() {
@@ -298,129 +213,10 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return fishState.getMap().getPorts();
     }
 
-    @NotNull
-    FisherFactory makeFisherFactory(
-        final FishState fishState,
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
-        final GravityDestinationStrategyFactory gravityDestinationStrategyFactory
-    ) {
-        return makeFisherFactory(
-            fishState,
-            regulationsFactory,
-            purseSeineGearFactory,
-            gravityDestinationStrategyFactory,
-            fishingStrategyFactory,
-            new PurseSeinerDepartingStrategyFactory()
-        );
-
-    }
-
-    @NotNull
-    FisherFactory makeFisherFactory(
-        final FishState fishState,
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
-        final PurseSeineGearFactory<B, F> purseSeineGearFactory,
-        final AlgorithmFactory<? extends DestinationStrategy> gravityDestinationStrategyFactory,
-        final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory,
-        final PurseSeinerDepartingStrategyFactory departingStrategy
-    ) {
-        final FisherFactory fisherFactory = new FisherFactory(
-            null,
-            regulationsFactory,
-            departingStrategy,
-            gravityDestinationStrategyFactory,
-            fishingStrategyFactory,
-            new NoDiscardingFactory(),
-            gearStrategy,
-            new IgnoreWeatherFactory(),
-            null,
-            null,
-            purseSeineGearFactory,
-            0
-        );
-
-        fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
-            fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
-                .getStrategies()
-                .stream()
-                .filter(strategy -> strategy instanceof DestinationBasedDepartingStrategy)
-                .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
-                .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
-            addHourlyCosts(),
-            fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
-            fisher -> fisher.getYearlyData().registerGatherer(
-                "Profits",
-                fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
-                    - fisher1.getYearlyCounterColumn(VARIABLE_COSTS),
-                Double.NaN
-            ),
-            fisher -> fisher.getYearlyCounter().addColumn("Distance travelled"),
-            fisher -> fisher.getYearlyData().registerGatherer("Distance travelled", fisher1 ->
-                fisher1.getYearlyCounterColumn("Distance travelled"), Double.NaN
-            ),
-            fisher -> fisher.addTripListener((tripRecord, fisher1) ->
-                fisher1.getYearlyCounter()
-                    .count("Distance travelled", tripRecord.getDistanceTravelled())
-            )
-        ));
-
-        return fisherFactory;
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private Consumer<Fisher> addHourlyCosts() {
-        final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            recordStream(costsFile.get()).collect(toImmutableRangeMap(
-                r -> Range.openClosed(
-                    getQuantity(r.getInt("lower_capacity"), TONNE),
-                    getQuantity(r.getInt("upper_capacity"), TONNE)
-                ),
-                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
-            ));
-        // Setup hourly costs as a function of capacity
-        return fisher -> {
-            final ComparableQuantity<Mass> capacity =
-                getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
-            final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
-            fisher.getAdditionalTripCosts().add(hourlyCost);
-        };
-    }
-
-    @SuppressWarnings("unused")
-    public InputPath getCostsFile() {
-        return costsFile;
-    }
-
-    public void setCostsFile(final InputPath costsFile) {
-        this.costsFile = costsFile;
-    }
-
     @SuppressWarnings("unused")
     @Override
     public void useDummyData() {
         getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
-        setCostsFile(
-            testInputFolder.path("no_costs.csv")
-        );
-        setVesselsFile(
-            testInputFolder.path("dummy_boats.csv")
-        );
-        getGearStrategy().setMaxFadDeploymentsFile(
-            testInputFolder.path("dummy_max_deployments.csv")
-        );
-        if (getFishingStrategyFactory() instanceof PurseSeinerFishingStrategyFactory<?, ?>)
-            ((PurseSeinerFishingStrategyFactory<?, ?>) getFishingStrategyFactory())
-                .setActionWeightsFile(
-                    testInputFolder.path("dummy_action_weights.csv")
-                );
-    }
-
-    public FadRefillGearStrategyFactory getGearStrategy() {
-        return gearStrategy;
-    }
-
-    public void setGearStrategy(final FadRefillGearStrategyFactory gearStrategy) {
-        this.gearStrategy = gearStrategy;
     }
 
     @Override
@@ -434,16 +230,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
         this.marketMapFactory = marketMapFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
     }
 
     @SuppressWarnings("unused")

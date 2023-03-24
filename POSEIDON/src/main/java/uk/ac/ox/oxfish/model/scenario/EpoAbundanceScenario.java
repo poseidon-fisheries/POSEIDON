@@ -23,18 +23,22 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
+import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
 import java.util.List;
 
@@ -43,21 +47,73 @@ import java.util.List;
  */
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
+    private InputPath vesselsFile = getInputFolder().path("boats.csv");
+    private PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory =
+        new PurseSeinerFleetFactory<>(
+            getInputFolder().path("costs.csv"),
+            new AbundancePurseSeineGearFactory(
+                new LinearAbundanceFadInitializerFactory(
+                    getAbundanceFiltersFactory(),
+                    getSpeciesCodesSupplier(),
+                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
+                )
+            ),
+            new FadRefillGearStrategyFactory(
+                getInputFolder().path("max_deployments.csv")
+            ),
+            new GravityDestinationStrategyFactory(
+                getInputFolder().path("action_weights.csv"),
+                getVesselsFile(),
+                new AttractionFieldsSupplier(
+                    new LocationValuesSupplier(
+                        getInputFolder().path("location_values.csv")
+                    ),
+                    getInputFolder().path("max_current_speeds.csv")
+                )
+            ),
+            new PurseSeinerAbundanceFishingStrategyFactory(
+                getSpeciesCodesSupplier(),
+                getInputFolder().path("action_weights.csv"),
+                new AbundanceCatchSamplersFactory(
+                    getSpeciesCodesSupplier(),
+                    getAbundanceFiltersFactory(),
+                    getInputFolder().path("set_samples.csv")
+                ),
+                new SetDurationSamplersFactory(
+                    getInputFolder().path("set_durations.csv")
+                ),
+                getInputFolder().path("max_current_speeds.csv"),
+                getInputFolder().path("set_compositions.csv")
+            ),
+            new StandardIattcRegulationsFactory(
+                new ProtectedAreasFromFolderFactory(
+                    getInputFolder().path("regions"),
+                    "region_tags.csv"
+                )
+            ),
+            new PurseSeinerDepartingStrategyFactory()
+        );
+
+    public PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> getPurseSeinerFleetFactory() {
+        return purseSeinerFleetFactory;
+    }
+
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory) {
+        this.purseSeinerFleetFactory = purseSeinerFleetFactory;
+    }
+
+    public InputPath getVesselsFile() {
+        return vesselsFile;
+    }
+
+    public void setVesselsFile(final InputPath vesselsFile) {
+        this.vesselsFile = vesselsFile;
+    }
+
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFromFileFactory(
             getInputFolder().path("abundance", "selectivity.csv"),
             getSpeciesCodesSupplier()
-        );
-    private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-        new GravityDestinationStrategyFactory(
-            getInputFolder().path("action_weights.csv"),
-            getVesselsFile(),
-            new AttractionFieldsSupplier(
-                new LocationValuesSupplier(
-                    getInputFolder().path("location_values.csv")
-                ),
-                getInputFolder().path("max_current_speeds.csv")
-            )
         );
 
     public EpoAbundanceScenario() {
@@ -65,32 +121,6 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        final InputPath maxCurrentSpeedsFile = getInputFolder().path("max_current_speeds.csv");
-        setFishingStrategyFactory(
-            new PurseSeinerAbundanceFishingStrategyFactory(
-                getSpeciesCodesSupplier(),
-                getInputFolder().path("action_weights.csv"),
-                new AbundanceCatchSamplersFactory(
-                    getSpeciesCodesSupplier(),
-                    abundanceFiltersFactory,
-                    getInputFolder().path("set_samples.csv")
-                ),
-                new SetDurationSamplersFactory(
-                    getInputFolder().path("set_durations.csv")
-                ),
-                maxCurrentSpeedsFile,
-                getInputFolder().path("set_compositions.csv")
-            )
-        );
-        setPurseSeineGearFactory(
-            new AbundancePurseSeineGearFactory(
-                new LinearAbundanceFadInitializerFactory(
-                    getAbundanceFiltersFactory(),
-                    getSpeciesCodesSupplier(),
-                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-                )
-            )
-        );
     }
 
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
@@ -101,24 +131,13 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
-        return gravityDestinationStrategyFactory;
-    }
-
-    public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
-        this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
-    }
-
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        final FisherFactory fisherFactory = makeFisherFactory(
-            fishState,
-            getRegulationsFactory(),
-            gravityDestinationStrategyFactory
-        );
+        final FisherFactory fisherFactory =
+            purseSeinerFleetFactory.makeFisherFactory(fishState);
 
         final List<Fisher> fishers =
             new PurseSeineVesselReader(
@@ -137,16 +156,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, Abu
     @Override
     public void useDummyData() {
         super.useDummyData();
-        this.gravityDestinationStrategyFactory
-            .getAttractionFieldsSupplier()
-            .getLocationValuesSupplier()
-            .setLocationValuesFile(testFolder().path("dummy_location_values.csv"));
-        this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            testFolder().path("dummy_action_weights.csv")
-        );
-        this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            testFolder().path("dummy_boats.csv")
-        );
+        vesselsFile = testFolder().path("dummy_boats.csv");
+        purseSeinerFleetFactory.useDummyData(testFolder());
     }
 
 }

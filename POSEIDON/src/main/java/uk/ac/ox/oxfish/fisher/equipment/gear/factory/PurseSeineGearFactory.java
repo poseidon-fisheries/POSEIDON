@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -232,5 +233,19 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             new UnreliableFishValueCalculator(globalBiology, rng, fishValueCalculatorStandardDeviation.apply(rng))
         );
         return fadManager;
+    }
+
+    public void addMonitors(final Monitors monitors) {
+        getFadDeploymentObservers()
+            .addAll(monitors.getFadDeploymentMonitors());
+        getAllSetsObservers()
+            .addAll(monitors.getAllSetsMonitors());
+        getFadSetObservers()
+            .addAll(monitors.getFadSetMonitors());
+        getNonAssociatedSetObservers()
+            .addAll(monitors.getNonAssociatedSetMonitors());
+        getDolphinSetObservers()
+            .addAll(monitors.getDolphinSetMonitors());
+        setBiomassLostMonitor(monitors.getBiomassLostMonitor());
     }
 }

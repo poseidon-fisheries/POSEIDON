@@ -39,7 +39,6 @@ public class EpoAbundanceScenarioBioOnly extends EpoScenario<AbundanceLocalBiolo
             )
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        setFishingStrategyFactory(new PurseSeinerAbundanceFishingStrategyFactory());
     }
 
 }

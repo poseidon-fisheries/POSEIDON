@@ -151,7 +151,7 @@ public class Slice1SweepsWithAltExoCatches {
         batchRunner.setScenarioSetup(scenario -> {
             final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
             final AlgorithmFactory<? extends Gear> gearFactory =
-                epoBiomassScenario.getPurseSeineGearFactory();
+                epoBiomassScenario.getPurseSeinerFleetFactory().getPurseSeineGearFactory();
             ((BiomassPurseSeineGearFactory) gearFactory).setActionSpecificRegulations(
                 regulationFactories);
             ((BiomassProcessesFactory) epoBiomassScenario.getBiologicalProcessesFactory())

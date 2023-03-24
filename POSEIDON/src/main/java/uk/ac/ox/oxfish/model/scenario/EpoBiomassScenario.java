@@ -25,16 +25,20 @@ import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
+import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -47,43 +51,10 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
  */
 public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, BiomassFad> {
 
-    private GravityDestinationStrategyFactory gravityDestinationStrategyFactory =
-        new GravityDestinationStrategyFactory(
-            getInputFolder().path("action_weights.csv"),
-            getVesselsFile(),
-            new AttractionFieldsSupplier(
-                new LocationValuesSupplier(
-                    getInputFolder().path("location_values.csv")
-                ),
-                getInputFolder().path("max_current_speeds.csv")
-            )
-        );
-
-    public EpoBiomassScenario() {
-        setBiologicalProcessesFactory(
-            new BiomassProcessesFactory(
-                getInputFolder().path("biomass"),
-                getSpeciesCodesSupplier(),
-                TARGET_YEAR
-            )
-        );
-        setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
-        final InputPath maxCurrentSpeedsFile = getInputFolder().path("max_current_speeds.csv");
-        setFishingStrategyFactory(
-            new PurseSeinerBiomassFishingStrategyFactory(
-                getSpeciesCodesSupplier(),
-                getInputFolder().path("action_weights.csv"),
-                new BiomassCatchSamplersFactory(
-                    getSpeciesCodesSupplier(),
-                    getInputFolder().path("set_samples.csv")
-                ),
-                new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
-                maxCurrentSpeedsFile,
-                getInputFolder().path("set_compositions.csv")
-
-            )
-        );
-        setPurseSeineGearFactory(
+    private InputPath vesselsFile = getInputFolder().path("boats.csv");
+    private PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory =
+        new PurseSeinerFleetFactory<>(
+            getInputFolder().path("costs.csv"),
             new BiomassPurseSeineGearFactory(
                 new BiomassFadInitializerFactory(
                     getSpeciesCodesSupplier(),
@@ -109,8 +80,66 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                         "Skipjack tuna", 1.25
                     )
                 )
+            ),
+            new FadRefillGearStrategyFactory(
+                getInputFolder().path("max_deployments.csv")
+            ),
+            new GravityDestinationStrategyFactory(
+                getInputFolder().path("action_weights.csv"),
+                getVesselsFile(),
+                new AttractionFieldsSupplier(
+                    new LocationValuesSupplier(
+                        getInputFolder().path("location_values.csv")
+                    ),
+                    getInputFolder().path("max_current_speeds.csv")
+                )
+            ),
+            new PurseSeinerBiomassFishingStrategyFactory(
+                getSpeciesCodesSupplier(),
+                getInputFolder().path("action_weights.csv"),
+                new BiomassCatchSamplersFactory(
+                    getSpeciesCodesSupplier(),
+                    getInputFolder().path("set_samples.csv")
+                ),
+                new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
+                getInputFolder().path("max_current_speeds.csv"),
+                getInputFolder().path("set_compositions.csv")
+
+            ),
+            new StandardIattcRegulationsFactory(
+                new ProtectedAreasFromFolderFactory(
+                    getInputFolder().path("regions"),
+                    "region_tags.csv"
+                )
+            ),
+            new PurseSeinerDepartingStrategyFactory()
+        );
+
+    public EpoBiomassScenario() {
+        setBiologicalProcessesFactory(
+            new BiomassProcessesFactory(
+                getInputFolder().path("biomass"),
+                getSpeciesCodesSupplier(),
+                TARGET_YEAR
             )
         );
+        setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));
+    }
+
+    public InputPath getVesselsFile() {
+        return vesselsFile;
+    }
+
+    public void setVesselsFile(final InputPath vesselsFile) {
+        this.vesselsFile = vesselsFile;
+    }
+
+    public PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> getPurseSeinerFleetFactory() {
+        return purseSeinerFleetFactory;
+    }
+
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory) {
+        this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 
     public static String getBoatId(final Fisher fisher) {
@@ -124,24 +153,13 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             .getDayOfYear();
     }
 
-    public GravityDestinationStrategyFactory getGravityDestinationStrategyFactory() {
-        return gravityDestinationStrategyFactory;
-    }
-
-    public void setGravityDestinationStrategyFactory(final GravityDestinationStrategyFactory gravityDestinationStrategyFactory) {
-        this.gravityDestinationStrategyFactory = gravityDestinationStrategyFactory;
-    }
-
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
 
-        final FisherFactory fisherFactory = makeFisherFactory(
-            fishState,
-            getRegulationsFactory(),
-            gravityDestinationStrategyFactory
-        );
+        purseSeinerFleetFactory.init(fishState);
+        final FisherFactory fisherFactory = purseSeinerFleetFactory.makeFisherFactory(fishState);
 
         fishState.getYearlyDataSet().registerGatherer(
             "Total profits",
@@ -171,16 +189,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     @Override
     public void useDummyData() {
         super.useDummyData();
-        this.gravityDestinationStrategyFactory
-            .getAttractionFieldsSupplier()
-            .getLocationValuesSupplier()
-            .setLocationValuesFile(testFolder().path("dummy_location_values.csv"));
-        this.gravityDestinationStrategyFactory.setActionWeightsFile(
-            testFolder().path("dummy_action_weights.csv")
-        );
-        this.gravityDestinationStrategyFactory.setMaxTripDurationFile(
-            testFolder().path("dummy_boats.csv")
-        );
+        vesselsFile = testFolder().path("dummy_boats.csv");
+        purseSeinerFleetFactory.useDummyData(testFolder());
     }
 
 }

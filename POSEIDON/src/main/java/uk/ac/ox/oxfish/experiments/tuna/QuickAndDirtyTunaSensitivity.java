@@ -72,6 +72,7 @@ public class QuickAndDirtyTunaSensitivity {
             //set the scenario
             AlgorithmFactory<? extends FadInitializer> fadInitializer =
                 scenario
+                    .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
                     .getFadInitializerFactory();
             //weird but we know the name, not the class!
@@ -105,6 +106,7 @@ public class QuickAndDirtyTunaSensitivity {
             //set the scenario
             AlgorithmFactory<? extends FadInitializer> fadInitializer =
                 scenario
+                    .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
                     .getFadInitializerFactory();
             //weird but we know the name, not the class!
@@ -141,6 +143,7 @@ public class QuickAndDirtyTunaSensitivity {
             //set the scenario
             AlgorithmFactory<? extends FadInitializer> fadInitializer =
                 scenario
+                    .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
                     .getFadInitializerFactory();
             //weird but we know the name, not the class!

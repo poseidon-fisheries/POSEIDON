@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -45,7 +46,7 @@ import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class GravityDestinationStrategyFactory
-    implements AlgorithmFactory<GravityDestinationStrategy> {
+    implements AlgorithmFactory<GravityDestinationStrategy>, Dummyable {
 
     private AttractionFieldsSupplier attractionFieldsSupplier;
 
@@ -155,4 +156,27 @@ public class GravityDestinationStrategyFactory
             .orElseThrow(() -> new IllegalStateException(
                 "No max trip duration known for " + fisher));
     }
+
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        getAttractionFieldsSupplier()
+            .getLocationValuesSupplier()
+            .setLocationValuesFile(dummyDataFolder.path("dummy_location_values.csv"));
+        setActionWeightsFile(
+            dummyDataFolder.path("dummy_action_weights.csv")
+        );
+        setMaxTripDurationFile(
+            dummyDataFolder.path("dummy_boats.csv")
+        );
+        getAttractionFieldsSupplier()
+            .getLocationValuesSupplier()
+            .setLocationValuesFile(dummyDataFolder.path("dummy_location_values.csv"));
+        setActionWeightsFile(
+            dummyDataFolder.path("dummy_action_weights.csv")
+        );
+        setMaxTripDurationFile(
+            dummyDataFolder.path("dummy_boats.csv")
+        );
+    }
+
 }

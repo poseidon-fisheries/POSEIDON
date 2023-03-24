@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -15,7 +16,7 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousFadSetterFromData> {
+public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousFadSetterFromData>, Dummyable {
 
 
     /**
@@ -112,5 +113,10 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     public void setKeepLog(final boolean keepLog) {
         this.keepLog = keepLog;
+    }
+
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        setsFile = dummyDataFolder.path("dummy_fad_sets.csv");
     }
 }

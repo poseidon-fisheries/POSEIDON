@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionSupplier;
 
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
-    implements AlgorithmFactory<PurseSeinerFishingStrategy<B>> {
+    implements AlgorithmFactory<PurseSeinerFishingStrategy<B>>, Dummyable {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
         new ActiveOpportunitiesFactory();
@@ -629,4 +630,8 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         this.fadDeploymentActionDecayConstant = fadDeploymentActionDecayConstant;
     }
 
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        actionWeightsFile = dummyDataFolder.path("dummy_action_weights.csv");
+    }
 }

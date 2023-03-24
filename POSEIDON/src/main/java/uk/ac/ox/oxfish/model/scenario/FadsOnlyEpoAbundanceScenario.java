@@ -22,7 +22,6 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
@@ -30,6 +29,7 @@ import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -61,7 +61,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
             new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
         );
         this.setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-        this.setFishingStrategyFactory(new FishUntilFullFactory());
     }
 
     @SuppressWarnings("unused")
@@ -89,12 +88,7 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
     @Override
     public void useDummyData() {
         super.useDummyData();
-        ((ExogenousFadMakerCSVFactory) fadMakerFactory).setDeploymentsFile(
-            testFolder().path("dummy_fad_deployments.csv")
-        );
-        ((ExogenousFadSetterCSVFactory) fadSetterFactory).setSetsFile(
-            testFolder().path("dummy_fad_sets.csv")
-        );
+        Dummyable.maybeUseDummyData(testFolder(), fadMakerFactory, fadSetterFactory);
     }
 
     @SuppressWarnings("unused")
@@ -109,11 +103,13 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         this.fadSetterFactory = fadSetterFactory;
     }
 
+    @SuppressWarnings("unused")
     public boolean isFadSettingActive() {
         return fadSettingActive;
     }
 
-    public void setFadSettingActive(boolean fadSettingActive) {
+    @SuppressWarnings("unused")
+    public void setFadSettingActive(final boolean fadSettingActive) {
         this.fadSettingActive = fadSettingActive;
     }
 

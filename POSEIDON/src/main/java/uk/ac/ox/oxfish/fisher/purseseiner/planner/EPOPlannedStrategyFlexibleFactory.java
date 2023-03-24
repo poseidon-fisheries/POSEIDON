@@ -10,13 +10,14 @@ import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
-public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy> {
+public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
     private final Locker<FishState, Map> catchSamplerLocker = new Locker<>();
     /**
@@ -295,5 +296,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     @SuppressWarnings("unused")
     public void setLocationValuesSupplier(final LocationValuesSupplier locationValuesSupplier) {
         this.locationValuesSupplier = locationValuesSupplier;
+    }
+
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        locationValuesSupplier.setLocationValuesFile(dummyDataFolder.path("dummy_location_values.csv"));
+        actionWeightsFile = dummyDataFolder.path("dummy_action_weights.csv");
+        maxTripDurationFile = dummyDataFolder.path("dummy_boats.csv");
     }
 }

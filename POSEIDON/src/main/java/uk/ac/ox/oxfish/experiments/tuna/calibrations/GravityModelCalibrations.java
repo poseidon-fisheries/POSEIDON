@@ -112,6 +112,7 @@ public class GravityModelCalibrations {
             final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
             final AbundanceFiltersFactory abundanceFiltersFactory = scenario.getAbundanceFiltersFactory();
             scenario
+                .getPurseSeinerFleetFactory()
                 .getPurseSeineGearFactory()
                 .setFadInitializerFactory(
                     fadInitializerFactoryMaker.apply(abundanceFiltersFactory)

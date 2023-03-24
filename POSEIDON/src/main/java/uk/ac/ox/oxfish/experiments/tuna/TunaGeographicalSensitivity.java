@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.DiscretizedOwnFadPlanningFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.GreedyInsertionFadPlanningFactory;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
@@ -14,7 +14,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -45,26 +44,39 @@ public class TunaGeographicalSensitivity {
             ///set up the scenario
             FishYAML yaml = new FishYAML();
             EpoScenarioPathfinding scenario = yaml.loadAs(
-                    new FileReader(MAIN_DIRECTORY.resolve(originalScenario).toFile()),
-                    EpoScenarioPathfinding.class);
+                new FileReader(MAIN_DIRECTORY.resolve(originalScenario).toFile()),
+                EpoScenarioPathfinding.class
+            );
 
-            if(Double.isFinite(hazardRate))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
-                    setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
+            if (Double.isFinite(hazardRate))
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                    .getPurseSeinerFleetFactory()
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory()
+                ).setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
 
             scenario.setZapperAge(zapperAge);
 
-            if(Double.isFinite(waitTime))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
-                        setDaysInWaterBeforeAttraction(new FixedDoubleParameter(waitTime));
+            if (Double.isFinite(waitTime))
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                    .getPurseSeinerFleetFactory()
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory()
+                ).setDaysInWaterBeforeAttraction(new FixedDoubleParameter(waitTime));
 
-            if(Double.isFinite(catchabilityMultiplier)) {
-                LinkedHashMap<String, Double> catchabilities = ((WeibullCatchabilitySelectivityAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory()).
-                        getCatchabilities();
+            if (Double.isFinite(catchabilityMultiplier)) {
+                LinkedHashMap<String, Double> catchabilities =
+                    ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                        .getPurseSeinerFleetFactory()
+                        .getPurseSeineGearFactory()
+                        .getFadInitializerFactory()
+                    ).getCatchabilities();
                 Set<String> species = catchabilities.keySet();
                 for (String tuna : species) {
-                    catchabilities.put(tuna,
-                            catchabilities.get(tuna)*catchabilityMultiplier);
+                    catchabilities.put(
+                        tuna,
+                        catchabilities.get(tuna) * catchabilityMultiplier
+                    );
                 }
             }
             GreedyInsertionFadPlanningFactory greedy;
@@ -84,7 +96,7 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    scenario.getDestinationStrategy().setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
                     break;
                 case GREEDY_0 :
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -94,15 +106,14 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(0));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    scenario.getDestinationStrategy().setFadModule(greedy);
-
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
                     break;
                 case GREEDY_IDENTITY:
                     greedy = new GreedyInsertionFadPlanningFactory();
                     greedy.setDiscretization(new IdentityDiscretizerFactory());
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    scenario.getDestinationStrategy().setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
                     break;
                 case GREEDY_VERY_HIGH_MINFADVALUE :
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -112,7 +123,7 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(2000000));
-                    scenario.getDestinationStrategy().setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
                     break;
                 case GREEDY_HIGH_GREED_FACTOR:
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -122,10 +133,10 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(500));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    scenario.getDestinationStrategy().setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
                     break;
                 case NEGATIVE_CENTROID:
-                    ((DiscretizedOwnFadPlanningFactory) scenario.getDestinationStrategy().getFadModule()).setDistancePenalty(new FixedDoubleParameter(-1d));
+                    ((DiscretizedOwnFadPlanningFactory) ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).getFadModule()).setDistancePenalty(new FixedDoubleParameter(-1d));
                     break;
             }
 

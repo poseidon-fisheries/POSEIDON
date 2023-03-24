@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -33,7 +34,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy> {
+public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy>, Dummyable {
 
     private InputPath maxFadDeploymentsFile;
     private final CacheByFile<Map<Integer, ImmutableMap<String, Integer>>> cache = new CacheByFile<>(this::readValues);
@@ -96,5 +97,10 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
             cache.apply(maxFadDeploymentsFile.get()).get(targetYear),
             fadCost
         );
+    }
+
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        maxFadDeploymentsFile = dummyDataFolder.path("dummy_max_deployments.csv");
     }
 }

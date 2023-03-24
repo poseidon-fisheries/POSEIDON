@@ -130,6 +130,7 @@ public class Sep20Calibrations {
             //set the scenario
             AlgorithmFactory<? extends FadInitializer> fadInitializer =
                 scenario
+                    .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
                     .getFadInitializerFactory();
             //weird but we know the name, not the class!
@@ -196,7 +197,7 @@ public class Sep20Calibrations {
 
             //set the gear to linear
             LinearClorophillAttractorFactory fadInitializer = new LinearClorophillAttractorFactory();
-            scenario.getPurseSeineGearFactory().setFadInitializerFactory(fadInitializer);
+            scenario.getPurseSeinerFleetFactory().getPurseSeineGearFactory().setFadInitializerFactory(fadInitializer);
             fadInitializer.getCatchabilities().clear();
             fadInitializer.getCatchabilities().put("Skipjack tuna",0d);
             fadInitializer.getCatchabilities().put("Yellowfin tuna",0d);

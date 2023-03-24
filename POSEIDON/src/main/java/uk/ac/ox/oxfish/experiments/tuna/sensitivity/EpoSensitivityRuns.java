@@ -186,7 +186,7 @@ public class EpoSensitivityRuns {
         final EpoScenarioPathfinding scenario,
         final AlgorithmFactory<? extends Regulation> regulationFactory
     ) {
-        scenario.setRegulationsFactory(
+        scenario.getPurseSeinerFleetFactory().setRegulationsFactory(
             new CompositeMultipleRegulationsFactory(
                 ImmutableList.of(
                     new StandardIattcRegulationsFactory(
@@ -209,7 +209,10 @@ public class EpoSensitivityRuns {
         final double threshold
     ) {
         final WeibullCatchabilitySelectivityEnvironmentalAttractorFactory fadInitializerFactory =
-            (WeibullCatchabilitySelectivityEnvironmentalAttractorFactory) scenario.getPurseSeineGearFactory().getFadInitializerFactory();
+            (WeibullCatchabilitySelectivityEnvironmentalAttractorFactory) scenario
+                .getPurseSeinerFleetFactory()
+                .getPurseSeineGearFactory()
+                .getFadInitializerFactory();
         final int avoidanceMapIndex = fadInitializerFactory
             .getEnvironmentalMaps()
             .stream()
