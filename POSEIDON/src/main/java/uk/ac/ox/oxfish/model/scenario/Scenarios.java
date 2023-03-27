@@ -83,27 +83,27 @@ public class Scenarios {
         add(
             "EPO Biomass",
             "A biomass-based scenario for purse-seine fishing in the Eastern Pacific Ocean.",
-            EpoBiomassScenario::new
+            EpoGravityBiomassScenario::new
         );
         add(
             "EPO Abundance",
             "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.",
-            EpoAbundanceScenario::new
+            EpoGravityAbundanceScenario::new
         );
         add(
             "FAD only EPO Abundance",
             "A vessel-less scenario for FAD parameter calibration purposes.",
-            FadsOnlyEpoAbundanceScenario::new
+            EpoFadsOnlyAbundanceScenario::new
         );
         add(
             "EPO Abundance Pathfinding",
             "Like EPO Abundance but using an alternative decision process",
-            EpoScenarioPathfinding::new
+            EpoPathPlanningAbundanceScenario::new
         );
         add(
             "EPO Abundance Biology Only",
             "A biology-only scenario for testing purposes",
-            EpoAbundanceScenarioBioOnly::new
+            EpoAbundanceScenario::new
         );
     }
 

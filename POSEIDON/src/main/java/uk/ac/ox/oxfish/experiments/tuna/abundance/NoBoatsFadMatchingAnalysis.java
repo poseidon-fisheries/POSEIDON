@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.experiments.tuna.abundance;
 
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
-import uk.ac.ox.oxfish.model.scenario.FadsOnlyEpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoFadsOnlyAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -62,7 +62,7 @@ public class NoBoatsFadMatchingAnalysis {
                 Paths.get(optimization.getScenarioFile()).toFile(),
                 optimization.getParameters()
         );
-        ((ExogenousFadSetterCSVFactory) ((FadsOnlyEpoAbundanceScenario) bestScenario).getFadSetterFactory()).setKeepLog(true);
+        ((ExogenousFadSetterCSVFactory) ((EpoFadsOnlyAbundanceScenario) bestScenario).getFadSetterFactory()).setKeepLog(true);
 
         yaml.dump(bestScenario,new FileWriter(CALIBRATION_FILE.getParent().resolve("best_scenario.yaml").toFile()));
 

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
@@ -22,9 +23,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
+import java.util.List;
 import java.util.function.Predicate;
 
-public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
+public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFromFileFactory(
@@ -88,13 +90,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     private boolean zapper = false;
     private boolean zapperAge = false;
 
-    public EpoScenarioPathfinding() {
-        setBiologicalProcessesFactory(
-            new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
-        );
-        setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-    }
-
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
         return abundanceFiltersFactory;
     }
@@ -112,10 +107,6 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-        scenarioPopulation.getPopulation().addAll(
-            purseSeinerFleetFactory.makeFishers(fishState, TARGET_YEAR)
-        );
-
         if (zapper) {
             final Predicate<AbstractFad> predicate = zapperAge ?
                 fad -> fad.getLocation().getGridX() <= 20 :
@@ -123,6 +114,11 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
             fishState.registerStartable(new FadZapper(predicate));
         }
         return scenarioPopulation;
+    }
+
+    @Override
+    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
+        return purseSeinerFleetFactory.makeFishers(fishState, targetYear);
     }
 
     public boolean isZapper() {

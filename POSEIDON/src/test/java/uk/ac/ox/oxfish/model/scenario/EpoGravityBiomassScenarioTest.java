@@ -31,11 +31,11 @@ import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class EpoBiomassScenarioTest {
+public class EpoGravityBiomassScenarioTest {
     @Test
     public void noFishGetsCaughtAndThrownOverboardImmediately() {
 
-        final EpoBiomassScenario scenario = new EpoBiomassScenario();
+        final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();
         scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
             new MarketMapFromPriceFileFactory(

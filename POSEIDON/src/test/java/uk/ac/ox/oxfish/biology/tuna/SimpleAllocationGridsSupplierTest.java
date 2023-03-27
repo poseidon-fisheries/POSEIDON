@@ -22,10 +22,9 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import java.nio.file.Paths;
 
@@ -38,7 +37,7 @@ public class SimpleAllocationGridsSupplierTest {
     public void clorophillMap() {
 
 
-        EpoAbundanceScenario scenarioPathfinding = new EpoAbundanceScenario();
+        EpoGravityAbundanceScenario scenarioPathfinding = new EpoGravityAbundanceScenario();
         FishState model = new FishState(0);
         model.setScenario(scenarioPathfinding);
         model.start();

@@ -18,12 +18,8 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -34,7 +30,7 @@ import uk.ac.ox.oxfish.utility.Dummyable;
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
+public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
 
     private boolean fadSettingActive = true;
 
@@ -55,13 +51,6 @@ public class FadsOnlyEpoAbundanceScenario extends EpoScenario<AbundanceLocalBiol
         new ExogenousFadSetterCSVFactory(
             getInputFolder().path("calibration", "fad_sets.csv"), true
         );
-
-    public FadsOnlyEpoAbundanceScenario() {
-        setBiologicalProcessesFactory(
-            new AbundanceProcessesFactory(getInputFolder().path("abundance"), getSpeciesCodesSupplier())
-        );
-        this.setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
-    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends AdditionalStartable> getFadMakerFactory() {

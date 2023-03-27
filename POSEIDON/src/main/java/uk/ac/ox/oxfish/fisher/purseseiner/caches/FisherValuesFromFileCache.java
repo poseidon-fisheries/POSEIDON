@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.getBoatId;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.getBoatId;
 
 /**
  * Caches based on this class store values loaded from a file and uniquely identified by:

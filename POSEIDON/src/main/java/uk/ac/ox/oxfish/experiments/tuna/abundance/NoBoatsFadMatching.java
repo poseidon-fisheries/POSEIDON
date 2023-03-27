@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.experiments.tuna.abundance;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.FadsOnlyEpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoFadsOnlyAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -67,10 +67,10 @@ public class NoBoatsFadMatching {
     ) throws FileNotFoundException {
 
         final FishYAML yaml = new FishYAML();
-        final FadsOnlyEpoAbundanceScenario scenario = yaml.loadAs(
+        final EpoFadsOnlyAbundanceScenario scenario = yaml.loadAs(
             new FileReader(
                 mainPath.resolve("fad_only_scenario.yaml").toFile()),
-            FadsOnlyEpoAbundanceScenario.class
+            EpoFadsOnlyAbundanceScenario.class
         );
         ((ExogenousFadMakerCSVFactory) scenario.getFadMakerFactory()).setDeploymentsFile(deploymentPath);
         ((ExogenousFadSetterCSVFactory) scenario.getFadSetterFactory()).

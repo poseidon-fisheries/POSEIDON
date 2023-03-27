@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class SpecificProtectedAreaFactoryTest extends TestCase {
 
-    final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+    final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
 
     public void testEveryEEZHasTilesInArea() {
         final Set<SpecificProtectedArea> areas = fishState.getFishers().stream().flatMap(fisher ->

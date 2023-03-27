@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
@@ -80,7 +80,7 @@ public class Slice1Sweeps {
                 opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
             ));
 
-        ImmutableList.Builder<Policy<? super EpoBiomassScenario>> policies = ImmutableList.builder();
+        ImmutableList.Builder<Policy<? super EpoGravityBiomassScenario>> policies = ImmutableList.builder();
         fadLimits.forEach((activeFadLimits, fadLimitsName) ->
             setLimits.forEach((generalSetLimits, setLimitsName) ->
                 policies.add(makePolicy(
@@ -90,7 +90,7 @@ public class Slice1Sweeps {
             )
         );
 
-        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoGravityBiomassScenario.class, scenarioPath, outputPath)
             .requestYearlyData()
             .requestFisherYearlyData()
             .registerRowProvider("action_log.csv", PurseSeineActionsLogger::new)
@@ -114,7 +114,7 @@ public class Slice1Sweeps {
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private static Policy<EpoBiomassScenario> makePolicy(
+    private static Policy<EpoGravityBiomassScenario> makePolicy(
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
         String policyName
     ) {

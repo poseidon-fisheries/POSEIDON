@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.WeibullLinearIntervalEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -109,7 +109,7 @@ public class GravityModelCalibrations {
             );
 
         fadInitializerFactories.forEach((scenarioName, fadInitializerFactoryMaker) -> {
-            final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
+            final EpoGravityAbundanceScenario scenario = new EpoGravityAbundanceScenario();
             final AbundanceFiltersFactory abundanceFiltersFactory = scenario.getAbundanceFiltersFactory();
             scenario
                 .getPurseSeinerFleetFactory()

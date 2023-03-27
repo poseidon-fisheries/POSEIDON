@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget;
-import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -53,8 +53,8 @@ public class Aug22Calibrations {
 
         FishYAML yaml = new FishYAML();
 
-        EpoScenarioPathfinding scenario = yaml.loadAs(new FileReader(originalScenario.toFile()),
-                EpoScenarioPathfinding.class);
+        EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(new FileReader(originalScenario.toFile()),
+                EpoPathPlanningAbundanceScenario.class);
         GenericOptimization optimization = yaml.loadAs(new FileReader(originalCalibration.toFile()),
                 GenericOptimization.class);
 

@@ -24,15 +24,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,9 +50,9 @@ public class TunaBiomassSensitivity {
 
         ///set up the scenario
         FishYAML yaml = new FishYAML();
-        EpoScenarioPathfinding scenario = yaml.loadAs(
+        EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
                 new FileReader(MAIN_DIRECTORY.resolve("linear.yaml").toFile()),
-                EpoScenarioPathfinding.class);
+                EpoPathPlanningAbundanceScenario.class);
 
         FishState model = new FishState(0);
         model.setScenario(scenario);

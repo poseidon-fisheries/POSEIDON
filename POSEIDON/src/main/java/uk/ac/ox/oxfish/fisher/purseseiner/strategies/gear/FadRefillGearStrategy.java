@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.getBoatId;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.getBoatId;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;

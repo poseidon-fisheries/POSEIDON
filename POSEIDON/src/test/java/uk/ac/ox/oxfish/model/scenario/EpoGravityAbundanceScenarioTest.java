@@ -38,10 +38,10 @@ import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
 
-public class EpoAbundanceScenarioTest extends TestCase {
+public class EpoGravityAbundanceScenarioTest extends TestCase {
 
     public void testRunOneYearWithoutCrashing() {
-        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         do {
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
@@ -55,7 +55,7 @@ public class EpoAbundanceScenarioTest extends TestCase {
      */
     public void testAllNonZeroGridCellsMapRightBiologySeaTiles() {
 
-        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         final List<Startable> startables = fishState.viewStartables();
 
         @SuppressWarnings("OptionalGetWithoutIsPresent") final AbundanceRestorer abundanceRestorer =

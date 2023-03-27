@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 
 import static java.time.Month.JULY;
 import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.dayOfYear;
 
 public class IattcClosurePeriodRandomizer implements AdditionalStartable {
 

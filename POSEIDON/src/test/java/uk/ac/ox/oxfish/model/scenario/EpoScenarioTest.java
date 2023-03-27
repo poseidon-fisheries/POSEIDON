@@ -37,23 +37,23 @@ public class EpoScenarioTest extends TestCase {
     }
 
     public void testSaveAndLoadEpoAbundanceScenario() {
-        saveAndLoadYaml(EpoAbundanceScenario.class);
+        saveAndLoadYaml(EpoGravityAbundanceScenario.class);
     }
 
     public void testSaveAndLoadEpoBiomassScenario() {
-        saveAndLoadYaml(EpoBiomassScenario.class);
+        saveAndLoadYaml(EpoGravityBiomassScenario.class);
     }
 
     public void testSaveAndLoadFadsOnlyEpoAbundanceScenario() {
-        saveAndLoadYaml(FadsOnlyEpoAbundanceScenario.class);
+        saveAndLoadYaml(EpoFadsOnlyAbundanceScenario.class);
     }
 
     public void testSaveAndLoadEpoAbundanceScenarioBioOnly() {
-        saveAndLoadYaml(EpoAbundanceScenarioBioOnly.class);
+        saveAndLoadYaml(EpoAbundanceScenario.class);
     }
 
     public void testSaveAndLoadEpoScenarioPathfinding() {
-        saveAndLoadYaml(EpoScenarioPathfinding.class);
+        saveAndLoadYaml(EpoPathPlanningAbundanceScenario.class);
     }
 
 

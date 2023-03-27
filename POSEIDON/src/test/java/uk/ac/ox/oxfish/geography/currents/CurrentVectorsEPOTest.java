@@ -2,25 +2,22 @@ package uk.ac.ox.oxfish.geography.currents;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO.ZERO_VECTOR;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 public class CurrentVectorsEPOTest extends TestCase {
     @SuppressWarnings("CommentedOutCode")
     public void testEpoScenarioHasNoDeadCells() {
         final FishState fishState = new FishState();
-        fishState.setScenario(new EpoAbundanceScenario());
+        fishState.setScenario(new EpoGravityAbundanceScenario());
         fishState.start();
         final CurrentVectors currentVectors = fishState.getFadMap().getDriftingObjectsMap().getCurrentVectors();
         final NauticalMap nauticalMap = fishState.getMap();

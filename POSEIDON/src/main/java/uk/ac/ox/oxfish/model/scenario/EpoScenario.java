@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -25,6 +26,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -35,7 +37,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -47,7 +48,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.Month;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -74,24 +75,13 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     public static final int TARGET_YEAR = 2017;
     public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
 
-    protected final List<AlgorithmFactory<? extends AdditionalStartable>> plugins = new ArrayList<>();
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
             inputFolder.path("species_codes.csv")
         );
-
-    private BiologicalProcessesFactory<B> biologicalProcessesFactory;
-
-    public BiologicalProcessesFactory<B> getBiologicalProcessesFactory() {
-        return biologicalProcessesFactory;
-    }
-
-    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<B> biologicalProcessesFactory) {
-        this.biologicalProcessesFactory = biologicalProcessesFactory;
-    }
-
     private final InputPath testInputFolder = inputFolder.path("tests");
+    private BiologicalProcessesFactory<B> biologicalProcessesFactory;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
@@ -108,6 +98,25 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             101,
             0.5
         );
+
+    public static String getBoatId(final Fisher fisher) {
+        return fisher.getTags().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
+    }
+
+    public static int dayOfYear(final Month month, final int dayOfMonth) {
+        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
+            .getDayOfYear();
+    }
+
+    public BiologicalProcessesFactory<B> getBiologicalProcessesFactory() {
+        return biologicalProcessesFactory;
+    }
+
+    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<B> biologicalProcessesFactory) {
+        this.biologicalProcessesFactory = biologicalProcessesFactory;
+    }
 
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;
@@ -161,10 +170,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             .forEach(fishState::registerStartable);
 
         return new ScenarioPopulation(
-            new ArrayList<>(),
+            makeFishers(fishState, TARGET_YEAR),
             new SocialNetwork(new EmptyNetworkBuilder()),
             ImmutableMap.of() // no entry in the fishery so no need to pass factory here
         );
+    }
+
+    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
+        return ImmutableList.of();
     }
 
     public FadMapFactory<B, F> getFadMapFactory() {

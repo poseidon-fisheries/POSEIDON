@@ -21,12 +21,11 @@ package uk.ac.ox.oxfish.biology.growers;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import static org.apache.logging.log4j.Level.DEBUG;
@@ -45,7 +44,7 @@ public class FadAwareLogisticGrowerTest {
             "step,stepOrder,process,species,biomassBefore,biomassAfter"
         );
 
-        final EpoBiomassScenario scenario = new EpoBiomassScenario();
+        final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();
         scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
             new MarketMapFromPriceFileFactory(

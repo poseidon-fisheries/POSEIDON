@@ -61,7 +61,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.TARGET_YEAR;
+import static uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 

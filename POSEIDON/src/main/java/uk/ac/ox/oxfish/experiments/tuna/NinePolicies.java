@@ -26,7 +26,8 @@ import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -54,13 +55,13 @@ public class NinePolicies {
     private static final int POLICY_KICK_IN_YEAR = 2;
 
     public static void main(final String[] args) {
-        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoGravityBiomassScenario.class, scenarioPath, outputPath)
             .setPolicies(new NinePolicies().makePolicies())
             .requestYearlyData()
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<? super EpoBiomassScenario>> makePolicies() {
+    private ImmutableList<Policy<? super EpoGravityBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();
@@ -112,13 +113,13 @@ public class NinePolicies {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(JULY, 15),
-                                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(JULY, 15),
+                                    EpoScenario.dayOfYear(OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoBiomassScenario.dayOfYear(FEBRUARY, 2),
+                                    EpoScenario.dayOfYear(NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(FEBRUARY, 2),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))
@@ -138,13 +139,13 @@ public class NinePolicies {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(JULY, 1),
-                                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(JULY, 1),
+                                    EpoScenario.dayOfYear(OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoBiomassScenario.dayOfYear(FEBRUARY, 16),
+                                    EpoScenario.dayOfYear(NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(FEBRUARY, 16),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))
@@ -159,10 +160,10 @@ public class NinePolicies {
         );
     }
 
-    private Policy<EpoBiomassScenario> makePolicy(
+    private Policy<EpoGravityBiomassScenario> makePolicy(
         final String policyName,
         final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        final Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        final Function<EpoGravityBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
         return Policy.makeDelayedRegulationsPolicy(
             policyName,

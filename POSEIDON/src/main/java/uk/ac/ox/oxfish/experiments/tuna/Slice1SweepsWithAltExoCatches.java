@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
@@ -28,7 +27,7 @@ import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -149,12 +148,12 @@ public class Slice1SweepsWithAltExoCatches {
         String policyName
     ) {
         batchRunner.setScenarioSetup(scenario -> {
-            final EpoBiomassScenario epoBiomassScenario = (EpoBiomassScenario) scenario;
+            final EpoGravityBiomassScenario epoGravityBiomassScenario = (EpoGravityBiomassScenario) scenario;
             final AlgorithmFactory<? extends Gear> gearFactory =
-                epoBiomassScenario.getPurseSeinerFleetFactory().getPurseSeineGearFactory();
+                epoGravityBiomassScenario.getPurseSeinerFleetFactory().getPurseSeineGearFactory();
             ((BiomassPurseSeineGearFactory) gearFactory).setActionSpecificRegulations(
                 regulationFactories);
-            ((BiomassProcessesFactory) epoBiomassScenario.getBiologicalProcessesFactory())
+            ((BiomassProcessesFactory) epoGravityBiomassScenario.getBiologicalProcessesFactory())
                 .getExogenousCatchesFactory()
                 .setCatchesFile(exoCatchesPath);
         });

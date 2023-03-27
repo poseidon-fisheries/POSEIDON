@@ -29,9 +29,8 @@ import uk.ac.ox.oxfish.model.data.heatmaps.FadDeploymentHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.FadSetHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.heatmaps.NonAssociatedSetHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,7 +51,7 @@ public class SampleTunaRun {
     private static final Path outputPath = scenarioPath.getParent();
 
     public static void main(final String[] args) {
-        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoGravityBiomassScenario.class, scenarioPath, outputPath)
             .setAfterStartConsumer(state -> System.out.println(state.getModel().getMap().asASCII()))
 //            .requestYearlyData()
 //            .requestFisherYearlyData()

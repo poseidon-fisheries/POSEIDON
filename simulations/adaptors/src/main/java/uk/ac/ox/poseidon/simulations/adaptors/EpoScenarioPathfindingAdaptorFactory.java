@@ -1,18 +1,18 @@
 package uk.ac.ox.poseidon.simulations.adaptors;
 
-import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
 import uk.ac.ox.poseidon.simulations.api.Scenario;
 
 public class EpoScenarioPathfindingAdaptorFactory
-    implements ScenarioAdaptorFactory<EpoScenarioPathfinding> {
+    implements ScenarioAdaptorFactory<EpoPathPlanningAbundanceScenario> {
 
     @Override
-    public Scenario apply(final EpoScenarioPathfinding epoScenarioPathfinding) {
-        return new EpoScenarioPathfindingAdaptor(epoScenarioPathfinding);
+    public Scenario apply(final EpoPathPlanningAbundanceScenario epoPathplanningAbundanceScenario) {
+        return new EpoScenarioPathfindingAdaptor(epoPathplanningAbundanceScenario);
     }
 
     @Override
-    public Class<EpoScenarioPathfinding> getDelegateClass() {
-        return EpoScenarioPathfinding.class;
+    public Class<EpoPathPlanningAbundanceScenario> getDelegateClass() {
+        return EpoPathPlanningAbundanceScenario.class;
     }
 }

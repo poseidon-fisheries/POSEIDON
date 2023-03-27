@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.SECONDS_PER_DAY;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
@@ -18,7 +18,7 @@ public class CurrentVectorsFactoryTest extends TestCase {
 
     public void testMetrePerSecondToXyPerDaysVector() {
 
-        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         final MapExtent mapExtent = fishState.getMap().getMapExtent();
 
         final double oneMeterPerSecondAtEquatorInDegreesPerDay =

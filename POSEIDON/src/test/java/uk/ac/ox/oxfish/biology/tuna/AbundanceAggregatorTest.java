@@ -36,7 +36,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 public class AbundanceAggregatorTest extends TestCase {
@@ -99,7 +99,7 @@ public class AbundanceAggregatorTest extends TestCase {
 
 
     public void testWithEpoAbundanceScenario() {
-        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
+        final EpoGravityAbundanceScenario scenario = new EpoGravityAbundanceScenario();
         scenario.useDummyData();
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);

@@ -3,18 +3,16 @@ package uk.ac.ox.oxfish.biology.tuna;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.ArrayUtils;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenarioBioOnly;
+import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
 
 import java.util.List;
-import java.util.Map;
 
 public class EpoBiologyOnlyScenarioTest extends TestCase {
 
     public void testRunBiologyOnlyScenario(){
-        final EpoAbundanceScenarioBioOnly scenario = new EpoAbundanceScenarioBioOnly();
+        final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
 
 
         ((AbundanceMortalityProcessFromFileFactory)

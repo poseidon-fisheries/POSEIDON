@@ -26,11 +26,9 @@ import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Paths;
-
 import static java.time.Month.*;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
-import static uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario.dayOfYear;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.dayOfYear;
 
 public class StandardIattcRegulationsFactory implements AlgorithmFactory<MultipleRegulations> {
 

@@ -30,7 +30,8 @@ import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -63,13 +64,13 @@ public class SetLimitsVsActiveFadsSweep {
     private static final int POLICY_KICK_IN_YEAR = 3;
 
     public static void main(final String[] args) {
-        new Runner<>(EpoBiomassScenario.class, scenarioPath, outputPath)
+        new Runner<>(EpoGravityBiomassScenario.class, scenarioPath, outputPath)
             .setPolicies(new SetLimitsVsActiveFadsSweep().makePolicies())
             .requestYearlyData()
             .run(NUM_YEARS_TO_RUN, NUM_RUNS_PER_POLICY);
     }
 
-    private ImmutableList<Policy<? super EpoBiomassScenario>> makePolicies() {
+    private ImmutableList<Policy<? super EpoGravityBiomassScenario>> makePolicies() {
 
         final AlgorithmFactory<? extends ActionSpecificRegulation> currentFadLimits =
             new ActiveFadLimitsFactory();
@@ -80,7 +81,7 @@ public class SetLimitsVsActiveFadsSweep {
                 i -> new SetLimitsFactory(i * 25)
             ));
 
-        final Map<Integer, Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>>> closureFactories =
+        final Map<Integer, Function<EpoGravityBiomassScenario, AlgorithmFactory<? extends Regulation>>> closureFactories =
             rangeClosed(0, 4).boxed().collect(toImmutableMap(
                 i -> i * 14,
                 i -> scenario ->
@@ -93,13 +94,13 @@ public class SetLimitsVsActiveFadsSweep {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(JULY, 29) - (i * 14),
-                                    EpoBiomassScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(JULY, 29) - (i * 14),
+                                    EpoScenario.dayOfYear(OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoBiomassScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoBiomassScenario.dayOfYear(JANUARY, 19) + (i * 14),
+                                    EpoScenario.dayOfYear(NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(JANUARY, 19) + (i * 14),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))
@@ -107,7 +108,7 @@ public class SetLimitsVsActiveFadsSweep {
                     )
             ));
 
-        final ImmutableList.Builder<Policy<? super EpoBiomassScenario>> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Policy<? super EpoGravityBiomassScenario>> builder = ImmutableList.builder();
 
         setLimitsFactories.forEach((i, setLimitsFactory) ->
             closureFactories.forEach((j, closureFactory) ->
@@ -122,12 +123,12 @@ public class SetLimitsVsActiveFadsSweep {
         return builder.build();
     }
 
-    private Policy<EpoBiomassScenario> makePolicy(
+    private Policy<EpoGravityBiomassScenario> makePolicy(
         String policyName,
         Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<EpoBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        Function<EpoGravityBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<EpoBiomassScenario> scenarioConsumer = scenario -> {
+        Consumer<EpoGravityBiomassScenario> scenarioConsumer = scenario -> {
             final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
                 Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
             Steppable setRegulations = simState -> {

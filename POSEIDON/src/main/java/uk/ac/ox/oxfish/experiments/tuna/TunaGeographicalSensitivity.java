@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
-import uk.ac.ox.oxfish.model.scenario.EpoScenarioPathfinding;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -43,9 +43,9 @@ public class TunaGeographicalSensitivity {
         for (int run = 0; run < 10; run++) {
             ///set up the scenario
             FishYAML yaml = new FishYAML();
-            EpoScenarioPathfinding scenario = yaml.loadAs(
+            EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
                 new FileReader(MAIN_DIRECTORY.resolve(originalScenario).toFile()),
-                EpoScenarioPathfinding.class
+                EpoPathPlanningAbundanceScenario.class
             );
 
             if (Double.isFinite(hazardRate))

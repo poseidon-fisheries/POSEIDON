@@ -23,10 +23,10 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
 
-public class FadsOnlyEpoAbundanceScenarioTest extends TestCase {
+public class FadsOnlyEpoGravityAbundanceScenarioTest extends TestCase {
 
     public void testRunTwoYearsWithoutCrashing() {
-        final FadsOnlyEpoAbundanceScenario scenario = new FadsOnlyEpoAbundanceScenario();
+        final EpoFadsOnlyAbundanceScenario scenario = new EpoFadsOnlyAbundanceScenario();
         scenario.useDummyData();
         final FishState fishState = new FishState();
         initFadRemovalLog();

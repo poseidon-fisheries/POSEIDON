@@ -9,7 +9,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 import java.io.*;
@@ -50,7 +50,7 @@ public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
      * the TicTacToeRegionalDivision per se...
      */
     public void testWriteRegionalBoundaries() {
-        final FishState fishState = startTestableScenario(EpoAbundanceScenario.class);
+        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         final NauticalMap map = fishState.getMap();
 
         final ImmutableList<Object[]> rows = map.getAllSeaTilesAsList().stream()
