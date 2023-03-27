@@ -2,9 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
@@ -19,17 +17,24 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStr
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 import uk.ac.ox.oxfish.geography.fads.FadZapper;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
 
-    private InputPath vesselsFile = getInputFolder().path("boats.csv");
+    private AbundanceFiltersFactory abundanceFiltersFactory =
+        new AbundanceFiltersFromFileFactory(
+            getInputFolder().path("abundance", "selectivity.csv"),
+            getSpeciesCodesSupplier()
+        );
+
     private PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory =
         new PurseSeinerFleetFactory<>(
+            getInputFolder().path("boats.csv"),
             getInputFolder().path("costs.csv"),
             new AbundancePurseSeineGearFactory(
                 new LinearAbundanceFadInitializerFactory(
@@ -51,7 +56,7 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                     getInputFolder().path("set_samples.csv")
                 ),
                 getInputFolder().path("action_weights.csv"),
-                getVesselsFile()
+                getInputFolder().path("boats.csv")
             ),
             new DefaultToDestinationStrategyFishingStrategyFactory(),
             new StandardIattcRegulationsFactory(
@@ -60,33 +65,28 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
                     "region_tags.csv"
                 )
             ),
-            new PurseSeinerDepartingStrategyFactory()
+            new PurseSeinerDepartingStrategyFactory(),
+            new YearlyMarketMapFromPriceFileFactory(
+                getInputFolder().path("prices.csv"),
+                getSpeciesCodesSupplier()
+            ),
+            new FromSimpleFilePortInitializer(
+                TARGET_YEAR,
+                getInputFolder().path("ports.csv")
+            )
         );
 
     public PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 
-    public InputPath getVesselsFile() {
-        return vesselsFile;
-    }
-
     private boolean zapper = false;
     private boolean zapperAge = false;
-
-    private AbundanceFiltersFactory abundanceFiltersFactory =
-        new AbundanceFiltersFromFileFactory(
-            getInputFolder().path("abundance", "selectivity.csv"),
-            getSpeciesCodesSupplier()
-        );
-
-    public void setVesselsFile(final InputPath vesselsFile) {
-        this.vesselsFile = vesselsFile;
-    }
 
     public EpoScenarioPathfinding() {
         setBiologicalProcessesFactory(
@@ -106,37 +106,22 @@ public class EpoScenarioPathfinding extends EpoScenario<AbundanceLocalBiology, A
     @Override
     public void useDummyData() {
         super.useDummyData();
-        vesselsFile = testFolder().path("dummy_boats.csv");
         purseSeinerFleetFactory.useDummyData(testFolder());
     }
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        final FisherFactory fisherFactory =
-            purseSeinerFleetFactory.makeFisherFactory(fishState);
-
-        final List<Fisher> fishers =
-            new PurseSeineVesselReader(
-                getVesselsFile().get(),
-                TARGET_YEAR,
-                fisherFactory,
-                buildPorts(fishState)
-            ).
-                apply(fishState);
+        scenarioPopulation.getPopulation().addAll(
+            purseSeinerFleetFactory.makeFishers(fishState, TARGET_YEAR)
+        );
 
         if (zapper) {
             final Predicate<AbstractFad> predicate = zapperAge ?
                 fad -> fad.getLocation().getGridX() <= 20 :
                 fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
-            fishState.registerStartable(
-                new FadZapper(
-                    predicate
-                )
-            );
+            fishState.registerStartable(new FadZapper(predicate));
         }
-        scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
     }
 

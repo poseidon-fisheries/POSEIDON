@@ -37,7 +37,7 @@ public class EpoBiomassScenarioTest {
 
         final EpoBiomassScenario scenario = new EpoBiomassScenario();
         scenario.useDummyData();
-        scenario.setMarketMapFactory(
+        scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
             new MarketMapFromPriceFileFactory(
                 scenario.getSpeciesCodesSupplier(),
                 scenario.getInputFolder().path("prices.csv"),

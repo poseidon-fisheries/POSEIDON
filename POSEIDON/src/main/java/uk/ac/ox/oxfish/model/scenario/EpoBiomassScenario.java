@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
@@ -37,12 +36,13 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassF
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
+import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.List;
 
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 
@@ -54,7 +54,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     private InputPath vesselsFile = getInputFolder().path("boats.csv");
     private PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory =
         new PurseSeinerFleetFactory<>(
-            getInputFolder().path("costs.csv"),
+            vesselsFile, getInputFolder().path("costs.csv"),
             new BiomassPurseSeineGearFactory(
                 new BiomassFadInitializerFactory(
                     getSpeciesCodesSupplier(),
@@ -112,7 +112,15 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
                     "region_tags.csv"
                 )
             ),
-            new PurseSeinerDepartingStrategyFactory()
+            new PurseSeinerDepartingStrategyFactory(),
+            new YearlyMarketMapFromPriceFileFactory(
+                getInputFolder().path("prices.csv"),
+                getSpeciesCodesSupplier()
+            ),
+            new FromSimpleFilePortInitializer(
+                TARGET_YEAR,
+                getInputFolder().path("ports.csv")
+            )
         );
 
     public EpoBiomassScenario() {
@@ -157,10 +165,9 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
     public ScenarioPopulation populateModel(final FishState fishState) {
 
         final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-
-        purseSeinerFleetFactory.init(fishState);
-        final FisherFactory fisherFactory = purseSeinerFleetFactory.makeFisherFactory(fishState);
-
+        scenarioPopulation.getPopulation().addAll(
+            purseSeinerFleetFactory.makeFishers(fishState, TARGET_YEAR)
+        );
         fishState.getYearlyDataSet().registerGatherer(
             "Total profits",
             model -> model.getFishers()
@@ -172,17 +179,8 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             "Profits"
         );
 
-        final List<Fisher> fishers =
-            new PurseSeineVesselReader(
-                getVesselsFile().get(),
-                TARGET_YEAR,
-                fisherFactory,
-                buildPorts(fishState)
-            ).apply(fishState);
-
         plugins.forEach(plugin -> fishState.registerStartable(plugin.apply(fishState)));
 
-        scenarioPopulation.getPopulation().addAll(fishers);
         return scenarioPopulation;
     }
 

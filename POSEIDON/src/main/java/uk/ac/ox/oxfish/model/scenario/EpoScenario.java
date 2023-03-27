@@ -34,9 +34,6 @@ import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
-import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -44,9 +41,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -97,11 +91,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.biologicalProcessesFactory = biologicalProcessesFactory;
     }
 
-    AlgorithmFactory<? extends MarketMap> marketMapFactory =
-        new YearlyMarketMapFromPriceFileFactory(
-            inputFolder.path("prices.csv"),
-            getSpeciesCodesSupplier()
-        );
     private final InputPath testInputFolder = inputFolder.path("tests");
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
@@ -111,11 +100,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             Y2018, Paths.get("currents", "currents_2018.csv")
         )
     );
-    private PortInitializer portInitializer =
-        new FromSimpleFilePortInitializer(
-            TARGET_YEAR,
-            inputFolder.path("ports.csv")
-        );
     private FadMapFactory<B, F> fadMapFactory;
     private List<AlgorithmFactory<? extends Startable>> additionalStartables = new LinkedList<>();
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
@@ -146,16 +130,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @SuppressWarnings("unused")
     public void setCurrentPatternMapSupplier(final CurrentPatternMapSupplier currentPatternMapSupplier) {
         this.currentPatternMapSupplier = currentPatternMapSupplier;
-    }
-
-    @SuppressWarnings("unused")
-    public PortInitializer getPortInitializer() {
-        return portInitializer;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPortInitializer(final PortInitializer portInitializer) {
-        this.portInitializer = portInitializer;
     }
 
     public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
@@ -201,18 +175,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         this.fadMapFactory = fadMapFactory;
     }
 
-    List<Port> buildPorts(final FishState fishState) {
-        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
-        portInitializer.buildPorts(
-            fishState.getMap(),
-            fishState.random,
-            seaTile -> marketMap,
-            fishState,
-            new FixedGasPrice(0)
-        );
-        return fishState.getMap().getPorts();
-    }
-
     @SuppressWarnings("unused")
     @Override
     public void useDummyData() {
@@ -222,14 +184,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     @Override
     public LocalDate getStartDate() {
         return START_DATE;
-    }
-
-    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
-        return marketMapFactory;
-    }
-
-    public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
-        this.marketMapFactory = marketMapFactory;
     }
 
     @SuppressWarnings("unused")
