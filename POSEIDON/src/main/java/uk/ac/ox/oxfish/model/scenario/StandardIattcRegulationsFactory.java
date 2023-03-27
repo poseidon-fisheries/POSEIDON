@@ -34,18 +34,18 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
 
     public static final AlgorithmFactory<TemporaryRegulation> CLOSURE_A_REG =
         new TemporaryRegulationFactory(
-            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
+            dayOfYear(2017, JULY, 29), dayOfYear(2017, OCTOBER, 8),
             new NoFishingFactory()
         );
     public static final AlgorithmFactory<TemporaryRegulation> CLOSURE_B_REG =
         new TemporaryRegulationFactory(
-            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
+            dayOfYear(2017, NOVEMBER, 9), dayOfYear(2017, JANUARY, 19),
             new NoFishingFactory()
         );
     public static final AlgorithmFactory<TemporaryRegulation> EL_CORRALITO_REG =
         new TemporaryRegulationFactory(
-            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
-            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
+            dayOfYear(2017, OCTOBER, 9), dayOfYear(2017, NOVEMBER, 8),
+            new SpecificProtectedAreaFromCoordinatesFactory("El Corralito", 4, -110, -3, -96)
         );
 
     private AlgorithmFactory<TemporaryRegulation> closureAReg = CLOSURE_A_REG;

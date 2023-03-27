@@ -14,10 +14,24 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
     private double eastLongitude;
 
     public SpecificProtectedAreaFromCoordinatesFactory(
-        double northLatitude,
-        double westLongitude,
-        double southLatitude,
-        double eastLongitude
+        final String name,
+        final double northLatitude,
+        final double westLongitude,
+        final double southLatitude,
+        final double eastLongitude
+    ) {
+        setName(name);
+        this.northLatitude = northLatitude;
+        this.westLongitude = westLongitude;
+        this.southLatitude = southLatitude;
+        this.eastLongitude = eastLongitude;
+    }
+
+    public SpecificProtectedAreaFromCoordinatesFactory(
+        final double northLatitude,
+        final double westLongitude,
+        final double southLatitude,
+        final double eastLongitude
     ) {
         this.northLatitude = northLatitude;
         this.westLongitude = westLongitude;
@@ -35,7 +49,7 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
     }
 
     @SuppressWarnings("unused")
-    public void setNorthLatitude(double northLatitude) {
+    public void setNorthLatitude(final double northLatitude) {
         this.northLatitude = northLatitude;
     }
 
@@ -44,7 +58,7 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
     }
 
     @SuppressWarnings("unused")
-    public void setWestLongitude(double westLongitude) {
+    public void setWestLongitude(final double westLongitude) {
         this.westLongitude = westLongitude;
     }
 
@@ -53,7 +67,7 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
     }
 
     @SuppressWarnings("unused")
-    public void setSouthLatitude(double southLatitude) {
+    public void setSouthLatitude(final double southLatitude) {
         this.southLatitude = southLatitude;
     }
 
@@ -62,12 +76,12 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
     }
 
     @SuppressWarnings("unused")
-    public void setEastLongitude(double eastLongitude) {
+    public void setEastLongitude(final double eastLongitude) {
         this.eastLongitude = eastLongitude;
     }
 
     @Override
-    BiPredicate<Integer, Integer> inAreaPredicate(MapExtent mapExtent) {
+    BiPredicate<Integer, Integer> inAreaPredicate(final MapExtent mapExtent) {
         final Envelope envelope = new Envelope(
             new Coordinate(getWestLongitude(), getNorthLatitude()),
             new Coordinate(getEastLongitude(), getSouthLatitude())

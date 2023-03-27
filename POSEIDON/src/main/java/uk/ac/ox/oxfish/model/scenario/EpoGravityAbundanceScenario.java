@@ -50,7 +50,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
 
     private PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
-            TARGET_YEAR,
+            getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
@@ -61,16 +61,19 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                 )
             ),
             new GravityDestinationStrategyFactory(
+                getTargetYear(),
                 getInputFolder().path("action_weights.csv"),
                 getInputFolder().path("boats.csv"),
                 new AttractionFieldsSupplier(
                     new LocationValuesSupplier(
-                        getInputFolder().path("location_values.csv")
+                        getInputFolder().path("location_values.csv"),
+                        getTargetYear()
                     ),
                     getInputFolder().path("max_current_speeds.csv")
                 )
             ),
             new PurseSeinerAbundanceFishingStrategyFactory(
+                getTargetYear(),
                 getSpeciesCodesSupplier(),
                 getInputFolder().path("action_weights.csv"),
                 new AbundanceCatchSamplersFactory(

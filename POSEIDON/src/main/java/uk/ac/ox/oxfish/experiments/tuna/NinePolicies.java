@@ -113,13 +113,13 @@ public class NinePolicies {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(JULY, 15),
-                                    EpoScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(2017, JULY, 15),
+                                    EpoScenario.dayOfYear(2017, OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoScenario.dayOfYear(FEBRUARY, 2),
+                                    EpoScenario.dayOfYear(2017, NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(2017, FEBRUARY, 2),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))
@@ -139,13 +139,13 @@ public class NinePolicies {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(JULY, 1),
-                                    EpoScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(2017, JULY, 1),
+                                    EpoScenario.dayOfYear(2017, OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoScenario.dayOfYear(FEBRUARY, 16),
+                                    EpoScenario.dayOfYear(2017, NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(2017, FEBRUARY, 16),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))

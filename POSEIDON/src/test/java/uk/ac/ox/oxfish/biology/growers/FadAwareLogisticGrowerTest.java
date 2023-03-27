@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import static org.apache.logging.log4j.Level.DEBUG;
 import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 public class FadAwareLogisticGrowerTest {
@@ -50,7 +49,7 @@ public class FadAwareLogisticGrowerTest {
             new MarketMapFromPriceFileFactory(
                 scenario.getSpeciesCodesSupplier(),
                 scenario.getInputFolder().path("prices.csv"),
-                TARGET_YEAR
+                scenario.getTargetYear()
             )
         );
         ((BiomassProcessesFactory) scenario.getBiologicalProcessesFactory())

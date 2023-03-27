@@ -11,7 +11,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology, Biomass
             new BiomassProcessesFactory(
                 getInputFolder().path("biomass"),
                 getSpeciesCodesSupplier(),
-                TARGET_YEAR
+                getTargetYear()
             )
         );
         setFadMapFactory(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));

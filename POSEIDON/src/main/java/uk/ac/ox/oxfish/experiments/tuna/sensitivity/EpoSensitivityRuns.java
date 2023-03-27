@@ -161,7 +161,7 @@ public class EpoSensitivityRuns {
             );
         final TemporaryRegulationFactory q3SpatialClosureFactory =
             new TemporaryRegulationFactory(
-                dayOfYear(JUNE, 1), dayOfYear(AUGUST, 31),
+                dayOfYear(2017, JUNE, 1), dayOfYear(2017, AUGUST, 31),
                 spatialClosureFactory
             );
         return makePolicyList(

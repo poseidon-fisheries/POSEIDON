@@ -59,6 +59,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
+    private int targetYear = 2017;
+
     public static final MapExtent DEFAULT_MAP_EXTENT =
         MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
 
@@ -72,8 +74,17 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         )
     );
 
-    public static final int TARGET_YEAR = 2017;
-    public static final LocalDate START_DATE = LocalDate.of(TARGET_YEAR - 1, 1, 1);
+    public int dayOfYear(final Month month, final int dayOfMonth) {
+        return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear();
+    }
+
+    public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
+        return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
+    }
+
+    public int getTargetYear() {
+        return targetYear;
+    }
 
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
@@ -105,9 +116,8 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
     }
 
-    public static int dayOfYear(final Month month, final int dayOfMonth) {
-        return LocalDate.of(TARGET_YEAR, month, dayOfMonth)
-            .getDayOfYear();
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
     }
 
     public BiologicalProcessesFactory<B> getBiologicalProcessesFactory() {
@@ -170,7 +180,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             .forEach(fishState::registerStartable);
 
         return new ScenarioPopulation(
-            makeFishers(fishState, TARGET_YEAR),
+            makeFishers(fishState, targetYear),
             new SocialNetwork(new EmptyNetworkBuilder()),
             ImmutableMap.of() // no entry in the fishery so no need to pass factory here
         );
@@ -196,7 +206,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     @Override
     public LocalDate getStartDate() {
-        return START_DATE;
+        return LocalDate.of(targetYear - 1, 1, 1);
     }
 
     @SuppressWarnings("unused")

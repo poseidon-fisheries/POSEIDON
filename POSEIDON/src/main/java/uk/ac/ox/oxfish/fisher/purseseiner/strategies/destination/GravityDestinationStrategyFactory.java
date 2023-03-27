@@ -42,22 +42,47 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class GravityDestinationStrategyFactory
     implements AlgorithmFactory<GravityDestinationStrategy>, Dummyable {
 
+    private int targetYear;
     private AttractionFieldsSupplier attractionFieldsSupplier;
 
     public GravityDestinationStrategyFactory(
+        final int targetYear,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile,
         final AttractionFieldsSupplier attractionFieldsSupplier
     ) {
+        this.targetYear = targetYear;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
         this.attractionFieldsSupplier = attractionFieldsSupplier;
+    }
+
+    public ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
+        return loadMaxTripDuration(targetYear, maxTripDurationFile);
+    }
+
+    public static ToDoubleFunction<Fisher> loadMaxTripDuration(
+        final int targetYear,
+        final Path maxTripDurationFile
+    ) {
+        return fisher -> maxTripDurationCache
+            .get(
+                maxTripDurationFile,
+                targetYear,
+                fisher
+            )
+            .orElseThrow(() -> new IllegalStateException(
+                "No max trip duration known for " + fisher));
+
+    }
+
+    public int getTargetYear() {
+        return targetYear;
     }
 
     public AttractionFieldsSupplier getAttractionFieldsSupplier() {
@@ -91,16 +116,8 @@ public class GravityDestinationStrategyFactory
         this.attractionFieldsSupplier = attractionFieldsSupplier;
     }
 
-    public static ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
-        return fisher -> maxTripDurationCache
-            .get(
-                maxTripDurationFile,
-                TARGET_YEAR,
-                fisher
-            )
-            .orElseThrow(() -> new IllegalStateException(
-                "No max trip duration known for " + fisher));
-
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
     }
 
     public InputPath getActionWeightsFile() {
@@ -139,7 +156,7 @@ public class GravityDestinationStrategyFactory
             identity(),
             field -> ActionWeightsCache.INSTANCE.get(
                 actionWeightsFile.get(),
-                TARGET_YEAR,
+                targetYear,
                 fisher,
                 field.getActionClass()
             )
@@ -150,7 +167,7 @@ public class GravityDestinationStrategyFactory
         return maxTripDurationCache
             .get(
                 maxTripDurationFile.get(),
-                TARGET_YEAR,
+                targetYear,
                 fisher
             )
             .orElseThrow(() -> new IllegalStateException(

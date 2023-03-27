@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
@@ -38,14 +37,18 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
 
     private InputPath maxFadDeploymentsFile;
     private final CacheByFile<Map<Integer, ImmutableMap<String, Integer>>> cache = new CacheByFile<>(this::readValues);
-    private int targetYear = EpoScenario.TARGET_YEAR;
+
+
+    private int targetYear;
+
     private double fadCost = 1000;
 
     @SuppressWarnings("unused")
     public FadRefillGearStrategyFactory() {
     }
 
-    public FadRefillGearStrategyFactory(final InputPath maxFadDeploymentsFile) {
+    public FadRefillGearStrategyFactory(final int targetYear, final InputPath maxFadDeploymentsFile) {
+        this.targetYear = targetYear;
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }
 

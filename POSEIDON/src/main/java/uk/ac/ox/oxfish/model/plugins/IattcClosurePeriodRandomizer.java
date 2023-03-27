@@ -23,7 +23,7 @@ public class IattcClosurePeriodRandomizer implements AdditionalStartable {
 
         // Every year, on July 15th, purse seine vessels must choose
         // which temporal closure period they will observe.
-        final int daysFromNow = 1 + dayOfYear(JULY, 15);
+        final int daysFromNow = 1 + dayOfYear(fishState.getCalendarYear(), JULY, 15);
 
         fishState.getFishers().forEach(fisher -> {
 

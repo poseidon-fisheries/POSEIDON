@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import static org.junit.Assert.assertTrue;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class EpoGravityBiomassScenarioTest {
@@ -41,7 +40,7 @@ public class EpoGravityBiomassScenarioTest {
             new MarketMapFromPriceFileFactory(
                 scenario.getSpeciesCodesSupplier(),
                 scenario.getInputFolder().path("prices.csv"),
-                TARGET_YEAR
+                scenario.getTargetYear()
             )
         );
 

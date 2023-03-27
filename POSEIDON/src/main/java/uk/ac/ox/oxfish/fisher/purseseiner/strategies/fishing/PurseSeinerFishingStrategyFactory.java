@@ -61,7 +61,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
-import static uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario.TARGET_YEAR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
@@ -81,6 +80,36 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final boolean delSetsCanPoachFads = false;
     private final int noaSetsRangeInSeaTiles = 0;
     private final int delSetsRangeInSeaTiles = 0;
+
+    private int targetYear;
+
+    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
+        final int targetYear,
+        final Path attractionWeightsFile
+    ) {
+        return fisher -> stream(ActionClass.values())
+            .map(ActionClass::getActionClass)
+            .collect(toImmutableMap(
+                identity(),
+                actionClass -> ActionWeightsCache.INSTANCE.get(
+                    attractionWeightsFile,
+                    targetYear,
+                    fisher,
+                    actionClass
+                )
+            ));
+    }
+
+    public Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
+        final Path attractionWeightsFile
+    ) {
+        return loadActionWeights(targetYear, attractionWeightsFile);
+    }
+
+    public int getTargetYear() {
+        return targetYear;
+    }
+
     private SetDurationSamplersFactory setDurationSamplersFactory;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath actionWeightsFile;
@@ -123,6 +152,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
 
 
     PurseSeinerFishingStrategyFactory(
+        final int targetYear,
         final Class<B> biologyClass,
         final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
@@ -132,7 +162,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final InputPath maxCurrentSpeedsFile,
         final InputPath setCompositionWeightsFile
     ) {
-        this(biologyClass, fadClass);
+        this(targetYear, biologyClass, fadClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
         this.catchSamplersFactory = catchSamplersFactory;
@@ -140,28 +170,19 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
         this.setCompositionWeightsFile = setCompositionWeightsFile;
     }
+
     PurseSeinerFishingStrategyFactory(
+        final int targetYear,
         final Class<B> biologyClass,
         final Class<F> fadClass
     ) {
+        this.targetYear = targetYear;
         this.fadClass = fadClass;
         this.biologyClass = biologyClass;
     }
 
-    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
-        final Path attractionWeightsFile
-    ) {
-        return fisher -> stream(ActionClass.values())
-            .map(ActionClass::getActionClass)
-            .collect(toImmutableMap(
-                identity(),
-                actionClass -> ActionWeightsCache.INSTANCE.get(
-                    attractionWeightsFile,
-                    TARGET_YEAR,
-                    fisher,
-                    actionClass
-                )
-            ));
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
     }
 
     @SuppressWarnings("unused")
@@ -402,7 +423,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         return callConstructor(
             this::loadActionWeights,
             this::makeSetOpportunityDetector,
-            makeActionValueFunctions(fishState),
+            makeActionValueFunctions(),
             getMaxCurrentSpeeds(fishState.getMap()),
             searchActionDecayConstant,
             fadDeploymentActionDecayConstant,
@@ -462,7 +483,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                 identity(),
                 actionClass -> ActionWeightsCache.INSTANCE.get(
                     actionWeightsFile.get(),
-                    TARGET_YEAR,
+                    targetYear,
                     fisher,
                     actionClass
                 )
@@ -581,7 +602,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     }
 
     private Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>
-    makeActionValueFunctions(final FishState fishState) {
+    makeActionValueFunctions() {
         return new ImmutableMap.Builder<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>()
             .put(
                 SearchAction.class,

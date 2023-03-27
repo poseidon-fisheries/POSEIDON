@@ -10,8 +10,6 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.TARGET_YEAR;
-
 public class LocationValuesSupplier
     implements Supplier<Map<Class<? extends PurseSeinerAction>, LocationValues>> {
     private static final LocationFisherValuesByActionCache locationValuesCache =
@@ -21,10 +19,23 @@ public class LocationValuesSupplier
     private double decayRateOfNonAssociatedSetLocationValues;
     private double decayRateOfDolphinSetLocationValues;
     private double decayRateOfDeploymentLocationValues;
+
+    private int targetYear;
+
+    public LocationValuesSupplier(final InputPath locationValuesFile, final int targetYear) {
+        this.locationValuesFile = locationValuesFile;
+        this.targetYear = targetYear;
+    }
+
+    public int getTargetYear() {
+        return targetYear;
+    }
+
     public LocationValuesSupplier() {
     }
-    public LocationValuesSupplier(final InputPath locationValuesFile) {
-        this.locationValuesFile = locationValuesFile;
+
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
     }
 
     @SuppressWarnings("unused")
@@ -116,7 +127,7 @@ public class LocationValuesSupplier
     ) {
         return locationValuesCache.getLocationValues(
             locationValuesFile.get(),
-            TARGET_YEAR,
+            targetYear,
             fisher,
             actionClass
         );

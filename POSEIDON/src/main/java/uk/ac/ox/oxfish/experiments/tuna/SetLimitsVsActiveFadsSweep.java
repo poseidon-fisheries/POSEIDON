@@ -94,13 +94,13 @@ public class SetLimitsVsActiveFadsSweep {
                             new MultipleRegulationsFactory(ImmutableMap.of(
                                 StandardIattcRegulationsFactory.EL_CORRALITO_REG, TAG_FOR_ALL,
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(JULY, 29) - (i * 14),
-                                    EpoScenario.dayOfYear(OCTOBER, 8),
+                                    EpoScenario.dayOfYear(2017, JULY, 29) - (i * 14),
+                                    EpoScenario.dayOfYear(2017, OCTOBER, 8),
                                     new NoFishingFactory()
                                 ), "closure A",
                                 new TemporaryRegulationFactory(
-                                    EpoScenario.dayOfYear(NOVEMBER, 9),
-                                    EpoScenario.dayOfYear(JANUARY, 19) + (i * 14),
+                                    EpoScenario.dayOfYear(2017, NOVEMBER, 9),
+                                    EpoScenario.dayOfYear(2017, JANUARY, 19) + (i * 14),
                                     new NoFishingFactory()
                                 ), "closure B"
                             ))

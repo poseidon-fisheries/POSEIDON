@@ -34,6 +34,7 @@ public class EpoPurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B,
             inputFolder.path("costs.csv"),
             purseSeineGearFactory,
             new FadRefillGearStrategyFactory(
+                targetYear,
                 inputFolder.path("max_deployments.csv")
             ),
             destinationStrategyFactory,

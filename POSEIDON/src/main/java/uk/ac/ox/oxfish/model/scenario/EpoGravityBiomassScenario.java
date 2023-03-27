@@ -44,7 +44,7 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
     private PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
-            TARGET_YEAR,
+            getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new BiomassPurseSeineGearFactory(
@@ -74,16 +74,19 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 )
             ),
             new GravityDestinationStrategyFactory(
+                getTargetYear(),
                 getInputFolder().path("action_weights.csv"),
                 getInputFolder().path("boats.csv"),
                 new AttractionFieldsSupplier(
                     new LocationValuesSupplier(
-                        getInputFolder().path("location_values.csv")
+                        getInputFolder().path("location_values.csv"),
+                        getTargetYear()
                     ),
                     getInputFolder().path("max_current_speeds.csv")
                 )
             ),
             new PurseSeinerBiomassFishingStrategyFactory(
+                getTargetYear(),
                 getSpeciesCodesSupplier(),
                 getInputFolder().path("action_weights.csv"),
                 new BiomassCatchSamplersFactory(

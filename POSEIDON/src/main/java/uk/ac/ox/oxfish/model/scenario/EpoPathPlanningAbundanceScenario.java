@@ -30,7 +30,7 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
 
     private PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
-            TARGET_YEAR,
+            getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
@@ -41,8 +41,10 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                 )
             ),
             new EPOPlannedStrategyFlexibleFactory(
+                getTargetYear(),
                 new LocationValuesSupplier(
-                    getInputFolder().path("location_values.csv")
+                    getInputFolder().path("location_values.csv"),
+                    getTargetYear()
                 ),
                 new AbundanceCatchSamplersFactory(
                     getSpeciesCodesSupplier(),

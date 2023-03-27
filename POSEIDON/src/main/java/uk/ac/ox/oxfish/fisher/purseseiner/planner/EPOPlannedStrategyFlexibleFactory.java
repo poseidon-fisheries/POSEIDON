@@ -19,6 +19,16 @@ import java.util.Map;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
+    private int targetYear;
+
+    public int getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
+    }
+
     private final Locker<FishState, Map> catchSamplerLocker = new Locker<>();
     /**
      * object used to draw catches for DEL and NOA
@@ -90,11 +100,13 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public EPOPlannedStrategyFlexibleFactory() {
     }
     public EPOPlannedStrategyFlexibleFactory(
+        final int targetYear,
         final LocationValuesSupplier locationValuesSupplier,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
+        this.targetYear = targetYear;
         this.locationValuesSupplier = locationValuesSupplier;
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
@@ -128,8 +140,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
                     () -> catchSamplersFactory.apply(state)
                 )
             ,
-            PurseSeinerFishingStrategyFactory.loadActionWeights(actionWeightsFile.get()),
-            GravityDestinationStrategyFactory.loadMaxTripDuration(maxTripDurationFile.get()),
+            PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear, actionWeightsFile.get()),
+            GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear, maxTripDurationFile.get()),
             additionalHourlyDelayDolphinSets.apply(state.getRandom()),
             additionalHourlyDelayDeployment.apply(state.getRandom()),
             additionalHourlyDelayNonAssociatedSets.apply(state.getRandom()),
