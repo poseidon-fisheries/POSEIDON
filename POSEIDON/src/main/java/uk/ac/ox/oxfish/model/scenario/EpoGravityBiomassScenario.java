@@ -23,25 +23,19 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 
 import java.util.List;
-
-import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
@@ -49,9 +43,10 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
     private PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory =
-        new PurseSeinerFleetFactory<>(
-            getInputFolder().path("boats.csv"),
-            getInputFolder().path("costs.csv"),
+        new EpoPurseSeinerFleetFactory<>(
+            TARGET_YEAR,
+            getInputFolder(),
+            getSpeciesCodesSupplier(),
             new BiomassPurseSeineGearFactory(
                 new BiomassFadInitializerFactory(
                     getSpeciesCodesSupplier(),
@@ -78,9 +73,6 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                     )
                 )
             ),
-            new FadRefillGearStrategyFactory(
-                getInputFolder().path("max_deployments.csv")
-            ),
             new GravityDestinationStrategyFactory(
                 getInputFolder().path("action_weights.csv"),
                 getInputFolder().path("boats.csv"),
@@ -101,22 +93,6 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
                 getInputFolder().path("max_current_speeds.csv"),
                 getInputFolder().path("set_compositions.csv")
-
-            ),
-            new StandardIattcRegulationsFactory(
-                new ProtectedAreasFromFolderFactory(
-                    getInputFolder().path("regions"),
-                    "region_tags.csv"
-                )
-            ),
-            new PurseSeinerDepartingStrategyFactory(),
-            new YearlyMarketMapFromPriceFileFactory(
-                getInputFolder().path("prices.csv"),
-                getSpeciesCodesSupplier()
-            ),
-            new FromSimpleFilePortInitializer(
-                TARGET_YEAR,
-                getInputFolder().path("ports.csv")
             )
         );
 
@@ -127,22 +103,6 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
     @SuppressWarnings("unused")
     public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
-    }
-
-    @Override
-    public ScenarioPopulation populateModel(final FishState fishState) {
-        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-        fishState.getYearlyDataSet().registerGatherer(
-            "Total profits",
-            model -> model.getFishers()
-                .stream()
-                .mapToDouble(fisher -> fisher.getLatestYearlyObservation("Profits"))
-                .sum(),
-            Double.NaN,
-            DOLLAR,
-            "Profits"
-        );
-        return scenarioPopulation;
     }
 
     @Override

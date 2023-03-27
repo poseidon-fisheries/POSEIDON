@@ -42,6 +42,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNINGS;
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
+import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>>
@@ -206,6 +207,17 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
                     .count("Distance travelled", tripRecord.getDistanceTravelled())
             )
         ));
+
+        fishState.getYearlyDataSet().registerGatherer(
+            "Total profits",
+            model -> model.getFishers()
+                .stream()
+                .mapToDouble(fisher -> fisher.getLatestYearlyObservation("Profits"))
+                .sum(),
+            Double.NaN,
+            DOLLAR,
+            "Profits"
+        );
 
         return fisherFactory;
     }
