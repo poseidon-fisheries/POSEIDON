@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.WhereFadsArePlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.WhereMoneyIsPlanningModule;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
@@ -10,8 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.Arrays;
 
 public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyIsPlanningModule> {
 
@@ -23,10 +20,6 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
     private AlgorithmFactory<? extends MapDiscretizer> discretization =
             new SquaresMapDiscretizerFactory(6, 3);
 
-
-    private String bannedXCoordinateBounds = "";
-    private String bannedYCoordinateBounds = "";
-
     private DoubleParameter valueWeight = new FixedDoubleParameter(1);
 
 
@@ -34,33 +27,17 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
 
 
     @Override
-    public WhereMoneyIsPlanningModule apply(FishState state) {
+    public WhereMoneyIsPlanningModule apply(final FishState state) {
 
-        OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-                new MapDiscretization(
-                        discretization.apply(state)
-                ),
-                minimumValueFadSets.apply(state.getRandom())
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
+            new MapDiscretization(
+                discretization.apply(state)
+            ),
+            minimumValueFadSets.apply(state.getRandom())
         );
-        if(!bannedXCoordinateBounds.isEmpty())
-        {
-            String[] coordinate = bannedXCoordinateBounds.split(",");
-            if(coordinate.length==2)
-            {
-                double[] bannedX = Arrays.stream(bannedXCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                double[] bannedY = Arrays.stream(bannedYCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                optionsGenerator.setBannedGridBounds(bannedY,bannedX);
-            }
-        }
-
-
         return new WhereMoneyIsPlanningModule(
-                optionsGenerator,
-                valueWeight.apply(state.getRandom())
+            optionsGenerator,
+            valueWeight.apply(state.getRandom())
         );
     }
 
@@ -69,25 +46,9 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
     }
 
     public void setDiscretization(
-            AlgorithmFactory<? extends MapDiscretizer> discretization) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
         this.discretization = discretization;
-    }
-
-
-    public String getBannedXCoordinateBounds() {
-        return bannedXCoordinateBounds;
-    }
-
-    public void setBannedXCoordinateBounds(String bannedXCoordinateBounds) {
-        this.bannedXCoordinateBounds = bannedXCoordinateBounds;
-    }
-
-    public String getBannedYCoordinateBounds() {
-        return bannedYCoordinateBounds;
-    }
-
-    public void setBannedYCoordinateBounds(String bannedYCoordinateBounds) {
-        this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
 
@@ -95,7 +56,7 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
         return valueWeight;
     }
 
-    public void setValueWeight(DoubleParameter valueWeight) {
+    public void setValueWeight(final DoubleParameter valueWeight) {
         this.valueWeight = valueWeight;
     }
 
@@ -103,7 +64,7 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
         return minimumValueFadSets;
     }
 
-    public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
+    public void setMinimumValueFadSets(final DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
     }
 }

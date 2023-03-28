@@ -26,10 +26,6 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
 
     private DoubleParameter additionalFadInspected = new FixedDoubleParameter(5d);
 
-
-    private String bannedXCoordinateBounds = "";
-    private String bannedYCoordinateBounds = "";
-
     @Override
     public GreedyInsertionFadPlanningModule apply(FishState state) {
 
@@ -39,20 +35,6 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
                 ),
                 minimumValueFadSets.apply(state.getRandom())
         );
-        if(!bannedXCoordinateBounds.isEmpty())
-        {
-            String[] coordinate = bannedXCoordinateBounds.split(",");
-            if(coordinate.length==2)
-            {
-                double[] bannedX = Arrays.stream(bannedXCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                double[] bannedY = Arrays.stream(bannedYCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                optionsGenerator.setBannedGridBounds(bannedY,bannedX);
-            }
-        }
 
         return new GreedyInsertionFadPlanningModule(
                 optionsGenerator,
@@ -76,22 +58,6 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
 
     public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
-    }
-
-    public String getBannedXCoordinateBounds() {
-        return bannedXCoordinateBounds;
-    }
-
-    public void setBannedXCoordinateBounds(String bannedXCoordinateBounds) {
-        this.bannedXCoordinateBounds = bannedXCoordinateBounds;
-    }
-
-    public String getBannedYCoordinateBounds() {
-        return bannedYCoordinateBounds;
-    }
-
-    public void setBannedYCoordinateBounds(String bannedYCoordinateBounds) {
-        this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
     public DoubleParameter getAdditionalFadInspected() {

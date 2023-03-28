@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import ec.util.MersenneTwisterFast;
+import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -11,10 +13,7 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import javax.annotation.Nonnull;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * generates a list of possible fads to set on.
@@ -34,22 +33,14 @@ public class OwnFadSetDiscretizedActionGenerator {
             return -Double.compare(o1.getSecond(), o2.getSecond());
         }
     };
-
-    private NauticalMap map;
     private final MapDiscretization discretization;
     /**
      * if a FAD has less than this in value, just ignore it!
      */
     private final double minimumFadValue;
+    private NauticalMap map;
     private PriorityQueue<ValuedFad>[] rankedFads;
-    /**
-     * if some bounds are provided, within them you will decide not to fish
-     */
-    private double[] bannedGridYBounds;
-    /**
-     * if some bounds are provided, within them you will decide not to fish
-     */
-    private double[] bannedGridXBounds;
+
     /**
      * when this is set to true, the generator will immediately remove all fads that are currently not
      * allowed to be caught. This is set to false because the standard procedure is to wait till the action
@@ -87,6 +78,11 @@ public class OwnFadSetDiscretizedActionGenerator {
         for (int i = 0; i < rankedFads.length; i++) {
             rankedFads[i] = new PriorityQueue<>(COMPARATOR);
         }
+
+        final Optional<DoubleGrid2D> maxShearMap = Optional
+            .ofNullable(map.getAdditionalMaps().get("Shear"))
+            .map(Supplier::get);
+
         //go through all your fads and rank them by profits
         for (Object fad : fadManager.getDeployedFads()) {
             AbstractFad deployedFad = (AbstractFad) fad;
@@ -104,22 +100,14 @@ public class OwnFadSetDiscretizedActionGenerator {
 
             SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
 
-/*            if (bannedGridYBounds != null &&
-                location.getGridY() >= bannedGridYBounds[0] &&
-                location.getGridY() <= bannedGridYBounds[1] &&
-                location.getGridX() >= bannedGridXBounds[0] &&
-                location.getGridX() <= bannedGridXBounds[1])
-                continue;
-*/
-            //If the shear at this location is too high then skip the FAD
-            if(map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY()) > maxAllowableShear){
-              continue;
-            }
+            // Check that the shear at this location is not too high, otherwise we'll have to skip the FAD
+            final boolean shearIsSafe = maxShearMap
+                .map(msm -> msm.get(location.getGridX(), location.getGridY()) <= maxAllowableShear)
+                .orElse(true);
 
             //This is where we want to artificially inflate the value to minimumFadValue
             //if they make a bad reading. Why was this removed before?
-
-            if (value >= minimumFadValue)
+            if (shearIsSafe && value >= minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                     add(new ValuedFad(deployedFad, value));
         }
@@ -193,28 +181,12 @@ public class OwnFadSetDiscretizedActionGenerator {
         return rankedFads.length;
     }
 
-    public double[] getBannedGridYBounds() {
-        return bannedGridYBounds;
+    public double getMaxAllowableShear() {
+        return maxAllowableShear;
     }
 
-    public void setBannedGridBounds(
-        double[] bannedGridYBounds,
-        double[] bannedGridXBounds
-    ) {
-        Preconditions.checkArgument(bannedGridXBounds.length == 2);
-        Preconditions.checkArgument(bannedGridYBounds.length == 2);
-        Preconditions.checkArgument(bannedGridYBounds[0] <= bannedGridYBounds[1]);
-        Preconditions.checkArgument(bannedGridXBounds[0] <= bannedGridXBounds[1]);
-        this.bannedGridYBounds = bannedGridYBounds;
-        this.bannedGridXBounds = bannedGridXBounds;
-    }
-
-    public void setMaxAllowableShear(double maxAllowableShear){
-        this.maxAllowableShear=maxAllowableShear;
-    }
-    public double getMaxAllowableShear(){return maxAllowableShear;}
-    public double[] getBannedGridXBounds() {
-        return bannedGridXBounds;
+    public void setMaxAllowableShear(double maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
     }
 
     public boolean isFilterOutCurrentlyInvalidFads() {

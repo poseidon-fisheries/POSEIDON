@@ -20,60 +20,52 @@
 
 package uk.ac.ox.oxfish.environment;
 
-import com.google.common.base.Supplier;
-import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
 
 public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    public String mapVariableName = "Clorophill"; //just a placeholder
-    private String pathToGridFile = "inputs/tests/clorophill.csv"; //just a placeholder
-
-    private int mapPeriod = 365;
+    public String mapVariableName;
+    private InputPath gridFile;
+    private int mapPeriod;
 
     public EnvironmentalMapFactory() {
     }
 
-    public EnvironmentalMapFactory(String mapVariableName, String pathToGridFile) {
-        this(mapVariableName, pathToGridFile, 365);
+    public EnvironmentalMapFactory(final String mapVariableName, final InputPath gridFile) {
+        this(mapVariableName, gridFile, 365);
     }
 
-    public EnvironmentalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
+    public EnvironmentalMapFactory(final String mapVariableName, final InputPath gridFile, final int mapPeriod) {
         this.mapVariableName = mapVariableName;
-        this.pathToGridFile = pathToGridFile;
+        this.gridFile = gridFile;
         this.mapPeriod = mapPeriod;
     }
 
-    public EnvironmentalMapFactory(String pathToGridFile) {
-        this.pathToGridFile = pathToGridFile;
-    }
-
     @Override
-    public AdditionalStartable apply(FishState model) {
+    public AdditionalStartable apply(final FishState model) {
 
-        return new AdditionalStartable(){
+        return new AdditionalStartable() {
 
             @Override
-            public void start(FishState model) {
-                SimpleGridsSupplier supplier = new SimpleGridsSupplier(
-                        Paths.get(pathToGridFile),
-                        model.getMap().getMapExtent(),
-                        mapPeriod,
-                        false,
-                        mapVariableName
+            public void start(final FishState model) {
+                final SimpleGridsSupplier supplier = new SimpleGridsSupplier(
+                    gridFile.get(),
+                    model.getMap().getMapExtent(),
+                    mapPeriod,
+                    false,
+                    mapVariableName
                 );
 
-                GenericGrids<String> grids = supplier.get();
+                final GenericGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
-                        mapVariableName,
-                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
+                    mapVariableName,
+                    () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
                 );
-
-
             }
 
             @Override
@@ -84,19 +76,19 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
 
     }
 
-    public String getPathToGridFile() {
-        return pathToGridFile;
+    public InputPath getGridFile() {
+        return gridFile;
     }
 
-    public void setPathToGridFile(String pathToGridFile) {
-        this.pathToGridFile = pathToGridFile;
+    public void setGridFile(final InputPath gridFile) {
+        this.gridFile = gridFile;
     }
 
     public int getMapPeriod() {
         return mapPeriod;
     }
 
-    public void setMapPeriod(int mapPeriod) {
+    public void setMapPeriod(final int mapPeriod) {
         this.mapPeriod = mapPeriod;
     }
 
@@ -104,7 +96,7 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
         return mapVariableName;
     }
 
-    public void setMapVariableName(String mapVariableName) {
+    public void setMapVariableName(final String mapVariableName) {
         this.mapVariableName = mapVariableName;
     }
 }

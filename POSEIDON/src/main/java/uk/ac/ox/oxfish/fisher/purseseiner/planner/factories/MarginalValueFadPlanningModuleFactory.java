@@ -45,11 +45,6 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(0d);
 
-
-    private String bannedXCoordinateBounds = "";
-    private String bannedYCoordinateBounds = "";
-
-
     @Override
     public MarginalValueFadPlanningModule apply(FishState state) {
 
@@ -59,20 +54,6 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
                 ),
                 minimumValueFadSets.apply(state.getRandom())
         );
-        if(!bannedXCoordinateBounds.isEmpty())
-        {
-            String[] coordinate = bannedXCoordinateBounds.split(",");
-            if(coordinate.length==2)
-            {
-                double[] bannedX = Arrays.stream(bannedXCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                double[] bannedY = Arrays.stream(bannedYCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                optionsGenerator.setBannedGridBounds(bannedY,bannedX);
-            }
-        }
 
         return new MarginalValueFadPlanningModule(
                 optionsGenerator
@@ -94,22 +75,6 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
 
     public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
-    }
-
-    public String getBannedXCoordinateBounds() {
-        return bannedXCoordinateBounds;
-    }
-
-    public void setBannedXCoordinateBounds(String bannedXCoordinateBounds) {
-        this.bannedXCoordinateBounds = bannedXCoordinateBounds;
-    }
-
-    public String getBannedYCoordinateBounds() {
-        return bannedYCoordinateBounds;
-    }
-
-    public void setBannedYCoordinateBounds(String bannedYCoordinateBounds) {
-        this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
 }

@@ -10,8 +10,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
-
 public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<DiscretizedOwnFadCentroidPlanningModule> {
 
 
@@ -26,10 +24,6 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
 
     private DoubleParameter distancePenalty = new FixedDoubleParameter(1d);
 
-
-    private String bannedXCoordinateBounds = "";
-    private String bannedYCoordinateBounds = "";
-
     @Override
     public DiscretizedOwnFadCentroidPlanningModule apply(FishState state) {
 
@@ -39,20 +33,6 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
                 ),
                 minimumValueFadSets.apply(state.getRandom())
         );
-        if(!bannedXCoordinateBounds.isEmpty())
-        {
-            String[] coordinate = bannedXCoordinateBounds.split(",");
-            if(coordinate.length==2)
-            {
-                double[] bannedX = Arrays.stream(bannedXCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                double[] bannedY = Arrays.stream(bannedYCoordinateBounds.split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
-                optionsGenerator.setBannedGridBounds(bannedY,bannedX);
-            }
-        }
         return new DiscretizedOwnFadCentroidPlanningModule(
                 optionsGenerator,
                 distancePenalty.apply(state.getRandom())
@@ -83,22 +63,6 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
 
     public void setDistancePenalty(DoubleParameter distancePenalty) {
         this.distancePenalty = distancePenalty;
-    }
-
-    public String getBannedXCoordinateBounds() {
-        return bannedXCoordinateBounds;
-    }
-
-    public void setBannedXCoordinateBounds(String bannedXCoordinateBounds) {
-        this.bannedXCoordinateBounds = bannedXCoordinateBounds;
-    }
-
-    public String getBannedYCoordinateBounds() {
-        return bannedYCoordinateBounds;
-    }
-
-    public void setBannedYCoordinateBounds(String bannedYCoordinateBounds) {
-        this.bannedYCoordinateBounds = bannedYCoordinateBounds;
     }
 
 }

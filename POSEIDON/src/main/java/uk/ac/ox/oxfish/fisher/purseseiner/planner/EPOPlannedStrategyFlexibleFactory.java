@@ -91,8 +91,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         ((DiscretizedOwnFadPlanningFactory) fadModule).setDiscretization(new SquaresMapDiscretizerFactory(6, 3));
         ((DiscretizedOwnFadPlanningFactory) fadModule).setDistancePenalty(new FixedDoubleParameter(1));
         ((DiscretizedOwnFadPlanningFactory) fadModule).setMinimumValueFadSets(new FixedDoubleParameter(5000));
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedXCoordinateBounds("-1,75");
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setBannedYCoordinateBounds("47, 51");
     }
 
     private LocationValuesSupplier locationValuesSupplier;

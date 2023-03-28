@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -40,7 +41,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
@@ -256,14 +259,18 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
             0
         );
 
-        generator.setBannedGridBounds(new double[]{-100, 1}, new double[]{-100, 1});
-        //only 3,3 will do
+        final DoubleGrid2D shearGrid = new DoubleGrid2D(4, 4);
+        range(0, 2).forEach(x ->
+            range(0, 4).forEach(y ->
+                shearGrid.set(x, y, 1)
+            )
+        );
+        map.getAdditionalMaps().put("Shear", () -> shearGrid);
 
-
-        generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
+        generator.startOrReset(fadManager, new MersenneTwisterFast(), map);
         final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions =
             generator.generateBestFadOpportunities();
-        assertEquals(initialOptions.size(), 1);
+        assertEquals(1, initialOptions.size());
         assertTrue(initialOptions.get(0).getSecond() == 3);
     }
 }
