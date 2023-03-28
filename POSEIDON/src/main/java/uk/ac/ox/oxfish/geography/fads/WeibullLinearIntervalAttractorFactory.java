@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class WeibullLinearIntervalAttractorFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
@@ -96,33 +95,30 @@ public class WeibullLinearIntervalAttractorFactory implements
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
-            new Supplier<AbundanceFadInitializer>() {
-                @Override
-                public AbundanceFadInitializer get() {
-                    final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+            () -> {
+                final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
 
-                    final HeterogeneousLinearIntervalAttractor fishAttractor =
-                        generateFishAttractor(
-                            fishState);
-                    final DoubleSupplier capacityGenerator;
-                    if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
-                        capacityGenerator = () -> Double.MAX_VALUE;
-                    else
-                        capacityGenerator = () -> {
-                            if (fishState.getRandom().nextFloat() <= probabilityOfFadBeingDud)
-                                return 0;
-                            else
-                                return Double.MAX_VALUE;
-                        };
+                final HeterogeneousLinearIntervalAttractor fishAttractor =
+                    generateFishAttractor(
+                        fishState);
+                final DoubleSupplier capacityGenerator;
+                if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
+                    capacityGenerator = () -> Double.MAX_VALUE;
+                else
+                    capacityGenerator = () -> {
+                        if (fishState.getRandom().nextFloat() <= probabilityOfFadBeingDud)
+                            return 0;
+                        else
+                            return Double.MAX_VALUE;
+                    };
 
-                    return new AbundanceFadInitializer(
-                        fishState.getBiology(),
-                        capacityGenerator,
-                        fishAttractor,
-                        fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
-                        fishState::getStep
-                    );
-                }
+                return new AbundanceFadInitializer(
+                    fishState.getBiology(),
+                    capacityGenerator,
+                    fishAttractor,
+                    fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+                    fishState::getStep
+                );
             }
 
         );
@@ -133,6 +129,9 @@ public class WeibullLinearIntervalAttractorFactory implements
     @NotNull
     protected HeterogeneousLinearIntervalAttractor generateFishAttractor(final FishState fishState) {
         final DoubleParameter[] carryingCapacities = new DoubleParameter[fishState.getBiology().getSize()];
+
+        //If we want to add correlation, this is the place to do it. I think -BP
+
         for (final Species species : fishState.getBiology().getSpecies()) {
             carryingCapacities[species.getIndex()] = new WeibullDoubleParameter(
                 carryingCapacityShapeParameters.get(species.getName()),

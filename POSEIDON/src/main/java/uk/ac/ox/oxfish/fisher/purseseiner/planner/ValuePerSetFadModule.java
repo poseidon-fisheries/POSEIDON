@@ -40,21 +40,35 @@ import java.util.PriorityQueue;
 public class ValuePerSetFadModule
         extends DiscretizedOwnFadPlanningModule {
 
+    //BP: I'm moving away from the 2 parameter model to a 1 parameter dampen model.
+    //Dampening is a simpler interpretation
+    //dampen=1: uniform at random across all regions
+    //dampen=0: scale VPS to give probability
     private final double intercept;
-
     private final double slope;
+
+    private final double dampen;
+    private final double westernBias;
 
 
     public ValuePerSetFadModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, double intercept, double slope) {
-
         super(optionsGenerator);
         this.intercept = intercept;
         this.slope = slope;
+        this.dampen = -1;
+        this.westernBias=0;
         Preconditions.checkArgument(optionsGenerator.getMinimumFadValue()<=0,
                                     "by setting minimum value fad set >0 you bias the value per set computation!");
+    }
 
-
-
+    public ValuePerSetFadModule(OwnFadSetDiscretizedActionGenerator optionsGenerator,double intercept, double slope, double dampen, double westernBias) {
+        super(optionsGenerator);
+        this.dampen = dampen;
+        this.westernBias=westernBias;
+        this.intercept = 0;
+        this.slope=1;
+        Preconditions.checkArgument(optionsGenerator.getMinimumFadValue()<=0,
+                "by setting minimum value fad set >0 you bias the value per set computation!");
     }
 
 
@@ -84,16 +98,27 @@ public class ValuePerSetFadModule
 
             double totalValueOfOption = 0;
             double numberOfOptions = 0;
-
+            double avgGridX = 0;
             //sum up the raw $ amount you expect to make
             for (OwnFadSetDiscretizedActionGenerator.ValuedFad fadInGroup : option.getFirst()) {
-                if(Double.isFinite(fadInGroup.getSecond()))
+                if(Double.isFinite(fadInGroup.getSecond())) {
+                    //int x=fadInGroup.getFirst().getLocation().getGridX();
+                    //int width = model.getMap().getWidth();
+                    avgGridX += fadInGroup.getFirst().getLocation().getGridX();
                     totalValueOfOption += fadInGroup.getSecond();
+                }
                 numberOfOptions++;
             }
-            //the actual "probability" is proportional to intercept + slope * SUM_OF_VALUE/NUMBER_OF_FADS
-
-            double probability = intercept + slope * totalValueOfOption / numberOfOptions;
+            avgGridX *= 1/numberOfOptions;
+            double westernProportion = Math.pow(2-avgGridX/model.getMap().getWidth(),westernBias);
+            double probability;
+            if(dampen>-1){
+                //The actual "probability" variation is dampened to be more like uniform at random
+                probability = westernProportion * (dampen + (1-dampen)*totalValueOfOption / numberOfOptions);
+            } else {
+                //the actual "probability" is proportional to intercept + slope * SUM_OF_VALUE/NUMBER_OF_FADS
+                probability = intercept + slope * totalValueOfOption / numberOfOptions;
+            }
             probabilities.add(new Pair<>(option.getSecond(),
                                          probability)
 
@@ -124,5 +149,9 @@ public class ValuePerSetFadModule
 
     public double getSlope() {
         return slope;
+    }
+
+    public double getDampen(){
+        return dampen;
     }
 }

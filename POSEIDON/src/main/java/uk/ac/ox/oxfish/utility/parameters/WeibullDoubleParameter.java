@@ -28,15 +28,15 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 public class WeibullDoubleParameter implements DoubleParameter {
 
     private double shape;
-
     private double scale;
+    private final double epsilon = 0.0001;
 
     private WeibullDistribution distribution;
 
     public WeibullDoubleParameter(double shape, double scale)
     {
-        this.shape = shape;
-        this.scale = scale;
+        this.shape = Math.max(shape,epsilon); //Cannot be zero
+        this.scale = Math.max(scale,epsilon);
     }
 
     @Override
@@ -55,7 +55,6 @@ public class WeibullDoubleParameter implements DoubleParameter {
                     shape,scale);
 
         return distribution.sample();
-
     }
 
 
@@ -64,18 +63,20 @@ public class WeibullDoubleParameter implements DoubleParameter {
     }
 
     public void setShape(double shape) {
-        this.shape = shape;
+        this.shape = Math.max(shape, epsilon);
         distribution=null;
     }
 
     public double getScale() {
-
         return scale;
     }
 
     public void setScale(double scale) {
         distribution=null;
+        this.scale = Math.max(scale,epsilon);
+    }
 
-        this.scale = scale;
+    public double inverseCDF(double probability){
+        return(scale*Math.pow(-Math.log(1-probability),1/shape));
     }
 }

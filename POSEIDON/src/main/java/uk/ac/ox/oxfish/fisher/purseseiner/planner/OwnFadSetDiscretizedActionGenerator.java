@@ -34,6 +34,8 @@ public class OwnFadSetDiscretizedActionGenerator {
             return -Double.compare(o1.getSecond(), o2.getSecond());
         }
     };
+
+    private NauticalMap map;
     private final MapDiscretization discretization;
     /**
      * if a FAD has less than this in value, just ignore it!
@@ -55,6 +57,9 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     private boolean filterOutCurrentlyInvalidFads = false;
 
+    //Set this value higher to allow vessels to set closer to the equator
+    private double maxAllowableShear = 0.90;
+
     //todo add minimum soaktime
 
     public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
@@ -73,6 +78,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         NauticalMap map
     ) {
 
+        this.map = map;
         //if you haven't, discretize!
         if (!discretization.isActive())
             discretization.discretize(map);
@@ -97,12 +103,22 @@ public class OwnFadSetDiscretizedActionGenerator {
             double value = fadManager.getFishValueCalculator().valueOf(deployedFad.getBiology(), prices);
 
             SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
-            if (bannedGridYBounds != null &&
+
+/*            if (bannedGridYBounds != null &&
                 location.getGridY() >= bannedGridYBounds[0] &&
                 location.getGridY() <= bannedGridYBounds[1] &&
                 location.getGridX() >= bannedGridXBounds[0] &&
                 location.getGridX() <= bannedGridXBounds[1])
                 continue;
+*/
+            //If the shear at this location is too high then skip the FAD
+            if(map.getAdditionalMaps().get("maxShear").get().get(location.getGridX(), location.getGridY()) > maxAllowableShear){
+              continue;
+            }
+
+            //This is where we want to artificially inflate the value to minimumFadValue
+            //if they make a bad reading. Why was this removed before?
+
             if (value >= minimumFadValue)
                 rankedFads[discretization.getGroup(deployedFad.getLocation())].
                     add(new ValuedFad(deployedFad, value));
@@ -193,6 +209,10 @@ public class OwnFadSetDiscretizedActionGenerator {
         this.bannedGridXBounds = bannedGridXBounds;
     }
 
+    public void setMaxAllowableShear(double maxAllowableShear){
+        this.maxAllowableShear=maxAllowableShear;
+    }
+    public double getMaxAllowableShear(){return maxAllowableShear;}
     public double[] getBannedGridXBounds() {
         return bannedGridXBounds;
     }
