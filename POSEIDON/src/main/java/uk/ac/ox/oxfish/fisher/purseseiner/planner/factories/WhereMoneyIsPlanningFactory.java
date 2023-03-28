@@ -25,6 +25,15 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(1d);
 
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
+    }
+
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
 
     @Override
     public WhereMoneyIsPlanningModule apply(final FishState state) {
@@ -33,7 +42,8 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
             new MapDiscretization(
                 discretization.apply(state)
             ),
-            minimumValueFadSets.apply(state.getRandom())
+            minimumValueFadSets.apply(state.getRandom()),
+            maxAllowableShear.apply(state.getRandom())
         );
         return new WhereMoneyIsPlanningModule(
             optionsGenerator,

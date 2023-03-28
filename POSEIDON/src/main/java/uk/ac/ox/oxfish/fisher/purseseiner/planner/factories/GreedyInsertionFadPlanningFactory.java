@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadCentroidPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GreedyInsertionFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -11,35 +10,39 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
-
 public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<GreedyInsertionFadPlanningModule>{
 
     /**
      * discretizes map so that when it is time to target FADs you just
      * go through a few relevant ones
      */
-    private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6,3);
+    private AlgorithmFactory<? extends MapDiscretizer> discretization = new SquaresMapDiscretizerFactory(6, 3);
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(0d);
 
     private DoubleParameter additionalFadInspected = new FixedDoubleParameter(5d);
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
+
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
+    }
 
     @Override
-    public GreedyInsertionFadPlanningModule apply(FishState state) {
+    public GreedyInsertionFadPlanningModule apply(final FishState state) {
 
-        OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-                new MapDiscretization(
-                        discretization.apply(state)
-                ),
-                minimumValueFadSets.apply(state.getRandom())
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
+            new MapDiscretization(discretization.apply(state)),
+            minimumValueFadSets.apply(state.getRandom()),
+            maxAllowableShear.apply(state.getRandom())
         );
 
         return new GreedyInsertionFadPlanningModule(
-                optionsGenerator,
-                additionalFadInspected.apply(state.getRandom()).intValue()
-
+            optionsGenerator,
+            additionalFadInspected.apply(state.getRandom()).intValue()
         );
 
     }
@@ -48,7 +51,7 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
         return discretization;
     }
 
-    public void setDiscretization(AlgorithmFactory<? extends MapDiscretizer> discretization) {
+    public void setDiscretization(final AlgorithmFactory<? extends MapDiscretizer> discretization) {
         this.discretization = discretization;
     }
 
@@ -56,7 +59,7 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
         return minimumValueFadSets;
     }
 
-    public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
+    public void setMinimumValueFadSets(final DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
     }
 
@@ -64,7 +67,7 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
         return additionalFadInspected;
     }
 
-    public void setAdditionalFadInspected(DoubleParameter additionalFadInspected) {
+    public void setAdditionalFadInspected(final DoubleParameter additionalFadInspected) {
         this.additionalFadInspected = additionalFadInspected;
     }
 

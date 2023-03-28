@@ -45,29 +45,31 @@ public class MarginalValueFadPlanningModule
 
 
     public MarginalValueFadPlanningModule(
-            MapDiscretization discretization,
-            double minimumValueOfFadBeforeBeingPickedUp) {
-        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
+        final MapDiscretization discretization,
+        final double minimumValueOfFadBeforeBeingPickedUp,
+        final double maxAllowableShear
+    ) {
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp, maxAllowableShear);
     }
 
-    public MarginalValueFadPlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator) {
+    public MarginalValueFadPlanningModule(final OwnFadSetDiscretizedActionGenerator optionsGenerator) {
         super(optionsGenerator);
     }
 
     @Override
     protected PlannedAction chooseFadSet(
-            Plan currentPlanSoFar, Fisher fisher, FishState model, NauticalMap map,
-            OwnFadSetDiscretizedActionGenerator optionsGenerator) {
-        List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
-                optionsGenerator.peekAllFads();
+        final Plan currentPlanSoFar, final Fisher fisher, final FishState model, final NauticalMap map,
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator
+    ) {
+        final List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+            optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
-        if(options == null || options.isEmpty())
+        if (options == null || options.isEmpty())
             return null;
         //if there is only one option, also don't bother
-        if(options.size()==1)
-        {
-            if(options.get(0).getSecond()>0) {
+        if (options.size() == 1) {
+            if (options.get(0).getSecond() > 0) {
                 lastFadGroupChosen = options.get(0).getSecond();
                 return optionsGenerator.chooseFad(options.get(0).getSecond());
             }
@@ -77,7 +79,7 @@ public class MarginalValueFadPlanningModule
 
         //if you can pick the same place you were fishing before, do so now
         if(lastFadGroupChosen >=0){
-            double valueIfFishingRemainsInThisArea = optionsGenerator.getValueOfThisOption(lastFadGroupChosen);
+            final double valueIfFishingRemainsInThisArea = optionsGenerator.getValueOfThisOption(lastFadGroupChosen);
 
             if(Double.isFinite(valueIfFishingRemainsInThisArea))
             {
@@ -89,10 +91,10 @@ public class MarginalValueFadPlanningModule
         lastFadGroupChosen = - 1;
 
 
-
-        int fadGroupChosen = GreedyInsertionFadPlanningModule.selectFadByCheapestInsertion(
-                currentPlanSoFar, fisher, map, options,
-                speedInKmPerHours, 0);
+        final int fadGroupChosen = GreedyInsertionFadPlanningModule.selectFadByCheapestInsertion(
+            currentPlanSoFar, fisher, map, options,
+            speedInKmPerHours, 0
+        );
 
         //all fads are empty, don't bother setting on any!
         if(fadGroupChosen<0 ||
@@ -108,13 +110,13 @@ public class MarginalValueFadPlanningModule
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         super.start(model, fisher);
         lastFadGroupChosen = -1;
     }
 
     @Override
-    public void prepareForReplanning(FishState state, Fisher fisher) {
+    public void prepareForReplanning(final FishState state, final Fisher fisher) {
         super.prepareForReplanning(state, fisher);
         lastFadGroupChosen = -1;
 

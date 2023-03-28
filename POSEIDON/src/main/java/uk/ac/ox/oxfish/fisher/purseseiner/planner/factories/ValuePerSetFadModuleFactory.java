@@ -38,39 +38,44 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
      * discretizes map so that when it is time to target FADs you just
      * go through a few relevant ones
      */
-    private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6, 3);
+    private AlgorithmFactory<? extends MapDiscretizer> discretization = new SquaresMapDiscretizerFactory(6, 3);
 
     private DoubleParameter intercept = new FixedDoubleParameter(0);
     private DoubleParameter slope = new FixedDoubleParameter(1d);
 
     //Keep this at -1 to use the "old" intercept/slope method
-    private DoubleParameter dampen = new FixedDoubleParameter( -1d);
+    private DoubleParameter dampen = new FixedDoubleParameter(-1d);
     //0 gives no bias to the western waters. Increase this to increase the western bias
     private DoubleParameter westernBias = new FixedDoubleParameter(0);
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
+
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
+    }
 
     @Override
     public ValuePerSetFadModule apply(final FishState state) {
 
-        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-            new MapDiscretization(
-                discretization.apply(state)
-            ),
-            0
-        );
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(new MapDiscretization(
+            discretization.apply(state)), 0, maxAllowableShear.apply(state.getRandom()));
 
         if (dampen.equals(-1)) {
             return new ValuePerSetFadModule(
-                    optionsGenerator,
-                    intercept.apply(state.getRandom()).doubleValue(),
-                    slope.apply(state.getRandom()).doubleValue()
+                optionsGenerator,
+                intercept.apply(state.getRandom()).doubleValue(),
+                slope.apply(state.getRandom()).doubleValue()
             );
         } else {
             return new ValuePerSetFadModule(
-                    optionsGenerator,
-                    0,1,
-                    dampen.apply(state.getRandom()).doubleValue(),
-                    westernBias.apply(state.getRandom()).doubleValue()
+                optionsGenerator,
+                0,
+                1,
+                dampen.apply(state.getRandom()).doubleValue(),
+                westernBias.apply(state.getRandom()).doubleValue()
 
             );
         }

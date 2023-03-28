@@ -26,13 +26,9 @@ import java.util.*;
 @SuppressWarnings("ALL")
 public class OwnFadSetDiscretizedActionGenerator {
 
+    private final static Comparator<ValuedFad> COMPARATOR =
+        (o1, o2) -> -Double.compare(o1.getSecond(), o2.getSecond());
 
-    private final static Comparator<ValuedFad> COMPARATOR = new Comparator<ValuedFad>() {
-        @Override
-        public int compare(ValuedFad o1, ValuedFad o2) {
-            return -Double.compare(o1.getSecond(), o2.getSecond());
-        }
-    };
     private final MapDiscretization discretization;
     /**
      * if a FAD has less than this in value, just ignore it!
@@ -49,13 +45,18 @@ public class OwnFadSetDiscretizedActionGenerator {
     private boolean filterOutCurrentlyInvalidFads = false;
 
     //Set this value higher to allow vessels to set closer to the equator
-    private double maxAllowableShear = 0.90;
+    private final double maxAllowableShear;
 
     //todo add minimum soaktime
 
-    public OwnFadSetDiscretizedActionGenerator(MapDiscretization discretization, double minimumFadValue) {
+    public OwnFadSetDiscretizedActionGenerator(
+        final MapDiscretization discretization,
+        final double minimumFadValue,
+        final double maxAllowableShear
+    ) {
         this.discretization = discretization;
         this.minimumFadValue = minimumFadValue;
+        this.maxAllowableShear = maxAllowableShear;
     }
 
     /**
@@ -183,10 +184,6 @@ public class OwnFadSetDiscretizedActionGenerator {
 
     public double getMaxAllowableShear() {
         return maxAllowableShear;
-    }
-
-    public void setMaxAllowableShear(double maxAllowableShear) {
-        this.maxAllowableShear = maxAllowableShear;
     }
 
     public boolean isFilterOutCurrentlyInvalidFads() {

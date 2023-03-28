@@ -1,16 +1,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
-
-import java.util.List;
 
 public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule {
 
@@ -28,27 +23,37 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
 
     public DiscretizedOwnFadPlanningModule(
-            MapDiscretization discretization,
-            double minimumValueOfFadBeforeBeingPickedUp) {
-        this( new OwnFadSetDiscretizedActionGenerator(discretization,
-                        minimumValueOfFadBeforeBeingPickedUp));
+        final MapDiscretization discretization,
+        final double minimumValueOfFadBeforeBeingPickedUp,
+        final double maxAllowableShear
+    ) {
+        this(
+            new OwnFadSetDiscretizedActionGenerator(
+                discretization,
+                minimumValueOfFadBeforeBeingPickedUp,
+                maxAllowableShear
+            )
+        );
     }
 
     public DiscretizedOwnFadPlanningModule(
-            OwnFadSetDiscretizedActionGenerator optionsGenerator) {
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator
+    ) {
         this.optionsGenerator =
-                optionsGenerator;
+            optionsGenerator;
     }
 
     @Override
-    public PlannedAction chooseNextAction(Plan currentPlanSoFar) {
+    public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
 
 
-        return chooseFadSet(currentPlanSoFar,
-                fisher,
-                fishState,
-                map,
-                optionsGenerator);
+        return chooseFadSet(
+            currentPlanSoFar,
+            fisher,
+            fishState,
+            map,
+            optionsGenerator
+        );
 
     }
 
@@ -61,21 +66,22 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         optionsGenerator.startOrReset(
-                FadManager.getFadManager(fisher),
-                model.getRandom(),
-                model.getMap());
+            FadManager.getFadManager(fisher),
+            model.getRandom(),
+            model.getMap()
+        );
         map = model.getMap();
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
-        this.fisher=fisher;
+        this.fisher = fisher;
         this.fishState = model;
 
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
-        map=null;
+    public void turnOff(final Fisher fisher) {
+        map = null;
         this.fisher = null;
         this.fishState = null;
 
@@ -93,8 +99,8 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      * @param fisher
      */
     @Override
-    public void prepareForReplanning(FishState state, Fisher fisher) {
-        start(state,fisher);
+    public void prepareForReplanning(final FishState state, final Fisher fisher) {
+        start(state, fisher);
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
     }
 
@@ -108,12 +114,13 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      * @return
      */
     @Override
-    public int maximumActionsInAPlan(FishState state, Fisher fisher) {
+    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
 
         return
-                Math.min(
-                        FadManager.getFadManager(fisher).getNumberOfRemainingYearlyActions(FadSetAction.class),
-                        MAX_OWN_FAD_SETS);
+            Math.min(
+                FadManager.getFadManager(fisher).getNumberOfRemainingYearlyActions(FadSetAction.class),
+                MAX_OWN_FAD_SETS
+            );
 
 
     }

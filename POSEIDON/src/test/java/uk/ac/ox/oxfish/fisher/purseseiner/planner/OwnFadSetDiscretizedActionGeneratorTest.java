@@ -41,9 +41,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
@@ -109,7 +107,8 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         discretization.discretize(map);
         final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
             discretization,
-            -100
+            -100,
+            0.90
         );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
@@ -196,7 +195,8 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         discretization.discretize(map);
         final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
             discretization,
-            2
+            2,
+            0.90
         );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
@@ -256,7 +256,8 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         discretization.discretize(map);
         final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
             discretization,
-            0
+            0,
+            0.9
         );
 
         final DoubleGrid2D shearGrid = new DoubleGrid2D(4, 4);

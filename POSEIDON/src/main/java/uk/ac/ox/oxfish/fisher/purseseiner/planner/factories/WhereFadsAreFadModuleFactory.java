@@ -18,21 +18,30 @@ public class WhereFadsAreFadModuleFactory implements AlgorithmFactory<WhereFadsA
      * go through a few relevant ones
      */
     private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6, 3);
+        new SquaresMapDiscretizerFactory(6, 3);
 
     private DoubleParameter ageWeight = new FixedDoubleParameter(1);
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(1d);
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
 
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
+    }
 
     @Override
     public WhereFadsArePlanningModule apply(final FishState state) {
 
         final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-                new MapDiscretization(
-                        discretization.apply(state)
-                ),
-                minimumValueFadSets.apply(state.getRandom())
+            new MapDiscretization(
+                discretization.apply(state)
+            ),
+            minimumValueFadSets.apply(state.getRandom()),
+            maxAllowableShear.apply(state.getRandom())
         );
         return new WhereFadsArePlanningModule(
                 optionsGenerator,

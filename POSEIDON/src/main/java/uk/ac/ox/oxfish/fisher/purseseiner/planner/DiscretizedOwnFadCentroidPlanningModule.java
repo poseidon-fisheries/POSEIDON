@@ -20,59 +20,61 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
-import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * pick the best fads in each quadrant through OwnFadSetDiscretizedActionGenerator and then apply an idea from Feillet (2005): pick the action
  * that has the highest value/distance_from_path_centroid
- *
- *
+ * <p>
+ * <p>
  * Feillet, Dominique, Pierre Dejax, and Michel Gendreau. “Traveling Salesman Problems with Profits.” Transportation
  * Science 39, no. 2 (2005): 188–205.
  */
 public class DiscretizedOwnFadCentroidPlanningModule
-        extends DiscretizedOwnFadPlanningModule {
+    extends DiscretizedOwnFadPlanningModule {
 
     //best fad is chosen as max $/(hr^penalty)
     private final double distancePenalty;
 
-    public DiscretizedOwnFadCentroidPlanningModule(MapDiscretization discretization,
-                                                   double minimumValueOfFadBeforeBeingPickedUp, double distancePenalty) {
-        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
+    public DiscretizedOwnFadCentroidPlanningModule(
+        final MapDiscretization discretization,
+        final double minimumValueOfFadBeforeBeingPickedUp,
+        final double distancePenalty,
+        final double maxAllowableShear
+    ) {
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp, maxAllowableShear);
         this.distancePenalty = distancePenalty;
     }
 
-    public DiscretizedOwnFadCentroidPlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator, double distancePenalty) {
+    public DiscretizedOwnFadCentroidPlanningModule(
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator,
+        final double distancePenalty
+    ) {
         super(optionsGenerator);
         this.distancePenalty = distancePenalty;
     }
 
-    protected PlannedAction chooseFadSet(Plan currentPlanSoFar,
-                                         Fisher fisher,
-                                         FishState model,
-                                         NauticalMap map,
-                                         OwnFadSetDiscretizedActionGenerator optionsGenerator
-                                                  ) {
+    protected PlannedAction chooseFadSet(
+        final Plan currentPlanSoFar,
+        final Fisher fisher,
+        final FishState model,
+        final NauticalMap map,
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator
+    ) {
 
 
-        List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> options =
-                optionsGenerator.generateBestFadOpportunities();
+        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> options =
+            optionsGenerator.generateBestFadOpportunities();
 
         //if there are no options, don't bother
-        if(options == null || options.isEmpty())
+        if (options == null || options.isEmpty())
             return null;
         //if there is only one option, also don't bother
         if(options.size()==1)
@@ -84,20 +86,21 @@ public class DiscretizedOwnFadCentroidPlanningModule
 
         //find which seatile the centroid belongs to (the centroid is the middle of a path so a convex operation
         //it should always land on some tile or another)
-        SeaTile centroid = map.getSeaTile((int) currentPlanSoFar.getGridXCentroid(),
-                                          (int) currentPlanSoFar.getGridYCentroid());
+        final SeaTile centroid = map.getSeaTile(
+            (int) currentPlanSoFar.getGridXCentroid(),
+            (int) currentPlanSoFar.getGridYCentroid()
+        );
 
         //pick the best value as a distance to centroid
         double discountedValue = Double.MIN_VALUE;
         Integer fadGroupChosen = null;
-        for (Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> option : options) {
-            double hoursSpentTravellingToThere =
-                    map.distance(centroid,option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
-            assert option.getFirst().getSecond()>=0;
-            double currentDiscountValue = option.getFirst().getSecond() /
-                    Math.pow(hoursSpentTravellingToThere+1,distancePenalty);
-            if(currentDiscountValue>= discountedValue)
-            {
+        for (final Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> option : options) {
+            final double hoursSpentTravellingToThere =
+                map.distance(centroid, option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
+            assert option.getFirst().getSecond() >= 0;
+            final double currentDiscountValue = option.getFirst().getSecond() /
+                Math.pow(hoursSpentTravellingToThere + 1, distancePenalty);
+            if (currentDiscountValue >= discountedValue) {
                 fadGroupChosen = option.getSecond();
                 discountedValue = currentDiscountValue;
             }

@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
+import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -49,8 +50,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
@@ -73,10 +75,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
         )
     );
-
-    public int dayOfYear(final Month month, final int dayOfMonth) {
-        return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear();
-    }
 
     public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
@@ -102,7 +100,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         )
     );
     private FadMapFactory<B, F> fadMapFactory;
-    private List<AlgorithmFactory<? extends Startable>> additionalStartables = new LinkedList<>();
+    private List<AlgorithmFactory<? extends Startable>> additionalStartables =
+        Stream.of(
+            new EnvironmentalMapFactory(
+                "Shear",
+                getInputFolder().path("currents", "shear.csv")
+            )
+        ).collect(Collectors.toList());
+
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             getInputFolder().path("depth.csv"),

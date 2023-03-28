@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.GreedyInsertionFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.MarginalValueFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -31,33 +30,28 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
-
-public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<MarginalValueFadPlanningModule>{
+public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<MarginalValueFadPlanningModule> {
 
 
+    private final DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
+
+    private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(0d);
     /**
      * discretizes map so that when it is time to target FADs you just
      * go through a few relevant ones
      */
-    private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6, 3);
-
-    private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(0d);
+    private AlgorithmFactory<? extends MapDiscretizer> discretization = new SquaresMapDiscretizerFactory(6, 3);
 
     @Override
-    public MarginalValueFadPlanningModule apply(FishState state) {
+    public MarginalValueFadPlanningModule apply(final FishState state) {
 
-        OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-                new MapDiscretization(
-                        discretization.apply(state)
-                ),
-                minimumValueFadSets.apply(state.getRandom())
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
+            new MapDiscretization(discretization.apply(state)),
+            minimumValueFadSets.apply(state.getRandom()),
+            maxAllowableShear.apply(state.getRandom())
         );
 
-        return new MarginalValueFadPlanningModule(
-                optionsGenerator
-        );
+        return new MarginalValueFadPlanningModule(optionsGenerator);
     }
 
     public AlgorithmFactory<? extends MapDiscretizer> getDiscretization() {
@@ -65,7 +59,8 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
     }
 
     public void setDiscretization(
-            AlgorithmFactory<? extends MapDiscretizer> discretization) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
         this.discretization = discretization;
     }
 
@@ -73,7 +68,7 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
         return minimumValueFadSets;
     }
 
-    public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
+    public void setMinimumValueFadSets(final DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
     }
 

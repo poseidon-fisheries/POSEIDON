@@ -17,27 +17,34 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
      * discretizes map so that when it is time to target FADs you just
      * go through a few relevant ones
      */
-    private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6,3);
+    private AlgorithmFactory<? extends MapDiscretizer> discretization = new SquaresMapDiscretizerFactory(6, 3);
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(0d);
 
     private DoubleParameter distancePenalty = new FixedDoubleParameter(1d);
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
+
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
+    }
 
     @Override
     public DiscretizedOwnFadCentroidPlanningModule apply(FishState state) {
 
         OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
-                new MapDiscretization(
-                        discretization.apply(state)
-                ),
-                minimumValueFadSets.apply(state.getRandom())
+            new MapDiscretization(discretization.apply(state)),
+            minimumValueFadSets.apply(state.getRandom()),
+            maxAllowableShear.apply(state.getRandom())
         );
-        return new DiscretizedOwnFadCentroidPlanningModule(
-                optionsGenerator,
-                distancePenalty.apply(state.getRandom())
 
-                );
+        return new DiscretizedOwnFadCentroidPlanningModule(
+            optionsGenerator,
+            distancePenalty.apply(state.getRandom())
+        );
 
     }
 
