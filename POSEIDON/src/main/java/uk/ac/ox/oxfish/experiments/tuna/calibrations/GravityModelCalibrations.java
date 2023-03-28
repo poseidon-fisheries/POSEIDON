@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.WeibullLinearIntervalEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -45,23 +46,29 @@ public class GravityModelCalibrations {
 
         final LinkedList<AdditionalMapFactory> environmentalMaps =
             new LinkedList<>(ImmutableList.of(
-                new AdditionalMapFactory("Clorophill", "inputs/tests/clorophill.csv"),
-                new AdditionalMapFactory("Temperature", "inputs/tests/temperature.csv"),
-                new AdditionalMapFactory("FrontalIndex", "inputs/tests/frontalindex.csv"),
-                new AdditionalMapFactory("SKJMINUSBET", "inputs/tests/skj_minus_bet.csv")
+                new AdditionalMapFactory(
+                    "Chlorophyll",
+                    InputPath.of("inputs", "epo_inputs", "environmental_maps", "chlorophyll.csv")
+                ),
+                new AdditionalMapFactory(
+                    "Temperature",
+                    InputPath.of("inputs", "epo_inputs", "environmental_maps", "temperature.csv")
+                ),
+                new AdditionalMapFactory(
+                    "FrontalIndex",
+                    InputPath.of("inputs", "epo_inputs", "environmental_maps", "frontal_index.csv")
+                )
             ));
 
         final LinkedList<DoubleParameter> environmentalThresholds =
             new LinkedList<>(ImmutableList.of(
                 new FixedDoubleParameter(0),
                 new FixedDoubleParameter(26.407350615564233),
-                new FixedDoubleParameter(0.0),
-                new FixedDoubleParameter(0.7964784251739445)
+                new FixedDoubleParameter(0.0)
             ));
 
         final LinkedList<DoubleParameter> environmentalPenalties =
             new LinkedList<>(ImmutableList.of(
-                new FixedDoubleParameter(2),
                 new FixedDoubleParameter(2),
                 new FixedDoubleParameter(2),
                 new FixedDoubleParameter(2)

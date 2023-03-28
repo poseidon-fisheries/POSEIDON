@@ -20,88 +20,76 @@
 
 package uk.ac.ox.oxfish.model.plugins;
 
-import com.google.common.base.Supplier;
-import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.tuna.AllocationGrids;
 import uk.ac.ox.oxfish.biology.tuna.SimpleAllocationGridsSupplier;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Paths;
 
 public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartable> {
-
-
-
-    public String mapVariableName = "Clorophill";
-    private String pathToGridFile = "inputs/tests/clorophill.csv";
-
+    public String mapVariableName;
+    private InputPath gridFile;
     private int mapPeriod = 365;
 
     public AdditionalMapFactory() {
     }
 
-    public AdditionalMapFactory(String mapVariableName, String pathToGridFile) {
-        this(mapVariableName, pathToGridFile, 365);
+    public AdditionalMapFactory(final String mapVariableName, final InputPath gridFile) {
+        this(mapVariableName, gridFile, 365);
     }
 
-    public AdditionalMapFactory(String mapVariableName, String pathToGridFile, int mapPeriod) {
+    public AdditionalMapFactory(final String mapVariableName, final InputPath gridFile, final int mapPeriod) {
         this.mapVariableName = mapVariableName;
-        this.pathToGridFile = pathToGridFile;
+        this.gridFile = gridFile;
         this.mapPeriod = mapPeriod;
     }
 
-    public AdditionalMapFactory(String pathToClorophillFile) {
-        this.pathToGridFile = pathToClorophillFile;
+    public AdditionalMapFactory(final InputPath gridFile) {
+        this.gridFile = gridFile;
     }
 
     @Override
-    public AdditionalStartable apply(FishState model) {
-
-        return new AdditionalStartable(){
-
+    public AdditionalStartable apply(final FishState model) {
+        return new AdditionalStartable() {
             @Override
-            public void start(FishState model) {
-                SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
-                        Paths.get(pathToGridFile),
-                        model.getMap().getMapExtent(),
-                        mapPeriod,
-                        false,
-                        mapVariableName
+            public void start(final FishState model) {
+                final SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
+                    gridFile.get(),
+                    model.getMap().getMapExtent(),
+                    mapPeriod,
+                    false,
+                    mapVariableName
                 );
 
-                AllocationGrids<String> grids = supplier.get();
+                final AllocationGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
-                        mapVariableName,
-                        (Supplier<DoubleGrid2D>) () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
+                    mapVariableName,
+                    () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
                 );
-
-
             }
-
             @Override
             public void turnOff() {
                 model.getMap().getAdditionalMaps().remove(mapVariableName);
             }
         };
-
     }
 
-    public String getPathToGridFile() {
-        return pathToGridFile;
+    public InputPath getGridFile() {
+        return gridFile;
     }
 
-    public void setPathToGridFile(String pathToGridFile) {
-        this.pathToGridFile = pathToGridFile;
+    public void setGridFile(final InputPath gridFile) {
+        this.gridFile = gridFile;
     }
 
     public int getMapPeriod() {
         return mapPeriod;
     }
 
-    public void setMapPeriod(int mapPeriod) {
+    public void setMapPeriod(final int mapPeriod) {
         this.mapPeriod = mapPeriod;
     }
 
@@ -109,7 +97,7 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
         return mapVariableName;
     }
 
-    public void setMapVariableName(String mapVariableName) {
+    public void setMapVariableName(final String mapVariableName) {
         this.mapVariableName = mapVariableName;
     }
 }

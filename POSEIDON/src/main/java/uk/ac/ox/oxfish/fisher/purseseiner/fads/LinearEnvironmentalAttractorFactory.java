@@ -40,6 +40,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
@@ -100,9 +101,9 @@ public class LinearEnvironmentalAttractorFactory implements
     }
 
     public static Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
-        final LinkedList<AdditionalMapFactory> environmentalMaps,
-        final LinkedList<DoubleParameter> environmentalPenalties,
-        final LinkedList<DoubleParameter> environmentalThresholds,
+        final List<AdditionalMapFactory> environmentalMaps,
+        final List<DoubleParameter> environmentalPenalties,
+        final List<DoubleParameter> environmentalThresholds,
         final FishState fishState
     ) {
         Function<SeaTile, Double> catchabilityPenaltyFunction = null;

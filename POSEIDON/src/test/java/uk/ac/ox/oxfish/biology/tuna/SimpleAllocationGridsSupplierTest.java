@@ -37,21 +37,21 @@ public class SimpleAllocationGridsSupplierTest {
     public void clorophillMap() {
 
 
-        EpoGravityAbundanceScenario scenarioPathfinding = new EpoGravityAbundanceScenario();
-        FishState model = new FishState(0);
+        final EpoGravityAbundanceScenario scenarioPathfinding = new EpoGravityAbundanceScenario();
+        final FishState model = new FishState(0);
         model.setScenario(scenarioPathfinding);
         model.start();
-        SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
-                Paths.get("inputs/tests/clorophill.csv"),
+        final SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
+                Paths.get("inputs/epo_inputs/environmental_maps/chlorophyll.csv"),
                 model.getMap().getMapExtent(),
-                "Clorophill"
+                "Chlorophyll"
         );
 
-        AllocationGrids<String> lame = supplier.get();
-        SeaTile seaTile = model.getMap().getSeaTile(new Coordinate(-142, 40));
-        double clorophill = lame.atOrBeforeStep(1).get("Clorophill").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(clorophill,0.258503,.0001);
-        clorophill = lame.atOrBeforeStep(360).get("Clorophill").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(clorophill,0.136956,.0001);
+        final AllocationGrids<String> lame = supplier.get();
+        final SeaTile seaTile = model.getMap().getSeaTile(new Coordinate(-142, 40));
+        double chlorophyll = lame.atOrBeforeStep(1).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
+        assertEquals(chlorophyll,0.258503,.0001);
+        chlorophyll = lame.atOrBeforeStep(360).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
+        assertEquals(chlorophyll,0.136956,.0001);
     }
 }

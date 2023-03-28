@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -56,9 +57,9 @@ public class LinearClorophillAttractorFactory implements
     private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
-    private String clorophillMapPath = "inputs/tests/clorophill.csv";
-    private int clorophillMapPeriodInDays = 365;
-    private DoubleParameter clorophillThreshold = new FixedDoubleParameter(0.15);
+    private InputPath chlorophyllMapPath = InputPath.of("inputs", "epo_inputs", "environmental_maps", "chlorophyll.csv");
+    private int chlorophyllMapPeriodInDays = 365;
+    private DoubleParameter chlorophyllThreshold = new FixedDoubleParameter(0.15);
 
     {
         maximumCarryingCapacities.put("Skipjack tuna", 135000d);
@@ -77,8 +78,8 @@ public class LinearClorophillAttractorFactory implements
                 @Override
                 public AbundanceFadInitializer get() {
                     //create the map
-                    final AdditionalMapFactory factory = new AdditionalMapFactory(clorophillMapPath);
-                    factory.setMapPeriod(clorophillMapPeriodInDays);
+                    final AdditionalMapFactory factory = new AdditionalMapFactory(chlorophyllMapPath);
+                    factory.setMapPeriod(chlorophyllMapPeriodInDays);
                     fishState.registerStartable(factory.apply(fishState));
 
                     //attractor:
@@ -125,7 +126,7 @@ public class LinearClorophillAttractorFactory implements
                         );
                         for (final Species species : globalBiology.getSpecies())
                             cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(), 0d) *
-                                Math.pow(Math.min(1d, currentHere / clorophillThreshold.apply(rng)), 2);
+                                Math.pow(Math.min(1d, currentHere / chlorophyllThreshold.apply(rng)), 2);
                         return cachability;
                     };
 
@@ -194,20 +195,20 @@ public class LinearClorophillAttractorFactory implements
         this.fadDudRate = fadDudRate;
     }
 
-    public String getClorophillMapPath() {
-        return clorophillMapPath;
+    public InputPath getChlorophyllMapPath() {
+        return chlorophyllMapPath;
     }
 
-    public void setClorophillMapPath(final String clorophillMapPath) {
-        this.clorophillMapPath = clorophillMapPath;
+    public void setChlorophyllMapPath(final InputPath chlorophyllMapPath) {
+        this.chlorophyllMapPath = chlorophyllMapPath;
     }
 
-    public DoubleParameter getClorophillThreshold() {
-        return clorophillThreshold;
+    public DoubleParameter getChlorophyllThreshold() {
+        return chlorophyllThreshold;
     }
 
-    public void setClorophillThreshold(final DoubleParameter clorophillThreshold) {
-        this.clorophillThreshold = clorophillThreshold;
+    public void setChlorophyllThreshold(final DoubleParameter chlorophyllThreshold) {
+        this.chlorophyllThreshold = chlorophyllThreshold;
     }
 
     public LinkedHashMap<String, Double> getMaximumCarryingCapacities() {
@@ -226,12 +227,12 @@ public class LinearClorophillAttractorFactory implements
         this.carryingCapacityMultiplier = carryingCapacityMultiplier;
     }
 
-    public int getClorophillMapPeriodInDays() {
-        return clorophillMapPeriodInDays;
+    public int getChlorophyllMapPeriodInDays() {
+        return chlorophyllMapPeriodInDays;
     }
 
-    public void setClorophillMapPeriodInDays(final int clorophillMapPeriodInDays) {
-        this.clorophillMapPeriodInDays = clorophillMapPeriodInDays;
+    public void setChlorophyllMapPeriodInDays(final int chlorophyllMapPeriodInDays) {
+        this.chlorophyllMapPeriodInDays = chlorophyllMapPeriodInDays;
     }
 
 }

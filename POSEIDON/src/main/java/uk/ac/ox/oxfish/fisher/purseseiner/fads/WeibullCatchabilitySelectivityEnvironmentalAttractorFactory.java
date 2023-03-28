@@ -4,7 +4,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -20,6 +19,7 @@ import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -46,16 +46,17 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
-    private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
+
+    private Map<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
+    private Map<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+    private Map<String, Double> catchabilities = new LinkedHashMap<>();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
     private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
     private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
-    private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
-    private LinkedList<DoubleParameter> environmentalThresholds = new LinkedList<>();
-    private LinkedList<DoubleParameter> environmentalPenalties = new LinkedList<>();
+    private List<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
+    private List<DoubleParameter> environmentalThresholds = new LinkedList<>();
+    private List<DoubleParameter> environmentalPenalties = new LinkedList<>();
 
     {
         carryingCapacityShapeParameters.put("Species 0", 0.5d);
@@ -81,16 +82,16 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
 
     public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
-        final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
-        final LinkedHashMap<String, Double> catchabilities,
+        final Map<String, Double> carryingCapacityShapeParameters,
+        final Map<String, Double> carryingCapacityScaleParameters,
+        final Map<String, Double> catchabilities,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter maximumDaysAttractions,
         final DoubleParameter fishReleaseProbabilityInPercent,
-        final LinkedList<AdditionalMapFactory> environmentalMaps,
-        final LinkedList<DoubleParameter> environmentalThresholds,
-        final LinkedList<DoubleParameter> environmentalPenalties
+        final List<AdditionalMapFactory> environmentalMaps,
+        final List<DoubleParameter> environmentalThresholds,
+        final List<DoubleParameter> environmentalPenalties
     ) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
@@ -181,31 +182,31 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
 
     }
 
-    public LinkedHashMap<String, Double> getCarryingCapacityShapeParameters() {
+    public Map<String, Double> getCarryingCapacityShapeParameters() {
         return carryingCapacityShapeParameters;
     }
 
     public void setCarryingCapacityShapeParameters(
-        final LinkedHashMap<String, Double> carryingCapacityShapeParameters
+        final Map<String, Double> carryingCapacityShapeParameters
     ) {
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
     }
 
-    public LinkedHashMap<String, Double> getCarryingCapacityScaleParameters() {
+    public Map<String, Double> getCarryingCapacityScaleParameters() {
         return carryingCapacityScaleParameters;
     }
 
     public void setCarryingCapacityScaleParameters(
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters
+        final Map<String, Double> carryingCapacityScaleParameters
     ) {
         this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
     }
 
-    public LinkedHashMap<String, Double> getCatchabilities() {
+    public Map<String, Double> getCatchabilities() {
         return catchabilities;
     }
 
-    public void setCatchabilities(final LinkedHashMap<String, Double> catchabilities) {
+    public void setCatchabilities(final Map<String, Double> catchabilities) {
         this.catchabilities = catchabilities;
     }
 
@@ -244,30 +245,30 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     }
 
 
-    public LinkedList<AdditionalMapFactory> getEnvironmentalMaps() {
+    public List<AdditionalMapFactory> getEnvironmentalMaps() {
         return environmentalMaps;
     }
 
-    public void setEnvironmentalMaps(final LinkedList<AdditionalMapFactory> environmentalMaps) {
+    public void setEnvironmentalMaps(final List<AdditionalMapFactory> environmentalMaps) {
         this.environmentalMaps = environmentalMaps;
     }
 
-    public LinkedList<DoubleParameter> getEnvironmentalThresholds() {
+    public List<DoubleParameter> getEnvironmentalThresholds() {
         return environmentalThresholds;
     }
 
     public void setEnvironmentalThresholds(
-        final LinkedList<DoubleParameter> environmentalThresholds
+        final List<DoubleParameter> environmentalThresholds
     ) {
         this.environmentalThresholds = environmentalThresholds;
     }
 
-    public LinkedList<DoubleParameter> getEnvironmentalPenalties() {
+    public List<DoubleParameter> getEnvironmentalPenalties() {
         return environmentalPenalties;
     }
 
     public void setEnvironmentalPenalties(
-        final LinkedList<DoubleParameter> environmentalPenalties
+        final List<DoubleParameter> environmentalPenalties
     ) {
         this.environmentalPenalties = environmentalPenalties;
     }
