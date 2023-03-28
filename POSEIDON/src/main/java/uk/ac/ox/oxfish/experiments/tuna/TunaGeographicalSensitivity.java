@@ -96,7 +96,7 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
                     break;
                 case GREEDY_0 :
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -106,14 +106,14 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(0));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
                     break;
                 case GREEDY_IDENTITY:
                     greedy = new GreedyInsertionFadPlanningFactory();
                     greedy.setDiscretization(new IdentityDiscretizerFactory());
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
                     break;
                 case GREEDY_VERY_HIGH_MINFADVALUE :
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -123,7 +123,7 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(2000000));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
                     break;
                 case GREEDY_HIGH_GREED_FACTOR:
                     greedy = new GreedyInsertionFadPlanningFactory();
@@ -133,10 +133,10 @@ public class TunaGeographicalSensitivity {
                     greedy.setDiscretization(discretization);
                     greedy.setAdditionalFadInspected(new FixedDoubleParameter(500));
                     greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModule(greedy);
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
                     break;
                 case NEGATIVE_CENTROID:
-                    ((DiscretizedOwnFadPlanningFactory) ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).getFadModule()).setDistancePenalty(new FixedDoubleParameter(-1d));
+                    ((DiscretizedOwnFadPlanningFactory) ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).getFadModuleFactory()).setDistancePenalty(new FixedDoubleParameter(-1d));
                     break;
             }
 

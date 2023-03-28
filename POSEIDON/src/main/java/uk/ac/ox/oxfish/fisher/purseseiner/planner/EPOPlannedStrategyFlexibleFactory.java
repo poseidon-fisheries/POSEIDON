@@ -1,12 +1,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.DiscretizedOwnFadPlanningFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -84,15 +82,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(0);
     private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(0);
     private boolean uniqueCatchSamplerForEachStrategy = false;
-    private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule = new DiscretizedOwnFadPlanningFactory();
-
-    {
-        //old default values
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setDiscretization(new SquaresMapDiscretizerFactory(6, 3));
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setDistancePenalty(new FixedDoubleParameter(1));
-        ((DiscretizedOwnFadPlanningFactory) fadModule).setMinimumValueFadSets(new FixedDoubleParameter(5000));
-    }
-
+    private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
     private LocationValuesSupplier locationValuesSupplier;
 
     public EPOPlannedStrategyFlexibleFactory() {
@@ -100,12 +90,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public EPOPlannedStrategyFlexibleFactory(
         final int targetYear,
         final LocationValuesSupplier locationValuesSupplier,
+        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
         this.targetYear = targetYear;
         this.locationValuesSupplier = locationValuesSupplier;
+        this.fadModuleFactory = fadModuleFactory;
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
@@ -154,7 +146,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             purgeIllegalActionsImmediately,
             noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
             delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
-            fadModule,
+            fadModuleFactory,
             locationValuesSupplier.get()
         );
 
@@ -291,12 +283,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 
-    public AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> getFadModule() {
-        return fadModule;
+    public AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> getFadModuleFactory() {
+        return fadModuleFactory;
     }
 
-    public void setFadModule(final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule) {
-        this.fadModule = fadModule;
+    public void setFadModuleFactory(final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory) {
+        this.fadModuleFactory = fadModuleFactory;
     }
 
     public LocationValuesSupplier getLocationValuesSupplier() {

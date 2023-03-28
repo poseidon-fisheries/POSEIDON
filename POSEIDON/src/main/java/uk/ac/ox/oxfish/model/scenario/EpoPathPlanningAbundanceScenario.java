@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnvironmentalAttractorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetFadModuleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
@@ -91,6 +92,7 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                     getInputFolder().path("location_values.csv"),
                     getTargetYear()
                 ),
+                new ValuePerSetFadModuleFactory(),
                 new AbundanceCatchSamplersFactory(
                     getSpeciesCodesSupplier(),
                     getAbundanceFiltersFactory(),
