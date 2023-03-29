@@ -53,7 +53,7 @@ public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<Thres
      */
     @Override
     public ThresholdExplorationProbability apply(FishState state) {
-        return new ThresholdExplorationProbability(multiplier.apply(state.getRandom()),
+        return new ThresholdExplorationProbability(multiplier.applyAsDouble(state.getRandom()),
                                                    new Function<FishState, Double>() {
                                                        @Override
                                                        public Double apply(FishState model) {

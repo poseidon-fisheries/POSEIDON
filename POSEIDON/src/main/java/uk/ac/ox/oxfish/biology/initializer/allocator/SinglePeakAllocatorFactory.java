@@ -20,29 +20,28 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
     private DoubleParameter peakBiomass = new FixedDoubleParameter(1);
 
 
-    @Override
-    public PyramidsAllocator apply(FishState fishState) {
-        final ArrayList<int[]> singlePeak = Lists.newArrayList();
-        final int peakX = Math.round(this.peakX.apply(fishState.getRandom()).floatValue());
-        final int peakY = Math.round(this.peakY.apply(fishState.getRandom()).floatValue());
-        singlePeak.add(new int[]{peakX,peakY});
-        return new PyramidsAllocator(
-                smoothingValue.apply(fishState.getRandom()),
-                maxSpread,
-                peakBiomass.apply(fishState.getRandom()),
-                singlePeak
-        );
-    }
-
     public SinglePeakAllocatorFactory() {
     }
 
+    @Override
+    public PyramidsAllocator apply(final FishState fishState) {
+        final ArrayList<int[]> singlePeak = Lists.newArrayList();
+        final int peakX = Math.toIntExact(Math.round(this.peakX.applyAsDouble(fishState.getRandom())));
+        final int peakY = Math.toIntExact(Math.round(this.peakY.applyAsDouble(fishState.getRandom())));
+        singlePeak.add(new int[]{peakX, peakY});
+        return new PyramidsAllocator(
+            smoothingValue.applyAsDouble(fishState.getRandom()),
+            maxSpread,
+            peakBiomass.applyAsDouble(fishState.getRandom()),
+            singlePeak
+        );
+    }
 
     public DoubleParameter getPeakX() {
         return peakX;
     }
 
-    public void setPeakX(DoubleParameter peakX) {
+    public void setPeakX(final DoubleParameter peakX) {
         this.peakX = peakX;
     }
 
@@ -50,7 +49,7 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
         return peakY;
     }
 
-    public void setPeakY(DoubleParameter peakY) {
+    public void setPeakY(final DoubleParameter peakY) {
         this.peakY = peakY;
     }
 
@@ -58,7 +57,7 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
         return smoothingValue;
     }
 
-    public void setSmoothingValue(DoubleParameter smoothingValue) {
+    public void setSmoothingValue(final DoubleParameter smoothingValue) {
         this.smoothingValue = smoothingValue;
     }
 
@@ -66,7 +65,7 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
         return maxSpread;
     }
 
-    public void setMaxSpread(int maxSpread) {
+    public void setMaxSpread(final int maxSpread) {
         this.maxSpread = maxSpread;
     }
 
@@ -74,7 +73,7 @@ public class SinglePeakAllocatorFactory implements AlgorithmFactory<PyramidsAllo
         return peakBiomass;
     }
 
-    public void setPeakBiomass(DoubleParameter peakBiomass) {
+    public void setPeakBiomass(final DoubleParameter peakBiomass) {
         this.peakBiomass = peakBiomass;
     }
 }

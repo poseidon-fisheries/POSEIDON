@@ -29,11 +29,11 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
 
     private int dayOfMeasurement = 365;
 
-    private  DoubleParameter lengthAtMaturity = new FixedDoubleParameter(50);
+    private DoubleParameter lengthAtMaturity = new FixedDoubleParameter(50);
 
     private DoubleParameter virginSSB = new FixedDoubleParameter(201231231);
 
-    private  String speciesName = "Species 0";
+    private String speciesName = "Species 0";
 
 
     /**
@@ -43,12 +43,12 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
      * @return the function result
      */
     @Override
-    public SprOracle apply(FishState fishState) {
+    public SprOracle apply(final FishState fishState) {
         return new SprOracle(
-                fishState.getBiology().getSpecie(speciesName),
-                lengthAtMaturity.apply(fishState.getRandom()),
-                dayOfMeasurement,
-                virginSSB.apply(fishState.getRandom())
+            fishState.getBiology().getSpecie(speciesName),
+            lengthAtMaturity.applyAsDouble(fishState.getRandom()),
+            dayOfMeasurement,
+            virginSSB.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -67,7 +67,7 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
      *
      * @param dayOfMeasurement Value to set for property 'dayOfMeasurement'.
      */
-    public void setDayOfMeasurement(int dayOfMeasurement) {
+    public void setDayOfMeasurement(final int dayOfMeasurement) {
         this.dayOfMeasurement = dayOfMeasurement;
     }
 
@@ -85,7 +85,7 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
      *
      * @param lengthAtMaturity Value to set for property 'lengthAtMaturity'.
      */
-    public void setLengthAtMaturity(DoubleParameter lengthAtMaturity) {
+    public void setLengthAtMaturity(final DoubleParameter lengthAtMaturity) {
         this.lengthAtMaturity = lengthAtMaturity;
     }
 
@@ -103,7 +103,7 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
      *
      * @param virginSSB Value to set for property 'virginSSB'.
      */
-    public void setVirginSSB(DoubleParameter virginSSB) {
+    public void setVirginSSB(final DoubleParameter virginSSB) {
         this.virginSSB = virginSSB;
     }
 
@@ -121,7 +121,7 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 }

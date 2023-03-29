@@ -34,21 +34,21 @@ import java.util.function.Supplier;
 public class BiomassTotalResetter extends BiomassLocationResetter {
 
 
-
     private final DoubleParameter yearlyBiomass;
 
     public BiomassTotalResetter(
-            Species species,
-            Supplier<BiomassAllocator> biomassAllocator,
-            DoubleParameter yearlyBiomass) {
+        final Species species,
+        final Supplier<BiomassAllocator> biomassAllocator,
+        final DoubleParameter yearlyBiomass
+    ) {
         super(species, biomassAllocator);
         this.yearlyBiomass = yearlyBiomass;
     }
 
 
     @Override
-    protected double computeBiomassNextYear(FishState simState) {
-        return yearlyBiomass.apply(simState.getRandom());
+    protected double computeBiomassNextYear(final FishState simState) {
+        return yearlyBiomass.applyAsDouble(simState.getRandom());
     }
 
     /**
@@ -59,7 +59,6 @@ public class BiomassTotalResetter extends BiomassLocationResetter {
     public DoubleParameter getYearlyBiomass() {
         return yearlyBiomass;
     }
-
 
 
 }

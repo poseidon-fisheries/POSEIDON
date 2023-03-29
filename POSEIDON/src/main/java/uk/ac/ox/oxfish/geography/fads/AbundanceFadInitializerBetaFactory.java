@@ -34,20 +34,23 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
 
     @NotNull
     @Override
-    protected DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity) {
+    protected DoubleSupplier buildCapacityGenerator(
+        final MersenneTwisterFast rng,
+        final double maximumCarryingCapacity
+    ) {
 
-        BetaDistribution distribution = new BetaDistribution(
-                new MTFApache(rng),
-                parameterAlpha.apply(rng),
-                parameterBeta.apply(rng)
+        final BetaDistribution distribution = new BetaDistribution(
+            new MTFApache(rng),
+            parameterAlpha.applyAsDouble(rng),
+            parameterBeta.applyAsDouble(rng)
         );
-        DoubleSupplier capacityGenerator;
-        double probabilityOfFadBeingDud = fadDudRate.apply(rng);
-        if(Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud ==0)
+        final DoubleSupplier capacityGenerator;
+        final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
+        if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
             capacityGenerator = () -> distribution.sample() * maximumCarryingCapacity;
         else
             capacityGenerator = () -> {
-                if(rng.nextFloat()<= probabilityOfFadBeingDud)
+                if (rng.nextFloat() <= probabilityOfFadBeingDud)
                     return 0;
                 else
                     return distribution.sample() * maximumCarryingCapacity;
@@ -61,7 +64,7 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
         return parameterAlpha;
     }
 
-    public void setParameterAlpha(DoubleParameter parameterAlpha) {
+    public void setParameterAlpha(final DoubleParameter parameterAlpha) {
         this.parameterAlpha = parameterAlpha;
     }
 
@@ -69,7 +72,7 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
         return parameterBeta;
     }
 
-    public void setParameterBeta(DoubleParameter parameterBeta) {
+    public void setParameterBeta(final DoubleParameter parameterBeta) {
         this.parameterBeta = parameterBeta;
     }
 
@@ -77,7 +80,7 @@ public class AbundanceFadInitializerBetaFactory extends AbstractAbundanceFadInit
         return fadDudRate;
     }
 
-    public void setFadDudRate(DoubleParameter fadDudRate) {
+    public void setFadDudRate(final DoubleParameter fadDudRate) {
         this.fadDudRate = fadDudRate;
     }
 }

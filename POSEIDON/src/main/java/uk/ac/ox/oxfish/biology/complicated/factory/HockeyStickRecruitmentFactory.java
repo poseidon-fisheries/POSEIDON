@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeyStickRecruitment> {
 
 
-
     private DoubleParameter virginRecruits = new FixedDoubleParameter(6000000);
 
     private DoubleParameter lengthAtMaturity = new FixedDoubleParameter(50);
@@ -20,13 +19,13 @@ public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeySti
 
 
     @Override
-    public HockeyStickRecruitment apply(FishState state) {
+    public HockeyStickRecruitment apply(final FishState state) {
         return new HockeyStickRecruitment(
-                false,
-                hinge.apply(state.getRandom()),
-                virginRecruits.apply(state.getRandom()),
-                lengthAtMaturity.apply(state.getRandom()),
-                virginSpawningBiomass.apply(state.getRandom())
+            false,
+            hinge.applyAsDouble(state.getRandom()),
+            virginRecruits.applyAsDouble(state.getRandom()),
+            lengthAtMaturity.applyAsDouble(state.getRandom()),
+            virginSpawningBiomass.applyAsDouble(state.getRandom())
 
         );
     }
@@ -35,7 +34,7 @@ public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeySti
         return virginRecruits;
     }
 
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -43,7 +42,7 @@ public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeySti
         return lengthAtMaturity;
     }
 
-    public void setLengthAtMaturity(DoubleParameter lengthAtMaturity) {
+    public void setLengthAtMaturity(final DoubleParameter lengthAtMaturity) {
         this.lengthAtMaturity = lengthAtMaturity;
     }
 
@@ -51,7 +50,7 @@ public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeySti
         return virginSpawningBiomass;
     }
 
-    public void setVirginSpawningBiomass(DoubleParameter virginSpawningBiomass) {
+    public void setVirginSpawningBiomass(final DoubleParameter virginSpawningBiomass) {
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 
@@ -59,7 +58,7 @@ public class HockeyStickRecruitmentFactory implements AlgorithmFactory<HockeySti
         return hinge;
     }
 
-    public void setHinge(DoubleParameter hinge) {
+    public void setHinge(final DoubleParameter hinge) {
         this.hinge = hinge;
     }
 }

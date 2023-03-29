@@ -29,9 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The factory building squared maps
  * Created by carrknight on 1/27/17.
  */
-public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMapDiscretizer>
-{
-
+public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMapDiscretizer> {
 
 
     private DoubleParameter horizontalSplits = new FixedDoubleParameter(2);
@@ -42,7 +40,7 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
     public SquaresMapDiscretizerFactory() {
     }
 
-    public SquaresMapDiscretizerFactory(int horizontalSplits, int verticalSplits) {
+    public SquaresMapDiscretizerFactory(final int horizontalSplits, final int verticalSplits) {
         this.horizontalSplits = new FixedDoubleParameter(horizontalSplits);
         this.verticalSplits = new FixedDoubleParameter(verticalSplits);
     }
@@ -54,9 +52,11 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
      * @return the function result
      */
     @Override
-    public SquaresMapDiscretizer apply(FishState fishState) {
-        return new SquaresMapDiscretizer(verticalSplits.apply(fishState.getRandom()).intValue(),
-                                         horizontalSplits.apply(fishState.getRandom()).intValue());
+    public SquaresMapDiscretizer apply(final FishState fishState) {
+        return new SquaresMapDiscretizer(
+            (int) verticalSplits.applyAsDouble(fishState.getRandom()),
+            (int) horizontalSplits.applyAsDouble(fishState.getRandom())
+        );
     }
 
 
@@ -74,7 +74,7 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
      *
      * @param horizontalSplits Value to set for property 'horizontalSplits'.
      */
-    public void setHorizontalSplits(DoubleParameter horizontalSplits) {
+    public void setHorizontalSplits(final DoubleParameter horizontalSplits) {
         this.horizontalSplits = horizontalSplits;
     }
 
@@ -92,7 +92,7 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
      *
      * @param verticalSplits Value to set for property 'verticalSplits'.
      */
-    public void setVerticalSplits(DoubleParameter verticalSplits) {
+    public void setVerticalSplits(final DoubleParameter verticalSplits) {
         this.verticalSplits = verticalSplits;
     }
 }

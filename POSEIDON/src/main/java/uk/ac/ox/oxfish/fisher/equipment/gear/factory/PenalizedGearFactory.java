@@ -14,10 +14,10 @@ public class PenalizedGearFactory implements AlgorithmFactory<PenalizedGear> {
     private AlgorithmFactory<? extends Gear> delegate = new FixedProportionGearFactory();
 
     @Override
-    public PenalizedGear apply(FishState fishState) {
+    public PenalizedGear apply(final FishState fishState) {
         return new PenalizedGear(
-                percentageCatchLost.apply(fishState.getRandom()),
-                delegate.apply(fishState)
+            percentageCatchLost.applyAsDouble(fishState.getRandom()),
+            delegate.apply(fishState)
         );
     }
 
@@ -25,7 +25,7 @@ public class PenalizedGearFactory implements AlgorithmFactory<PenalizedGear> {
         return percentageCatchLost;
     }
 
-    public void setPercentageCatchLost(DoubleParameter percentageCatchLost) {
+    public void setPercentageCatchLost(final DoubleParameter percentageCatchLost) {
         this.percentageCatchLost = percentageCatchLost;
     }
 
@@ -33,7 +33,7 @@ public class PenalizedGearFactory implements AlgorithmFactory<PenalizedGear> {
         return delegate;
     }
 
-    public void setDelegate(AlgorithmFactory<? extends Gear> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends Gear> delegate) {
         this.delegate = delegate;
     }
 }

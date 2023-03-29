@@ -39,7 +39,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<KernelTransduction> {
 
 
-
     private DoubleParameter forgettingFactor = new FixedDoubleParameter(.95);
 
     private DoubleParameter xBandwidth = new FixedDoubleParameter(25);
@@ -58,28 +57,28 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      * @return the function result
      */
     @Override
-    public KernelTransduction apply(FishState state) {
+    public KernelTransduction apply(final FishState state) {
 
         return new KernelTransduction(
-                state.getMap(),
-                forgettingFactor.apply(state.getRandom()),
-                new Pair<>(
-                        new GridXExtractor(),
-                        xBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new GridYExtractor(),
-                        yBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new PortDistanceExtractor(new ManhattanDistance(), 1d),
-                        distanceFromPortBandwidth.apply(state.getRandom())
-                ),
-                                new Pair<>(
-                        new HabitatExtractor(),
-                        habitatBandwidth.apply(state.getRandom())
-                ));
-
+            state.getMap(),
+            forgettingFactor.applyAsDouble(state.getRandom()),
+            new Pair<>(
+                new GridXExtractor(),
+                xBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new GridYExtractor(),
+                yBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new PortDistanceExtractor(new ManhattanDistance(), 1d),
+                distanceFromPortBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new HabitatExtractor(),
+                habitatBandwidth.applyAsDouble(state.getRandom())
+            )
+        );
 
 
     }
@@ -99,7 +98,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      *
      * @param forgettingFactor Value to set for property 'forgettingFactor'.
      */
-    public void setForgettingFactor(DoubleParameter forgettingFactor) {
+    public void setForgettingFactor(final DoubleParameter forgettingFactor) {
         this.forgettingFactor = forgettingFactor;
     }
 
@@ -117,7 +116,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      *
      * @param xBandwidth Value to set for property 'xBandwidth'.
      */
-    public void setxBandwidth(DoubleParameter xBandwidth) {
+    public void setxBandwidth(final DoubleParameter xBandwidth) {
         this.xBandwidth = xBandwidth;
     }
 
@@ -135,7 +134,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      *
      * @param yBandwidth Value to set for property 'yBandwidth'.
      */
-    public void setyBandwidth(DoubleParameter yBandwidth) {
+    public void setyBandwidth(final DoubleParameter yBandwidth) {
         this.yBandwidth = yBandwidth;
     }
 
@@ -153,7 +152,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      *
      * @param distanceFromPortBandwidth Value to set for property 'distanceFromPortBandwidth'.
      */
-    public void setDistanceFromPortBandwidth(DoubleParameter distanceFromPortBandwidth) {
+    public void setDistanceFromPortBandwidth(final DoubleParameter distanceFromPortBandwidth) {
         this.distanceFromPortBandwidth = distanceFromPortBandwidth;
     }
 
@@ -171,7 +170,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      *
      * @param habitatBandwidth Value to set for property 'habitatBandwidth'.
      */
-    public void setHabitatBandwidth(DoubleParameter habitatBandwidth) {
+    public void setHabitatBandwidth(final DoubleParameter habitatBandwidth) {
         this.habitatBandwidth = habitatBandwidth;
     }
 }

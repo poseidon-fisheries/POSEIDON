@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -38,7 +37,7 @@ public class ConstantAllocatorFactory implements AlgorithmFactory<ConstantBiomas
     public ConstantAllocatorFactory() {
     }
 
-    public ConstantAllocatorFactory(double constantValue) {
+    public ConstantAllocatorFactory(final double constantValue) {
         this.constantValue = new FixedDoubleParameter(constantValue);
     }
 
@@ -49,9 +48,8 @@ public class ConstantAllocatorFactory implements AlgorithmFactory<ConstantBiomas
      * @return the function result
      */
     @Override
-    public ConstantBiomassAllocator apply(FishState state) {
-
-        return new ConstantBiomassAllocator(constantValue.apply(state.getRandom()));
+    public ConstantBiomassAllocator apply(final FishState state) {
+        return new ConstantBiomassAllocator(constantValue.applyAsDouble(state.getRandom()));
     }
 
 
@@ -69,7 +67,7 @@ public class ConstantAllocatorFactory implements AlgorithmFactory<ConstantBiomas
      *
      * @param constantValue Value to set for property 'constantValue'.
      */
-    public void setConstantValue(DoubleParameter constantValue) {
+    public void setConstantValue(final DoubleParameter constantValue) {
         this.constantValue = constantValue;
     }
 }

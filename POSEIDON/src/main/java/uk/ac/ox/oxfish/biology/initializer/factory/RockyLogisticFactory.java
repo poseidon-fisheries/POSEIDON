@@ -33,10 +33,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates the Rocky Logistic Initializer
  * Created by carrknight on 9/29/15.
  */
-public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticInitializer>
-{
-
-
+public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticInitializer> {
 
 
     private DoubleParameter sandyCarryingCapacity = new FixedDoubleParameter(2000);
@@ -44,16 +41,15 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
     private DoubleParameter rockyCarryingCapacity = new FixedDoubleParameter(10000);
 
 
-
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
-    private DoubleParameter percentageLimitOnDailyMovement =new FixedDoubleParameter(0.01);
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
 
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.001);
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
 
 
     private int numberOfSpecies = 1;
@@ -75,7 +71,8 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 
@@ -86,14 +83,16 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
      * @return the function result
      */
     @Override
-    public RockyLogisticInitializer apply(FishState state) {
-        MersenneTwisterFast random = state.getRandom();
-        return new RockyLogisticInitializer(rockyCarryingCapacity,
-                                            sandyCarryingCapacity,
-                                            percentageLimitOnDailyMovement.apply(random),
-                                            differentialPercentageToMove.apply(random),
-                                            numberOfSpecies,
-                                            grower.apply(state));
+    public RockyLogisticInitializer apply(final FishState state) {
+        final MersenneTwisterFast random = state.getRandom();
+        return new RockyLogisticInitializer(
+            rockyCarryingCapacity,
+            sandyCarryingCapacity,
+            percentageLimitOnDailyMovement.applyAsDouble(random),
+            differentialPercentageToMove.applyAsDouble(random),
+            numberOfSpecies,
+            grower.apply(state)
+        );
     }
 
 
@@ -101,7 +100,7 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
         return sandyCarryingCapacity;
     }
 
-    public void setSandyCarryingCapacity(DoubleParameter sandyCarryingCapacity) {
+    public void setSandyCarryingCapacity(final DoubleParameter sandyCarryingCapacity) {
         this.sandyCarryingCapacity = sandyCarryingCapacity;
     }
 
@@ -109,7 +108,7 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
         return rockyCarryingCapacity;
     }
 
-    public void setRockyCarryingCapacity(DoubleParameter rockyCarryingCapacity) {
+    public void setRockyCarryingCapacity(final DoubleParameter rockyCarryingCapacity) {
         this.rockyCarryingCapacity = rockyCarryingCapacity;
     }
 
@@ -119,7 +118,8 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
     }
 
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -128,7 +128,8 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
     }
 
     public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
+        final DoubleParameter differentialPercentageToMove
+    ) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 
@@ -136,10 +137,9 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
         return numberOfSpecies;
     }
 
-    public void setNumberOfSpecies(int numberOfSpecies) {
+    public void setNumberOfSpecies(final int numberOfSpecies) {
         this.numberOfSpecies = numberOfSpecies;
     }
-
 
 
 }

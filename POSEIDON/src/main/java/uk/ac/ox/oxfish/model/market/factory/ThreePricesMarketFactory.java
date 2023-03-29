@@ -29,27 +29,28 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/12/17.
  */
-public class ThreePricesMarketFactory implements AlgorithmFactory<NThresholdsMarket>{
+public class ThreePricesMarketFactory implements AlgorithmFactory<NThresholdsMarket> {
 
 
     private DoubleParameter lowAgeThreshold = new FixedDoubleParameter(1);
 
-    private DoubleParameter highAgeThreshold= new FixedDoubleParameter(10);
+    private DoubleParameter highAgeThreshold = new FixedDoubleParameter(10);
 
-    private DoubleParameter priceBelowThreshold= new FixedDoubleParameter(10);
+    private DoubleParameter priceBelowThreshold = new FixedDoubleParameter(10);
 
-    private DoubleParameter priceBetweenThresholds= new FixedDoubleParameter(10);
+    private DoubleParameter priceBetweenThresholds = new FixedDoubleParameter(10);
 
-    private DoubleParameter priceAboveThresholds= new FixedDoubleParameter(10);
+    private DoubleParameter priceAboveThresholds = new FixedDoubleParameter(10);
 
 
     public ThreePricesMarketFactory() {
     }
 
     public ThreePricesMarketFactory(
-            double lowAgeThreshold, double highAgeThreshold,
-            double priceBelowThreshold, double priceBetweenThresholds,
-            double priceAboveThresholds) {
+        double lowAgeThreshold, double highAgeThreshold,
+        double priceBelowThreshold, double priceBetweenThresholds,
+        double priceAboveThresholds
+    ) {
         this.lowAgeThreshold = new FixedDoubleParameter(lowAgeThreshold);
         this.highAgeThreshold = new FixedDoubleParameter(highAgeThreshold);
         this.priceBelowThreshold = new FixedDoubleParameter(priceBelowThreshold);
@@ -68,11 +69,11 @@ public class ThreePricesMarketFactory implements AlgorithmFactory<NThresholdsMar
 
 
         return NThresholdsMarket.ThreePricesMarket(
-                lowAgeThreshold.apply(state.getRandom()).intValue(),
-                highAgeThreshold.apply(state.getRandom()).intValue(),
-                priceBelowThreshold.apply(state.getRandom()),
-                priceBetweenThresholds.apply(state.getRandom()),
-                priceAboveThresholds.apply(state.getRandom())
+            (int) lowAgeThreshold.applyAsDouble(state.getRandom()),
+            (int) highAgeThreshold.applyAsDouble(state.getRandom()),
+            priceBelowThreshold.applyAsDouble(state.getRandom()),
+            priceBetweenThresholds.applyAsDouble(state.getRandom()),
+            priceAboveThresholds.applyAsDouble(state.getRandom())
         );
     }
 

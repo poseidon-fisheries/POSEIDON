@@ -5,14 +5,13 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class PIDControllerIndicatorTarget implements AlgorithmFactory<AdditionalStartable> {
-
 
 
     private String indicatorColumnName = "Average Trip Duration";
@@ -43,77 +42,80 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
     public AdditionalStartable apply(FishState fishState) {
 
         UnchangingPastSensor target = new
-                UnchangingPastSensor(indicatorColumnName,
-                indicatorMultiplier.apply(fishState.getRandom()),
-                numberOfYearsToLookBackForTarget);
+            UnchangingPastSensor(
+            indicatorColumnName,
+            indicatorMultiplier.applyAsDouble(fishState.getRandom()),
+            numberOfYearsToLookBackForTarget
+        );
 
 
         PastAverageSensor current = new PastAverageSensor(
-                indicatorColumnName,
-                numberOfYearsToAverageForCurrent
+            indicatorColumnName,
+            numberOfYearsToAverageForCurrent
         );
 
         UnchangingPastSensor offset = new
-                UnchangingPastSensor(offsetColumnName,
-                averageToOffsetMultiplier.apply(fishState.getRandom()),
-                numberOfYearsToAverageForOffset);
+            UnchangingPastSensor(
+            offsetColumnName,
+            averageToOffsetMultiplier.applyAsDouble(fishState.getRandom()),
+            numberOfYearsToAverageForOffset
+        );
 
 
         PIDController controller = new PIDController(
-                current,
-                target,
-                TargetToTACController.POLICY_TO_ALLSPECIESTAC_ACTUATOR,
-                365,
-                0,
-                0,
-                0,
-                0
+            current,
+            target,
+            TargetToTACController.POLICY_TO_ALLSPECIESTAC_ACTUATOR,
+            365,
+            0,
+            0,
+            0,
+            0
         );
         controller.setOffsetSetter(offset);
         controller.setZeroOverflowProtection(overflowAtZeroProtection);
         controller.setMinimumPolicy(minimumTAC);
 
         return model -> fishState.scheduleOnceInXDays(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
+            new Steppable() {
+                @Override
+                public void step(SimState simState) {
 //                        controller.setP(
 //                                - 0.1 *
 //                        );
-                        final Double meanIndicator = new PastAverageSensor(
-                                indicatorColumnName,
-                                numberOfYearsToLookBackForTarget
-                        ).scan(((FishState) simState));
-                        System.out.println("mean_index:" +
-                                meanIndicator);
-                        final Double meanOffset = new PastAverageSensor(
-                                offsetColumnName,
-                                numberOfYearsToLookBackForTarget
-                        ).scan(((FishState) simState));
-                        System.out.println("mean_offset:" +
-                                meanOffset);
+                    final Double meanIndicator = new PastAverageSensor(
+                        indicatorColumnName,
+                        numberOfYearsToLookBackForTarget
+                    ).scan(((FishState) simState));
+                    System.out.println("mean_index:" +
+                        meanIndicator);
+                    final Double meanOffset = new PastAverageSensor(
+                        offsetColumnName,
+                        numberOfYearsToLookBackForTarget
+                    ).scan(((FishState) simState));
+                    System.out.println("mean_offset:" +
+                        meanOffset);
 
-                        if(!integrated) {
-                            controller.setP(0.5 * (meanOffset / meanIndicator));
-                        }
-                        else{
-                            controller.setP(0.5 * (meanOffset / meanIndicator));
-                            controller.setI(0.05 * (meanOffset / meanIndicator));
+                    if (!integrated) {
+                        controller.setP(0.5 * (meanOffset / meanIndicator));
+                    } else {
+                        controller.setP(0.5 * (meanOffset / meanIndicator));
+                        controller.setI(0.05 * (meanOffset / meanIndicator));
 
-                        }
-                        if(negative) {
-                            controller.setP(-controller.getP());
-                            controller.setI(-controller.getI());
-
-                        }
-
-                        System.out.println("p controller: " + controller.getP());
-                        controller.start(model);
-                        controller.step(model);
                     }
-                },
-                StepOrder.DAWN,
-                365 * startingYear + 1
+                    if (negative) {
+                        controller.setP(-controller.getP());
+                        controller.setI(-controller.getI());
+
+                    }
+
+                    System.out.println("p controller: " + controller.getP());
+                    controller.start(model);
+                    controller.step(model);
+                }
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
         );
 
 
@@ -174,8 +176,6 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
     public void setAverageToOffsetMultiplier(DoubleParameter averageToOffsetMultiplier) {
         this.averageToOffsetMultiplier = averageToOffsetMultiplier;
     }
-
-
 
 
     public int getStartingYear() {

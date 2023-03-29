@@ -25,8 +25,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class RandomSmoothedFactory  implements AlgorithmFactory<RandomSmoothedAllocator>{
-
+public class RandomSmoothedFactory implements AlgorithmFactory<RandomSmoothedAllocator> {
 
 
     private DoubleParameter absoluteMaximum = new FixedDoubleParameter(5000d);
@@ -46,18 +45,13 @@ public class RandomSmoothedFactory  implements AlgorithmFactory<RandomSmoothedAl
      * @return the function result
      */
     @Override
-    public RandomSmoothedAllocator apply(FishState state) {
-
-
+    public RandomSmoothedAllocator apply(final FishState state) {
         return new RandomSmoothedAllocator(
-                absoluteMaximum.apply(state.getRandom()),
-                absoluteMinimum.apply(state.getRandom()),
-                smoothingRuns.apply(state.getRandom()).intValue(),
-                aggressivness.apply(state.getRandom())
-
-
+            absoluteMaximum.applyAsDouble(state.getRandom()),
+            absoluteMinimum.applyAsDouble(state.getRandom()),
+            (int) smoothingRuns.applyAsDouble(state.getRandom()),
+            aggressivness.applyAsDouble(state.getRandom())
         );
-
     }
 
     /**
@@ -70,12 +64,30 @@ public class RandomSmoothedFactory  implements AlgorithmFactory<RandomSmoothedAl
     }
 
     /**
+     * Setter for property 'absoluteMaximum'.
+     *
+     * @param absoluteMaximum Value to set for property 'absoluteMaximum'.
+     */
+    public void setAbsoluteMaximum(final DoubleParameter absoluteMaximum) {
+        this.absoluteMaximum = absoluteMaximum;
+    }
+
+    /**
      * Getter for property 'absoluteMinimum'.
      *
      * @return Value for property 'absoluteMinimum'.
      */
     public DoubleParameter getAbsoluteMinimum() {
         return absoluteMinimum;
+    }
+
+    /**
+     * Setter for property 'absoluteMinimum'.
+     *
+     * @param absoluteMinimum Value to set for property 'absoluteMinimum'.
+     */
+    public void setAbsoluteMinimum(final DoubleParameter absoluteMinimum) {
+        this.absoluteMinimum = absoluteMinimum;
     }
 
     /**
@@ -88,6 +100,15 @@ public class RandomSmoothedFactory  implements AlgorithmFactory<RandomSmoothedAl
     }
 
     /**
+     * Setter for property 'smoothingRuns'.
+     *
+     * @param smoothingRuns Value to set for property 'smoothingRuns'.
+     */
+    public void setSmoothingRuns(final DoubleParameter smoothingRuns) {
+        this.smoothingRuns = smoothingRuns;
+    }
+
+    /**
      * Getter for property 'aggressivness'.
      *
      * @return Value for property 'aggressivness'.
@@ -97,38 +118,11 @@ public class RandomSmoothedFactory  implements AlgorithmFactory<RandomSmoothedAl
     }
 
     /**
-     * Setter for property 'absoluteMaximum'.
-     *
-     * @param absoluteMaximum Value to set for property 'absoluteMaximum'.
-     */
-    public void setAbsoluteMaximum(DoubleParameter absoluteMaximum) {
-        this.absoluteMaximum = absoluteMaximum;
-    }
-
-    /**
-     * Setter for property 'absoluteMinimum'.
-     *
-     * @param absoluteMinimum Value to set for property 'absoluteMinimum'.
-     */
-    public void setAbsoluteMinimum(DoubleParameter absoluteMinimum) {
-        this.absoluteMinimum = absoluteMinimum;
-    }
-
-    /**
-     * Setter for property 'smoothingRuns'.
-     *
-     * @param smoothingRuns Value to set for property 'smoothingRuns'.
-     */
-    public void setSmoothingRuns(DoubleParameter smoothingRuns) {
-        this.smoothingRuns = smoothingRuns;
-    }
-
-    /**
      * Setter for property 'aggressivness'.
      *
      * @param aggressivness Value to set for property 'aggressivness'.
      */
-    public void setAggressivness(DoubleParameter aggressivness) {
+    public void setAggressivness(final DoubleParameter aggressivness) {
         this.aggressivness = aggressivness;
     }
 }

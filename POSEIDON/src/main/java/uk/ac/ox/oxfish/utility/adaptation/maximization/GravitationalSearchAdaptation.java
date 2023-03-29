@@ -126,7 +126,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
     private void initializeSpeed(FishState model) {
         speed = new double[currentCoordinates.length];
         for (int i = 0; i < speed.length; i++)
-            speed[i] = initialSpeed.apply(model.getRandom());
+            speed[i] = initialSpeed.applyAsDouble(model.getRandom());
     }
 
     @Override

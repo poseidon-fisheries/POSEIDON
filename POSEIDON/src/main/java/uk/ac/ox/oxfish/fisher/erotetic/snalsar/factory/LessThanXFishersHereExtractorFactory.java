@@ -27,11 +27,11 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
-public class LessThanXFishersHereExtractorFactory implements AlgorithmFactory<LessThanXFishersHereExtractor>
-{
+public class LessThanXFishersHereExtractorFactory implements AlgorithmFactory<LessThanXFishersHereExtractor> {
 
 
     private DoubleParameter minimumNumberOfFishersToMakeItUnacceptable = new FixedDoubleParameter(1d);
+
     /**
      * Applies this function to the given argument.
      *
@@ -39,9 +39,9 @@ public class LessThanXFishersHereExtractorFactory implements AlgorithmFactory<Le
      * @return the function result
      */
     @Override
-    public LessThanXFishersHereExtractor apply(FishState state) {
-        return  new LessThanXFishersHereExtractor(
-                minimumNumberOfFishersToMakeItUnacceptable.apply(state.getRandom()).intValue());
+    public LessThanXFishersHereExtractor apply(final FishState state) {
+        return new LessThanXFishersHereExtractor(
+            (int) minimumNumberOfFishersToMakeItUnacceptable.applyAsDouble(state.getRandom()));
     }
 
     /**
@@ -59,7 +59,8 @@ public class LessThanXFishersHereExtractorFactory implements AlgorithmFactory<Le
      * @param minimumNumberOfFishersToMakeItUnacceptable Value to set for property 'minimumNumberOfFishersToMakeItUnacceptable'.
      */
     public void setMinimumNumberOfFishersToMakeItUnacceptable(
-            DoubleParameter minimumNumberOfFishersToMakeItUnacceptable) {
+        final DoubleParameter minimumNumberOfFishersToMakeItUnacceptable
+    ) {
         this.minimumNumberOfFishersToMakeItUnacceptable = minimumNumberOfFishersToMakeItUnacceptable;
     }
 }

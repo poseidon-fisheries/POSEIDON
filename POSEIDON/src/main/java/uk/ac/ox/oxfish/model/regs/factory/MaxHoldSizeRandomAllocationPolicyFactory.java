@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class MaxHoldSizeRandomAllocationPolicyFactory implements AlgorithmFactory<MaxHoldSizeRandomAllocationPolicy> {
 
 
-
     private DoubleParameter yearlyHoldSizeLimit = new FixedDoubleParameter(10000d);
 
 
@@ -40,8 +39,8 @@ public class MaxHoldSizeRandomAllocationPolicyFactory implements AlgorithmFactor
      * @return the function result
      */
     @Override
-    public MaxHoldSizeRandomAllocationPolicy apply(FishState state) {
-        return new MaxHoldSizeRandomAllocationPolicy(yearlyHoldSizeLimit.apply(state.getRandom()));
+    public MaxHoldSizeRandomAllocationPolicy apply(final FishState state) {
+        return new MaxHoldSizeRandomAllocationPolicy(yearlyHoldSizeLimit.applyAsDouble(state.getRandom()));
     }
 
     /**
@@ -58,7 +57,7 @@ public class MaxHoldSizeRandomAllocationPolicyFactory implements AlgorithmFactor
      *
      * @param yearlyHoldSizeLimit Value to set for property 'yearlyHoldSizeLimit'.
      */
-    public void setYearlyHoldSizeLimit(DoubleParameter yearlyHoldSizeLimit) {
+    public void setYearlyHoldSizeLimit(final DoubleParameter yearlyHoldSizeLimit) {
         this.yearlyHoldSizeLimit = yearlyHoldSizeLimit;
     }
 }

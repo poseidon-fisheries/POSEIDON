@@ -54,17 +54,21 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
      * @return the function result
      */
     @Override
-    public GarbageGearDecorator apply(FishState state) {
+    public GarbageGearDecorator apply(final FishState state) {
 
-        Species garbageSpecies = state.getBiology().getSpecie(garbageSpeciesName);
-        Preconditions.checkArgument(garbageSpecies != null && garbageSpecies.isImaginary(),
-                                    "The garbage species must be exist and be'imaginary'");
-        Gear delegate = this.delegate.apply(state);
+        final Species garbageSpecies = state.getBiology().getSpecie(garbageSpeciesName);
+        Preconditions.checkArgument(
+            garbageSpecies != null && garbageSpecies.isImaginary(),
+            "The garbage species must be exist and be'imaginary'"
+        );
+        final Gear delegate = this.delegate.apply(state);
 
-        return new GarbageGearDecorator(garbageSpecies,
-                                        proportionSimulatedToGarbage.apply(state.getRandom()),
-                                        delegate,
-                                        rounding);
+        return new GarbageGearDecorator(
+            garbageSpecies,
+            proportionSimulatedToGarbage.applyAsDouble(state.getRandom()),
+            delegate,
+            rounding
+        );
 
 
     }
@@ -83,7 +87,7 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
      *
      * @param garbageSpeciesName Value to set for property 'garbageSpeciesName'.
      */
-    public void setGarbageSpeciesName(String garbageSpeciesName) {
+    public void setGarbageSpeciesName(final String garbageSpeciesName) {
         this.garbageSpeciesName = garbageSpeciesName;
     }
 
@@ -101,7 +105,7 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
      *
      * @param proportionSimulatedToGarbage Value to set for property 'proportionSimulatedToGarbage'.
      */
-    public void setProportionSimulatedToGarbage(DoubleParameter proportionSimulatedToGarbage) {
+    public void setProportionSimulatedToGarbage(final DoubleParameter proportionSimulatedToGarbage) {
         this.proportionSimulatedToGarbage = proportionSimulatedToGarbage;
     }
 
@@ -120,7 +124,8 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends Gear> delegate) {
+        final AlgorithmFactory<? extends Gear> delegate
+    ) {
         this.delegate = delegate;
     }
 
@@ -138,7 +143,7 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 

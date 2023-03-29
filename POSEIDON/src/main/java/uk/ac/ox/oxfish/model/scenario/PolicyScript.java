@@ -148,7 +148,7 @@ public class PolicyScript
 
                 fisher.getAdditionalTripCosts().clear();
                 fisher.getAdditionalTripCosts().add(new HourlyCost(
-                        hourlyTravellingCosts.apply(state.getRandom())
+                        hourlyTravellingCosts.applyAsDouble(state.getRandom())
                 ));
             }
             state.getFisherFactory(nameOfPopulation).getAdditionalSetups().add(
@@ -157,7 +157,7 @@ public class PolicyScript
                         public void accept(Fisher fisher) {
                             fisher.getAdditionalTripCosts().clear();
                             fisher.getAdditionalTripCosts().add(new HourlyCost(
-                                    hourlyTravellingCosts.apply(state.getRandom())
+                                    hourlyTravellingCosts.applyAsDouble(state.getRandom())
                             ));
                         }
                     }

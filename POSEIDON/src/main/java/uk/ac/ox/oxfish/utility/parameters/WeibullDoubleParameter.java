@@ -45,7 +45,7 @@ public class WeibullDoubleParameter implements DoubleParameter {
     }
 
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
 
         if(distribution==null)
             distribution = new WeibullDistribution(

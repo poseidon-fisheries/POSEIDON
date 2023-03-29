@@ -38,70 +38,63 @@ import java.util.Map;
  * are going to be two species: species 1 lives inside the box, species 0 lives outside (and possibly inside as well)
  * Created by carrknight on 1/4/16.
  */
-public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
-
-    /**
-     * the smallest x that is inside the box
-     */
-    private int lowestX;
-
-    /**
-     * the smallest y that is inside the box
-     */
-    private int lowestY;
-
-    /**
-     * the height of the box
-     */
-    private int boxHeight;
-
-    /**
-     * the width of the box
-     */
-    private int boxWidth;
+public class TwoSpeciesBoxInitializer extends AbstractBiologyInitializer {
 
     /**
      * is the Species 0 also inside the box or not?
      */
     private final boolean species0InsideTheBox;
-
     /**
      * max capacity for first species in each box
      */
     private final DoubleParameter firstSpeciesCapacity;
-
     /**
      * ratio of maxCapacitySecond/maxCapacityFirst
      */
     private final DoubleParameter ratioFirstToSecondSpecies;
-
-
-
-
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
     private final double percentageLimitOnDailyMovement;
-
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
     private final double differentialPercentageToMove;
-
     /**
      * get the list of all the logistic local biologies
      */
-    private Map<SeaTile,BiomassLocalBiology> biologies = new HashMap<>();
-
+    private final Map<SeaTile, BiomassLocalBiology> biologies = new HashMap<>();
     private final LogisticGrowerInitializer grower;
+    /**
+     * the smallest x that is inside the box
+     */
+    private int lowestX;
+    /**
+     * the smallest y that is inside the box
+     */
+    private int lowestY;
+    /**
+     * the height of the box
+     */
+    private int boxHeight;
+    /**
+     * the width of the box
+     */
+    private int boxWidth;
 
 
     public TwoSpeciesBoxInitializer(
-            int lowestX, int lowestY, int boxHeight, int boxWidth, boolean species0InsideTheBox,
-            DoubleParameter firstSpeciesCapacity,
-            DoubleParameter ratioFirstToSecondSpecies,  double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove,
-            LogisticGrowerInitializer grower) {
+        final int lowestX,
+        final int lowestY,
+        final int boxHeight,
+        final int boxWidth,
+        final boolean species0InsideTheBox,
+        final DoubleParameter firstSpeciesCapacity,
+        final DoubleParameter ratioFirstToSecondSpecies,
+        final double percentageLimitOnDailyMovement,
+        final double differentialPercentageToMove,
+        final LogisticGrowerInitializer grower
+    ) {
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.boxHeight = boxHeight;
@@ -117,7 +110,8 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -126,59 +120,58 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
 
-        if(seaTile.isLand())
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
 
         //start by assuming both species are in
-        double firstSpeciesCapacity = this.firstSpeciesCapacity.apply(random);
-        double secondSpeciesRatio = ratioFirstToSecondSpecies.apply(random);
+        double firstSpeciesCapacity = this.firstSpeciesCapacity.applyAsDouble(random);
+        final double secondSpeciesRatio = ratioFirstToSecondSpecies.applyAsDouble(random);
         Preconditions.checkArgument(firstSpeciesCapacity > 0);
-        Preconditions.checkArgument(secondSpeciesRatio>=0);
-   //     Preconditions.checkArgument(secondSpeciesRatio<=1);
+        Preconditions.checkArgument(secondSpeciesRatio >= 0);
+        //     Preconditions.checkArgument(secondSpeciesRatio<=1);
         double secondSpeciesCapacity;
-        if(secondSpeciesRatio == 1)
+        if (secondSpeciesRatio == 1)
             secondSpeciesCapacity = firstSpeciesCapacity;
-        else if(secondSpeciesRatio>1)
-        {
-            secondSpeciesCapacity = secondSpeciesRatio* firstSpeciesCapacity;
+        else if (secondSpeciesRatio > 1) {
+            secondSpeciesCapacity = secondSpeciesRatio * firstSpeciesCapacity;
 
-        }
-        else
+        } else
             secondSpeciesCapacity = firstSpeciesCapacity *
-                    secondSpeciesRatio/(1-secondSpeciesRatio);
+                secondSpeciesRatio / (1 - secondSpeciesRatio);
 
         //and if it's inside the box
-        if(isInsideTheBox(seaTile))
-        {
-            if(!species0InsideTheBox)
+        if (isInsideTheBox(seaTile)) {
+            if (!species0InsideTheBox)
                 firstSpeciesCapacity = 0;
-        }
-        else
-        {
+        } else {
             secondSpeciesCapacity = 0;
         }
 
 
-        BiomassLocalBiology toReturn =  new BiomassLocalBiology(
-                new double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
-                new double[]{firstSpeciesCapacity,secondSpeciesCapacity});
-        biologies.put(seaTile,toReturn);
+        final BiomassLocalBiology toReturn = new BiomassLocalBiology(
+            new double[]{random.nextDouble() * firstSpeciesCapacity, random.nextDouble() * secondSpeciesCapacity},
+            new double[]{firstSpeciesCapacity, secondSpeciesCapacity}
+        );
+        biologies.put(seaTile, toReturn);
         return toReturn;
     }
 
-    private boolean isInsideTheBox(SeaTile where)
-    {
+    private boolean isInsideTheBox(final SeaTile where) {
 
         Preconditions.checkArgument(boxHeight >= 0, "height of biobox can't be negative");
         Preconditions.checkArgument(boxWidth >= 0, "width of biobox can't be negative");
-        int x=where.getGridX();
-        int y=where.getGridY();
-        if(x >= lowestX &&(boxWidth == Integer.MAX_VALUE || x< lowestX + boxWidth)) {
-            if (y >= lowestY && ( boxHeight == Integer.MAX_VALUE ||y < lowestY + boxHeight))
-                return true;
+        final int x = where.getGridX();
+        final int y = where.getGridY();
+        if (x >= lowestX && (boxWidth == Integer.MAX_VALUE || x < lowestX + boxWidth)) {
+            return y >= lowestY && (boxHeight == Integer.MAX_VALUE || y < lowestY + boxHeight);
         }
         return false;
 
@@ -195,15 +188,20 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
-    {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
 
 
+        for (final Species species : biology.getSpecies())
+            grower.initializeGrower(biologies, model, random, species);
 
-        for(Species species : biology.getSpecies())
-            grower.initializeGrower(biologies,model,random,species);
-
-        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology, differentialPercentageToMove, percentageLimitOnDailyMovement);
+        final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
+            map,
+            random,
+            biology,
+            differentialPercentageToMove,
+            percentageLimitOnDailyMovement
+        );
 
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
@@ -224,16 +222,32 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         return lowestX;
     }
 
+    protected void setLowestX(final int lowestX) {
+        this.lowestX = lowestX;
+    }
+
     public int getLowestY() {
         return lowestY;
+    }
+
+    protected void setLowestY(final int lowestY) {
+        this.lowestY = lowestY;
     }
 
     public int getBoxHeight() {
         return boxHeight;
     }
 
+    protected void setBoxHeight(final int boxHeight) {
+        this.boxHeight = boxHeight;
+    }
+
     public int getBoxWidth() {
         return boxWidth;
+    }
+
+    protected void setBoxWidth(final int boxWidth) {
+        this.boxWidth = boxWidth;
     }
 
     public boolean isSpecies0InsideTheBox() {
@@ -248,29 +262,12 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         return ratioFirstToSecondSpecies;
     }
 
-
     public double getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;
     }
 
     public double getDifferentialPercentageToMove() {
         return differentialPercentageToMove;
-    }
-
-    protected void setLowestX(int lowestX) {
-        this.lowestX = lowestX;
-    }
-
-    protected void setLowestY(int lowestY) {
-        this.lowestY = lowestY;
-    }
-
-    protected void setBoxHeight(int boxHeight) {
-        this.boxHeight = boxHeight;
-    }
-
-    protected void setBoxWidth(int boxWidth) {
-        this.boxWidth = boxWidth;
     }
 }
 

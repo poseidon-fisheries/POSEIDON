@@ -33,13 +33,12 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 /**
  * Created by carrknight on 7/8/17.
  */
-public class RecruitmentBySpawningFactory  implements AlgorithmFactory<RecruitmentProcess>{
+public class RecruitmentBySpawningFactory implements AlgorithmFactory<RecruitmentProcess> {
 
     /**
      * the number of recruits you'd get in a "virgin" state.
      */
     private DoubleParameter virginRecruits = new FixedDoubleParameter(40741397);
-
 
 
     /**
@@ -53,7 +52,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
     /**
      * if true the spawning biomass counts relative fecundity (this is true for yelloweye rockfish)
      */
-    private boolean  addRelativeFecundityToSpawningBiomass = false;
+    private boolean addRelativeFecundityToSpawningBiomass = false;
 
     /**
      * whether there is a delay between the recruit being computed and they actually being the recruits for that year
@@ -75,23 +74,25 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      * @return the function result
      */
     @Override
-    public RecruitmentProcess apply(FishState state) {
-        int delay = yearlyDelay.apply(state.getRandom()).intValue();
-        if(delay<=0)
+    public RecruitmentProcess apply(final FishState state) {
+        final int delay = (int) yearlyDelay.applyAsDouble(state.getRandom());
+        if (delay <= 0)
             return new RecruitmentBySpawningBiomass(
-                    virginRecruits.apply(state.getRandom()).intValue(),
-                    steepness.apply(state.getRandom()),
-                    cumulativePhi.apply(state.getRandom()),
-                    addRelativeFecundityToSpawningBiomass,
-                    maturity, relativeFecundity, femaleSubdivisionIndex, false);
+                (int) virginRecruits.applyAsDouble(state.getRandom()),
+                steepness.applyAsDouble(state.getRandom()),
+                cumulativePhi.applyAsDouble(state.getRandom()),
+                addRelativeFecundityToSpawningBiomass,
+                maturity, relativeFecundity, femaleSubdivisionIndex, false
+            );
         else
             return new RecruitmentBySpawningBiomassDelayed(
-                    virginRecruits.apply(state.getRandom()).intValue(),
-                    steepness.apply(state.getRandom()),
-                    cumulativePhi.apply(state.getRandom()),
-                    addRelativeFecundityToSpawningBiomass,
-                    maturity, relativeFecundity, femaleSubdivisionIndex,
-                    delay);
+                (int) virginRecruits.applyAsDouble(state.getRandom()),
+                steepness.applyAsDouble(state.getRandom()),
+                cumulativePhi.applyAsDouble(state.getRandom()),
+                addRelativeFecundityToSpawningBiomass,
+                maturity, relativeFecundity, femaleSubdivisionIndex,
+                delay
+            );
     }
 
     /**
@@ -108,7 +109,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param virginRecruits Value to set for property 'virginRecruits'.
      */
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -126,7 +127,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param steepness Value to set for property 'steepness'.
      */
-    public void setSteepness(DoubleParameter steepness) {
+    public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
@@ -144,7 +145,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param addRelativeFecundityToSpawningBiomass Value to set for property 'addRelativeFecundityToSpawningBiomass'.
      */
-    public void setAddRelativeFecundityToSpawningBiomass(boolean addRelativeFecundityToSpawningBiomass) {
+    public void setAddRelativeFecundityToSpawningBiomass(final boolean addRelativeFecundityToSpawningBiomass) {
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
     }
 
@@ -162,7 +163,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param cumulativePhi Value to set for property 'cumulativePhi'.
      */
-    public void setCumulativePhi(DoubleParameter cumulativePhi) {
+    public void setCumulativePhi(final DoubleParameter cumulativePhi) {
         this.cumulativePhi = cumulativePhi;
     }
 
@@ -180,7 +181,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param yearlyDelay Value to set for property 'yearlyDelay'.
      */
-    public void setYearlyDelay(DoubleParameter yearlyDelay) {
+    public void setYearlyDelay(final DoubleParameter yearlyDelay) {
         this.yearlyDelay = yearlyDelay;
     }
 
@@ -199,7 +200,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param maturity Value to set for property 'maturity'.
      */
-    public void setMaturity(double[] maturity) {
+    public void setMaturity(final double[] maturity) {
         this.maturity = maturity;
     }
 
@@ -217,7 +218,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param relativeFecundity Value to set for property 'relativeFecundity'.
      */
-    public void setRelativeFecundity(double[] relativeFecundity) {
+    public void setRelativeFecundity(final double[] relativeFecundity) {
         this.relativeFecundity = relativeFecundity;
     }
 
@@ -235,7 +236,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      *
      * @param femaleSubdivisionIndex Value to set for property 'femaleSubdivisionIndex'.
      */
-    public void setFemaleSubdivisionIndex(int femaleSubdivisionIndex) {
+    public void setFemaleSubdivisionIndex(final int femaleSubdivisionIndex) {
         this.femaleSubdivisionIndex = femaleSubdivisionIndex;
     }
 }

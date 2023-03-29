@@ -100,7 +100,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         velocities = new double[dimensions];
         for(int i=0; i<dimensions; i++)
         {
-            velocities[i] =  initialVelocities[i].apply(random);
+            velocities[i] =  initialVelocities[i].applyAsDouble(random);
         }
     }
 

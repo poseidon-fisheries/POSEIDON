@@ -43,9 +43,12 @@ public class LastMomentAbundanceFadInitalizerFactory implements
     private DoubleParameter daysItTakeToFillUp = new FixedDoubleParameter(35);
     private DoubleParameter dudProbability = new FixedDoubleParameter(0.1);
     private HashMap<String, Double> maxCatchabilitiesPerSpecies = new HashMap<>();
+    private DoubleParameter rangeInSeaTiles = new FixedDoubleParameter(0);
+
     public LastMomentAbundanceFadInitalizerFactory() {
 
     }
+
     public LastMomentAbundanceFadInitalizerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
@@ -60,41 +63,41 @@ public class LastMomentAbundanceFadInitalizerFactory implements
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    private DoubleParameter rangeInSeaTiles = new FixedDoubleParameter(0);
-
     @Override
-    public FadInitializer<AbundanceLocalBiology, ? extends LastMomentFad> apply(FishState fishState) {
-        double[] catchabilities = new double[fishState.getBiology().getSize()];
+    public FadInitializer<AbundanceLocalBiology, ? extends LastMomentFad> apply(final FishState fishState) {
+        final double[] catchabilities = new double[fishState.getBiology().getSize()];
         //todo
-        for (Map.Entry<String, Double> catchability : maxCatchabilitiesPerSpecies.entrySet()) {
+        for (final Map.Entry<String, Double> catchability : maxCatchabilitiesPerSpecies.entrySet()) {
             catchabilities[fishState.getSpecies(catchability.getKey()).getIndex()] =
                 catchability.getValue();
 
         }
 
-        Double range = rangeInSeaTiles.apply(fishState.getRandom());
+        final double range = rangeInSeaTiles.applyAsDouble(fishState.getRandom());
         final Map<Species, NonMutatingArrayFilter> selectivityFilters =
             abundanceFiltersFactory.apply(fishState)
                 .get(FadSetAction.class);
-        if (range == null || range.isNaN() || range.intValue() <= 0) {
+        if (Double.isNaN(range) || (int) range <= 0) {
             return new LastMomentAbundanceFadInitializer(
-                daysItTakeToFillUp.apply(fishState.getRandom()).intValue(),
-                daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
+                (int) daysItTakeToFillUp.applyAsDouble(fishState.getRandom()),
+                (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
                 selectivityFilters,
-                dudProbability.apply(fishState.getRandom()),
+                dudProbability.applyAsDouble(fishState.getRandom()),
                 catchabilities,
                 fishState.getBiology()
             );
         } else {
 
-            assert range.intValue()>=1;
-            return new LastMomentAbundanceFadWithRangeInitializer<>( daysItTakeToFillUp.apply(fishState.getRandom()).intValue(),
-                                                        daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                                                        selectivityFilters,
-                                                        dudProbability.apply(fishState.getRandom()),
-                                                        catchabilities,
-                                                        fishState.getBiology(),
-                                                                     range.intValue());
+            assert (int) range >= 1;
+            return new LastMomentAbundanceFadWithRangeInitializer<>(
+                (int) daysItTakeToFillUp.applyAsDouble(fishState.getRandom()),
+                (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
+                selectivityFilters,
+                dudProbability.applyAsDouble(fishState.getRandom()),
+                catchabilities,
+                fishState.getBiology(),
+                (int) range
+            );
         }
 
     }
@@ -104,7 +107,7 @@ public class LastMomentAbundanceFadInitalizerFactory implements
         return daysItTakeToFillUp;
     }
 
-    public void setDaysItTakeToFillUp(DoubleParameter daysItTakeToFillUp) {
+    public void setDaysItTakeToFillUp(final DoubleParameter daysItTakeToFillUp) {
         this.daysItTakeToFillUp = daysItTakeToFillUp;
     }
 
@@ -112,31 +115,31 @@ public class LastMomentAbundanceFadInitalizerFactory implements
         return daysInWaterBeforeAttraction;
     }
 
+    public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
+        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+    }
+
     public DoubleParameter getDudProbability() {
         return dudProbability;
+    }
+
+    public void setDudProbability(final DoubleParameter dudProbability) {
+        this.dudProbability = dudProbability;
     }
 
     public HashMap<String, Double> getMaxCatchabilitiesPerSpecies() {
         return maxCatchabilitiesPerSpecies;
     }
 
-    public void setMaxCatchabilitiesPerSpecies(HashMap<String, Double> maxCatchabilitiesPerSpecies) {
+    public void setMaxCatchabilitiesPerSpecies(final HashMap<String, Double> maxCatchabilitiesPerSpecies) {
         this.maxCatchabilitiesPerSpecies = maxCatchabilitiesPerSpecies;
-    }
-
-    public void setDaysInWaterBeforeAttraction(DoubleParameter daysInWaterBeforeAttraction) {
-        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-    }
-
-    public void setDudProbability(DoubleParameter dudProbability) {
-        this.dudProbability = dudProbability;
     }
 
     public DoubleParameter getRangeInSeaTiles() {
         return rangeInSeaTiles;
     }
 
-    public void setRangeInSeaTiles(DoubleParameter rangeInSeaTiles) {
+    public void setRangeInSeaTiles(final DoubleParameter rangeInSeaTiles) {
         this.rangeInSeaTiles = rangeInSeaTiles;
     }
 }

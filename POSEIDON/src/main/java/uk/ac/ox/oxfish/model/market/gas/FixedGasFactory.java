@@ -42,7 +42,7 @@ public class FixedGasFactory implements AlgorithmFactory<FixedGasPrice> {
     @Override
     public FixedGasPrice apply(FishState state) {
 
-        return new FixedGasPrice(gasPrice.apply(state.getRandom()));
+        return new FixedGasPrice(gasPrice.applyAsDouble(state.getRandom()));
 
     }
 

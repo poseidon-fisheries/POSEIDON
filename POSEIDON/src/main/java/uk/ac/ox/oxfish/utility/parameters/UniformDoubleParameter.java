@@ -50,7 +50,7 @@ public class UniformDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         Preconditions.checkArgument(maximum >= minimum, "maximum is not bigger than minimum");
         return (maximum-minimum)*mersenneTwisterFast.nextDouble(true,true)+minimum;
     }

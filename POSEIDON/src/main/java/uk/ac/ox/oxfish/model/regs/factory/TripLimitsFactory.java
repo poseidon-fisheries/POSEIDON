@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -37,7 +36,7 @@ import java.util.Map;
 public class TripLimitsFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
 
-    private HashMap<String,Double> limits = new HashMap<>();
+    private HashMap<String, Double> limits = new HashMap<>();
 
     private DoubleParameter tripLimitPeriod = new FixedDoubleParameter(60);
 
@@ -54,26 +53,24 @@ public class TripLimitsFactory implements AlgorithmFactory<MultiQuotaRegulation>
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState state) {
+    public MultiQuotaRegulation apply(final FishState state) {
         //set up the quotas
-        double[] quotas = new double[state.getSpecies().size()];
+        final double[] quotas = new double[state.getSpecies().size()];
         //anything not specified is not protected!
-        Arrays.fill(quotas,Double.POSITIVE_INFINITY);
+        Arrays.fill(quotas, Double.POSITIVE_INFINITY);
 
         //create array
-        for (Map.Entry<String, Double> limit : limits.entrySet())
-        {
+        for (final Map.Entry<String, Double> limit : limits.entrySet()) {
             quotas[state.getBiology().getSpecie(limit.getKey()).getIndex()]
-                    =
-                    limit.getValue();
+                =
+                limit.getValue();
 
         }
 
         //return it!
         return new MultiQuotaRegulation(
-                quotas
-                ,state,
-                 tripLimitPeriod.apply(state.getRandom()).intValue()
+            quotas, state,
+            (int) tripLimitPeriod.applyAsDouble(state.getRandom())
         );
     }
 
@@ -91,7 +88,7 @@ public class TripLimitsFactory implements AlgorithmFactory<MultiQuotaRegulation>
      *
      * @param limits Value to set for property 'limits'.
      */
-    public void setLimits(HashMap<String, Double> limits) {
+    public void setLimits(final HashMap<String, Double> limits) {
         this.limits = limits;
     }
 
@@ -109,7 +106,7 @@ public class TripLimitsFactory implements AlgorithmFactory<MultiQuotaRegulation>
      *
      * @param tripLimitPeriod Value to set for property 'tripLimitPeriod'.
      */
-    public void setTripLimitPeriod(DoubleParameter tripLimitPeriod) {
+    public void setTripLimitPeriod(final DoubleParameter tripLimitPeriod) {
         this.tripLimitPeriod = tripLimitPeriod;
     }
 }

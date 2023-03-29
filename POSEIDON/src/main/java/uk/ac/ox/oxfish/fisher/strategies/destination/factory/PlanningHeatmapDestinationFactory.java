@@ -37,53 +37,36 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFa
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.function.Supplier;
 
 
-public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<PlanningHeatmapDestinationStrategy>{
-
-
-
-    private boolean ignoreFailedTrips = false;
-
-
-    /**
-     * step size when exploring
-     */
-    private DoubleParameter explorationStepSize = new UniformDoubleParameter(1, 10);
-
-    /**
-     * probability of exploring (imitating here means using other people observations as your own)
-     */
-    private AlgorithmFactory<? extends AdaptationProbability> probability =
-            new FixedProbabilityFactory(.2,1d);
-
-    /**
-     * the regression object (used primarily for species regression)
-     */
-    private AlgorithmFactory<? extends GeographicalRegression<Double>> regression =
-            new NearestNeighborRegressionFactory();
-
-
-
-    private boolean almostPerfectKnowledge = false;
-
-
-
-    /**
-     *
-     */
-    private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
+public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<PlanningHeatmapDestinationStrategy> {
 
 
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
-    private final Locker<String,String> locker = new Locker<>();
+    private final Locker<String, String> locker = new Locker<>();
+    private boolean ignoreFailedTrips = false;
+    /**
+     * step size when exploring
+     */
+    private DoubleParameter explorationStepSize = new UniformDoubleParameter(1, 10);
+    /**
+     * probability of exploring (imitating here means using other people observations as your own)
+     */
+    private AlgorithmFactory<? extends AdaptationProbability> probability =
+        new FixedProbabilityFactory(.2, 1d);
+    /**
+     * the regression object (used primarily for species regression)
+     */
+    private AlgorithmFactory<? extends GeographicalRegression<Double>> regression =
+        new NearestNeighborRegressionFactory();
+    private boolean almostPerfectKnowledge = false;
+    /**
+     *
+     */
+    private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
 
     /**
      * Applies this function to the given argument.
@@ -92,69 +75,67 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      * @return the function result
      */
     @Override
-    public PlanningHeatmapDestinationStrategy apply(FishState state) {
+    public PlanningHeatmapDestinationStrategy apply(final FishState state) {
 
         //add data gathering if necessary
-        if(!state.equals(locker.getCurrentKey()))
-        {
+        if (!state.equals(locker.getCurrentKey())) {
             locker.presentKey(state.getHopefullyUniqueID(), () -> null);
             addDataGatherers(state);
             assert locker.getCurrentKey().equals(state);
         }
 
-        if(!almostPerfectKnowledge)
+        if (!almostPerfectKnowledge)
             return new PlanningHeatmapDestinationStrategy(
-                    new ProfitFunctionRegression(
-                            new ProfitFunction(24*5),
-                            regression,
-                            state
-                    ),
-                    acquisition.apply(state),
-                    ignoreFailedTrips,
-                    probability.apply(state),
-                    state.getMap(),
-                    state.getRandom(),
-                    explorationStepSize.apply(state.getRandom()).intValue()
+                new ProfitFunctionRegression(
+                    new ProfitFunction(24 * 5),
+                    regression,
+                    state
+                ),
+                acquisition.apply(state),
+                ignoreFailedTrips,
+                probability.apply(state),
+                state.getMap(),
+                state.getRandom(),
+                (int) explorationStepSize.applyAsDouble(state.getRandom())
             );
         else
             return PlanningHeatmapDestinationStrategy.AlmostPerfectKnowledge(
-                    24*5,
-                    state.getSpecies().size(),
-                    acquisition.apply(state),
-                    ignoreFailedTrips,
-                    probability.apply(state),
-                    state.getMap(),
-                    state.getRandom(),
-                    explorationStepSize.apply(state.getRandom()).intValue(),
-                    state.getBiology()
+                24 * 5,
+                state.getSpecies().size(),
+                acquisition.apply(state),
+                ignoreFailedTrips,
+                probability.apply(state),
+                state.getMap(),
+                state.getRandom(),
+                (int) explorationStepSize.applyAsDouble(state.getRandom()),
+                state.getBiology()
             );
     }
 
 
-    private void addDataGatherers(FishState state) {
+    private void addDataGatherers(final FishState state) {
 
 
         //first add data gatherers
         state.getYearlyDataSet().registerGatherer("Average Prediction Error",
-                                                  model -> {
-                                                      double size =model.getFishers().size();
-                                                      if(size == 0)
-                                                          return Double.NaN;
-                                                      else
-                                                      {
-                                                          double total = 0;
-                                                          for(Fisher fisher1 : state.getFishers()) {
-                                                              DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
-                                                              for(Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
-                                                                  errors.accept(error);
-                                                              total += errors.getAverage();
-                                                          }
-                                                          return total/size;
-                                                      }
-                                                  }, Double.NaN);
+            model -> {
+                final double size = model.getFishers().size();
+                if (size == 0)
+                    return Double.NaN;
+                else {
+                    double total = 0;
+                    for (final Fisher fisher1 : state.getFishers()) {
+                        final DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
+                        for (final Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
+                            errors.accept(error);
+                        total += errors.getAverage();
+                    }
+                    return total / size;
+                }
+            }, Double.NaN
+        );
 
     }
-
 
 
     /**
@@ -171,7 +152,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      *
      * @param ignoreFailedTrips Value to set for property 'ignoreFailedTrips'.
      */
-    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
+    public void setIgnoreFailedTrips(final boolean ignoreFailedTrips) {
         this.ignoreFailedTrips = ignoreFailedTrips;
     }
 
@@ -190,7 +171,8 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        final AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 
@@ -208,7 +190,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      *
      * @param explorationStepSize Value to set for property 'explorationStepSize'.
      */
-    public void setExplorationStepSize(DoubleParameter explorationStepSize) {
+    public void setExplorationStepSize(final DoubleParameter explorationStepSize) {
         this.explorationStepSize = explorationStepSize;
     }
 
@@ -228,7 +210,8 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      * @param regression Value to set for property 'regression'.
      */
     public void setRegression(
-            AlgorithmFactory<? extends GeographicalRegression<Double>> regression) {
+        final AlgorithmFactory<? extends GeographicalRegression<Double>> regression
+    ) {
         this.regression = regression;
     }
 
@@ -247,7 +230,8 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      * @param acquisition Value to set for property 'acquisition'.
      */
     public void setAcquisition(
-            AlgorithmFactory<? extends AcquisitionFunction> acquisition) {
+        final AlgorithmFactory<? extends AcquisitionFunction> acquisition
+    ) {
         this.acquisition = acquisition;
     }
 
@@ -265,7 +249,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      *
      * @param almostPerfectKnowledge Value to set for property 'almostPerfectKnowledge'.
      */
-    public void setAlmostPerfectKnowledge(boolean almostPerfectKnowledge) {
+    public void setAlmostPerfectKnowledge(final boolean almostPerfectKnowledge) {
         this.almostPerfectKnowledge = almostPerfectKnowledge;
     }
 }

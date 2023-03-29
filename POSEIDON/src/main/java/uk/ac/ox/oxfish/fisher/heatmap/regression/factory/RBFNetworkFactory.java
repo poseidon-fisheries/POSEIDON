@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 3/7/17.
  */
-public class RBFNetworkFactory  implements AlgorithmFactory<RBFNetworkRegression>{
+public class RBFNetworkFactory implements AlgorithmFactory<RBFNetworkRegression> {
 
 
     private final DoubleParameter learningRate = new FixedDoubleParameter(100);
@@ -49,17 +49,17 @@ public class RBFNetworkFactory  implements AlgorithmFactory<RBFNetworkRegression
      * @return the function result
      */
     @Override
-    public RBFNetworkRegression apply(FishState state) {
+    public RBFNetworkRegression apply(final FishState state) {
         return new RBFNetworkRegression(
 
-                new ObservationExtractor[]{
-                        new GridXExtractor(),
-                        new GridYExtractor()
-                },order.apply(state.getRandom()).intValue(),
-                new double[]{0,0},
-                new double[]{state.getMap().getWidth(),state.getMap().getHeight()},
-                learningRate.apply(state.getRandom()),
-                initialWeight.apply(state.getRandom())
+            new ObservationExtractor[]{
+                new GridXExtractor(),
+                new GridYExtractor()
+            }, (int) order.applyAsDouble(state.getRandom()),
+            new double[]{0, 0},
+            new double[]{state.getMap().getWidth(), state.getMap().getHeight()},
+            learningRate.applyAsDouble(state.getRandom()),
+            initialWeight.applyAsDouble(state.getRandom())
         );
     }
 

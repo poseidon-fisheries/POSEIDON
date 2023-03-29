@@ -37,7 +37,6 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
     private DoubleParameter virginRecruits = new FixedDoubleParameter(40741397);
 
 
-
     /**
      * logistic growth parameter
      */
@@ -67,6 +66,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      * if this flag is set to true, there will be new recruits every day
      */
     private boolean recruitsDaily = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -74,28 +74,27 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      * @return the function result
      */
     @Override
-    public RecruitmentBySpawningBiomass apply(FishState fishState) {
+    public RecruitmentBySpawningBiomass apply(final FishState fishState) {
 
         return new RecruitmentBySpawningBiomass(
-                virginRecruits.apply(fishState.getRandom()).intValue(),
-                steepness.apply(fishState.getRandom()),
-                cumulativePhi.apply(fishState.getRandom()),
-                false,
-                new Function<Species, double[]>() {
-                    @Override
-                    public double[] apply(Species species) {
-                        double[] actualMaturity = new double[species.getNumberOfBins()];
-                        double maxMaturity = halfFemalePopulation ? 0.5 : 1;
-                        for(int bin=0; bin<species.getNumberOfBins(); bin++)
-                            actualMaturity[bin] = species.getLength(subdivisionThatSpawns,bin) >= lengthAtMaturity ? maxMaturity : 0;
-                        return actualMaturity;
+            (int) virginRecruits.applyAsDouble(fishState.getRandom()),
+            steepness.applyAsDouble(fishState.getRandom()),
+            cumulativePhi.applyAsDouble(fishState.getRandom()),
+            false,
+            species -> {
+                final double[] actualMaturity = new double[species.getNumberOfBins()];
+                final double maxMaturity = halfFemalePopulation ? 0.5 : 1;
+                for (int bin = 0; bin < species.getNumberOfBins(); bin++)
+                    actualMaturity[bin] = species.getLength(subdivisionThatSpawns,
+                        bin) >= lengthAtMaturity ? maxMaturity : 0;
+                return actualMaturity;
 
-                    }
-                },
-                null,
-                subdivisionThatSpawns,
+            },
+            null,
+            subdivisionThatSpawns,
 
-                recruitsDaily);
+            recruitsDaily
+        );
 
     }
 
@@ -113,7 +112,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      *
      * @param virginRecruits Value to set for property 'virginRecruits'.
      */
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -131,7 +130,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      *
      * @param steepness Value to set for property 'steepness'.
      */
-    public void setSteepness(DoubleParameter steepness) {
+    public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
@@ -149,7 +148,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      *
      * @param cumulativePhi Value to set for property 'cumulativePhi'.
      */
-    public void setCumulativePhi(DoubleParameter cumulativePhi) {
+    public void setCumulativePhi(final DoubleParameter cumulativePhi) {
         this.cumulativePhi = cumulativePhi;
     }
 
@@ -167,7 +166,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      *
      * @param lengthAtMaturity Value to set for property 'lengthAtMaturity'.
      */
-    public void setLengthAtMaturity(double lengthAtMaturity) {
+    public void setLengthAtMaturity(final double lengthAtMaturity) {
         this.lengthAtMaturity = lengthAtMaturity;
     }
 
@@ -185,7 +184,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
      *
      * @param subdivisionThatSpawns Value to set for property 'subdivisionThatSpawns'.
      */
-    public void setSubdivisionThatSpawns(int subdivisionThatSpawns) {
+    public void setSubdivisionThatSpawns(final int subdivisionThatSpawns) {
         this.subdivisionThatSpawns = subdivisionThatSpawns;
     }
 
@@ -194,7 +193,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
         return halfFemalePopulation;
     }
 
-    public void setHalfFemalePopulation(boolean halfFemalePopulation) {
+    public void setHalfFemalePopulation(final boolean halfFemalePopulation) {
         this.halfFemalePopulation = halfFemalePopulation;
     }
 
@@ -202,7 +201,7 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
         return recruitsDaily;
     }
 
-    public void setRecruitsDaily(boolean recruitsDaily) {
+    public void setRecruitsDaily(final boolean recruitsDaily) {
         this.recruitsDaily = recruitsDaily;
     }
 }

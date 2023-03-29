@@ -36,8 +36,10 @@ public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator>
     public RandomAllocatorFactory() {
     }
 
-    public RandomAllocatorFactory(double minimum,
-                                  double maximum) {
+    public RandomAllocatorFactory(
+        final double minimum,
+        final double maximum
+    ) {
         this.minimum = new FixedDoubleParameter(minimum);
         this.maximum = new FixedDoubleParameter(maximum);
     }
@@ -49,10 +51,10 @@ public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator>
      * @return the function result
      */
     @Override
-    public RandomAllocator apply(FishState state) {
-        return  new RandomAllocator(
-                maximum.apply(state.getRandom()),
-                minimum.apply(state.getRandom())
+    public RandomAllocator apply(final FishState state) {
+        return new RandomAllocator(
+            maximum.applyAsDouble(state.getRandom()),
+            minimum.applyAsDouble(state.getRandom())
         );
     }
 
@@ -71,7 +73,7 @@ public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator>
      *
      * @param minimum Value to set for property 'minimum'.
      */
-    public void setMinimum(DoubleParameter minimum) {
+    public void setMinimum(final DoubleParameter minimum) {
         this.minimum = minimum;
     }
 
@@ -89,7 +91,7 @@ public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator>
      *
      * @param maximum Value to set for property 'maximum'.
      */
-    public void setMaximum(DoubleParameter maximum) {
+    public void setMaximum(final DoubleParameter maximum) {
         this.maximum = maximum;
     }
 }

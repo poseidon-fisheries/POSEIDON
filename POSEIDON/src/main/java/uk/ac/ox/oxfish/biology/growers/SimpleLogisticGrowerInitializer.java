@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.growers;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -41,26 +40,30 @@ public class SimpleLogisticGrowerInitializer implements LogisticGrowerInitialize
     private final DoubleParameter steepness;
 
 
-    public SimpleLogisticGrowerInitializer(DoubleParameter steepness) {
+    public SimpleLogisticGrowerInitializer(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
     @Override
     public void initializeGrower(
-            Map<SeaTile, BiomassLocalBiology> tiles, FishState state, MersenneTwisterFast random, Species species)
-    {
+        final Map<SeaTile, BiomassLocalBiology> tiles,
+        final FishState state,
+        final MersenneTwisterFast random,
+        final Species species
+    ) {
 
-        Collection<BiomassLocalBiology> biologies = tiles.values();
-        if(biologies.isEmpty())
+        final Collection<BiomassLocalBiology> biologies = tiles.values();
+        if (biologies.isEmpty())
             return;
         //initialize the malthusian parameter
 
-        IndependentLogisticBiomassGrower grower = new IndependentLogisticBiomassGrower(
-                steepness.apply(random),
-                species);
+        final IndependentLogisticBiomassGrower grower = new IndependentLogisticBiomassGrower(
+            steepness.applyAsDouble(random),
+            species
+        );
 
         //add all the biologies
-        for(BiomassLocalBiology biology : biologies)
+        for (final BiomassLocalBiology biology : biologies)
             grower.getBiologies().add(biology);
         state.registerStartable(grower);
 

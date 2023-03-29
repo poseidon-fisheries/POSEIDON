@@ -35,19 +35,16 @@ import java.util.HashMap;
  */
 public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<FixedProbabilityDepartingStrategy> {
 
-    private DoubleParameter initialProbabilityToLeavePort= new FixedDoubleParameter(0.5);
-
+    private final static HashMap<FishState, Startable> adapters = new HashMap<>();
+    private DoubleParameter initialProbabilityToLeavePort = new FixedDoubleParameter(0.5);
     private DoubleParameter explorationProbability = new FixedDoubleParameter(0.6);
-
     private DoubleParameter shockSize = new FixedDoubleParameter(0.6);
-
     private DoubleParameter imitationProbability = new FixedDoubleParameter(1);
-
     private boolean checkOnlyOnceADay = false;
 
-    private final static HashMap<FishState,Startable> adapters = new HashMap<>();
-
-
+    public static HashMap<FishState, Startable> getAdapters() {
+        return adapters;
+    }
 
     /**
      * Applies this function to the given argument.
@@ -56,21 +53,22 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
      * @return the function result
      */
     @Override
-    public FixedProbabilityDepartingStrategy apply(FishState state) {
-        FixedProbabilityDepartingStrategy toReturn = new FixedProbabilityDepartingStrategy(
-                initialProbabilityToLeavePort.apply(state.random), checkOnlyOnceADay);
+    public FixedProbabilityDepartingStrategy apply(final FishState state) {
+        final FixedProbabilityDepartingStrategy toReturn = new FixedProbabilityDepartingStrategy(
+            initialProbabilityToLeavePort.applyAsDouble(state.random), checkOnlyOnceADay);
 
         //only once per model, please
-        if(adapters.get(state) == null)
-        {
+        if (adapters.get(state) == null) {
             adapters.put(state, new Startable() {
                 @Override
-                public void start(FishState model) {
-                    GearImitationAnalysis.attachGoingOutProbabilityToEveryone(model.getFishers(),
-                                                                              model,
-                                                                              shockSize.apply(model.getRandom()),
-                                                                              explorationProbability.apply(model.getRandom()),
-                                                                              imitationProbability.apply(model.getRandom()));
+                public void start(final FishState model) {
+                    GearImitationAnalysis.attachGoingOutProbabilityToEveryone(
+                        model.getFishers(),
+                        model,
+                        shockSize.applyAsDouble(model.getRandom()),
+                        explorationProbability.applyAsDouble(model.getRandom()),
+                        imitationProbability.applyAsDouble(model.getRandom())
+                    );
                 }
 
                 @Override
@@ -84,13 +82,13 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
         return toReturn;
     }
 
-
     public DoubleParameter getInitialProbabilityToLeavePort() {
         return initialProbabilityToLeavePort;
     }
 
     public void setInitialProbabilityToLeavePort(
-            DoubleParameter initialProbabilityToLeavePort) {
+        final DoubleParameter initialProbabilityToLeavePort
+    ) {
         this.initialProbabilityToLeavePort = initialProbabilityToLeavePort;
     }
 
@@ -98,7 +96,7 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
         return explorationProbability;
     }
 
-    public void setExplorationProbability(DoubleParameter explorationProbability) {
+    public void setExplorationProbability(final DoubleParameter explorationProbability) {
         this.explorationProbability = explorationProbability;
     }
 
@@ -106,7 +104,7 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
         return shockSize;
     }
 
-    public void setShockSize(DoubleParameter shockSize) {
+    public void setShockSize(final DoubleParameter shockSize) {
         this.shockSize = shockSize;
     }
 
@@ -114,19 +112,15 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
         return imitationProbability;
     }
 
-    public void setImitationProbability(DoubleParameter imitationProbability) {
+    public void setImitationProbability(final DoubleParameter imitationProbability) {
         this.imitationProbability = imitationProbability;
-    }
-
-    public static HashMap<FishState, Startable> getAdapters() {
-        return adapters;
     }
 
     public boolean isCheckOnlyOnceADay() {
         return checkOnlyOnceADay;
     }
 
-    public void setCheckOnlyOnceADay(boolean checkOnlyOnceADay) {
+    public void setCheckOnlyOnceADay(final boolean checkOnlyOnceADay) {
         this.checkOnlyOnceADay = checkOnlyOnceADay;
     }
 }

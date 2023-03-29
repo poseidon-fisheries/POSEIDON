@@ -20,13 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.HabitatExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -35,25 +33,23 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 8/22/16.
  */
-public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory<GeographicallyWeightedRegression>
-{
-
-
-    private  DoubleParameter initialMin = new FixedDoubleParameter(-100);
-    private DoubleParameter initialMax = new FixedDoubleParameter(100);
-    private DoubleParameter initialUncertainty = new FixedDoubleParameter(10000);
-    private DoubleParameter rbfBandwidth = new FixedDoubleParameter(3);
-    private DoubleParameter exponentialForgetting = new FixedDoubleParameter(.98d);
+public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory<GeographicallyWeightedRegression> {
 
 
     private final static ObservationExtractor[] extractors = new ObservationExtractor[2];
+
     static {
-        ManhattanDistance distance = new ManhattanDistance();
-        extractors[0] = new PortDistanceExtractor(distance,0d);
+        final ManhattanDistance distance = new ManhattanDistance();
+        extractors[0] = new PortDistanceExtractor(distance, 0d);
         extractors[1] = new HabitatExtractor();
 
     }
 
+    private DoubleParameter initialMin = new FixedDoubleParameter(-100);
+    private DoubleParameter initialMax = new FixedDoubleParameter(100);
+    private DoubleParameter initialUncertainty = new FixedDoubleParameter(10000);
+    private DoubleParameter rbfBandwidth = new FixedDoubleParameter(3);
+    private DoubleParameter exponentialForgetting = new FixedDoubleParameter(.98d);
 
     /**
      * Applies this function to the given argument.
@@ -62,21 +58,18 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      * @return the function result
      */
     @Override
-    public GeographicallyWeightedRegression apply(FishState fishState) {
-
-
+    public GeographicallyWeightedRegression apply(final FishState fishState) {
         return new GeographicallyWeightedRegression(
-                fishState.getMap(),
-                exponentialForgetting.apply(fishState.getRandom()),
-                new ManhattanDistance(),
-                rbfBandwidth.apply(fishState.getRandom()),
-                extractors,
-                initialMin.apply(fishState.getRandom()),
-                initialMax.apply(fishState.getRandom()),
-                initialUncertainty.apply(fishState.getRandom()),
-                fishState.getRandom()
+            fishState.getMap(),
+            exponentialForgetting.applyAsDouble(fishState.getRandom()),
+            new ManhattanDistance(),
+            rbfBandwidth.applyAsDouble(fishState.getRandom()),
+            extractors,
+            initialMin.applyAsDouble(fishState.getRandom()),
+            initialMax.applyAsDouble(fishState.getRandom()),
+            initialUncertainty.applyAsDouble(fishState.getRandom()),
+            fishState.getRandom()
         );
-
     }
 
 
@@ -94,7 +87,7 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      *
      * @param initialMin Value to set for property 'initialMin'.
      */
-    public void setInitialMin(DoubleParameter initialMin) {
+    public void setInitialMin(final DoubleParameter initialMin) {
         this.initialMin = initialMin;
     }
 
@@ -112,7 +105,7 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      *
      * @param initialMax Value to set for property 'initialMax'.
      */
-    public void setInitialMax(DoubleParameter initialMax) {
+    public void setInitialMax(final DoubleParameter initialMax) {
         this.initialMax = initialMax;
     }
 
@@ -130,7 +123,7 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      *
      * @param initialUncertainty Value to set for property 'initialUncertainty'.
      */
-    public void setInitialUncertainty(DoubleParameter initialUncertainty) {
+    public void setInitialUncertainty(final DoubleParameter initialUncertainty) {
         this.initialUncertainty = initialUncertainty;
     }
 
@@ -148,7 +141,7 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      *
      * @param rbfBandwidth Value to set for property 'rbfBandwidth'.
      */
-    public void setRbfBandwidth(DoubleParameter rbfBandwidth) {
+    public void setRbfBandwidth(final DoubleParameter rbfBandwidth) {
         this.rbfBandwidth = rbfBandwidth;
     }
 
@@ -166,7 +159,7 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
      *
      * @param exponentialForgetting Value to set for property 'exponentialForgetting'.
      */
-    public void setExponentialForgetting(DoubleParameter exponentialForgetting) {
+    public void setExponentialForgetting(final DoubleParameter exponentialForgetting) {
         this.exponentialForgetting = exponentialForgetting;
     }
 }

@@ -41,7 +41,7 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
     private final int numberOfSchools;
 
 
-    private final Pair<Integer,Integer>[] waypoints;
+    private final Pair<Integer, Integer>[] waypoints;
 
     private final DoubleParameter startingX;
 
@@ -51,16 +51,17 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
 
     private final DoubleParameter speedInDays;
 
-    private final DoubleParameter  biomassEach;
+    private final DoubleParameter biomassEach;
 
     private final List<InfiniteSchool> schools;
 
 
     public OneSpeciesInfiniteSchoolsInitializer(
-            int numberOfSchools,
-            Pair<Integer,Integer>[] waypoints, DoubleParameter startingX,
-            DoubleParameter startingY, DoubleParameter diameter,
-            DoubleParameter speedInDays, DoubleParameter biomassEach) {
+        final int numberOfSchools,
+        final Pair<Integer, Integer>[] waypoints, final DoubleParameter startingX,
+        final DoubleParameter startingY, final DoubleParameter diameter,
+        final DoubleParameter speedInDays, final DoubleParameter biomassEach
+    ) {
         this.numberOfSchools = numberOfSchools;
         this.waypoints = waypoints;
         this.startingX = startingX;
@@ -80,18 +81,18 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
      * @return a global biology object
      */
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
-        GlobalBiology globalBiology = super.generateGlobal(random, modelBeingInitialized);
+    public GlobalBiology generateGlobal(final MersenneTwisterFast random, final FishState modelBeingInitialized) {
+        final GlobalBiology globalBiology = super.generateGlobal(random, modelBeingInitialized);
 
-        for(int i =0 ; i< numberOfSchools ; i++) {
-            InfiniteSchool school = new InfiniteSchool(
-                    startingX.apply(random).intValue(),
-                    startingY.apply(random).intValue(),
-                    speedInDays.apply(random).intValue(),
-                    diameter.apply(random),
-                    biomassEach.apply(random),
-                    globalBiology.getSpecie(0),
-                    waypoints
+        for (int i = 0; i < numberOfSchools; i++) {
+            final InfiniteSchool school = new InfiniteSchool(
+                (int) startingX.applyAsDouble(random),
+                (int) startingY.applyAsDouble(random),
+                (int) speedInDays.applyAsDouble(random),
+                diameter.applyAsDouble(random),
+                biomassEach.applyAsDouble(random),
+                globalBiology.getSpecie(0),
+                waypoints
             );
             schools.add(school);
         }
@@ -102,7 +103,8 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -111,11 +113,16 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
-        if(seaTile.isLand())
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
-        return new SchoolLocalBiology(schools,seaTile);
+        return new SchoolLocalBiology(schools, seaTile);
     }
 
     /**
@@ -129,10 +136,11 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
 
         //start all schools
-        for(InfiniteSchool school : schools)
+        for (final InfiniteSchool school : schools)
             model.registerStartable(school);
     }
 

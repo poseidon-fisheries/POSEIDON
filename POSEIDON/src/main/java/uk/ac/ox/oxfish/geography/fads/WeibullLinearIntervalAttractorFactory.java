@@ -43,15 +43,6 @@ public class WeibullLinearIntervalAttractorFactory implements
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
-
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
@@ -91,12 +82,20 @@ public class WeibullLinearIntervalAttractorFactory implements
         this.minAbundanceThreshold = minAbundanceThreshold;
     }
 
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
             () -> {
-                final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+                final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(fishState.getRandom());
 
                 final HeterogeneousLinearIntervalAttractor fishAttractor =
                     generateFishAttractor(
@@ -116,7 +115,7 @@ public class WeibullLinearIntervalAttractorFactory implements
                     fishState.getBiology(),
                     capacityGenerator,
                     fishAttractor,
-                    fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+                    fishReleaseProbabilityInPercent.applyAsDouble(fishState.getRandom()) / 100d,
                     fishState::getStep
                 );
             }
@@ -139,11 +138,9 @@ public class WeibullLinearIntervalAttractorFactory implements
             );
         }
         return new HeterogeneousLinearIntervalAttractor(
-            daysInWaterBeforeAttraction.apply(
-                fishState.getRandom()).intValue(),
-            daysItTakesToFillUp.apply(
-                fishState.getRandom()).intValue(),
-            minAbundanceThreshold.apply(fishState.getRandom()),
+            (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
+            (int) daysItTakesToFillUp.applyAsDouble(fishState.getRandom()),
+            minAbundanceThreshold.applyAsDouble(fishState.getRandom()),
             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
             fishState,
             carryingCapacities

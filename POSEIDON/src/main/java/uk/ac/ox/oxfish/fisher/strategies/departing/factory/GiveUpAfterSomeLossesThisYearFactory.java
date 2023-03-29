@@ -10,7 +10,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<GiveUpAfterSomeLossesThisYearDecorator> {
 
 
-
     private DoubleParameter howManyBadTripsBeforeGivingUp = new FixedDoubleParameter(3);
 
     private DoubleParameter minimumProfitPerTripRequired = new FixedDoubleParameter(0);
@@ -19,16 +18,12 @@ public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<Gi
 
 
     @Override
-    public GiveUpAfterSomeLossesThisYearDecorator apply(FishState state) {
-
+    public GiveUpAfterSomeLossesThisYearDecorator apply(final FishState state) {
         return new GiveUpAfterSomeLossesThisYearDecorator(
-                howManyBadTripsBeforeGivingUp.apply(state.getRandom()).intValue(),
-                minimumProfitPerTripRequired.apply(state.getRandom()).intValue(),
-                delegate.apply(state)
-
+            (int) howManyBadTripsBeforeGivingUp.applyAsDouble(state.getRandom()),
+            (int) minimumProfitPerTripRequired.applyAsDouble(state.getRandom()),
+            delegate.apply(state)
         );
-
-
     }
 
 
@@ -36,7 +31,7 @@ public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<Gi
         return howManyBadTripsBeforeGivingUp;
     }
 
-    public void setHowManyBadTripsBeforeGivingUp(DoubleParameter howManyBadTripsBeforeGivingUp) {
+    public void setHowManyBadTripsBeforeGivingUp(final DoubleParameter howManyBadTripsBeforeGivingUp) {
         this.howManyBadTripsBeforeGivingUp = howManyBadTripsBeforeGivingUp;
     }
 
@@ -44,7 +39,7 @@ public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<Gi
         return minimumProfitPerTripRequired;
     }
 
-    public void setMinimumProfitPerTripRequired(DoubleParameter minimumProfitPerTripRequired) {
+    public void setMinimumProfitPerTripRequired(final DoubleParameter minimumProfitPerTripRequired) {
         this.minimumProfitPerTripRequired = minimumProfitPerTripRequired;
     }
 
@@ -52,7 +47,7 @@ public class GiveUpAfterSomeLossesThisYearFactory implements AlgorithmFactory<Gi
         return delegate;
     }
 
-    public void setDelegate(AlgorithmFactory<? extends DepartingStrategy> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends DepartingStrategy> delegate) {
         this.delegate = delegate;
     }
 }

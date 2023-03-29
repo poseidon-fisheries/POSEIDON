@@ -35,15 +35,13 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
  * The Threshold Erotetic Destination Strategy where the threshold is the average
  * Created by carrknight on 4/11/16.
  */
-public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFactory<SimpleEroteticDestinationStrategy>
-{
-
+public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFactory<SimpleEroteticDestinationStrategy> {
 
 
     private DoubleParameter minimumObservations = new FixedDoubleParameter(5);
 
 
-    private DoubleParameter updateInterval = new UniformDoubleParameter(5,15);
+    private DoubleParameter updateInterval = new UniformDoubleParameter(5, 15);
 
 
     /**
@@ -53,14 +51,14 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
      * @return the function result
      */
     @Override
-    public SimpleEroteticDestinationStrategy apply(FishState state)
-    {
+    public SimpleEroteticDestinationStrategy apply(final FishState state) {
         return new SimpleEroteticDestinationStrategy(
-                new FeatureThresholdAnswer<>(
-                        minimumObservations.apply(state.getRandom()).intValue(),
-                        SNALSARutilities.PROFIT_FEATURE,
-                        FeatureExtractor.AVERAGE_PROFIT_FEATURE),
-                new FavoriteDestinationStrategy(state.getMap(),state.getRandom())
+            new FeatureThresholdAnswer<>(
+                (int) minimumObservations.applyAsDouble(state.getRandom()),
+                SNALSARutilities.PROFIT_FEATURE,
+                FeatureExtractor.AVERAGE_PROFIT_FEATURE
+            ),
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom())
 
         );
     }
@@ -80,7 +78,7 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
      *
      * @param minimumObservations Value to set for property 'minimumObservations'.
      */
-    public void setMinimumObservations(DoubleParameter minimumObservations) {
+    public void setMinimumObservations(final DoubleParameter minimumObservations) {
         this.minimumObservations = minimumObservations;
     }
 
@@ -88,7 +86,7 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
         return updateInterval;
     }
 
-    public void setUpdateInterval(DoubleParameter updateInterval) {
+    public void setUpdateInterval(final DoubleParameter updateInterval) {
         this.updateInterval = updateInterval;
     }
 }

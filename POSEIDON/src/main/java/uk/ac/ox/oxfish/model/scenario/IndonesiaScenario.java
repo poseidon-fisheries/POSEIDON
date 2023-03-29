@@ -218,7 +218,7 @@ public class IndonesiaScenario implements Scenario {
                 }
             },
             model,
-            new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom))
+            new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom))
         );
         Iterator<String> colorIterator = BoatColors.BOAT_COLORS.keySet().iterator();
         for (Port port : ports) {

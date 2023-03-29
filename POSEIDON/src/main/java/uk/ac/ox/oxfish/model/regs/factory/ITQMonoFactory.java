@@ -38,20 +38,19 @@ import java.util.function.Supplier;
  * Creates both individual quotas like the IQMonoFactory and a quota market for fishers to trade in
  * Created by carrknight on 8/26/15.
  */
-public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
-{
+public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
 
     /**
      * one market only for each fish-state
      */
-    private final Locker<String,ITQMarketBuilder> marketBuilders = new Locker<>();
+    private final Locker<String, ITQMarketBuilder> marketBuilders = new Locker<>();
 
     /**
      * quota available to each guy
      */
     private DoubleParameter individualQuota = new FixedDoubleParameter(5000);
 
-    public ITQMonoFactory(double individualQuota) {
+    public ITQMonoFactory(final double individualQuota) {
         this.individualQuota = new FixedDoubleParameter(individualQuota);
     }
 
@@ -66,43 +65,44 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
      * @return the function result
      */
     @Override
-    public MonoQuotaRegulation apply(FishState state) {
+    public MonoQuotaRegulation apply(final FishState state) {
         //todo need to make this for multiple species
 
 
-        ITQMarketBuilder marketBuilder =
-                marketBuilders.presentKey(state.getHopefullyUniqueID(),
-                                          new Supplier<ITQMarketBuilder>() {
-                                              @Override
-                                              public ITQMarketBuilder get() {
-                                                  //if not, create it!
-                                                  ITQMarketBuilder initializer = new ITQMarketBuilder(0);
-                                                  //make sure it will start with the model
-                                                  state.registerStartable(initializer);
-                                                  return initializer;
-                                              }
-                                          });
+        final ITQMarketBuilder marketBuilder =
+            marketBuilders.presentKey(
+                state.getHopefullyUniqueID(),
+                new Supplier<ITQMarketBuilder>() {
+                    @Override
+                    public ITQMarketBuilder get() {
+                        //if not, create it!
+                        final ITQMarketBuilder initializer = new ITQMarketBuilder(0);
+                        //make sure it will start with the model
+                        state.registerStartable(initializer);
+                        return initializer;
+                    }
+                }
+            );
 
         assert marketBuilder != null;
 
-        ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
+        final ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
-            public ITQOrderBook apply(Species species) {
+            public ITQOrderBook apply(final Species species) {
                 return marketBuilder.getMarket();
             }
         });
 
-        MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom())
-        ) {
+        final MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.applyAsDouble(state.getRandom())) {
 
             @Override
-            public void start(FishState model, Fisher fisher) {
+            public void start(final FishState model, final Fisher fisher) {
                 super.start(model, fisher);
                 fisher.getOpportunityCosts().add(cost);
             }
 
             @Override
-            public void turnOff(Fisher fisher) {
+            public void turnOff(final Fisher fisher) {
                 super.turnOff(fisher);
                 fisher.getOpportunityCosts().remove(cost);
             }
@@ -115,7 +115,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
         return individualQuota;
     }
 
-    public void setIndividualQuota(DoubleParameter individualQuota) {
+    public void setIndividualQuota(final DoubleParameter individualQuota) {
         this.individualQuota = individualQuota;
     }
 }

@@ -57,24 +57,6 @@ public class LinearEnvironmentalAttractorFactory implements
     private LinkedList<DoubleParameter> environmentalPenalties = new LinkedList<>();
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
-
-    public LinearEnvironmentalAttractorFactory() {
-    }
-
-    public LinearEnvironmentalAttractorFactory(
-        final AbundanceFiltersFactory abundanceFiltersFactory
-    ) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
     private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
@@ -99,6 +81,14 @@ public class LinearEnvironmentalAttractorFactory implements
     {
         catchabilities.put("Species 0", 0.001d);
     }
+    public LinearEnvironmentalAttractorFactory() {
+    }
+
+    public LinearEnvironmentalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory
+    ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
 
     public static Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
         final List<AdditionalMapFactory> environmentalMaps,
@@ -113,8 +103,8 @@ public class LinearEnvironmentalAttractorFactory implements
             final AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
             fishState.registerStartable(newMap);
             final String mapName = environmentalMaps.get(environmental).mapVariableName;
-            final double threshold = environmentalThresholds.get(environmental).apply(fishState.getRandom());
-            final double penalty = environmentalPenalties.get(environmental).apply(fishState.getRandom());
+            final double threshold = environmentalThresholds.get(environmental).applyAsDouble(fishState.getRandom());
+            final double penalty = environmentalPenalties.get(environmental).applyAsDouble(fishState.getRandom());
 
             final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
                 final double currentHere = fishState.getMap().getAdditionalMaps().get(
@@ -134,6 +124,14 @@ public class LinearEnvironmentalAttractorFactory implements
         return catchabilityPenaltyFunction;
     }
 
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
@@ -146,7 +144,7 @@ public class LinearEnvironmentalAttractorFactory implements
 
                 //attractor:
                 final MersenneTwisterFast rng = fishState.getRandom();
-                final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+                final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
                 final DoubleSupplier capacityGenerator;
                 if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
                     capacityGenerator = () -> Double.MAX_VALUE;
@@ -165,7 +163,7 @@ public class LinearEnvironmentalAttractorFactory implements
                         maximumCarryingCapacities.containsKey(species.getName()) ?
                             new FixedDoubleParameter(
                                 maximumCarryingCapacities.get(species.getName()) *
-                                    carryingCapacityMultiplier.apply(rng)
+                                    carryingCapacityMultiplier.applyAsDouble(rng)
 
                             ) :
                             new FixedDoubleParameter(-1);
@@ -196,12 +194,12 @@ public class LinearEnvironmentalAttractorFactory implements
                     new CatchabilitySelectivityFishAttractor(
                         carryingCapacities,
                         catchabilitySupplier,
-                        daysInWaterBeforeAttraction.apply(rng).intValue(),
-                        maximumDaysAttractions.apply(rng).intValue(),
+                        (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
+                        (int) maximumDaysAttractions.applyAsDouble(rng),
                         fishState,
                         abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                     ),
-                    fishReleaseProbabilityInPercent.apply(rng) / 100d,
+                    fishReleaseProbabilityInPercent.applyAsDouble(rng) / 100d,
                     fishState::getStep
                 );
             }

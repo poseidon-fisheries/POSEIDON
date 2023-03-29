@@ -30,11 +30,10 @@ import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
  * Creates WindThreshold strategies
  * Created by carrknight on 9/8/15.
  */
-public class WindThresholdFactory  implements AlgorithmFactory<WindThresholdStrategy> {
+public class WindThresholdFactory implements AlgorithmFactory<WindThresholdStrategy> {
 
 
-
-    private DoubleParameter maximumWindSpeedTolerated = new NormalDoubleParameter(50,10);
+    private DoubleParameter maximumWindSpeedTolerated = new NormalDoubleParameter(50, 10);
 
 
     /**
@@ -44,15 +43,15 @@ public class WindThresholdFactory  implements AlgorithmFactory<WindThresholdStra
      * @return the function result
      */
     @Override
-    public WindThresholdStrategy apply(FishState state) {
-        return new WindThresholdStrategy(maximumWindSpeedTolerated.apply(state.getRandom()));
+    public WindThresholdStrategy apply(final FishState state) {
+        return new WindThresholdStrategy(maximumWindSpeedTolerated.applyAsDouble(state.getRandom()));
     }
 
     public DoubleParameter getMaximumWindSpeedTolerated() {
         return maximumWindSpeedTolerated;
     }
 
-    public void setMaximumWindSpeedTolerated(DoubleParameter maximumWindSpeedTolerated) {
+    public void setMaximumWindSpeedTolerated(final DoubleParameter maximumWindSpeedTolerated) {
         this.maximumWindSpeedTolerated = maximumWindSpeedTolerated;
     }
 }

@@ -34,27 +34,27 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Supplier;
 
-public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestinationStrategy>{
+public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestinationStrategy> {
 
     /**
      * share the same discretization
      */
-    private final Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String, MapDiscretization> discretizationLocker = new Locker<>();
     private AlgorithmFactory<? extends MapDiscretizer> discretizer =
-            new CentroidMapFileFactory();
+        new CentroidMapFileFactory();
 
     /**
      * grabbed from post-ITQ visit counts
      */
-    private double[] preferences =new double[]{
-            0.00586319218241042,0.00260586319218241,0.0560260586319218,
-            0.0182410423452769,0.0130293159609121,0,0.00195439739413681,
-            0,0.0501628664495114,0.00325732899022801,0,0.10228013029316,
-            0.0130293159609121,0.00977198697068404,0.0208469055374593,0.0534201954397394,
-            0.0514657980456026,0.0495114006514658,0.000651465798045603,0.0638436482084691,
-            0.00977198697068404,0.193485342019544,0.0104234527687296,0,0.0592833876221498,
-            0.0377850162866449,0.044299674267101,0.0143322475570033,0.0957654723127036,
-            0.00130293159609121,0,0.0175895765472313
+    private double[] preferences = new double[]{
+        0.00586319218241042, 0.00260586319218241, 0.0560260586319218,
+        0.0182410423452769, 0.0130293159609121, 0, 0.00195439739413681,
+        0, 0.0501628664495114, 0.00325732899022801, 0, 0.10228013029316,
+        0.0130293159609121, 0.00977198697068404, 0.0208469055374593, 0.0534201954397394,
+        0.0514657980456026, 0.0495114006514658, 0.000651465798045603, 0.0638436482084691,
+        0.00977198697068404, 0.193485342019544, 0.0104234527687296, 0, 0.0592833876221498,
+        0.0377850162866449, 0.044299674267101, 0.0143322475570033, 0.0957654723127036,
+        0.00130293159609121, 0, 0.0175895765472313
     };
 
     private DoubleParameter maxDistance = new FixedDoubleParameter(200);
@@ -67,29 +67,29 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
      * @return the function result
      */
     @Override
-    public ClampedDestinationStrategy apply(FishState state) {
+    public ClampedDestinationStrategy apply(final FishState state) {
 
         //create the discretization
-        MapDiscretization discretization = discretizationLocker.presentKey(
-                state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
-                    @Override
-                    public MapDiscretization get() {
-                        MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                        MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                        toReturn.discretize(state.getMap());
-                        return toReturn;
+        final MapDiscretization discretization = discretizationLocker.presentKey(
+            state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
+                @Override
+                public MapDiscretization get() {
+                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                    toReturn.discretize(state.getMap());
+                    return toReturn;
 
-                    }
                 }
+            }
         );
 
 
         return new ClampedDestinationStrategy(
-                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                discretization,
-                maxDistance.apply(state.getRandom()),
-                preferences
-                );
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+            discretization,
+            maxDistance.applyAsDouble(state.getRandom()),
+            preferences
+        );
 
     }
 
@@ -107,7 +107,7 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
      *
      * @param preferences Value to set for property 'preferences'.
      */
-    public void setPreferences(double[] preferences) {
+    public void setPreferences(final double[] preferences) {
         this.preferences = preferences;
     }
 
@@ -125,7 +125,7 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
      *
      * @param maxDistance Value to set for property 'maxDistance'.
      */
-    public void setMaxDistance(DoubleParameter maxDistance) {
+    public void setMaxDistance(final DoubleParameter maxDistance) {
         this.maxDistance = maxDistance;
     }
 
@@ -144,7 +144,8 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
      * @param discretizer Value to set for property 'discretizer'.
      */
     public void setDiscretizer(
-            AlgorithmFactory<? extends MapDiscretizer> discretizer) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretizer
+    ) {
         this.discretizer = discretizer;
     }
 }

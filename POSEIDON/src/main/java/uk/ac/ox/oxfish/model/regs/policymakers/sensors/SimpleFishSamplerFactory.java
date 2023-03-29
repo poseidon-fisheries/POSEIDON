@@ -13,7 +13,7 @@ public class SimpleFishSamplerFactory implements AlgorithmFactory<SimpleFisherSa
     @Override
     public SimpleFisherSampler apply(FishState fishState) {
         return new SimpleFisherSampler(
-                percentageSampled.apply(fishState.getRandom())
+                percentageSampled.applyAsDouble(fishState.getRandom())
         );
     }
 

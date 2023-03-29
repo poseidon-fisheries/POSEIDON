@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/8/17.
  */
-public class LogisticRecruitmentFactory implements AlgorithmFactory<LogisticRecruitmentProcess>
-{
+public class LogisticRecruitmentFactory implements AlgorithmFactory<LogisticRecruitmentProcess> {
 
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(100000000);
 
@@ -44,16 +43,17 @@ public class LogisticRecruitmentFactory implements AlgorithmFactory<LogisticRecr
      * @return the function result
      */
     @Override
-    public LogisticRecruitmentProcess apply(FishState fishState) {
-        return new LogisticRecruitmentProcess(carryingCapacity.apply(fishState.getRandom()),
-                                              malthusianParameter.apply(fishState.getRandom()), false);
+    public LogisticRecruitmentProcess apply(final FishState fishState) {
+        return new LogisticRecruitmentProcess(carryingCapacity.applyAsDouble(fishState.getRandom()),
+            malthusianParameter.applyAsDouble(fishState.getRandom()), false
+        );
     }
 
     public DoubleParameter getCarryingCapacity() {
         return carryingCapacity;
     }
 
-    public void setCarryingCapacity(DoubleParameter carryingCapacity) {
+    public void setCarryingCapacity(final DoubleParameter carryingCapacity) {
         this.carryingCapacity = carryingCapacity;
     }
 
@@ -61,7 +61,7 @@ public class LogisticRecruitmentFactory implements AlgorithmFactory<LogisticRecr
         return malthusianParameter;
     }
 
-    public void setMalthusianParameter(DoubleParameter malthusianParameter) {
+    public void setMalthusianParameter(final DoubleParameter malthusianParameter) {
         this.malthusianParameter = malthusianParameter;
     }
 }

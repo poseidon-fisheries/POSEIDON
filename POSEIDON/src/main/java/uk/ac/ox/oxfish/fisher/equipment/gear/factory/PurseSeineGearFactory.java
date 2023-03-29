@@ -230,7 +230,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations,
-            new UnreliableFishValueCalculator(globalBiology, rng, fishValueCalculatorStandardDeviation.apply(rng))
+            new UnreliableFishValueCalculator(globalBiology, rng, fishValueCalculatorStandardDeviation.applyAsDouble(rng))
         );
         return fadManager;
     }

@@ -66,9 +66,9 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         final ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dayToCoordinatesMap);
         if (isDataInTonnes)
             setter.setSimulatedToDataScaler(DEFAULT_SIMULATED_TO_DATA_SCALER);
-        final int range = neighborhoodSearchSize.apply(state.getRandom()).intValue();
+        final int range = (int) neighborhoodSearchSize.applyAsDouble(state.getRandom());
         setter.setNeighborhoodSearchSize(range);
-        setter.setMissingFadError(getMissingFadError().apply(state.getRandom()));
+        setter.setMissingFadError(getMissingFadError().applyAsDouble(state.getRandom()));
         if (keepLog)
             setter.startOrResetLogger(state);
         return setter;

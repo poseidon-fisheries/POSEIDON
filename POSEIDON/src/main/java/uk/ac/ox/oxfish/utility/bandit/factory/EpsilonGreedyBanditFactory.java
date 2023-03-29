@@ -55,7 +55,7 @@ public class EpsilonGreedyBanditFactory implements
         return new BanditSupplier() {
             @Override
             public EpsilonGreedyBanditAlgorithm apply(BanditAverage banditAverage) {
-                return new EpsilonGreedyBanditAlgorithm(banditAverage,explorationRate.apply(state.getRandom()));
+                return new EpsilonGreedyBanditAlgorithm(banditAverage,explorationRate.applyAsDouble(state.getRandom()));
             }
         };
     }

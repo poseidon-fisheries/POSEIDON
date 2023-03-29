@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.policymakers.SingleSpeciesBiomassTaxman;
@@ -36,16 +35,11 @@ import java.util.WeakHashMap;
 public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
+    private final WeakHashMap<FishState, SingleSpeciesBiomassTaxman> taxes = new WeakHashMap<>();
     private int speciesIndex = 0;
-
-    private DoubleParameter biomassThreshold =  new FixedDoubleParameter(5000000);
-
+    private DoubleParameter biomassThreshold = new FixedDoubleParameter(5000000);
     private DoubleParameter tax = new FixedDoubleParameter(10);
-
     private boolean taxWhenBelowThreshold = true;
-
-
-    private final WeakHashMap<FishState,SingleSpeciesBiomassTaxman> taxes = new WeakHashMap<>();
 
     /**
      * Applies this function to the given argument.
@@ -54,19 +48,19 @@ public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<Protecte
      * @return the function result
      */
     @Override
-    public ProtectedAreasOnly apply(FishState fishState) {
-        ProtectedAreasOnly regulations = new ProtectedAreasOnly();
+    public ProtectedAreasOnly apply(final FishState fishState) {
+        final ProtectedAreasOnly regulations = new ProtectedAreasOnly();
 
-        if(!taxes.containsKey(fishState)) {
-            SingleSpeciesBiomassTaxman taxman = new SingleSpeciesBiomassTaxman(
-                    fishState.getSpecies().get(speciesIndex),
-                    tax.apply(fishState.getRandom()),
-                    biomassThreshold.apply(fishState.getRandom()),
-                    taxWhenBelowThreshold
+        if (!taxes.containsKey(fishState)) {
+            final SingleSpeciesBiomassTaxman taxman = new SingleSpeciesBiomassTaxman(
+                fishState.getSpecies().get(speciesIndex),
+                tax.applyAsDouble(fishState.getRandom()),
+                biomassThreshold.applyAsDouble(fishState.getRandom()),
+                taxWhenBelowThreshold
             );
 
             fishState.registerStartable(taxman);
-            taxes.put(fishState,taxman);
+            taxes.put(fishState, taxman);
         }
 
         return regulations;
@@ -87,7 +81,7 @@ public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<Protecte
      *
      * @param speciesIndex Value to set for property 'speciesIndex'.
      */
-    public void setSpeciesIndex(int speciesIndex) {
+    public void setSpeciesIndex(final int speciesIndex) {
         this.speciesIndex = speciesIndex;
     }
 
@@ -105,7 +99,7 @@ public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<Protecte
      *
      * @param biomassThreshold Value to set for property 'biomassThreshold'.
      */
-    public void setBiomassThreshold(DoubleParameter biomassThreshold) {
+    public void setBiomassThreshold(final DoubleParameter biomassThreshold) {
         this.biomassThreshold = biomassThreshold;
     }
 
@@ -123,7 +117,7 @@ public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<Protecte
      *
      * @param tax Value to set for property 'tax'.
      */
-    public void setTax(DoubleParameter tax) {
+    public void setTax(final DoubleParameter tax) {
         this.tax = tax;
     }
 
@@ -141,7 +135,7 @@ public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<Protecte
      *
      * @param taxWhenBelowThreshold Value to set for property 'taxWhenBelowThreshold'.
      */
-    public void setTaxWhenBelowThreshold(boolean taxWhenBelowThreshold) {
+    public void setTaxWhenBelowThreshold(final boolean taxWhenBelowThreshold) {
         this.taxWhenBelowThreshold = taxWhenBelowThreshold;
     }
 }

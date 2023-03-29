@@ -31,19 +31,25 @@ public class FadAwareLogisticGrowerFactory implements AlgorithmFactory<FadAwareL
 
     private boolean useLastYearBiomass = true;
 
-    @SuppressWarnings("unused") public FadAwareLogisticGrowerFactory() { }
+    @SuppressWarnings("unused")
+    public FadAwareLogisticGrowerFactory() {
+    }
 
-    @SuppressWarnings("unused") public boolean getUseLastYearBiomass() { return useLastYearBiomass; }
+    @SuppressWarnings("unused")
+    public boolean getUseLastYearBiomass() {
+        return useLastYearBiomass;
+    }
 
-    @SuppressWarnings("unused") public void setUseLastYearBiomass(final boolean useLastYearBiomass) {
+    @SuppressWarnings("unused")
+    public void setUseLastYearBiomass(final boolean useLastYearBiomass) {
         this.useLastYearBiomass = useLastYearBiomass;
     }
 
     @Override
     public FadAwareLogisticGrowerInitializer apply(final FishState state) {
         return new FadAwareLogisticGrowerInitializer(
-            carryingCapacity.apply(state.getRandom()),
-            steepness.apply(state.getRandom()),
+            carryingCapacity.applyAsDouble(state.getRandom()),
+            steepness.applyAsDouble(state.getRandom()),
             useLastYearBiomass
         );
     }

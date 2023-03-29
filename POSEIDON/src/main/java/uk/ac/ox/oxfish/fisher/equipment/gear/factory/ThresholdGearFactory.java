@@ -33,8 +33,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * An abundance based gear, catching fish only above/below a length quota
  * Created by carrknight on 3/11/16.
  */
-public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundanceGear>
-{
+public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundanceGear> {
 
     private boolean rounding = true;
     private DoubleParameter threshold = new FixedDoubleParameter(10d);
@@ -53,21 +52,23 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      * @return the function result
      */
     @Override
-    public HomogeneousAbundanceGear apply(FishState fishState) {
-        MersenneTwisterFast random = fishState.getRandom();
-        return  new HomogeneousAbundanceGear(litersGasPerHourFished.apply(random),
-                                             new FixedProportionFilter(catchability.apply(random), rounding),
-                                             new CutoffAbundanceFilter(threshold.apply(random),
-                                                                       selectAboveThreshold, rounding));
+    public HomogeneousAbundanceGear apply(final FishState fishState) {
+        final MersenneTwisterFast random = fishState.getRandom();
+        return new HomogeneousAbundanceGear(
+            litersGasPerHourFished.applyAsDouble(random),
+            new FixedProportionFilter(catchability.applyAsDouble(random), rounding),
+            new CutoffAbundanceFilter(threshold.applyAsDouble(random),
+                selectAboveThreshold, rounding
+            )
+        );
     }
-
 
 
     public boolean isSelectAboveThreshold() {
         return selectAboveThreshold;
     }
 
-    public void setSelectAboveThreshold(boolean selectAboveThreshold) {
+    public void setSelectAboveThreshold(final boolean selectAboveThreshold) {
         this.selectAboveThreshold = selectAboveThreshold;
     }
 
@@ -85,7 +86,7 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      *
      * @param threshold Value to set for property 'threshold'.
      */
-    public void setThreshold(DoubleParameter threshold) {
+    public void setThreshold(final DoubleParameter threshold) {
         this.threshold = threshold;
     }
 
@@ -103,7 +104,7 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      *
      * @param litersGasPerHourFished Value to set for property 'litersGasPerHourFished'.
      */
-    public void setLitersGasPerHourFished(DoubleParameter litersGasPerHourFished) {
+    public void setLitersGasPerHourFished(final DoubleParameter litersGasPerHourFished) {
         this.litersGasPerHourFished = litersGasPerHourFished;
     }
 
@@ -121,7 +122,7 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      *
      * @param catchability Value to set for property 'catchability'.
      */
-    public void setCatchability(DoubleParameter catchability) {
+    public void setCatchability(final DoubleParameter catchability) {
         this.catchability = catchability;
     }
 
@@ -140,7 +141,7 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 }

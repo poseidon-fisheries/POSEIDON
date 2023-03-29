@@ -193,10 +193,10 @@ public class NoDataTachiuoSlice1Policy {
                 final SimpleLogisticGearFactory タチウオ = (SimpleLogisticGearFactory) futureGear.getGears().get("タチウオ");
                 タチウオ.setSelexParameter2(
                         new FixedDoubleParameter(
-                                タチウオ.getSelexParameter2().apply(new MersenneTwisterFast()) * selex2Multiplier));
+                                タチウオ.getSelexParameter2().applyAsDouble(new MersenneTwisterFast()) * selex2Multiplier));
                 タチウオ.setSelexParameter1(
                         new FixedDoubleParameter(
-                                タチウオ.getSelexParameter1().apply(new MersenneTwisterFast()) * selex1Multiplier));
+                                タチウオ.getSelexParameter1().applyAsDouble(new MersenneTwisterFast()) * selex1Multiplier));
 
 
 

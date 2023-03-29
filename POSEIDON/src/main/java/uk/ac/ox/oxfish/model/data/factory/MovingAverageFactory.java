@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Builds Moving Average
  * Created by carrknight on 11/11/16.
  */
-public class MovingAverageFactory implements AlgorithmFactory<MovingAverage<Double>>{
+public class MovingAverageFactory implements AlgorithmFactory<MovingAverage<Double>> {
 
 
     private DoubleParameter window = new FixedDoubleParameter(20);
@@ -42,8 +42,8 @@ public class MovingAverageFactory implements AlgorithmFactory<MovingAverage<Doub
      * @return the function result
      */
     @Override
-    public MovingAverage<Double> apply(FishState state) {
-        return new MovingAverage<>(window.apply(state.getRandom()).intValue());
+    public MovingAverage<Double> apply(final FishState state) {
+        return new MovingAverage<>((int) window.applyAsDouble(state.getRandom()));
     }
 
 
@@ -61,7 +61,7 @@ public class MovingAverageFactory implements AlgorithmFactory<MovingAverage<Doub
      *
      * @param window Value to set for property 'window'.
      */
-    public void setWindow(DoubleParameter window) {
+    public void setWindow(final DoubleParameter window) {
         this.window = window;
     }
 }

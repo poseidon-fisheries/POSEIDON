@@ -20,13 +20,10 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SeasonExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DailyLogisticDepartingStrategy;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -38,8 +35,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The logistic decision to go out or not parametrized for Longliners by Steve Saul
  * Created by carrknight on 12/2/16.
  */
-public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy>
-{
+public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy> {
 
 
     private DoubleParameter intercept = new FixedDoubleParameter(-3.626);
@@ -54,19 +50,19 @@ public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory
      * @return the function result
      */
     @Override
-    public DailyLogisticDepartingStrategy apply(FishState state) {
+    public DailyLogisticDepartingStrategy apply(final FishState state) {
 
         return new DailyLogisticDepartingStrategy(
-                new LogisticClassifier(
-                        //intercept:
-                        new Pair<>(
-                                new InterceptExtractor()
-                        ,intercept.apply(state.getRandom())),
-                        //summer?:
-                        new Pair<>(
-                                new SeasonExtractor(Season.SUMMER)
-                                ,summer.apply(state.getRandom()))
-                ));
+            new LogisticClassifier(
+                //intercept:
+                new Pair<>(
+                    new InterceptExtractor()
+                    , intercept.applyAsDouble(state.getRandom())),
+                //summer?:
+                new Pair<>(
+                    new SeasonExtractor(Season.SUMMER)
+                    , summer.applyAsDouble(state.getRandom()))
+            ));
 
 
     }
@@ -81,6 +77,10 @@ public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory
         return intercept;
     }
 
+    public void setIntercept(final DoubleParameter intercept) {
+        this.intercept = intercept;
+    }
+
     /**
      * Getter for property 'summer'.
      *
@@ -90,11 +90,7 @@ public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory
         return summer;
     }
 
-    public void setIntercept(DoubleParameter intercept) {
-        this.intercept = intercept;
-    }
-
-    public void setSummer(DoubleParameter summer) {
+    public void setSummer(final DoubleParameter summer) {
         this.summer = summer;
     }
 }

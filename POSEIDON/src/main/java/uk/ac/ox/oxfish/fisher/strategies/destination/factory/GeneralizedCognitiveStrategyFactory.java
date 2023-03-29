@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarF
 import uk.ac.ox.oxfish.fisher.strategies.destination.GeneralizedCognitiveStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.BetaDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -36,30 +35,31 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<GeneralizedCognitiveStrategy> {
 
-	private DoubleParameter minAbsoluteSatisfactoryProfit = new FixedDoubleParameter(1);
-	private DoubleParameter minRelativeSatisfactoryProfit = new FixedDoubleParameter(0);
-	private DoubleParameter weightProfit = new FixedDoubleParameter(1);
-	private DoubleParameter weightLegal = new FixedDoubleParameter(1);
-	private DoubleParameter weightCommunal = new FixedDoubleParameter(1);
-	private DoubleParameter weightReputation = new FixedDoubleParameter(1);
+    private DoubleParameter minAbsoluteSatisfactoryProfit = new FixedDoubleParameter(1);
+    private DoubleParameter minRelativeSatisfactoryProfit = new FixedDoubleParameter(0);
+    private DoubleParameter weightProfit = new FixedDoubleParameter(1);
+    private DoubleParameter weightLegal = new FixedDoubleParameter(1);
+    private DoubleParameter weightCommunal = new FixedDoubleParameter(1);
+    private DoubleParameter weightReputation = new FixedDoubleParameter(1);
     private AlgorithmFactory<? extends TimeScalarFunction> timeScalarFunction =
-            new InverseTimeScalarFactory();
-	private DoubleParameter kExploration = new FixedDoubleParameter(.1);
+        new InverseTimeScalarFactory();
+    private DoubleParameter kExploration = new FixedDoubleParameter(.1);
 
-	@Override
-	public GeneralizedCognitiveStrategy apply(FishState state) {
-        MersenneTwisterFast random = state.random;
-		return new GeneralizedCognitiveStrategy(
-				minAbsoluteSatisfactoryProfit.apply(random),
-				minRelativeSatisfactoryProfit.apply(random),
-				weightProfit.apply(random),
-				weightLegal.apply(random),
-				weightCommunal.apply(random),
-				weightReputation.apply(random),
-				timeScalarFunction.apply(state),
-				kExploration.apply(random)/*,//kExplore
-				numberOfTerritorySites.apply(random)*/);
-	}
+    @Override
+    public GeneralizedCognitiveStrategy apply(final FishState state) {
+        final MersenneTwisterFast random = state.random;
+        return new GeneralizedCognitiveStrategy(
+            minAbsoluteSatisfactoryProfit.applyAsDouble(random),
+            minRelativeSatisfactoryProfit.applyAsDouble(random),
+            weightProfit.applyAsDouble(random),
+            weightLegal.applyAsDouble(random),
+            weightCommunal.applyAsDouble(random),
+            weightReputation.applyAsDouble(random),
+            timeScalarFunction.apply(state),
+            kExploration.applyAsDouble(random)/*,//kExplore
+				numberOfTerritorySites.apply(random)*/
+        );
+    }
 	
 /*    private DoubleParameter numberOfTerritorySites = new FixedDoubleParameter(5);
     public DoubleParameter getNumberOfTerritorySites(){
@@ -69,64 +69,64 @@ public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<Gen
     	numberOfTerritorySites = nSites;
     }*/
 
-    public DoubleParameter getMinAbsolute(){
-		return minAbsoluteSatisfactoryProfit;
-	}
-	
-	public void setMinAbsolute(DoubleParameter minAbsolute){
-		minAbsoluteSatisfactoryProfit=minAbsolute;
-	}
-	
-	public DoubleParameter getMinRelative(){
-		return minRelativeSatisfactoryProfit;
-	}
-	
-	public void setMinRelative(DoubleParameter minRelative){
-		minRelativeSatisfactoryProfit=minRelative;
-	}
-	
-	
-	public DoubleParameter getWeightProfit(){
-		return weightProfit;
-	}
-	
-	public void setWeightProfit(DoubleParameter weightProfit){
-		this.weightProfit=weightProfit;
-	}
-	
-	public DoubleParameter getWeightLegal(){
-		return weightLegal;
-	}	
-	
-	public void setWeightLegal(DoubleParameter weightLegal){
-		this.weightLegal = weightLegal;
-	}
-	
-	public DoubleParameter getWeightCommunal(){
-		return weightCommunal;
-	}
+    public DoubleParameter getMinAbsolute() {
+        return minAbsoluteSatisfactoryProfit;
+    }
 
-	public void setWeightCommunal(DoubleParameter weightCommunal){
-		this.weightCommunal = weightCommunal;
-	}
-	
-	public DoubleParameter getWeightReputation(){
-		return weightReputation;
-	}
-	
-	public void setWeightReputation(DoubleParameter weightReputation){
-		this.weightReputation = weightReputation;
-	}
-	
-	public DoubleParameter getKExploration(){
-		return kExploration;
-	}
-	
-	public void setKExploration(DoubleParameter kExploration){
-		this.kExploration = kExploration;
-	}
-	
-	   /**
+    public void setMinAbsolute(final DoubleParameter minAbsolute) {
+        minAbsoluteSatisfactoryProfit = minAbsolute;
+    }
+
+    public DoubleParameter getMinRelative() {
+        return minRelativeSatisfactoryProfit;
+    }
+
+    public void setMinRelative(final DoubleParameter minRelative) {
+        minRelativeSatisfactoryProfit = minRelative;
+    }
+
+
+    public DoubleParameter getWeightProfit() {
+        return weightProfit;
+    }
+
+    public void setWeightProfit(final DoubleParameter weightProfit) {
+        this.weightProfit = weightProfit;
+    }
+
+    public DoubleParameter getWeightLegal() {
+        return weightLegal;
+    }
+
+    public void setWeightLegal(final DoubleParameter weightLegal) {
+        this.weightLegal = weightLegal;
+    }
+
+    public DoubleParameter getWeightCommunal() {
+        return weightCommunal;
+    }
+
+    public void setWeightCommunal(final DoubleParameter weightCommunal) {
+        this.weightCommunal = weightCommunal;
+    }
+
+    public DoubleParameter getWeightReputation() {
+        return weightReputation;
+    }
+
+    public void setWeightReputation(final DoubleParameter weightReputation) {
+        this.weightReputation = weightReputation;
+    }
+
+    public DoubleParameter getKExploration() {
+        return kExploration;
+    }
+
+    public void setKExploration(final DoubleParameter kExploration) {
+        this.kExploration = kExploration;
+    }
+
+    /**
      * Getter for property 'timeScalarFunction'.
      *
      * @return Value for property 'timeScalarFunction'.
@@ -141,8 +141,9 @@ public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<Gen
      * @param timeScalarFunction Value to set for property 'timeScalarFunction'.
      */
     public void setTimeScalarFunction(
-            AlgorithmFactory<? extends TimeScalarFunction> timeScalarFunction) {
+        final AlgorithmFactory<? extends TimeScalarFunction> timeScalarFunction
+    ) {
         this.timeScalarFunction = timeScalarFunction;
     }
-	
+
 }

@@ -21,20 +21,16 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class KernelTransductionFactory implements AlgorithmFactory<KernelTransduction>
-{
+public class KernelTransductionFactory implements AlgorithmFactory<KernelTransduction> {
 
 
     private DoubleParameter spaceBandwidth = new FixedDoubleParameter(5);
@@ -50,14 +46,15 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
      * @return the function result
      */
     @Override
-    public KernelTransduction apply(FishState state) {
-        double bandwidth = spaceBandwidth.apply(state.getRandom());
+    public KernelTransduction apply(final FishState state) {
+        final double bandwidth = spaceBandwidth.applyAsDouble(state.getRandom());
         return new KernelTransduction(
-                state.getMap(),
-                forgettingFactor.apply(state.getRandom()),
-                new Pair<>(new GridXExtractor(), bandwidth),
+            state.getMap(),
+            forgettingFactor.applyAsDouble(state.getRandom()),
+            new Pair<>(new GridXExtractor(), bandwidth),
 
-                new Pair<>(new GridYExtractor(), bandwidth));
+            new Pair<>(new GridYExtractor(), bandwidth)
+        );
     }
 
 
@@ -65,7 +62,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
         return spaceBandwidth;
     }
 
-    public void setSpaceBandwidth(DoubleParameter spaceBandwidth) {
+    public void setSpaceBandwidth(final DoubleParameter spaceBandwidth) {
         this.spaceBandwidth = spaceBandwidth;
     }
 
@@ -73,7 +70,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
         return forgettingFactor;
     }
 
-    public void setForgettingFactor(DoubleParameter forgettingFactor) {
+    public void setForgettingFactor(final DoubleParameter forgettingFactor) {
         this.forgettingFactor = forgettingFactor;
     }
 }

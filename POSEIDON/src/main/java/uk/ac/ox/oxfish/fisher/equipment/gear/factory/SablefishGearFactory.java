@@ -39,51 +39,38 @@ import java.util.Arrays;
 public class SablefishGearFactory implements HomogeneousGearFactory {
 
 
-    private static final double FEMALE[] =
-            new double[]{0.197813,0.879397,0.868362,0.851041,0.944782,1,0.983772,0.909702,0.79965,0.674605,0.547736,
-                    0.428506,0.32337,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,
-                    0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,
-                    0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,
-                    0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,0.235663,
-                    0.235663,0.235663,0.235663,0.235663,0.235663};
+    private static final double[] FEMALE =
+        new double[]{0.197813, 0.879397, 0.868362, 0.851041, 0.944782, 1, 0.983772, 0.909702, 0.79965, 0.674605, 0.547736,
+            0.428506, 0.32337, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663,
+            0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663,
+            0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663,
+            0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663, 0.235663,
+            0.235663, 0.235663, 0.235663, 0.235663, 0.235663};
 
 
-    private static final double MALE[] =
-            new double[]{
-                    0.197813,0.876199,0.862056,0.841788,0.931111,0.98431,0.967137,0.893213,0.784184,0.660738,0.535813,
-                    0.41866,0.315549,0.229678,0.229394,0.22911,0.228826,0.228543,0.22826,0.227977,0.227695,0.227413,
-                    0.227132,0.226851,0.22657,0.226289,0.226009,0.22573,0.22545,0.225171,0.224892,0.224614,0.224336,
-                    0.224058,0.223781,0.223504,0.223227,0.222951,0.222675,0.222399,0.222124,0.221849,0.221574,0.2213,
-                    0.221026,0.220753,0.220479,0.220207,0.219934,0.219662,0.21939,0.21939,0.21939,0.21939,0.21939,
-                    0.21939,0.21939,0.21939,0.21939,0.21939
-            };
-
-
-
+    private static final double[] MALE =
+        new double[]{
+            0.197813, 0.876199, 0.862056, 0.841788, 0.931111, 0.98431, 0.967137, 0.893213, 0.784184, 0.660738, 0.535813,
+            0.41866, 0.315549, 0.229678, 0.229394, 0.22911, 0.228826, 0.228543, 0.22826, 0.227977, 0.227695, 0.227413,
+            0.227132, 0.226851, 0.22657, 0.226289, 0.226009, 0.22573, 0.22545, 0.225171, 0.224892, 0.224614, 0.224336,
+            0.224058, 0.223781, 0.223504, 0.223227, 0.222951, 0.222675, 0.222399, 0.222124, 0.221849, 0.221574, 0.2213,
+            0.221026, 0.220753, 0.220479, 0.220207, 0.219934, 0.219662, 0.21939, 0.21939, 0.21939, 0.21939, 0.21939,
+            0.21939, 0.21939, 0.21939, 0.21939, 0.21939
+        };
+    private final Locker<String, ArrayFilter> selectivity = new Locker<>();
     /**
      * retention inflection parameter
      */
     private DoubleParameter retentionInflection = new FixedDoubleParameter(45.5128);
-
-
     /**
      * retention slope parameter
      */
     private DoubleParameter retentionSlope = new FixedDoubleParameter(3.12457);
-
-
     /**
      * retention slope parameter: if null retention is ignored
      */
     private DoubleParameter retentionAsymptote = new FixedDoubleParameter(0.910947);
-
-
     private DoubleParameter litersOfGasConsumedPerHour = new FixedDoubleParameter(0);
-
-
-    private Locker<String,ArrayFilter> selectivity = new Locker<>();
-
-
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
 
@@ -94,11 +81,12 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
 
 
     public SablefishGearFactory(
-            double catchability,
-            double retentionInflection,
-            double retentionSlope,
-            double retentionAsymptote,
-            double litersOfGasConsumedPerHour) {
+        final double catchability,
+        final double retentionInflection,
+        final double retentionSlope,
+        final double retentionAsymptote,
+        final double litersOfGasConsumedPerHour
+    ) {
         this.averageCatchability = new FixedDoubleParameter(catchability);
         this.retentionInflection = new FixedDoubleParameter(retentionInflection);
         this.retentionSlope = new FixedDoubleParameter(retentionSlope);
@@ -113,20 +101,23 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      * @return the function result
      */
     @Override
-    public HomogeneousAbundanceGear apply(FishState state) {
-        MersenneTwisterFast random = state.getRandom();
+    public HomogeneousAbundanceGear apply(final FishState state) {
+        final MersenneTwisterFast random = state.getRandom();
         return new HomogeneousAbundanceGear(
-                litersOfGasConsumedPerHour.apply(random),
-                new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                selectivity.presentKey(state.getHopefullyUniqueID(),
-                                       () -> new ArrayFilter(
-                                               true, Arrays.copyOf(MALE, MALE.length),
-                                               Arrays.copyOf(FEMALE,FEMALE.length)
-                                       )),
-                new RetentionAbundanceFilter(true,
-                                             retentionInflection.apply(random),
-                                             retentionSlope.apply(random),
-                                             retentionAsymptote.apply(random), rounding)
+            litersOfGasConsumedPerHour.applyAsDouble(random),
+            new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
+            selectivity.presentKey(
+                state.getHopefullyUniqueID(),
+                () -> new ArrayFilter(
+                    true, Arrays.copyOf(MALE, MALE.length),
+                    Arrays.copyOf(FEMALE, FEMALE.length)
+                )
+            ),
+            new RetentionAbundanceFilter(true,
+                retentionInflection.applyAsDouble(random),
+                retentionSlope.applyAsDouble(random),
+                retentionAsymptote.applyAsDouble(random), rounding
+            )
 
         );
     }
@@ -146,7 +137,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionInflection Value to set for property 'retentionInflection'.
      */
-    public void setRetentionInflection(DoubleParameter retentionInflection) {
+    public void setRetentionInflection(final DoubleParameter retentionInflection) {
         this.retentionInflection = retentionInflection;
     }
 
@@ -164,7 +155,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionSlope Value to set for property 'retentionSlope'.
      */
-    public void setRetentionSlope(DoubleParameter retentionSlope) {
+    public void setRetentionSlope(final DoubleParameter retentionSlope) {
         this.retentionSlope = retentionSlope;
     }
 
@@ -182,7 +173,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionAsymptote Value to set for property 'retentionAsymptote'.
      */
-    public void setRetentionAsymptote(DoubleParameter retentionAsymptote) {
+    public void setRetentionAsymptote(final DoubleParameter retentionAsymptote) {
         this.retentionAsymptote = retentionAsymptote;
     }
 
@@ -200,20 +191,24 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      *
      * @param litersOfGasConsumedPerHour Value to set for property 'litersOfGasConsumedPerHour'.
      */
-    public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
+    public void setLitersOfGasConsumedPerHour(final DoubleParameter litersOfGasConsumedPerHour) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DoubleParameter getAverageCatchability() {
         return averageCatchability;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
 
@@ -231,7 +226,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 }

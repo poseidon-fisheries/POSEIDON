@@ -21,14 +21,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
 import com.google.common.base.Preconditions;
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -45,18 +42,13 @@ import java.util.WeakHashMap;
 public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
 
 
-
-    private AlgorithmFactory<? extends AdaptationProbability>
-            probability = new FixedProbabilityFactory(.2, .6);
-
-
-    private boolean yearly = false;
-
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-
+    private AlgorithmFactory<? extends AdaptationProbability>
+        probability = new FixedProbabilityFactory(.2, .6);
+    private boolean yearly = false;
     private DoubleParameter minimumGasPerLiter = new FixedDoubleParameter(0);
 
     private DoubleParameter maximumGasPerLiter = new FixedDoubleParameter(20);
@@ -74,83 +66,77 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      * @return the function result
      */
     @Override
-    public PeriodicUpdateGearStrategy apply(FishState model) {
+    public PeriodicUpdateGearStrategy apply(final FishState model) {
 
-        final double shock = shockSize.apply(model.getRandom());
-        final double minTrawlingSpeed = minimumGasPerLiter.apply(model.getRandom());
-        final double maxTrawlingSpeed = maximumGasPerLiter.apply(model.getRandom());
+        final double shock = shockSize.applyAsDouble(model.getRandom());
+        final double minTrawlingSpeed = minimumGasPerLiter.applyAsDouble(model.getRandom());
+        final double maxTrawlingSpeed = maximumGasPerLiter.applyAsDouble(model.getRandom());
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(model))
-        {
+        if (!weakStateMap.contains(model)) {
             weakStateMap.add(model);
             addDataGatherers(model);
             assert weakStateMap.contains(model);
         }
 
         return new PeriodicUpdateGearStrategy(
-                yearly,
-                new RandomStep<Gear>() {
-                    @Override
-                    public Gear randomStep(
-                            FishState state,
-                            MersenneTwisterFast random, Fisher fisher,
-                            Gear current1) {
-                        Preconditions.checkArgument(current1.getClass().equals(RandomCatchabilityTrawl.class),
-                                                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear");
-                        assert current1.getClass().equals(RandomCatchabilityTrawl.class);
-                        RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
+            yearly,
+            (state, random, fisher, current1) -> {
+                Preconditions.checkArgument(
+                    current1.getClass().equals(RandomCatchabilityTrawl.class),
+                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear"
+                );
+                assert current1.getClass().equals(RandomCatchabilityTrawl.class);
+                final RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 
-                        double currentShock = (random.nextDouble()-0.5) * shock * (maxTrawlingSpeed-minTrawlingSpeed);
-                        if (random.nextBoolean())
-                            currentShock -= currentShock;
-                        double newMileage = current.getGasPerHourFished() + currentShock;
-                        newMileage = Math.max(newMileage, minTrawlingSpeed);
-                        newMileage = Math.min(newMileage, maxTrawlingSpeed);
-                        return new RandomCatchabilityTrawl(
-                                current.getCatchabilityMeanPerSpecie(),
-                                current.getCatchabilityDeviationPerSpecie(),
-                                newMileage
-                        );
-                    }
-                }
-                ,
-                probability.apply(model)
+                double currentShock = (random.nextDouble() - 0.5) * shock * (maxTrawlingSpeed - minTrawlingSpeed);
+                if (random.nextBoolean())
+                    currentShock -= currentShock;
+                double newMileage = current.getGasPerHourFished() + currentShock;
+                newMileage = Math.max(newMileage, minTrawlingSpeed);
+                newMileage = Math.min(newMileage, maxTrawlingSpeed);
+                return new RandomCatchabilityTrawl(
+                    current.getCatchabilityMeanPerSpecie(),
+                    current.getCatchabilityDeviationPerSpecie(),
+                    newMileage
+                );
+            }
+            ,
+            probability.apply(model)
 
         );
     }
 
-    private void addDataGatherers(FishState model) {
+    private void addDataGatherers(final FishState model) {
         //first add data gatherers
         model.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", state -> {
-            double size =state.getFishers().size();
-            if(size == 0)
+            final double size = state.getFishers().size();
+            if (size == 0)
                 return Double.NaN;
-            else
-            {
+            else {
                 double total = 0;
-                for(Fisher fisher1 : state.getFishers())
-                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
-                return total/size;
+                for (final Fisher fisher1 : state.getFishers())
+                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
+                return total / size;
             }
         }, Double.NaN);
 
 
-        for(int i=0; i<model.getSpecies().size(); i++)
-        {
+        for (int i = 0; i < model.getSpecies().size(); i++) {
             final int finalI = i;
             model.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
-                                                     state -> {
-                                                         double size = state.getFishers().size();
-                                                         if (size == 0)
-                                                             return Double.NaN;
-                                                         else {
-                                                             double total = 0;
-                                                             for (Fisher fisher1 : state.getFishers())
-                                                                 total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
-                                                             return total / size;
-                                                         }
-                                                     }, Double.NaN);
+                state -> {
+                    final double size = state.getFishers().size();
+                    if (size == 0)
+                        return Double.NaN;
+                    else {
+                        double total = 0;
+                        for (final Fisher fisher1 : state.getFishers())
+                            total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                        return total / size;
+                    }
+                }, Double.NaN
+            );
         }
     }
 
@@ -169,7 +155,8 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        final AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 
@@ -187,7 +174,7 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      *
      * @param yearly Value to set for property 'yearly'.
      */
-    public void setYearly(boolean yearly) {
+    public void setYearly(final boolean yearly) {
         this.yearly = yearly;
     }
 
@@ -205,7 +192,7 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      *
      * @param minimumGasPerLiter Value to set for property 'minimumGasPerLiter'.
      */
-    public void setMinimumGasPerLiter(DoubleParameter minimumGasPerLiter) {
+    public void setMinimumGasPerLiter(final DoubleParameter minimumGasPerLiter) {
         this.minimumGasPerLiter = minimumGasPerLiter;
     }
 
@@ -223,7 +210,7 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      *
      * @param maximumGasPerLiter Value to set for property 'maximumGasPerLiter'.
      */
-    public void setMaximumGasPerLiter(DoubleParameter maximumGasPerLiter) {
+    public void setMaximumGasPerLiter(final DoubleParameter maximumGasPerLiter) {
         this.maximumGasPerLiter = maximumGasPerLiter;
     }
 
@@ -241,7 +228,7 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
      *
      * @param shockSize Value to set for property 'shockSize'.
      */
-    public void setShockSize(DoubleParameter shockSize) {
+    public void setShockSize(final DoubleParameter shockSize) {
         this.shockSize = shockSize;
     }
 }

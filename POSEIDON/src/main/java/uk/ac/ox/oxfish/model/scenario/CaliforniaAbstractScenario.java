@@ -634,11 +634,11 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
             for(int id=0;id<entry.getValue();id++)
             {
-                final double speed = cruiseSpeedInKph.apply(random);
-                final double capacity = holdSizePerBoat.apply(random);
+                final double speed = cruiseSpeedInKph.applyAsDouble(random);
+                final double capacity = holdSizePerBoat.applyAsDouble(random);
                 final double engineWeight = 10000;
-                final double mileage = literPerKilometer.apply(random);
-                final double fuelCapacity = fuelTankInLiters.apply(random);
+                final double mileage = literPerKilometer.applyAsDouble(random);
+                final double fuelCapacity = fuelTankInLiters.applyAsDouble(random);
 
                 Gear fisherGear = gear.apply(model);
 
@@ -669,7 +669,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 log.add(newFisher,model);
                 //add other trip costs
                 newFisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCosts.apply(random))
+                        new HourlyCost(hourlyTravellingCosts.applyAsDouble(random))
                 );
             }
 
@@ -695,10 +695,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 gearStrategy,
                 weatherStrategy,
                 () -> new Boat(10, 10, new Engine(0,
-                                                  literPerKilometer.apply(random),
-                                                  cruiseSpeedInKph.apply(random)),
-                               new FuelTank(fuelTankInLiters.apply(random))),
-                () -> new Hold(holdSizePerBoat.apply(random), biology),
+                                                  literPerKilometer.applyAsDouble(random),
+                                                  cruiseSpeedInKph.applyAsDouble(random)),
+                               new FuelTank(fuelTankInLiters.applyAsDouble(random))),
+                () -> new Hold(holdSizePerBoat.applyAsDouble(random), biology),
                 gear,
 
                 fisherCounter);

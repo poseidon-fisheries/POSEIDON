@@ -25,21 +25,17 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.function.Predicate;
-
 /**
  * creates a per-trip iterative destination strategy
  * Created by carrknight on 6/19/15.
  */
-public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
-{
+public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy> {
 
 
     DoubleParameter stepSize = new FixedDoubleParameter(5d);
@@ -53,22 +49,24 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
      * @return the function result
      */
     @Override
-    public PerTripIterativeDestinationStrategy apply(FishState state) {
+    public PerTripIterativeDestinationStrategy apply(final FishState state) {
 
-        MersenneTwisterFast random = state.getRandom();
-        NauticalMap map = state.getMap();
+        final MersenneTwisterFast random = state.getRandom();
+        final NauticalMap map = state.getMap();
 
 
-        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
-                                                                           20);
+        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(
+            (int) stepSize.applyAsDouble(random),
+            20
+        );
         return new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map, random), algorithm, 1d-stayingStillProbability.apply(random), 0d,
-                new HourlyProfitInTripObjective(), new Predicate<SeaTile>() {
-            @Override
-            public boolean test(SeaTile a) {
-                return true;
-            }
-        });
+            new FavoriteDestinationStrategy(map, random),
+            algorithm,
+            1d - stayingStillProbability.applyAsDouble(random),
+            0d,
+            new HourlyProfitInTripObjective(),
+            a -> true
+        );
 
     }
 
@@ -76,7 +74,7 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
         return stepSize;
     }
 
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
 
@@ -85,7 +83,7 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
         return stayingStillProbability;
     }
 
-    public void setStayingStillProbability(DoubleParameter stayingStillProbability) {
+    public void setStayingStillProbability(final DoubleParameter stayingStillProbability) {
         this.stayingStillProbability = stayingStillProbability;
     }
 }

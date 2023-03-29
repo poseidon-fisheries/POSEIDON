@@ -53,7 +53,7 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
      * @param averageCatchability Value to set for property 'averageCatchability'.
      */
     @Override
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.catchability = averageCatchability;
     }
 
@@ -64,11 +64,11 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
      * @return the function result
      */
     @Override
-    public HomogeneousAbundanceGear apply(FishState state) {
+    public HomogeneousAbundanceGear apply(final FishState state) {
 
         return new HomogeneousAbundanceGear(
-                litersOfGasConsumed.apply(state.getRandom()),
-                new FixedProportionFilter(getAverageCatchability().apply(state.getRandom()), rounding)
+            litersOfGasConsumed.applyAsDouble(state.getRandom()),
+            new FixedProportionFilter(getAverageCatchability().applyAsDouble(state.getRandom()), rounding)
         );
     }
 
@@ -87,7 +87,7 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
      *
      * @param litersOfGasConsumed Value to set for property 'litersOfGasConsumed'.
      */
-    public void setLitersOfGasConsumed(DoubleParameter litersOfGasConsumed) {
+    public void setLitersOfGasConsumed(final DoubleParameter litersOfGasConsumed) {
         this.litersOfGasConsumed = litersOfGasConsumed;
     }
 
@@ -106,7 +106,7 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 }

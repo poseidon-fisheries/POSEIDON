@@ -53,12 +53,12 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
      * @return the function result
      */
     @Override
-    public AgeLimitedConstantRateDiffuser apply(FishState state) {
+    public AgeLimitedConstantRateDiffuser apply(final FishState state) {
         return new AgeLimitedConstantRateDiffuser(
-                diffusingRange.apply(state.getRandom()).intValue(),
-                diffusingRate.apply(state.getRandom()),
-                smallestMovingBin.apply(state.getRandom()).intValue(),
-                largestMovingBin.apply(state.getRandom()).intValue()
+            (int) diffusingRange.applyAsDouble(state.getRandom()),
+            diffusingRate.applyAsDouble(state.getRandom()),
+            (int) smallestMovingBin.applyAsDouble(state.getRandom()),
+            (int) largestMovingBin.applyAsDouble(state.getRandom())
         );
     }
 
@@ -73,12 +73,30 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
     }
 
     /**
+     * Setter for property 'diffusingRate'.
+     *
+     * @param diffusingRate Value to set for property 'diffusingRate'.
+     */
+    public void setDiffusingRate(final DoubleParameter diffusingRate) {
+        this.diffusingRate = diffusingRate;
+    }
+
+    /**
      * Getter for property 'diffusingRange'.
      *
      * @return Value for property 'diffusingRange'.
      */
     public DoubleParameter getDiffusingRange() {
         return diffusingRange;
+    }
+
+    /**
+     * Setter for property 'diffusingRange'.
+     *
+     * @param diffusingRange Value to set for property 'diffusingRange'.
+     */
+    public void setDiffusingRange(final DoubleParameter diffusingRange) {
+        this.diffusingRange = diffusingRange;
     }
 
     /**
@@ -91,6 +109,15 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
     }
 
     /**
+     * Setter for property 'smallestMovingBin'.
+     *
+     * @param smallestMovingBin Value to set for property 'smallestMovingBin'.
+     */
+    public void setSmallestMovingBin(final DoubleParameter smallestMovingBin) {
+        this.smallestMovingBin = smallestMovingBin;
+    }
+
+    /**
      * Getter for property 'largestMovingBin'.
      *
      * @return Value for property 'largestMovingBin'.
@@ -100,38 +127,11 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
     }
 
     /**
-     * Setter for property 'diffusingRate'.
-     *
-     * @param diffusingRate Value to set for property 'diffusingRate'.
-     */
-    public void setDiffusingRate(DoubleParameter diffusingRate) {
-        this.diffusingRate = diffusingRate;
-    }
-
-    /**
-     * Setter for property 'diffusingRange'.
-     *
-     * @param diffusingRange Value to set for property 'diffusingRange'.
-     */
-    public void setDiffusingRange(DoubleParameter diffusingRange) {
-        this.diffusingRange = diffusingRange;
-    }
-
-    /**
-     * Setter for property 'smallestMovingBin'.
-     *
-     * @param smallestMovingBin Value to set for property 'smallestMovingBin'.
-     */
-    public void setSmallestMovingBin(DoubleParameter smallestMovingBin) {
-        this.smallestMovingBin = smallestMovingBin;
-    }
-
-    /**
      * Setter for property 'largestMovingBin'.
      *
      * @param largestMovingBin Value to set for property 'largestMovingBin'.
      */
-    public void setLargestMovingBin(DoubleParameter largestMovingBin) {
+    public void setLargestMovingBin(final DoubleParameter largestMovingBin) {
         this.largestMovingBin = largestMovingBin;
     }
 }

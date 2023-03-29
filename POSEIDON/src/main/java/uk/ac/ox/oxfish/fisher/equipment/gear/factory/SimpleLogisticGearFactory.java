@@ -28,28 +28,28 @@ public class SimpleLogisticGearFactory implements HomogeneousGearFactory {
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
 
-
-
     @Override
-    public HomogeneousAbundanceGear apply(FishState fishState) {
+    public HomogeneousAbundanceGear apply(final FishState fishState) {
 
-        MersenneTwisterFast random = fishState.getRandom();
+        final MersenneTwisterFast random = fishState.getRandom();
 
         return new HomogeneousAbundanceGear(
-                litersOfGasConsumedPerHour.apply(random),
-                new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                new LogisticSimpleFilter(
-                        true,
-                        rounding,
-                        selexParameter1.apply(random),
-                        selexParameter2.apply(random)));
+            litersOfGasConsumedPerHour.applyAsDouble(random),
+            new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
+            new LogisticSimpleFilter(
+                true,
+                rounding,
+                selexParameter1.applyAsDouble(random),
+                selexParameter2.applyAsDouble(random)
+            )
+        );
     }
 
     public boolean isRounding() {
         return rounding;
     }
 
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 
@@ -57,7 +57,7 @@ public class SimpleLogisticGearFactory implements HomogeneousGearFactory {
         return selexParameter1;
     }
 
-    public void setSelexParameter1(DoubleParameter selexParameter1) {
+    public void setSelexParameter1(final DoubleParameter selexParameter1) {
         this.selexParameter1 = selexParameter1;
     }
 
@@ -65,7 +65,7 @@ public class SimpleLogisticGearFactory implements HomogeneousGearFactory {
         return selexParameter2;
     }
 
-    public void setSelexParameter2(DoubleParameter selexParameter2) {
+    public void setSelexParameter2(final DoubleParameter selexParameter2) {
         this.selexParameter2 = selexParameter2;
     }
 
@@ -74,7 +74,7 @@ public class SimpleLogisticGearFactory implements HomogeneousGearFactory {
         return litersOfGasConsumedPerHour;
     }
 
-    public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
+    public void setLitersOfGasConsumedPerHour(final DoubleParameter litersOfGasConsumedPerHour) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
     }
 
@@ -84,7 +84,7 @@ public class SimpleLogisticGearFactory implements HomogeneousGearFactory {
     }
 
     @Override
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
 }

@@ -41,21 +41,21 @@ import java.util.function.Supplier;
 /**
  * Created by carrknight on 7/17/17.
  */
-public abstract class  BarebonesLogitDestinationFactory implements
-        AlgorithmFactory<LogitDestinationStrategy>{
+public abstract class BarebonesLogitDestinationFactory implements
+    AlgorithmFactory<LogitDestinationStrategy> {
     /**
      * everybody shares the parent same destination logit strategy
      */
-    private final Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String, MapDiscretization> discretizationLocker = new Locker<>();
     protected AlgorithmFactory<? extends MapDiscretizer> discretizer =
-            new CentroidMapFileFactory();
+        new CentroidMapFileFactory();
     /**
      * intercept of dummy variable (I have been here in the past 90 days)
      */
     private DoubleParameter habitIntercept =
-            new FixedDoubleParameter(2.53163185);
+        new FixedDoubleParameter(2.53163185);
     private DoubleParameter distanceInKm =
-            new FixedDoubleParameter(-0.00759009);
+        new FixedDoubleParameter(-0.00759009);
     private DoubleParameter habitPeriodInDays = new FixedDoubleParameter(90);
     private boolean automaticallyAvoidMPA = true;
     private boolean automaticallyAvoidWastelands = true;
@@ -66,69 +66,72 @@ public abstract class  BarebonesLogitDestinationFactory implements
      * @param state the function argument
      * @return the function result
      */
-    public LogitDestinationStrategy apply(FishState state) {
+    public LogitDestinationStrategy apply(final FishState state) {
         //create the discretization
-        MapDiscretization discretization = discretizationLocker.presentKey(
-                state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
-                    @Override
-                    public MapDiscretization get() {
-                        MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                        MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                        toReturn.discretize(state.getMap());
-                        return toReturn;
+        final MapDiscretization discretization = discretizationLocker.presentKey(
+            state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
+                @Override
+                public MapDiscretization get() {
+                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                    toReturn.discretize(state.getMap());
+                    return toReturn;
 
-                    }
                 }
+            }
         );
 
         //every area is valid
-        int areas = discretization.getNumberOfGroups();
-        List<Integer> validAreas = new LinkedList<>();
-        for(int i=0; i<areas; i++)
+        final int areas = discretization.getNumberOfGroups();
+        final List<Integer> validAreas = new LinkedList<>();
+        for (int i = 0; i < areas; i++)
             validAreas.add(i);
 
 
-        double[][] betas = buildBetas(state, areas, validAreas);
+        final double[][] betas = buildBetas(state, areas, validAreas);
 
-        ObservationExtractor[][] extractors = buildExtractors(state, discretization, areas, betas);
+        final ObservationExtractor[][] extractors = buildExtractors(state, discretization, areas, betas);
 
 
         automaticallyAvoidMPA = true;
         automaticallyAvoidWastelands = true;
         return new LogitDestinationStrategy(
-                betas,
-                extractors,
-                validAreas,
-                discretization,
-                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                state.getRandom(),
-                automaticallyAvoidMPA, automaticallyAvoidWastelands);
+            betas,
+            extractors,
+            validAreas,
+            discretization,
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+            state.getRandom(),
+            automaticallyAvoidMPA, automaticallyAvoidWastelands
+        );
 
 
     }
 
     @NotNull
     protected ObservationExtractor[][] buildExtractors(
-            FishState state, MapDiscretization discretization, int areas, double[][] betas) {
+        final FishState state, final MapDiscretization discretization, final int areas, final double[][] betas
+    ) {
         //get the extractors
-        ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
-        ObservationExtractor[] commonExtractor = new ObservationExtractor[]{
-                buildHabitExtractor(discretization,
-                                    getHabitPeriodInDays().apply(state.getRandom()).intValue()),
-                new PortDistanceExtractor()
+        final ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
+        final ObservationExtractor[] commonExtractor = new ObservationExtractor[]{
+            buildHabitExtractor(
+                discretization,
+                (int) getHabitPeriodInDays().applyAsDouble(state.getRandom())
+            ),
+            new PortDistanceExtractor()
         };
-        for(int i=0; i<areas; i++)
+        for (int i = 0; i < areas; i++)
             extractors[i] = commonExtractor;
         return extractors;
     }
 
-    protected double[][] buildBetas(FishState state, int areas, List<Integer> validAreas) {
+    protected double[][] buildBetas(final FishState state, final int areas, final List<Integer> validAreas) {
         //the same parameters for all the choices
-        double[][] betas = new double[areas][2];
-        betas[0][0] = habitIntercept.apply(state.getRandom());
-        betas[0][1] = distanceInKm.apply(state.getRandom());
-        for(int i=1; i<areas; i++)
-        {
+        final double[][] betas = new double[areas][2];
+        betas[0][0] = habitIntercept.applyAsDouble(state.getRandom());
+        betas[0][1] = distanceInKm.applyAsDouble(state.getRandom());
+        for (int i = 1; i < areas; i++) {
             betas[i][0] = betas[0][0];
             betas[i][1] = betas[0][1];
         }
@@ -152,7 +155,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
      *
      * @param habitIntercept Value to set for property 'habitIntercept'.
      */
-    public void setHabitIntercept(DoubleParameter habitIntercept) {
+    public void setHabitIntercept(final DoubleParameter habitIntercept) {
         this.habitIntercept = habitIntercept;
     }
 
@@ -170,7 +173,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
      *
      * @param distanceInKm Value to set for property 'distanceInKm'.
      */
-    public void setDistanceInKm(DoubleParameter distanceInKm) {
+    public void setDistanceInKm(final DoubleParameter distanceInKm) {
         this.distanceInKm = distanceInKm;
     }
 
@@ -189,7 +192,8 @@ public abstract class  BarebonesLogitDestinationFactory implements
      * @param discretizer Value to set for property 'discretizer'.
      */
     public void setDiscretizer(
-            AlgorithmFactory<? extends MapDiscretizer> discretizer) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretizer
+    ) {
         this.discretizer = discretizer;
     }
 
@@ -207,7 +211,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
      *
      * @param habitPeriodInDays Value to set for property 'habitPeriodInDays'.
      */
-    public void setHabitPeriodInDays(DoubleParameter habitPeriodInDays) {
+    public void setHabitPeriodInDays(final DoubleParameter habitPeriodInDays) {
         this.habitPeriodInDays = habitPeriodInDays;
     }
 
@@ -226,7 +230,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
      *
      * @param automaticallyAvoidMPA Value to set for property 'automaticallyAvoidMPA'.
      */
-    public void setAutomaticallyAvoidMPA(boolean automaticallyAvoidMPA) {
+    public void setAutomaticallyAvoidMPA(final boolean automaticallyAvoidMPA) {
         this.automaticallyAvoidMPA = automaticallyAvoidMPA;
     }
 
@@ -244,7 +248,7 @@ public abstract class  BarebonesLogitDestinationFactory implements
      *
      * @param automaticallyAvoidWastelands Value to set for property 'automaticallyAvoidWastelands'.
      */
-    public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
+    public void setAutomaticallyAvoidWastelands(final boolean automaticallyAvoidWastelands) {
         this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
     }
 }

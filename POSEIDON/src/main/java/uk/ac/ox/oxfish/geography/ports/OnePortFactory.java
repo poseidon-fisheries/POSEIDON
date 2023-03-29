@@ -48,10 +48,12 @@ public class OnePortFactory implements AlgorithmFactory<OnePortInitializer> {
      * @return the function result
      */
     @Override
-    public OnePortInitializer apply(FishState fishState) {
+    public OnePortInitializer apply(final FishState fishState) {
 
-        return new OnePortInitializer(portPositionX.apply(fishState.getRandom()).intValue(),
-                                      portPositionY.apply(fishState.getRandom()).intValue());
+        return new OnePortInitializer(
+            (int) portPositionX.applyAsDouble(fishState.getRandom()),
+            (int) portPositionY.applyAsDouble(fishState.getRandom())
+        );
     }
 
 
@@ -69,7 +71,7 @@ public class OnePortFactory implements AlgorithmFactory<OnePortInitializer> {
      *
      * @param portPositionX Value to set for property 'portPositionX'.
      */
-    public void setPortPositionX(DoubleParameter portPositionX) {
+    public void setPortPositionX(final DoubleParameter portPositionX) {
         this.portPositionX = portPositionX;
     }
 
@@ -87,7 +89,7 @@ public class OnePortFactory implements AlgorithmFactory<OnePortInitializer> {
      *
      * @param portPositionY Value to set for property 'portPositionY'.
      */
-    public void setPortPositionY(DoubleParameter portPositionY) {
+    public void setPortPositionY(final DoubleParameter portPositionY) {
         this.portPositionY = portPositionY;
     }
 }

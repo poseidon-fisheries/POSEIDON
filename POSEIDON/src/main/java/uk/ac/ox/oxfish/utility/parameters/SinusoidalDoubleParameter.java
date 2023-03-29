@@ -49,7 +49,7 @@ public class SinusoidalDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast)
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast)
     {
 
         double toReturn = Math.sin(2 * Math.PI * step / frequency);

@@ -17,17 +17,8 @@ import java.util.Map;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
-    private int targetYear;
-
-    public int getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(final int targetYear) {
-        this.targetYear = targetYear;
-    }
-
     private final Locker<FishState, Map> catchSamplerLocker = new Locker<>();
+    private int targetYear;
     /**
      * object used to draw catches for DEL and NOA
      */
@@ -84,7 +75,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private boolean uniqueCatchSamplerForEachStrategy = false;
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
     private LocationValuesSupplier locationValuesSupplier;
-
     public EPOPlannedStrategyFlexibleFactory() {
     }
     public EPOPlannedStrategyFlexibleFactory(
@@ -101,6 +91,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
+    }
+
+    public int getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final int targetYear) {
+        this.targetYear = targetYear;
     }
 
     public InputPath getActionWeightsFile() {
@@ -132,20 +130,20 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             ,
             PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear, actionWeightsFile.get()),
             GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear, maxTripDurationFile.get()),
-            additionalHourlyDelayDolphinSets.apply(state.getRandom()),
-            additionalHourlyDelayDeployment.apply(state.getRandom()),
-            additionalHourlyDelayNonAssociatedSets.apply(state.getRandom()),
-            ownFadActionWeightBias.apply(state.getRandom()),
-            deploymentBias.apply(state.getRandom()),
-            noaBias.apply(state.getRandom()),
-            minimumValueOpportunisticFadSets.apply(state.getRandom()),
-            hoursWastedOnFailedSearches.apply(state.getRandom()),
-            planningHorizonInHours.apply(state.getRandom()),
-            minimumPercentageOfTripDurationAllowed.apply(state.getRandom()),
+            additionalHourlyDelayDolphinSets.applyAsDouble(state.getRandom()),
+            additionalHourlyDelayDeployment.applyAsDouble(state.getRandom()),
+            additionalHourlyDelayNonAssociatedSets.applyAsDouble(state.getRandom()),
+            ownFadActionWeightBias.applyAsDouble(state.getRandom()),
+            deploymentBias.applyAsDouble(state.getRandom()),
+            noaBias.applyAsDouble(state.getRandom()),
+            minimumValueOpportunisticFadSets.applyAsDouble(state.getRandom()),
+            hoursWastedOnFailedSearches.applyAsDouble(state.getRandom()),
+            planningHorizonInHours.applyAsDouble(state.getRandom()),
+            minimumPercentageOfTripDurationAllowed.applyAsDouble(state.getRandom()),
             noaSetsCanPoachFads,
             purgeIllegalActionsImmediately,
-            noaSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
-            delSetsRangeInSeatiles.apply(state.getRandom()).intValue(),
+            (int) noaSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
+            (int) delSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             fadModuleFactory,
             locationValuesSupplier.get()
         );

@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyProfitExtractor;
-import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
@@ -41,15 +40,13 @@ import java.util.function.Supplier;
  * Logit destination strategy using RPUE - travel costs with full knowledge
  * Created by carrknight on 2/6/17.
  */
-public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestinationStrategy>
-{
-
+public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestinationStrategy> {
 
 
     /**
      * everybody shares the parent same destination logit strategy
      */
-    private Locker<String,MapDiscretization> discretizationLocker = new Locker<>();
+    private final Locker<String, MapDiscretization> discretizationLocker = new Locker<>();
 
 
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new IdentityDiscretizerFactory();
@@ -58,7 +55,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     private DoubleParameter profitBeta = new FixedDoubleParameter(1d);
     private boolean automaticallyAvoidMPA = true;
     private boolean automaticallyAvoidWastelands = true;
-    private DoubleParameter hoursOut = new FixedDoubleParameter(5*24d);
+    private DoubleParameter hoursOut = new FixedDoubleParameter(5 * 24d);
 
 
     /**
@@ -68,64 +65,65 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      * @return the function result
      */
     @Override
-    public LogitDestinationStrategy apply(FishState state) {
+    public LogitDestinationStrategy apply(final FishState state) {
 
-        MapDiscretization discretization = discretizationLocker.
-                presentKey(
-                        state.getHopefullyUniqueID(),
-                        new Supplier<MapDiscretization>()
-                        {
-                            @Override
-                            public MapDiscretization get() {
+        final MapDiscretization discretization = discretizationLocker.
+            presentKey(
+                state.getHopefullyUniqueID(),
+                new Supplier<MapDiscretization>() {
+                    @Override
+                    public MapDiscretization get() {
 
-                                MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                                MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                                toReturn.discretize(state.getMap());
-                                return toReturn;
-                            }
-                        }
-                );
+                        final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                        final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                        toReturn.discretize(state.getMap());
+                        return toReturn;
+                    }
+                }
+            );
 
 
         //betas are just +1 for revenue and -1 for gas costs
-        int numberOfGroups = discretization.getNumberOfGroups();
-        double[][] betas = new double[numberOfGroups][1];
+        final int numberOfGroups = discretization.getNumberOfGroups();
+        final double[][] betas = new double[numberOfGroups][1];
 
-        for(int i=0; i<numberOfGroups; i++)
-        {
-            betas[i][0] = profitBeta.apply(state.getRandom());;
+        for (int i = 0; i < numberOfGroups; i++) {
+            betas[i][0] = profitBeta.applyAsDouble(state.getRandom());
 
         }
 
         //use trip simulator (poorly) to simulate trips so you can figure out what revenues and costs are
         //0: revenue
         //1: gas costs
-        ObservationExtractor[][] extractors = buildRPUEExtractors(numberOfGroups,
-                                                                  hoursOut.apply(state.getRandom()));
+        final ObservationExtractor[][] extractors = buildRPUEExtractors(
+            numberOfGroups,
+            hoursOut.applyAsDouble(state.getRandom())
+        );
 
 
         //"names" are one to one
-        LinkedList<Integer> rowNames = new LinkedList<>();
-        for(int i=0; i<numberOfGroups; i++)
+        final LinkedList<Integer> rowNames = new LinkedList<>();
+        for (int i = 0; i < numberOfGroups; i++)
             rowNames.add(i);
 
         return
-                new LogitDestinationStrategy(
-                        betas,
-                        extractors,
-                        rowNames,
-                        discretization,
-                        new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                        state.getRandom(), automaticallyAvoidMPA, automaticallyAvoidWastelands);
+            new LogitDestinationStrategy(
+                betas,
+                extractors,
+                rowNames,
+                discretization,
+                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+                state.getRandom(), automaticallyAvoidMPA, automaticallyAvoidWastelands
+            );
 
 
     }
 
-    private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups, double hoursOut) {
-        ObservationExtractor[] commonExtractor = new ObservationExtractor[1];
+    private ObservationExtractor[][] buildRPUEExtractors(final int numberOfGroups, final double hoursOut) {
+        final ObservationExtractor[] commonExtractor = new ObservationExtractor[1];
         commonExtractor[0] = new SimulatedHourlyProfitExtractor(hoursOut);
-        ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];
-        for(int i=0; i<numberOfGroups; i++)
+        final ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];
+        for (int i = 0; i < numberOfGroups; i++)
             extractors[i] = commonExtractor;
         return extractors;
     }
@@ -146,7 +144,8 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      * @param discretizer Value to set for property 'discretizer'.
      */
     public void setDiscretizer(
-            AlgorithmFactory<? extends MapDiscretizer> discretizer) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretizer
+    ) {
         this.discretizer = discretizer;
     }
 
@@ -165,7 +164,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      *
      * @param profitBeta Value to set for property 'profitBeta'.
      */
-    public void setProfitBeta(DoubleParameter profitBeta) {
+    public void setProfitBeta(final DoubleParameter profitBeta) {
         this.profitBeta = profitBeta;
     }
 
@@ -183,7 +182,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      *
      * @param automaticallyAvoidMPA Value to set for property 'automaticallyAvoidMPA'.
      */
-    public void setAutomaticallyAvoidMPA(boolean automaticallyAvoidMPA) {
+    public void setAutomaticallyAvoidMPA(final boolean automaticallyAvoidMPA) {
         this.automaticallyAvoidMPA = automaticallyAvoidMPA;
     }
 
@@ -201,7 +200,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      *
      * @param automaticallyAvoidWastelands Value to set for property 'automaticallyAvoidWastelands'.
      */
-    public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
+    public void setAutomaticallyAvoidWastelands(final boolean automaticallyAvoidWastelands) {
         this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
     }
 
@@ -219,7 +218,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      *
      * @param hoursOut Value to set for property 'hoursOut'.
      */
-    public void setHoursOut(DoubleParameter hoursOut) {
+    public void setHoursOut(final DoubleParameter hoursOut) {
         this.hoursOut = hoursOut;
     }
 }

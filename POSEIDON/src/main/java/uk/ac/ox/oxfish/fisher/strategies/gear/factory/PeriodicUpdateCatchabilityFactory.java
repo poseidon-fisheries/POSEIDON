@@ -46,17 +46,13 @@ import java.util.WeakHashMap;
 public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
 
 
-    private AlgorithmFactory<? extends AdaptationProbability>
-            probability = new FixedProbabilityFactory(.2, 1);
-
-
-    private boolean yearly = true;
-
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-
+    private AlgorithmFactory<? extends AdaptationProbability>
+        probability = new FixedProbabilityFactory(.2, 1);
+    private boolean yearly = true;
     private DoubleParameter minimumCatchability = new FixedDoubleParameter(0.01);
 
     private DoubleParameter maximumCatchability = new FixedDoubleParameter(0.2);
@@ -71,73 +67,73 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      * Creates the gear
      */
     @Override
-    public PeriodicUpdateGearStrategy apply(FishState model) {
+    public PeriodicUpdateGearStrategy apply(final FishState model) {
 
         //size of our delta
-        final double shock = shockSize.apply(model.getRandom());
-        final double minCatchability = minimumCatchability.apply(model.getRandom());
-        final double maxCatchability = maximumCatchability.apply(model.getRandom());
+        final double shock = shockSize.applyAsDouble(model.getRandom());
+        final double minCatchability = minimumCatchability.applyAsDouble(model.getRandom());
+        final double maxCatchability = maximumCatchability.applyAsDouble(model.getRandom());
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(model))
-        {
+        if (!weakStateMap.contains(model)) {
             weakStateMap.add(model);
             addDataGatherers(model);
             assert weakStateMap.contains(model);
         }
 
         return new PeriodicUpdateGearStrategy(
-                yearly,
-                new RandomStep<Gear>() {
-                    @Override
-                    public Gear randomStep(
-                            FishState state, MersenneTwisterFast random, Fisher fisher,
-                            Gear current1) {
-                        Preconditions.checkArgument(current1.getClass().equals(RandomCatchabilityTrawl.class),
-                                                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear while we got " +
-                                                            current1.getClass()
-                        );
-                        assert current1.getClass().equals(RandomCatchabilityTrawl.class);
-                        RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
+            yearly,
+            new RandomStep<Gear>() {
+                @Override
+                public Gear randomStep(
+                    final FishState state, final MersenneTwisterFast random, final Fisher fisher,
+                    final Gear current1
+                ) {
+                    Preconditions.checkArgument(
+                        current1.getClass().equals(RandomCatchabilityTrawl.class),
+                        "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear while we got " +
+                            current1.getClass()
+                    );
+                    assert current1.getClass().equals(RandomCatchabilityTrawl.class);
+                    final RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 
-                        double[] original = current.getCatchabilityMeanPerSpecie();
-                        double[] catchability = Arrays.copyOf(original, original.length);
-                        for(int i = 0; i< original.length; i++)
-                        {
-                            double currentShock = random.nextDouble() * shock * (maxCatchability-minCatchability);
-                            if (random.nextBoolean())
-                                currentShock -= currentShock;
-                            catchability[i] = original[i] + currentShock;
-                            catchability[i] = Math.max(catchability[i], minCatchability);
-                            catchability[i] = Math.min(catchability[i], maxCatchability);
+                    final double[] original = current.getCatchabilityMeanPerSpecie();
+                    final double[] catchability = Arrays.copyOf(original, original.length);
+                    for (int i = 0; i < original.length; i++) {
+                        double currentShock = random.nextDouble() * shock * (maxCatchability - minCatchability);
+                        if (random.nextBoolean())
+                            currentShock -= currentShock;
+                        catchability[i] = original[i] + currentShock;
+                        catchability[i] = Math.max(catchability[i], minCatchability);
+                        catchability[i] = Math.min(catchability[i], maxCatchability);
 
-                        }
-                        return new RandomCatchabilityTrawl(
-                                catchability,
-                                current.getCatchabilityDeviationPerSpecie(),
-                                current.getGasPerHourFished()
-                        );
                     }
+                    return new RandomCatchabilityTrawl(
+                        catchability,
+                        current.getCatchabilityDeviationPerSpecie(),
+                        current.getGasPerHourFished()
+                    );
                 }
-                ,
-                probability.apply(model)
+            }
+            ,
+            probability.apply(model)
 
         );
     }
 
-    private void addDataGatherers(FishState model) {
+    private void addDataGatherers(final FishState model) {
         //start collecting red catchability and blue catchability
-        for(int species = 0; species<model.getSpecies().size(); species++) {
-            int i = species;
-            model.getYearlyDataSet().registerGatherer(model.getSpecies().get(species)+ " Catchability", state1 -> {
-                double size = state1.getFishers().size();
+        for (int species = 0; species < model.getSpecies().size(); species++) {
+            final int i = species;
+            model.getYearlyDataSet().registerGatherer(model.getSpecies().get(species) + " Catchability", state1 -> {
+                final double size = state1.getFishers().size();
                 if (size == 0)
                     return Double.NaN;
                 else {
                     double total = 0;
-                    for (Fisher fisher1 : state1.getFishers())
+                    for (final Fisher fisher1 : state1.getFishers())
                         total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[i]
-                                ;
+                            ;
                     return total / size;
                 }
             }, Double.NaN);
@@ -161,7 +157,8 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        final AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 
@@ -179,7 +176,7 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      *
      * @param yearly Value to set for property 'yearly'.
      */
-    public void setYearly(boolean yearly) {
+    public void setYearly(final boolean yearly) {
         this.yearly = yearly;
     }
 
@@ -206,7 +203,7 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      *
      * @param minimumCatchability Value to set for property 'minimumCatchability'.
      */
-    public void setMinimumCatchability(DoubleParameter minimumCatchability) {
+    public void setMinimumCatchability(final DoubleParameter minimumCatchability) {
         this.minimumCatchability = minimumCatchability;
     }
 
@@ -224,7 +221,7 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      *
      * @param maximumCatchability Value to set for property 'maximumCatchability'.
      */
-    public void setMaximumCatchability(DoubleParameter maximumCatchability) {
+    public void setMaximumCatchability(final DoubleParameter maximumCatchability) {
         this.maximumCatchability = maximumCatchability;
     }
 
@@ -242,7 +239,7 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
      *
      * @param shockSize Value to set for property 'shockSize'.
      */
-    public void setShockSize(DoubleParameter shockSize) {
+    public void setShockSize(final DoubleParameter shockSize) {
         this.shockSize = shockSize;
     }
 }

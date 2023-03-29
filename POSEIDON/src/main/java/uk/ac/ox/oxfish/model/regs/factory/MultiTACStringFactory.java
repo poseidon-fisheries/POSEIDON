@@ -37,61 +37,29 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
 
     /**
+     * for each model there is only one quota object being shared
+     */
+    private final Locker<String, MultiQuotaRegulation> modelQuota = new Locker<>();
+    /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that ALL FISHERS gets 100 quotas a year
      * for species 0 and a random quota of 1 to 100 for species 2. The other species are then assumed NOT TO BE PROTECTED
      * by the quota (and can be fished out freely)
      */
     private String yearlyQuotaMaps = "0:500000";
 
-
-    /**
-     * for each model there is only one quota object being shared
-     */
-    private final Locker<String,MultiQuotaRegulation> modelQuota = new Locker<>();
-
-
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param state the function argument
-     * @return the function result
-     */
-    @Override
-    public MultiQuotaRegulation apply(FishState state)
-    {
-
-
-        return modelQuota.presentKey(state.getHopefullyUniqueID(),
-                                     new Supplier<MultiQuotaRegulation>() {
-                                         @Override
-                                         public MultiQuotaRegulation get() {
-                                             return  createInstance(
-                                                     state, MultiTACStringFactory.this.yearlyQuotaMaps);
-                                         }
-                                     });
-
-
-
-
-
-    }
-
-
-
     public static MultiQuotaRegulation createInstance(
-            FishState state, final String yearlyQuotaMaps)
-    {
+        FishState state, final String yearlyQuotaMaps
+    ) {
 
         double[] quotas = turnStringIntoQuotaArray(state, yearlyQuotaMaps);
 
         MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
-      //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
-      //  state.registerStartable(manager);
+        //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
+        //  state.registerStartable(manager);
 
         return regulations;
     }
-
 
     public static double[] turnStringIntoQuotaArray(FishState state, String yearlyQuotaMaps) {
         Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
@@ -102,14 +70,38 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         //start them as non-binding
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //go for each input and read the results
-        for(Map.Entry<String,String> input : quotasInputted.entrySet())
-        {
-            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
-            Preconditions.checkArgument(yearlyQuota>0, "quotas must start above 0!");
+        for (Map.Entry<String, String> input : quotasInputted.entrySet()) {
+            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
+                .applyAsDouble(state.getRandom());
+            Preconditions.checkArgument(yearlyQuota > 0, "quotas must start above 0!");
             Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;
         }
         return quotas;
+    }
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public MultiQuotaRegulation apply(FishState state) {
+
+
+        return modelQuota.presentKey(
+            state.getHopefullyUniqueID(),
+            new Supplier<MultiQuotaRegulation>() {
+                @Override
+                public MultiQuotaRegulation get() {
+                    return createInstance(
+                        state, MultiTACStringFactory.this.yearlyQuotaMaps);
+                }
+            }
+        );
+
+
     }
 
     public String getYearlyQuotaMaps() {

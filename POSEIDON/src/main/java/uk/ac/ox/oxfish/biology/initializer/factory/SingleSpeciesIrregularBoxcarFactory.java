@@ -16,37 +16,36 @@ public class SingleSpeciesIrregularBoxcarFactory extends SingleSpeciesBoxcarAbst
      * these would represent the "mid-point" of lengths that we are going to model. Fish would transition from
      * one to the other
      */
-    private List<Double> binnedLengthsInCm = Lists.newArrayList(10d,30d,60d);
-
+    private List<Double> binnedLengthsInCm = Lists.newArrayList(10d, 30d, 60d);
 
 
     @Override
-    protected GrowthBinByList generateBins(FishState state) {
-        double[] lengths = new double[binnedLengthsInCm.size()];
-        double[] weights = new double[binnedLengthsInCm.size()];
+    protected GrowthBinByList generateBins(final FishState state) {
+        final double[] lengths = new double[binnedLengthsInCm.size()];
+        final double[] weights = new double[binnedLengthsInCm.size()];
 
-        final Double alpha = getAllometricAlpha().apply(state.getRandom());
-        final Double beta = getAllometricBeta().apply(state.getRandom());
+        final Double alpha = getAllometricAlpha().applyAsDouble(state.getRandom());
+        final Double beta = getAllometricBeta().applyAsDouble(state.getRandom());
 
         for (int bin = 0; bin < lengths.length; bin++) {
             lengths[bin] = binnedLengthsInCm.get(bin);
 
             weights[bin] = EquallySpacedBertalanffyFactory.bertnalanffyLengthToWeight(
-                    alpha,
-                    beta,
-                    lengths[bin]
+                alpha,
+                beta,
+                lengths[bin]
             );
         }
         return new GrowthBinByList(
-                1,
-                lengths,
-                weights,
-                EquallySpacedBertalanffyFactory.bertalanffyLengthAtAge(
-                        getLInfinity().apply(state.getRandom()),
-                        0,
-                        getK().apply(state.getRandom()),
-                        EquallySpacedBertalanffyFactory.MAXIMUM_AGE_TRACKED
-                )
+            1,
+            lengths,
+            weights,
+            EquallySpacedBertalanffyFactory.bertalanffyLengthAtAge(
+                getLInfinity().applyAsDouble(state.getRandom()),
+                0,
+                getK().applyAsDouble(state.getRandom()),
+                EquallySpacedBertalanffyFactory.MAXIMUM_AGE_TRACKED
+            )
 
 
         );
@@ -57,7 +56,7 @@ public class SingleSpeciesIrregularBoxcarFactory extends SingleSpeciesBoxcarAbst
         return binnedLengthsInCm;
     }
 
-    public void setBinnedLengthsInCm(List<Double> binnedLengthsInCm) {
+    public void setBinnedLengthsInCm(final List<Double> binnedLengthsInCm) {
         this.binnedLengthsInCm = binnedLengthsInCm;
     }
 }

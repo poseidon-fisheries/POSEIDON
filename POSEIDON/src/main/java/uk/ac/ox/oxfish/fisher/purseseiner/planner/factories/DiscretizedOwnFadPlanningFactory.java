@@ -33,17 +33,17 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
     }
 
     @Override
-    public DiscretizedOwnFadCentroidPlanningModule apply(FishState state) {
+    public DiscretizedOwnFadCentroidPlanningModule apply(final FishState state) {
 
-        OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
             new MapDiscretization(discretization.apply(state)),
-            minimumValueFadSets.apply(state.getRandom()),
-            maxAllowableShear.apply(state.getRandom())
+            minimumValueFadSets.applyAsDouble(state.getRandom()),
+            maxAllowableShear.applyAsDouble(state.getRandom())
         );
 
         return new DiscretizedOwnFadCentroidPlanningModule(
             optionsGenerator,
-            distancePenalty.apply(state.getRandom())
+            distancePenalty.applyAsDouble(state.getRandom())
         );
 
     }
@@ -52,7 +52,7 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
         return discretization;
     }
 
-    public void setDiscretization(AlgorithmFactory<? extends MapDiscretizer> discretization) {
+    public void setDiscretization(final AlgorithmFactory<? extends MapDiscretizer> discretization) {
         this.discretization = discretization;
     }
 
@@ -60,7 +60,7 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
         return minimumValueFadSets;
     }
 
-    public void setMinimumValueFadSets(DoubleParameter minimumValueFadSets) {
+    public void setMinimumValueFadSets(final DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;
     }
 
@@ -68,7 +68,7 @@ public class DiscretizedOwnFadPlanningFactory implements AlgorithmFactory<Discre
         return distancePenalty;
     }
 
-    public void setDistancePenalty(DoubleParameter distancePenalty) {
+    public void setDistancePenalty(final DoubleParameter distancePenalty) {
         this.distancePenalty = distancePenalty;
     }
 

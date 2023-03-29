@@ -51,7 +51,7 @@ public class NormalDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         return mersenneTwisterFast.nextGaussian()*standardDeviation + mean;
     }
 

@@ -32,26 +32,26 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * affect all the quotas that were created before as well
  * Created by carrknight on 6/14/15.
  */
-public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
-{
+public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
     /**
      * This provides a static singleton instance that will be used when building the list of constructors in the
      * {@link uk.ac.ox.oxfish.model.regs.factory.Regulations} class, so all the TACs are forced to remain connected.
      */
     private static TACMonoFactory instance = new TACMonoFactory();
-    public static TACMonoFactory getInstance() { return instance; };
-
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<String,MonoQuotaRegulation> modelQuota = new Locker<>();
+    private final Locker<String, MonoQuotaRegulation> modelQuota = new Locker<>();
 
-
+    ;
     /**
      * the quota to use
      */
     private DoubleParameter quota = new FixedDoubleParameter(500000);
 
+    public static TACMonoFactory getInstance() {
+        return instance;
+    }
 
     /**
      * Creates a TAC and optionally the whole structure that keeps track of opportunity costs
@@ -64,24 +64,24 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     public MonoQuotaRegulation apply(FishState state) {
 
 
-        final Double yearlyQuota = quota.apply(state.random);
+        final Double yearlyQuota = quota.applyAsDouble(state.random);
         final MonoQuotaRegulation quotaRegulation =
-                modelQuota.presentKey(state.getHopefullyUniqueID(),
-                        () -> new MonoQuotaRegulation(yearlyQuota));
+            modelQuota.presentKey(
+                state.getHopefullyUniqueID(),
+                () -> new MonoQuotaRegulation(yearlyQuota)
+            );
 
         //if it has not been consumed (probably because the model still has to start) then:
-        if(quotaRegulation.getQuotaRemaining(0) > 0 &&
-                Math.abs(quotaRegulation.getQuotaRemaining(0)-quotaRegulation.getYearlyQuota())<.1)
+        if (quotaRegulation.getQuotaRemaining(0) > 0 &&
+            Math.abs(quotaRegulation.getQuotaRemaining(0) - quotaRegulation.getYearlyQuota()) < .1)
             quotaRegulation.setQuotaRemaining(0, yearlyQuota);
 
         //set yearly quota (notice that this will affect everyone)
         quotaRegulation.setYearlyQuota(yearlyQuota);
 
         //don't let quota remaining be above yearly quota though
-        if(quotaRegulation.getQuotaRemaining(0) > quotaRegulation.getYearlyQuota())
+        if (quotaRegulation.getQuotaRemaining(0) > quotaRegulation.getYearlyQuota())
             quotaRegulation.setQuotaRemaining(0, yearlyQuota);
-
-
 
 
         return quotaRegulation;

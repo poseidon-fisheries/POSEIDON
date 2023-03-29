@@ -40,125 +40,115 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
 
 
     /**
+     * the smallest x that is inside the box
+     */
+    private DoubleParameter lowestX = new FixedDoubleParameter(0);
+    /**
+     * the smallest y that is inside the box
+     */
+    private DoubleParameter lowestY = new FixedDoubleParameter(0);
+    /**
+     * the height of the box
+     */
+    private DoubleParameter boxHeight = new FixedDoubleParameter(10);
+    /**
+     * the width of the box
+     */
+    private DoubleParameter boxWidth = new FixedDoubleParameter(10d);
+    /**
+     * is the Species 0 also inside the box or not?
+     */
+    private boolean species0InsideTheBox = false;
+    /**
+     * max capacity for first species in each box
+     */
+    private DoubleParameter firstSpeciesCapacity = new FixedDoubleParameter(5000);
+    /**
+     * ratio of maxCapacitySecond/maxCapacityFirst
+     */
+    private DoubleParameter ratioFirstToSecondSpecies = new FixedDoubleParameter(1d);
+    /**
+     * fixes a limit on how much biomass can leave the sea-tile
+     */
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
+    /**
+     * how much of the differential between two seatile's biomass should be solved by movement in a single day
+     */
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
+
+
+    public TwoSpeciesBoxFactory() {
+    }
+
+    /**
      * Applies this function to the given argument.
      *
      * @param fishState the function argument
      * @return the function result
      */
     @Override
-    public GenericBiomassInitializer apply(FishState fishState) {
+    public GenericBiomassInitializer apply(final FishState fishState) {
 
 
-        double x = lowestX.apply(fishState.getRandom());
-        double y = lowestY.apply(fishState.getRandom());
-        double width = getBoxWidth().apply(fishState.getRandom());
-        double height = getBoxHeight().apply(fishState.getRandom());
+        final double x = lowestX.applyAsDouble(fishState.getRandom());
+        final double y = lowestY.applyAsDouble(fishState.getRandom());
+        final double width = getBoxWidth().applyAsDouble(fishState.getRandom());
+        final double height = getBoxHeight().applyAsDouble(fishState.getRandom());
 
 
-        return  new GenericBiomassInitializer(
+        return new GenericBiomassInitializer(
 
 
-                Lists.newArrayList(
-                        firstSpeciesCapacity,
-                        //this was a very stupid way of doing ratios I am carrying over for backward compatibility
-                        new DoubleParameter() {
-                            @Override
-                            public DoubleParameter makeCopy() {
-                                return this;
-                            }
+            Lists.newArrayList(
+                firstSpeciesCapacity,
+                //this was a very stupid way of doing ratios I am carrying over for backward compatibility
+                new DoubleParameter() {
+                    @Override
+                    public DoubleParameter makeCopy() {
+                        return this;
+                    }
 
-                            @Override
-                            public Double apply(MersenneTwisterFast mersenneTwisterFast) {
-                                Double ratio = ratioFirstToSecondSpecies.apply(mersenneTwisterFast);
-                                double firstSpecies = firstSpeciesCapacity.apply(mersenneTwisterFast);
-                                double secondSpeciesCapacity = 0;
-                                if(ratio == 1)
-                                    secondSpeciesCapacity = firstSpecies;
-                                else if(ratio>1)
-                                {
-                                    secondSpeciesCapacity = ratio* firstSpecies;
+                    @Override
+                    public double applyAsDouble(final MersenneTwisterFast mersenneTwisterFast) {
+                        final double ratio = ratioFirstToSecondSpecies.applyAsDouble(mersenneTwisterFast);
+                        final double firstSpecies = firstSpeciesCapacity.applyAsDouble(mersenneTwisterFast);
+                        double secondSpeciesCapacity = 0;
+                        if (ratio == 1)
+                            secondSpeciesCapacity = firstSpecies;
+                        else if (ratio > 1) {
+                            secondSpeciesCapacity = ratio * firstSpecies;
 
-                                }
-                                else
-                                    secondSpeciesCapacity = firstSpecies *
-                                            ratio/(1-ratio);
-                                return  secondSpeciesCapacity;
-                            }
-                        }
+                        } else
+                            secondSpeciesCapacity = firstSpecies *
+                                ratio / (1 - ratio);
+                        return secondSpeciesCapacity;
+                    }
+                }
+            ),
+            new FixedDoubleParameter(0),
+            new FixedDoubleParameter(1d),
+            percentageLimitOnDailyMovement.applyAsDouble(fishState.getRandom()),
+            differentialPercentageToMove.applyAsDouble(fishState.getRandom()),
+            grower.apply(fishState),
+            Lists.newArrayList(
+                new BoundedAllocatorDecorator(x, y, x + width - 1, y + height - 1, false,
+                    new ConstantBiomassAllocator(1)
                 ),
-                new FixedDoubleParameter(0),
-                new FixedDoubleParameter(1d),
-                percentageLimitOnDailyMovement.apply(fishState.getRandom()),
-                differentialPercentageToMove.apply(fishState.getRandom()),
-                grower.apply(fishState),
-                Lists.newArrayList(
-                        new BoundedAllocatorDecorator(x, y, x+width-1, y+height-1, false,
-                                                      new ConstantBiomassAllocator(1)),
-                        new BoundedAllocatorDecorator(x, y, x+width-1, y+height-1, true,
-                                                      new ConstantBiomassAllocator(1))
+                new BoundedAllocatorDecorator(x, y, x + width - 1, y + height - 1, true,
+                    new ConstantBiomassAllocator(1)
                 )
+            )
 
 
         );
     }
 
-
-
-    /**
-     * the smallest x that is inside the box
-     */
-    private DoubleParameter lowestX = new FixedDoubleParameter(0);
-
-    /**
-     * the smallest y that is inside the box
-     */
-    private DoubleParameter lowestY = new FixedDoubleParameter(0);
-
-    /**
-     * the height of the box
-     */
-    private DoubleParameter boxHeight = new FixedDoubleParameter(10);
-
-    /**
-     * the width of the box
-     */
-    private DoubleParameter boxWidth  = new FixedDoubleParameter(10d);
-
-    /**
-     * is the Species 0 also inside the box or not?
-     */
-    private boolean species0InsideTheBox = false;
-
-    /**
-     * max capacity for first species in each box
-     */
-    private DoubleParameter firstSpeciesCapacity = new FixedDoubleParameter(5000);
-
-    /**
-     * ratio of maxCapacitySecond/maxCapacityFirst
-     */
-    private DoubleParameter ratioFirstToSecondSpecies = new FixedDoubleParameter(1d);
-
-    /**
-     * fixes a limit on how much biomass can leave the sea-tile
-     */
-    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
-
-    /**
-     * how much of the differential between two seatile's biomass should be solved by movement in a single day
-     */
-    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
-
-
-    public TwoSpeciesBoxFactory() {
-    }
-
-
     public DoubleParameter getLowestX() {
         return lowestX;
     }
 
-    public void setLowestX(DoubleParameter lowestX) {
+    public void setLowestX(final DoubleParameter lowestX) {
         this.lowestX = lowestX;
     }
 
@@ -166,7 +156,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return lowestY;
     }
 
-    public void setLowestY(DoubleParameter lowestY) {
+    public void setLowestY(final DoubleParameter lowestY) {
         this.lowestY = lowestY;
     }
 
@@ -174,7 +164,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return boxHeight;
     }
 
-    public void setBoxHeight(DoubleParameter boxHeight) {
+    public void setBoxHeight(final DoubleParameter boxHeight) {
         this.boxHeight = boxHeight;
     }
 
@@ -182,7 +172,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return boxWidth;
     }
 
-    public void setBoxWidth(DoubleParameter boxWidth) {
+    public void setBoxWidth(final DoubleParameter boxWidth) {
         this.boxWidth = boxWidth;
     }
 
@@ -190,7 +180,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return species0InsideTheBox;
     }
 
-    public void setSpecies0InsideTheBox(boolean species0InsideTheBox) {
+    public void setSpecies0InsideTheBox(final boolean species0InsideTheBox) {
         this.species0InsideTheBox = species0InsideTheBox;
     }
 
@@ -198,7 +188,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return firstSpeciesCapacity;
     }
 
-    public void setFirstSpeciesCapacity(DoubleParameter firstSpeciesCapacity) {
+    public void setFirstSpeciesCapacity(final DoubleParameter firstSpeciesCapacity) {
         this.firstSpeciesCapacity = firstSpeciesCapacity;
     }
 
@@ -206,11 +196,9 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         return ratioFirstToSecondSpecies;
     }
 
-    public void setRatioFirstToSecondSpecies(DoubleParameter ratioFirstToSecondSpecies) {
+    public void setRatioFirstToSecondSpecies(final DoubleParameter ratioFirstToSecondSpecies) {
         this.ratioFirstToSecondSpecies = ratioFirstToSecondSpecies;
     }
-
-    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6,0.8);
 
     /**
      * Getter for property 'grower'.
@@ -227,7 +215,8 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 
@@ -236,7 +225,8 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
     }
 
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -245,7 +235,8 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
     }
 
     public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
+        final DoubleParameter differentialPercentageToMove
+    ) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 }

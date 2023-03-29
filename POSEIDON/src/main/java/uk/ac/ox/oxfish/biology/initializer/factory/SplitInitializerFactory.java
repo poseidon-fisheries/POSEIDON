@@ -35,18 +35,16 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(10000);
 
 
-
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
-    private DoubleParameter percentageLimitOnDailyMovement =new FixedDoubleParameter(0.01);
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
 
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.0005);
-
-
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.0005);
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
     /**
      * Applies this function to the given argument.
@@ -55,23 +53,22 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
      * @return the function result
      */
     @Override
-    public SplitInitializer apply(FishState state) {
-        return new SplitInitializer(carryingCapacity,
-                                    percentageLimitOnDailyMovement.apply(state.random),
-                                    differentialPercentageToMove.apply(state.random),
-                                    grower.apply(state));
+    public SplitInitializer apply(final FishState state) {
+        return new SplitInitializer(
+            carryingCapacity,
+            percentageLimitOnDailyMovement.applyAsDouble(state.random),
+            differentialPercentageToMove.applyAsDouble(state.random),
+            grower.apply(state)
+        );
     }
-
 
     public DoubleParameter getCarryingCapacity() {
         return carryingCapacity;
     }
 
-    public void setCarryingCapacity(DoubleParameter carryingCapacity) {
+    public void setCarryingCapacity(final DoubleParameter carryingCapacity) {
         this.carryingCapacity = carryingCapacity;
     }
-
-    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
     /**
      * Getter for property 'grower'.
@@ -88,7 +85,8 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 
@@ -97,7 +95,8 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
     }
 
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -106,7 +105,8 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
     }
 
     public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
+        final DoubleParameter differentialPercentageToMove
+    ) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 }

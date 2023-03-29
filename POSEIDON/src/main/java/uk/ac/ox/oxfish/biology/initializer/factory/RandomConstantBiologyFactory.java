@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomConstantBiologyInitializer> {
 
 
-
     private double minBiomass = 0;
 
     private double maxBiomass = 5000;
@@ -51,9 +50,10 @@ public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomCons
      * @return the function result
      */
     @Override
-    public RandomConstantBiologyInitializer apply(FishState state) {
-        return new RandomConstantBiologyInitializer(minBiomass,maxBiomass,
-                                                    biologySmoothingIndex.apply(state.random).intValue());
+    public RandomConstantBiologyInitializer apply(final FishState state) {
+        return new RandomConstantBiologyInitializer(minBiomass, maxBiomass,
+            (int) biologySmoothingIndex.applyAsDouble(state.random)
+        );
     }
 
 
@@ -61,7 +61,7 @@ public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomCons
         return minBiomass;
     }
 
-    public void setMinBiomass(double minBiomass) {
+    public void setMinBiomass(final double minBiomass) {
         this.minBiomass = minBiomass;
     }
 
@@ -69,7 +69,7 @@ public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomCons
         return maxBiomass;
     }
 
-    public void setMaxBiomass(double maxBiomass) {
+    public void setMaxBiomass(final double maxBiomass) {
         this.maxBiomass = maxBiomass;
     }
 
@@ -77,7 +77,7 @@ public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomCons
         return biologySmoothingIndex;
     }
 
-    public void setBiologySmoothingIndex(DoubleParameter biologySmoothingIndex) {
+    public void setBiologySmoothingIndex(final DoubleParameter biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
 }

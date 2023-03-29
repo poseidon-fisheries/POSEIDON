@@ -20,14 +20,11 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.SmoothMovementRule;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -40,29 +37,20 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSpeciesBiomassInitializer> {
 
 
+    DoubleParameter minCapacityRatio = new FixedDoubleParameter(.2);
+    DoubleParameter exponent = new FixedDoubleParameter(1);
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
-
     private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
-
-
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
     private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
-
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
     private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
-
     private DoubleParameter maxInitialCapacity = new FixedDoubleParameter(1.0);
-
     private DoubleParameter minInitialCapacity = new FixedDoubleParameter(0.0);
-
-
-    DoubleParameter minCapacityRatio = new FixedDoubleParameter(.2);
-
-    DoubleParameter exponent = new FixedDoubleParameter(1);
 
     /**
      * Applies this function to the given argument.
@@ -71,42 +59,39 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      * @return the function result
      */
     @Override
-    public SingleSpeciesBiomassInitializer apply(FishState state) {
+    public SingleSpeciesBiomassInitializer apply(final FishState state) {
 
-        double exponent = getExponent().apply(state.getRandom());
-        double minCapacityRatio = getMinCapacityRatio().apply(state.getRandom());
-        double maxCapacity = getCarryingCapacity().apply(state.getRandom());
-        BiomassAllocator leftToRightAllocator =
-                new BiomassAllocator() {
-                    @Override
-                    public double allocate(
-                            SeaTile tile, NauticalMap map, MersenneTwisterFast random)
-                    {
+        final double exponent = getExponent().applyAsDouble(state.getRandom());
+        final double minCapacityRatio = getMinCapacityRatio().applyAsDouble(state.getRandom());
+        final double maxCapacity = getCarryingCapacity().applyAsDouble(state.getRandom());
+        final BiomassAllocator leftToRightAllocator =
+            (tile, map, random) -> {
 
-                        double correctRatio = Math.max(
-                                Math.pow(
-                                        (map.getWidth()-tile.getGridX())
-                                                /
-                                                (float)map.getWidth(),
-                                        exponent),
-                                minCapacityRatio);
-                        return correctRatio * maxCapacity;
-                    }
-                };
+                final double correctRatio = Math.max(
+                    Math.pow(
+                        (map.getWidth() - tile.getGridX())
+                            /
+                            (float) map.getWidth(),
+                        exponent
+                    ),
+                    minCapacityRatio
+                );
+                return correctRatio * maxCapacity;
+            };
 
 
         return new SingleSpeciesBiomassInitializer(
-                leftToRightAllocator,
-                leftToRightAllocator,
-                new SmoothMovementRule(
+            leftToRightAllocator,
+            leftToRightAllocator,
+            new SmoothMovementRule(
+                percentageLimitOnDailyMovement.applyAsDouble(state.getRandom()),
+                differentialPercentageToMove.applyAsDouble(state.getRandom())
+            ),
+            "Species 0",
+            getGrower().apply(state),
 
-                        percentageLimitOnDailyMovement.apply(state.getRandom()),
-                        differentialPercentageToMove.apply(state.getRandom())
-                ),
-                "Species 0",
-                getGrower().apply(state),
-
-                false);
+            false
+        );
     }
 
 
@@ -124,7 +109,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param carryingCapacity Value to set for property 'carryingCapacity'.
      */
-    public void setCarryingCapacity(DoubleParameter carryingCapacity) {
+    public void setCarryingCapacity(final DoubleParameter carryingCapacity) {
         this.carryingCapacity = carryingCapacity;
     }
 
@@ -143,7 +128,8 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 
@@ -162,7 +148,8 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      * @param percentageLimitOnDailyMovement Value to set for property 'percentageLimitOnDailyMovement'.
      */
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -180,7 +167,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param differentialPercentageToMove Value to set for property 'differentialPercentageToMove'.
      */
-    public void setDifferentialPercentageToMove(DoubleParameter differentialPercentageToMove) {
+    public void setDifferentialPercentageToMove(final DoubleParameter differentialPercentageToMove) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 
@@ -198,7 +185,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param minCapacityRatio Value to set for property 'minCapacityRatio'.
      */
-    public void setMinCapacityRatio(DoubleParameter minCapacityRatio) {
+    public void setMinCapacityRatio(final DoubleParameter minCapacityRatio) {
         this.minCapacityRatio = minCapacityRatio;
     }
 
@@ -216,7 +203,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param exponent Value to set for property 'exponent'.
      */
-    public void setExponent(DoubleParameter exponent) {
+    public void setExponent(final DoubleParameter exponent) {
         this.exponent = exponent;
     }
 
@@ -234,7 +221,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param maxInitialCapacity Value to set for property 'maxInitialCapacity'.
      */
-    public void setMaxInitialCapacity(DoubleParameter maxInitialCapacity) {
+    public void setMaxInitialCapacity(final DoubleParameter maxInitialCapacity) {
         this.maxInitialCapacity = maxInitialCapacity;
     }
 
@@ -252,7 +239,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      *
      * @param minInitialCapacity Value to set for property 'minInitialCapacity'.
      */
-    public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
+    public void setMinInitialCapacity(final DoubleParameter minInitialCapacity) {
         this.minInitialCapacity = minInitialCapacity;
     }
 }

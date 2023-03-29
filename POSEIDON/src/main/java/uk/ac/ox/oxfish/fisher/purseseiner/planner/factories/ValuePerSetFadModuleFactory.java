@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSetFadModule>{
+public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSetFadModule> {
 
     /**
      * discretizes map so that when it is time to target FADs you just
@@ -57,11 +57,11 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
             new OwnFadSetDiscretizedActionGenerator(
                 new MapDiscretization(discretization.apply(state)),
                 0,
-                maxAllowableShear.apply(state.getRandom())
+                maxAllowableShear.applyAsDouble(state.getRandom())
             );
         return new ValuePerSetFadModule(
             optionsGenerator,
-            dampen.apply(state.getRandom())
+            dampen.applyAsDouble(state.getRandom())
         );
     }
 

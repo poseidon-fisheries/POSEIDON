@@ -29,24 +29,23 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates the Simple Map initializer
  * Created by carrknight on 11/5/15.
  */
-public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapInitializer>{
+public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapInitializer> {
 
     private DoubleParameter width = new FixedDoubleParameter(50);
 
-    private DoubleParameter height= new FixedDoubleParameter(50);
+    private DoubleParameter height = new FixedDoubleParameter(50);
 
-    private DoubleParameter coastalRoughness= new FixedDoubleParameter(4);
+    private DoubleParameter coastalRoughness = new FixedDoubleParameter(4);
 
-    private DoubleParameter depthSmoothing= new FixedDoubleParameter(1000000);
+    private DoubleParameter depthSmoothing = new FixedDoubleParameter(1000000);
 
-    private DoubleParameter cellSizeInKilometers= new FixedDoubleParameter(10);
+    private DoubleParameter cellSizeInKilometers = new FixedDoubleParameter(10);
 
-    private DoubleParameter maxLandWidth= new FixedDoubleParameter(10);
+    private DoubleParameter maxLandWidth = new FixedDoubleParameter(10);
 
     private DoubleParameter minInitialDepth = new FixedDoubleParameter(5000);
 
     private DoubleParameter maxInitialDepth = new FixedDoubleParameter(5000);
-
 
 
     public SimpleMapInitializerFactory() {
@@ -54,9 +53,10 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
 
 
     public SimpleMapInitializerFactory(
-            int width, int height,
-            int coastalRoughness, int depthSmoothing,
-            double cellSizeInKilometers) {
+        final int width, final int height,
+        final int coastalRoughness, final int depthSmoothing,
+        final double cellSizeInKilometers
+    ) {
         this.width = new FixedDoubleParameter(width);
         this.height = new FixedDoubleParameter(height);
         this.coastalRoughness = new FixedDoubleParameter(coastalRoughness);
@@ -71,16 +71,16 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
      * @return the function result
      */
     @Override
-    public SimpleMapInitializer apply(FishState fishState) {
+    public SimpleMapInitializer apply(final FishState fishState) {
         return new SimpleMapInitializer(
-                width.apply(fishState.getRandom()).intValue(),
-                height.apply(fishState.getRandom()).intValue(),
-                coastalRoughness.apply(fishState.getRandom()).intValue(),
-                depthSmoothing.apply(fishState.getRandom()).intValue(),
-                cellSizeInKilometers.apply(fishState.getRandom()),
-                maxLandWidth.apply(fishState.getRandom()).intValue(),
-                minInitialDepth.apply(fishState.getRandom()),
-                maxInitialDepth.apply(fishState.getRandom())
+            (int) width.applyAsDouble(fishState.getRandom()),
+            (int) height.applyAsDouble(fishState.getRandom()),
+            (int) coastalRoughness.applyAsDouble(fishState.getRandom()),
+            (int) depthSmoothing.applyAsDouble(fishState.getRandom()),
+            cellSizeInKilometers.applyAsDouble(fishState.getRandom()),
+            (int) maxLandWidth.applyAsDouble(fishState.getRandom()),
+            minInitialDepth.applyAsDouble(fishState.getRandom()),
+            maxInitialDepth.applyAsDouble(fishState.getRandom())
 
         );
 
@@ -91,7 +91,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return width;
     }
 
-    public void setWidth(DoubleParameter width) {
+    public void setWidth(final DoubleParameter width) {
         this.width = width;
     }
 
@@ -99,7 +99,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return height;
     }
 
-    public void setHeight(DoubleParameter height) {
+    public void setHeight(final DoubleParameter height) {
         this.height = height;
     }
 
@@ -107,7 +107,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return coastalRoughness;
     }
 
-    public void setCoastalRoughness(DoubleParameter coastalRoughness) {
+    public void setCoastalRoughness(final DoubleParameter coastalRoughness) {
         this.coastalRoughness = coastalRoughness;
     }
 
@@ -115,7 +115,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return depthSmoothing;
     }
 
-    public void setDepthSmoothing(DoubleParameter depthSmoothing) {
+    public void setDepthSmoothing(final DoubleParameter depthSmoothing) {
         this.depthSmoothing = depthSmoothing;
     }
 
@@ -123,7 +123,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return cellSizeInKilometers;
     }
 
-    public void setCellSizeInKilometers(DoubleParameter cellSizeInKilometers) {
+    public void setCellSizeInKilometers(final DoubleParameter cellSizeInKilometers) {
         this.cellSizeInKilometers = cellSizeInKilometers;
     }
 
@@ -141,7 +141,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
      *
      * @param maxLandWidth Value to set for property 'maxLandWidth'.
      */
-    public void setMaxLandWidth(DoubleParameter maxLandWidth) {
+    public void setMaxLandWidth(final DoubleParameter maxLandWidth) {
         this.maxLandWidth = maxLandWidth;
     }
 
@@ -149,7 +149,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return minInitialDepth;
     }
 
-    public void setMinInitialDepth(DoubleParameter minInitialDepth) {
+    public void setMinInitialDepth(final DoubleParameter minInitialDepth) {
         this.minInitialDepth = minInitialDepth;
     }
 
@@ -157,7 +157,7 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
         return maxInitialDepth;
     }
 
-    public void setMaxInitialDepth(DoubleParameter maxInitialDepth) {
+    public void setMaxInitialDepth(final DoubleParameter maxInitialDepth) {
         this.maxInitialDepth = maxInitialDepth;
     }
 }

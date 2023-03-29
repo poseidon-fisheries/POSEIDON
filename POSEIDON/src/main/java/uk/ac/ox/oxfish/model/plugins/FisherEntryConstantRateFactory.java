@@ -20,14 +20,12 @@
 
 package uk.ac.ox.oxfish.model.plugins;
 
-import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FisherEntryConstantRateFactory implements AlgorithmFactory<FisherEntryConstantRate> {
-
 
 
     /**
@@ -53,9 +51,11 @@ public class FisherEntryConstantRateFactory implements AlgorithmFactory<FisherEn
     @Override
     public FisherEntryConstantRate apply(FishState state) {
 
-        return new FisherEntryConstantRate(growthRateInPercentage.apply(state.getRandom()),
-                                           populationName,
-                                           firstYearEntryOccurs.apply(state.getRandom()).intValue());
+        return new FisherEntryConstantRate(
+            growthRateInPercentage.applyAsDouble(state.getRandom()),
+            populationName,
+            (int) firstYearEntryOccurs.applyAsDouble(state.getRandom())
+        );
     }
 
     /**

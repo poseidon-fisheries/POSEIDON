@@ -24,66 +24,63 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 
 import java.util.DoubleSummaryStatistics;
-import java.util.function.DoubleConsumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WeibullDoubleParameterTest {
 
 
     @Test
     public void looksAboutRight() {
-        WeibullDoubleParameter weibull = new WeibullDoubleParameter(10000,0.5);
+        final WeibullDoubleParameter weibull = new WeibullDoubleParameter(10000, 0.5);
 
-        MersenneTwisterFast rng = new MersenneTwisterFast();
-        DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
         for (int samples = 0; samples < 10000; samples++) {
-            stats.accept(weibull.apply(rng));
+            stats.accept(weibull.applyAsDouble(rng));
         }
-        assertTrue(stats.getAverage()>.45);
-        assertTrue(stats.getAverage()<.55);
-        assertTrue(stats.getMin()>.45);
-        assertTrue(stats.getMax()<.55);
+        assertTrue(stats.getAverage() > .45);
+        assertTrue(stats.getAverage() < .55);
+        assertTrue(stats.getMin() > .45);
+        assertTrue(stats.getMax() < .55);
 
 
     }
 
     @Test
     public void looksAboutRight2() {
-        WeibullDoubleParameter weibull = new WeibullDoubleParameter(0.5,10000);
+        final WeibullDoubleParameter weibull = new WeibullDoubleParameter(0.5, 10000);
 
-        MersenneTwisterFast rng = new MersenneTwisterFast();
-        DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
         for (int samples = 0; samples < 10000; samples++) {
-            stats.accept(weibull.apply(rng));
+            stats.accept(weibull.applyAsDouble(rng));
         }
-        assertTrue(stats.getAverage()>18000);
-        assertTrue(stats.getAverage()<22000);
-
+        assertTrue(stats.getAverage() > 18000);
+        assertTrue(stats.getAverage() < 22000);
 
 
     }
 
     @Test
     public void randomSeedWorks() {
-        WeibullDoubleParameter weibull = new WeibullDoubleParameter(0.5,10000);
+        final WeibullDoubleParameter weibull = new WeibullDoubleParameter(0.5, 10000);
 
         MersenneTwisterFast rng = new MersenneTwisterFast(0);
         DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
         for (int samples = 0; samples < 10000; samples++) {
-            stats.accept(weibull.apply(rng));
+            stats.accept(weibull.applyAsDouble(rng));
         }
-        double firstAverage = stats.getAverage();
+        final double firstAverage = stats.getAverage();
 
         weibull.setShape(0.5);
         rng = new MersenneTwisterFast(0);
         stats = new DoubleSummaryStatistics();
         for (int samples = 0; samples < 10000; samples++) {
-            stats.accept(weibull.apply(rng));
+            stats.accept(weibull.applyAsDouble(rng));
         }
-        assertEquals(firstAverage,stats.getAverage(),.0001);
-
-
+        assertEquals(firstAverage, stats.getAverage(), .0001);
 
 
     }

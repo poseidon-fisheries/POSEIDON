@@ -40,21 +40,13 @@ import java.util.WeakHashMap;
 public class SingleSpeciesPIDTaxationOnLandingsFactory implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
+    private final WeakHashMap<FishState, SingleSpeciesPIDTaxman> taxes = new WeakHashMap<>();
     private int speciesIndex = 0;
-
     //how often does it act in # of days!
     private DoubleParameter actionInterval = new FixedDoubleParameter(7);
-
     private DoubleParameter landingTarget = new FixedDoubleParameter(5000);
-
-
     private DoubleParameter p = new FixedDoubleParameter(.05);
-
     private DoubleParameter i = new FixedDoubleParameter(.1);
-
-
-    private final WeakHashMap<FishState,SingleSpeciesPIDTaxman> taxes = new WeakHashMap<>();
-
 
     /**
      * Applies this function to the given argument.
@@ -66,47 +58,46 @@ public class SingleSpeciesPIDTaxationOnLandingsFactory implements AlgorithmFacto
     public ProtectedAreasOnly apply(FishState fishState) {
         ProtectedAreasOnly regulations = new ProtectedAreasOnly();
 
-        if(!taxes.containsKey(fishState)) {
-            double target = landingTarget.apply(fishState.getRandom());
+        if (!taxes.containsKey(fishState)) {
+            double target = landingTarget.applyAsDouble(fishState.getRandom());
 
             Species species = fishState.getSpecies().get(speciesIndex);
-            int days = actionInterval.apply(fishState.getRandom()).intValue();
+            int days = (int) actionInterval.applyAsDouble(fishState.getRandom());
             //creates the pid taxman, targeting landings
             SingleSpeciesPIDTaxman pid = new SingleSpeciesPIDTaxman(
-                    species,
-                    new Sensor<FishState, Double>() {
-                        @Override
-                        public Double scan(FishState fisher) {
-                            DataColumn landings = fisher.getDailyDataSet().getColumn(
-                                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
-                            double totalLandings = 0;
-                            int toCycle = Math.min(days, landings.size());
-                            for (int i = 0; i < toCycle; i++)
-                                totalLandings += landings.getDatumXStepsAgo(i);
+                species,
+                new Sensor<FishState, Double>() {
+                    @Override
+                    public Double scan(FishState fisher) {
+                        DataColumn landings = fisher.getDailyDataSet().getColumn(
+                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                        double totalLandings = 0;
+                        int toCycle = Math.min(days, landings.size());
+                        for (int i = 0; i < toCycle; i++)
+                            totalLandings += landings.getDatumXStepsAgo(i);
 
-                            return totalLandings;
-                        }
-                    },
-                    new Sensor<FishState, Double>() {
-                        @Override
-                        public Double scan(FishState system) {
-                            return target;
-                        }
-                    },
-                    days,
-                    -p.apply(fishState.getRandom()),
-                    -i.apply(fishState.getRandom()),
-                    0d
+                        return totalLandings;
+                    }
+                },
+                new Sensor<FishState, Double>() {
+                    @Override
+                    public Double scan(FishState system) {
+                        return target;
+                    }
+                },
+                days,
+                -p.applyAsDouble(fishState.getRandom()),
+                -i.applyAsDouble(fishState.getRandom()),
+                0d
             );
 
             fishState.registerStartable(pid);
-            taxes.put(fishState,pid);
+            taxes.put(fishState, pid);
         }
 
         return regulations;
 
     }
-
 
 
     /**

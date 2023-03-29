@@ -43,13 +43,13 @@ public class LinearSSBRatioSpawningFactory implements AlgorithmFactory<LinearSSB
      * @return the function result
      */
     @Override
-    public LinearSSBRatioSpawning apply(FishState fishState) {
+    public LinearSSBRatioSpawning apply(final FishState fishState) {
         return new LinearSSBRatioSpawning(
-                virginRecruits.apply(fishState.getRandom()),
-                lengthAtMaturity.apply(fishState.getRandom()),
-                virginSpawningBiomass.apply(fishState.getRandom()),
-
-                false);
+            virginRecruits.applyAsDouble(fishState.getRandom()),
+            lengthAtMaturity.applyAsDouble(fishState.getRandom()),
+            virginSpawningBiomass.applyAsDouble(fishState.getRandom()),
+            false
+        );
     }
 
     /**
@@ -66,7 +66,7 @@ public class LinearSSBRatioSpawningFactory implements AlgorithmFactory<LinearSSB
      *
      * @param virginRecruits Value to set for property 'virginRecruits'.
      */
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -84,7 +84,7 @@ public class LinearSSBRatioSpawningFactory implements AlgorithmFactory<LinearSSB
      *
      * @param lengthAtMaturity Value to set for property 'lengthAtMaturity'.
      */
-    public void setLengthAtMaturity(DoubleParameter lengthAtMaturity) {
+    public void setLengthAtMaturity(final DoubleParameter lengthAtMaturity) {
         this.lengthAtMaturity = lengthAtMaturity;
     }
 
@@ -102,7 +102,7 @@ public class LinearSSBRatioSpawningFactory implements AlgorithmFactory<LinearSSB
      *
      * @param virginSpawningBiomass Value to set for property 'virginSpawningBiomass'.
      */
-    public void setVirginSpawningBiomass(DoubleParameter virginSpawningBiomass) {
+    public void setVirginSpawningBiomass(final DoubleParameter virginSpawningBiomass) {
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 }

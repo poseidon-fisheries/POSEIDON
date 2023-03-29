@@ -42,8 +42,27 @@ import java.util.function.Supplier;
 public class WeibullCatchabilitySelectivityAttractorFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
+    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
     private AbundanceFiltersFactory abundanceFiltersFactory;
+    private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
+    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
+    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
+    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
 
+    {
+        carryingCapacityShapeParameters.put("Species 0", 0.5d);
+    }
+
+    {
+        carryingCapacityScaleParameters.put("Species 0", 100000d);
+    }
+
+    {
+        catchabilities.put("Species 0", 0.001d);
+    }
     public WeibullCatchabilitySelectivityAttractorFactory() {
     }
 
@@ -59,27 +78,6 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
-    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
-    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
-
-    {
-        carryingCapacityShapeParameters.put("Species 0", 0.5d);
-    }
-
-    {
-        carryingCapacityScaleParameters.put("Species 0", 100000d);
-    }
-
-    {
-        catchabilities.put("Species 0", 0.001d);
-    }
-
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
@@ -87,7 +85,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                 @Override
                 public AbundanceFadInitializer get() {
                     final MersenneTwisterFast rng = fishState.getRandom();
-                    final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+                    final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
                     final DoubleSupplier capacityGenerator;
                     if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
                         capacityGenerator = () -> Double.MAX_VALUE;
@@ -123,12 +121,12 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                         new CatchabilitySelectivityFishAttractor(
                             carryingCapacities,
                             catchabilitiesHere,
-                            daysInWaterBeforeAttraction.apply(rng).intValue(),
-                            maximumDaysAttractions.apply(rng).intValue(),
+                            (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
+                            (int) maximumDaysAttractions.applyAsDouble(rng),
                             fishState,
                             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                         ),
-                        fishReleaseProbabilityInPercent.apply(rng) / 100d,
+                        fishReleaseProbabilityInPercent.applyAsDouble(rng) / 100d,
                         fishState::getStep
                     );
                 }

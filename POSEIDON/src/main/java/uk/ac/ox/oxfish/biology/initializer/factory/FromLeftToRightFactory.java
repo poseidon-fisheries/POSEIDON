@@ -31,8 +31,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The initializer for the left-to-right biology initializer
  * Created by carrknight on 6/22/15.
  */
-public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializer>
-{
+public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializer> {
 
     /**
      * leftmost biomass
@@ -48,7 +47,6 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
     private DoubleParameter exponent = new FixedDoubleParameter(2);
 
 
-
     /**
      * Applies this function to the given argument.
      *
@@ -56,9 +54,10 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
      * @return the function result
      */
     @Override
-    public BiologyInitializer apply(FishState state) {
-        return new FromLeftToRightInitializer(maximumBiomass.apply(state.random),
-                                              biologySmoothingIndex.apply(state.random).intValue(), exponent.apply(state.getRandom()));
+    public BiologyInitializer apply(final FishState state) {
+        return new FromLeftToRightInitializer(maximumBiomass.applyAsDouble(state.random),
+            (int) biologySmoothingIndex.applyAsDouble(state.random), exponent.applyAsDouble(state.getRandom())
+        );
     }
 
 
@@ -66,7 +65,7 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
         return maximumBiomass;
     }
 
-    public void setMaximumBiomass(DoubleParameter maximumBiomass) {
+    public void setMaximumBiomass(final DoubleParameter maximumBiomass) {
         this.maximumBiomass = maximumBiomass;
     }
 
@@ -74,7 +73,7 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
         return biologySmoothingIndex;
     }
 
-    public void setBiologySmoothingIndex(DoubleParameter biologySmoothingIndex) {
+    public void setBiologySmoothingIndex(final DoubleParameter biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
 
@@ -92,7 +91,7 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
      *
      * @param exponent Value to set for property 'exponent'.
      */
-    public void setExponent(DoubleParameter exponent) {
+    public void setExponent(final DoubleParameter exponent) {
         this.exponent = exponent;
     }
 }

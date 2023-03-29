@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<GreedyInsertionFadPlanningModule>{
+public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<GreedyInsertionFadPlanningModule> {
 
     /**
      * discretizes map so that when it is time to target FADs you just
@@ -36,13 +36,13 @@ public class GreedyInsertionFadPlanningFactory implements AlgorithmFactory<Greed
 
         final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
             new MapDiscretization(discretization.apply(state)),
-            minimumValueFadSets.apply(state.getRandom()),
-            maxAllowableShear.apply(state.getRandom())
+            minimumValueFadSets.applyAsDouble(state.getRandom()),
+            maxAllowableShear.applyAsDouble(state.getRandom())
         );
 
         return new GreedyInsertionFadPlanningModule(
             optionsGenerator,
-            additionalFadInspected.apply(state.getRandom()).intValue()
+            (int) additionalFadInspected.applyAsDouble(state.getRandom())
         );
 
     }

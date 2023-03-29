@@ -52,10 +52,10 @@ public class BiasedFadMapFactory extends GenericFadMapFactory {
         return
             new BiasedCurrentVectors(
                 super.buildCurrentVectors(fishState),
-                biasY.apply(fishState.getRandom()),
-                biasX.apply(fishState.getRandom()),
-                gridYMinimum.apply(fishState.getRandom()).intValue(),
-                gridYMaximum.apply(fishState.getRandom()).intValue()
+                biasY.applyAsDouble(fishState.getRandom()),
+                biasX.applyAsDouble(fishState.getRandom()),
+                (int) gridYMinimum.applyAsDouble(fishState.getRandom()),
+                (int) gridYMaximum.applyAsDouble(fishState.getRandom())
             );
 
     }

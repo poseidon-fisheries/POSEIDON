@@ -20,12 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -37,8 +32,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -46,9 +39,19 @@ import java.util.function.Predicate;
  * step if ANY of the environmental thresholds is not met
  */
 public class WeibullLinearIntervalEnvironmentalAttractorFactory
-        extends WeibullLinearIntervalAttractorFactory {
+    extends WeibullLinearIntervalAttractorFactory {
 
-    public WeibullLinearIntervalEnvironmentalAttractorFactory() {}
+    private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
+    private LinkedList<DoubleParameter> environmentalThresholds = new LinkedList<>();
+
+    {
+        final AdditionalMapFactory e = new AdditionalMapFactory();
+        environmentalMaps.add(e);
+        environmentalThresholds.add(new FixedDoubleParameter(0.15));
+    }
+
+    public WeibullLinearIntervalEnvironmentalAttractorFactory() {
+    }
 
     public WeibullLinearIntervalEnvironmentalAttractorFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
@@ -76,33 +79,24 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
         this.environmentalThresholds = environmentalThresholds;
     }
 
-    private LinkedList<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
-
-    private LinkedList<DoubleParameter>  environmentalThresholds = new LinkedList<>();
-
-    {
-        AdditionalMapFactory e = new AdditionalMapFactory();
-        environmentalMaps.add(e);
-        environmentalThresholds.add(new FixedDoubleParameter(0.15));
-    }
-
     @NotNull
     @Override
-    protected HeterogeneousLinearIntervalAttractor generateFishAttractor(FishState fishState) {
+    protected HeterogeneousLinearIntervalAttractor generateFishAttractor(final FishState fishState) {
 
         //this is called within a locker, so it's safe to assume the startables will only be registered once
         Predicate<SeaTile> passesAllFilters = seaTile -> true;
         for (int environmental = 0; environmental < environmentalMaps.size(); environmental++) {
 
-            AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
+            final AdditionalStartable newMap = environmentalMaps.get(environmental).apply(fishState);
             fishState.registerStartable(newMap);
             final String mapName = environmentalMaps.get(environmental).mapVariableName;
-            final double threshold = environmentalThresholds.get(environmental).apply(fishState.getRandom());
+            final double threshold = environmentalThresholds.get(environmental).applyAsDouble(fishState.getRandom());
 
             final Predicate<SeaTile> passes = seaTile -> fishState.getMap().getAdditionalMaps().get(
-                   mapName).get().get(
-                   seaTile.getGridX(),
-                   seaTile.getGridY()) >= threshold;
+                mapName).get().get(
+                seaTile.getGridX(),
+                seaTile.getGridY()
+            ) >= threshold;
 
             passesAllFilters = passesAllFilters.and(passes);
 
@@ -110,8 +104,8 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
         }
 
 
-        HeterogeneousLinearIntervalAttractor attractor = super.generateFishAttractor(
-                fishState);
+        final HeterogeneousLinearIntervalAttractor attractor = super.generateFishAttractor(
+            fishState);
         attractor.setAdditionalAttractionHurdle(passesAllFilters);
         return attractor;
     }
@@ -120,7 +114,7 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
         return environmentalMaps;
     }
 
-    public void setEnvironmentalMaps(LinkedList<AdditionalMapFactory> environmentalMaps) {
+    public void setEnvironmentalMaps(final LinkedList<AdditionalMapFactory> environmentalMaps) {
         this.environmentalMaps = environmentalMaps;
     }
 
@@ -129,7 +123,8 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
     }
 
     public void setEnvironmentalThresholds(
-            LinkedList<DoubleParameter> environmentalThresholds) {
+        final LinkedList<DoubleParameter> environmentalThresholds
+    ) {
         this.environmentalThresholds = environmentalThresholds;
     }
 }

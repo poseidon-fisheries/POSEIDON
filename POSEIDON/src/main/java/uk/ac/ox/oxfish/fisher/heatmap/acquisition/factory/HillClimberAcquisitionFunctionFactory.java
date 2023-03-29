@@ -39,8 +39,8 @@ public class HillClimberAcquisitionFunctionFactory implements AlgorithmFactory<H
      * @return the function result
      */
     @Override
-    public HillClimberAcquisitionFunction apply(FishState state) {
-        return new HillClimberAcquisitionFunction(stepSize.apply(state.getRandom()).intValue());
+    public HillClimberAcquisitionFunction apply(final FishState state) {
+        return new HillClimberAcquisitionFunction((int) stepSize.applyAsDouble(state.getRandom()));
     }
 
     /**
@@ -57,7 +57,7 @@ public class HillClimberAcquisitionFunctionFactory implements AlgorithmFactory<H
      *
      * @param stepSize Value to set for property 'stepSize'.
      */
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
 }

@@ -46,7 +46,8 @@ public class FixedNumberOfEdges extends AbstractNetworkBuilder {
      */
     @Override
     public void addFisher(
-            Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher newAddition, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
 
 
         //ignored!
@@ -61,7 +62,8 @@ public class FixedNumberOfEdges extends AbstractNetworkBuilder {
      */
     @Override
     public void removeFisher(
-            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher toRemove, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
 
         currentNetwork.removeVertex(toRemove);
     }
@@ -73,34 +75,34 @@ public class FixedNumberOfEdges extends AbstractNetworkBuilder {
      * @return the function result
      */
     @Override
-    public DirectedGraph<Fisher, FriendshipEdge> apply(FishState fishState) {
+    public DirectedGraph<Fisher, FriendshipEdge> apply(final FishState fishState) {
 
-        DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
+        final DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
 
 
-        int numberOfEdges = edges.apply(fishState.getRandom()).intValue();
+        final int numberOfEdges = (int) edges.applyAsDouble(fishState.getRandom());
 
-        ObservableList<Fisher> fishers = fishState.getFishers();
+        final ObservableList<Fisher> fishers = fishState.getFishers();
 
-        List<NetworkPredicate> predicates = computePredicates(fishState);
+        final List<NetworkPredicate> predicates = computePredicates(fishState);
         mainloop:
-        while(graph.getEdgeCount()<numberOfEdges)
-        {
-            Fisher first = fishers.get(fishState.getRandom().nextInt(fishers.size()));
-            Fisher second = fishers.get(fishState.getRandom().nextInt(fishers.size()));
+        while (graph.getEdgeCount() < numberOfEdges) {
+            final Fisher first = fishers.get(fishState.getRandom().nextInt(fishers.size()));
+            final Fisher second = fishers.get(fishState.getRandom().nextInt(fishers.size()));
 
-            Collection<Fisher> successors = graph.getSuccessors(first);
-            if(successors !=null && successors.contains(second))
+            final Collection<Fisher> successors = graph.getSuccessors(first);
+            if (successors != null && successors.contains(second))
                 continue;
-            for (NetworkPredicate predicate : predicates)
-            {
-                if(!predicate.test(first,second))
-                 continue mainloop;
+            for (final NetworkPredicate predicate : predicates) {
+                if (!predicate.test(first, second))
+                    continue mainloop;
             }
 
-            graph.addEdge(new FriendshipEdge(),
-                          first,
-                          second);
+            graph.addEdge(
+                new FriendshipEdge(),
+                first,
+                second
+            );
 
 
         }
@@ -124,7 +126,7 @@ public class FixedNumberOfEdges extends AbstractNetworkBuilder {
      *
      * @param edges Value to set for property 'edges'.
      */
-    public void setEdges(DoubleParameter edges) {
+    public void setEdges(final DoubleParameter edges) {
         this.edges = edges;
     }
 

@@ -43,7 +43,7 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
                                     controller = new TargetToTACController(
                                             new UnchangingPastSensor(
                                                     catchColumnName,
-                                                    catchesToTargetMultiplier.apply(fishState.getRandom()),
+                                                    catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
                                                     1
                                             ),
                                             365
@@ -52,7 +52,7 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
                                     controller = new TargetToTACController(
                                             new UnchangingPastSensor(
                                                     catchColumnName,
-                                                    catchesToTargetMultiplier.apply(fishState.getRandom()),
+                                                    catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
                                                     1
                                             ),
                                             365,

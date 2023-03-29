@@ -22,14 +22,11 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.PersonalTuningRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.SocialTuningRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -42,21 +39,14 @@ import java.util.WeakHashMap;
 /**
  * Created by carrknight on 9/13/16.
  */
-public class PersonalTuningRegressionFactory implements AlgorithmFactory<PersonalTuningRegression>{
+public class PersonalTuningRegressionFactory implements AlgorithmFactory<PersonalTuningRegression> {
 
 
+    /**
+     * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
+     */
+    private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
     private AlgorithmFactory<? extends GeographicalRegression> nested = new DefaultKernelRegressionFactory();
-    {
-        ((DefaultKernelRegressionFactory) nested).setDistanceFromPortBandwidth(new UniformDoubleParameter(0.1, 1000));
-        ((DefaultKernelRegressionFactory) nested).setHabitatBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((DefaultKernelRegressionFactory) nested).setTimeBandwidth(new UniformDoubleParameter(100,10000));
-        ((DefaultKernelRegressionFactory) nested).setxBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((DefaultKernelRegressionFactory) nested).setyBandwidth(new UniformDoubleParameter(0.1,1000));
-    }
-
-
-
-
     /**
      * the gradient is guessed numerically by checking prediction error at x +- percentageChangeToGuessGradient * x
      */
@@ -65,17 +55,15 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     /**
      * the alpha/gamma that is by how much we change our current parameters given the latest gradient
      */
-    private DoubleParameter stepSize =  new FixedDoubleParameter(.01);
+    private DoubleParameter stepSize = new FixedDoubleParameter(.01);
 
-
-
-
-    /**
-     * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
-     */
-    private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-
-
+    {
+        ((DefaultKernelRegressionFactory) nested).setDistanceFromPortBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((DefaultKernelRegressionFactory) nested).setHabitatBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((DefaultKernelRegressionFactory) nested).setTimeBandwidth(new UniformDoubleParameter(100, 10000));
+        ((DefaultKernelRegressionFactory) nested).setxBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((DefaultKernelRegressionFactory) nested).setyBandwidth(new UniformDoubleParameter(0.1, 1000));
+    }
 
     /**
      * Applies this function to the given argument.
@@ -84,61 +72,61 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      * @return the function result
      */
     @Override
-    public PersonalTuningRegression apply(FishState state) {
+    public PersonalTuningRegression apply(final FishState state) {
 
 
-
-        GeographicalRegression delegate = this.nested.apply(state);
-        DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
+        final GeographicalRegression delegate = this.nested.apply(state);
+        final DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
         Arrays.fill(zeros, new FixedDoubleParameter(0));
 
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(state))
-        {
+        if (!weakStateMap.contains(state)) {
             weakStateMap.add(state);
-            addDataGatherers(state,zeros.length);
+            addDataGatherers(state, zeros.length);
             assert weakStateMap.contains(state);
         }
 
         return new PersonalTuningRegression(
-                delegate,
-                percentageChangeToGuessGradient.apply(state.getRandom()),
-                stepSize.apply(state.getRandom()),
-                50);
+            delegate,
+            percentageChangeToGuessGradient.applyAsDouble(state.getRandom()),
+            stepSize.applyAsDouble(state.getRandom()),
+            50
+        );
 
     }
 
-    private void addDataGatherers(FishState state, int length) {
+    private void addDataGatherers(final FishState state, final int length) {
 
 
-        for(int i=0; i<length; i++)
-        {
+        for (int i = 0; i < length; i++) {
 
             //first add data gatherers
-            int finalI = i;
-            Gatherer<FishState> gatherer = model -> {
-                double size = model.getFishers().size();
+            final int finalI = i;
+            final Gatherer<FishState> gatherer = model -> {
+                final double size = model.getFishers().size();
                 if (size == 0)
                     return Double.NaN;
                 else {
                     double total = 0;
-                    for (Fisher fisher1 : state.getFishers()) {
+                    for (final Fisher fisher1 : state.getFishers()) {
                         total +=
-                                ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
-                                        getHeatmap().getParametersAsArray()[finalI];
+                            ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
+                                getHeatmap().getParametersAsArray()[finalI];
                     }
                     return total / size;
                 }
             };
             state.
-                    getDailyDataSet().
-                    registerGatherer("Average Heatmap Parameter " + i,
-                                     gatherer, Double.NaN);
+                getDailyDataSet().
+                registerGatherer("Average Heatmap Parameter " + i,
+                    gatherer, Double.NaN
+                );
             state.
-                    getYearlyDataSet().
-                    registerGatherer("Average Heatmap Parameter " + i,
-                                     gatherer, Double.NaN);
+                getYearlyDataSet().
+                registerGatherer("Average Heatmap Parameter " + i,
+                    gatherer, Double.NaN
+                );
         }
 
     }
@@ -159,7 +147,8 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      * @param nested Value to set for property 'nested'.
      */
     public void setNested(
-            AlgorithmFactory<? extends GeographicalRegression> nested) {
+        final AlgorithmFactory<? extends GeographicalRegression> nested
+    ) {
         this.nested = nested;
     }
 
@@ -179,7 +168,8 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      * @param percentageChangeToGuessGradient Value to set for property 'percentageChangeToGuessGradient'.
      */
     public void setPercentageChangeToGuessGradient(
-            DoubleParameter percentageChangeToGuessGradient) {
+        final DoubleParameter percentageChangeToGuessGradient
+    ) {
         this.percentageChangeToGuessGradient = percentageChangeToGuessGradient;
     }
 
@@ -197,7 +187,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      *
      * @param stepSize Value to set for property 'stepSize'.
      */
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
 

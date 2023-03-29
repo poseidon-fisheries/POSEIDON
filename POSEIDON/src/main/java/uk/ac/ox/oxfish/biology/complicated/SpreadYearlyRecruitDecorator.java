@@ -16,8 +16,6 @@ import static uk.ac.ox.oxfish.biology.complicated.YearlyRecruitmentProcess.YEARL
 public class SpreadYearlyRecruitDecorator implements RecruitmentProcess {
 
 
-
-
     /**
      * imagine this needs to spawn twice a year at day 100 and day 200, this would be:
      * 100 -- fixedDoubleParameter 0.5
@@ -34,37 +32,44 @@ public class SpreadYearlyRecruitDecorator implements RecruitmentProcess {
     private final MersenneTwisterFast random;
 
 
-    public SpreadYearlyRecruitDecorator(LinkedHashMap<Integer, DoubleParameter> spawningDayToProportion,
-                                        YearlyRecruitmentProcess delegate, MersenneTwisterFast random) {
+    public SpreadYearlyRecruitDecorator(
+        final LinkedHashMap<Integer, DoubleParameter> spawningDayToProportion,
+        final YearlyRecruitmentProcess delegate, final MersenneTwisterFast random
+    ) {
         this.spawningDayToProportion = spawningDayToProportion;
         this.delegate = delegate;
         this.random = random;
-        Preconditions.checkArgument(!delegate.isRecruitEveryday(),
-                "This decorator assumes the formula is not already divided by 365");
+        Preconditions.checkArgument(
+            !delegate.isRecruitEveryday(),
+            "This decorator assumes the formula is not already divided by 365"
+        );
         //todo this wouldn't be too difficult to fix. just multiply by 365/daysSimulated
 
     }
 
 
     @Override
-    public double recruit(Species species, Meristics meristics,
-                          StructuredAbundance abundance,
-                          int dayOfTheYear,
-                          int daysSimulated) {
-        Preconditions.checkArgument(daysSimulated==1);
+    public double recruit(
+        final Species species, final Meristics meristics,
+        final StructuredAbundance abundance,
+        final int dayOfTheYear,
+        final int daysSimulated
+    ) {
+        Preconditions.checkArgument(daysSimulated == 1);
 
         //not a spawning day
-        if(!spawningDayToProportion.containsKey(dayOfTheYear))
+        if (!spawningDayToProportion.containsKey(dayOfTheYear))
             return 0d;
-        else{
+        else {
             //spawning day
             final DoubleParameter scaling = spawningDayToProportion.get(dayOfTheYear);
 
 
-            return scaling.apply(random) * delegate.recruit(
-                    species, meristics, abundance,
-                    YEARLY_RECRUITMENT_SPAWNING_DAY,
-                    daysSimulated);
+            return scaling.applyAsDouble(random) * delegate.recruit(
+                species, meristics, abundance,
+                YEARLY_RECRUITMENT_SPAWNING_DAY,
+                daysSimulated
+            );
 
         }
 
@@ -76,7 +81,7 @@ public class SpreadYearlyRecruitDecorator implements RecruitmentProcess {
     }
 
     @Override
-    public void addNoise(NoiseMaker noiseMaker) {
+    public void addNoise(final NoiseMaker noiseMaker) {
         delegate.addNoise(noiseMaker);
     }
 

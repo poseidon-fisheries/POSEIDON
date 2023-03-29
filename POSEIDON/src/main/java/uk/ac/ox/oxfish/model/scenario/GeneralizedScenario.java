@@ -300,7 +300,7 @@ public class GeneralizedScenario implements Scenario{
         if(portPositionX == null || portPositionX < 0)
             RandomPortInitializer.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom,
                     new FixedGasPrice(
-                            gasPricePerLiter.apply(mapMakerRandom)),
+                            gasPricePerLiter.applyAsDouble(mapMakerRandom)),
                     model);
         else
         {
@@ -337,7 +337,7 @@ public class GeneralizedScenario implements Scenario{
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
         for(Port port : ports)
-            port.setGasPricePerLiter(gasPricePerLiter.apply(random));
+            port.setGasPricePerLiter(gasPricePerLiter.applyAsDouble(random));
 
         //create logbook initializer
         LogbookInitializer log = logbook.apply(model);
@@ -361,11 +361,11 @@ public class GeneralizedScenario implements Scenario{
                 discardingStrategy,
                 gearStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                        literPerKilometer.apply(random),
-                        speedInKmh.apply(random)),
-                        new FuelTank(fuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(holdSize.apply(random),biology),
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.applyAsDouble(random),
+                        literPerKilometer.applyAsDouble(random),
+                        speedInKmh.applyAsDouble(random)),
+                        new FuelTank(fuelTankSize.applyAsDouble(random))),
+                (Supplier<Hold>) () -> new Hold(holdSize.applyAsDouble(random),biology),
                 gear,
 
                 0);

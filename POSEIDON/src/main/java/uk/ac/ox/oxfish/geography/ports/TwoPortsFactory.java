@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 1/21/17.
  */
-public class TwoPortsFactory implements AlgorithmFactory<TwoPortsInitializer>
-{
+public class TwoPortsFactory implements AlgorithmFactory<TwoPortsInitializer> {
 
     /**
      * the X position of the port on the grid.
@@ -41,11 +40,10 @@ public class TwoPortsFactory implements AlgorithmFactory<TwoPortsInitializer>
     private DoubleParameter port1PositionY = new FixedDoubleParameter(0);
 
 
-
     /**
      * the X position of the port on the grid.
      */
-    private  DoubleParameter port2PositionX = new FixedDoubleParameter(40);
+    private DoubleParameter port2PositionX = new FixedDoubleParameter(40);
     /**
      * the X position of the port on the grid.
      */
@@ -65,12 +63,12 @@ public class TwoPortsFactory implements AlgorithmFactory<TwoPortsInitializer>
     @Override
     public TwoPortsInitializer apply(FishState fishState) {
         return new TwoPortsInitializer(
-                port1PositionX.apply(fishState.getRandom()).intValue(),
-                port1PositionY.apply(fishState.getRandom()).intValue(),
-                port2PositionX.apply(fishState.getRandom()).intValue(),
-                port2PositionY.apply(fishState.getRandom()).intValue(),
-                namePort1,
-                namePort2
+            (int) port1PositionX.applyAsDouble(fishState.getRandom()),
+            (int) port1PositionY.applyAsDouble(fishState.getRandom()),
+            (int) port2PositionX.applyAsDouble(fishState.getRandom()),
+            (int) port2PositionY.applyAsDouble(fishState.getRandom()),
+            namePort1,
+            namePort2
         );
     }
 

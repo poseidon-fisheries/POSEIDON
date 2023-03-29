@@ -38,25 +38,28 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
 
 
     private static final String[] NAMES = new String[]{
-            "Red Species",
-            "Blue Species"
+        "Red Species",
+        "Blue Species"
     };
 
     public TwoSpeciesRockyLogisticInitializer(
-            DoubleParameter rockyCarryingCapacity,
-            DoubleParameter sandyCarryingCapacity,
-            double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove,
-            LogisticGrowerInitializer grower) {
+        final DoubleParameter rockyCarryingCapacity,
+        final DoubleParameter sandyCarryingCapacity,
+        final double percentageLimitOnDailyMovement,
+        final double differentialPercentageToMove,
+        final LogisticGrowerInitializer grower
+    ) {
         super(rockyCarryingCapacity, sandyCarryingCapacity, percentageLimitOnDailyMovement,
-              differentialPercentageToMove, 2,grower);
+            differentialPercentageToMove, 2, grower
+        );
     }
 
 
     /**
      * the carrying capacity is an average between the rocky and the sandy one depending on how rocky
      * the tile is
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -65,32 +68,36 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
-        if(seaTile.isLand())
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
-        else
-        {
+        else {
 
-            double carryingCapacityFirst =
-                    (1-seaTile.getRockyPercentage()) *  getSandyCarryingCapacity().apply(random)  +
-                            seaTile.getRockyPercentage() * getRockyCarryingCapacity().apply(random);
+            final double carryingCapacityFirst =
+                (1 - seaTile.getRockyPercentage()) * getSandyCarryingCapacity().applyAsDouble(random) +
+                    seaTile.getRockyPercentage() * getRockyCarryingCapacity().applyAsDouble(random);
 
-            double carryingCapacitySecond =
-                    (1-seaTile.getRockyPercentage()) *  getRockyCarryingCapacity().apply(random)  +
-                            seaTile.getRockyPercentage() * getSandyCarryingCapacity().apply(random);
+            final double carryingCapacitySecond =
+                (1 - seaTile.getRockyPercentage()) * getRockyCarryingCapacity().applyAsDouble(random) +
+                    seaTile.getRockyPercentage() * getSandyCarryingCapacity().applyAsDouble(random);
 
 
-            BiomassLocalBiology local = new BiomassLocalBiology(
-                    new double[]{
-                            carryingCapacityFirst * random.nextDouble(),
-                            carryingCapacitySecond * random.nextDouble()
-                    },
-                    new double[]{
-                            carryingCapacityFirst, carryingCapacitySecond
-                    }
+            final BiomassLocalBiology local = new BiomassLocalBiology(
+                new double[]{
+                    carryingCapacityFirst * random.nextDouble(),
+                    carryingCapacitySecond * random.nextDouble()
+                },
+                new double[]{
+                    carryingCapacityFirst, carryingCapacitySecond
+                }
             );
-            biologies.put(seaTile,local);
+            biologies.put(seaTile, local);
             return local;
         }
     }

@@ -31,8 +31,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Created by carrknight on 9/30/15.
  */
 
-public class OneSpecieGearFactory implements AlgorithmFactory<OneSpecieGear>
-{
+public class OneSpecieGearFactory implements AlgorithmFactory<OneSpecieGear> {
 
     private int specieTargetIndex = 0;
 
@@ -46,9 +45,11 @@ public class OneSpecieGearFactory implements AlgorithmFactory<OneSpecieGear>
      * @return the function result
      */
     @Override
-    public OneSpecieGear apply(FishState state) {
-        return new OneSpecieGear(state.getSpecies().get(specieTargetIndex),
-                                 proportionCaught.apply(state.getRandom()));
+    public OneSpecieGear apply(final FishState state) {
+        return new OneSpecieGear(
+            state.getSpecies().get(specieTargetIndex),
+            proportionCaught.applyAsDouble(state.getRandom())
+        );
     }
 
 
@@ -56,7 +57,7 @@ public class OneSpecieGearFactory implements AlgorithmFactory<OneSpecieGear>
         return specieTargetIndex;
     }
 
-    public void setSpecieTargetIndex(int specieTargetIndex) {
+    public void setSpecieTargetIndex(final int specieTargetIndex) {
         this.specieTargetIndex = specieTargetIndex;
     }
 
@@ -64,7 +65,7 @@ public class OneSpecieGearFactory implements AlgorithmFactory<OneSpecieGear>
         return proportionCaught;
     }
 
-    public void setProportionCaught(DoubleParameter proportionCaught) {
+    public void setProportionCaught(final DoubleParameter proportionCaught) {
         this.proportionCaught = proportionCaught;
     }
 }

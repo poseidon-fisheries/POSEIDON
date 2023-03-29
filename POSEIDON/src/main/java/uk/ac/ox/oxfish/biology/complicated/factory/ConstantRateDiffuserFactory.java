@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Created by carrknight on 7/8/17.
  */
 public class ConstantRateDiffuserFactory
-        implements AlgorithmFactory<ConstantRateAbundanceDiffuser> {
+    implements AlgorithmFactory<ConstantRateAbundanceDiffuser> {
 
 
     /**
@@ -50,10 +50,10 @@ public class ConstantRateDiffuserFactory
      * @return the function result
      */
     @Override
-    public ConstantRateAbundanceDiffuser apply(FishState state) {
+    public ConstantRateAbundanceDiffuser apply(final FishState state) {
         return new ConstantRateAbundanceDiffuser(
-                diffusingRange.apply(state.getRandom()).intValue(),
-                diffusingRate.apply(state.getRandom())
+            (int) diffusingRange.applyAsDouble(state.getRandom()),
+            diffusingRate.applyAsDouble(state.getRandom())
         );
     }
 

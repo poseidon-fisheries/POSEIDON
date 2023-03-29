@@ -7,15 +7,15 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class SimulatedProfitCPUEObjectiveFactory implements
-        AlgorithmFactory<SimulatedProfitWithCPUEObjectiveFunction> {
+    AlgorithmFactory<SimulatedProfitWithCPUEObjectiveFunction> {
 
-    private DoubleParameter tripLength = new FixedDoubleParameter(5*24);
+    private DoubleParameter tripLength = new FixedDoubleParameter(5 * 24);
 
 
     @Override
-    public SimulatedProfitWithCPUEObjectiveFunction apply(FishState fishState) {
+    public SimulatedProfitWithCPUEObjectiveFunction apply(final FishState fishState) {
         return new SimulatedProfitWithCPUEObjectiveFunction(
-                tripLength.apply(fishState.getRandom()).intValue()
+            (int) tripLength.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -23,7 +23,7 @@ public class SimulatedProfitCPUEObjectiveFactory implements
         return tripLength;
     }
 
-    public void setTripLength(DoubleParameter tripLength) {
+    public void setTripLength(final DoubleParameter tripLength) {
         this.tripLength = tripLength;
     }
 }

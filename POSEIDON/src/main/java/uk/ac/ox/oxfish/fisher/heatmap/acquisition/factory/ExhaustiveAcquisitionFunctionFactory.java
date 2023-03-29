@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<ExhaustiveAcquisitionFunction> {
 
 
-
     private DoubleParameter proportionSearched = new FixedDoubleParameter(1d);
     private boolean ignoreProtectedAreas = true;
     private boolean ignoreWastelands = true;
@@ -44,10 +43,12 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
      * @return the function result
      */
     @Override
-    public ExhaustiveAcquisitionFunction apply(FishState state) {
-        return new ExhaustiveAcquisitionFunction(proportionSearched.apply(state.getRandom()),
-                                                 ignoreProtectedAreas,
-                                                 ignoreWastelands);
+    public ExhaustiveAcquisitionFunction apply(final FishState state) {
+        return new ExhaustiveAcquisitionFunction(
+            proportionSearched.applyAsDouble(state.getRandom()),
+            ignoreProtectedAreas,
+            ignoreWastelands
+        );
     }
 
 
@@ -55,7 +56,7 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
         return proportionSearched;
     }
 
-    public void setProportionSearched(DoubleParameter proportionSearched) {
+    public void setProportionSearched(final DoubleParameter proportionSearched) {
         this.proportionSearched = proportionSearched;
     }
 
@@ -73,7 +74,7 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
      *
      * @param ignoreProtectedAreas Value to set for property 'ignoreProtectedAreas'.
      */
-    public void setIgnoreProtectedAreas(boolean ignoreProtectedAreas) {
+    public void setIgnoreProtectedAreas(final boolean ignoreProtectedAreas) {
         this.ignoreProtectedAreas = ignoreProtectedAreas;
     }
 
@@ -91,7 +92,7 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
      *
      * @param ignoreWastelands Value to set for property 'ignoreWastelands'.
      */
-    public void setIgnoreWastelands(boolean ignoreWastelands) {
+    public void setIgnoreWastelands(final boolean ignoreWastelands) {
         this.ignoreWastelands = ignoreWastelands;
     }
 }

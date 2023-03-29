@@ -18,12 +18,13 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
      * go through a few relevant ones
      */
     private AlgorithmFactory<? extends MapDiscretizer> discretization =
-            new SquaresMapDiscretizerFactory(6, 3);
+        new SquaresMapDiscretizerFactory(6, 3);
 
     private DoubleParameter valueWeight = new FixedDoubleParameter(1);
 
 
     private DoubleParameter minimumValueFadSets = new FixedDoubleParameter(1d);
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
 
     public DoubleParameter getMaxAllowableShear() {
         return maxAllowableShear;
@@ -33,8 +34,6 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
         this.maxAllowableShear = maxAllowableShear;
     }
 
-    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
-
     @Override
     public WhereMoneyIsPlanningModule apply(final FishState state) {
 
@@ -42,12 +41,12 @@ public class WhereMoneyIsPlanningFactory implements AlgorithmFactory<WhereMoneyI
             new MapDiscretization(
                 discretization.apply(state)
             ),
-            minimumValueFadSets.apply(state.getRandom()),
-            maxAllowableShear.apply(state.getRandom())
+            minimumValueFadSets.applyAsDouble(state.getRandom()),
+            maxAllowableShear.applyAsDouble(state.getRandom())
         );
         return new WhereMoneyIsPlanningModule(
             optionsGenerator,
-            valueWeight.apply(state.getRandom())
+            valueWeight.applyAsDouble(state.getRandom())
         );
     }
 

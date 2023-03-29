@@ -51,7 +51,7 @@ public class AbundanceFadInitializerFactory
         final MersenneTwisterFast rng,
         final double maximumCarryingCapacity
     ) {
-        final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+        final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
         final DoubleSupplier capacityGenerator;
         if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
             capacityGenerator = () -> maximumCarryingCapacity;

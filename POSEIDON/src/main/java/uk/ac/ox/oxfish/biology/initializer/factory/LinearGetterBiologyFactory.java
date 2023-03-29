@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.initializer.LinearGetterBiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -30,8 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 2/6/17.
  */
-public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetterBiologyInitializer>
-{
+public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetterBiologyInitializer> {
 
 
     private DoubleParameter intercept = new FixedDoubleParameter(1000);
@@ -60,18 +58,17 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      * @return the function result
      */
     @Override
-    public LinearGetterBiologyInitializer apply(FishState state) {
-
+    public LinearGetterBiologyInitializer apply(final FishState state) {
         return new LinearGetterBiologyInitializer(
-                intercept.apply(state.getRandom()),
-                x.apply(state.getRandom()),
-                y.apply(state.getRandom()),
-                xDay.apply(state.getRandom()),
-                yDay.apply(state.getRandom()),
-                rocky.apply(state.getRandom()),
-                xRocky.apply(state.getRandom()),
-                yRocky.apply(state.getRandom()),
-                dayRocky.apply(state.getRandom())
+            intercept.applyAsDouble(state.getRandom()),
+            x.applyAsDouble(state.getRandom()),
+            y.applyAsDouble(state.getRandom()),
+            xDay.applyAsDouble(state.getRandom()),
+            yDay.applyAsDouble(state.getRandom()),
+            rocky.applyAsDouble(state.getRandom()),
+            xRocky.applyAsDouble(state.getRandom()),
+            yRocky.applyAsDouble(state.getRandom()),
+            dayRocky.applyAsDouble(state.getRandom())
         );
     }
 
@@ -89,7 +86,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param intercept Value to set for property 'intercept'.
      */
-    public void setIntercept(DoubleParameter intercept) {
+    public void setIntercept(final DoubleParameter intercept) {
         this.intercept = intercept;
     }
 
@@ -107,7 +104,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param x Value to set for property 'x'.
      */
-    public void setX(DoubleParameter x) {
+    public void setX(final DoubleParameter x) {
         this.x = x;
     }
 
@@ -125,7 +122,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param y Value to set for property 'y'.
      */
-    public void setY(DoubleParameter y) {
+    public void setY(final DoubleParameter y) {
         this.y = y;
     }
 
@@ -143,7 +140,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param xDay Value to set for property 'xDay'.
      */
-    public void setxDay(DoubleParameter xDay) {
+    public void setxDay(final DoubleParameter xDay) {
         this.xDay = xDay;
     }
 
@@ -161,7 +158,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param yDay Value to set for property 'yDay'.
      */
-    public void setyDay(DoubleParameter yDay) {
+    public void setyDay(final DoubleParameter yDay) {
         this.yDay = yDay;
     }
 
@@ -179,7 +176,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param rocky Value to set for property 'rocky'.
      */
-    public void setRocky(DoubleParameter rocky) {
+    public void setRocky(final DoubleParameter rocky) {
         this.rocky = rocky;
     }
 
@@ -197,7 +194,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param xRocky Value to set for property 'xRocky'.
      */
-    public void setxRocky(DoubleParameter xRocky) {
+    public void setxRocky(final DoubleParameter xRocky) {
         this.xRocky = xRocky;
     }
 
@@ -215,7 +212,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param yRocky Value to set for property 'yRocky'.
      */
-    public void setyRocky(DoubleParameter yRocky) {
+    public void setyRocky(final DoubleParameter yRocky) {
         this.yRocky = yRocky;
     }
 
@@ -233,7 +230,7 @@ public class LinearGetterBiologyFactory implements AlgorithmFactory<LinearGetter
      *
      * @param dayRocky Value to set for property 'dayRocky'.
      */
-    public void setDayRocky(DoubleParameter dayRocky) {
+    public void setDayRocky(final DoubleParameter dayRocky) {
         this.dayRocky = dayRocky;
     }
 }

@@ -32,26 +32,18 @@ import java.util.HashSet;
  * Create RandomCatchabilityTrawlGear
  * Created by carrknight on 9/30/15.
  */
-public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCatchabilityTrawl>
-{
+public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCatchabilityTrawl> {
 
-
-    private DoubleParameter meanCatchabilityFirstSpecies = new FixedDoubleParameter(.01);
-
-    private DoubleParameter standardDeviationCatchabilityFirstSpecies = new FixedDoubleParameter(0);
-
-
-    private DoubleParameter meanCatchabilityOtherSpecies = new FixedDoubleParameter(.01);
-
-    private DoubleParameter standardDeviationCatchabilityOtherSpecies = new FixedDoubleParameter(0);
-
-
-    private DoubleParameter gasPerHourFished = new FixedDoubleParameter(5);
 
     /**
      * here so that we know for which model we started gathering data
      */
     private final HashSet<FishState> models = new HashSet<>();
+    private DoubleParameter meanCatchabilityFirstSpecies = new FixedDoubleParameter(.01);
+    private DoubleParameter standardDeviationCatchabilityFirstSpecies = new FixedDoubleParameter(0);
+    private DoubleParameter meanCatchabilityOtherSpecies = new FixedDoubleParameter(.01);
+    private DoubleParameter standardDeviationCatchabilityOtherSpecies = new FixedDoubleParameter(0);
+    private DoubleParameter gasPerHourFished = new FixedDoubleParameter(5);
 
     public RandomCatchabilityTrawlFactory() {
     }
@@ -64,22 +56,21 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
      * @return the function result
      */
     @Override
-    public RandomCatchabilityTrawl apply(FishState state) {
+    public RandomCatchabilityTrawl apply(final FishState state) {
 
-        int species = state.getSpecies().size();
-        double[] means = new double[species];
-        double[] std = new double[species];
+        final int species = state.getSpecies().size();
+        final double[] means = new double[species];
+        final double[] std = new double[species];
 
-        means[0] = meanCatchabilityFirstSpecies.apply(state.getRandom());
-        std[0] = standardDeviationCatchabilityFirstSpecies.apply(state.getRandom());
+        means[0] = meanCatchabilityFirstSpecies.applyAsDouble(state.getRandom());
+        std[0] = standardDeviationCatchabilityFirstSpecies.applyAsDouble(state.getRandom());
 
-        for(int i=1; i<means.length; i++)
-        {
-            means[i] = meanCatchabilityOtherSpecies.apply(state.getRandom());
-            std[i] = standardDeviationCatchabilityOtherSpecies.apply(state.getRandom());
+        for (int i = 1; i < means.length; i++) {
+            means[i] = meanCatchabilityOtherSpecies.applyAsDouble(state.getRandom());
+            std[i] = standardDeviationCatchabilityOtherSpecies.applyAsDouble(state.getRandom());
         }
 
-        return new RandomCatchabilityTrawl(means, std, gasPerHourFished.apply(state.getRandom()));
+        return new RandomCatchabilityTrawl(means, std, gasPerHourFished.applyAsDouble(state.getRandom()));
 
 
     }
@@ -89,7 +80,8 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     }
 
     public void setMeanCatchabilityFirstSpecies(
-            DoubleParameter meanCatchabilityFirstSpecies) {
+        final DoubleParameter meanCatchabilityFirstSpecies
+    ) {
         this.meanCatchabilityFirstSpecies = meanCatchabilityFirstSpecies;
     }
 
@@ -98,7 +90,8 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     }
 
     public void setStandardDeviationCatchabilityFirstSpecies(
-            DoubleParameter standardDeviationCatchabilityFirstSpecies) {
+        final DoubleParameter standardDeviationCatchabilityFirstSpecies
+    ) {
         this.standardDeviationCatchabilityFirstSpecies = standardDeviationCatchabilityFirstSpecies;
     }
 
@@ -107,7 +100,8 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     }
 
     public void setMeanCatchabilityOtherSpecies(
-            DoubleParameter meanCatchabilityOtherSpecies) {
+        final DoubleParameter meanCatchabilityOtherSpecies
+    ) {
         this.meanCatchabilityOtherSpecies = meanCatchabilityOtherSpecies;
     }
 
@@ -116,7 +110,8 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     }
 
     public void setStandardDeviationCatchabilityOtherSpecies(
-            DoubleParameter standardDeviationCatchabilityOtherSpecies) {
+        final DoubleParameter standardDeviationCatchabilityOtherSpecies
+    ) {
         this.standardDeviationCatchabilityOtherSpecies = standardDeviationCatchabilityOtherSpecies;
     }
 
@@ -124,7 +119,7 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
         return gasPerHourFished;
     }
 
-    public void setGasPerHourFished(DoubleParameter gasPerHourFished) {
+    public void setGasPerHourFished(final DoubleParameter gasPerHourFished) {
         this.gasPerHourFished = gasPerHourFished;
     }
 

@@ -40,7 +40,7 @@ public class MaxHoursOutFactory implements AlgorithmFactory<MaxHoursOutRegulatio
     }
 
 
-    public MaxHoursOutFactory(double maxHoursOut) {
+    public MaxHoursOutFactory(final double maxHoursOut) {
         this.maxHoursOut = new FixedDoubleParameter(maxHoursOut);
     }
 
@@ -52,10 +52,10 @@ public class MaxHoursOutFactory implements AlgorithmFactory<MaxHoursOutRegulatio
      * @return the function result
      */
     @Override
-    public MaxHoursOutRegulation apply(FishState fishState) {
+    public MaxHoursOutRegulation apply(final FishState fishState) {
         return new MaxHoursOutRegulation(
-                delegate.apply(fishState),
-                maxHoursOut.apply(fishState.getRandom())
+            delegate.apply(fishState),
+            maxHoursOut.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -73,7 +73,7 @@ public class MaxHoursOutFactory implements AlgorithmFactory<MaxHoursOutRegulatio
      *
      * @param delegate Value to set for property 'delegate'.
      */
-    public void setDelegate(AlgorithmFactory<? extends Regulation> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends Regulation> delegate) {
         this.delegate = delegate;
     }
 
@@ -91,7 +91,7 @@ public class MaxHoursOutFactory implements AlgorithmFactory<MaxHoursOutRegulatio
      *
      * @param maxHoursOut Value to set for property 'maxHoursOut'.
      */
-    public void setMaxHoursOut(DoubleParameter maxHoursOut) {
+    public void setMaxHoursOut(final DoubleParameter maxHoursOut) {
         this.maxHoursOut = maxHoursOut;
     }
 }

@@ -19,33 +19,32 @@ public class TwoSidedMapFactory implements AlgorithmFactory<TwoSidedMap> {
         return width;
     }
 
+    public void setWidth(final DoubleParameter width) {
+        this.width = width;
+    }
+
     public DoubleParameter getHeight() {
         return height;
+    }
+
+    public void setHeight(final DoubleParameter height) {
+        this.height = height;
     }
 
     public DoubleParameter getCellSizeInKilometers() {
         return cellSizeInKilometers;
     }
 
+    public void setCellSizeInKilometers(final DoubleParameter cellSizeInKilometers) {
+        this.cellSizeInKilometers = cellSizeInKilometers;
+    }
 
     @Override
-    public TwoSidedMap apply(FishState fishState) {
+    public TwoSidedMap apply(final FishState fishState) {
         return new TwoSidedMap(
-                getWidth().apply(fishState.getRandom()).intValue(),
-                getHeight().apply(fishState.getRandom()).intValue(),
-                getCellSizeInKilometers().apply(fishState.getRandom())
+            (int) getWidth().applyAsDouble(fishState.getRandom()),
+            (int) getHeight().applyAsDouble(fishState.getRandom()),
+            getCellSizeInKilometers().applyAsDouble(fishState.getRandom())
         );
-    }
-
-    public void setWidth(DoubleParameter width) {
-        this.width = width;
-    }
-
-    public void setHeight(DoubleParameter height) {
-        this.height = height;
-    }
-
-    public void setCellSizeInKilometers(DoubleParameter cellSizeInKilometers) {
-        this.cellSizeInKilometers = cellSizeInKilometers;
     }
 }

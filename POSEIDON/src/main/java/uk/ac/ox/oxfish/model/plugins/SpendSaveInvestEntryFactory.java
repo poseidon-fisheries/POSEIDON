@@ -20,20 +20,20 @@ public class SpendSaveInvestEntryFactory implements AlgorithmFactory<SpendSaveIn
 
 
     @Override
-    public SpendSaveInvestEntry apply(FishState fishState) {
+    public SpendSaveInvestEntry apply(final FishState fishState) {
         return
-                new SpendSaveInvestEntry(
-                        moneyNeededForANewEntry.apply(fishState.getRandom()),
-                        yearlyExpenses.apply(fishState.getRandom()),
-                        populationName
-                );
+            new SpendSaveInvestEntry(
+                moneyNeededForANewEntry.applyAsDouble(fishState.getRandom()),
+                yearlyExpenses.applyAsDouble(fishState.getRandom()),
+                populationName
+            );
     }
 
     public DoubleParameter getMoneyNeededForANewEntry() {
         return moneyNeededForANewEntry;
     }
 
-    public void setMoneyNeededForANewEntry(DoubleParameter moneyNeededForANewEntry) {
+    public void setMoneyNeededForANewEntry(final DoubleParameter moneyNeededForANewEntry) {
         this.moneyNeededForANewEntry = moneyNeededForANewEntry;
     }
 
@@ -41,7 +41,7 @@ public class SpendSaveInvestEntryFactory implements AlgorithmFactory<SpendSaveIn
         return yearlyExpenses;
     }
 
-    public void setYearlyExpenses(DoubleParameter yearlyExpenses) {
+    public void setYearlyExpenses(final DoubleParameter yearlyExpenses) {
         this.yearlyExpenses = yearlyExpenses;
     }
 
@@ -49,7 +49,7 @@ public class SpendSaveInvestEntryFactory implements AlgorithmFactory<SpendSaveIn
         return populationName;
     }
 
-    public void setPopulationName(String populationName) {
+    public void setPopulationName(final String populationName) {
         this.populationName = populationName;
     }
 }

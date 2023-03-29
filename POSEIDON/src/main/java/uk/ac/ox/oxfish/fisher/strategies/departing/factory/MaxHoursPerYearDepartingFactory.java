@@ -27,8 +27,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
-public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHoursPerYearDepartingStrategy>
-{
+public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHoursPerYearDepartingStrategy> {
 
     private DoubleParameter maxHoursOut = new FixedDoubleParameter(1200);
 
@@ -37,7 +36,7 @@ public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHour
     }
 
 
-    public MaxHoursPerYearDepartingFactory(double maxHoursOut) {
+    public MaxHoursPerYearDepartingFactory(final double maxHoursOut) {
         this.maxHoursOut = new FixedDoubleParameter(maxHoursOut);
     }
 
@@ -48,9 +47,9 @@ public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHour
      * @return the function result
      */
     @Override
-    public MaxHoursPerYearDepartingStrategy apply(FishState fishState) {
+    public MaxHoursPerYearDepartingStrategy apply(final FishState fishState) {
         return new MaxHoursPerYearDepartingStrategy(
-                maxHoursOut.apply(fishState.getRandom())
+            maxHoursOut.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -68,7 +67,7 @@ public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHour
      *
      * @param maxHoursOut Value to set for property 'maxHoursOut'.
      */
-    public void setMaxHoursOut(DoubleParameter maxHoursOut) {
+    public void setMaxHoursOut(final DoubleParameter maxHoursOut) {
         this.maxHoursOut = maxHoursOut;
     }
 }

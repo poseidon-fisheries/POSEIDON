@@ -49,8 +49,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
     public RandomTrawlStringFactory() {
     }
 
-    public RandomTrawlStringFactory(String catchabilityMap)
-    {
+    public RandomTrawlStringFactory(final String catchabilityMap) {
         this.catchabilityMap = catchabilityMap;
     }
 
@@ -61,34 +60,36 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
      * @return the function result
      */
     @Override
-    public RandomCatchabilityTrawl apply(FishState state) {
+    public RandomCatchabilityTrawl apply(final FishState state) {
 
-        int species = state.getSpecies().size();
-        double[] means = new double[species];
-        double[] std = new double[species];
+        final int species = state.getSpecies().size();
+        final double[] means = new double[species];
+        final double[] std = new double[species];
 
-        Map<String, String> catchabilities = Splitter.on(",").withKeyValueSeparator(":").split(catchabilityMap.trim());
+        final Map<String, String> catchabilities = Splitter.on(",")
+            .withKeyValueSeparator(":")
+            .split(catchabilityMap.trim());
         Preconditions.checkArgument(catchabilities.size() > 0, "no catchability!");
-        for(Map.Entry<String,String> catchability : catchabilities.entrySet())
-        {
+        for (final Map.Entry<String, String> catchability : catchabilities.entrySet()) {
             means[Integer.parseInt(catchability.getKey().trim())] = DoubleParameter.parseDoubleParameter(
-                    catchability.getValue().trim()
-            ).apply(state.getRandom());
+                catchability.getValue().trim()
+            ).applyAsDouble(state.getRandom());
         }
 
-        if(standardDeviationMap.contains(":")) {
-            Map<String, String> deviations = Splitter.on(",").withKeyValueSeparator(":").split(standardDeviationMap);
+        if (standardDeviationMap.contains(":")) {
+            final Map<String, String> deviations = Splitter.on(",")
+                .withKeyValueSeparator(":")
+                .split(standardDeviationMap);
             assert !deviations.isEmpty();
-                for (Map.Entry<String, String> deviation : deviations.entrySet()) {
-                    std[Integer.parseInt(deviation.getKey().trim())] = DoubleParameter.parseDoubleParameter(
-                            deviation.getValue().trim()
-                    ).apply(state.getRandom());
-                }
-
+            for (final Map.Entry<String, String> deviation : deviations.entrySet()) {
+                std[Integer.parseInt(deviation.getKey().trim())] = DoubleParameter.parseDoubleParameter(
+                    deviation.getValue().trim()
+                ).applyAsDouble(state.getRandom());
+            }
 
 
         }
-        return new RandomCatchabilityTrawl(means, std, trawlSpeed.apply(state.getRandom()));
+        return new RandomCatchabilityTrawl(means, std, trawlSpeed.applyAsDouble(state.getRandom()));
 
     }
 
@@ -96,7 +97,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
         return catchabilityMap;
     }
 
-    public void setCatchabilityMap(String catchabilityMap) {
+    public void setCatchabilityMap(final String catchabilityMap) {
         this.catchabilityMap = catchabilityMap;
     }
 
@@ -104,7 +105,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
         return standardDeviationMap;
     }
 
-    public void setStandardDeviationMap(String standardDeviationMap) {
+    public void setStandardDeviationMap(final String standardDeviationMap) {
         this.standardDeviationMap = standardDeviationMap;
     }
 
@@ -112,7 +113,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
         return trawlSpeed;
     }
 
-    public void setTrawlSpeed(DoubleParameter trawlSpeed) {
+    public void setTrawlSpeed(final DoubleParameter trawlSpeed) {
         this.trawlSpeed = trawlSpeed;
     }
 }

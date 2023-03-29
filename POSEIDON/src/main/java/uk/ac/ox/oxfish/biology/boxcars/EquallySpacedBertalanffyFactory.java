@@ -35,13 +35,13 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      * the allometric alpha converting length length cm to weight grams
      */
     private DoubleParameter allometricAlpha =
-            new FixedDoubleParameter(0.015);
+        new FixedDoubleParameter(0.015);
 
     /**
      * the allometric beta converting length length cm to weight grams
      */
     private DoubleParameter allometricBeta =
-            new FixedDoubleParameter(2.961);
+        new FixedDoubleParameter(2.961);
 
     /**
      * the L_zero of the VB formula
@@ -64,6 +64,24 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
 
     private int numberOfBins = 100;
 
+    @NotNull
+
+    public static double[] bertalanffyLengthAtAge(
+        final double LInfinity, final double LZero,
+        final double kParameter, final int maximumAgeTracked
+    ) {
+        final double[] lengthAtAge = new double[100];
+        lengthAtAge[0] = LZero;
+        for (int i = 1; i < maximumAgeTracked; i++) {
+            lengthAtAge[i] = LInfinity + ((LZero - LInfinity)) *
+                Math.exp(-kParameter * i);
+        }
+        return lengthAtAge;
+    }
+
+    public static double bertnalanffyLengthToWeight(final double alpha, final double beta, final double currentLength) {
+        return alpha * Math.pow(currentLength, beta) / 1000d;
+    }
 
     /**
      * Applies this function to the given argument.
@@ -72,71 +90,54 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      * @return the function result
      */
     @Override
-    public GrowthBinByList apply(FishState fishState) {
+    public GrowthBinByList apply(final FishState fishState) {
 
-        double[] lengths = new double[numberOfBins];
-        double[] weights = new double[numberOfBins];
+        final double[] lengths = new double[numberOfBins];
+        final double[] weights = new double[numberOfBins];
         //equal spaced growth
-        double LInfinity = maxLengthInCm.apply(fishState.getRandom());
-        double LZero = recruitLengthInCm.apply(fishState.getRandom());
-        double increment = (LInfinity - LZero)/(numberOfBins-1);
+        final double LInfinity = maxLengthInCm.applyAsDouble(fishState.getRandom());
+        final double LZero = recruitLengthInCm.applyAsDouble(fishState.getRandom());
+        double increment = (LInfinity - LZero) / (numberOfBins - 1);
 
 
         //allometric weight
-        double alpha = allometricAlpha.apply(fishState.getRandom());
-        double beta = allometricBeta.apply(fishState.getRandom());
-        lengths[0] =  LZero;
+        final double alpha = allometricAlpha.applyAsDouble(fishState.getRandom());
+        final double beta = allometricBeta.applyAsDouble(fishState.getRandom());
+        lengths[0] = LZero;
 
         //if you are using a fixed increment, time to set it now!
-        if(cmPerBin != null && Double.isFinite(cmPerBin)) {
+        if (cmPerBin != null && Double.isFinite(cmPerBin)) {
             increment = cmPerBin;
-            lengths[0] =  cmPerBin /2;
+            lengths[0] = cmPerBin / 2;
 
         }
 
-        weights[0] = bertnalanffyLengthToWeight(alpha, beta,  lengths[0]);
+        weights[0] = bertnalanffyLengthToWeight(alpha, beta, lengths[0]);
 
 
-
-        for(int i=1; i<lengths.length; i++)
-        {
-            lengths[i] = lengths[i-1] + increment;
+        for (int i = 1; i < lengths.length; i++) {
+            lengths[i] = lengths[i - 1] + increment;
             //the allometric function turns it into grams, we want kg!
-            weights[i] =  bertnalanffyLengthToWeight(alpha, beta,  lengths[i]);
+            weights[i] = bertnalanffyLengthToWeight(alpha, beta, lengths[i]);
 
         }
 
 
         //sometimes we need to know what is the length at specific age, we can compute that here!
-        double k = kYearlyParameter.apply(fishState.getRandom());
-        double[] lengthAtAge = bertalanffyLengthAtAge(LInfinity, LZero,k,
-                MAXIMUM_AGE_TRACKED);
+        final double k = kYearlyParameter.applyAsDouble(fishState.getRandom());
+        final double[] lengthAtAge = bertalanffyLengthAtAge(LInfinity, LZero, k,
+            MAXIMUM_AGE_TRACKED
+        );
 
 
-        return new GrowthBinByList(1,
-                                   lengths,
-                                   weights,
-                                   lengthAtAge);
+        return new GrowthBinByList(
+            1,
+            lengths,
+            weights,
+            lengthAtAge
+        );
 
 
-    }
-
-    @NotNull
-
-    public static double[] bertalanffyLengthAtAge(double LInfinity, double LZero,
-                                                   double kParameter, int maximumAgeTracked) {
-        double[] lengthAtAge = new double[100];
-        lengthAtAge[0] = LZero;
-        for(int i = 1; i< maximumAgeTracked; i++)
-        {
-            lengthAtAge[i] = LInfinity + ((LZero - LInfinity))*
-                    Math.exp(-kParameter*i);
-        }
-        return lengthAtAge;
-    }
-
-    public static double bertnalanffyLengthToWeight(double alpha, double beta, double currentLength) {
-        return alpha * Math.pow(currentLength, beta) / 1000d;
     }
 
     /**
@@ -153,7 +154,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param allometricAlpha Value to set for property 'allometricAlpha'.
      */
-    public void setAllometricAlpha(DoubleParameter allometricAlpha) {
+    public void setAllometricAlpha(final DoubleParameter allometricAlpha) {
         this.allometricAlpha = allometricAlpha;
     }
 
@@ -171,7 +172,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param allometricBeta Value to set for property 'allometricBeta'.
      */
-    public void setAllometricBeta(DoubleParameter allometricBeta) {
+    public void setAllometricBeta(final DoubleParameter allometricBeta) {
         this.allometricBeta = allometricBeta;
     }
 
@@ -189,7 +190,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param recruitLengthInCm Value to set for property 'recruitLengthInCm'.
      */
-    public void setRecruitLengthInCm(DoubleParameter recruitLengthInCm) {
+    public void setRecruitLengthInCm(final DoubleParameter recruitLengthInCm) {
         this.recruitLengthInCm = recruitLengthInCm;
     }
 
@@ -207,7 +208,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param maxLengthInCm Value to set for property 'maxLengthInCm'.
      */
-    public void setMaxLengthInCm(DoubleParameter maxLengthInCm) {
+    public void setMaxLengthInCm(final DoubleParameter maxLengthInCm) {
         this.maxLengthInCm = maxLengthInCm;
     }
 
@@ -225,7 +226,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param kYearlyParameter Value to set for property 'kYearlyParameter'.
      */
-    public void setkYearlyParameter(DoubleParameter kYearlyParameter) {
+    public void setkYearlyParameter(final DoubleParameter kYearlyParameter) {
         this.kYearlyParameter = kYearlyParameter;
     }
 
@@ -243,7 +244,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param numberOfBins Value to set for property 'numberOfBins'.
      */
-    public void setNumberOfBins(int numberOfBins) {
+    public void setNumberOfBins(final int numberOfBins) {
         this.numberOfBins = numberOfBins;
     }
 
@@ -261,7 +262,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      *
      * @param cmPerBin Value to set for property 'cmPerBin'.
      */
-    public void setCmPerBin(Double cmPerBin) {
+    public void setCmPerBin(final Double cmPerBin) {
         this.cmPerBin = cmPerBin;
     }
 }

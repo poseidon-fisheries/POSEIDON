@@ -42,7 +42,7 @@ public class BiomassPurseSeineGearFactory
     public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {
         return new BiomassPurseSeineGear(
             makeFadManager(fishState),
-            getSuccessfulSetProbability().apply(fishState.getRandom())
+            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom())
         );
     }
 

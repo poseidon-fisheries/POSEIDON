@@ -46,12 +46,12 @@ public class FishUntilFullFactory implements AlgorithmFactory<FishUntilFullStrat
         return minimumPercentageFull;
     }
 
-    public void setMinimumPercentageFull(DoubleParameter minimumPercentageFull) {
+    public void setMinimumPercentageFull(final DoubleParameter minimumPercentageFull) {
         this.minimumPercentageFull = minimumPercentageFull;
     }
 
     @Override
-    public FishUntilFullStrategy apply(FishState state) {
-        return new FishUntilFullStrategy(getMinimumPercentageFull().apply(state.random));
+    public FishUntilFullStrategy apply(final FishState state) {
+        return new FishUntilFullStrategy(getMinimumPercentageFull().applyAsDouble(state.random));
     }
 }

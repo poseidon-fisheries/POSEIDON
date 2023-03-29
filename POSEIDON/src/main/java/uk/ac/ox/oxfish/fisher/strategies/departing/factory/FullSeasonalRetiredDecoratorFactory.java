@@ -24,9 +24,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.EffortStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -77,27 +75,22 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      * @return the function result
      */
     @Override
-    public FullSeasonalRetiredDecorator apply(FishState state) {
+    public FullSeasonalRetiredDecorator apply(final FishState state) {
 
 
-
-
-        double fulltimeProbability = probabilityStartingFullTime.apply(state.getRandom());
+        final double fulltimeProbability = probabilityStartingFullTime.applyAsDouble(state.getRandom());
         return new FullSeasonalRetiredDecorator(
-                state.random.nextDouble()< fulltimeProbability ? EffortStatus.FULLTIME : EffortStatus.SEASONAL,
-                targetVariable.apply(state.getRandom()),
-                minimumVariable.apply(state.getRandom()),
-                maxHoursOutWhenSeasonal.apply(state.getRandom()).intValue(),
-                decorated.apply(state),
-                variableName,
-                firstYearYouCanSwitch.apply(state.getRandom()).intValue(),
-                getInertia().apply(state.getRandom()).intValue(),
-
-
-                canReturnFromRetirement);
+            state.random.nextDouble() < fulltimeProbability ? EffortStatus.FULLTIME : EffortStatus.SEASONAL,
+            targetVariable.applyAsDouble(state.getRandom()),
+            minimumVariable.applyAsDouble(state.getRandom()),
+            (int) maxHoursOutWhenSeasonal.applyAsDouble(state.getRandom()),
+            decorated.apply(state),
+            variableName,
+            (int) firstYearYouCanSwitch.applyAsDouble(state.getRandom()),
+            (int) getInertia().applyAsDouble(state.getRandom()),
+            canReturnFromRetirement
+        );
     }
-
-
 
 
     /**
@@ -114,7 +107,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param probabilityStartingFullTime Value to set for property 'probabilityStartingFullTime'.
      */
-    public void setProbabilityStartingFullTime(DoubleParameter probabilityStartingFullTime) {
+    public void setProbabilityStartingFullTime(final DoubleParameter probabilityStartingFullTime) {
         this.probabilityStartingFullTime = probabilityStartingFullTime;
     }
 
@@ -132,7 +125,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param targetVariable Value to set for property 'targetVariable'.
      */
-    public void setTargetVariable(DoubleParameter targetVariable) {
+    public void setTargetVariable(final DoubleParameter targetVariable) {
         this.targetVariable = targetVariable;
     }
 
@@ -150,7 +143,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param minimumVariable Value to set for property 'minimumVariable'.
      */
-    public void setMinimumVariable(DoubleParameter minimumVariable) {
+    public void setMinimumVariable(final DoubleParameter minimumVariable) {
         this.minimumVariable = minimumVariable;
     }
 
@@ -169,7 +162,8 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      * @param decorated Value to set for property 'delegate'.
      */
     public void setDecorated(
-            AlgorithmFactory<? extends DepartingStrategy> decorated) {
+        final AlgorithmFactory<? extends DepartingStrategy> decorated
+    ) {
         this.decorated = decorated;
     }
 
@@ -187,7 +181,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param maxHoursOutWhenSeasonal Value to set for property 'maxHoursOutWhenSeasonal'.
      */
-    public void setMaxHoursOutWhenSeasonal(DoubleParameter maxHoursOutWhenSeasonal) {
+    public void setMaxHoursOutWhenSeasonal(final DoubleParameter maxHoursOutWhenSeasonal) {
         this.maxHoursOutWhenSeasonal = maxHoursOutWhenSeasonal;
     }
 
@@ -205,7 +199,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param variableName Value to set for property 'variableName'.
      */
-    public void setVariableName(String variableName) {
+    public void setVariableName(final String variableName) {
         this.variableName = variableName;
     }
 
@@ -224,7 +218,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @param firstYearYouCanSwitch Value to set for property 'firstYearYouCanSwitch'.
      */
-    public void setFirstYearYouCanSwitch(DoubleParameter firstYearYouCanSwitch) {
+    public void setFirstYearYouCanSwitch(final DoubleParameter firstYearYouCanSwitch) {
         this.firstYearYouCanSwitch = firstYearYouCanSwitch;
     }
 
@@ -232,7 +226,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
         return inertia;
     }
 
-    public void setInertia(DoubleParameter inertia) {
+    public void setInertia(final DoubleParameter inertia) {
         this.inertia = inertia;
     }
 
@@ -240,7 +234,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
         return canReturnFromRetirement;
     }
 
-    public void setCanReturnFromRetirement(boolean canReturnFromRetirement) {
+    public void setCanReturnFromRetirement(final boolean canReturnFromRetirement) {
         this.canReturnFromRetirement = canReturnFromRetirement;
     }
 }

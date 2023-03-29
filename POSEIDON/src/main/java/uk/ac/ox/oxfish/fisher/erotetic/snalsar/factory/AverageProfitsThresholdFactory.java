@@ -27,11 +27,10 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
- * Creates the Avergae Profits Threshold Extractor
+ * Creates the Average Profits Threshold Extractor
  * Created by carrknight on 6/8/16.
  */
-public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageProfitsThresholdExtractor>
-{
+public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageProfitsThresholdExtractor> {
 
     private DoubleParameter scale = new FixedDoubleParameter(1d);
 
@@ -40,11 +39,10 @@ public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageP
     }
 
 
-    public AverageProfitsThresholdFactory(double multiplier) {
+    public AverageProfitsThresholdFactory(final double multiplier) {
 
         scale = new FixedDoubleParameter(multiplier);
     }
-
 
 
     /**
@@ -54,8 +52,8 @@ public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageP
      * @return the function result
      */
     @Override
-    public AverageProfitsThresholdExtractor apply(FishState state) {
-        return new AverageProfitsThresholdExtractor(scale.apply(state.getRandom()));
+    public AverageProfitsThresholdExtractor apply(final FishState state) {
+        return new AverageProfitsThresholdExtractor(scale.applyAsDouble(state.getRandom()));
     }
 
 
@@ -63,7 +61,7 @@ public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageP
         return scale;
     }
 
-    public void setScale(DoubleParameter scale) {
+    public void setScale(final DoubleParameter scale) {
         this.scale = scale;
     }
 }

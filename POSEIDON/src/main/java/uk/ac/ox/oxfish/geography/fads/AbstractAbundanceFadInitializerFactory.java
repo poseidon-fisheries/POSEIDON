@@ -49,14 +49,14 @@ public abstract class AbstractAbundanceFadInitializerFactory
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
-        final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
+        final double totalCarryingCapacity = getTotalCarryingCapacity().applyAsDouble(rng);
         final DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);
 
         return new AbundanceFadInitializer(
             fishState.getBiology(),
             capacityGenerator,
             makeFishAttractor(fishState, rng),
-            getFishReleaseProbabilityInPercent().apply(rng) / 100d,
+            getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep
         );
     }

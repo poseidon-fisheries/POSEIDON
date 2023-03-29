@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class OneBinAbundanceFactory implements AlgorithmFactory<OneBinInitialAbundance> {
 
 
-
     private int initialBin = 0;
 
     private int initialSubdivision = -1;
@@ -44,11 +43,11 @@ public class OneBinAbundanceFactory implements AlgorithmFactory<OneBinInitialAbu
      * @return the function result
      */
     @Override
-    public OneBinInitialAbundance apply(FishState fishState) {
+    public OneBinInitialAbundance apply(final FishState fishState) {
         return new OneBinInitialAbundance(
-                initialBin,
-                initialBinPopulation.apply(fishState.getRandom()),
-                initialSubdivision
+            initialBin,
+            initialBinPopulation.applyAsDouble(fishState.getRandom()),
+            initialSubdivision
         );
     }
 
@@ -66,7 +65,7 @@ public class OneBinAbundanceFactory implements AlgorithmFactory<OneBinInitialAbu
      *
      * @param initialBin Value to set for property 'initialBin'.
      */
-    public void setInitialBin(int initialBin) {
+    public void setInitialBin(final int initialBin) {
         this.initialBin = initialBin;
     }
 
@@ -84,7 +83,7 @@ public class OneBinAbundanceFactory implements AlgorithmFactory<OneBinInitialAbu
      *
      * @param initialSubdivision Value to set for property 'initialSubdivision'.
      */
-    public void setInitialSubdivision(int initialSubdivision) {
+    public void setInitialSubdivision(final int initialSubdivision) {
         this.initialSubdivision = initialSubdivision;
     }
 
@@ -102,7 +101,7 @@ public class OneBinAbundanceFactory implements AlgorithmFactory<OneBinInitialAbu
      *
      * @param initialBinPopulation Value to set for property 'initialBinPopulation'.
      */
-    public void setInitialBinPopulation(DoubleParameter initialBinPopulation) {
+    public void setInitialBinPopulation(final DoubleParameter initialBinPopulation) {
         this.initialBinPopulation = initialBinPopulation;
     }
 }

@@ -44,12 +44,12 @@ public class KernelizedRandomFactory implements AlgorithmFactory<KernelizedRando
      * @return the function result
      */
     @Override
-    public KernelizedRandomAllocator apply(FishState fishState) {
+    public KernelizedRandomAllocator apply(final FishState fishState) {
         return new KernelizedRandomAllocator(
-                maximum.apply(fishState.getRandom()),
-                minimum.apply(fishState.getRandom()),
-                bandwidth.apply(fishState.getRandom()),
-                fixedPoints.apply(fishState.getRandom()).intValue()
+            maximum.applyAsDouble(fishState.getRandom()),
+            minimum.applyAsDouble(fishState.getRandom()),
+            bandwidth.applyAsDouble(fishState.getRandom()),
+            (int) fixedPoints.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -67,7 +67,7 @@ public class KernelizedRandomFactory implements AlgorithmFactory<KernelizedRando
      *
      * @param minimum Value to set for property 'minimum'.
      */
-    public void setMinimum(DoubleParameter minimum) {
+    public void setMinimum(final DoubleParameter minimum) {
         this.minimum = minimum;
     }
 
@@ -85,7 +85,7 @@ public class KernelizedRandomFactory implements AlgorithmFactory<KernelizedRando
      *
      * @param maximum Value to set for property 'maximum'.
      */
-    public void setMaximum(DoubleParameter maximum) {
+    public void setMaximum(final DoubleParameter maximum) {
         this.maximum = maximum;
     }
 
@@ -103,7 +103,7 @@ public class KernelizedRandomFactory implements AlgorithmFactory<KernelizedRando
      *
      * @param fixedPoints Value to set for property 'fixedPoints'.
      */
-    public void setFixedPoints(DoubleParameter fixedPoints) {
+    public void setFixedPoints(final DoubleParameter fixedPoints) {
         this.fixedPoints = fixedPoints;
     }
 
@@ -121,7 +121,7 @@ public class KernelizedRandomFactory implements AlgorithmFactory<KernelizedRando
      *
      * @param bandwidth Value to set for property 'bandwidth'.
      */
-    public void setBandwidth(DoubleParameter bandwidth) {
+    public void setBandwidth(final DoubleParameter bandwidth) {
         this.bandwidth = bandwidth;
     }
 }

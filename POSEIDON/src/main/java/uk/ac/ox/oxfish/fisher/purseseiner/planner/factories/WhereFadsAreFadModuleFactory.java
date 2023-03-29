@@ -40,12 +40,12 @@ public class WhereFadsAreFadModuleFactory implements AlgorithmFactory<WhereFadsA
             new MapDiscretization(
                 discretization.apply(state)
             ),
-            minimumValueFadSets.apply(state.getRandom()),
-            maxAllowableShear.apply(state.getRandom())
+            minimumValueFadSets.applyAsDouble(state.getRandom()),
+            maxAllowableShear.applyAsDouble(state.getRandom())
         );
         return new WhereFadsArePlanningModule(
-                optionsGenerator,
-               ageWeight.apply(state.getRandom())
+            optionsGenerator,
+            ageWeight.applyAsDouble(state.getRandom())
         );
     }
 
@@ -54,7 +54,8 @@ public class WhereFadsAreFadModuleFactory implements AlgorithmFactory<WhereFadsA
     }
 
     public void setDiscretization(
-            final AlgorithmFactory<? extends MapDiscretizer> discretization) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
         this.discretization = discretization;
     }
 

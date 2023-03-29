@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/12/17.
  */
-public class DiscardUnderagedFactory  implements AlgorithmFactory<DiscardUnderaged>{
+public class DiscardUnderagedFactory implements AlgorithmFactory<DiscardUnderaged> {
 
 
     private DoubleParameter minAgeRetained = new FixedDoubleParameter(1);
@@ -41,15 +41,15 @@ public class DiscardUnderagedFactory  implements AlgorithmFactory<DiscardUnderag
      * @return the function result
      */
     @Override
-    public DiscardUnderaged apply(FishState state) {
-        return new DiscardUnderaged(minAgeRetained.apply(state.getRandom()).intValue());
+    public DiscardUnderaged apply(final FishState state) {
+        return new DiscardUnderaged((int) minAgeRetained.applyAsDouble(state.getRandom()));
     }
 
     public DoubleParameter getMinAgeRetained() {
         return minAgeRetained;
     }
 
-    public void setMinAgeRetained(DoubleParameter minAgeRetained) {
+    public void setMinAgeRetained(final DoubleParameter minAgeRetained) {
         this.minAgeRetained = minAgeRetained;
     }
 }

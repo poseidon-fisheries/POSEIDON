@@ -49,9 +49,10 @@ public class KnifeEdgePerTripFactory implements AlgorithmFactory<KnifeEdgePerTri
      * @return the function result
      */
     @Override
-    public KnifeEdgePerTripObjective apply(FishState fishState) {
-        return new KnifeEdgePerTripObjective(opportunityCosts,
-                                             threshold.apply(fishState.getRandom())
+    public KnifeEdgePerTripObjective apply(final FishState fishState) {
+        return new KnifeEdgePerTripObjective(
+            opportunityCosts,
+            threshold.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -70,7 +71,7 @@ public class KnifeEdgePerTripFactory implements AlgorithmFactory<KnifeEdgePerTri
      *
      * @param opportunityCosts Value to set for property 'opportunityCosts'.
      */
-    public void setOpportunityCosts(boolean opportunityCosts) {
+    public void setOpportunityCosts(final boolean opportunityCosts) {
         this.opportunityCosts = opportunityCosts;
     }
 
@@ -88,7 +89,7 @@ public class KnifeEdgePerTripFactory implements AlgorithmFactory<KnifeEdgePerTri
      *
      * @param threshold Value to set for property 'threshold'.
      */
-    public void setThreshold(DoubleParameter threshold) {
+    public void setThreshold(final DoubleParameter threshold) {
         this.threshold = threshold;
     }
 }

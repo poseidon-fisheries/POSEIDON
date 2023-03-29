@@ -40,18 +40,14 @@ import java.util.function.Supplier;
 public class ReplicatorDestinationFactory implements AlgorithmFactory<ReplicatorDrivenDestinationStrategy> {
 
 
-
+    private final Locker<String, StrategyReplicator> replicator = new Locker<>();
     private List<AlgorithmFactory<? extends DestinationStrategy>> options = new LinkedList<>();
+    private DoubleParameter inertia = new FixedDoubleParameter(.8);
+
     {
         options.add(new BanditDestinationFactory());
         options.add(new GravitationalSearchDestinationFactory());
     }
-
-
-    private Locker<String,StrategyReplicator> replicator = new Locker<>();
-
-    private DoubleParameter inertia = new FixedDoubleParameter(.8);
-
 
     /**
      * Applies this function to the given argument.
@@ -60,62 +56,62 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
      * @return the function result
      */
     @Override
-    public ReplicatorDrivenDestinationStrategy apply(FishState state) {
+    public ReplicatorDrivenDestinationStrategy apply(final FishState state) {
 
-        StrategyReplicator replicator =
-                this.replicator.presentKey(state.getHopefullyUniqueID(),
-                                           new Supplier<StrategyReplicator>() {
-                                               @Override
+        final StrategyReplicator replicator =
+            this.replicator.presentKey(
+                state.getHopefullyUniqueID(),
+                new Supplier<StrategyReplicator>() {
+                    @Override
 
-                                               public StrategyReplicator get() {
+                    public StrategyReplicator get() {
 
-                                                   StrategyReplicator replicator = new StrategyReplicator(
-                                                           options,
-                                                           new CashFlowObjective(60),
-                                                           inertia.apply(
-                                                                   state.getRandom()));
+                        final StrategyReplicator replicator = new StrategyReplicator(
+                            options,
+                            new CashFlowObjective(60),
+                            inertia.applyAsDouble(
+                                state.getRandom())
+                        );
 
-                                                   state.registerStartable(replicator);
+                        state.registerStartable(replicator);
 
 
-                                                   for(int strategy = 0; strategy<options.size(); strategy++)
-                                                   {
-                                                       int finalStrategy = strategy;
-                                                       state.getDailyDataSet().
-                                                               registerGatherer(
-                                                                       "Fishers using strategy " + strategy,
-                                                                                new Gatherer<FishState>() {
-                                                                                    @Override
-                                                                                    public Double apply(FishState state) {
-                                                                                        double count = 0;
-                                                                                        for(Fisher fisher : state.getFishers())
-                                                                                        {
-                                                                                            if(((ReplicatorDrivenDestinationStrategy) fisher.getDestinationStrategy()).getStrategyIndex() == finalStrategy)
-                                                                                                count++;
-                                                                                        }
-                                                                                        return count;
+                        for (int strategy = 0; strategy < options.size(); strategy++) {
+                            final int finalStrategy = strategy;
+                            state.getDailyDataSet().
+                                registerGatherer(
+                                    "Fishers using strategy " + strategy,
+                                    (Gatherer<FishState>) state1 -> {
+                                        double count = 0;
+                                        for (final Fisher fisher : state1.getFishers()) {
+                                            if (((ReplicatorDrivenDestinationStrategy) fisher.getDestinationStrategy()).getStrategyIndex() == finalStrategy)
+                                                count++;
+                                        }
+                                        return count;
 
-                                                                                    }
-                                                                                },Double.NaN);
-                                                       int finalStrategy1 = strategy;
-                                                       state.getDailyDataSet().
-                                                               registerGatherer(
-                                                                       "Fitness of strategy " + strategy,
-                                                                       new Gatherer<FishState>() {
-                                                                           @Override
-                                                                           public Double apply(FishState state) {
-                                                                               return replicator.getLastObservedFitnesses()[finalStrategy1];
-                                                                           }
-                                                                       },Double.NaN);
-                                                   }
-                                                   return replicator;
-                                               }
-                                           });
+                                    }, Double.NaN
+                                );
+                            final int finalStrategy1 = strategy;
+                            state.getDailyDataSet().
+                                registerGatherer(
+                                    "Fitness of strategy " + strategy,
+                                    new Gatherer<FishState>() {
+                                        @Override
+                                        public Double apply(final FishState state) {
+                                            return replicator.getLastObservedFitnesses()[finalStrategy1];
+                                        }
+                                    }, Double.NaN
+                                );
+                        }
+                        return replicator;
+                    }
+                }
+            );
 
-        int strategy = state.getRandom().nextInt(replicator.getOptions().size());
+        final int strategy = state.getRandom().nextInt(replicator.getOptions().size());
         return new ReplicatorDrivenDestinationStrategy(
-                strategy,
-                replicator.getOptions().get(strategy).apply(state)
+            strategy,
+            replicator.getOptions().get(strategy).apply(state)
         );
 
     }
@@ -135,7 +131,8 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
      * @param options Value to set for property 'options'.
      */
     public void setOptions(
-            List<AlgorithmFactory<? extends DestinationStrategy>> options) {
+        final List<AlgorithmFactory<? extends DestinationStrategy>> options
+    ) {
         this.options = options;
     }
 
@@ -154,7 +151,7 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
      *
      * @param inertia Value to set for property 'inertia'.
      */
-    public void setInertia(DoubleParameter inertia) {
+    public void setInertia(final DoubleParameter inertia) {
         this.inertia = inertia;
     }
 }

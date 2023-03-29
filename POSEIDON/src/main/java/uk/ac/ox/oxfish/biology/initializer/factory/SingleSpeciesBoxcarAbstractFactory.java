@@ -38,12 +38,12 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * the allometric alpha converting length length cm to weight grams
      */
     private DoubleParameter allometricAlpha =
-            new FixedDoubleParameter(0.015);
+        new FixedDoubleParameter(0.015);
     /**
      * the allometric beta converting length length cm to weight grams
      */
     private DoubleParameter allometricBeta =
-            new FixedDoubleParameter(2.961);
+        new FixedDoubleParameter(2.961);
     private int numberOfBins = 25;
     private DoubleParameter yearlyMortality = new FixedDoubleParameter(.1);
     private DoubleParameter virginRecruits = new FixedDoubleParameter(40741397);
@@ -74,68 +74,67 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * @return the function result
      */
     @Override
-    public SingleSpeciesAbundanceInitializer apply(FishState state) {
+    public SingleSpeciesAbundanceInitializer apply(final FishState state) {
 
         //aging
-        FixedBoxcarAging aging = new FixedBoxcarAging(
-                K.apply(state.getRandom()),
-                LInfinity.apply(state.getRandom())
+        final FixedBoxcarAging aging = new FixedBoxcarAging(
+            K.applyAsDouble(state.getRandom()),
+            LInfinity.applyAsDouble(state.getRandom())
         );
         //meristic
-        GrowthBinByList meristicsInstance = generateBins(state);
+        final GrowthBinByList meristicsInstance = generateBins(state);
 
         //mortality
-        ExponentialMortalityProcess mortality = new ExponentialMortalityProcess(
-                getYearlyMortality().apply(state.getRandom()));
+        final ExponentialMortalityProcess mortality = new ExponentialMortalityProcess(
+            getYearlyMortality().applyAsDouble(state.getRandom()));
         //recruitment
-        RecruitmentBySpawningJackKnifeMaturity recruitment = new RecruitmentBySpawningJackKnifeMaturity();
-        recruitment.setLengthAtMaturity(lengthAtMaturity.apply(state.getRandom()));
+        final RecruitmentBySpawningJackKnifeMaturity recruitment = new RecruitmentBySpawningJackKnifeMaturity();
+        recruitment.setLengthAtMaturity(lengthAtMaturity.applyAsDouble(state.getRandom()));
         recruitment.setCumulativePhi(cumulativePhi);
         recruitment.setSteepness(steepness);
-        Double virginRecruits = this.virginRecruits.apply(state.getRandom());
+        final Double virginRecruits = this.virginRecruits.applyAsDouble(state.getRandom());
         recruitment.setVirginRecruits(new FixedDoubleParameter(virginRecruits));
         //add noise if necessary
         RecruitmentBySpawningJackKnifeMaturityWithProcessError optionalRecruitment = null;
-        if(!(recruitmentProcessStandardDeviation instanceof NullParameter ) && !(recruitmentNoiseStartingYear instanceof NullParameter)){
+        if (!(recruitmentProcessStandardDeviation instanceof NullParameter) && !(recruitmentNoiseStartingYear instanceof NullParameter)) {
 
-                optionalRecruitment = new RecruitmentBySpawningJackKnifeMaturityWithProcessError();
-                optionalRecruitment.setDelegate(recruitment);
-                optionalRecruitment.setLognormalStandardDeviation(recruitmentProcessStandardDeviation);
-                optionalRecruitment.setFirstYearRecruitmentBecomesNoisy(recruitmentNoiseStartingYear);
+            optionalRecruitment = new RecruitmentBySpawningJackKnifeMaturityWithProcessError();
+            optionalRecruitment.setDelegate(recruitment);
+            optionalRecruitment.setLognormalStandardDeviation(recruitmentProcessStandardDeviation);
+            optionalRecruitment.setFirstYearRecruitmentBecomesNoisy(recruitmentNoiseStartingYear);
         }
 
 
         final RecruitmentBySpawningBiomass noiselessRecruitment = recruitment.apply(state);
-        RecruitmentBySpawningBiomass recruitmentInstance = optionalRecruitment == null ? noiselessRecruitment : optionalRecruitment.apply(state);
-        BoxCarSimulator simulator = new BoxCarSimulator(
-                virginRecruits,
-                aging,
-                noiselessRecruitment, //always provide noiseless recruitment to avoid noise affecting your guessed K
-                meristicsInstance,
-                mortality);
-        StructuredAbundance structuredAbundance = simulator.virginCondition(state, 100);
+        final RecruitmentBySpawningBiomass recruitmentInstance = optionalRecruitment == null ? noiselessRecruitment : optionalRecruitment.apply(
+            state);
+        final BoxCarSimulator simulator = new BoxCarSimulator(
+            virginRecruits,
+            aging,
+            noiselessRecruitment, //always provide noiseless recruitment to avoid noise affecting your guessed K
+            meristicsInstance,
+            mortality
+        );
+        final StructuredAbundance structuredAbundance = simulator.virginCondition(state, 100);
         Preconditions.checkState(structuredAbundance.getSubdivisions() == 1, "invalid boxcar abundance structure!");
-        double scaling = initialBtOverK.apply(state.getRandom());
+        final double scaling = initialBtOverK.applyAsDouble(state.getRandom());
 
-        double[] abundances = structuredAbundance.asMatrix()[0];
+        final double[] abundances = structuredAbundance.asMatrix()[0];
 
         final double carryingCapacity = FishStateUtilities.weigh(structuredAbundance, meristicsInstance);
         System.out.println("================================= ");
         System.out.println("carrying capacity " + carryingCapacity);
 
-        InitialAbundanceFromListFactory abundance = new InitialAbundanceFromListFactory();
+        final InitialAbundanceFromListFactory abundance = new InitialAbundanceFromListFactory();
         abundance.setFishPerBinPerSex(Doubles.asList(abundances));
 
         state.registerStartable(new Startable() {
             @Override
-            public void start(FishState model) {
+            public void start(final FishState model) {
                 model.getYearlyDataSet().registerGatherer("Bt/K " + speciesName,
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState state) {
-                                return state.getTotalBiomass(state.getBiology().getSpecie(speciesName)) / carryingCapacity;
-                            }
-                        }, Double.NaN);
+                    (Gatherer<FishState>) state1 -> state1.getTotalBiomass(state1.getBiology()
+                        .getSpecie(speciesName)) / carryingCapacity, Double.NaN
+                );
             }
 
             @Override
@@ -145,19 +144,19 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
         });
 
         return new SingleSpeciesAbundanceInitializer(
-                speciesName,
-                abundance.apply(state),
-                initialAbundanceAllocator.apply(state),
-                aging,
-                meristicsInstance,
-                scaling,
-                recruitmentInstance,
-                diffuser.apply(state),
-                recruitAllocator.apply(state),
-                habitabilityAllocator.apply(state),
-                mortality,
-                true,
-                false
+            speciesName,
+            abundance.apply(state),
+            initialAbundanceAllocator.apply(state),
+            aging,
+            meristicsInstance,
+            scaling,
+            recruitmentInstance,
+            diffuser.apply(state),
+            recruitAllocator.apply(state),
+            habitabilityAllocator.apply(state),
+            mortality,
+            true,
+            false
 
         );
 
@@ -180,7 +179,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -198,7 +197,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param initialBtOverK Value to set for property 'initialBtOverK'.
      */
-    public void setInitialBtOverK(DoubleParameter initialBtOverK) {
+    public void setInitialBtOverK(final DoubleParameter initialBtOverK) {
         this.initialBtOverK = initialBtOverK;
     }
 
@@ -216,7 +215,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param LInfinity Value to set for property 'LInfinity'.
      */
-    public void setLInfinity(DoubleParameter LInfinity) {
+    public void setLInfinity(final DoubleParameter LInfinity) {
         this.LInfinity = LInfinity;
     }
 
@@ -234,7 +233,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param k Value to set for property 'k'.
      */
-    public void setK(DoubleParameter k) {
+    public void setK(final DoubleParameter k) {
         K = k;
     }
 
@@ -252,7 +251,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param allometricAlpha Value to set for property 'allometricAlpha'.
      */
-    public void setAllometricAlpha(DoubleParameter allometricAlpha) {
+    public void setAllometricAlpha(final DoubleParameter allometricAlpha) {
         this.allometricAlpha = allometricAlpha;
     }
 
@@ -270,7 +269,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param allometricBeta Value to set for property 'allometricBeta'.
      */
-    public void setAllometricBeta(DoubleParameter allometricBeta) {
+    public void setAllometricBeta(final DoubleParameter allometricBeta) {
         this.allometricBeta = allometricBeta;
     }
 
@@ -288,7 +287,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param numberOfBins Value to set for property 'numberOfBins'.
      */
-    public void setNumberOfBins(int numberOfBins) {
+    public void setNumberOfBins(final int numberOfBins) {
         this.numberOfBins = numberOfBins;
     }
 
@@ -306,7 +305,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param yearlyMortality Value to set for property 'yearlyMortality'.
      */
-    public void setYearlyMortality(DoubleParameter yearlyMortality) {
+    public void setYearlyMortality(final DoubleParameter yearlyMortality) {
         this.yearlyMortality = yearlyMortality;
     }
 
@@ -324,7 +323,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param virginRecruits Value to set for property 'virginRecruits'.
      */
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -342,7 +341,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param steepness Value to set for property 'steepness'.
      */
-    public void setSteepness(DoubleParameter steepness) {
+    public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
@@ -360,7 +359,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param cumulativePhi Value to set for property 'cumulativePhi'.
      */
-    public void setCumulativePhi(DoubleParameter cumulativePhi) {
+    public void setCumulativePhi(final DoubleParameter cumulativePhi) {
         this.cumulativePhi = cumulativePhi;
     }
 
@@ -378,7 +377,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      *
      * @param lengthAtMaturity Value to set for property 'lengthAtMaturity'.
      */
-    public void setLengthAtMaturity(DoubleParameter lengthAtMaturity) {
+    public void setLengthAtMaturity(final DoubleParameter lengthAtMaturity) {
         this.lengthAtMaturity = lengthAtMaturity;
     }
 
@@ -397,7 +396,8 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * @param initialAbundanceAllocator Value to set for property 'initialAbundanceAllocator'.
      */
     public void setInitialAbundanceAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> initialAbundanceAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> initialAbundanceAllocator
+    ) {
         this.initialAbundanceAllocator = initialAbundanceAllocator;
     }
 
@@ -416,7 +416,8 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * @param diffuser Value to set for property 'diffuser'.
      */
     public void setDiffuser(
-            AlgorithmFactory<? extends AbundanceDiffuser> diffuser) {
+        final AlgorithmFactory<? extends AbundanceDiffuser> diffuser
+    ) {
         this.diffuser = diffuser;
     }
 
@@ -435,7 +436,8 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * @param recruitAllocator Value to set for property 'recruitAllocator'.
      */
     public void setRecruitAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> recruitAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> recruitAllocator
+    ) {
         this.recruitAllocator = recruitAllocator;
     }
 
@@ -454,7 +456,8 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      * @param habitabilityAllocator Value to set for property 'habitabilityAllocator'.
      */
     public void setHabitabilityAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator
+    ) {
         this.habitabilityAllocator = habitabilityAllocator;
     }
 
@@ -462,7 +465,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
         return abundanceSimulator;
     }
 
-    public void setAbundanceSimulator(BoxCarSimulator abundanceSimulator) {
+    public void setAbundanceSimulator(final BoxCarSimulator abundanceSimulator) {
         this.abundanceSimulator = abundanceSimulator;
     }
 
@@ -470,7 +473,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
         return recruitmentProcessStandardDeviation;
     }
 
-    public void setRecruitmentProcessStandardDeviation(DoubleParameter recruitmentProcessStandardDeviation) {
+    public void setRecruitmentProcessStandardDeviation(final DoubleParameter recruitmentProcessStandardDeviation) {
         this.recruitmentProcessStandardDeviation = recruitmentProcessStandardDeviation;
     }
 
@@ -478,7 +481,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
         return recruitmentNoiseStartingYear;
     }
 
-    public void setRecruitmentNoiseStartingYear(DoubleParameter recruitmentNoiseStartingYear) {
+    public void setRecruitmentNoiseStartingYear(final DoubleParameter recruitmentNoiseStartingYear) {
         this.recruitmentNoiseStartingYear = recruitmentNoiseStartingYear;
     }
 }

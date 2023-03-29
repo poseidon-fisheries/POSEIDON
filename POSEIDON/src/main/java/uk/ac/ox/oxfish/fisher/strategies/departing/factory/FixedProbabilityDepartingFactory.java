@@ -26,9 +26,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedProbabilityDepartingStrategy>
-{
-    private DoubleParameter probabilityToLeavePort= new FixedDoubleParameter(1);
+public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedProbabilityDepartingStrategy> {
+    private DoubleParameter probabilityToLeavePort = new FixedDoubleParameter(1);
 
 
     private boolean checkOnlyOnceADay = false;
@@ -40,9 +39,11 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
      * @return the function result
      */
     @Override
-    public FixedProbabilityDepartingStrategy apply(FishState state) {
-        return new FixedProbabilityDepartingStrategy(probabilityToLeavePort.apply(state.random),
-                false);
+    public FixedProbabilityDepartingStrategy apply(final FishState state) {
+        return new FixedProbabilityDepartingStrategy(
+            probabilityToLeavePort.applyAsDouble(state.random),
+            false
+        );
     }
 
 
@@ -50,7 +51,7 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
         return probabilityToLeavePort;
     }
 
-    public void setProbabilityToLeavePort(DoubleParameter probabilityToLeavePort) {
+    public void setProbabilityToLeavePort(final DoubleParameter probabilityToLeavePort) {
         this.probabilityToLeavePort = probabilityToLeavePort;
     }
 
@@ -59,7 +60,7 @@ public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedP
         return checkOnlyOnceADay;
     }
 
-    public void setCheckOnlyOnceADay(boolean checkOnlyOnceADay) {
+    public void setCheckOnlyOnceADay(final boolean checkOnlyOnceADay) {
         this.checkOnlyOnceADay = checkOnlyOnceADay;
     }
 }

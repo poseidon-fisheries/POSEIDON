@@ -33,43 +33,38 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperatureHazard> {
 
 
+    AdditionalMapFactory additionalMapFactory = new AdditionalMapFactory();
     private DoubleParameter minimumDaysBeforeHazardCanTakePlace = new FixedDoubleParameter(10);
-
-    private DoubleParameter valueBelowWhichHazardHappens = new FixedDoubleParameter(25) ;
-
+    private DoubleParameter valueBelowWhichHazardHappens = new FixedDoubleParameter(25);
     private DoubleParameter hazardProbability = new FixedDoubleParameter(.2);
 
-
-    @Override
-    public FadTemperatureHazard apply(FishState fishState) {
-
-        fishState.registerStartable( additionalMapFactory.apply(fishState));
-
-        return new FadTemperatureHazard(
-                minimumDaysBeforeHazardCanTakePlace.apply(fishState.getRandom()).intValue(),
-                valueBelowWhichHazardHappens.apply(fishState.getRandom()).doubleValue(),
-                hazardProbability.apply(fishState.getRandom()).doubleValue(),
-                additionalMapFactory.getMapVariableName()
-
-        );
-    }
-
-    AdditionalMapFactory additionalMapFactory = new AdditionalMapFactory();
     {
         additionalMapFactory.setGridFile(InputPath.of("inputs", "tests", "temperature.csv"));
         additionalMapFactory.setMapPeriod(365);
         additionalMapFactory.setMapVariableName("Temperature");
     }
 
+    @Override
+    public FadTemperatureHazard apply(final FishState fishState) {
 
+        fishState.registerStartable(additionalMapFactory.apply(fishState));
 
+        return new FadTemperatureHazard(
+            (int) minimumDaysBeforeHazardCanTakePlace.applyAsDouble(fishState.getRandom()),
+            valueBelowWhichHazardHappens.applyAsDouble(fishState.getRandom()),
+            hazardProbability.applyAsDouble(fishState.getRandom()),
+            additionalMapFactory.getMapVariableName()
+
+        );
+    }
 
     public DoubleParameter getMinimumDaysBeforeHazardCanTakePlace() {
         return minimumDaysBeforeHazardCanTakePlace;
     }
 
     public void setMinimumDaysBeforeHazardCanTakePlace(
-            DoubleParameter minimumDaysBeforeHazardCanTakePlace) {
+        final DoubleParameter minimumDaysBeforeHazardCanTakePlace
+    ) {
         this.minimumDaysBeforeHazardCanTakePlace = minimumDaysBeforeHazardCanTakePlace;
     }
 
@@ -77,7 +72,7 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         return valueBelowWhichHazardHappens;
     }
 
-    public void setValueBelowWhichHazardHappens(DoubleParameter valueBelowWhichHazardHappens) {
+    public void setValueBelowWhichHazardHappens(final DoubleParameter valueBelowWhichHazardHappens) {
         this.valueBelowWhichHazardHappens = valueBelowWhichHazardHappens;
     }
 
@@ -85,7 +80,7 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         return hazardProbability;
     }
 
-    public void setHazardProbability(DoubleParameter hazardProbability) {
+    public void setHazardProbability(final DoubleParameter hazardProbability) {
         this.hazardProbability = hazardProbability;
     }
 
@@ -94,7 +89,7 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         return additionalMapFactory.getGridFile();
     }
 
-    public void setPathToMapFile(InputPath pathToClorophillFile) {
+    public void setPathToMapFile(final InputPath pathToClorophillFile) {
         additionalMapFactory.setGridFile(pathToClorophillFile);
     }
 
@@ -102,7 +97,7 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         return additionalMapFactory.getMapPeriod();
     }
 
-    public void setMapPeriod(int mapPeriod) {
+    public void setMapPeriod(final int mapPeriod) {
         additionalMapFactory.setMapPeriod(mapPeriod);
     }
 
@@ -110,7 +105,7 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
         return additionalMapFactory.getMapVariableName();
     }
 
-    public void setMapVariableName(String mapVariableName) {
+    public void setMapVariableName(final String mapVariableName) {
         additionalMapFactory.setMapVariableName(mapVariableName);
     }
 }

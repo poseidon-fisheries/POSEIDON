@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
-public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToRightMixedInitializer>{
+public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToRightMixedInitializer> {
 
 
     /**
@@ -58,10 +58,11 @@ public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToR
      * @return the function result
      */
     @Override
-    public FromLeftToRightMixedInitializer apply(FishState state) {
-        FromLeftToRightMixedInitializer initializer = new FromLeftToRightMixedInitializer(
-                maximumBiomass.apply(state.getRandom()),
-                proportionSecondSpeciesToFirst.apply(state.getRandom()));
+    public FromLeftToRightMixedInitializer apply(final FishState state) {
+        final FromLeftToRightMixedInitializer initializer = new FromLeftToRightMixedInitializer(
+            maximumBiomass.applyAsDouble(state.getRandom()),
+            proportionSecondSpeciesToFirst.applyAsDouble(state.getRandom())
+        );
         initializer.setFirstSpeciesName(firstSpeciesName);
         initializer.setSecondSpeciesName(secondSpeciesName);
         return initializer;
@@ -82,7 +83,8 @@ public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToR
      * @param proportionSecondSpeciesToFirst Value to set for property 'proportionSecondSpeciesToFirst'.
      */
     public void setProportionSecondSpeciesToFirst(
-            DoubleParameter proportionSecondSpeciesToFirst) {
+        final DoubleParameter proportionSecondSpeciesToFirst
+    ) {
         this.proportionSecondSpeciesToFirst = proportionSecondSpeciesToFirst;
     }
 
@@ -100,7 +102,7 @@ public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToR
      *
      * @param maximumBiomass Value to set for property 'maximumBiomass'.
      */
-    public void setMaximumBiomass(DoubleParameter maximumBiomass) {
+    public void setMaximumBiomass(final DoubleParameter maximumBiomass) {
         this.maximumBiomass = maximumBiomass;
     }
 
@@ -108,7 +110,7 @@ public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToR
         return firstSpeciesName;
     }
 
-    public void setFirstSpeciesName(String firstSpeciesName) {
+    public void setFirstSpeciesName(final String firstSpeciesName) {
         this.firstSpeciesName = firstSpeciesName;
     }
 
@@ -116,7 +118,7 @@ public class FromLeftToRightMixedFactory implements AlgorithmFactory<FromLeftToR
         return secondSpeciesName;
     }
 
-    public void setSecondSpeciesName(String secondSpeciesName) {
+    public void setSecondSpeciesName(final String secondSpeciesName) {
         this.secondSpeciesName = secondSpeciesName;
     }
 }

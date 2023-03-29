@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 8/1/16.
  */
-public class ParticleFilterRegressionFactory  implements AlgorithmFactory<ParticleFilterRegression>{
+public class ParticleFilterRegressionFactory implements AlgorithmFactory<ParticleFilterRegression> {
 
 
     private DoubleParameter distanceNoise = new FixedDoubleParameter(.1);
@@ -52,16 +52,16 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      * @return the function result
      */
     @Override
-    public ParticleFilterRegression apply(FishState state) {
+    public ParticleFilterRegression apply(final FishState state) {
         return new ParticleFilterRegression(
-                distanceNoise.apply(state.getRandom()),
-                evidenceDeviation.apply(state.getRandom()),
-                temporalDrift.apply(state.getRandom()),
-                filterSize.apply(state.getRandom()).intValue(),
-                state.getMap(),
-                state.getRandom(),
-                minValue.apply(state.getRandom()),
-                maxValue.apply(state.getRandom())
+            distanceNoise.applyAsDouble(state.getRandom()),
+            evidenceDeviation.applyAsDouble(state.getRandom()),
+            temporalDrift.applyAsDouble(state.getRandom()),
+            (int) filterSize.applyAsDouble(state.getRandom()),
+            state.getMap(),
+            state.getRandom(),
+            minValue.applyAsDouble(state.getRandom()),
+            maxValue.applyAsDouble(state.getRandom())
         );
     }
 
@@ -80,7 +80,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param distanceNoise Value to set for property 'distanceNoise'.
      */
-    public void setDistanceNoise(DoubleParameter distanceNoise) {
+    public void setDistanceNoise(final DoubleParameter distanceNoise) {
         this.distanceNoise = distanceNoise;
     }
 
@@ -98,7 +98,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param evidenceDeviation Value to set for property 'evidenceDeviation'.
      */
-    public void setEvidenceDeviation(DoubleParameter evidenceDeviation) {
+    public void setEvidenceDeviation(final DoubleParameter evidenceDeviation) {
         this.evidenceDeviation = evidenceDeviation;
     }
 
@@ -116,7 +116,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param temporalDrift Value to set for property 'temporalDrift'.
      */
-    public void setTemporalDrift(DoubleParameter temporalDrift) {
+    public void setTemporalDrift(final DoubleParameter temporalDrift) {
         this.temporalDrift = temporalDrift;
     }
 
@@ -134,7 +134,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param filterSize Value to set for property 'filterSize'.
      */
-    public void setFilterSize(DoubleParameter filterSize) {
+    public void setFilterSize(final DoubleParameter filterSize) {
         this.filterSize = filterSize;
     }
 
@@ -152,7 +152,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param minValue Value to set for property 'minValue'.
      */
-    public void setMinValue(DoubleParameter minValue) {
+    public void setMinValue(final DoubleParameter minValue) {
         this.minValue = minValue;
     }
 
@@ -170,7 +170,7 @@ public class ParticleFilterRegressionFactory  implements AlgorithmFactory<Partic
      *
      * @param maxValue Value to set for property 'maxValue'.
      */
-    public void setMaxValue(DoubleParameter maxValue) {
+    public void setMaxValue(final DoubleParameter maxValue) {
         this.maxValue = maxValue;
     }
 }

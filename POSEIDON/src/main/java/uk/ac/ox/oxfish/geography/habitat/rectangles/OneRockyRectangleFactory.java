@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Created by carrknight on 11/18/15.
  */
 public class OneRockyRectangleFactory
-        implements AlgorithmFactory<RockyRectanglesHabitatInitializer>
-{
+    implements AlgorithmFactory<RockyRectanglesHabitatInitializer> {
 
 
     private DoubleParameter topLeftX = new FixedDoubleParameter(0);
@@ -52,10 +51,11 @@ public class OneRockyRectangleFactory
     @Override
     public RockyRectanglesHabitatInitializer apply(FishState fishState) {
         return new RockyRectanglesHabitatInitializer(
-                topLeftX.apply(fishState.getRandom()).intValue(),
-                topLeftY.apply(fishState.getRandom()).intValue(),
-                width.apply(fishState.getRandom()).intValue(),
-                height.apply(fishState.getRandom()).intValue());
+            (int) topLeftX.applyAsDouble(fishState.getRandom()),
+            (int) topLeftY.applyAsDouble(fishState.getRandom()),
+            (int) width.applyAsDouble(fishState.getRandom()),
+            (int) height.applyAsDouble(fishState.getRandom())
+        );
     }
 
     public DoubleParameter getTopLeftX() {

@@ -12,22 +12,21 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FadMapDummyFactory implements AlgorithmFactory<FadMap>  {
+public class FadMapDummyFactory implements AlgorithmFactory<FadMap> {
 
     private boolean isBiomassOnly = false;
-
 
 
     private DoubleParameter fixedXCurrent = new FixedDoubleParameter(+1);
     private DoubleParameter fixedYCurrent = new FixedDoubleParameter(-1);
 
     @NotNull
-    protected ConstantCurrentVector getCurrentVectors(FishState fishState, NauticalMap map) {
+    protected ConstantCurrentVector getCurrentVectors(final FishState fishState, final NauticalMap map) {
         return new ConstantCurrentVector(
-                fixedXCurrent.apply(fishState.getRandom()),
-                fixedYCurrent.apply(fishState.getRandom()),
-                map.getHeight(),
-                map.getWidth()
+            fixedXCurrent.applyAsDouble(fishState.getRandom()),
+            fixedYCurrent.applyAsDouble(fishState.getRandom()),
+            map.getHeight(),
+            map.getWidth()
         );
     }
 
@@ -35,7 +34,7 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap>  {
         return fixedXCurrent;
     }
 
-    public void setFixedXCurrent(DoubleParameter fixedXCurrent) {
+    public void setFixedXCurrent(final DoubleParameter fixedXCurrent) {
         this.fixedXCurrent = fixedXCurrent;
     }
 
@@ -43,21 +42,21 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap>  {
         return fixedYCurrent;
     }
 
-    public void setFixedYCurrent(DoubleParameter fixedYCurrent) {
+    public void setFixedYCurrent(final DoubleParameter fixedYCurrent) {
         this.fixedYCurrent = fixedYCurrent;
     }
 
     @Override
-    public FadMap apply(FishState fishState) {
+    public FadMap apply(final FishState fishState) {
 
 
-        NauticalMap map = fishState.getMap();
+        final NauticalMap map = fishState.getMap();
         return new FadMap(
-                map,
-                getCurrentVectors(fishState, map),
-                fishState.getBiology(),
-                isBiomassOnly ? BiomassLocalBiology.class : AbundanceLocalBiology.class,
-                isBiomassOnly ? BiomassFad.class : AbundanceFad.class
+            map,
+            getCurrentVectors(fishState, map),
+            fishState.getBiology(),
+            isBiomassOnly ? BiomassLocalBiology.class : AbundanceLocalBiology.class,
+            isBiomassOnly ? BiomassFad.class : AbundanceFad.class
         );
 
 
@@ -68,7 +67,7 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap>  {
         return isBiomassOnly;
     }
 
-    public void setBiomassOnly(boolean biomassOnly) {
+    public void setBiomassOnly(final boolean biomassOnly) {
         isBiomassOnly = biomassOnly;
     }
 }

@@ -29,77 +29,40 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 1/21/17.
  */
-public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchInitializer>
-{
+public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchInitializer> {
+    private final Locker<String, YellowBycatchInitializer> instance = new Locker<>();
     private boolean separateBycatchStock = false;
-
     private String targetSpeciesName = "Sablefish";
-
-    private String bycatchSpeciesName  = "Yelloweye Rockfish";
-
+    private String bycatchSpeciesName = "Yelloweye Rockfish";
     private DoubleParameter bycatchRho = new FixedDoubleParameter(0.981194230283006d);
-
     private DoubleParameter bycatchNaturalSurvivalRate = new FixedDoubleParameter(0.95504);
-
     private DoubleParameter bycatchRecruitmentSteepness = new FixedDoubleParameter(0.44056);
-
-
     private DoubleParameter bycatchRecruitmentLag = new FixedDoubleParameter(14);
-
     private DoubleParameter bycatchWeightAtRecruitment = new FixedDoubleParameter(1.11910);
-
     private DoubleParameter bycatchWeightAtRecruitmentMinus1 = new FixedDoubleParameter(1.01604);
-
-
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
-
     private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(111.1395982902 * 1000d);
-
-
-
-
-
-    private DoubleParameter  targetRho = new FixedDoubleParameter(0.813181970802262);
-
+    private DoubleParameter targetRho = new FixedDoubleParameter(0.813181970802262);
     private DoubleParameter targetNaturalSurvivalRate = new FixedDoubleParameter(0.92311);
-
     private DoubleParameter targetRecruitmentSteepness = new FixedDoubleParameter(0.6);
-
-
     private DoubleParameter targetRecruitmentLag = new FixedDoubleParameter(3);
-
     private DoubleParameter targetWeightAtRecruitment = new FixedDoubleParameter(1.03313);
-
     private DoubleParameter targetWeightAtRecruitmentMinus1 = new FixedDoubleParameter(0.63456);
-
-
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
-
     //this is the recruits on the year before the start of the simulation!
     private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(16713267);
-
-
-
     private DoubleParameter northSouthSeparator = new FixedDoubleParameter(50);
-
     /**
      * any cell with x >= verticalSeparator will include the bycatch species
      */
     private DoubleParameter verticalSeparator
-            = new FixedDoubleParameter(25);
-
-
+        = new FixedDoubleParameter(25);
     private DoubleParameter proportionOfBycatchNorth = new FixedDoubleParameter(1d);
-
-
     private DoubleParameter diffusingRate = new FixedDoubleParameter(.0001);
-
-    private Locker<String,YellowBycatchInitializer> instance = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -108,56 +71,50 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      * @return the function result
      */
     @Override
-    public YellowBycatchInitializer apply(FishState state) {
-        int northSouthSeparator = this.northSouthSeparator.apply(state.getRandom()).intValue();
-        return instance.presentKey(state.getHopefullyUniqueID(),
-                            new Supplier<YellowBycatchInitializer>() {
-                                @Override
-                                public YellowBycatchInitializer get() {
-                                    return new YellowBycatchInitializer(
-                                            separateBycatchStock,
-                                            targetSpeciesName,
-                                            bycatchSpeciesName,
-                                            bycatchRho.apply(state.getRandom()),
-                                            bycatchNaturalSurvivalRate.apply(state.getRandom()),
-                                            bycatchRecruitmentSteepness.apply(state.getRandom()),
-                                            bycatchRecruitmentLag.apply(state.getRandom()).intValue(),
-                                            bycatchWeightAtRecruitment.apply(state.getRandom()),
-                                            bycatchWeightAtRecruitmentMinus1.apply(state.getRandom()),
-                                            bycatchVirginBiomass.apply(state.getRandom()),
-                                            bycatchInitialRecruits.apply(state.getRandom()),
-                                            targetRho.apply(state.getRandom()),
-                                            targetNaturalSurvivalRate.apply(state.getRandom()),
-                                            targetRecruitmentSteepness.apply(state.getRandom()),
-                                            targetRecruitmentLag.apply(state.getRandom()).intValue(),
-                                            targetWeightAtRecruitment.apply(state.getRandom()),
-                                            targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
-                                            targetVirginBiomass.apply(state.getRandom()),
-                                            targetInitialRecruits.apply(state.getRandom()),
-                                            verticalSeparator.apply(state.getRandom()).intValue(),
-                                            northSouthSeparator,
-                                            new Function<SeaTile, Double>() {
-                                                @Override
-                                                public Double apply(SeaTile seaTile) {
-                                                    if(seaTile.getGridY() < northSouthSeparator)
-                                                        return proportionOfBycatchNorth.apply(state.getRandom());
-                                                    else
-                                                        return 1d;
-                                                }
-                                            },
-                                            diffusingRate.apply(state.getRandom()));
-                                }
-                            });
+    public YellowBycatchInitializer apply(final FishState state) {
+        final int northSouthSeparator = (int) this.northSouthSeparator.applyAsDouble(state.getRandom());
+        return instance.presentKey(
+            state.getHopefullyUniqueID(),
+            () -> new YellowBycatchInitializer(
+                separateBycatchStock,
+                targetSpeciesName,
+                bycatchSpeciesName,
+                bycatchRho.applyAsDouble(state.getRandom()),
+                bycatchNaturalSurvivalRate.applyAsDouble(state.getRandom()),
+                bycatchRecruitmentSteepness.applyAsDouble(state.getRandom()),
+                (int) bycatchRecruitmentLag.applyAsDouble(state.getRandom()),
+                bycatchWeightAtRecruitment.applyAsDouble(state.getRandom()),
+                bycatchWeightAtRecruitmentMinus1.applyAsDouble(state.getRandom()),
+                bycatchVirginBiomass.applyAsDouble(state.getRandom()),
+                bycatchInitialRecruits.applyAsDouble(state.getRandom()),
+                targetRho.applyAsDouble(state.getRandom()),
+                targetNaturalSurvivalRate.applyAsDouble(state.getRandom()),
+                targetRecruitmentSteepness.applyAsDouble(state.getRandom()),
+                (int) targetRecruitmentLag.applyAsDouble(state.getRandom()),
+                targetWeightAtRecruitment.applyAsDouble(state.getRandom()),
+                targetWeightAtRecruitmentMinus1.applyAsDouble(state.getRandom()),
+                targetVirginBiomass.applyAsDouble(state.getRandom()),
+                targetInitialRecruits.applyAsDouble(state.getRandom()),
+                (int) verticalSeparator.applyAsDouble(state.getRandom()),
+                northSouthSeparator,
+                (Function<SeaTile, Double>) seaTile -> {
+                    if (seaTile.getGridY() < northSouthSeparator)
+                        return proportionOfBycatchNorth.applyAsDouble(state.getRandom());
+                    else
+                        return 1d;
+                },
+                diffusingRate.applyAsDouble(state.getRandom())
+            )
+        );
 
     }
-
 
 
     public boolean isSeparateBycatchStock() {
         return separateBycatchStock;
     }
 
-    public void setSeparateBycatchStock(boolean separateBycatchStock) {
+    public void setSeparateBycatchStock(final boolean separateBycatchStock) {
         this.separateBycatchStock = separateBycatchStock;
     }
 
@@ -165,7 +122,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetSpeciesName;
     }
 
-    public void setTargetSpeciesName(String targetSpeciesName) {
+    public void setTargetSpeciesName(final String targetSpeciesName) {
         this.targetSpeciesName = targetSpeciesName;
     }
 
@@ -173,7 +130,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchSpeciesName;
     }
 
-    public void setBycatchSpeciesName(String bycatchSpeciesName) {
+    public void setBycatchSpeciesName(final String bycatchSpeciesName) {
         this.bycatchSpeciesName = bycatchSpeciesName;
     }
 
@@ -181,7 +138,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchRho;
     }
 
-    public void setBycatchRho(DoubleParameter bycatchRho) {
+    public void setBycatchRho(final DoubleParameter bycatchRho) {
         this.bycatchRho = bycatchRho;
     }
 
@@ -189,7 +146,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchNaturalSurvivalRate;
     }
 
-    public void setBycatchNaturalSurvivalRate(DoubleParameter bycatchNaturalSurvivalRate) {
+    public void setBycatchNaturalSurvivalRate(final DoubleParameter bycatchNaturalSurvivalRate) {
         this.bycatchNaturalSurvivalRate = bycatchNaturalSurvivalRate;
     }
 
@@ -197,7 +154,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchRecruitmentSteepness;
     }
 
-    public void setBycatchRecruitmentSteepness(DoubleParameter bycatchRecruitmentSteepness) {
+    public void setBycatchRecruitmentSteepness(final DoubleParameter bycatchRecruitmentSteepness) {
         this.bycatchRecruitmentSteepness = bycatchRecruitmentSteepness;
     }
 
@@ -205,7 +162,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchRecruitmentLag;
     }
 
-    public void setBycatchRecruitmentLag(DoubleParameter bycatchRecruitmentLag) {
+    public void setBycatchRecruitmentLag(final DoubleParameter bycatchRecruitmentLag) {
         this.bycatchRecruitmentLag = bycatchRecruitmentLag;
     }
 
@@ -213,7 +170,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchWeightAtRecruitment;
     }
 
-    public void setBycatchWeightAtRecruitment(DoubleParameter bycatchWeightAtRecruitment) {
+    public void setBycatchWeightAtRecruitment(final DoubleParameter bycatchWeightAtRecruitment) {
         this.bycatchWeightAtRecruitment = bycatchWeightAtRecruitment;
     }
 
@@ -222,7 +179,8 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     }
 
     public void setBycatchWeightAtRecruitmentMinus1(
-            DoubleParameter bycatchWeightAtRecruitmentMinus1) {
+        final DoubleParameter bycatchWeightAtRecruitmentMinus1
+    ) {
         this.bycatchWeightAtRecruitmentMinus1 = bycatchWeightAtRecruitmentMinus1;
     }
 
@@ -230,7 +188,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchVirginBiomass;
     }
 
-    public void setBycatchVirginBiomass(DoubleParameter bycatchVirginBiomass) {
+    public void setBycatchVirginBiomass(final DoubleParameter bycatchVirginBiomass) {
         this.bycatchVirginBiomass = bycatchVirginBiomass;
     }
 
@@ -238,7 +196,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return bycatchInitialRecruits;
     }
 
-    public void setBycatchInitialRecruits(DoubleParameter bycatchInitialRecruits) {
+    public void setBycatchInitialRecruits(final DoubleParameter bycatchInitialRecruits) {
         this.bycatchInitialRecruits = bycatchInitialRecruits;
     }
 
@@ -246,7 +204,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetRho;
     }
 
-    public void setTargetRho(DoubleParameter targetRho) {
+    public void setTargetRho(final DoubleParameter targetRho) {
         this.targetRho = targetRho;
     }
 
@@ -254,7 +212,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetNaturalSurvivalRate;
     }
 
-    public void setTargetNaturalSurvivalRate(DoubleParameter targetNaturalSurvivalRate) {
+    public void setTargetNaturalSurvivalRate(final DoubleParameter targetNaturalSurvivalRate) {
         this.targetNaturalSurvivalRate = targetNaturalSurvivalRate;
     }
 
@@ -262,7 +220,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetRecruitmentSteepness;
     }
 
-    public void setTargetRecruitmentSteepness(DoubleParameter targetRecruitmentSteepness) {
+    public void setTargetRecruitmentSteepness(final DoubleParameter targetRecruitmentSteepness) {
         this.targetRecruitmentSteepness = targetRecruitmentSteepness;
     }
 
@@ -270,7 +228,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetRecruitmentLag;
     }
 
-    public void setTargetRecruitmentLag(DoubleParameter targetRecruitmentLag) {
+    public void setTargetRecruitmentLag(final DoubleParameter targetRecruitmentLag) {
         this.targetRecruitmentLag = targetRecruitmentLag;
     }
 
@@ -278,7 +236,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetWeightAtRecruitment;
     }
 
-    public void setTargetWeightAtRecruitment(DoubleParameter targetWeightAtRecruitment) {
+    public void setTargetWeightAtRecruitment(final DoubleParameter targetWeightAtRecruitment) {
         this.targetWeightAtRecruitment = targetWeightAtRecruitment;
     }
 
@@ -287,7 +245,8 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     }
 
     public void setTargetWeightAtRecruitmentMinus1(
-            DoubleParameter targetWeightAtRecruitmentMinus1) {
+        final DoubleParameter targetWeightAtRecruitmentMinus1
+    ) {
         this.targetWeightAtRecruitmentMinus1 = targetWeightAtRecruitmentMinus1;
     }
 
@@ -295,7 +254,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetVirginBiomass;
     }
 
-    public void setTargetVirginBiomass(DoubleParameter targetVirginBiomass) {
+    public void setTargetVirginBiomass(final DoubleParameter targetVirginBiomass) {
         this.targetVirginBiomass = targetVirginBiomass;
     }
 
@@ -303,7 +262,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return targetInitialRecruits;
     }
 
-    public void setTargetInitialRecruits(DoubleParameter targetInitialRecruits) {
+    public void setTargetInitialRecruits(final DoubleParameter targetInitialRecruits) {
         this.targetInitialRecruits = targetInitialRecruits;
     }
 
@@ -311,7 +270,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         return verticalSeparator;
     }
 
-    public void setVerticalSeparator(DoubleParameter verticalSeparator) {
+    public void setVerticalSeparator(final DoubleParameter verticalSeparator) {
         this.verticalSeparator = verticalSeparator;
     }
 
@@ -330,7 +289,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      *
      * @param northSouthSeparator Value to set for property 'northSouthSeparator'.
      */
-    public void setNorthSouthSeparator(DoubleParameter northSouthSeparator) {
+    public void setNorthSouthSeparator(final DoubleParameter northSouthSeparator) {
         this.northSouthSeparator = northSouthSeparator;
     }
 
@@ -348,16 +307,13 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      *
      * @param proportionOfBycatchNorth Value to set for property 'proportionOfBycatchNorth'.
      */
-    public void setProportionOfBycatchNorth(DoubleParameter proportionOfBycatchNorth) {
+    public void setProportionOfBycatchNorth(final DoubleParameter proportionOfBycatchNorth) {
         this.proportionOfBycatchNorth = proportionOfBycatchNorth;
     }
 
-    public YellowBycatchInitializer retrieveLastMade(){
-        return instance.presentKey(instance.getCurrentKey(), new Supplier<YellowBycatchInitializer>() {
-            @Override
-            public YellowBycatchInitializer get() {
-                throw new RuntimeException("Not instantiated yet!");
-            }
+    public YellowBycatchInitializer retrieveLastMade() {
+        return instance.presentKey(instance.getCurrentKey(), () -> {
+            throw new RuntimeException("Not instantiated yet!");
         });
     }
 
@@ -375,7 +331,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      *
      * @param diffusingRate Value to set for property 'diffusingRate'.
      */
-    public void setDiffusingRate(DoubleParameter diffusingRate) {
+    public void setDiffusingRate(final DoubleParameter diffusingRate) {
         this.diffusingRate = diffusingRate;
     }
 }

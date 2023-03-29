@@ -23,8 +23,6 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysAYearDecorator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -40,8 +38,10 @@ public class MaximumDaysAYearFactory implements AlgorithmFactory<MaximumDaysAYea
     public MaximumDaysAYearFactory() {
     }
 
-    public MaximumDaysAYearFactory(int maxNumberOfDaysOutPerYear,
-                                   AlgorithmFactory<? extends FishingStrategy> delegate) {
+    public MaximumDaysAYearFactory(
+        final int maxNumberOfDaysOutPerYear,
+        final AlgorithmFactory<? extends FishingStrategy> delegate
+    ) {
         this.maxNumberOfDaysOutPerYear = new FixedDoubleParameter(maxNumberOfDaysOutPerYear);
         this.delegate = delegate;
     }
@@ -53,9 +53,11 @@ public class MaximumDaysAYearFactory implements AlgorithmFactory<MaximumDaysAYea
      * @return the function result
      */
     @Override
-    public MaximumDaysAYearDecorator apply(FishState state) {
-        return new MaximumDaysAYearDecorator(delegate.apply(state),
-                                             maxNumberOfDaysOutPerYear.apply(state.getRandom()).intValue());
+    public MaximumDaysAYearDecorator apply(final FishState state) {
+        return new MaximumDaysAYearDecorator(
+            delegate.apply(state),
+            (int) maxNumberOfDaysOutPerYear.applyAsDouble(state.getRandom())
+        );
 
 
     }
@@ -76,7 +78,8 @@ public class MaximumDaysAYearFactory implements AlgorithmFactory<MaximumDaysAYea
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends FishingStrategy> delegate) {
+        final AlgorithmFactory<? extends FishingStrategy> delegate
+    ) {
         this.delegate = delegate;
     }
 
@@ -94,7 +97,7 @@ public class MaximumDaysAYearFactory implements AlgorithmFactory<MaximumDaysAYea
      *
      * @param maxNumberOfDaysOutPerYear Value to set for property 'maxNumberOfDaysOutPerYear'.
      */
-    public void setMaxNumberOfDaysOutPerYear(DoubleParameter maxNumberOfDaysOutPerYear) {
+    public void setMaxNumberOfDaysOutPerYear(final DoubleParameter maxNumberOfDaysOutPerYear) {
         this.maxNumberOfDaysOutPerYear = maxNumberOfDaysOutPerYear;
     }
 }

@@ -29,7 +29,7 @@ public class AbundanceAwareFixedPriceMarketFactory implements AlgorithmFactory<F
     public FlexibleAbundanceMarket apply(FishState state) {
         return new FlexibleAbundanceMarket(
                 new FixedPricingStrategy(
-                        marketPrice.apply(state.getRandom())
+                        marketPrice.applyAsDouble(state.getRandom())
                 )
         );
     }

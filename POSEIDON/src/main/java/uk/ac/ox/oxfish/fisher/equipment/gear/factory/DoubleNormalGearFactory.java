@@ -33,8 +33,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Gear that has DoubleNormal selectivity and logistic retention. The default values are for Shortspine
  * Created by carrknight on 5/17/16.
  */
-public class DoubleNormalGearFactory implements HomogeneousGearFactory
-{
+public class DoubleNormalGearFactory implements HomogeneousGearFactory {
 
     private boolean rounding = true;
     /**
@@ -44,19 +43,19 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
 
     private DoubleParameter top = new FixedDoubleParameter(-7);
 
-    private DoubleParameter  ascWidth = new FixedDoubleParameter(3.77);
+    private DoubleParameter ascWidth = new FixedDoubleParameter(3.77);
 
-    private DoubleParameter  dscWidth = new FixedDoubleParameter(6.78);
+    private DoubleParameter dscWidth = new FixedDoubleParameter(6.78);
 
-    private Double  initialScaling = Double.NaN;
+    private Double initialScaling = Double.NaN;
 
-    private Double  finalScaling = Double.NaN;
+    private Double finalScaling = Double.NaN;
 
     private DoubleParameter binMin = new FixedDoubleParameter(0);
 
-    private DoubleParameter binMax= new FixedDoubleParameter(75);
+    private DoubleParameter binMax = new FixedDoubleParameter(75);
 
-    private DoubleParameter binWidth= new FixedDoubleParameter(1);
+    private DoubleParameter binWidth = new FixedDoubleParameter(1);
 
     /**
      * retention inflection parameter
@@ -79,21 +78,21 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
 
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
-    public DoubleNormalGearFactory()
-    {
+    public DoubleNormalGearFactory() {
 
 
     }
 
 
     public DoubleNormalGearFactory(
-            Double peak, Double top, Double ascWidth,
-            Double dscWidth, Double initialScaling, Double finalScaling,
-            Double binMin, Double binMax, Double binWidth,
-            Double retentionInflection, Double retentionSlope,
-            Double retentionAsymptote,
-            Double litersOfGasConsumedPerHour,
-            Double averageCatchability) {
+        final Double peak, final Double top, final Double ascWidth,
+        final Double dscWidth, final Double initialScaling, final Double finalScaling,
+        final Double binMin, final Double binMax, final Double binWidth,
+        final Double retentionInflection, final Double retentionSlope,
+        final Double retentionAsymptote,
+        final Double litersOfGasConsumedPerHour,
+        final Double averageCatchability
+    ) {
         this.peak = new FixedDoubleParameter(peak);
         this.top = new FixedDoubleParameter(top);
         this.ascWidth = new FixedDoubleParameter(ascWidth);
@@ -117,25 +116,27 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      * @return the function result
      */
     @Override
-    public HomogeneousAbundanceGear apply(FishState state) {
-        MersenneTwisterFast random = state.getRandom();
-        return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                            new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                                            new DoubleNormalFilter(
-                                                    true,
-                                                    rounding, peak.apply(random),
-                                                    top.apply(random),
-                                                    ascWidth.apply(random),
-                                                    dscWidth.apply(random),
-                                                    initialScaling, finalScaling,
-                                                    binMin.apply(random),
-                                                    binMax.apply(random),
-                                                    binWidth.apply(random)
-                                            ),
-                                            new RetentionAbundanceFilter(true,
-                                                                         retentionInflection.apply(random),
-                                                                         retentionSlope.apply(random),
-                                                                         retentionAsymptote.apply(random), rounding)
+    public HomogeneousAbundanceGear apply(final FishState state) {
+        final MersenneTwisterFast random = state.getRandom();
+        return new HomogeneousAbundanceGear(
+            litersOfGasConsumedPerHour.applyAsDouble(random),
+            new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
+            new DoubleNormalFilter(
+                true,
+                rounding, peak.applyAsDouble(random),
+                top.applyAsDouble(random),
+                ascWidth.applyAsDouble(random),
+                dscWidth.applyAsDouble(random),
+                initialScaling, finalScaling,
+                binMin.applyAsDouble(random),
+                binMax.applyAsDouble(random),
+                binWidth.applyAsDouble(random)
+            ),
+            new RetentionAbundanceFilter(true,
+                retentionInflection.applyAsDouble(random),
+                retentionSlope.applyAsDouble(random),
+                retentionAsymptote.applyAsDouble(random), rounding
+            )
         );
     }
 
@@ -153,7 +154,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param peak Value to set for property 'peak'.
      */
-    public void setPeak(DoubleParameter peak) {
+    public void setPeak(final DoubleParameter peak) {
         this.peak = peak;
     }
 
@@ -171,7 +172,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param top Value to set for property 'top'.
      */
-    public void setTop(DoubleParameter top) {
+    public void setTop(final DoubleParameter top) {
         this.top = top;
     }
 
@@ -189,7 +190,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param ascWidth Value to set for property 'ascWidth'.
      */
-    public void setAscWidth(DoubleParameter ascWidth) {
+    public void setAscWidth(final DoubleParameter ascWidth) {
         this.ascWidth = ascWidth;
     }
 
@@ -207,7 +208,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param dscWidth Value to set for property 'dscWidth'.
      */
-    public void setDscWidth(DoubleParameter dscWidth) {
+    public void setDscWidth(final DoubleParameter dscWidth) {
         this.dscWidth = dscWidth;
     }
 
@@ -225,7 +226,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param initialScaling Value to set for property 'initialScaling'.
      */
-    public void setInitialScaling(Double initialScaling) {
+    public void setInitialScaling(final Double initialScaling) {
         this.initialScaling = initialScaling;
     }
 
@@ -243,7 +244,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param finalScaling Value to set for property 'finalScaling'.
      */
-    public void setFinalScaling(Double finalScaling) {
+    public void setFinalScaling(final Double finalScaling) {
         this.finalScaling = finalScaling;
     }
 
@@ -261,7 +262,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param binMin Value to set for property 'binMin'.
      */
-    public void setBinMin(DoubleParameter binMin) {
+    public void setBinMin(final DoubleParameter binMin) {
         this.binMin = binMin;
     }
 
@@ -279,7 +280,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param binMax Value to set for property 'binMax'.
      */
-    public void setBinMax(DoubleParameter binMax) {
+    public void setBinMax(final DoubleParameter binMax) {
         this.binMax = binMax;
     }
 
@@ -297,7 +298,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param binWidth Value to set for property 'binWidth'.
      */
-    public void setBinWidth(DoubleParameter binWidth) {
+    public void setBinWidth(final DoubleParameter binWidth) {
         this.binWidth = binWidth;
     }
 
@@ -315,7 +316,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param retentionInflection Value to set for property 'retentionInflection'.
      */
-    public void setRetentionInflection(DoubleParameter retentionInflection) {
+    public void setRetentionInflection(final DoubleParameter retentionInflection) {
         this.retentionInflection = retentionInflection;
     }
 
@@ -333,7 +334,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param retentionSlope Value to set for property 'retentionSlope'.
      */
-    public void setRetentionSlope(DoubleParameter retentionSlope) {
+    public void setRetentionSlope(final DoubleParameter retentionSlope) {
         this.retentionSlope = retentionSlope;
     }
 
@@ -351,19 +352,23 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param retentionAsymptote Value to set for property 'retentionAsymptote'.
      */
-    public void setRetentionAsymptote(DoubleParameter retentionAsymptote) {
+    public void setRetentionAsymptote(final DoubleParameter retentionAsymptote) {
         this.retentionAsymptote = retentionAsymptote;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DoubleParameter getAverageCatchability() {
         return averageCatchability;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
 
@@ -381,7 +386,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param litersOfGasConsumedPerHour Value to set for property 'litersOfGasConsumedPerHour'.
      */
-    public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
+    public void setLitersOfGasConsumedPerHour(final DoubleParameter litersOfGasConsumedPerHour) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
     }
 
@@ -399,7 +404,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 }

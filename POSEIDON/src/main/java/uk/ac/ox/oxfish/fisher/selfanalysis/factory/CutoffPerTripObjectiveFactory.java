@@ -33,9 +33,11 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class CutoffPerTripObjectiveFactory implements AlgorithmFactory<CutoffPerTripObjective> {
 
-    private final ConditionalDoubleParameter lowThreshold = new ConditionalDoubleParameter(false,new FixedDoubleParameter(0));
+    private final ConditionalDoubleParameter lowThreshold = new ConditionalDoubleParameter(false,
+        new FixedDoubleParameter(0));
 
-    private final ConditionalDoubleParameter highThreshold = new ConditionalDoubleParameter(false,new FixedDoubleParameter(0));
+    private final ConditionalDoubleParameter highThreshold = new ConditionalDoubleParameter(false,
+        new FixedDoubleParameter(0));
 
     private boolean opportunityCosts = true;
 
@@ -47,11 +49,11 @@ public class CutoffPerTripObjectiveFactory implements AlgorithmFactory<CutoffPer
      * @return the function result
      */
     @Override
-    public CutoffPerTripObjective apply(FishState fishState) {
+    public CutoffPerTripObjective apply(final FishState fishState) {
         return new CutoffPerTripObjective(
-                new HourlyProfitInTripObjective(opportunityCosts),
-                lowThreshold.apply(fishState.getRandom()),
-                highThreshold.apply(fishState.getRandom())
+            new HourlyProfitInTripObjective(opportunityCosts),
+            lowThreshold.applyAsDouble(fishState.getRandom()),
+            highThreshold.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -87,7 +89,7 @@ public class CutoffPerTripObjectiveFactory implements AlgorithmFactory<CutoffPer
      *
      * @param opportunityCosts Value to set for property 'opportunityCosts'.
      */
-    public void setOpportunityCosts(boolean opportunityCosts) {
+    public void setOpportunityCosts(final boolean opportunityCosts) {
         this.opportunityCosts = opportunityCosts;
     }
 }

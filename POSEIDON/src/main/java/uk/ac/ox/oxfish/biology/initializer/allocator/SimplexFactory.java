@@ -45,20 +45,20 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      * @return the function result
      */
     @Override
-    public SimplexAllocator apply(FishState fishState) {
-        final double drawnRandomSeed = randomSeed.apply(fishState.getRandom());
-        long randomSeed;
+    public SimplexAllocator apply(final FishState fishState) {
+        final double drawnRandomSeed = randomSeed.applyAsDouble(fishState.getRandom());
+        final long randomSeed;
         //it might not have been set up, if so just pick at random!
-        if(!Double.isFinite(drawnRandomSeed) || Double.isNaN(drawnRandomSeed))
+        if (!Double.isFinite(drawnRandomSeed) || Double.isNaN(drawnRandomSeed))
             randomSeed = fishState.getRandom().nextLong();
         else
             randomSeed = (long) drawnRandomSeed;
         System.out.println("simplex random seed: " + randomSeed);
         return new SimplexAllocator(
-                maximum.apply(fishState.getRandom()),
-                minimum.apply(fishState.getRandom()),
-                bandwidth.apply(fishState.getRandom()),
-                randomSeed
+            maximum.applyAsDouble(fishState.getRandom()),
+            minimum.applyAsDouble(fishState.getRandom()),
+            bandwidth.applyAsDouble(fishState.getRandom()),
+            randomSeed
         );
     }
 
@@ -76,7 +76,7 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      *
      * @param minimum Value to set for property 'minimum'.
      */
-    public void setMinimum(DoubleParameter minimum) {
+    public void setMinimum(final DoubleParameter minimum) {
         this.minimum = minimum;
     }
 
@@ -94,7 +94,7 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      *
      * @param maximum Value to set for property 'maximum'.
      */
-    public void setMaximum(DoubleParameter maximum) {
+    public void setMaximum(final DoubleParameter maximum) {
         this.maximum = maximum;
     }
 
@@ -112,7 +112,7 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
      *
      * @param bandwidth Value to set for property 'bandwidth'.
      */
-    public void setBandwidth(DoubleParameter bandwidth) {
+    public void setBandwidth(final DoubleParameter bandwidth) {
         this.bandwidth = bandwidth;
     }
 
@@ -121,7 +121,7 @@ public class SimplexFactory implements AlgorithmFactory<SimplexAllocator> {
         return randomSeed;
     }
 
-    public void setRandomSeed(DoubleParameter randomSeed) {
+    public void setRandomSeed(final DoubleParameter randomSeed) {
         this.randomSeed = randomSeed;
     }
 }

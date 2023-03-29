@@ -17,14 +17,13 @@ import java.util.List;
 public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactory<RecruitmentBySpawningBiomass> {
 
 
-    private List<Double> maturity = Lists.newArrayList(.0d,.5d,.1d);
+    private List<Double> maturity = Lists.newArrayList(.0d, .5d, .1d);
 
 
     /**
      * the number of recruits you'd get in a "virgin" state.
      */
     private DoubleParameter virginRecruits = new FixedDoubleParameter(40741397);
-
 
 
     /**
@@ -36,17 +35,17 @@ public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactor
     private DoubleParameter spawningStockBiomass = new FixedDoubleParameter(10000);
 
     @Override
-    public RecruitmentBySpawningBiomass apply(FishState fishState) {
+    public RecruitmentBySpawningBiomass apply(final FishState fishState) {
         return new RecruitmentBySpawningBiomass(
-                virginRecruits.apply(fishState.getRandom()).intValue(),
-                steepness.apply(fishState.getRandom()),
-                spawningStockBiomass.apply(fishState.getRandom())/
-                        virginRecruits.apply(fishState.getRandom()),
-                false,
-                Doubles.toArray(maturity),
-                null,
-                0,
-                false
+            (int) virginRecruits.applyAsDouble(fishState.getRandom()),
+            steepness.applyAsDouble(fishState.getRandom()),
+            spawningStockBiomass.applyAsDouble(fishState.getRandom()) /
+                virginRecruits.applyAsDouble(fishState.getRandom()),
+            false,
+            Doubles.toArray(maturity),
+            null,
+            0,
+            false
         );
 
 
@@ -56,7 +55,7 @@ public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactor
         return maturity;
     }
 
-    public void setMaturity(List<Double> maturity) {
+    public void setMaturity(final List<Double> maturity) {
         this.maturity = maturity;
     }
 
@@ -64,7 +63,7 @@ public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactor
         return virginRecruits;
     }
 
-    public void setVirginRecruits(DoubleParameter virginRecruits) {
+    public void setVirginRecruits(final DoubleParameter virginRecruits) {
         this.virginRecruits = virginRecruits;
     }
 
@@ -72,7 +71,7 @@ public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactor
         return steepness;
     }
 
-    public void setSteepness(DoubleParameter steepness) {
+    public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
@@ -80,7 +79,7 @@ public class SimplifiedBevertonHoltRecruitmentFactory implements AlgorithmFactor
         return spawningStockBiomass;
     }
 
-    public void setSpawningStockBiomass(DoubleParameter spawningStockBiomass) {
+    public void setSpawningStockBiomass(final DoubleParameter spawningStockBiomass) {
         this.spawningStockBiomass = spawningStockBiomass;
     }
 }

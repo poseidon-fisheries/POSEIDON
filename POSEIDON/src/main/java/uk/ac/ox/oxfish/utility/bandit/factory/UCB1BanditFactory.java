@@ -52,8 +52,8 @@ public class UCB1BanditFactory implements
         return new BanditSupplier() {
             @Override
             public UCB1BanditAlgorithm apply(BanditAverage banditAverage) {
-                return new UCB1BanditAlgorithm(minimumReward.apply(state.getRandom()),
-                                               maximumReward.apply(state.getRandom()),
+                return new UCB1BanditAlgorithm(minimumReward.applyAsDouble(state.getRandom()),
+                                               maximumReward.applyAsDouble(state.getRandom()),
                                                banditAverage);
             }
         };

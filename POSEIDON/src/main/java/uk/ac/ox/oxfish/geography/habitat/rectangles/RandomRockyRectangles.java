@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * Class that builds a fixed number of rocky rectangles
  * Created by carrknight on 11/18/15.
  */
-public class RandomRockyRectangles implements   RockyRectangleMaker {
+public class RandomRockyRectangles implements RockyRectangleMaker {
 
 
     final private DoubleParameter rectangleHeight;
@@ -39,8 +39,12 @@ public class RandomRockyRectangles implements   RockyRectangleMaker {
     final private int numberOfRectangles;
 
 
-    public RandomRockyRectangles(DoubleParameter rockyHeight, DoubleParameter rockyWidth, int numberOfRectangles) {
-        Preconditions.checkArgument(numberOfRectangles>0);
+    public RandomRockyRectangles(
+        final DoubleParameter rockyHeight,
+        final DoubleParameter rockyWidth,
+        final int numberOfRectangles
+    ) {
+        Preconditions.checkArgument(numberOfRectangles > 0);
 
         this.rectangleHeight = rockyHeight;
         this.rectangleWidth = rockyWidth;
@@ -55,13 +59,12 @@ public class RandomRockyRectangles implements   RockyRectangleMaker {
      * @return the coordinates of the rectangle, the habitat initializer will fill these with rocks
      */
     @Override
-    public RockyRectangle[] buildRectangles(MersenneTwisterFast random, NauticalMap map)
-    {
-        RockyRectangle[] toReturn = new RockyRectangle[numberOfRectangles];
-        int mapWidth= map.getWidth();
-        int mapHeight= map.getHeight();
+    public RockyRectangle[] buildRectangles(final MersenneTwisterFast random, final NauticalMap map) {
+        final RockyRectangle[] toReturn = new RockyRectangle[numberOfRectangles];
+        final int mapWidth = map.getWidth();
+        final int mapHeight = map.getHeight();
 
-        for(int i=0;i<toReturn.length;i++) {
+        for (int i = 0; i < toReturn.length; i++) {
             //create the bottom left corner
             int x;
             int y;
@@ -74,10 +77,10 @@ public class RandomRockyRectangles implements   RockyRectangleMaker {
 
 
             //get rectangle size
-            int rockyWidth = rectangleWidth.apply(random).intValue();
-            int rockyHeight = rectangleHeight.apply(random).intValue();
+            final int rockyWidth = (int) rectangleWidth.applyAsDouble(random);
+            final int rockyHeight = (int) rectangleHeight.applyAsDouble(random);
             //return it!
-            toReturn[i] = new RockyRectangle(x,y,rockyWidth,rockyHeight);
+            toReturn[i] = new RockyRectangle(x, y, rockyWidth, rockyHeight);
         }
         return toReturn;
 

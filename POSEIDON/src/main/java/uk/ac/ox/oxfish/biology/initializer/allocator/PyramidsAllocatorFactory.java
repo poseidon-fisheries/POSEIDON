@@ -45,12 +45,12 @@ public class PyramidsAllocatorFactory implements AlgorithmFactory<PyramidsAlloca
      * @return the function result
      */
     @Override
-    public PyramidsAllocator apply(FishState fishState) {
+    public PyramidsAllocator apply(final FishState fishState) {
         return new PyramidsAllocator(
-                numberOfPeaks,
-                smoothingValue.apply(fishState.getRandom()),
-                maxSpread,
-                peakBiomass.apply(fishState.getRandom())
+            numberOfPeaks,
+            smoothingValue.applyAsDouble(fishState.getRandom()),
+            maxSpread,
+            peakBiomass.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -68,7 +68,7 @@ public class PyramidsAllocatorFactory implements AlgorithmFactory<PyramidsAlloca
      *
      * @param numberOfPeaks Value to set for property 'numberOfPeaks'.
      */
-    public void setNumberOfPeaks(int numberOfPeaks) {
+    public void setNumberOfPeaks(final int numberOfPeaks) {
         this.numberOfPeaks = numberOfPeaks;
     }
 
@@ -86,7 +86,7 @@ public class PyramidsAllocatorFactory implements AlgorithmFactory<PyramidsAlloca
      *
      * @param smoothingValue Value to set for property 'smoothingValue'.
      */
-    public void setSmoothingValue(DoubleParameter smoothingValue) {
+    public void setSmoothingValue(final DoubleParameter smoothingValue) {
         this.smoothingValue = smoothingValue;
     }
 
@@ -104,7 +104,7 @@ public class PyramidsAllocatorFactory implements AlgorithmFactory<PyramidsAlloca
      *
      * @param maxSpread Value to set for property 'maxSpread'.
      */
-    public void setMaxSpread(int maxSpread) {
+    public void setMaxSpread(final int maxSpread) {
         this.maxSpread = maxSpread;
     }
 
@@ -122,7 +122,7 @@ public class PyramidsAllocatorFactory implements AlgorithmFactory<PyramidsAlloca
      *
      * @param peakBiomass Value to set for property 'peakBiomass'.
      */
-    public void setPeakBiomass(DoubleParameter peakBiomass) {
+    public void setPeakBiomass(final DoubleParameter peakBiomass) {
         this.peakBiomass = peakBiomass;
     }
 }

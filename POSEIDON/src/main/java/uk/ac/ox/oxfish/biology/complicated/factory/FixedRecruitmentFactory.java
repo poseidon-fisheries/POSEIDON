@@ -31,7 +31,7 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProc
 
     private DoubleParameter yearlyRecruits = new FixedDoubleParameter(10000);
 
-    private boolean yearly=false;
+    private boolean yearly = false;
 
     /**
      * Applies this function to the given argument.
@@ -40,22 +40,26 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProc
      * @return the function result
      */
     @Override
-    public RecruitmentProcess apply(FishState fishState) {
+    public RecruitmentProcess apply(final FishState fishState) {
 
-        if(yearly)
-            return new YearlyRecruitmentProcess(false){
+        if (yearly)
+            return new YearlyRecruitmentProcess(false) {
                 @Override
-                protected double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance) {
-                    return yearlyRecruits.apply(fishState.getRandom());
+                protected double computeYearlyRecruitment(
+                    final Species species,
+                    final Meristics meristics,
+                    final StructuredAbundance abundance
+                ) {
+                    return yearlyRecruits.applyAsDouble(fishState.getRandom());
                 }
 
                 @Override
-                public void addNoise(NoiseMaker noiseMaker) {
+                public void addNoise(final NoiseMaker noiseMaker) {
                     throw new RuntimeException("add noise to the doubleparameter instead");
                 }
             };
         else
-        return new FixedRecruitmentProcess(yearlyRecruits.apply(fishState.getRandom()));
+            return new FixedRecruitmentProcess(yearlyRecruits.applyAsDouble(fishState.getRandom()));
 
     }
 
@@ -73,7 +77,7 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProc
      *
      * @param yearlyRecruits Value to set for property 'yearlyRecruits'.
      */
-    public void setYearlyRecruits(DoubleParameter yearlyRecruits) {
+    public void setYearlyRecruits(final DoubleParameter yearlyRecruits) {
         this.yearlyRecruits = yearlyRecruits;
     }
 
@@ -81,7 +85,7 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProc
         return yearly;
     }
 
-    public void setYearly(boolean yearly) {
+    public void setYearly(final boolean yearly) {
         this.yearly = yearly;
     }
 }

@@ -29,12 +29,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiologyInitializer>
-{
-
-
-
-
+public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiologyInitializer> {
 
 
     private DoubleParameter firstSpeciesCapacity = new FixedDoubleParameter(5000);
@@ -43,7 +38,6 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
      * ratio of maxCapacitySecond/maxCapacityFirst
      */
     private DoubleParameter capacityRatioSecondToFirst = new FixedDoubleParameter(.2);
-
 
 
     /**
@@ -55,6 +49,7 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
     private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
     /**
      * Applies this function to the given argument.
@@ -63,18 +58,19 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
      * @return the function result
      */
     @Override
-    public WellMixedBiologyInitializer apply(FishState state) {
-        return new WellMixedBiologyInitializer(firstSpeciesCapacity,capacityRatioSecondToFirst,
-                                               percentageLimitOnDailyMovement.apply(state.getRandom()),
-                                               differentialPercentageToMove.apply(state.getRandom()),
-                                               grower.apply(state));
+    public WellMixedBiologyInitializer apply(final FishState state) {
+        return new WellMixedBiologyInitializer(firstSpeciesCapacity, capacityRatioSecondToFirst,
+            percentageLimitOnDailyMovement.applyAsDouble(state.getRandom()),
+            differentialPercentageToMove.applyAsDouble(state.getRandom()),
+            grower.apply(state)
+        );
     }
 
     public DoubleParameter getFirstSpeciesCapacity() {
         return firstSpeciesCapacity;
     }
 
-    public void setFirstSpeciesCapacity(DoubleParameter firstSpeciesCapacity) {
+    public void setFirstSpeciesCapacity(final DoubleParameter firstSpeciesCapacity) {
         this.firstSpeciesCapacity = firstSpeciesCapacity;
     }
 
@@ -82,7 +78,11 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
         return capacityRatioSecondToFirst;
     }
 
-    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
+    public void setCapacityRatioSecondToFirst(
+        final DoubleParameter capacityRatioSecondToFirst
+    ) {
+        this.capacityRatioSecondToFirst = capacityRatioSecondToFirst;
+    }
 
     /**
      * Getter for property 'grower'.
@@ -99,15 +99,18 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
+
     public DoubleParameter getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;
     }
 
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -116,12 +119,8 @@ public class WellMixedBiologyFactory implements AlgorithmFactory<WellMixedBiolog
     }
 
     public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
+        final DoubleParameter differentialPercentageToMove
+    ) {
         this.differentialPercentageToMove = differentialPercentageToMove;
-    }
-
-    public void setCapacityRatioSecondToFirst(
-            DoubleParameter capacityRatioSecondToFirst) {
-        this.capacityRatioSecondToFirst = capacityRatioSecondToFirst;
     }
 }

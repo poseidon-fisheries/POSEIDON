@@ -51,9 +51,9 @@ public class ConditionalDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         if(active)
-            return value.apply(mersenneTwisterFast);
+            return value.applyAsDouble(mersenneTwisterFast);
         else
             return Double.NaN;
     }

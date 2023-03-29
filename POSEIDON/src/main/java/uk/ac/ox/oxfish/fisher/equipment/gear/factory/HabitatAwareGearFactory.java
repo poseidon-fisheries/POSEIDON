@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates HabitatAwareRandomCatchability gears
  * Created by carrknight on 9/30/15.
  */
-public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRandomCatchability>
-{
+public class HabitatAwareGearFactory implements AlgorithmFactory<HabitatAwareRandomCatchability> {
 
 
     private DoubleParameter meanCatchabilityRocky = new FixedDoubleParameter(.01);
@@ -57,26 +56,26 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
      * @return the function result
      */
     @Override
-    public HabitatAwareRandomCatchability apply(FishState state) {
+    public HabitatAwareRandomCatchability apply(final FishState state) {
 
 
-        int species = state.getSpecies().size();
-        double[] meansRocky = new double[species];
-        double[] meansSandy = new double[species];
-        double[] stdRocky = new double[species];
-        double[] stdSandy = new double[species];
+        final int species = state.getSpecies().size();
+        final double[] meansRocky = new double[species];
+        final double[] meansSandy = new double[species];
+        final double[] stdRocky = new double[species];
+        final double[] stdSandy = new double[species];
 
 
-        for(int i=0; i<meansSandy.length; i++)
-        {
-            meansRocky[i] = meanCatchabilityRocky.apply(state.getRandom());
-            meansSandy[i] = meanCatchabilitySandy.apply(state.getRandom());
-            stdSandy[i] = standardDeviationCatchabilitySandy.apply(state.getRandom());
-            stdRocky[i] = standardDeviationCatchabilityRocky.apply(state.getRandom());
+        for (int i = 0; i < meansSandy.length; i++) {
+            meansRocky[i] = meanCatchabilityRocky.applyAsDouble(state.getRandom());
+            meansSandy[i] = meanCatchabilitySandy.applyAsDouble(state.getRandom());
+            stdSandy[i] = standardDeviationCatchabilitySandy.applyAsDouble(state.getRandom());
+            stdRocky[i] = standardDeviationCatchabilityRocky.applyAsDouble(state.getRandom());
         }
 
-        return new HabitatAwareRandomCatchability(meansSandy,stdSandy,meansRocky,stdRocky,
-                                                  trawlSpeed.apply(state.getRandom()));
+        return new HabitatAwareRandomCatchability(meansSandy, stdSandy, meansRocky, stdRocky,
+            trawlSpeed.applyAsDouble(state.getRandom())
+        );
 
     }
 
@@ -84,7 +83,7 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
         return meanCatchabilityRocky;
     }
 
-    public void setMeanCatchabilityRocky(DoubleParameter meanCatchabilityRocky) {
+    public void setMeanCatchabilityRocky(final DoubleParameter meanCatchabilityRocky) {
         this.meanCatchabilityRocky = meanCatchabilityRocky;
     }
 
@@ -93,7 +92,8 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
     }
 
     public void setStandardDeviationCatchabilityRocky(
-            DoubleParameter standardDeviationCatchabilityRocky) {
+        final DoubleParameter standardDeviationCatchabilityRocky
+    ) {
         this.standardDeviationCatchabilityRocky = standardDeviationCatchabilityRocky;
     }
 
@@ -101,7 +101,7 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
         return meanCatchabilitySandy;
     }
 
-    public void setMeanCatchabilitySandy(DoubleParameter meanCatchabilitySandy) {
+    public void setMeanCatchabilitySandy(final DoubleParameter meanCatchabilitySandy) {
         this.meanCatchabilitySandy = meanCatchabilitySandy;
     }
 
@@ -110,7 +110,8 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
     }
 
     public void setStandardDeviationCatchabilitySandy(
-            DoubleParameter standardDeviationCatchabilitySandy) {
+        final DoubleParameter standardDeviationCatchabilitySandy
+    ) {
         this.standardDeviationCatchabilitySandy = standardDeviationCatchabilitySandy;
     }
 
@@ -118,7 +119,7 @@ public class HabitatAwareGearFactory  implements AlgorithmFactory<HabitatAwareRa
         return trawlSpeed;
     }
 
-    public void setTrawlSpeed(DoubleParameter trawlSpeed) {
+    public void setTrawlSpeed(final DoubleParameter trawlSpeed) {
         this.trawlSpeed = trawlSpeed;
     }
 }

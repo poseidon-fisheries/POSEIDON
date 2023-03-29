@@ -37,9 +37,7 @@ import java.util.Map;
  * in the map
  * Created by carrknight on 9/29/15.
  */
-public class RockyLogisticInitializer extends AbstractBiologyInitializer
-{
-
+public class RockyLogisticInitializer extends AbstractBiologyInitializer {
 
 
     private final DoubleParameter rockyCarryingCapacity;
@@ -68,13 +66,14 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     /**
      * get the list of all the logistic local biologies
      */
-    protected Map<SeaTile,BiomassLocalBiology> biologies = new HashMap<>();
+    protected Map<SeaTile, BiomassLocalBiology> biologies = new HashMap<>();
 
     public RockyLogisticInitializer(
-            DoubleParameter rockyCarryingCapacity, DoubleParameter sandyCarryingCapacity,
-            double percentageLimitOnDailyMovement, double differentialPercentageToMove,
-            int numberOfSpecies,
-            LogisticGrowerInitializer grower) {
+        final DoubleParameter rockyCarryingCapacity, final DoubleParameter sandyCarryingCapacity,
+        final double percentageLimitOnDailyMovement, final double differentialPercentageToMove,
+        final int numberOfSpecies,
+        final LogisticGrowerInitializer grower
+    ) {
         this.rockyCarryingCapacity = rockyCarryingCapacity;
         this.sandyCarryingCapacity = sandyCarryingCapacity;
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
@@ -86,7 +85,8 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     /**
      * the carrying capacity is an average between the rocky and the sandy one depending on how rocky
      * the tile is
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -95,21 +95,25 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
-        if(seaTile.isLand())
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
-        else
-        {
-            int species = biology.getSize();
-            double carryingCapacityLevel =
+        else {
+            final int species = biology.getSize();
+            final double carryingCapacityLevel =
 
-                    (1-seaTile.getRockyPercentage()) *  sandyCarryingCapacity.apply(random)  +
-                            seaTile.getRockyPercentage() * rockyCarryingCapacity.apply(random);
+                (1 - seaTile.getRockyPercentage()) * sandyCarryingCapacity.applyAsDouble(random) +
+                    seaTile.getRockyPercentage() * rockyCarryingCapacity.applyAsDouble(random);
 
 
-            BiomassLocalBiology local = new BiomassLocalBiology(carryingCapacityLevel, species, random);
-            biologies.put(seaTile,local);
+            final BiomassLocalBiology local = new BiomassLocalBiology(carryingCapacityLevel, species, random);
+            biologies.put(seaTile, local);
             return local;
         }
     }
@@ -126,19 +130,18 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
 
 
-
-
-
-        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-                                                                         differentialPercentageToMove,
-                                                                         percentageLimitOnDailyMovement);
+        final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
+            differentialPercentageToMove,
+            percentageLimitOnDailyMovement
+        );
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
 
-        for(Species species : biology.getSpecies())
-            grower.initializeGrower(biologies,model,random,species);
+        for (final Species species : biology.getSpecies())
+            grower.initializeGrower(biologies, model, random, species);
     }
 
 
@@ -149,8 +152,8 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
      */
     @Override
     public String[] getSpeciesNames() {
-        String[] generics = new String[numberOfSpecies];
-        for(int i=0; i<numberOfSpecies; i++)
+        final String[] generics = new String[numberOfSpecies];
+        for (int i = 0; i < numberOfSpecies; i++)
             generics[i] = "Species " + i;
         return generics;
     }

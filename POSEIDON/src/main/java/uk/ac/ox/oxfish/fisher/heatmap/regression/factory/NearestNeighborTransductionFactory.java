@@ -23,9 +23,9 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.CartesianRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationTimeExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -51,20 +51,20 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
      * @return the function result
      */
     @Override
-    public NearestNeighborTransduction apply(FishState state) {
+    public NearestNeighborTransduction apply(final FishState state) {
         return new NearestNeighborTransduction(
-                state.getMap(),
-                new ObservationExtractor[]{
-                        new GridYExtractor(),
-                        new GridXExtractor(),
-                        new ObservationTimeExtractor()
-                },
-                new double[]{
-                        spaceBandwidth.apply(state.getRandom()),
-                        spaceBandwidth.apply(state.getRandom()),
-                        timeBandwidth.apply(state.getRandom())
-                },
-                new CartesianRegressionDistance(0) //gets changed by the regression
+            state.getMap(),
+            new ObservationExtractor[]{
+                new GridYExtractor(),
+                new GridXExtractor(),
+                new ObservationTimeExtractor()
+            },
+            new double[]{
+                spaceBandwidth.applyAsDouble(state.getRandom()),
+                spaceBandwidth.applyAsDouble(state.getRandom()),
+                timeBandwidth.applyAsDouble(state.getRandom())
+            },
+            new CartesianRegressionDistance(0) //gets changed by the regression
 
         );
     }
@@ -84,7 +84,7 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
      *
      * @param timeBandwidth Value to set for property 'timeBandwidth'.
      */
-    public void setTimeBandwidth(DoubleParameter timeBandwidth) {
+    public void setTimeBandwidth(final DoubleParameter timeBandwidth) {
         this.timeBandwidth = timeBandwidth;
     }
 
@@ -102,7 +102,7 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
      *
      * @param spaceBandwidth Value to set for property 'spaceBandwidth'.
      */
-    public void setSpaceBandwidth(DoubleParameter spaceBandwidth) {
+    public void setSpaceBandwidth(final DoubleParameter spaceBandwidth) {
         this.spaceBandwidth = spaceBandwidth;
     }
 

@@ -215,15 +215,15 @@ public class FisherDefinition {
     }
 
     Supplier<Engine> makeEngineSupplier(MersenneTwisterFast random) {
-        return () -> new Engine(enginePower.apply(random), literPerKilometer.apply(random), speedInKmh.apply(random));
+        return () -> new Engine(enginePower.applyAsDouble(random), literPerKilometer.applyAsDouble(random), speedInKmh.applyAsDouble(random));
     }
 
     Supplier<FuelTank> makeFuelTankSupplier(MersenneTwisterFast random) {
-        return () -> new FuelTank(fuelTankSize.apply(random));
+        return () -> new FuelTank(fuelTankSize.applyAsDouble(random));
     }
 
     Supplier<Hold> makeHoldSupplier(MersenneTwisterFast random, GlobalBiology biology) {
-        return () -> new Hold(holdSize.apply(random), biology);
+        return () -> new Hold(holdSize.applyAsDouble(random), biology);
     }
 
     Supplier<Boat> makeBoatSupplier(MersenneTwisterFast random) {
@@ -283,7 +283,7 @@ public class FisherDefinition {
                         //don't bother if we don't have any variable costs
                         if(hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
                             return;
-                        double vc = hourlyVariableCost.apply(fisher.grabRandomizer());
+                        double vc = hourlyVariableCost.applyAsDouble(fisher.grabRandomizer());
                         //don't bother if variable costs are negative!
                         if(vc>0)
                             fisher.getAdditionalTripCosts().add(
@@ -294,7 +294,7 @@ public class FisherDefinition {
                         // EFFORT COSTS
                         if(hourlyEffortCost == null || hourlyEffortCost instanceof NullParameter)
                                 return;
-                        double effortCost = hourlyEffortCost.apply(fisher.grabRandomizer());
+                        double effortCost = hourlyEffortCost.applyAsDouble(fisher.grabRandomizer());
                         //don't bother if variable costs are negative!
                         if(effortCost>0)
                             fisher.getAdditionalTripCosts().add(

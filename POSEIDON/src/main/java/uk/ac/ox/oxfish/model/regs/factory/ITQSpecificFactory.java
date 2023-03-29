@@ -38,14 +38,13 @@ import java.util.function.Function;
  * Like Mono factory but these quotas are not valid for all species but only for one of them
  * Created by carrknight on 9/22/15.
  */
-public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulation>
-{
+public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulation> {
 
 
     /**
      * one market only for each fish-state
      */
-    private final Map<FishState,ITQMarketBuilder> marketBuilders = new HashMap<>(1);
+    private final Map<FishState, ITQMarketBuilder> marketBuilders = new HashMap<>(1);
 
     /**
      * quota available to each guy
@@ -68,8 +67,7 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         //todo need to make this for multiple species
 
         //did we create a market already?
-        if(!marketBuilders.containsKey(state))
-        {
+        if (!marketBuilders.containsKey(state)) {
             //if not, create it!
             ITQMarketBuilder initializer = new ITQMarketBuilder(0);
             //make sure it will start with the model
@@ -84,16 +82,16 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
-                if(species== protectedSpecies)
+                if (species == protectedSpecies)
                     return marketBuilder.getMarket();
                 else
                     return null;
             }
         });
         SpecificQuotaRegulation regulation = new SpecificQuotaRegulation(
-                individualQuota.apply(state.getRandom()), state,
-                protectedSpecies)
-        {
+            individualQuota.applyAsDouble(state.getRandom()), state,
+            protectedSpecies
+        ) {
             @Override
             public void start(FishState model, Fisher fisher) {
                 super.start(model, fisher);
@@ -111,9 +109,6 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         marketBuilder.addTrader(regulation);
         return regulation;
     }
-
-
-
 
 
     public DoubleParameter getIndividualQuota() {

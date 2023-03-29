@@ -55,11 +55,10 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
     private AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator = new ConstantAllocatorFactory();
 
     private AlgorithmFactory<? extends NaturalMortalityProcess> mortalityProcess =
-            new ExponentialMortalityFactory();
+        new ExponentialMortalityFactory();
 
 
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
-
 
 
     private boolean daily = false;
@@ -75,23 +74,24 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @return the function result
      */
     @Override
-    public SingleSpeciesAbundanceInitializer apply(FishState state) {
+    public SingleSpeciesAbundanceInitializer apply(final FishState state) {
 
-        if(histogrammerOutput)
+        if (histogrammerOutput)
             state.getOutputPlugins().add(new CatchesHistogrammer());
 
         return new SingleSpeciesAbundanceInitializer(
-                speciesName,
-                initialAbundanceFactory.apply(state),
-                initialAbundanceAllocator.apply(state),
-                aging.apply(state),
-                meristics.apply(state),
-                scaling.apply(state.getRandom()),
-                recruitment.apply(state),
-                diffuser.apply(state),
-                recruitAllocator.apply(state),
-                habitabilityAllocator.apply(state),
-                mortalityProcess.apply(state), daily, rounding);
+            speciesName,
+            initialAbundanceFactory.apply(state),
+            initialAbundanceAllocator.apply(state),
+            aging.apply(state),
+            meristics.apply(state),
+            scaling.applyAsDouble(state.getRandom()),
+            recruitment.apply(state),
+            diffuser.apply(state),
+            recruitAllocator.apply(state),
+            habitabilityAllocator.apply(state),
+            mortalityProcess.apply(state), daily, rounding
+        );
 
 
     }
@@ -104,6 +104,15 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      */
     public String getSpeciesName() {
         return speciesName;
+    }
+
+    /**
+     * Setter for property 'speciesName'.
+     *
+     * @param speciesName Value to set for property 'speciesName'.
+     */
+    public void setSpeciesName(final String speciesName) {
+        this.speciesName = speciesName;
     }
 
     /**
@@ -121,7 +130,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param aging Value to set for property 'aging'.
      */
     public void setAging(
-            AlgorithmFactory<? extends AgingProcess> aging) {
+        final AlgorithmFactory<? extends AgingProcess> aging
+    ) {
         this.aging = aging;
     }
 
@@ -140,7 +150,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param initialAbundanceAllocator Value to set for property 'initialAbundanceAllocator'.
      */
     public void setInitialAbundanceAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> initialAbundanceAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> initialAbundanceAllocator
+    ) {
         this.initialAbundanceAllocator = initialAbundanceAllocator;
     }
 
@@ -159,7 +170,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param meristics Value to set for property 'meristics'.
      */
     public void setMeristics(
-            AlgorithmFactory<? extends Meristics> meristics) {
+        final AlgorithmFactory<? extends Meristics> meristics
+    ) {
         this.meristics = meristics;
     }
 
@@ -178,7 +190,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param recruitment Value to set for property 'recruitment'.
      */
     public void setRecruitment(
-            AlgorithmFactory<? extends RecruitmentProcess> recruitment) {
+        final AlgorithmFactory<? extends RecruitmentProcess> recruitment
+    ) {
         this.recruitment = recruitment;
     }
 
@@ -197,7 +210,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param diffuser Value to set for property 'diffuser'.
      */
     public void setDiffuser(
-            AlgorithmFactory<? extends AbundanceDiffuser> diffuser) {
+        final AlgorithmFactory<? extends AbundanceDiffuser> diffuser
+    ) {
         this.diffuser = diffuser;
     }
 
@@ -216,7 +230,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param recruitAllocator Value to set for property 'recruitAllocator'.
      */
     public void setRecruitAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> recruitAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> recruitAllocator
+    ) {
         this.recruitAllocator = recruitAllocator;
     }
 
@@ -234,19 +249,9 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      *
      * @param scaling Value to set for property 'scaling'.
      */
-    public void setScaling(DoubleParameter scaling) {
+    public void setScaling(final DoubleParameter scaling) {
         this.scaling = scaling;
     }
-
-    /**
-     * Setter for property 'speciesName'.
-     *
-     * @param speciesName Value to set for property 'speciesName'.
-     */
-    public void setSpeciesName(String speciesName) {
-        this.speciesName = speciesName;
-    }
-
 
     /**
      * Getter for property 'initialAbundanceFactory'.
@@ -263,7 +268,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param initialAbundanceFactory Value to set for property 'initialAbundanceFactory'.
      */
     public void setInitialAbundanceFactory(
-            AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory) {
+        final AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory
+    ) {
         this.initialAbundanceFactory = initialAbundanceFactory;
     }
 
@@ -282,7 +288,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param habitabilityAllocator Value to set for property 'habitabilityAllocator'.
      */
     public void setHabitabilityAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator
+    ) {
         this.habitabilityAllocator = habitabilityAllocator;
     }
 
@@ -301,7 +308,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      * @param mortalityProcess Value to set for property 'mortalityProcess'.
      */
     public void setMortalityProcess(
-            AlgorithmFactory<? extends NaturalMortalityProcess> mortalityProcess) {
+        final AlgorithmFactory<? extends NaturalMortalityProcess> mortalityProcess
+    ) {
         this.mortalityProcess = mortalityProcess;
     }
 
@@ -319,7 +327,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      *
      * @param daily Value to set for property 'daily'.
      */
-    public void setDaily(boolean daily) {
+    public void setDaily(final boolean daily) {
         this.daily = daily;
     }
 
@@ -337,7 +345,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 
@@ -356,7 +364,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      *
      * @param histogrammerOutput Value to set for property 'histogrammerOutput'.
      */
-    public void setHistogrammerOutput(boolean histogrammerOutput) {
+    public void setHistogrammerOutput(final boolean histogrammerOutput) {
         this.histogrammerOutput = histogrammerOutput;
     }
 }

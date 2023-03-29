@@ -26,10 +26,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class PerfectDestinationFactory implements AlgorithmFactory<PerfectDestinationStrategy>
-{
+public class PerfectDestinationFactory implements AlgorithmFactory<PerfectDestinationStrategy> {
 
-    private DoubleParameter maxHoursOut = new FixedDoubleParameter(5*24d);
+    private DoubleParameter maxHoursOut = new FixedDoubleParameter(5 * 24d);
 
 
     /**
@@ -39,11 +38,11 @@ public class PerfectDestinationFactory implements AlgorithmFactory<PerfectDestin
      * @return the function result
      */
     @Override
-    public PerfectDestinationStrategy apply(FishState fishState) {
+    public PerfectDestinationStrategy apply(final FishState fishState) {
         return new PerfectDestinationStrategy(
-                maxHoursOut.apply(fishState.getRandom()),
-                                  fishState.getMap(),
-                                  fishState.getRandom()
+            maxHoursOut.applyAsDouble(fishState.getRandom()),
+            fishState.getMap(),
+            fishState.getRandom()
         );
     }
 
@@ -61,7 +60,7 @@ public class PerfectDestinationFactory implements AlgorithmFactory<PerfectDestin
      *
      * @param maxHoursOut Value to set for property 'maxHoursOut'.
      */
-    public void setMaxHoursOut(DoubleParameter maxHoursOut) {
+    public void setMaxHoursOut(final DoubleParameter maxHoursOut) {
         this.maxHoursOut = maxHoursOut;
     }
 }

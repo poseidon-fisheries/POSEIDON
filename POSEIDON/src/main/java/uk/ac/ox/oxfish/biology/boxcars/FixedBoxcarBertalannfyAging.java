@@ -20,17 +20,15 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcarAging>{
+public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcarAging> {
 
 
-
-    private DoubleParameter LInfinity= new FixedDoubleParameter(113);
+    private DoubleParameter LInfinity = new FixedDoubleParameter(113);
 
     private DoubleParameter K = new FixedDoubleParameter(.364);
 
@@ -42,14 +40,11 @@ public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcar
      * @return the function result
      */
     @Override
-    public FixedBoxcarAging apply(FishState fishState) {
-
-
+    public FixedBoxcarAging apply(final FishState fishState) {
         return new FixedBoxcarAging(
-                K.apply(fishState.getRandom()),
-                LInfinity.apply(fishState.getRandom())
+            K.applyAsDouble(fishState.getRandom()),
+            LInfinity.applyAsDouble(fishState.getRandom())
         );
-
     }
 
 
@@ -67,7 +62,7 @@ public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcar
      *
      * @param LInfinity Value to set for property 'LInfinity'.
      */
-    public void setLInfinity(DoubleParameter LInfinity) {
+    public void setLInfinity(final DoubleParameter LInfinity) {
         this.LInfinity = LInfinity;
     }
 
@@ -85,7 +80,7 @@ public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcar
      *
      * @param k Value to set for property 'k'.
      */
-    public void setK(DoubleParameter k) {
+    public void setK(final DoubleParameter k) {
         K = k;
     }
 

@@ -35,59 +35,56 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactory<NearestNeighborRegression> {
 
 
+    private final static ObservationExtractor[] extractors = new ObservationExtractor[5];
 
+    static {
+        extractors[0] = new ObservationTimeExtractor();
+        extractors[1] = new GridXExtractor();
+        extractors[2] = new GridYExtractor();
+        final ManhattanDistance distance = new ManhattanDistance();
+        extractors[3] = new PortDistanceExtractor(distance, 1d);
+        extractors[4] = new HabitatExtractor();
 
+    }
 
-        private DoubleParameter timeBandwidth = new FixedDoubleParameter(5000d);
+    private DoubleParameter timeBandwidth = new FixedDoubleParameter(5000d);
+    private DoubleParameter xBandwidth = new FixedDoubleParameter(.5d);
+    private DoubleParameter yBandwidth = new FixedDoubleParameter(.5d);
+    private DoubleParameter distanceFromPortBandwidth = new FixedDoubleParameter(.5d);
+    private DoubleParameter habitatBandwidth = new FixedDoubleParameter(1d);
+    private DoubleParameter neighbors = new FixedDoubleParameter(1d);
 
+    /**
+     * Getter for property 'extractors'.
+     *
+     * @return Value for property 'extractors'.
+     */
+    public static ObservationExtractor[] getExtractors() {
+        return extractors;
+    }
 
-        private DoubleParameter xBandwidth = new FixedDoubleParameter(.5d);
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public NearestNeighborRegression apply(final FishState state) {
 
-        private DoubleParameter yBandwidth = new FixedDoubleParameter(.5d);
+        final double[] bandwidths = new double[5];
+        bandwidths[0] = timeBandwidth.applyAsDouble(state.getRandom());
+        bandwidths[1] = xBandwidth.applyAsDouble(state.getRandom());
+        bandwidths[2] = yBandwidth.applyAsDouble(state.getRandom());
+        bandwidths[3] = distanceFromPortBandwidth.applyAsDouble(state.getRandom());
+        bandwidths[4] = habitatBandwidth.applyAsDouble(state.getRandom());
 
-        private DoubleParameter distanceFromPortBandwidth = new FixedDoubleParameter(.5d);
-
-        private DoubleParameter habitatBandwidth = new FixedDoubleParameter(1d);
-
-
-        private final static ObservationExtractor[] extractors = new ObservationExtractor[5];
-        static {
-            extractors[0] = new ObservationTimeExtractor();
-            extractors[1] = new GridXExtractor();
-            extractors[2] = new GridYExtractor();
-            ManhattanDistance distance = new ManhattanDistance();
-            extractors[3] = new PortDistanceExtractor(distance, 1d);
-            extractors[4] = new HabitatExtractor();
-
-        }
-
-
-        private DoubleParameter neighbors= new FixedDoubleParameter(1d);
-
-
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param state the function argument
-         * @return the function result
-         */
-        @Override
-        public NearestNeighborRegression apply(FishState state) {
-
-            double bandwidths[] = new double[5];
-            bandwidths[0] = timeBandwidth.apply(state.getRandom());
-            bandwidths[1] = xBandwidth.apply(state.getRandom());
-            bandwidths[2] = yBandwidth.apply(state.getRandom());
-            bandwidths[3] = distanceFromPortBandwidth.apply(state.getRandom());
-            bandwidths[4] = habitatBandwidth.apply(state.getRandom());
-
-            return new NearestNeighborRegression(
-                    neighbors.apply(state.getRandom()).intValue(),
-                    bandwidths,
-                    extractors
-            );
-        }
-
+        return new NearestNeighborRegression(
+            (int) neighbors.applyAsDouble(state.getRandom()),
+            bandwidths,
+            extractors
+        );
+    }
 
     /**
      * Getter for property 'timeBandwidth'.
@@ -103,7 +100,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param timeBandwidth Value to set for property 'timeBandwidth'.
      */
-    public void setTimeBandwidth(DoubleParameter timeBandwidth) {
+    public void setTimeBandwidth(final DoubleParameter timeBandwidth) {
         this.timeBandwidth = timeBandwidth;
     }
 
@@ -121,7 +118,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param xBandwidth Value to set for property 'xBandwidth'.
      */
-    public void setxBandwidth(DoubleParameter xBandwidth) {
+    public void setxBandwidth(final DoubleParameter xBandwidth) {
         this.xBandwidth = xBandwidth;
     }
 
@@ -139,7 +136,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param yBandwidth Value to set for property 'yBandwidth'.
      */
-    public void setyBandwidth(DoubleParameter yBandwidth) {
+    public void setyBandwidth(final DoubleParameter yBandwidth) {
         this.yBandwidth = yBandwidth;
     }
 
@@ -157,7 +154,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param distanceFromPortBandwidth Value to set for property 'distanceFromPortBandwidth'.
      */
-    public void setDistanceFromPortBandwidth(DoubleParameter distanceFromPortBandwidth) {
+    public void setDistanceFromPortBandwidth(final DoubleParameter distanceFromPortBandwidth) {
         this.distanceFromPortBandwidth = distanceFromPortBandwidth;
     }
 
@@ -175,17 +172,8 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param habitatBandwidth Value to set for property 'habitatBandwidth'.
      */
-    public void setHabitatBandwidth(DoubleParameter habitatBandwidth) {
+    public void setHabitatBandwidth(final DoubleParameter habitatBandwidth) {
         this.habitatBandwidth = habitatBandwidth;
-    }
-
-    /**
-     * Getter for property 'extractors'.
-     *
-     * @return Value for property 'extractors'.
-     */
-    public static ObservationExtractor[] getExtractors() {
-        return extractors;
     }
 
     /**
@@ -202,7 +190,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
      *
      * @param neighbors Value to set for property 'neighbors'.
      */
-    public void setNeighbors(DoubleParameter neighbors) {
+    public void setNeighbors(final DoubleParameter neighbors) {
         this.neighbors = neighbors;
     }
 }

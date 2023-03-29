@@ -18,20 +18,25 @@ import java.util.Map;
 public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
-    public final static Map<String, Actuator<FishState,Double>> EFFORT_ACTUATORS = new HashMap<>();
+    public final static Map<String, Actuator<FishState, Double>> EFFORT_ACTUATORS = new HashMap<>();
+
     static {
-        EFFORT_ACTUATORS.put("season",
-                IndexTargetController.RATIO_TO_SEASONAL_CLOSURE
-                );
-        EFFORT_ACTUATORS.put("season_hours_out",
-                IndexTargetController.RATIO_TO_PERSONAL_SEASONAL_CLOSURE
-                );
-        EFFORT_ACTUATORS.put("fleet",
-                IndexTargetController.RATIO_TO_FLEET_SIZE
-                );
-        EFFORT_ACTUATORS.put("daysatsea",
-                IndexTargetController.RATIO_TO_DAYSATSEA
-                );
+        EFFORT_ACTUATORS.put(
+            "season",
+            IndexTargetController.RATIO_TO_SEASONAL_CLOSURE
+        );
+        EFFORT_ACTUATORS.put(
+            "season_hours_out",
+            IndexTargetController.RATIO_TO_PERSONAL_SEASONAL_CLOSURE
+        );
+        EFFORT_ACTUATORS.put(
+            "fleet",
+            IndexTargetController.RATIO_TO_FLEET_SIZE
+        );
+        EFFORT_ACTUATORS.put(
+            "daysatsea",
+            IndexTargetController.RATIO_TO_DAYSATSEA
+        );
     }
 
 
@@ -56,45 +61,42 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
     public AdditionalStartable apply(FishState fishState) {
 
 
-        Preconditions.checkArgument(EFFORT_ACTUATORS.containsKey(effortDefinition),
-                "The valid effort actuators are " + EFFORT_ACTUATORS.keySet());
-
+        Preconditions.checkArgument(
+            EFFORT_ACTUATORS.containsKey(effortDefinition),
+            "The valid effort actuators are " + EFFORT_ACTUATORS.keySet()
+        );
 
 
         return new AdditionalStartable() {
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                LBSPREffortPolicy lbspr = new LBSPREffortPolicy(
-                                        sprColumnName,
-                                        linearParameter.apply(fishState.getRandom()),
-                                        cubicParameter.apply(fishState.getRandom()),
-                                        sprTarget.apply(fishState.getRandom()),
-                                        maxChangeEachYear.apply(fishState.getRandom()),
-                                        EFFORT_ACTUATORS.get(effortDefinition),
-                                        blockEntryWhenSeasonIsNotFull);
-                                lbspr.start(model);
-                                lbspr.step(model);
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            LBSPREffortPolicy lbspr = new LBSPREffortPolicy(
+                                sprColumnName,
+                                linearParameter.applyAsDouble(fishState.getRandom()),
+                                cubicParameter.applyAsDouble(fishState.getRandom()),
+                                sprTarget.applyAsDouble(fishState.getRandom()),
+                                maxChangeEachYear.applyAsDouble(fishState.getRandom()),
+                                EFFORT_ACTUATORS.get(effortDefinition),
+                                blockEntryWhenSeasonIsNotFull
+                            );
+                            lbspr.start(model);
+                            lbspr.step(model);
 
 
-                                //creaqte also a collector
-                                fishState.getYearlyDataSet().registerGatherer(
-                                        "LBSPREffortPolicy output",
-                                        new Gatherer<FishState>() {
-                                            @Override
-                                            public Double apply(FishState fishState) {
-                                                return lbspr.getAccumulatedDelta();
-                                            }
-                                        },
-                                        Double.NaN
-                                );
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365 * startingYear + 1
+                            //creaqte also a collector
+                            fishState.getYearlyDataSet().registerGatherer(
+                                "LBSPREffortPolicy output",
+                                (Gatherer<FishState>) fishState1 -> lbspr.getAccumulatedDelta(),
+                                Double.NaN
+                            );
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
                 );
             }
         };
@@ -144,6 +146,10 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
         return effortDefinition;
     }
 
+    public void setEffortDefinition(String effortDefinition) {
+        this.effortDefinition = effortDefinition;
+    }
+
     public int getStartingYear() {
         return startingYear;
     }
@@ -158,9 +164,5 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
 
     public void setBlockEntryWhenSeasonIsNotFull(boolean blockEntryWhenSeasonIsNotFull) {
         this.blockEntryWhenSeasonIsNotFull = blockEntryWhenSeasonIsNotFull;
-    }
-
-    public void setEffortDefinition(String effortDefinition) {
-        this.effortDefinition = effortDefinition;
     }
 }

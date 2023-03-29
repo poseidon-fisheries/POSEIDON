@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 8/3/16.
  */
-public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKalmanRegression>{
+public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKalmanRegression> {
 
 
     private DoubleParameter distancePenalty = new FixedDoubleParameter(2);
@@ -56,18 +56,19 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
      * @return the function result
      */
     @Override
-    public SimpleKalmanRegression apply(FishState state) {
+    public SimpleKalmanRegression apply(final FishState state) {
         return new SimpleKalmanRegression(
-                distancePenalty.apply(state.getRandom()),
-                drift.apply(state.getRandom()),
-                minValue.apply(state.getRandom()),
-                maxValue.apply(state.getRandom()),
-                initialUncertainty.apply(state.getRandom()),
-                evidenceUncertainty.apply(state.getRandom()),
-                optimism.apply(state.getRandom()),
-                fishingHerePenalty.apply(state.getRandom()),
-                state.getMap(),
-                state.getRandom()) ;
+            distancePenalty.applyAsDouble(state.getRandom()),
+            drift.applyAsDouble(state.getRandom()),
+            minValue.applyAsDouble(state.getRandom()),
+            maxValue.applyAsDouble(state.getRandom()),
+            initialUncertainty.applyAsDouble(state.getRandom()),
+            evidenceUncertainty.applyAsDouble(state.getRandom()),
+            optimism.applyAsDouble(state.getRandom()),
+            fishingHerePenalty.applyAsDouble(state.getRandom()),
+            state.getMap(),
+            state.getRandom()
+        );
     }
 
 
@@ -75,7 +76,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
         return distancePenalty;
     }
 
-    public void setDistancePenalty(DoubleParameter distancePenalty) {
+    public void setDistancePenalty(final DoubleParameter distancePenalty) {
         this.distancePenalty = distancePenalty;
     }
 
@@ -83,7 +84,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
         return initialUncertainty;
     }
 
-    public void setInitialUncertainty(DoubleParameter initialUncertainty) {
+    public void setInitialUncertainty(final DoubleParameter initialUncertainty) {
         this.initialUncertainty = initialUncertainty;
     }
 
@@ -91,7 +92,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
         return drift;
     }
 
-    public void setDrift(DoubleParameter drift) {
+    public void setDrift(final DoubleParameter drift) {
         this.drift = drift;
     }
 
@@ -100,7 +101,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
         return minValue;
     }
 
-    public void setMinValue(DoubleParameter minValue) {
+    public void setMinValue(final DoubleParameter minValue) {
         this.minValue = minValue;
     }
 
@@ -108,7 +109,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
         return maxValue;
     }
 
-    public void setMaxValue(DoubleParameter maxValue) {
+    public void setMaxValue(final DoubleParameter maxValue) {
         this.maxValue = maxValue;
     }
 
@@ -126,7 +127,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
      *
      * @param optimism Value to set for property 'optimism'.
      */
-    public void setOptimism(DoubleParameter optimism) {
+    public void setOptimism(final DoubleParameter optimism) {
         this.optimism = optimism;
     }
 
@@ -144,7 +145,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
      *
      * @param evidenceUncertainty Value to set for property 'evidenceUncertainty'.
      */
-    public void setEvidenceUncertainty(DoubleParameter evidenceUncertainty) {
+    public void setEvidenceUncertainty(final DoubleParameter evidenceUncertainty) {
         this.evidenceUncertainty = evidenceUncertainty;
     }
 
@@ -162,7 +163,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
      *
      * @param fishingHerePenalty Value to set for property 'fishingHerePenalty'.
      */
-    public void setFishingHerePenalty(DoubleParameter fishingHerePenalty) {
+    public void setFishingHerePenalty(final DoubleParameter fishingHerePenalty) {
         this.fishingHerePenalty = fishingHerePenalty;
     }
 }

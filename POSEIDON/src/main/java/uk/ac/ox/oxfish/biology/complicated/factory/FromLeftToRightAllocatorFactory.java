@@ -46,14 +46,14 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      * @return the function result
      */
     @Override
-    public FromLeftToRightBiomassAllocator apply(FishState state) {
+    public FromLeftToRightBiomassAllocator apply(final FishState state) {
 
         return new FromLeftToRightBiomassAllocator(
-                lowestX.apply(state.getRandom()),
-                lowestY.apply(state.getRandom()),
-                highestX.apply(state.getRandom()),
-                highestY.apply(state.getRandom()),
-                exponent.apply(state.getRandom())
+            lowestX.applyAsDouble(state.getRandom()),
+            lowestY.applyAsDouble(state.getRandom()),
+            highestX.applyAsDouble(state.getRandom()),
+            highestY.applyAsDouble(state.getRandom()),
+            exponent.applyAsDouble(state.getRandom())
         );
 
     }
@@ -72,7 +72,7 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      *
      * @param lowestX Value to set for property 'lowestX'.
      */
-    public void setLowestX(DoubleParameter lowestX) {
+    public void setLowestX(final DoubleParameter lowestX) {
         this.lowestX = lowestX;
     }
 
@@ -90,7 +90,7 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      *
      * @param lowestY Value to set for property 'lowestY'.
      */
-    public void setLowestY(DoubleParameter lowestY) {
+    public void setLowestY(final DoubleParameter lowestY) {
         this.lowestY = lowestY;
     }
 
@@ -108,7 +108,7 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      *
      * @param highestX Value to set for property 'highestX'.
      */
-    public void setHighestX(DoubleParameter highestX) {
+    public void setHighestX(final DoubleParameter highestX) {
         this.highestX = highestX;
     }
 
@@ -126,7 +126,7 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      *
      * @param highestY Value to set for property 'highestY'.
      */
-    public void setHighestY(DoubleParameter highestY) {
+    public void setHighestY(final DoubleParameter highestY) {
         this.highestY = highestY;
     }
 
@@ -144,7 +144,7 @@ public class FromLeftToRightAllocatorFactory implements AlgorithmFactory<FromLef
      *
      * @param exponent Value to set for property 'exponent'.
      */
-    public void setExponent(DoubleParameter exponent) {
+    public void setExponent(final DoubleParameter exponent) {
         this.exponent = exponent;
     }
 }

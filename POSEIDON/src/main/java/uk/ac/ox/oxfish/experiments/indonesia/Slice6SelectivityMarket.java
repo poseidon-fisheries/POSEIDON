@@ -196,12 +196,12 @@ public class Slice6SelectivityMarket {
                 if(nonPremium.getLowAgeThreshold()==nonPremium.getHighAgeThreshold())
                     nonPremium.setLowAgeThreshold(
                             new FixedDoubleParameter(
-                                    nonPremium.getHighAgeThreshold().apply(random)-1d));
+                                    nonPremium.getHighAgeThreshold().applyAsDouble(random)-1d));
                 nonPremium.setPriceBelowThreshold(
-                        new FixedDoubleParameter(nonPremium.getPriceBelowThreshold().apply(random)*penalty)
+                        new FixedDoubleParameter(nonPremium.getPriceBelowThreshold().applyAsDouble(random)*penalty)
                 );
                 nonPremium.setPriceBetweenThresholds(
-                        new FixedDoubleParameter(nonPremium.getPriceBetweenThresholds().apply(random)*penalty)
+                        new FixedDoubleParameter(nonPremium.getPriceBetweenThresholds().applyAsDouble(random)*penalty)
                 );
 
                 ThreePricesWithPremium newMarket = new ThreePricesWithPremium();

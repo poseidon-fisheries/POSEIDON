@@ -308,7 +308,7 @@ public class TwoPopulationsScenario implements Scenario{
         portInitializer.buildPorts(map,
                                    mapMakerRandom,
                                    seaTile -> marketMap, model,
-                                   new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom)));
+                                   new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom)));
 
 
         //create initial mpas
@@ -343,7 +343,7 @@ public class TwoPopulationsScenario implements Scenario{
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
         for(Port port : ports)
-            port.setGasPricePerLiter(gasPricePerLiter.apply(random));
+            port.setGasPricePerLiter(gasPricePerLiter.applyAsDouble(random));
 
 
 
@@ -357,11 +357,11 @@ public class TwoPopulationsScenario implements Scenario{
                 discardingStrategySmall,
                 gearStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                   smallLitersPerKilometer.apply(random),
-                                                                   smallSpeed.apply(random)),
-                                                new FuelTank(smallFuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(smallHoldSize.apply(random),biology),
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.applyAsDouble(random),
+                                                                   smallLitersPerKilometer.applyAsDouble(random),
+                                                                   smallSpeed.applyAsDouble(random)),
+                                                new FuelTank(smallFuelTankSize.applyAsDouble(random))),
+                (Supplier<Hold>) () -> new Hold(smallHoldSize.applyAsDouble(random),biology),
                 gearSmall,
 
                 0);
@@ -376,11 +376,11 @@ public class TwoPopulationsScenario implements Scenario{
                 discardingStrategyLarge,
                 gearStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                   largeLitersPerKilometer.apply(random),
-                                                                   largeSpeed.apply(random)),
-                                                new FuelTank(largeFuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(largeHoldSize.apply(random), biology),
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.applyAsDouble(random),
+                                                                   largeLitersPerKilometer.applyAsDouble(random),
+                                                                   largeSpeed.applyAsDouble(random)),
+                                                new FuelTank(largeFuelTankSize.applyAsDouble(random))),
+                (Supplier<Hold>) () -> new Hold(largeHoldSize.applyAsDouble(random), biology),
                 gearLarge,
 
                 0);
@@ -401,7 +401,7 @@ public class TwoPopulationsScenario implements Scenario{
                 fisher.getTags().add("canoe");
                 //add hourly cost
                 fisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCostSmall.apply(model.getRandom()))
+                        new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
                 );
             }
         });
@@ -412,7 +412,7 @@ public class TwoPopulationsScenario implements Scenario{
                 fisher.getTags().add("ship");
                 fisher.getTags().add("red");
                 fisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCostLarge.apply(model.getRandom()))
+                        new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
                 );
             }
         });

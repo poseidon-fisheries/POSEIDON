@@ -25,24 +25,25 @@ import uk.ac.ox.oxfish.biology.SmoothMovementRule;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.*;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.RandomAllocatorFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeciesBiomassInitializer>{
-
+public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeciesBiomassInitializer> {
 
 
     private AlgorithmFactory<? extends BiomassAllocator> initialBiomassAllocator = new
-            RandomAllocatorFactory(
-            0,
-            5000
+        RandomAllocatorFactory(
+        0,
+        5000
     );
 
     private AlgorithmFactory<? extends BiomassAllocator> initialCapacityAllocator =
-            new ConstantAllocatorFactory(5000d);
+        new ConstantAllocatorFactory(5000d);
 
 
     /**
@@ -62,35 +63,36 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
 
     private boolean unfishable = false;
 
-    /**Si
+    /**
+     * Si
      * Applies this function to the given argument.
      *
      * @param state the function argument
      * @return the function result
      */
     @Override
-    public SingleSpeciesBiomassInitializer apply(FishState state) {
+    public SingleSpeciesBiomassInitializer apply(final FishState state) {
 
 
-        double  movementRate = differentialPercentageToMove.apply(state.getRandom());
-        double  movementLimit = percentageLimitOnDailyMovement.apply(state.getRandom());
+        final double movementRate = differentialPercentageToMove.applyAsDouble(state.getRandom());
+        final double movementLimit = percentageLimitOnDailyMovement.applyAsDouble(state.getRandom());
 
         return new SingleSpeciesBiomassInitializer(
-                initialBiomassAllocator.apply(state),
-                initialCapacityAllocator.apply(state),
-                movementRate > 0 & movementLimit > 0 ?
-                        new SmoothMovementRule(
+            initialBiomassAllocator.apply(state),
+            initialCapacityAllocator.apply(state),
+            movementRate > 0 & movementLimit > 0 ?
+                new SmoothMovementRule(
 
-                                percentageLimitOnDailyMovement.apply(state.getRandom()),
-                                differentialPercentageToMove.apply(state.getRandom())
-                        ) :
-                        new NoMovement(),
-                speciesName,
-                grower.apply(state),
+                    percentageLimitOnDailyMovement.applyAsDouble(state.getRandom()),
+                    differentialPercentageToMove.applyAsDouble(state.getRandom())
+                ) :
+                new NoMovement(),
+            speciesName,
+            grower.apply(state),
 
 
-                unfishable);
-
+            unfishable
+        );
 
 
     }
@@ -111,7 +113,8 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      * @param initialBiomassAllocator Value to set for property 'initialBiomassAllocator'.
      */
     public void setInitialBiomassAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> initialBiomassAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> initialBiomassAllocator
+    ) {
         this.initialBiomassAllocator = initialBiomassAllocator;
     }
 
@@ -130,7 +133,8 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      * @param initialCapacityAllocator Value to set for property 'initialCapacityAllocator'.
      */
     public void setInitialCapacityAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> initialCapacityAllocator) {
+        final AlgorithmFactory<? extends BiomassAllocator> initialCapacityAllocator
+    ) {
         this.initialCapacityAllocator = initialCapacityAllocator;
     }
 
@@ -149,7 +153,8 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      * @param percentageLimitOnDailyMovement Value to set for property 'percentageLimitOnDailyMovement'.
      */
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -167,7 +172,7 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      *
      * @param differentialPercentageToMove Value to set for property 'differentialPercentageToMove'.
      */
-    public void setDifferentialPercentageToMove(DoubleParameter differentialPercentageToMove) {
+    public void setDifferentialPercentageToMove(final DoubleParameter differentialPercentageToMove) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 
@@ -185,7 +190,7 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -204,7 +209,8 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 
@@ -222,7 +228,7 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
      *
      * @param unfishable Value to set for property 'unfishable'.
      */
-    public void setUnfishable(boolean unfishable) {
+    public void setUnfishable(final boolean unfishable) {
         this.unfishable = unfishable;
     }
 }

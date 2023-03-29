@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates fixed proportion gears
  * Created by carrknight on 9/30/15.
  */
-public class FixedProportionGearFactory implements AlgorithmFactory<FixedProportionGear>
-{
+public class FixedProportionGearFactory implements AlgorithmFactory<FixedProportionGear> {
 
     /**
      * this applies to each specie
@@ -50,15 +49,15 @@ public class FixedProportionGearFactory implements AlgorithmFactory<FixedProport
      * @return the function result
      */
     @Override
-    public FixedProportionGear apply(FishState state) {
-        return new FixedProportionGear(catchabilityPerHour.apply(state.getRandom()));
+    public FixedProportionGear apply(final FishState state) {
+        return new FixedProportionGear(catchabilityPerHour.applyAsDouble(state.getRandom()));
     }
 
     public DoubleParameter getCatchabilityPerHour() {
         return catchabilityPerHour;
     }
 
-    public void setCatchabilityPerHour(DoubleParameter catchabilityPerHour) {
+    public void setCatchabilityPerHour(final DoubleParameter catchabilityPerHour) {
         this.catchabilityPerHour = catchabilityPerHour;
     }
 }

@@ -15,16 +15,18 @@ public class MaxThroughputDecoratorFactory implements AlgorithmFactory<MaxThroug
 
 
     @Override
-    public MaxThroughputDecorator apply(FishState fishState) {
-        return new MaxThroughputDecorator(delegate.apply(fishState),
-                maxThroughput.apply(fishState.getRandom()));
+    public MaxThroughputDecorator apply(final FishState fishState) {
+        return new MaxThroughputDecorator(
+            delegate.apply(fishState),
+            maxThroughput.applyAsDouble(fishState.getRandom())
+        );
     }
 
     public AlgorithmFactory<? extends Gear> getDelegate() {
         return delegate;
     }
 
-    public void setDelegate(AlgorithmFactory<? extends Gear> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends Gear> delegate) {
         this.delegate = delegate;
     }
 
@@ -32,7 +34,7 @@ public class MaxThroughputDecoratorFactory implements AlgorithmFactory<MaxThroug
         return maxThroughput;
     }
 
-    public void setMaxThroughput(DoubleParameter maxThroughput) {
+    public void setMaxThroughput(final DoubleParameter maxThroughput) {
         this.maxThroughput = maxThroughput;
     }
 }

@@ -34,9 +34,9 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
 
     private DoubleParameter climateChangePercentageMovement = new FixedDoubleParameter(0.001);
 
-    private  int northMigration = 1;
+    private int northMigration = 1;
 
-    private  int westMigration = 1;
+    private int westMigration = 1;
 
     private int speciesAffectedByClimateChange = 0;
 
@@ -47,14 +47,14 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      * @return the function result
      */
     @Override
-    public SingleSpeciesBiomassInitializer apply(FishState model) {
-        SingleSpeciesBiomassInitializer apply = super.apply(model);
+    public SingleSpeciesBiomassInitializer apply(final FishState model) {
+        final SingleSpeciesBiomassInitializer apply = super.apply(model);
         //add climate change
         model.registerStartable(new CarryingCapacityDiffuser(
-                climateChangePercentageMovement.apply(model.getRandom()),
-                northMigration,
-                westMigration,
-                speciesAffectedByClimateChange
+            climateChangePercentageMovement.applyAsDouble(model.getRandom()),
+            northMigration,
+            westMigration,
+            speciesAffectedByClimateChange
         ));
         return apply;
     }
@@ -73,7 +73,7 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      *
      * @param climateChangePercentageMovement Value to set for property 'climateChangePercentageMovement'.
      */
-    public void setClimateChangePercentageMovement(DoubleParameter climateChangePercentageMovement) {
+    public void setClimateChangePercentageMovement(final DoubleParameter climateChangePercentageMovement) {
         this.climateChangePercentageMovement = climateChangePercentageMovement;
     }
 
@@ -92,7 +92,7 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      *
      * @param northMigration Value to set for property 'northMigration'.
      */
-    public void setNorthMigration(int northMigration) {
+    public void setNorthMigration(final int northMigration) {
         this.northMigration = northMigration;
     }
 
@@ -110,7 +110,7 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      *
      * @param westMigration Value to set for property 'westMigration'.
      */
-    public void setWestMigration(int westMigration) {
+    public void setWestMigration(final int westMigration) {
         this.westMigration = westMigration;
     }
 
@@ -128,7 +128,7 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      *
      * @param speciesAffectedByClimateChange Value to set for property 'speciesAffectedByClimateChange'.
      */
-    public void setSpeciesAffectedByClimateChange(int speciesAffectedByClimateChange) {
+    public void setSpeciesAffectedByClimateChange(final int speciesAffectedByClimateChange) {
         this.speciesAffectedByClimateChange = speciesAffectedByClimateChange;
     }
 }

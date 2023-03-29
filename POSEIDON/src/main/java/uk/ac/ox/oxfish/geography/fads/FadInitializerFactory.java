@@ -126,7 +126,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         final double[] a = new double[globalBiology.getSize()];
         map.forEach((speciesName, parameter) -> {
             final int index = globalBiology.getSpecie(speciesName).getIndex();
-            a[index] = parameter.apply(rng);
+            a[index] = parameter.applyAsDouble(rng);
         });
         return a;
     }

@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates a separate mono-quota regulation object each time it is called. This way each quota acts independently
  * Created by carrknight on 6/14/15.
  */
-public class IQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
-{
+public class IQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
 
 
     DoubleParameter individualQuota = new FixedDoubleParameter(5000);
@@ -44,15 +43,15 @@ public class IQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
      * @return the function result
      */
     @Override
-    public MonoQuotaRegulation apply(FishState state) {
-        return new MonoQuotaRegulation(individualQuota.apply(state.random));
+    public MonoQuotaRegulation apply(final FishState state) {
+        return new MonoQuotaRegulation(individualQuota.applyAsDouble(state.random));
     }
 
     public DoubleParameter getIndividualQuota() {
         return individualQuota;
     }
 
-    public void setIndividualQuota(DoubleParameter individualQuota) {
+    public void setIndividualQuota(final DoubleParameter individualQuota) {
         this.individualQuota = individualQuota;
     }
 }

@@ -47,8 +47,9 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
     }
 
     public BoundedAllocatorFactory(
-            double lowestX, double lowestY, double highestX,
-            double highestY, boolean insideTheBox) {
+        final double lowestX, final double lowestY, final double highestX,
+        final double highestY, final boolean insideTheBox
+    ) {
         this.lowestX = new FixedDoubleParameter(lowestX);
         this.lowestY = new FixedDoubleParameter(lowestY);
         this.highestX = new FixedDoubleParameter(highestX);
@@ -63,14 +64,14 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      * @return the function result
      */
     @Override
-    public BoundedAllocatorDecorator apply(FishState state) {
+    public BoundedAllocatorDecorator apply(final FishState state) {
         return new BoundedAllocatorDecorator(
-                lowestX.apply(state.getRandom()),
-                lowestY.apply(state.getRandom()),
-                highestX.apply(state.getRandom()),
-                highestY.apply(state.getRandom()),
-                insideTheBox,
-                delegate.apply(state)
+            lowestX.applyAsDouble(state.getRandom()),
+            lowestY.applyAsDouble(state.getRandom()),
+            highestX.applyAsDouble(state.getRandom()),
+            highestY.applyAsDouble(state.getRandom()),
+            insideTheBox,
+            delegate.apply(state)
 
         );
     }
@@ -89,7 +90,7 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      *
      * @param lowestX Value to set for property 'lowestX'.
      */
-    public void setLowestX(DoubleParameter lowestX) {
+    public void setLowestX(final DoubleParameter lowestX) {
         this.lowestX = lowestX;
     }
 
@@ -107,7 +108,7 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      *
      * @param lowestY Value to set for property 'lowestY'.
      */
-    public void setLowestY(DoubleParameter lowestY) {
+    public void setLowestY(final DoubleParameter lowestY) {
         this.lowestY = lowestY;
     }
 
@@ -125,7 +126,7 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      *
      * @param highestX Value to set for property 'highestX'.
      */
-    public void setHighestX(DoubleParameter highestX) {
+    public void setHighestX(final DoubleParameter highestX) {
         this.highestX = highestX;
     }
 
@@ -143,7 +144,7 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      *
      * @param highestY Value to set for property 'highestY'.
      */
-    public void setHighestY(DoubleParameter highestY) {
+    public void setHighestY(final DoubleParameter highestY) {
         this.highestY = highestY;
     }
 
@@ -161,7 +162,7 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      *
      * @param insideTheBox Value to set for property 'insideTheBox'.
      */
-    public void setInsideTheBox(boolean insideTheBox) {
+    public void setInsideTheBox(final boolean insideTheBox) {
         this.insideTheBox = insideTheBox;
     }
 
@@ -180,7 +181,8 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocato
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends BiomassAllocator> delegate) {
+        final AlgorithmFactory<? extends BiomassAllocator> delegate
+    ) {
         this.delegate = delegate;
     }
 }

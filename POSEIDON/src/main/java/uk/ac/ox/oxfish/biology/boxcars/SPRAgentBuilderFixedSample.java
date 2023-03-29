@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.biology.boxcars;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -11,65 +10,56 @@ import java.util.LinkedHashMap;
 
 public class SPRAgentBuilderFixedSample implements CatchAtLengthFactory {
 
-    private  String surveyTag = "spr_agent";
+    private String surveyTag = "spr_agent";
 
-    private  String speciesName = "Species 0";
+    private String speciesName = "Species 0";
 
-    private LinkedHashMap<String,Integer> tagsToSample =
-            new LinkedHashMap<>();
-    {
-     //   tagsToSample.put("population9",100);
-    }
-
+    private LinkedHashMap<String, Integer> tagsToSample =
+        new LinkedHashMap<>();
     private DoubleParameter assumedLinf = new FixedDoubleParameter(86);
-
-    private  DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437) ;
-
-    private  DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984) ;
-
-    private  DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100) ;
-
+    private DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437);
+    private DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984);
+    private DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100);
     //these aren't "real" virgin recruits, this is just the number of simulated ones
     //used by Peter in his formula
-    private  DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000) ;
-
-    private  DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
-
-    private  DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
-
-    private  DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
-
-    private  DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
-
+    private DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000);
+    private DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
+    private DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
+    private DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
+    private DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
     private boolean useTNCFormula = true;
-
     /**
      * if using TNC formula, shall we remove the smallest percentile of catches from the SPR?
      * Both in real world and in the simulated one, it tends to improve numerical stability by quite a lot
      */
     private boolean removeSmallestPercentile = false;
 
+    {
+        //   tagsToSample.put("population9",100);
+    }
+
     @Override
     public SPRAgent apply(FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
 
 
-        return new SPRAgent(surveyTag,
-                fishState.getBiology().getSpecie(speciesName),
-                new CatchSamplerFixedSample(
-                        tagsToSample,
-                        fishState.getBiology().getSpecie(speciesName)
-                ),
-                assumedLinf.apply(random),
-                assumedKParameter.apply(random),
-                assumedNaturalMortality.apply(random),
-                simulatedMaxAge.apply(random).intValue(),
-                simulatedVirginRecruits.apply(random),
-                assumedLengthBinCm.apply(random),
-                assumedVarA.apply(random),
-                assumedVarB.apply(random),
-                assumedLengthAtMaturity.apply(random),
-                useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
+        return new SPRAgent(
+            surveyTag,
+            fishState.getBiology().getSpecie(speciesName),
+            new CatchSamplerFixedSample(
+                tagsToSample,
+                fishState.getBiology().getSpecie(speciesName)
+            ),
+            assumedLinf.applyAsDouble(random),
+            assumedKParameter.applyAsDouble(random),
+            assumedNaturalMortality.applyAsDouble(random),
+            (int) simulatedMaxAge.applyAsDouble(random),
+            simulatedVirginRecruits.applyAsDouble(random),
+            assumedLengthBinCm.applyAsDouble(random),
+            assumedVarA.applyAsDouble(random),
+            assumedVarB.applyAsDouble(random),
+            assumedLengthAtMaturity.applyAsDouble(random),
+            useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
         );
 
     }

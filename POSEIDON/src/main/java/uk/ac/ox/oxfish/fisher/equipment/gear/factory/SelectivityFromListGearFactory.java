@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.ArrayFilter;
@@ -26,13 +25,14 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
 
     private int numberOfSubdivisions = 1;
 
-   private DoubleParameter averageCatchability = new FixedDoubleParameter(0.0001);
+    private DoubleParameter averageCatchability = new FixedDoubleParameter(0.0001);
 
     @Override
-    public HomogeneousAbundanceGear apply(FishState fishState) {
-        MersenneTwisterFast random = fishState.getRandom();
-        List<Double> selectivityPerBin = Arrays.stream(this.selectivityPerBin.split(",")).map(Double::parseDouble).
-                collect(Collectors.toList());
+    public HomogeneousAbundanceGear apply(final FishState fishState) {
+        final MersenneTwisterFast random = fishState.getRandom();
+        final List<Double> selectivityPerBin = Arrays.stream(this.selectivityPerBin.split(","))
+            .map(Double::parseDouble).
+            collect(Collectors.toList());
         final double[][] selectivity = new double[numberOfSubdivisions][selectivityPerBin.size()];
         for (int bin = 0; bin < selectivityPerBin.size(); bin++) {
             for (int subdivision = 0; subdivision < selectivity.length; subdivision++) {
@@ -41,9 +41,9 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
         }
 
         return new HomogeneousAbundanceGear(
-                litersOfGasConsumedPerHour.apply(random),
-                new FixedProportionFilter(averageCatchability.apply(random), false),
-                new ArrayFilter(false,selectivity)
+            litersOfGasConsumedPerHour.applyAsDouble(random),
+            new FixedProportionFilter(averageCatchability.applyAsDouble(random), false),
+            new ArrayFilter(false, selectivity)
         );
     }
 
@@ -52,7 +52,7 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
         return selectivityPerBin;
     }
 
-    public void setSelectivityPerBin(String selectivityPerBin) {
+    public void setSelectivityPerBin(final String selectivityPerBin) {
         this.selectivityPerBin = selectivityPerBin;
     }
 
@@ -60,7 +60,7 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
         return litersOfGasConsumedPerHour;
     }
 
-    public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
+    public void setLitersOfGasConsumedPerHour(final DoubleParameter litersOfGasConsumedPerHour) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
     }
 
@@ -68,7 +68,7 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
         return numberOfSubdivisions;
     }
 
-    public void setNumberOfSubdivisions(int numberOfSubdivisions) {
+    public void setNumberOfSubdivisions(final int numberOfSubdivisions) {
         this.numberOfSubdivisions = numberOfSubdivisions;
     }
 
@@ -78,7 +78,7 @@ public class SelectivityFromListGearFactory implements HomogeneousGearFactory {
     }
 
     @Override
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
 }

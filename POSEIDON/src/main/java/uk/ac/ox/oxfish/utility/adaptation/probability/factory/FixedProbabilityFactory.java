@@ -56,8 +56,8 @@ public class FixedProbabilityFactory implements AlgorithmFactory<FixedProbabilit
      */
     @Override
     public FixedProbability apply(FishState state) {
-        return new FixedProbability(explorationProbability.apply(state.getRandom()),
-                                    imitationProbability.apply(state.getRandom()));
+        return new FixedProbability(explorationProbability.applyAsDouble(state.getRandom()),
+                                    imitationProbability.applyAsDouble(state.getRandom()));
     }
 
     public DoubleParameter getExplorationProbability() {

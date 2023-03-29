@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 import com.google.common.base.Preconditions;
 import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
-import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -37,12 +37,14 @@ public class SingleSpeciesRegularBoxcarFactory extends SingleSpeciesBoxcarAbstra
     private double cmPerBin = 5;
 
     @Override
-    protected GrowthBinByList generateBins(FishState state) {
-        if(getCmPerBin() * getNumberOfBins() + getCmPerBin()/2 <= getLInfinity().apply(state.getRandom()))
+    protected GrowthBinByList generateBins(final FishState state) {
+        if (getCmPerBin() * getNumberOfBins() + getCmPerBin() / 2 <= getLInfinity().applyAsDouble(state.getRandom()))
             Log.warn("The number of bins provided given their width won't reach l-infinity...");
-        Preconditions.checkArgument(getCmPerBin() * getNumberOfBins() + getCmPerBin()/2 >=  getLInfinity().apply(state.getRandom())/2,
-                "bins do not reach even half of L_infinity. The biology is inconsistent!");
-        EquallySpacedBertalanffyFactory  meristic = new EquallySpacedBertalanffyFactory();
+        Preconditions.checkArgument(
+            getCmPerBin() * getNumberOfBins() + getCmPerBin() / 2 >= getLInfinity().applyAsDouble(state.getRandom()) / 2,
+            "bins do not reach even half of L_infinity. The biology is inconsistent!"
+        );
+        final EquallySpacedBertalanffyFactory meristic = new EquallySpacedBertalanffyFactory();
         meristic.setCmPerBin(getCmPerBin());
         meristic.setNumberOfBins(getNumberOfBins());
         meristic.setAllometricAlpha(getAllometricAlpha());
@@ -50,7 +52,7 @@ public class SingleSpeciesRegularBoxcarFactory extends SingleSpeciesBoxcarAbstra
         meristic.setRecruitLengthInCm(new FixedDoubleParameter(0));
         meristic.setMaxLengthInCm(getLInfinity());
         meristic.setkYearlyParameter(getK());
-        GrowthBinByList meristicsInstance = meristic.apply(state);
+        final GrowthBinByList meristicsInstance = meristic.apply(state);
         return meristicsInstance;
     }
 
@@ -69,7 +71,7 @@ public class SingleSpeciesRegularBoxcarFactory extends SingleSpeciesBoxcarAbstra
      *
      * @param cmPerBin Value to set for property 'cmPerBin'.
      */
-    public void setCmPerBin(double cmPerBin) {
+    public void setCmPerBin(final double cmPerBin) {
         this.cmPerBin = cmPerBin;
     }
 }

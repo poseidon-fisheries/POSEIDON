@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import uk.ac.ox.oxfish.biology.complicated.LocalSullivanTransitionAging;
 import uk.ac.ox.oxfish.biology.complicated.SullivanTransitionAging;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -30,8 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransitionAging> {
 
 
-
-    private DoubleParameter LInfinity= new FixedDoubleParameter(113);
+    private DoubleParameter LInfinity = new FixedDoubleParameter(113);
 
     private DoubleParameter K = new FixedDoubleParameter(.364);
 
@@ -47,13 +45,13 @@ public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransition
      * @return the function result
      */
     @Override
-    public SullivanTransitionAging apply(FishState fishState) {
+    public SullivanTransitionAging apply(final FishState fishState) {
         return new SullivanTransitionAging(
-                K.apply(fishState.getRandom()),
-                LInfinity.apply(fishState.getRandom()),
-                gammaScaleParameter.apply(fishState.getRandom()),
-                agingPeriodInDays
-                                           );
+            K.applyAsDouble(fishState.getRandom()),
+            LInfinity.applyAsDouble(fishState.getRandom()),
+            gammaScaleParameter.applyAsDouble(fishState.getRandom()),
+            agingPeriodInDays
+        );
     }
 
     /**
@@ -70,7 +68,7 @@ public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransition
      *
      * @param LInfinity Value to set for property 'LInfinity'.
      */
-    public void setLInfinity(DoubleParameter LInfinity) {
+    public void setLInfinity(final DoubleParameter LInfinity) {
         this.LInfinity = LInfinity;
     }
 
@@ -88,7 +86,7 @@ public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransition
      *
      * @param k Value to set for property 'k'.
      */
-    public void setK(DoubleParameter k) {
+    public void setK(final DoubleParameter k) {
         K = k;
     }
 
@@ -106,7 +104,7 @@ public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransition
      *
      * @param gammaScaleParameter Value to set for property 'gammaScaleParameter'.
      */
-    public void setGammaScaleParameter(DoubleParameter gammaScaleParameter) {
+    public void setGammaScaleParameter(final DoubleParameter gammaScaleParameter) {
         this.gammaScaleParameter = gammaScaleParameter;
     }
 
@@ -124,7 +122,7 @@ public class SullivanAgingFactory implements AlgorithmFactory<SullivanTransition
      *
      * @param agingPeriodInDays Value to set for property 'agingPeriodInDays'.
      */
-    public void setAgingPeriodInDays(int agingPeriodInDays) {
+    public void setAgingPeriodInDays(final int agingPeriodInDays) {
         this.agingPeriodInDays = agingPeriodInDays;
     }
 }

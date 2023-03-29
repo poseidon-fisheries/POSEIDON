@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttractorFactory.createEnvironmentalPenaltyAndStartEnvironmentalMaps;
 
@@ -38,15 +37,6 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
-
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
     private Map<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
     private Map<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
     private Map<String, Double> catchabilities = new LinkedHashMap<>();
@@ -106,75 +96,80 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
         this.environmentalPenalties = environmentalPenalties;
     }
 
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
-            new Supplier<AbundanceFadInitializer>() {
-                @Override
-                public AbundanceFadInitializer get() {
+            () -> {
 
 
-                    //attractor:
-                    final MersenneTwisterFast rng = fishState.getRandom();
-                    final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
-                    final DoubleSupplier capacityGenerator;
-                    if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
-                        capacityGenerator = () -> Double.MAX_VALUE;
-                    else
-                        capacityGenerator = () -> {
-                            if (rng.nextFloat() <= probabilityOfFadBeingDud)
-                                return 0;
-                            else
-                                return Double.MAX_VALUE;
-                        };
-
-                    final GlobalBiology globalBiology = fishState.getBiology();
-                    final DoubleParameter[] carryingCapacities = new DoubleParameter[globalBiology.getSize()];
-                    //double[] maxCatchability = new double[fishState.getBiology().getSize()];
-                    // double[] cachabilityOtherwise = new double[fishState.getBiology().getSize()];
-                    for (final Species species : globalBiology.getSpecies()) {
-                        carryingCapacities[species.getIndex()] =
-                            carryingCapacityScaleParameters.containsKey(species.getName()) ?
-                                new WeibullDoubleParameter(
-                                    carryingCapacityShapeParameters.get(species.getName()),
-                                    carryingCapacityScaleParameters.get(species.getName())
-                                ) : new FixedDoubleParameter(-1);
-
-
-                    }
-                    final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
-                        environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
-
-                    final Function<AbstractFad, double[]> catchabilitySupplier = abstractFad -> {
-
-                        final double[] cachability = new double[globalBiology.getSize()];
-                        final SeaTile fadLocation = abstractFad.getLocation();
-                        final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
-                        if (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
-                            return cachability;
-
-                        for (final Species species : globalBiology.getSpecies())
-                            cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(), 0d) *
-                                penaltyHere;
-                        return cachability;
+                //attractor:
+                final MersenneTwisterFast rng = fishState.getRandom();
+                final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
+                final DoubleSupplier capacityGenerator;
+                if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
+                    capacityGenerator = () -> Double.MAX_VALUE;
+                else
+                    capacityGenerator = () -> {
+                        if (rng.nextFloat() <= probabilityOfFadBeingDud)
+                            return 0;
+                        else
+                            return Double.MAX_VALUE;
                     };
 
+                final GlobalBiology globalBiology = fishState.getBiology();
+                final DoubleParameter[] carryingCapacities = new DoubleParameter[globalBiology.getSize()];
+                //double[] maxCatchability = new double[fishState.getBiology().getSize()];
+                // double[] cachabilityOtherwise = new double[fishState.getBiology().getSize()];
+                for (final Species species : globalBiology.getSpecies()) {
+                    carryingCapacities[species.getIndex()] =
+                        carryingCapacityScaleParameters.containsKey(species.getName()) ?
+                            new WeibullDoubleParameter(
+                                carryingCapacityShapeParameters.get(species.getName()),
+                                carryingCapacityScaleParameters.get(species.getName())
+                            ) : new FixedDoubleParameter(-1);
 
-                    return new AbundanceFadInitializer(
-                        globalBiology,
-                        capacityGenerator,
-                        new CatchabilitySelectivityFishAttractor(
-                            carryingCapacities,
-                            catchabilitySupplier,
-                            daysInWaterBeforeAttraction.apply(rng).intValue(),
-                            maximumDaysAttractions.apply(rng).intValue(),
-                            fishState,
-                            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
-                        ),
-                        fishReleaseProbabilityInPercent.apply(rng) / 100d,
-                        fishState::getStep
-                    );
+
                 }
+                final Function<SeaTile, Double> finalCatchabilityPenaltyFunction = createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+                    environmentalMaps, environmentalPenalties, environmentalThresholds, fishState);
+
+                final Function<AbstractFad, double[]> catchabilitySupplier = abstractFad -> {
+
+                    final double[] cachability = new double[globalBiology.getSize()];
+                    final SeaTile fadLocation = abstractFad.getLocation();
+                    final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
+                    if (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
+                        return cachability;
+
+                    for (final Species species : globalBiology.getSpecies())
+                        cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(), 0d) *
+                            penaltyHere;
+                    return cachability;
+                };
+
+
+                return new AbundanceFadInitializer(
+                    globalBiology,
+                    capacityGenerator,
+                    new CatchabilitySelectivityFishAttractor(
+                        carryingCapacities,
+                        catchabilitySupplier,
+                        (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
+                        (int) maximumDaysAttractions.applyAsDouble(rng),
+                        fishState,
+                        abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
+                    ),
+                    fishReleaseProbabilityInPercent.applyAsDouble(rng) / 100d,
+                    fishState::getStep
+                );
             }
 
         );

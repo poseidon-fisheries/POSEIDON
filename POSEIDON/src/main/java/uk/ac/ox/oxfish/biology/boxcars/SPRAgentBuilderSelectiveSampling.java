@@ -5,7 +5,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -19,32 +18,32 @@ import java.util.function.Predicate;
 public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
 
 
-    private  String surveyTag = "spr_agent";
+    private String surveyTag = "spr_agent";
 
-    private  String speciesName = "Species 0";
+    private String speciesName = "Species 0";
 
-    private LinkedHashMap<String,Double> probabilityOfSamplingEachTag =
-            new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> probabilityOfSamplingEachTag =
+        new LinkedHashMap<>();
 
     private DoubleParameter assumedLinf = new FixedDoubleParameter(86);
 
-    private  DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437) ;
+    private DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437);
 
-    private  DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984) ;
+    private DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984);
 
-    private  DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100) ;
+    private DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100);
 
     //these aren't "real" virgin recruits, this is just the number of simulated ones
     //used by Peter in his formula
-    private  DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000) ;
+    private DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000);
 
-    private  DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
+    private DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
 
-    private  DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
+    private DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
 
-    private  DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
+    private DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
 
-    private  DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
+    private DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
 
     private boolean useTNCFormula = true;
 
@@ -58,17 +57,19 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
     public SPRAgentBuilderSelectiveSampling() {
     }
 
-    public SPRAgentBuilderSelectiveSampling(String surveyTag, String speciesName,
-                                            LinkedHashMap<String,Double> probabilityOfSamplingEachTag,
-                                            double assumedLinf,
-                                            double assumedKParameter,
-                                            double assumedNaturalMortality,
-                                            int simulatedMaxAge,
-                                            double simulatedVirginRecruits,
-                                            double assumedLengthBinCm,
-                                            double assumedVarA,
-                                            double assumedVarB,
-                                            double assumedLengthAtMaturity) {
+    public SPRAgentBuilderSelectiveSampling(
+        String surveyTag, String speciesName,
+        LinkedHashMap<String, Double> probabilityOfSamplingEachTag,
+        double assumedLinf,
+        double assumedKParameter,
+        double assumedNaturalMortality,
+        int simulatedMaxAge,
+        double simulatedVirginRecruits,
+        double assumedLengthBinCm,
+        double assumedVarA,
+        double assumedVarB,
+        double assumedLengthAtMaturity
+    ) {
         this.surveyTag = surveyTag;
         this.speciesName = speciesName;
         this.probabilityOfSamplingEachTag = probabilityOfSamplingEachTag;
@@ -84,40 +85,40 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
     }
 
 
-
-
     @Override
     public SPRAgent apply(FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
 
 
-        return new SPRAgent(surveyTag,
-                fishState.getBiology().getSpecie(speciesName),
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        for (Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
-                            if(fisher.getTags().contains(tagProbability.getKey()) && random.nextDouble()<tagProbability.getValue()) {
-                                return true;
-                            }
-
-
+        return new SPRAgent(
+            surveyTag,
+            fishState.getBiology().getSpecie(speciesName),
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(Fisher fisher) {
+                    for (Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
+                        if (fisher.getTags()
+                            .contains(tagProbability.getKey()) && random.nextDouble() < tagProbability.getValue()) {
+                            return true;
                         }
-                        return false;
-                    }
-                },
-                assumedLinf.apply(random),
-                assumedKParameter.apply(random),
-                assumedNaturalMortality.apply(random),
-                simulatedMaxAge.apply(random).intValue(),
-                simulatedVirginRecruits.apply(random),
-                assumedLengthBinCm.apply(random),
-                assumedVarA.apply(random),
-                assumedVarB.apply(random),
-                assumedLengthAtMaturity.apply(random),
-                useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
 
-                );
+
+                    }
+                    return false;
+                }
+            },
+            assumedLinf.applyAsDouble(random),
+            assumedKParameter.applyAsDouble(random),
+            assumedNaturalMortality.applyAsDouble(random),
+            (int) simulatedMaxAge.applyAsDouble(random),
+            simulatedVirginRecruits.applyAsDouble(random),
+            assumedLengthBinCm.applyAsDouble(random),
+            assumedVarA.applyAsDouble(random),
+            assumedVarB.applyAsDouble(random),
+            assumedLengthAtMaturity.applyAsDouble(random),
+            useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
+
+        );
 
     }
 

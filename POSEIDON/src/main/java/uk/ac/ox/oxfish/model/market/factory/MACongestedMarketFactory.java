@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Create Congested Market with Moving Average congestion
  * Created by carrknight on 1/6/16.
  */
-public class MACongestedMarketFactory implements AlgorithmFactory<MACongestedMarket>
-{
+public class MACongestedMarketFactory implements AlgorithmFactory<MACongestedMarket> {
 
 
     /**
@@ -58,10 +57,10 @@ public class MACongestedMarketFactory implements AlgorithmFactory<MACongestedMar
      */
     @Override
     public MACongestedMarket apply(FishState fishState) {
-        return  new MACongestedMarket(
-                demandIntercept.apply(fishState.getRandom()),
-                demandSlope.apply(fishState.getRandom()),
-                observationWindow.apply(fishState.getRandom()).intValue()
+        return new MACongestedMarket(
+            demandIntercept.applyAsDouble(fishState.getRandom()),
+            demandSlope.applyAsDouble(fishState.getRandom()),
+            (int) observationWindow.applyAsDouble(fishState.getRandom())
         );
     }
 

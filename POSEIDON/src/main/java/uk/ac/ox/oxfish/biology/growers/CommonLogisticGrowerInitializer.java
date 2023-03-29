@@ -16,29 +16,32 @@ public class CommonLogisticGrowerInitializer implements LogisticGrowerInitialize
     private final double distributionalWeight;
 
 
-    public CommonLogisticGrowerInitializer(DoubleParameter steepness, double distributeProportionally) {
+    public CommonLogisticGrowerInitializer(final DoubleParameter steepness, final double distributeProportionally) {
         this.steepness = steepness;
         this.distributionalWeight = distributeProportionally;
     }
 
     @Override
     public void initializeGrower(
-            Map<SeaTile, BiomassLocalBiology> tiles, FishState state, MersenneTwisterFast random, Species species)
-    {
+        final Map<SeaTile, BiomassLocalBiology> tiles,
+        final FishState state,
+        final MersenneTwisterFast random,
+        final Species species
+    ) {
 
-        Collection<BiomassLocalBiology> biologies = tiles.values();
-        if(biologies.isEmpty())
+        final Collection<BiomassLocalBiology> biologies = tiles.values();
+        if (biologies.isEmpty())
             return;
         //initialize the malthusian parameter
 
-        CommonLogisticGrower grower = new CommonLogisticGrower(
-            steepness.apply(random),
+        final CommonLogisticGrower grower = new CommonLogisticGrower(
+            steepness.applyAsDouble(random),
             species,
             distributionalWeight
         );
 
         //add all the biologies
-        for(BiomassLocalBiology biology : biologies)
+        for (final BiomassLocalBiology biology : biologies)
             grower.getBiologies().add(biology);
         state.registerStartable(grower);
 

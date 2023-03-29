@@ -30,26 +30,9 @@ import java.util.function.Supplier;
 public class LinearClorophillAttractorFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
-    private AbundanceFiltersFactory abundanceFiltersFactory;
-
-    public LinearClorophillAttractorFactory() {
-    }
-
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
-
-    public LinearClorophillAttractorFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
+    private AbundanceFiltersFactory abundanceFiltersFactory;
     private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> catchabilities = new LinkedHashMap<>();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
@@ -57,7 +40,12 @@ public class LinearClorophillAttractorFactory implements
     private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private DoubleParameter carryingCapacityMultiplier = new FixedDoubleParameter(1.0);
-    private InputPath chlorophyllMapPath = InputPath.of("inputs", "epo_inputs", "environmental_maps", "chlorophyll.csv");
+    private InputPath chlorophyllMapPath = InputPath.of(
+        "inputs",
+        "epo_inputs",
+        "environmental_maps",
+        "chlorophyll.csv"
+    );
     private int chlorophyllMapPeriodInDays = 365;
     private DoubleParameter chlorophyllThreshold = new FixedDoubleParameter(0.15);
 
@@ -69,6 +57,19 @@ public class LinearClorophillAttractorFactory implements
 
     {
         catchabilities.put("Species 0", 0.001d);
+    }
+    public LinearClorophillAttractorFactory() {
+    }
+    public LinearClorophillAttractorFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
+    }
+
+    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
@@ -84,7 +85,7 @@ public class LinearClorophillAttractorFactory implements
 
                     //attractor:
                     final MersenneTwisterFast rng = fishState.getRandom();
-                    final double probabilityOfFadBeingDud = fadDudRate.apply(rng);
+                    final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
                     final DoubleSupplier capacityGenerator;
                     if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
                         capacityGenerator = () -> Double.MAX_VALUE;
@@ -105,7 +106,7 @@ public class LinearClorophillAttractorFactory implements
                             maximumCarryingCapacities.containsKey(species.getName()) ?
                                 new FixedDoubleParameter(
                                     maximumCarryingCapacities.get(species.getName()) *
-                                        carryingCapacityMultiplier.apply(rng)
+                                        carryingCapacityMultiplier.applyAsDouble(rng)
 
                                 ) :
                                 new FixedDoubleParameter(-1);
@@ -126,7 +127,7 @@ public class LinearClorophillAttractorFactory implements
                         );
                         for (final Species species : globalBiology.getSpecies())
                             cachability[species.getIndex()] = catchabilities.getOrDefault(species.getName(), 0d) *
-                                Math.pow(Math.min(1d, currentHere / chlorophyllThreshold.apply(rng)), 2);
+                                Math.pow(Math.min(1d, currentHere / chlorophyllThreshold.applyAsDouble(rng)), 2);
                         return cachability;
                     };
 
@@ -137,12 +138,12 @@ public class LinearClorophillAttractorFactory implements
                         new CatchabilitySelectivityFishAttractor(
                             carryingCapacities,
                             catchabilitySupplier,
-                            daysInWaterBeforeAttraction.apply(rng).intValue(),
-                            maximumDaysAttractions.apply(rng).intValue(),
+                            (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
+                            (int) maximumDaysAttractions.applyAsDouble(rng),
                             fishState,
                             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
                         ),
-                        fishReleaseProbabilityInPercent.apply(rng) / 100d,
+                        fishReleaseProbabilityInPercent.applyAsDouble(rng) / 100d,
                         fishState::getStep
                     );
                 }

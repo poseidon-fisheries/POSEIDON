@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ProportionalMortalityFactory implements AlgorithmFactory<ProportionalMortalityProcess>{
+public class ProportionalMortalityFactory implements AlgorithmFactory<ProportionalMortalityProcess> {
 
 
     private DoubleParameter yearlyMortality = new FixedDoubleParameter(.1);
@@ -39,9 +39,9 @@ public class ProportionalMortalityFactory implements AlgorithmFactory<Proportion
      * @return the function result
      */
     @Override
-    public ProportionalMortalityProcess apply(FishState fishState) {
+    public ProportionalMortalityProcess apply(final FishState fishState) {
         return new ProportionalMortalityProcess(
-                yearlyMortality.apply(fishState.getRandom())
+            yearlyMortality.applyAsDouble(fishState.getRandom())
         );
     }
 
@@ -59,7 +59,7 @@ public class ProportionalMortalityFactory implements AlgorithmFactory<Proportion
      *
      * @param yearlyMortality Value to set for property 'yearlyMortality'.
      */
-    public void setYearlyMortality(DoubleParameter yearlyMortality) {
+    public void setYearlyMortality(final DoubleParameter yearlyMortality) {
         this.yearlyMortality = yearlyMortality;
     }
 }

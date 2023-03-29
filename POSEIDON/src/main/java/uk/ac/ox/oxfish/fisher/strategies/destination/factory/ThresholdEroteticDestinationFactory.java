@@ -47,14 +47,14 @@ public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<Sim
      * @return the function result
      */
     @Override
-    public SimpleEroteticDestinationStrategy apply(FishState state) {
+    public SimpleEroteticDestinationStrategy apply(final FishState state) {
         return new SimpleEroteticDestinationStrategy(
-                new ThresholdAnswer<>(
-                        minimumObservations.apply(state.getRandom()).intValue(),
-                        minimumObservations.apply(state.getRandom()),
-                        SNALSARutilities.PROFIT_FEATURE
-                ),
-                new FavoriteDestinationStrategy(state.getMap(),state.getRandom())
+            new ThresholdAnswer<>(
+                (int) minimumObservations.applyAsDouble(state.getRandom()),
+                minimumObservations.applyAsDouble(state.getRandom()),
+                SNALSARutilities.PROFIT_FEATURE
+            ),
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom())
 
         );
     }
@@ -63,7 +63,7 @@ public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<Sim
         return minimumObservations;
     }
 
-    public void setMinimumObservations(DoubleParameter minimumObservations) {
+    public void setMinimumObservations(final DoubleParameter minimumObservations) {
         this.minimumObservations = minimumObservations;
     }
 
@@ -71,7 +71,7 @@ public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<Sim
         return profitThreshold;
     }
 
-    public void setProfitThreshold(DoubleParameter profitThreshold) {
+    public void setProfitThreshold(final DoubleParameter profitThreshold) {
         this.profitThreshold = profitThreshold;
     }
 

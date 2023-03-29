@@ -68,7 +68,7 @@ public class SelectDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast){
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast){
         Preconditions.checkArgument(possibleValues.length > 0);
 
         double possibleValue = possibleValues[mersenneTwisterFast.nextInt(possibleValues.length)];

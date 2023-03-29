@@ -42,8 +42,8 @@ public class ExponentialMovingAverageFactory implements AlgorithmFactory<Exponen
      * @return the function result
      */
     @Override
-    public ExponentialMovingAverage<Double> apply(FishState state) {
-        return new ExponentialMovingAverage<>(alpha.apply(state.getRandom()));
+    public ExponentialMovingAverage<Double> apply(final FishState state) {
+        return new ExponentialMovingAverage<>(alpha.applyAsDouble(state.getRandom()));
     }
 
 
@@ -61,7 +61,7 @@ public class ExponentialMovingAverageFactory implements AlgorithmFactory<Exponen
      *
      * @param alpha Value to set for property 'alpha'.
      */
-    public void setAlpha(DoubleParameter alpha) {
+    public void setAlpha(final DoubleParameter alpha) {
         this.alpha = alpha;
     }
 }

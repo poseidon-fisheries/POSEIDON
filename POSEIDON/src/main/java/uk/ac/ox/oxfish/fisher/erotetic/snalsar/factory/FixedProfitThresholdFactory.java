@@ -30,19 +30,18 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates a Fixed Profit Threshold Extractor
  * Created by carrknight on 6/8/16.
  */
-public class FixedProfitThresholdFactory implements AlgorithmFactory<FixedProfitThresholdExtractor>
-{
+public class FixedProfitThresholdFactory implements AlgorithmFactory<FixedProfitThresholdExtractor> {
 
     /**
      * the threshold (fixed for all elements)
      */
-    private DoubleParameter  fixedThreshold = new FixedDoubleParameter(0d);
+    private DoubleParameter fixedThreshold = new FixedDoubleParameter(0d);
 
 
     public FixedProfitThresholdFactory() {
     }
 
-    public FixedProfitThresholdFactory(double threshold) {
+    public FixedProfitThresholdFactory(final double threshold) {
         fixedThreshold = new FixedDoubleParameter(threshold);
     }
 
@@ -53,8 +52,8 @@ public class FixedProfitThresholdFactory implements AlgorithmFactory<FixedProfit
      * @return the function result
      */
     @Override
-    public FixedProfitThresholdExtractor apply(FishState state) {
-        return new FixedProfitThresholdExtractor(fixedThreshold.apply(state.getRandom()));
+    public FixedProfitThresholdExtractor apply(final FishState state) {
+        return new FixedProfitThresholdExtractor(fixedThreshold.applyAsDouble(state.getRandom()));
     }
 
 
@@ -72,7 +71,7 @@ public class FixedProfitThresholdFactory implements AlgorithmFactory<FixedProfit
      *
      * @param fixedThreshold Value to set for property 'fixedThreshold'.
      */
-    public void setFixedThreshold(DoubleParameter fixedThreshold) {
+    public void setFixedThreshold(final DoubleParameter fixedThreshold) {
         this.fixedThreshold = fixedThreshold;
     }
 }

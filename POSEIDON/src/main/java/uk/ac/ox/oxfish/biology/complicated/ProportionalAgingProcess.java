@@ -34,26 +34,26 @@ public class ProportionalAgingProcess extends LocalAgingProcess {
 
 
     /**
-     * ignored
-     */
-    @Override
-    public void start(Species species) {
-        //ignored
-    }
-
-    /**
      * generates a number between 0 and 1 (the method bounds it so otherwise) representing
      * how many fish of class x move between one bin and the next
      */
     private final DoubleParameter proportionAging;
 
-
-    public ProportionalAgingProcess(DoubleParameter proportionAging) {
+    public ProportionalAgingProcess(final DoubleParameter proportionAging) {
         this.proportionAging = proportionAging;
     }
 
     /**
+     * ignored
+     */
+    @Override
+    public void start(final Species species) {
+        //ignored
+    }
+
+    /**
      * as a side-effect ages the local biology according to its rules
+     *
      * @param localBiology
      * @param species
      * @param model
@@ -62,30 +62,28 @@ public class ProportionalAgingProcess extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
-            int daysToSimulate)
-    {
+        final AbundanceLocalBiology localBiology, final Species species, final FishState model, final boolean rounding,
+        final int daysToSimulate
+    ) {
 
-        StructuredAbundance abundance = localBiology.getAbundance(species);
+        final StructuredAbundance abundance = localBiology.getAbundance(species);
 
 
-        for(int subdivision = 0; subdivision <  abundance.getSubdivisions(); subdivision++)
-            //go from oldest to youngest and age them (to avoid double aging)
+        for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++)
+        //go from oldest to youngest and age them (to avoid double aging)
         {
-            double[] cohort = abundance.asMatrix()[subdivision];
-            for(int bin = cohort.length-1; bin>=0; bin--)
-            {
+            final double[] cohort = abundance.asMatrix()[subdivision];
+            for (int bin = cohort.length - 1; bin >= 0; bin--) {
                 //male
-                double deltaMale = proportionalStep(cohort[bin],model.getRandom(),daysToSimulate/365d );
-                if(rounding)
+                double deltaMale = proportionalStep(cohort[bin], model.getRandom(), daysToSimulate / 365d);
+                if (rounding)
                     deltaMale = (int) deltaMale;
-                cohort[bin]-=deltaMale;
-                assert cohort[bin] >=0;
-                if(bin<cohort.length-1) //if you are at very last bin, you just die
-                    cohort[bin+1]+=deltaMale;
+                cohort[bin] -= deltaMale;
+                assert cohort[bin] >= 0;
+                if (bin < cohort.length - 1) //if you are at very last bin, you just die
+                    cohort[bin + 1] += deltaMale;
             }
         }
-
 
 
     }
@@ -93,17 +91,17 @@ public class ProportionalAgingProcess extends LocalAgingProcess {
 
     /**
      * tells you for these many fish how many age and how many don't
+     *
      * @param binAbundance the number of fish
      * @param scaling
      * @return fish that move to the next bin
      */
-    private double proportionalStep(double binAbundance, MersenneTwisterFast random, double scaling)
-    {
+    private double proportionalStep(final double binAbundance, final MersenneTwisterFast random, final double scaling) {
 
-        Preconditions.checkArgument(binAbundance>=0);
-        if(binAbundance == 0)
+        Preconditions.checkArgument(binAbundance >= 0);
+        if (binAbundance == 0)
             return 0;
-        double proportion = Math.max(0,Math.min(1,proportionAging.apply(random))) * scaling;
+        final double proportion = Math.max(0, Math.min(1, proportionAging.applyAsDouble(random))) * scaling;
         return (proportion * binAbundance);
 
     }

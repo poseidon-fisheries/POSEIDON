@@ -32,15 +32,14 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * A fisher must find it both profitable and safe to go out.
  * Created by carrknight on 9/11/15.
  */
-public class DoubleLogisticDepartingFactory implements AlgorithmFactory<CompositeDepartingStrategy>
-{
+public class DoubleLogisticDepartingFactory implements AlgorithmFactory<CompositeDepartingStrategy> {
 
 
     private DoubleParameter weatherL = new FixedDoubleParameter(1);
 
     private DoubleParameter weatherK = new FixedDoubleParameter(10);
 
-    private DoubleParameter weatherX0 = new FixedDoubleParameter(1) ;
+    private DoubleParameter weatherX0 = new FixedDoubleParameter(1);
 
     /**
      * how much windspeed affects "environment harshness"
@@ -53,14 +52,11 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
     private DoubleParameter boatLengthSensitivity = new FixedDoubleParameter(-.02);
 
 
-
-
-
     private DoubleParameter efficiencyL = new FixedDoubleParameter(1);
 
     private DoubleParameter efficiencyK = new FixedDoubleParameter(20);
 
-    private DoubleParameter efficiencyX0 = new FixedDoubleParameter(1) ;
+    private DoubleParameter efficiencyX0 = new FixedDoubleParameter(1);
 
 
     private DoubleParameter cashflowTarget = new FixedDoubleParameter(1000);
@@ -75,29 +71,28 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
      * @return the function result
      */
     @Override
-    public CompositeDepartingStrategy apply(FishState state)
-    {
+    public CompositeDepartingStrategy apply(final FishState state) {
 
         return new CompositeDepartingStrategy(
 
-                new CashFlowLogisticDepartingStrategy(efficiencyL.apply(state.getRandom()),
-                                                      efficiencyK.apply(state.getRandom()),
-                                                      efficiencyX0.apply(state.getRandom()),
-                                                      cashflowTarget.apply(state.getRandom()),
-                                                      cashflowPeriod.apply(state.getRandom()).intValue()
-                                                      ),
-                new WeatherLogisticDepartingStrategy(
-                        weatherL.apply(state.getRandom()),
-                        weatherK.apply(state.getRandom()),
-                        weatherX0.apply(state.getRandom()),
-                        windspeedSensitivity.apply(state.getRandom()),
-                        windspeedSensitivity.apply(state.getRandom()),
-                        0)
+            new CashFlowLogisticDepartingStrategy(
+                efficiencyL.applyAsDouble(state.getRandom()),
+                efficiencyK.applyAsDouble(state.getRandom()),
+                efficiencyX0.applyAsDouble(state.getRandom()),
+                cashflowTarget.applyAsDouble(state.getRandom()),
+                (int) cashflowPeriod.applyAsDouble(state.getRandom())
+            ),
+            new WeatherLogisticDepartingStrategy(
+                weatherL.applyAsDouble(state.getRandom()),
+                weatherK.applyAsDouble(state.getRandom()),
+                weatherX0.applyAsDouble(state.getRandom()),
+                windspeedSensitivity.applyAsDouble(state.getRandom()),
+                windspeedSensitivity.applyAsDouble(state.getRandom()),
+                0
+            )
 
 
-
-                );
-
+        );
 
 
     }
@@ -107,7 +102,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return weatherL;
     }
 
-    public void setWeatherL(DoubleParameter weatherL) {
+    public void setWeatherL(final DoubleParameter weatherL) {
         this.weatherL = weatherL;
     }
 
@@ -115,7 +110,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return weatherK;
     }
 
-    public void setWeatherK(DoubleParameter weatherK) {
+    public void setWeatherK(final DoubleParameter weatherK) {
         this.weatherK = weatherK;
     }
 
@@ -123,7 +118,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return weatherX0;
     }
 
-    public void setWeatherX0(DoubleParameter weatherX0) {
+    public void setWeatherX0(final DoubleParameter weatherX0) {
         this.weatherX0 = weatherX0;
     }
 
@@ -131,7 +126,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return windspeedSensitivity;
     }
 
-    public void setWindspeedSensitivity(DoubleParameter windspeedSensitivity) {
+    public void setWindspeedSensitivity(final DoubleParameter windspeedSensitivity) {
         this.windspeedSensitivity = windspeedSensitivity;
     }
 
@@ -139,7 +134,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return boatLengthSensitivity;
     }
 
-    public void setBoatLengthSensitivity(DoubleParameter boatLengthSensitivity) {
+    public void setBoatLengthSensitivity(final DoubleParameter boatLengthSensitivity) {
         this.boatLengthSensitivity = boatLengthSensitivity;
     }
 
@@ -147,7 +142,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return efficiencyL;
     }
 
-    public void setEfficiencyL(DoubleParameter efficiencyL) {
+    public void setEfficiencyL(final DoubleParameter efficiencyL) {
         this.efficiencyL = efficiencyL;
     }
 
@@ -155,7 +150,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return efficiencyK;
     }
 
-    public void setEfficiencyK(DoubleParameter efficiencyK) {
+    public void setEfficiencyK(final DoubleParameter efficiencyK) {
         this.efficiencyK = efficiencyK;
     }
 
@@ -163,7 +158,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return efficiencyX0;
     }
 
-    public void setEfficiencyX0(DoubleParameter efficiencyX0) {
+    public void setEfficiencyX0(final DoubleParameter efficiencyX0) {
         this.efficiencyX0 = efficiencyX0;
     }
 
@@ -171,7 +166,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return cashflowTarget;
     }
 
-    public void setCashflowTarget(DoubleParameter cashflowTarget) {
+    public void setCashflowTarget(final DoubleParameter cashflowTarget) {
         this.cashflowTarget = cashflowTarget;
     }
 
@@ -179,7 +174,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
         return cashflowPeriod;
     }
 
-    public void setCashflowPeriod(DoubleParameter cashflowPeriod) {
+    public void setCashflowPeriod(final DoubleParameter cashflowPeriod) {
         this.cashflowPeriod = cashflowPeriod;
     }
 }

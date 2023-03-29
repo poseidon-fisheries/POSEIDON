@@ -18,36 +18,30 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements AlgorithmFactory<RecruitmentBySpawningBiomass> {
 
     private RecruitmentBySpawningJackKnifeMaturity delegate =
-            new RecruitmentBySpawningJackKnifeMaturity();
-
+        new RecruitmentBySpawningJackKnifeMaturity();
+    private DoubleParameter lognormalStandardDeviation = new FixedDoubleParameter(0.4);
+    private DoubleParameter firstYearRecruitmentBecomesNoisy = new FixedDoubleParameter(0);
 
     @Override
-    public RecruitmentBySpawningBiomass apply(FishState fishState) {
+    public RecruitmentBySpawningBiomass apply(final FishState fishState) {
         final RecruitmentBySpawningBiomass original = delegate.apply(fishState);
-        final Double standardDeviation = lognormalStandardDeviation.apply(fishState.getRandom());
-        if(standardDeviation>0)
+        final Double standardDeviation = lognormalStandardDeviation.applyAsDouble(fishState.getRandom());
+        if (standardDeviation > 0)
             original.addNoise(new YearAwareLogNormalNoiseMaker(
-                    firstYearRecruitmentBecomesNoisy.apply(fishState.getRandom()).intValue(),
-                    standardDeviation,
-                    fishState
+                (int) firstYearRecruitmentBecomesNoisy.applyAsDouble(fishState.getRandom()),
+                standardDeviation,
+                fishState
             ));
         else
             Log.warn("Negative/0 standard deviation in recruitment means no noise in recruitments...");
         return original;
     }
 
-    private DoubleParameter lognormalStandardDeviation = new FixedDoubleParameter(0.4);
-
-
-
-
-    private DoubleParameter firstYearRecruitmentBecomesNoisy = new FixedDoubleParameter(0);
-
     public RecruitmentBySpawningJackKnifeMaturity getDelegate() {
         return delegate;
     }
 
-    public void setDelegate(RecruitmentBySpawningJackKnifeMaturity delegate) {
+    public void setDelegate(final RecruitmentBySpawningJackKnifeMaturity delegate) {
         this.delegate = delegate;
     }
 
@@ -56,7 +50,7 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements A
         return lognormalStandardDeviation;
     }
 
-    public void setLognormalStandardDeviation(DoubleParameter lognormalStandardDeviation) {
+    public void setLognormalStandardDeviation(final DoubleParameter lognormalStandardDeviation) {
         this.lognormalStandardDeviation = lognormalStandardDeviation;
     }
 
@@ -64,16 +58,14 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements A
         return firstYearRecruitmentBecomesNoisy;
     }
 
-    public void setFirstYearRecruitmentBecomesNoisy(DoubleParameter firstYearRecruitmentBecomesNoisy) {
+    public void setFirstYearRecruitmentBecomesNoisy(final DoubleParameter firstYearRecruitmentBecomesNoisy) {
         this.firstYearRecruitmentBecomesNoisy = firstYearRecruitmentBecomesNoisy;
     }
-
 
 
     /**
      * what I am doing here is reproducing the BH recruitment from the DLMtoolkit which has a lognormal that is recentered
      * by substituting away -sd^2/2;
-     *
      */
     public static class YearAwareLogNormalNoiseMaker implements NoiseMaker {
 
@@ -86,26 +78,29 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements A
 
         private final double adjustment;
 
-        public YearAwareLogNormalNoiseMaker(int yearToStart, double lognormalStandardDeviation, FishState state) {
-            Preconditions.checkArgument(lognormalStandardDeviation>0);
+        public YearAwareLogNormalNoiseMaker(
+            final int yearToStart,
+            final double lognormalStandardDeviation,
+            final FishState state
+        ) {
+            Preconditions.checkArgument(lognormalStandardDeviation > 0);
             Preconditions.checkArgument(Double.isFinite(yearToStart));
             Preconditions.checkArgument(Double.isFinite(lognormalStandardDeviation));
             this.yearToStart = yearToStart;
             this.state = state;
-            this.logNormalDistribution = new LogNormalDistribution(0d,lognormalStandardDeviation);
-            this.adjustment = 0.5* Math.pow(logNormalDistribution.getShape(),2);
+            this.logNormalDistribution = new LogNormalDistribution(0d, lognormalStandardDeviation);
+            this.adjustment = 0.5 * Math.pow(logNormalDistribution.getShape(), 2);
         }
 
         @Override
         public Double get() {
 
-            if(state.getYear()>=yearToStart) {
+            if (state.getYear() >= yearToStart) {
                 this.logNormalDistribution.reseedRandomGenerator(state.getRandom().nextLong());
                 return -1 + (logNormalDistribution.sample(1)[0] - adjustment);
-            }else
+            } else
                 return 0d;
         }
-
 
 
     }

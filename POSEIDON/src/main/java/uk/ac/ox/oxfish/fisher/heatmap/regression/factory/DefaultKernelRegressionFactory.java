@@ -21,7 +21,8 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelRegression;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
@@ -35,8 +36,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 9/2/16.
  */
-public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRegression>{
-
+public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRegression> {
 
 
     private DoubleParameter timeBandwidth = new FixedDoubleParameter(10000);
@@ -60,39 +60,39 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      * @return the function result
      */
     @Override
-    public KernelRegression apply(FishState state) {
+    public KernelRegression apply(final FishState state) {
 
         return new KernelRegression(
-                numberOfObservations.apply(state.getRandom()).intValue(),
-                rbfKernel ? new RBFDistance(0) : new EpanechinikovKernel(0),
-                new Pair<>(
-                        new GridXExtractor(),
-                        xBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new GridYExtractor(),
-                        yBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new PortDistanceExtractor(new ManhattanDistance(), 1d),
-                        distanceFromPortBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new HabitatExtractor(),
-                        habitatBandwidth.apply(state.getRandom())
-                ),
-                new Pair<>(
-                        new ObservationExtractor() {
-                            @Override
-                            public double extract(
-                                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                                return Math.sqrt(timeOfObservation+1);
-                            }
-                        },
-                        timeBandwidth.apply(state.getRandom())
-                )
-                );
-
+            (int) numberOfObservations.applyAsDouble(state.getRandom()),
+            rbfKernel ? new RBFDistance(0) : new EpanechinikovKernel(0),
+            new Pair<>(
+                new GridXExtractor(),
+                xBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new GridYExtractor(),
+                yBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new PortDistanceExtractor(new ManhattanDistance(), 1d),
+                distanceFromPortBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new HabitatExtractor(),
+                habitatBandwidth.applyAsDouble(state.getRandom())
+            ),
+            new Pair<>(
+                new ObservationExtractor() {
+                    @Override
+                    public double extract(
+                        final SeaTile tile, final double timeOfObservation, final Fisher agent, final FishState model
+                    ) {
+                        return Math.sqrt(timeOfObservation + 1);
+                    }
+                },
+                timeBandwidth.applyAsDouble(state.getRandom())
+            )
+        );
 
 
     }
@@ -112,7 +112,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param timeBandwidth Value to set for property 'timeBandwidth'.
      */
-    public void setTimeBandwidth(DoubleParameter timeBandwidth) {
+    public void setTimeBandwidth(final DoubleParameter timeBandwidth) {
         this.timeBandwidth = timeBandwidth;
     }
 
@@ -130,7 +130,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param numberOfObservations Value to set for property 'numberOfObservations'.
      */
-    public void setNumberOfObservations(DoubleParameter numberOfObservations) {
+    public void setNumberOfObservations(final DoubleParameter numberOfObservations) {
         this.numberOfObservations = numberOfObservations;
     }
 
@@ -148,7 +148,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param xBandwidth Value to set for property 'xBandwidth'.
      */
-    public void setxBandwidth(DoubleParameter xBandwidth) {
+    public void setxBandwidth(final DoubleParameter xBandwidth) {
         this.xBandwidth = xBandwidth;
     }
 
@@ -166,7 +166,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param yBandwidth Value to set for property 'yBandwidth'.
      */
-    public void setyBandwidth(DoubleParameter yBandwidth) {
+    public void setyBandwidth(final DoubleParameter yBandwidth) {
         this.yBandwidth = yBandwidth;
     }
 
@@ -184,7 +184,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param distanceFromPortBandwidth Value to set for property 'distanceFromPortBandwidth'.
      */
-    public void setDistanceFromPortBandwidth(DoubleParameter distanceFromPortBandwidth) {
+    public void setDistanceFromPortBandwidth(final DoubleParameter distanceFromPortBandwidth) {
         this.distanceFromPortBandwidth = distanceFromPortBandwidth;
     }
 
@@ -202,7 +202,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param habitatBandwidth Value to set for property 'habitatBandwidth'.
      */
-    public void setHabitatBandwidth(DoubleParameter habitatBandwidth) {
+    public void setHabitatBandwidth(final DoubleParameter habitatBandwidth) {
         this.habitatBandwidth = habitatBandwidth;
     }
 
@@ -220,7 +220,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      *
      * @param rbfKernel Value to set for property 'rbfKernel'.
      */
-    public void setRbfKernel(boolean rbfKernel) {
+    public void setRbfKernel(final boolean rbfKernel) {
         this.rbfKernel = rbfKernel;
     }
 }

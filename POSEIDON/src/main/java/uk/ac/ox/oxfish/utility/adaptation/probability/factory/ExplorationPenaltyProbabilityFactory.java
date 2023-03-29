@@ -50,10 +50,10 @@ public class ExplorationPenaltyProbabilityFactory
      */
     @Override
     public ExplorationPenaltyProbability apply(FishState state) {
-        return new ExplorationPenaltyProbability(explorationProbability.apply(state.getRandom()),
-                                                 imitationProbability.apply(state.getRandom()),
-                                                 incrementMultiplier.apply(state.getRandom()),
-                                                 explorationProbabilityMinimum.apply(state.getRandom()));
+        return new ExplorationPenaltyProbability(explorationProbability.applyAsDouble(state.getRandom()),
+                                                 imitationProbability.applyAsDouble(state.getRandom()),
+                                                 incrementMultiplier.applyAsDouble(state.getRandom()),
+                                                 explorationProbabilityMinimum.applyAsDouble(state.getRandom()));
     }
 
 

@@ -55,7 +55,7 @@ public class BetaDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         return betaDist.inverseCumulativeProbability(mersenneTwisterFast.nextDouble());
     }
 

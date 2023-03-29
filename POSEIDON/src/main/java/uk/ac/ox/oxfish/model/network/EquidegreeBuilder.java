@@ -38,7 +38,7 @@ import java.util.*;
  * Builds network where everyone has the same out-degree of edges
  * Created by carrknight on 7/1/15.
  */
-public class EquidegreeBuilder extends AbstractNetworkBuilder{
+public class EquidegreeBuilder extends AbstractNetworkBuilder {
 
     private DoubleParameter degree = new FixedDoubleParameter(2d);
 
@@ -61,70 +61,68 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
      * @return the function result
      */
     @Override
-    public DirectedGraph<Fisher, FriendshipEdge> apply(FishState state) {
+    public DirectedGraph<Fisher, FriendshipEdge> apply(final FishState state) {
 
-        DirectedGraph<Fisher,FriendshipEdge> toReturn = new DirectedSparseGraph<>();
+        final DirectedGraph<Fisher, FriendshipEdge> toReturn = new DirectedSparseGraph<>();
 
         //get all the fishers
         final List<Fisher> fishers = state.getFishers();
         final int populationSize = fishers.size();
-        if(populationSize <= 1)
+        if (populationSize <= 1)
             Preconditions.checkArgument(
-                    false, "Cannot create social network with no fishers to connect");
+                false, "Cannot create social network with no fishers to connect");
 
         Log.trace("random before populating " + state.getRandom().nextDouble());
-        for(Fisher fisher : fishers)
-        {
+        for (final Fisher fisher : fishers) {
             int degree = computeDegree(state.getRandom());
-            if( populationSize <= degree) {
+            if (populationSize <= degree) {
 
-                degree = populationSize-1;
+                degree = populationSize - 1;
                 Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
 
             }
-            List<Fisher> friends = new LinkedList<>();
+            final List<Fisher> friends = new LinkedList<>();
 
-            List<NetworkPredicate> predicates = super.computePredicates(state);
-            List<Fisher> candidates = new LinkedList<>();
-            for(Fisher candidate : fishers)
-            {
-                boolean allowed = candidate!=fisher;
-                boolean notConnected = equalOutDegree ? toReturn.findEdge(candidate,fisher) == null :  toReturn.findEdge(fisher,candidate) == null;
-                boolean mutualAllowed = allowMutualFriendships || notConnected;
-                for (NetworkPredicate predicate : predicates)
+            final List<NetworkPredicate> predicates = super.computePredicates(state);
+            final List<Fisher> candidates = new LinkedList<>();
+            for (final Fisher candidate : fishers) {
+                boolean allowed = candidate != fisher;
+                final boolean notConnected = equalOutDegree ? toReturn.findEdge(
+                    candidate,
+                    fisher
+                ) == null : toReturn.findEdge(fisher, candidate) == null;
+                final boolean mutualAllowed = allowMutualFriendships || notConnected;
+                for (final NetworkPredicate predicate : predicates)
                     allowed = allowed && predicate.test(fisher, candidate);
-                if(allowed  && mutualAllowed)
+                if (allowed && mutualAllowed)
                     candidates.add(candidate);
             }
 
 
             Collections.sort(candidates, Comparator.comparingInt(Fisher::getID));
 
-            while(friends.size() < degree && friends.size() < candidates.size())
-            {
-                int randomConnection = state.getRandom().nextInt(candidates.size());
+            while (friends.size() < degree && friends.size() < candidates.size()) {
+                final int randomConnection = state.getRandom().nextInt(candidates.size());
                 final Fisher candidate = candidates.get(randomConnection);
                 assert (candidate != fisher);
 
-                if(!friends.contains(candidate))
+                if (!friends.contains(candidate))
                     friends.add(candidate);
 
 
             }
 
-            if(friends.size()<degree && Log.DEBUG)
-            {
-                assert friends.size()==candidates.size();
+            if (friends.size() < degree && Log.DEBUG) {
+                assert friends.size() == candidates.size();
                 Log.debug(fisher + " couldn't have " + degree + "friends because the total number of valid candidates" +
-                                  " were " + candidates.size() +
-                                  ", and the total number of friends the fisher actually has is " + friends.size());
+                    " were " + candidates.size() +
+                    ", and the total number of friends the fisher actually has is " + friends.size());
             }
-
 
 
             //now make them your friends!
 
-            if(friends.size() > 0)
+            if (friends.size() > 0)
                 addSetOfFriends(toReturn, fisher, friends);
             else //if you have no friends add yourself as an unconnected person
                 toReturn.addVertex(fisher);
@@ -136,25 +134,28 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
     }
 
     private void addSetOfFriends(
-            DirectedGraph<Fisher, FriendshipEdge> network, Fisher fisher, Collection<Fisher> newConnections) {
-        for(Fisher friend : newConnections) {
-        if(equalOutDegree)
-            network.addEdge(new FriendshipEdge(), fisher, friend, EdgeType.DIRECTED);
-        else
-            network.addEdge(new FriendshipEdge(), friend, fisher, EdgeType.DIRECTED);
+        final DirectedGraph<Fisher, FriendshipEdge> network,
+        final Fisher fisher,
+        final Collection<Fisher> newConnections
+    ) {
+        for (final Fisher friend : newConnections) {
+            if (equalOutDegree)
+                network.addEdge(new FriendshipEdge(), fisher, friend, EdgeType.DIRECTED);
+            else
+                network.addEdge(new FriendshipEdge(), friend, fisher, EdgeType.DIRECTED);
         }
     }
 
 
-    private int computeDegree(MersenneTwisterFast random){
-        return degree.apply(random).intValue();
+    private int computeDegree(final MersenneTwisterFast random) {
+        return (int) degree.applyAsDouble(random);
     }
 
     public DoubleParameter getDegree() {
         return degree;
     }
 
-    public void setDegree(DoubleParameter degree) {
+    public void setDegree(final DoubleParameter degree) {
         this.degree = degree;
     }
 
@@ -168,28 +169,26 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
      */
     @Override
     public void addFisher(
-            Fisher fisher, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher fisher, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
         Preconditions.checkArgument(!currentNetwork.containsVertex(fisher));
 
         currentNetwork.addVertex(fisher);
-        ObservableList<Fisher> fishers = state.getFishers();
-        List<NetworkPredicate> predicates = super.computePredicates(state);
+        final ObservableList<Fisher> fishers = state.getFishers();
+        final List<NetworkPredicate> predicates = super.computePredicates(state);
 
 
-
-        int degree = computeDegree(state.getRandom());
-        Set<Fisher> friends = new HashSet<>(degree);
-        ArrayList<Fisher> candidates = new ArrayList<>(fishers);
+        final int degree = computeDegree(state.getRandom());
+        final Set<Fisher> friends = new HashSet<>(degree);
+        final ArrayList<Fisher> candidates = new ArrayList<>(fishers);
         candidates.remove(fisher); //ignore yourself!
-        while(friends.size() < degree && candidates.size() > 0)
-        {
+        while (friends.size() < degree && candidates.size() > 0) {
             final Fisher candidate = candidates.get(state.getRandom().nextInt(candidates.size()));
-            if(candidate != fisher)
-            {
+            if (candidate != fisher) {
                 boolean allowed = true;
-                for(NetworkPredicate predicate : predicates)
-                    allowed = allowed && predicate.test(fisher,candidate);
-                if(allowed)
+                for (final NetworkPredicate predicate : predicates)
+                    allowed = allowed && predicate.test(fisher, candidate);
+                if (allowed)
                     friends.add(candidate);
             }
             candidates.remove(candidate);
@@ -207,7 +206,8 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
      */
     @Override
     public void removeFisher(
-            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher toRemove, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
         currentNetwork.removeVertex(toRemove);
     }
 
@@ -225,7 +225,7 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
      *
      * @param allowMutualFriendships Value to set for property 'allowMutualFriendships'.
      */
-    public void setAllowMutualFriendships(boolean allowMutualFriendships) {
+    public void setAllowMutualFriendships(final boolean allowMutualFriendships) {
         this.allowMutualFriendships = allowMutualFriendships;
     }
 
@@ -243,7 +243,7 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder{
      *
      * @param equalOutDegree Value to set for property 'equalOutDegree'.
      */
-    public void setEqualOutDegree(boolean equalOutDegree) {
+    public void setEqualOutDegree(final boolean equalOutDegree) {
         this.equalOutDegree = equalOutDegree;
     }
 }

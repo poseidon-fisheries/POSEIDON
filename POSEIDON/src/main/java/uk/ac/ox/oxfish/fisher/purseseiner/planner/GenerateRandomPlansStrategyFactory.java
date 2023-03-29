@@ -16,22 +16,24 @@ public class GenerateRandomPlansStrategyFactory implements AlgorithmFactory<Plan
     private DoubleParameter hourDelayBetweenFishing = new FixedDoubleParameter(1.0);
 
     @Override
-    public PlannedStrategy apply(FishState state) {
-        DummyFishingPlanningModule fishingAtRandom = new DummyFishingPlanningModule(
-                hourDelayBetweenFishing.apply(state.getRandom()),100000000
+    public PlannedStrategy apply(final FishState state) {
+        final DummyFishingPlanningModule fishingAtRandom = new DummyFishingPlanningModule(
+            hourDelayBetweenFishing.applyAsDouble(state.getRandom()), 100000000
         );
-        Map<ActionType, Double> plannableActionWeights = new HashMap<>();
-        plannableActionWeights.put(ActionType.FishingOnTile,100d); //should normalize (actually probably ignore it altogether)
-        HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
-        planModules.put(ActionType.FishingOnTile,fishingAtRandom);
+        final Map<ActionType, Double> plannableActionWeights = new HashMap<>();
+        plannableActionWeights.put(ActionType.FishingOnTile,
+            100d); //should normalize (actually probably ignore it altogether)
+        final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
+        planModules.put(ActionType.FishingOnTile, fishingAtRandom);
 
-        DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
-                new FixedDoubleParameter(5*24), //120hr
-                plannableActionWeights,
-                planModules,
-                false);
+        final DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
+            new FixedDoubleParameter(5 * 24), //120hr
+            plannableActionWeights,
+            planModules,
+            false
+        );
 
-        return new PlannedStrategy(planner,500); //there should be no replanning!
+        return new PlannedStrategy(planner, 500); //there should be no replanning!
 
     }
 
@@ -39,7 +41,7 @@ public class GenerateRandomPlansStrategyFactory implements AlgorithmFactory<Plan
         return hourDelayBetweenFishing;
     }
 
-    public void setHourDelayBetweenFishing(DoubleParameter hourDelayBetweenFishing) {
+    public void setHourDelayBetweenFishing(final DoubleParameter hourDelayBetweenFishing) {
         this.hourDelayBetweenFishing = hourDelayBetweenFishing;
     }
 }

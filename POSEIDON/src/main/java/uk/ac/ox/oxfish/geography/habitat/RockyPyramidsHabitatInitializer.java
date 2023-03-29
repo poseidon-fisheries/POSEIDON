@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
 
 
-
     private final int numberOfPeaks;
 
 
@@ -49,13 +48,14 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
 
     @Override
     public void applyHabitats(
-            NauticalMap map, MersenneTwisterFast random, FishState model) {
+        NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
 
         final int mapHeight = map.getHeight();
         final int mapWidth = map.getWidth();
 
-        for(int i=0; i< numberOfPeaks; i++) {
+        for (int i = 0; i < numberOfPeaks; i++) {
 
             //create the bottom left corner
             int x;
@@ -67,32 +67,28 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
             while (map.getSeaTile(x, y).isLand());
 
 
-            map.getSeaTile(x,y).setHabitat(new TileHabitat(1d));
+            map.getSeaTile(x, y).setHabitat(new TileHabitat(1d));
 
-            for(int spread = 1; spread<maxSpread; spread++)
-            {
+            for (int spread = 1; spread < maxSpread; spread++) {
 
 
                 //vertical border
-                for(int h=-spread; h<=spread; h++)
-                {
-                    SeaTile border = map.getSeaTile(x-spread, y + h);
-                    if(border != null && border.isWater())
-                    {
+                for (int h = -spread; h <= spread; h++) {
+                    SeaTile border = map.getSeaTile(x - spread, y + h);
+                    if (border != null && border.isWater()) {
 
                         border.setHabitat(new TileHabitat(
-                                Math.min(border.getRockyPercentage() +
-                                                 Math.pow(smoothingValue.apply(random),spread), 1)
+                            Math.min(border.getRockyPercentage() +
+                                Math.pow(smoothingValue.applyAsDouble(random), spread), 1)
 
 
                         ));
                     }
-                    border = map.getSeaTile(x+spread, y + h);
-                    if(border != null && border.isWater())
-                    {
+                    border = map.getSeaTile(x + spread, y + h);
+                    if (border != null && border.isWater()) {
                         border.setHabitat(new TileHabitat(
-                                Math.min(border.getRockyPercentage() +
-                                                 Math.pow(smoothingValue.apply(random),spread), 1)
+                            Math.min(border.getRockyPercentage() +
+                                Math.pow(smoothingValue.applyAsDouble(random), spread), 1)
 
 
                         ));
@@ -101,23 +97,21 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                 //horizontal border
                 //vertical border
 
-                for(int w=-spread+1; w<spread; w++)
-                {
-                    SeaTile border = map.getSeaTile(x+w, y - spread);
-                    if(border != null && border.isWater())
-                    {
+                for (int w = -spread + 1; w < spread; w++) {
+                    SeaTile border = map.getSeaTile(x + w, y - spread);
+                    if (border != null && border.isWater()) {
                         border.setHabitat(new TileHabitat(
-                                Math.min( border.getRockyPercentage() + Math.pow(smoothingValue.apply(random),spread),1)
+                            Math.min(border.getRockyPercentage() + Math.pow(smoothingValue.applyAsDouble(random),
+                                spread), 1)
 
 
                         ));
                     }
-                    border = map.getSeaTile(x+w, y+spread);
-                    if(border != null && border.isWater())
-                    {
+                    border = map.getSeaTile(x + w, y + spread);
+                    if (border != null && border.isWater()) {
                         border.setHabitat(new TileHabitat(
-                                Math.min( border.getRockyPercentage() +
-                                                  Math.pow(smoothingValue.apply(random),spread),1)
+                            Math.min(border.getRockyPercentage() +
+                                Math.pow(smoothingValue.applyAsDouble(random), spread), 1)
 
 
                         ));
@@ -125,16 +119,12 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                 }
 
 
-
             }
 
 
-
         }
 
-        }
-
-
+    }
 
 
 }

@@ -32,23 +32,23 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * factory that creates an hill-climber strategy with a random starting point
  */
-public class YearlyIterativeDestinationFactory implements AlgorithmFactory<YearlyIterativeDestinationStrategy>
-{
+public class YearlyIterativeDestinationFactory implements AlgorithmFactory<YearlyIterativeDestinationStrategy> {
 
     DoubleParameter stepSize = new FixedDoubleParameter(5d);
 
 
-
     @Override
-    public YearlyIterativeDestinationStrategy apply(FishState state) {
+    public YearlyIterativeDestinationStrategy apply(final FishState state) {
 
-        MersenneTwisterFast random = state.random;
-        NauticalMap map = state.getMap();
+        final MersenneTwisterFast random = state.random;
+        final NauticalMap map = state.getMap();
 
 
-        return new YearlyIterativeDestinationStrategy(new FavoriteDestinationStrategy(map,random),
-                                                      stepSize.apply(random).intValue(),
-                                                      10);
+        return new YearlyIterativeDestinationStrategy(
+            new FavoriteDestinationStrategy(map, random),
+            (int) stepSize.applyAsDouble(random),
+            10
+        );
 
     }
 
@@ -56,7 +56,7 @@ public class YearlyIterativeDestinationFactory implements AlgorithmFactory<Yearl
         return stepSize;
     }
 
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
 }

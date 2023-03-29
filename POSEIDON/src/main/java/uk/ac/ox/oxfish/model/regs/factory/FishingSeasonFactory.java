@@ -29,43 +29,39 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Creates fishing seasons of any amount
  */
-public class FishingSeasonFactory implements AlgorithmFactory<FishingSeason>
-{
+public class FishingSeasonFactory implements AlgorithmFactory<FishingSeason> {
 
     /**
      * number of days one is allowed to fish. It gets rounded
      */
     private DoubleParameter seasonLength = new FixedDoubleParameter(200);
-
-
-    public FishingSeasonFactory() {
-    }
-
-    public FishingSeasonFactory(double seasonLength, boolean respectMPA) {
-        this.seasonLength =new FixedDoubleParameter(seasonLength);
-        this.respectMPA = respectMPA;
-    }
-
     /**
      * is the mpa to be respected?
      */
     private boolean respectMPA = true;
 
+    public FishingSeasonFactory() {
+    }
+
+    public FishingSeasonFactory(final double seasonLength, final boolean respectMPA) {
+        this.seasonLength = new FixedDoubleParameter(seasonLength);
+        this.respectMPA = respectMPA;
+    }
 
     /**
      * creates a fishing season regulation for this agent
      */
     @Override
-    public FishingSeason apply(FishState state) {
-        final int length = seasonLength.apply(state.random).intValue();
-        return new FishingSeason(respectMPA,length);
+    public FishingSeason apply(final FishState state) {
+        final int length = (int) seasonLength.applyAsDouble(state.random);
+        return new FishingSeason(respectMPA, length);
     }
 
     public DoubleParameter getSeasonLength() {
         return seasonLength;
     }
 
-    public void setSeasonLength(DoubleParameter seasonLength) {
+    public void setSeasonLength(final DoubleParameter seasonLength) {
         this.seasonLength = seasonLength;
     }
 
@@ -73,7 +69,7 @@ public class FishingSeasonFactory implements AlgorithmFactory<FishingSeason>
         return respectMPA;
     }
 
-    public void setRespectMPA(boolean respectMPA) {
+    public void setRespectMPA(final boolean respectMPA) {
         this.respectMPA = respectMPA;
     }
 }

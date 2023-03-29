@@ -47,20 +47,21 @@ import static uk.ac.ox.oxfish.fisher.strategies.destination.ExploreExploitImitat
 /**
  * creates a trip strategy that has imitates friends when not exploring
  */
-public class PerTripImitativeDestinationFactory implements AlgorithmFactory<ExploreExploitImitateDestinationStrategy>
-{
+public class PerTripImitativeDestinationFactory implements AlgorithmFactory<ExploreExploitImitateDestinationStrategy> {
 
     private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
-            new HourlyProfitObjectiveFactory();
+        new HourlyProfitObjectiveFactory();
 
     private DoubleParameter stepSize = new UniformDoubleParameter(1d, 10d);
 
 
     private AlgorithmFactory<? extends AdaptationProbability> probability =
-            new ExplorationPenaltyProbabilityFactory(.2,
-                                                     1d,
-                                                     .02,
-                                                     .01);
+        new ExplorationPenaltyProbabilityFactory(
+            .2,
+            1d,
+            .02,
+            .01
+        );
 
     private boolean ignoreEdgeDirection = true;
 
@@ -101,7 +102,6 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     private double maxInitialDistance = -1;
 
 
-
     /**
      * Applies this function to the given argument.
      *
@@ -113,48 +113,47 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
 
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
-        double probabilityUnfriending = dropInUtilityNeededForUnfriend.apply(state.getRandom());
+        double probabilityUnfriending = dropInUtilityNeededForUnfriend.applyAsDouble(state.getRandom());
         DefaultBeamHillClimbing algorithm;
 
-        Predicate<SeaTile>  explorationValidator = automaticallyIgnoreMPAs ?
-                new Predicate<SeaTile>() {
-                    @Override
-                    public boolean test(SeaTile tile) {
-                        return !tile.isProtected();
-                    }
-                } :
-                new Predicate<SeaTile>() {
-                    @Override
-                    public boolean test(SeaTile tile) {
-                        return true;
-                    }
-                };
+        Predicate<SeaTile> explorationValidator = automaticallyIgnoreMPAs ?
+            new Predicate<SeaTile>() {
+                @Override
+                public boolean test(SeaTile tile) {
+                    return !tile.isProtected();
+                }
+            } :
+            new Predicate<SeaTile>() {
+                @Override
+                public boolean test(SeaTile tile) {
+                    return true;
+                }
+            };
 
-        if(automaticallyIgnoreAreasWhereFishNeverGrows) {
+        if (automaticallyIgnoreAreasWhereFishNeverGrows) {
             explorationValidator =
-                    explorationValidator.and(new Predicate<SeaTile>() {
-                        @Override
-                        public boolean test(SeaTile seaTile) {
-                            return
-                                            seaTile.isFishingEvenPossibleHere();
-                        }
-                    });
+                explorationValidator.and(new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile seaTile) {
+                        return
+                            seaTile.isFishingEvenPossibleHere();
+                    }
+                });
         }
-        if(probabilityUnfriending <= 0)
-        { //no unfriending
+        if (probabilityUnfriending <= 0) { //no unfriending
 
             algorithm = new DefaultBeamHillClimbing(alwaysCopyBest,
-                                                    BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
-                                                    stepSize.apply(
-                                                            random).intValue(),
-                                                    100, backtracksOnBadExploration);
-        }
-        else {
-            algorithm = DefaultBeamHillClimbing.BeamHillClimbingWithUnfriending(alwaysCopyBest,
-                                                                                probabilityUnfriending,
-                                                                                stepSize.apply(
-                                                                                        random).intValue(),
-                                                                                100);
+                BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
+                (int) stepSize.applyAsDouble(random),
+                100, backtracksOnBadExploration
+            );
+        } else {
+            algorithm = DefaultBeamHillClimbing.BeamHillClimbingWithUnfriending(
+                alwaysCopyBest,
+                probabilityUnfriending,
+                (int) stepSize.applyAsDouble(random),
+                100
+            );
         }
 
         //never start from an invalid spot!
@@ -165,40 +164,39 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         while (!explorationValidator.test(initialFavoriteSpot));
 
 
-
         //add gatherer if necessary
-        if(state.getYearlyDataSet().getColumn(EXPLORING_COLUMN_NAME)==null)
-        {
+        if (state.getYearlyDataSet().getColumn(EXPLORING_COLUMN_NAME) == null) {
             registerGatherer(state, EXPLORING_COLUMN_NAME);
             registerGatherer(state, EXPLOITING_COLUMN_NAME);
             registerGatherer(state, IMITATING_COLUMN_NAME);
         }
 
         return new ExploreExploitImitateDestinationStrategy(
-                new FavoriteDestinationStrategy(initialFavoriteSpot), algorithm,
-                probability.apply(state),
-                objectiveFunction.apply(state), explorationValidator,
-                ignoreFailedTrips, maxInitialDistance);
+            new FavoriteDestinationStrategy(initialFavoriteSpot), algorithm,
+            probability.apply(state),
+            objectiveFunction.apply(state), explorationValidator,
+            ignoreFailedTrips, maxInitialDistance
+        );
 
 
     }
 
     private void registerGatherer(FishState state, final String exploringColumnName) {
         state.getYearlyDataSet().registerGatherer(exploringColumnName,
-                                                  new Gatherer<FishState>() {
-                                                      @Override
-                                                      public Double apply(FishState fishState) {
-                                                          double sum =0;
-                                                          for(Fisher fisher : fishState.getFishers())
-                                                          {
-                                                              if(fisher.getYearlyCounter().hasColumn(
-                                                                      exploringColumnName))
-                                                                  sum+=fisher.getYearlyCounter().getColumn(
-                                                                          exploringColumnName);
-                                                          }
-                                                          return sum;
-                                                      }
-                                                  }, Double.NaN);
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    double sum = 0;
+                    for (Fisher fisher : fishState.getFishers()) {
+                        if (fisher.getYearlyCounter().hasColumn(
+                            exploringColumnName))
+                            sum += fisher.getYearlyCounter().getColumn(
+                                exploringColumnName);
+                    }
+                    return sum;
+                }
+            }, Double.NaN
+        );
     }
 
     public DoubleParameter getStepSize() {
@@ -222,9 +220,9 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     }
 
 
-
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 
@@ -234,7 +232,8 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     }
 
     public void setDropInUtilityNeededForUnfriend(
-            DoubleParameter dropInUtilityNeededForUnfriend) {
+        DoubleParameter dropInUtilityNeededForUnfriend
+    ) {
         this.dropInUtilityNeededForUnfriend = dropInUtilityNeededForUnfriend;
     }
 
@@ -262,7 +261,8 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      * @param objectiveFunction Value to set for property 'objectiveFunction'.
      */
     public void setObjectiveFunction(
-            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
+    ) {
         this.objectiveFunction = objectiveFunction;
     }
 

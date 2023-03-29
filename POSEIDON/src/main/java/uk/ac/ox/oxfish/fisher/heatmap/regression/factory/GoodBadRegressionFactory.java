@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.GoodBadRegression;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.model.FishState;
@@ -31,14 +30,13 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 8/23/16.
  */
-public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegression>{
+public class GoodBadRegressionFactory implements AlgorithmFactory<GoodBadRegression> {
 
 
-
-    private DoubleParameter  badAverage = new FixedDoubleParameter(-10);
+    private DoubleParameter badAverage = new FixedDoubleParameter(-10);
     private DoubleParameter goodAverage = new FixedDoubleParameter(10);
 
-    private  DoubleParameter standardDeviation = new FixedDoubleParameter(7.5);
+    private DoubleParameter standardDeviation = new FixedDoubleParameter(7.5);
 
     private DoubleParameter distancePenalty = new FixedDoubleParameter(10);
 
@@ -52,17 +50,17 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      * @return the function result
      */
     @Override
-    public GoodBadRegression apply(FishState fishState) {
+    public GoodBadRegression apply(final FishState fishState) {
 
         return new GoodBadRegression(
-                fishState.getMap(),
-                new ManhattanDistance(),
-                fishState.getRandom(),
-                badAverage.apply(fishState.getRandom()),
-                goodAverage.apply(fishState.getRandom()),
-                standardDeviation.apply(fishState.getRandom()),
-                distancePenalty.apply(fishState.getRandom()),
-                drift.apply(fishState.getRandom())
+            fishState.getMap(),
+            new ManhattanDistance(),
+            fishState.getRandom(),
+            badAverage.applyAsDouble(fishState.getRandom()),
+            goodAverage.applyAsDouble(fishState.getRandom()),
+            standardDeviation.applyAsDouble(fishState.getRandom()),
+            distancePenalty.applyAsDouble(fishState.getRandom()),
+            drift.applyAsDouble(fishState.getRandom())
         );
 
     }
@@ -82,7 +80,7 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      *
      * @param badAverage Value to set for property 'badAverage'.
      */
-    public void setBadAverage(DoubleParameter badAverage) {
+    public void setBadAverage(final DoubleParameter badAverage) {
         this.badAverage = badAverage;
     }
 
@@ -100,7 +98,7 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      *
      * @param goodAverage Value to set for property 'goodAverage'.
      */
-    public void setGoodAverage(DoubleParameter goodAverage) {
+    public void setGoodAverage(final DoubleParameter goodAverage) {
         this.goodAverage = goodAverage;
     }
 
@@ -118,7 +116,7 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      *
      * @param standardDeviation Value to set for property 'standardDeviation'.
      */
-    public void setStandardDeviation(DoubleParameter standardDeviation) {
+    public void setStandardDeviation(final DoubleParameter standardDeviation) {
         this.standardDeviation = standardDeviation;
     }
 
@@ -136,7 +134,7 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      *
      * @param distancePenalty Value to set for property 'distancePenalty'.
      */
-    public void setDistancePenalty(DoubleParameter distancePenalty) {
+    public void setDistancePenalty(final DoubleParameter distancePenalty) {
         this.distancePenalty = distancePenalty;
     }
 
@@ -154,7 +152,7 @@ public class GoodBadRegressionFactory  implements AlgorithmFactory<GoodBadRegres
      *
      * @param drift Value to set for property 'drift'.
      */
-    public void setDrift(DoubleParameter drift) {
+    public void setDrift(final DoubleParameter drift) {
         this.drift = drift;
     }
 }

@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
-import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -31,24 +30,24 @@ public class ISlopeTACController implements AlgorithmFactory<AdditionalStartable
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                TargetToTACController controller = new TargetToTACController(
-                                        new ISlope(
-                                                catchColumnName,
-                                                indicatorColumnName,
-                                                gainLambdaParameter.apply(model.getRandom()),
-                                                precautionaryScaling.apply(model.getRandom()),
-                                                interval
-                                        )
-                                );
-                                controller.start(model);
-                                controller.step(model);
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365 * startingYear + 1
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            TargetToTACController controller = new TargetToTACController(
+                                new ISlope(
+                                    catchColumnName,
+                                    indicatorColumnName,
+                                    gainLambdaParameter.applyAsDouble(model.getRandom()),
+                                    precautionaryScaling.applyAsDouble(model.getRandom()),
+                                    interval
+                                )
+                            );
+                            controller.start(model);
+                            controller.step(model);
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
                 );
             }
         };

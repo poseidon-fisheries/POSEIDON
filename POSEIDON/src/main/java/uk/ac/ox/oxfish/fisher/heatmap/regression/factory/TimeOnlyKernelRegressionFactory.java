@@ -35,8 +35,7 @@ public class TimeOnlyKernelRegressionFactory implements AlgorithmFactory<TimeOnl
     private DoubleParameter timeBandwidth = new FixedDoubleParameter(1000d);
 
 
-    private DoubleParameter maximumNumberOfObservations= new FixedDoubleParameter(100d);
-
+    private DoubleParameter maximumNumberOfObservations = new FixedDoubleParameter(100d);
 
 
     /**
@@ -46,10 +45,10 @@ public class TimeOnlyKernelRegressionFactory implements AlgorithmFactory<TimeOnl
      * @return the function result
      */
     @Override
-    public TimeOnlyKernelRegression apply(FishState state) {
+    public TimeOnlyKernelRegression apply(final FishState state) {
         return new TimeOnlyKernelRegression(
-                maximumNumberOfObservations.apply(state.getRandom()).intValue(),
-                timeBandwidth.apply(state.getRandom())
+            (int) maximumNumberOfObservations.applyAsDouble(state.getRandom()),
+            timeBandwidth.applyAsDouble(state.getRandom())
         );
     }
 
@@ -57,7 +56,7 @@ public class TimeOnlyKernelRegressionFactory implements AlgorithmFactory<TimeOnl
         return timeBandwidth;
     }
 
-    public void setTimeBandwidth(DoubleParameter timeBandwidth) {
+    public void setTimeBandwidth(final DoubleParameter timeBandwidth) {
         this.timeBandwidth = timeBandwidth;
     }
 
@@ -65,7 +64,7 @@ public class TimeOnlyKernelRegressionFactory implements AlgorithmFactory<TimeOnl
         return maximumNumberOfObservations;
     }
 
-    public void setMaximumNumberOfObservations(DoubleParameter maximumNumberOfObservations) {
+    public void setMaximumNumberOfObservations(final DoubleParameter maximumNumberOfObservations) {
         this.maximumNumberOfObservations = maximumNumberOfObservations;
     }
 }

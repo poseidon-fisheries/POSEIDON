@@ -68,8 +68,8 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
         final MersenneTwisterFast rng = state.getRandom();
         return new FromFileMapInitializer(
             mapFile.get(),
-            gridWidthInCell.apply(rng).intValue(),
-            mapPaddingInDegrees.apply(rng),
+            (int) gridWidthInCell.applyAsDouble(rng),
+            mapPaddingInDegrees.applyAsDouble(rng),
             header,
             latLong
         );

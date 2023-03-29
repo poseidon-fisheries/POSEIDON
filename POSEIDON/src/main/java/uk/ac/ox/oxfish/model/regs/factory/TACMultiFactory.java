@@ -34,13 +34,12 @@ import java.util.Map;
  * Multiquota factory, including TAC Opportunity Cost manager
  * Created by carrknight on 10/20/15.
  */
-public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
-{
+public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
     /**
      * for each model there is only one quota object being shared
      */
-    private final Map<FishState,MultiQuotaRegulation> modelQuota = new HashMap<>();
+    private final Map<FishState, MultiQuotaRegulation> modelQuota = new HashMap<>();
 
 
     /**
@@ -61,36 +60,32 @@ public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState state)
-    {
+    public MultiQuotaRegulation apply(final FishState state) {
 
-        if(!modelQuota.containsKey(state))
-            modelQuota.put(state,createInstance(state.getRandom(), state.getSpecies().size(), state));
+        if (!modelQuota.containsKey(state))
+            modelQuota.put(state, createInstance(state.getRandom(), state.getSpecies().size(), state));
 
         return modelQuota.get(state);
-
-
 
 
     }
 
 
+    private MultiQuotaRegulation createInstance(
+        final MersenneTwisterFast random, final int numberOfSpecies,
+        final FishState state
+    ) {
 
-    private MultiQuotaRegulation createInstance(MersenneTwisterFast random, int numberOfSpecies,
-                                                FishState state)
-    {
+        final double[] quotas = new double[numberOfSpecies];
+        quotas[0] = firstSpeciesQuota.applyAsDouble(random);
 
-        double[] quotas = new double[numberOfSpecies];
-        quotas[0] = firstSpeciesQuota.apply(random);
-
-        for(int i=1; i<numberOfSpecies; i++)
-        {
-            quotas[i] = otherSpeciesQuota.apply(random);
+        for (int i = 1; i < numberOfSpecies; i++) {
+            quotas[i] = otherSpeciesQuota.applyAsDouble(random);
         }
-        MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
+        final MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
-     //   TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
-    //    state.registerStartable(manager);
+        //   TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
+        //    state.registerStartable(manager);
 
 
         return regulations;
@@ -100,7 +95,7 @@ public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
         return firstSpeciesQuota;
     }
 
-    public void setFirstSpeciesQuota(DoubleParameter firstSpeciesQuota) {
+    public void setFirstSpeciesQuota(final DoubleParameter firstSpeciesQuota) {
         this.firstSpeciesQuota = firstSpeciesQuota;
     }
 
@@ -108,7 +103,7 @@ public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
         return otherSpeciesQuota;
     }
 
-    public void setOtherSpeciesQuota(DoubleParameter otherSpeciesQuota) {
+    public void setOtherSpeciesQuota(final DoubleParameter otherSpeciesQuota) {
         this.otherSpeciesQuota = otherSpeciesQuota;
     }
 }

@@ -173,7 +173,7 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
                             new NoiseMaker() {
                                 @Override
                                 public Double get() {
-                                    return noise.apply(model.getRandom());
+                                    return noise.applyAsDouble(model.getRandom());
                                 }
                             }
 

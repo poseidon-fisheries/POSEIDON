@@ -38,7 +38,7 @@ public class NearestNeighborRegressionFactory implements AlgorithmFactory<Neares
     private DoubleParameter spaceBandwidth = new FixedDoubleParameter(5d);
 
 
-    private DoubleParameter neighbors= new FixedDoubleParameter(1d);
+    private DoubleParameter neighbors = new FixedDoubleParameter(1d);
 
 
     /**
@@ -48,11 +48,11 @@ public class NearestNeighborRegressionFactory implements AlgorithmFactory<Neares
      * @return the function result
      */
     @Override
-    public NearestNeighborRegression apply(FishState state) {
+    public NearestNeighborRegression apply(final FishState state) {
         return new NearestNeighborRegression(
-                neighbors.apply(state.getRandom()).intValue(),
-                timeBandwidth.apply(state.getRandom()),
-                spaceBandwidth.apply(state.getRandom())
+            (int) neighbors.applyAsDouble(state.getRandom()),
+            timeBandwidth.applyAsDouble(state.getRandom()),
+            spaceBandwidth.applyAsDouble(state.getRandom())
         );
     }
 
@@ -71,7 +71,7 @@ public class NearestNeighborRegressionFactory implements AlgorithmFactory<Neares
      *
      * @param timeBandwidth Value to set for property 'timeBandwidth'.
      */
-    public void setTimeBandwidth(DoubleParameter timeBandwidth) {
+    public void setTimeBandwidth(final DoubleParameter timeBandwidth) {
         this.timeBandwidth = timeBandwidth;
     }
 
@@ -89,7 +89,7 @@ public class NearestNeighborRegressionFactory implements AlgorithmFactory<Neares
      *
      * @param spaceBandwidth Value to set for property 'spaceBandwidth'.
      */
-    public void setSpaceBandwidth(DoubleParameter spaceBandwidth) {
+    public void setSpaceBandwidth(final DoubleParameter spaceBandwidth) {
         this.spaceBandwidth = spaceBandwidth;
     }
 
@@ -107,7 +107,7 @@ public class NearestNeighborRegressionFactory implements AlgorithmFactory<Neares
      *
      * @param neighbors Value to set for property 'neighbors'.
      */
-    public void setNeighbors(DoubleParameter neighbors) {
+    public void setNeighbors(final DoubleParameter neighbors) {
         this.neighbors = neighbors;
     }
 }

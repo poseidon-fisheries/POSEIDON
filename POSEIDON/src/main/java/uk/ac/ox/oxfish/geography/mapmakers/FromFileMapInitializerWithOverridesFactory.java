@@ -5,7 +5,6 @@ import com.google.common.collect.HashBasedTable;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Hashtable;
 import java.util.List;
 
 public class FromFileMapInitializerWithOverridesFactory extends FromFileMapInitializerFactory {
@@ -16,6 +15,9 @@ public class FromFileMapInitializerWithOverridesFactory extends FromFileMapIniti
      */
     private List<String> depthOverrides = Lists.newArrayList("0,0,100");
 
+    public FromFileMapInitializerWithOverridesFactory() {
+    }
+
     /**
      * Applies this function to the given argument.
      *
@@ -23,37 +25,37 @@ public class FromFileMapInitializerWithOverridesFactory extends FromFileMapIniti
      * @return the function result
      */
     @Override
-    public FromFileMapInitializer apply(FishState state) {
+    public FromFileMapInitializer apply(final FishState state) {
         final MersenneTwisterFast rng = state.getRandom();
-        final HashBasedTable<Integer, Integer, Double> overrides = HashBasedTable.create(depthOverrides.size(), depthOverrides.size());
-        for (String override : depthOverrides) {
+        final HashBasedTable<Integer, Integer, Double> overrides = HashBasedTable.create(
+            depthOverrides.size(),
+            depthOverrides.size()
+        );
+        for (final String override : depthOverrides) {
             final String[] split = override.split(",");
             overrides.put(
-                    Integer.parseInt(split[0]),
-                    Integer.parseInt(split[1]),
-                    Double.parseDouble(split[2])
-                    );
+                Integer.parseInt(split[0]),
+                Integer.parseInt(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         }
 
         return new FromFileMapInitializer(
-                getMapFile().get(),
-                getGridWidthInCell().apply(rng).intValue(),
-                getMapPaddingInDegrees().apply(rng),
-                isHeader(),
-                isLatLong(),
-                overrides
+            getMapFile().get(),
+            (int) getGridWidthInCell().applyAsDouble(rng),
+            getMapPaddingInDegrees().applyAsDouble(rng),
+            isHeader(),
+            isLatLong(),
+            overrides
         );
-    }
-
-    public FromFileMapInitializerWithOverridesFactory() {
     }
 
     public List<String> getDepthOverrides() {
         return depthOverrides;
     }
 
-    public void setDepthOverrides(List<String> depthOverrides) {
+    public void setDepthOverrides(final List<String> depthOverrides) {
         this.depthOverrides = depthOverrides;
     }
 }

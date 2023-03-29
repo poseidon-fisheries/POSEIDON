@@ -27,8 +27,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ExitDecoratorFactory implements AlgorithmFactory<ExitDepartingDecorator>
-{
+public class ExitDecoratorFactory implements AlgorithmFactory<ExitDepartingDecorator> {
 
 
     AlgorithmFactory<? extends DepartingStrategy> decorated = new FixedRestTimeDepartingFactory();
@@ -43,11 +42,11 @@ public class ExitDecoratorFactory implements AlgorithmFactory<ExitDepartingDecor
      * @return the function result
      */
     @Override
-    public ExitDepartingDecorator apply(FishState fishState) {
+    public ExitDepartingDecorator apply(final FishState fishState) {
 
         return new ExitDepartingDecorator(
-                decorated.apply(fishState),
-                consecutiveLossYearsBeforeQuitting.apply(fishState.getRandom()).intValue()
+            decorated.apply(fishState),
+            (int) consecutiveLossYearsBeforeQuitting.applyAsDouble(fishState.getRandom())
         );
 
     }
@@ -67,7 +66,8 @@ public class ExitDecoratorFactory implements AlgorithmFactory<ExitDepartingDecor
      * @param decorated Value to set for property 'decorated'.
      */
     public void setDecorated(
-            AlgorithmFactory<? extends DepartingStrategy> decorated) {
+        final AlgorithmFactory<? extends DepartingStrategy> decorated
+    ) {
         this.decorated = decorated;
     }
 
@@ -86,7 +86,8 @@ public class ExitDecoratorFactory implements AlgorithmFactory<ExitDepartingDecor
      * @param consecutiveLossYearsBeforeQuitting Value to set for property 'consecutiveLossYearsBeforeQuitting'.
      */
     public void setConsecutiveLossYearsBeforeQuitting(
-            DoubleParameter consecutiveLossYearsBeforeQuitting) {
+        final DoubleParameter consecutiveLossYearsBeforeQuitting
+    ) {
         this.consecutiveLossYearsBeforeQuitting = consecutiveLossYearsBeforeQuitting;
     }
 }

@@ -16,9 +16,11 @@ public class DelayGearDecoratorFactory implements AlgorithmFactory<DelayGearDeco
 
 
     @Override
-    public DelayGearDecorator apply(FishState fishState) {
-        return new DelayGearDecorator(delegate.apply(fishState),
-                hoursItTake.apply(fishState.getRandom()).intValue());
+    public DelayGearDecorator apply(final FishState fishState) {
+        return new DelayGearDecorator(
+            delegate.apply(fishState),
+            (int) hoursItTake.applyAsDouble(fishState.getRandom())
+        );
     }
 
 
@@ -26,7 +28,7 @@ public class DelayGearDecoratorFactory implements AlgorithmFactory<DelayGearDeco
         return hoursItTake;
     }
 
-    public void setHoursItTake(DoubleParameter hoursItTake) {
+    public void setHoursItTake(final DoubleParameter hoursItTake) {
         this.hoursItTake = hoursItTake;
     }
 
@@ -34,7 +36,7 @@ public class DelayGearDecoratorFactory implements AlgorithmFactory<DelayGearDeco
         return delegate;
     }
 
-    public void setDelegate(AlgorithmFactory<? extends Gear> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends Gear> delegate) {
         this.delegate = delegate;
     }
 }

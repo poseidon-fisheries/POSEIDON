@@ -31,7 +31,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
     public ConditionalMarket apply(FishState fishState) {
         final NThresholdsMarket nonPremium = nonPremiumMarket.apply(fishState);
         final NThresholdsMarket premium = nonPremiumMarket.apply(fishState);
-        final double v = premiumInPercentage.apply(fishState.getRandom());
+        final double v = premiumInPercentage.applyAsDouble(fishState.getRandom());
 
         //save prices to restore later
         if(premiumFirstBin) {

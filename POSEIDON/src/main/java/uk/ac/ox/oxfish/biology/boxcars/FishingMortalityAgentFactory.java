@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMortalityAgent> {
 
 
-    private  String speciesName = "Species 0";
+    private String speciesName = "Species 0";
 
 
     /**
@@ -54,20 +54,20 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      * @return the function result
      */
     @Override
-    public FishingMortalityAgent apply(FishState fishState) {
+    public FishingMortalityAgent apply(final FishState fishState) {
 
         return new FishingMortalityAgent(
-                new LogisticSimpleFilter(
-                        true,selectivityRounding,
-                        selexParameter1.apply(fishState.getRandom()),
-                        selexParameter2.apply(fishState.getRandom())
+            new LogisticSimpleFilter(
+                true, selectivityRounding,
+                selexParameter1.applyAsDouble(fishState.getRandom()),
+                selexParameter2.applyAsDouble(fishState.getRandom())
 
 
+            ),
+            fishState.getBiology().getSpecie(speciesName),
 
-                                            ),
-                fishState.getBiology().getSpecie(speciesName),
-
-                computeDailyFishingMortality);
+            computeDailyFishingMortality
+        );
     }
 
     /**
@@ -84,7 +84,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -103,7 +103,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @param selexParameter1 Value to set for property 'selectivityAParameter'.
      */
-    public void setSelexParameter1(DoubleParameter selexParameter1) {
+    public void setSelexParameter1(final DoubleParameter selexParameter1) {
         this.selexParameter1 = selexParameter1;
     }
 
@@ -121,7 +121,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @param selexParameter2 Value to set for property 'selectivityBParameter'.
      */
-    public void setSelexParameter2(DoubleParameter selexParameter2) {
+    public void setSelexParameter2(final DoubleParameter selexParameter2) {
         this.selexParameter2 = selexParameter2;
     }
 
@@ -139,7 +139,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @param selectivityRounding Value to set for property 'selectivityRounding'.
      */
-    public void setSelectivityRounding(boolean selectivityRounding) {
+    public void setSelectivityRounding(final boolean selectivityRounding) {
         this.selectivityRounding = selectivityRounding;
     }
 
@@ -147,7 +147,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
         return computeDailyFishingMortality;
     }
 
-    public void setComputeDailyFishingMortality(boolean computeDailyFishingMortality) {
+    public void setComputeDailyFishingMortality(final boolean computeDailyFishingMortality) {
         this.computeDailyFishingMortality = computeDailyFishingMortality;
     }
 }

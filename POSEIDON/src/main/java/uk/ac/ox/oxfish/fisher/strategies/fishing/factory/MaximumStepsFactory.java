@@ -31,14 +31,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The factory of MaximumDaysStrategy. For the factory instead of focusing on steps I focus on days
  * Created by carrknight on 6/23/15.
  */
-public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorator>
-{
+public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorator> {
 
     /**
      * how many DAYS (not steps) after which the fisher refuses to fish
      */
     private DoubleParameter daysAtSea = new FixedDoubleParameter(5);
-
 
 
     private AlgorithmFactory<? extends FishingStrategy> delegate = new FishUntilFullFactory();
@@ -47,7 +45,7 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
     }
 
 
-    public MaximumStepsFactory(double daysAtSea) {
+    public MaximumStepsFactory(final double daysAtSea) {
         this.daysAtSea = new FixedDoubleParameter(daysAtSea);
     }
 
@@ -58,12 +56,14 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
      * @return the function result
      */
     @Override
-    public MaximumDaysDecorator apply(FishState state) {
+    public MaximumDaysDecorator apply(final FishState state) {
 
-        int rounded = (int) Math.round(daysAtSea.apply(state.random));
+        final int rounded = (int) Math.round(daysAtSea.applyAsDouble(state.random));
 
-        return new MaximumDaysDecorator(delegate.apply(state),
-                rounded);
+        return new MaximumDaysDecorator(
+            delegate.apply(state),
+            rounded
+        );
 
     }
 
@@ -71,7 +71,7 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
         return daysAtSea;
     }
 
-    public void setDaysAtSea(DoubleParameter daysAtSea) {
+    public void setDaysAtSea(final DoubleParameter daysAtSea) {
         this.daysAtSea = daysAtSea;
     }
 
@@ -79,7 +79,7 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
         return delegate;
     }
 
-    public void setDelegate(AlgorithmFactory<? extends FishingStrategy> delegate) {
+    public void setDelegate(final AlgorithmFactory<? extends FishingStrategy> delegate) {
         this.delegate = delegate;
     }
 }

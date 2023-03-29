@@ -45,8 +45,8 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
                                             new ISlope(
                                                     catchColumnName,
                                                     indicatorColumnName,
-                                                    gainLambdaParameter.apply(model.getRandom()),
-                                                    precautionaryScaling.apply(model.getRandom()),
+                                                    gainLambdaParameter.applyAsDouble(model.getRandom()),
+                                                    precautionaryScaling.applyAsDouble(model.getRandom()),
                                                     interval
                                             )
                                     );
@@ -55,8 +55,8 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
                                             new ISlope(
                                                     catchColumnName,
                                                     indicatorColumnName,
-                                                    gainLambdaParameter.apply(model.getRandom()),
-                                                    precautionaryScaling.apply(model.getRandom()),
+                                                    gainLambdaParameter.applyAsDouble(model.getRandom()),
+                                                    precautionaryScaling.applyAsDouble(model.getRandom()),
                                                     interval
                                             ),
                                             targetedSpecies

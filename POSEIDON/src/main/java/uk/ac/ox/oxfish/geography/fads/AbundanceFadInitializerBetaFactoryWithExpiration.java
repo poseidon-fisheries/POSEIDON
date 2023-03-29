@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.function.Supplier;
 
 public class AbundanceFadInitializerBetaFactoryWithExpiration
-        extends AbundanceFadInitializerBetaFactory {
+    extends AbundanceFadInitializerBetaFactory {
 
     private DoubleParameter daysOfFadActivity = new FixedDoubleParameter(50);
 
@@ -48,17 +48,19 @@ public class AbundanceFadInitializerBetaFactoryWithExpiration
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(
-            FishState fishState) {
+        final FishState fishState
+    ) {
         return new ExpirationDecoratorFadInitializer<>(
-                daysOfFadActivity.apply(fishState.getRandom()).intValue(),
-                super.apply(fishState));
+            (int) daysOfFadActivity.applyAsDouble(fishState.getRandom()),
+            super.apply(fishState)
+        );
     }
 
     public DoubleParameter getDaysOfFadActivity() {
         return daysOfFadActivity;
     }
 
-    public void setDaysOfFadActivity(DoubleParameter daysOfFadActivity) {
+    public void setDaysOfFadActivity(final DoubleParameter daysOfFadActivity) {
         this.daysOfFadActivity = daysOfFadActivity;
     }
 }

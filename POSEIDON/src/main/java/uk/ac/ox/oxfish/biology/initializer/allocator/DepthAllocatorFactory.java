@@ -31,14 +31,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDecorator> {
 
 
-
-
     private DoubleParameter minDepth = new FixedDoubleParameter(800);
     private DoubleParameter maxDepth = new FixedDoubleParameter(1500);
 
 
     private AlgorithmFactory<? extends BiomassAllocator> delegate =
-            new BoundedAllocatorFactory(62,27,95,34,true);
+        new BoundedAllocatorFactory(62, 27, 95, 34, true);
 
 
     /**
@@ -48,11 +46,11 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDec
      * @return the function result
      */
     @Override
-    public DepthAllocatorDecorator apply(FishState state) {
+    public DepthAllocatorDecorator apply(final FishState state) {
         return new DepthAllocatorDecorator(
-                minDepth.apply(state.getRandom()),
-                maxDepth.apply(state.getRandom()),
-                delegate.apply(state)
+            minDepth.applyAsDouble(state.getRandom()),
+            maxDepth.applyAsDouble(state.getRandom()),
+            delegate.apply(state)
 
         );
     }
@@ -72,7 +70,7 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDec
      *
      * @param minDepth Value to set for property 'minDepth'.
      */
-    public void setMinDepth(DoubleParameter minDepth) {
+    public void setMinDepth(final DoubleParameter minDepth) {
         this.minDepth = minDepth;
     }
 
@@ -90,7 +88,7 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDec
      *
      * @param maxDepth Value to set for property 'maxDepth'.
      */
-    public void setMaxDepth(DoubleParameter maxDepth) {
+    public void setMaxDepth(final DoubleParameter maxDepth) {
         this.maxDepth = maxDepth;
     }
 
@@ -109,7 +107,8 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDec
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends BiomassAllocator> delegate) {
+        final AlgorithmFactory<? extends BiomassAllocator> delegate
+    ) {
         this.delegate = delegate;
     }
 }

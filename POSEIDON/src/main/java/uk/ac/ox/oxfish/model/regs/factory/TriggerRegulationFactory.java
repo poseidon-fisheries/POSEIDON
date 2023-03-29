@@ -52,8 +52,8 @@ public class TriggerRegulationFactory implements AlgorithmFactory<TriggerRegulat
     @Override
     public TriggerRegulation apply(FishState fishState) {
         return new TriggerRegulation(
-                lowThreshold.apply(fishState.getRandom()),
-                highThreshold.apply(fishState.getRandom()),
+                lowThreshold.applyAsDouble(fishState.getRandom()),
+                highThreshold.applyAsDouble(fishState.getRandom()),
                 indicatorName,
                 businessAsUsual.apply(fishState),
                 emergency.apply(fishState)

@@ -88,12 +88,12 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
                                 ),
                                 new UnchangingPastSensor(
                                         indicatorColumnName,
-                                        multiplier.apply(model.getRandom()),
-                                        yearsToLookBackForTarget.apply(model.getRandom()).intValue()
+                                        multiplier.applyAsDouble(model.getRandom()),
+                                    (int)yearsToLookBackForTarget.applyAsDouble(model.getRandom())
                                 ),
                                 blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
                                         effortActuator, 365,
-                                maxChangePerYear.apply(model.getRandom()),
+                                maxChangePerYear.applyAsDouble(model.getRandom()),
                                 false,
 
 

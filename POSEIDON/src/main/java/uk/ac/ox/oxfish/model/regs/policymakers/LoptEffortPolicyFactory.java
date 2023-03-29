@@ -18,7 +18,6 @@ import java.util.Map;
 public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
-
     private String meanLengthColumnName = "Mean Length Caught " + "Lutjanus malabaricus" + " " + "spr_agent_total";
 
     private DoubleParameter targetLength = new FixedDoubleParameter(60);
@@ -39,44 +38,46 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
 
 
         final Map<String, Actuator<FishState, Double>> effortActuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS;
-        Preconditions.checkArgument(effortActuators.containsKey(effortDefinition),
-                "The valid effort actuators are " + effortActuators.keySet());
-
+        Preconditions.checkArgument(
+            effortActuators.containsKey(effortDefinition),
+            "The valid effort actuators are " + effortActuators.keySet()
+        );
 
 
         return new AdditionalStartable() {
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                LoptEffortPolicy lopt = new LoptEffortPolicy(
-                                        meanLengthColumnName,
-                                        1d-bufferValue.apply(fishState.getRandom()),
-                                        targetLength.apply(fishState.getRandom()),
-                                        howManyYearsToLookBackTo.apply(fishState.getRandom()).intValue(),
-                                        effortActuators.get(effortDefinition),
-                                        blockEntryWhenSeasonIsNotFull);
-                                lopt.start(model);
-                                lopt.step(model);
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            LoptEffortPolicy lopt = new LoptEffortPolicy(
+                                meanLengthColumnName,
+                                1d - bufferValue.applyAsDouble(fishState.getRandom()),
+                                targetLength.applyAsDouble(fishState.getRandom()),
+                                (int) howManyYearsToLookBackTo.applyAsDouble(fishState.getRandom()),
+                                effortActuators.get(effortDefinition),
+                                blockEntryWhenSeasonIsNotFull
+                            );
+                            lopt.start(model);
+                            lopt.step(model);
 
 
-                                //creaqte also a collector
-                                fishState.getYearlyDataSet().registerGatherer(
-                                        "LoptEffortPolicy output",
-                                        new Gatherer<FishState>() {
-                                            @Override
-                                            public Double apply(FishState fishState) {
-                                                return lopt.getTheoreticalSuggestedEffort();
-                                            }
-                                        },
-                                        Double.NaN
-                                );
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365 * startingYear + 1
+                            //creaqte also a collector
+                            fishState.getYearlyDataSet().registerGatherer(
+                                "LoptEffortPolicy output",
+                                new Gatherer<FishState>() {
+                                    @Override
+                                    public Double apply(FishState fishState) {
+                                        return lopt.getTheoreticalSuggestedEffort();
+                                    }
+                                },
+                                Double.NaN
+                            );
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
                 );
             }
         };
@@ -119,6 +120,10 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
         return effortDefinition;
     }
 
+    public void setEffortDefinition(String effortDefinition) {
+        this.effortDefinition = effortDefinition;
+    }
+
     public boolean isBlockEntryWhenSeasonIsNotFull() {
         return blockEntryWhenSeasonIsNotFull;
     }
@@ -133,9 +138,5 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
 
     public void setStartingYear(int startingYear) {
         this.startingYear = startingYear;
-    }
-
-    public void setEffortDefinition(String effortDefinition) {
-        this.effortDefinition = effortDefinition;
     }
 }

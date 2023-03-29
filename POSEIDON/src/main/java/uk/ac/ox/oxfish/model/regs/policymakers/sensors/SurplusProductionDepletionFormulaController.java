@@ -17,19 +17,18 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 //TAC=D*K*r/2
 public class SurplusProductionDepletionFormulaController implements
-        AlgorithmFactory<AdditionalStartable>
-{
+    AlgorithmFactory<AdditionalStartable> {
 
-    private DoubleParameter carryingCapacityMinimum = new FixedDoubleParameter( 100000);
-    private DoubleParameter carryingCapacityMaximum = new FixedDoubleParameter( 30000000);
-    private DoubleParameter logisticGrowthMinimum =new FixedDoubleParameter(  0.1);
-    private DoubleParameter logisticGrowthMaximum =new FixedDoubleParameter(  0.8);
-    private DoubleParameter catchabilityMinimum = new FixedDoubleParameter( 0);
-    private DoubleParameter catchabilityMaximum = new FixedDoubleParameter( 0.0001);
+    private DoubleParameter carryingCapacityMinimum = new FixedDoubleParameter(100000);
+    private DoubleParameter carryingCapacityMaximum = new FixedDoubleParameter(30000000);
+    private DoubleParameter logisticGrowthMinimum = new FixedDoubleParameter(0.1);
+    private DoubleParameter logisticGrowthMaximum = new FixedDoubleParameter(0.8);
+    private DoubleParameter catchabilityMinimum = new FixedDoubleParameter(0);
+    private DoubleParameter catchabilityMaximum = new FixedDoubleParameter(0.0001);
 
-    private String indicatorColumnName =  "Species 0 CPHO";
+    private String indicatorColumnName = "Species 0 CPHO";
 
-    private  String catchColumnName = "Species 0 Landings";
+    private String catchColumnName = "Species 0 Landings";
 
     private DoubleParameter minimumTAC = new FixedDoubleParameter(10000);
 
@@ -44,91 +43,88 @@ public class SurplusProductionDepletionFormulaController implements
     public AdditionalStartable apply(FishState fishState) {
 
         SurplusProductionStockAssessment depletionSensor =
-                new SurplusProductionStockAssessment(
-                        new double[]{
-                                carryingCapacityMinimum.apply(fishState.getRandom()),
-                                carryingCapacityMaximum.apply(fishState.getRandom())
-                        },
-                        new double[]{
-                                logisticGrowthMinimum.apply(fishState.getRandom()),
-                                logisticGrowthMaximum.apply(fishState.getRandom())
-                        },
-                        new double[]{
-                                catchabilityMinimum.apply(fishState.getRandom()),
-                                catchabilityMaximum.apply(fishState.getRandom())
-                        },
-                        indicatorColumnName,
-                        catchColumnName
+            new SurplusProductionStockAssessment(
+                new double[]{
+                    carryingCapacityMinimum.applyAsDouble(fishState.getRandom()),
+                    carryingCapacityMaximum.applyAsDouble(fishState.getRandom())
+                },
+                new double[]{
+                    logisticGrowthMinimum.applyAsDouble(fishState.getRandom()),
+                    logisticGrowthMaximum.applyAsDouble(fishState.getRandom())
+                },
+                new double[]{
+                    catchabilityMinimum.applyAsDouble(fishState.getRandom()),
+                    catchabilityMaximum.applyAsDouble(fishState.getRandom())
+                },
+                indicatorColumnName,
+                catchColumnName
 
-                        );
+            );
 
         final TargetToTACController controller = new TargetToTACController(
-                new Sensor<FishState, Double>() {
+            new Sensor<FishState, Double>() {
+                @Override
+                public Double scan(FishState system) {
+
+                    final SurplusProductionResult assessment = depletionSensor.scan(system);
+                    if (assessment == null) {
+                        System.out.println("stock assessment has failed!");
+                        return minimumTAC.applyAsDouble(fishState.getRandom());
+                    } else {
+                        double currentDepletion = assessment.getDepletion()[assessment.getDepletion().length - 1];
+
+                        //TAC=D*K*r/2
+                        //formula from here: https://dlmtool.github.io/DLMtool/reference/SPMSY.html
+                        final double tac = currentDepletion * assessment.getCarryingCapacity() *
+                            assessment.getLogisticGrowth() / 2d;
+                        System.out.println("tac: " + tac);
+                        System.out.println("current_depletion: " + currentDepletion);
+                        System.out.println("carrying_capacity: " + assessment.getCarryingCapacity());
+                        System.out.println("logistic_growth: " + assessment.getLogisticGrowth());
+
+                        lastAssessedCarryingCapacity = assessment.getCarryingCapacity();
+                        lastAssessedCurrentDepletion = currentDepletion;
+                        lastAssessedLogisticGrowth = assessment.getLogisticGrowth();
+
+                        if (tac < 0)
+                            return minimumTAC.applyAsDouble(fishState.getRandom());
+
+                        return tac;
+                    }
+
+                }
+            },
+            interval * 365
+        );
+
+
+        return model -> {
+
+            model.getYearlyDataSet().registerGatherer("Last Assessed Carrying Capacity",
+                (Gatherer<FishState>) fishState1 -> lastAssessedCarryingCapacity, Double.NaN
+            );
+            model.getYearlyDataSet().registerGatherer("Last Assessed Depletion",
+                (Gatherer<FishState>) fishState1 -> lastAssessedCurrentDepletion, Double.NaN
+            );
+
+            model.getYearlyDataSet().registerGatherer("Last Assessed Logistic Growth",
+                (Gatherer<FishState>) fishState1 -> lastAssessedLogisticGrowth, Double.NaN
+            );
+
+
+            model.scheduleOnceInXDays(
+                new Steppable() {
                     @Override
-                    public Double scan(FishState system) {
-
-                        final SurplusProductionResult assessment = depletionSensor.scan(system);
-                        if (assessment == null) {
-                            System.out.println("stock assessment has failed!");
-                            return minimumTAC.apply(fishState.getRandom());
-                        }
-                        else {
-                            double currentDepletion = assessment.getDepletion()[assessment.getDepletion().length - 1];
-
-                            //TAC=D*K*r/2
-                            //formula from here: https://dlmtool.github.io/DLMtool/reference/SPMSY.html
-                            final double tac = currentDepletion * assessment.getCarryingCapacity() *
-                                    assessment.getLogisticGrowth() / 2d;
-                            System.out.println("tac: " + tac);
-                            System.out.println("current_depletion: " + currentDepletion);
-                            System.out.println("carrying_capacity: " + assessment.getCarryingCapacity());
-                            System.out.println("logistic_growth: " + assessment.getLogisticGrowth());
-
-                            lastAssessedCarryingCapacity=assessment.getCarryingCapacity();
-                            lastAssessedCurrentDepletion=currentDepletion;
-                            lastAssessedLogisticGrowth=assessment.getLogisticGrowth();
-
-                            if(tac<0)
-                                return minimumTAC.apply(fishState.getRandom());
-
-                            return tac;
-                        }
-
+                    public void step(SimState simState) {
+                        controller.start(model);
+                        controller.step(model);
                     }
                 },
-                interval * 365);
+                StepOrder.DAWN,
+                365 * startingYear + 1
+            );
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-
-                model.getYearlyDataSet().registerGatherer("Last Assessed Carrying Capacity",
-                        (Gatherer<FishState>) fishState1 -> lastAssessedCarryingCapacity,Double.NaN
-                );
-                model.getYearlyDataSet().registerGatherer("Last Assessed Depletion",
-                        (Gatherer<FishState>) fishState1 -> lastAssessedCurrentDepletion,Double.NaN
-                );
-
-                model.getYearlyDataSet().registerGatherer("Last Assessed Logistic Growth",
-                        (Gatherer<FishState>) fishState1 -> lastAssessedLogisticGrowth,Double.NaN
-                );
-
-
-                model.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                controller.start(model);
-                                controller.step(model);
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365*startingYear+1
-                );
-
-
-            }
         };
 
 

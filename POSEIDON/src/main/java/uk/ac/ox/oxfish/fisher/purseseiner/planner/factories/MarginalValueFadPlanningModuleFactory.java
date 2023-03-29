@@ -47,8 +47,8 @@ public class MarginalValueFadPlanningModuleFactory implements AlgorithmFactory<M
 
         final OwnFadSetDiscretizedActionGenerator optionsGenerator = new OwnFadSetDiscretizedActionGenerator(
             new MapDiscretization(discretization.apply(state)),
-            minimumValueFadSets.apply(state.getRandom()),
-            maxAllowableShear.apply(state.getRandom())
+            minimumValueFadSets.applyAsDouble(state.getRandom()),
+            maxAllowableShear.applyAsDouble(state.getRandom())
         );
 
         return new MarginalValueFadPlanningModule(optionsGenerator);

@@ -31,13 +31,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * A factory building cashflow objective functions
  * Created by carrknight on 3/24/16.
  */
-public class CashFlowObjectiveFactory implements AlgorithmFactory<CashFlowObjective>{
-
+public class CashFlowObjectiveFactory implements AlgorithmFactory<CashFlowObjective> {
 
 
     private DoubleParameter period = new FixedDoubleParameter(365);
 
-    public CashFlowObjectiveFactory(DoubleParameter period) {
+    public CashFlowObjectiveFactory(final DoubleParameter period) {
         this.period = period;
     }
 
@@ -51,9 +50,9 @@ public class CashFlowObjectiveFactory implements AlgorithmFactory<CashFlowObject
      * @return the function result
      */
     @Override
-    public CashFlowObjective apply(FishState fishState) {
-        int period = this.period.apply(fishState.getRandom()).intValue();
-        Preconditions.checkArgument(period>0, "Cashflow objective must have a period higher than 0");
+    public CashFlowObjective apply(final FishState fishState) {
+        final int period = (int) this.period.applyAsDouble(fishState.getRandom());
+        Preconditions.checkArgument(period > 0, "Cashflow objective must have a period higher than 0");
         return new CashFlowObjective(period);
     }
 
@@ -71,7 +70,7 @@ public class CashFlowObjectiveFactory implements AlgorithmFactory<CashFlowObject
      *
      * @param period Value to set for property 'period'.
      */
-    public void setPeriod(DoubleParameter period) {
+    public void setPeriod(final DoubleParameter period) {
         this.period = period;
     }
 }

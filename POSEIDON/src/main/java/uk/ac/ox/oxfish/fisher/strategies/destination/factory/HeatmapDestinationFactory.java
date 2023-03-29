@@ -41,44 +41,34 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 
-public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestinationStrategy>{
-
-
-
-    private boolean ignoreFailedTrips = false;
-
-
-    /**
-     * step size when exploring
-     */
-    private DoubleParameter explorationStepSize = new UniformDoubleParameter(1, 10);
-
-    /**
-     * probability of exploring (imitating here means using other people observations as your own)
-     */
-    private AlgorithmFactory<? extends AdaptationProbability> probability =
-            new FixedProbabilityFactory(.2,1d);
-
-    /**
-     * the regression object (the one that builds the actual heatmap)
-     */
-    private AlgorithmFactory<? extends GeographicalRegression<Double>> regression =
-            new NearestNeighborRegressionFactory();
-
-    /**
-     *
-     */
-    private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
+public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestinationStrategy> {
 
 
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-
-
+    private boolean ignoreFailedTrips = false;
+    /**
+     * step size when exploring
+     */
+    private DoubleParameter explorationStepSize = new UniformDoubleParameter(1, 10);
+    /**
+     * probability of exploring (imitating here means using other people observations as your own)
+     */
+    private AlgorithmFactory<? extends AdaptationProbability> probability =
+        new FixedProbabilityFactory(.2, 1d);
+    /**
+     * the regression object (the one that builds the actual heatmap)
+     */
+    private AlgorithmFactory<? extends GeographicalRegression<Double>> regression =
+        new NearestNeighborRegressionFactory();
+    /**
+     *
+     */
+    private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
     private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
-            new HourlyProfitObjectiveFactory(true);
+        new HourlyProfitObjectiveFactory(true);
 
 
     /**
@@ -88,49 +78,49 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @return the function result
      */
     @Override
-    public HeatmapDestinationStrategy apply(FishState state) {
+    public HeatmapDestinationStrategy apply(final FishState state) {
 
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(state))
-        {
+        if (!weakStateMap.contains(state)) {
             weakStateMap.add(state);
             addDataGatherers(state);
             assert weakStateMap.contains(state);
         }
 
         return new HeatmapDestinationStrategy(
-                regression.apply(state),
-                acquisition.apply(state),
-                ignoreFailedTrips,
-                probability.apply(state),
-                state.getMap(),
-                state.getRandom(),
-                explorationStepSize.apply(state.getRandom()).intValue(),
-                objectiveFunction.apply(state));
+            regression.apply(state),
+            acquisition.apply(state),
+            ignoreFailedTrips,
+            probability.apply(state),
+            state.getMap(),
+            state.getRandom(),
+            (int) explorationStepSize.applyAsDouble(state.getRandom()),
+            objectiveFunction.apply(state)
+        );
     }
 
-    private void addDataGatherers(FishState state) {
+    private void addDataGatherers(final FishState state) {
 
 
         //first add data gatherers
         state.getYearlyDataSet().registerGatherer("Average Prediction Error",
-                                                  model -> {
-            double size =model.getFishers().size();
-            if(size == 0)
-                return Double.NaN;
-            else
-            {
-                double total = 0;
-                for(Fisher fisher1 : state.getFishers()) {
-                    DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
-                    for(Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
-                        errors.accept(error);
-                    total += errors.getAverage();
+            model -> {
+                final double size = model.getFishers().size();
+                if (size == 0)
+                    return Double.NaN;
+                else {
+                    double total = 0;
+                    for (final Fisher fisher1 : state.getFishers()) {
+                        final DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
+                        for (final Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
+                            errors.accept(error);
+                        total += errors.getAverage();
+                    }
+                    return total / size;
                 }
-                return total/size;
-            }
-        }, Double.NaN);
+            }, Double.NaN
+        );
 
     }
 
@@ -149,7 +139,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      *
      * @param ignoreFailedTrips Value to set for property 'ignoreFailedTrips'.
      */
-    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
+    public void setIgnoreFailedTrips(final boolean ignoreFailedTrips) {
         this.ignoreFailedTrips = ignoreFailedTrips;
     }
 
@@ -168,7 +158,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        final AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 
@@ -186,7 +177,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      *
      * @param explorationStepSize Value to set for property 'explorationStepSize'.
      */
-    public void setExplorationStepSize(DoubleParameter explorationStepSize) {
+    public void setExplorationStepSize(final DoubleParameter explorationStepSize) {
         this.explorationStepSize = explorationStepSize;
     }
 
@@ -206,7 +197,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param regression Value to set for property 'regression'.
      */
     public void setRegression(
-            AlgorithmFactory<? extends GeographicalRegression<Double>> regression) {
+        final AlgorithmFactory<? extends GeographicalRegression<Double>> regression
+    ) {
         this.regression = regression;
     }
 
@@ -225,7 +217,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param acquisition Value to set for property 'acquisition'.
      */
     public void setAcquisition(
-            AlgorithmFactory<? extends AcquisitionFunction> acquisition) {
+        final AlgorithmFactory<? extends AcquisitionFunction> acquisition
+    ) {
         this.acquisition = acquisition;
     }
 
@@ -245,7 +238,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param objectiveFunction Value to set for property 'objectiveFunction'.
      */
     public void setObjectiveFunction(
-            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        final AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
+    ) {
         this.objectiveFunction = objectiveFunction;
     }
 }

@@ -14,12 +14,12 @@ public class IattcClosurePeriodRandomizerFactory implements AlgorithmFactory<Iat
     }
 
     @SuppressWarnings("unused")
-    public void setProportionOfBoatsInClosureA(DoubleParameter proportionOfBoatsInClosureA) {
+    public void setProportionOfBoatsInClosureA(final DoubleParameter proportionOfBoatsInClosureA) {
         this.proportionOfBoatsInClosureA = proportionOfBoatsInClosureA;
     }
 
     @Override
-    public IattcClosurePeriodRandomizer apply(FishState fishState) {
-        return new IattcClosurePeriodRandomizer(proportionOfBoatsInClosureA.apply(fishState.getRandom()));
+    public IattcClosurePeriodRandomizer apply(final FishState fishState) {
+        return new IattcClosurePeriodRandomizer(proportionOfBoatsInClosureA.applyAsDouble(fishState.getRandom()));
     }
 }

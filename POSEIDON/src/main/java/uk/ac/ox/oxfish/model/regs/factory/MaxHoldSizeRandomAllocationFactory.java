@@ -41,7 +41,7 @@ public class MaxHoldSizeRandomAllocationFactory implements AlgorithmFactory<MaxH
      */
     @Override
     public MaxHoldSizeRandomAllocationPolicy apply(FishState state) {
-        return new MaxHoldSizeRandomAllocationPolicy(maxCumulativeHoldSize.apply(state.getRandom()));
+        return new MaxHoldSizeRandomAllocationPolicy(maxCumulativeHoldSize.applyAsDouble(state.getRandom()));
     }
 
     /**

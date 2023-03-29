@@ -27,9 +27,9 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
- *creates fixed rest time departing strategies
+ * creates fixed rest time departing strategies
  */
-public class FixedRestTimeDepartingFactory implements AlgorithmFactory<FixedRestTimeDepartingStrategy>{
+public class FixedRestTimeDepartingFactory implements AlgorithmFactory<FixedRestTimeDepartingStrategy> {
 
 
     private DoubleParameter hoursBetweenEachDeparture = new FixedDoubleParameter(12.0);
@@ -41,9 +41,8 @@ public class FixedRestTimeDepartingFactory implements AlgorithmFactory<FixedRest
      * @return the function result
      */
     @Override
-    public FixedRestTimeDepartingStrategy apply(FishState state)
-    {
-        return new FixedRestTimeDepartingStrategy(hoursBetweenEachDeparture.apply(state.getRandom()));
+    public FixedRestTimeDepartingStrategy apply(final FishState state) {
+        return new FixedRestTimeDepartingStrategy(hoursBetweenEachDeparture.applyAsDouble(state.getRandom()));
     }
 
 
@@ -51,7 +50,7 @@ public class FixedRestTimeDepartingFactory implements AlgorithmFactory<FixedRest
         return hoursBetweenEachDeparture;
     }
 
-    public void setHoursBetweenEachDeparture(DoubleParameter hoursBetweenEachDeparture) {
+    public void setHoursBetweenEachDeparture(final DoubleParameter hoursBetweenEachDeparture) {
         this.hoursBetweenEachDeparture = hoursBetweenEachDeparture;
     }
 }

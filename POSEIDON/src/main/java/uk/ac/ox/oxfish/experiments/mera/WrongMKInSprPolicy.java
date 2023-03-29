@@ -98,8 +98,8 @@ public class WrongMKInSprPolicy {
                         );
 
                         System.out.println("guessed mk " +
-                                (sprAgent.getAssumedNaturalMortality().apply(new MersenneTwisterFast()))/
-                                        (sprAgent.getAssumedKParameter().apply(new MersenneTwisterFast()))
+                                (sprAgent.getAssumedNaturalMortality().applyAsDouble(new MersenneTwisterFast()))/
+                                        (sprAgent.getAssumedKParameter().applyAsDouble(new MersenneTwisterFast()))
                         );
 
                         //change the REAL K so that it's just original M * (real K/M)
@@ -114,8 +114,8 @@ public class WrongMKInSprPolicy {
                         );
 
                         System.out.println("real mk " +
-                                (biology.getYearlyMortality().apply(new MersenneTwisterFast()))/
-                                        (biology.getK().apply(new MersenneTwisterFast()))
+                                (biology.getYearlyMortality().applyAsDouble(new MersenneTwisterFast()))/
+                                        (biology.getK().applyAsDouble(new MersenneTwisterFast()))
                         );
 
 
@@ -203,21 +203,16 @@ public class WrongMKInSprPolicy {
                     );
 
                     System.out.println("real mk " +
-                            (biology.getYearlyMortality().apply(new MersenneTwisterFast()))/
-                                    (biology.getK().apply(new MersenneTwisterFast()))
+                            (biology.getYearlyMortality().applyAsDouble(new MersenneTwisterFast()))/
+                                    (biology.getK().applyAsDouble(new MersenneTwisterFast()))
                     );
 
 
                 }
             });
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(StringBuffer writer, FishState model, Integer year) {
-                    writer.
-                            append(realMK).append(",").append("adaptive").append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                    append(realMK).append(",").append("adaptive").append(","));
 
 
 

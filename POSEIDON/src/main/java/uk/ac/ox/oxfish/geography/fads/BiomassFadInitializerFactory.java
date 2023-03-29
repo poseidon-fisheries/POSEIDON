@@ -48,12 +48,12 @@ public class BiomassFadInitializerFactory
     @Override
     public BiomassFadInitializer apply(final FishState fishState) {
         final MersenneTwisterFast rng = fishState.getRandom();
-        final double totalCarryingCapacity = getTotalCarryingCapacity().apply(rng);
+        final double totalCarryingCapacity = getTotalCarryingCapacity().applyAsDouble(rng);
         return new BiomassFadInitializer(
             fishState.getBiology(),
             totalCarryingCapacity,
             makeFishAttractor(fishState, rng),
-            getFishReleaseProbabilityInPercent().apply(rng) / 100d,
+            getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep
         );
     }

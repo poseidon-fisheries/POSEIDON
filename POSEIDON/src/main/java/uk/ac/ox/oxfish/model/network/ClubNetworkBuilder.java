@@ -27,14 +27,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClubNetworkBuilder extends AbstractNetworkBuilder {
 
     private int nextClubSize;
 
     private Collection<Fisher> club;
-
 
 
     private DoubleParameter clubSize = new FixedDoubleParameter(2);
@@ -53,21 +55,21 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
      */
     @Override
     public void addFisher(
-            Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher newAddition, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
 
-        List<NetworkPredicate> predicates = super.computePredicates(state);
-
+        final List<NetworkPredicate> predicates = super.computePredicates(state);
 
 
         //build new club
-        if(club == null || club.size()>= nextClubSize) {
+        if (club == null || club.size() >= nextClubSize) {
             club = new LinkedList<>();
-            nextClubSize = clubSize.apply(state.getRandom()).intValue();
+            nextClubSize = (int) clubSize.applyAsDouble(state.getRandom());
         }
         //make sure this club is okay
         clubpredicates:
-        for(Fisher clubMember : club) {
-            for (NetworkPredicate predicate : predicates)
+        for (final Fisher clubMember : club) {
+            for (final NetworkPredicate predicate : predicates)
                 if (!predicate.test(clubMember, newAddition)) {
                     club = new LinkedList<>();
                     break clubpredicates;
@@ -75,21 +77,23 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
         }
 
         //add yourself as friend of everybody in the club
-        for(Fisher clubMember : club) {
-            currentNetwork.addEdge(new FriendshipEdge(),
-                             clubMember,
-                             newAddition);
-            currentNetwork.addEdge(new FriendshipEdge(),
-                             newAddition,
-                             clubMember);
+        for (final Fisher clubMember : club) {
+            currentNetwork.addEdge(
+                new FriendshipEdge(),
+                clubMember,
+                newAddition
+            );
+            currentNetwork.addEdge(
+                new FriendshipEdge(),
+                newAddition,
+                clubMember
+            );
 
         }
         club.add(newAddition);
 
 
-
-
-        }
+    }
 
     /**
      * remove fisher from network. This is to be used while the model is running to clear any ties
@@ -100,7 +104,8 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
      */
     @Override
     public void removeFisher(
-            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        final Fisher toRemove, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
 
     }
 
@@ -111,13 +116,13 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
      * @return the function result
      */
     @Override
-    public DirectedGraph<Fisher, FriendshipEdge> apply(FishState fishState) {
+    public DirectedGraph<Fisher, FriendshipEdge> apply(final FishState fishState) {
 
-        DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
-        List<Fisher> fishers = new ArrayList<>(fishState.getFishers());
+        final DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
+        final List<Fisher> fishers = new ArrayList<>(fishState.getFishers());
 
-        for (Fisher fisher : fishers) {
-            addFisher(fisher,graph,fishState);
+        for (final Fisher fisher : fishers) {
+            addFisher(fisher, graph, fishState);
         }
         return graph;
 
@@ -147,7 +152,7 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
      *
      * @param clubSize Value to set for property 'clubSize'.
      */
-    public void setClubSize(DoubleParameter clubSize) {
+    public void setClubSize(final DoubleParameter clubSize) {
         this.clubSize = clubSize;
     }
 }

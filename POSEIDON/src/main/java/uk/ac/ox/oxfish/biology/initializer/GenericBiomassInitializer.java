@@ -75,12 +75,12 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
 
 
     public GenericBiomassInitializer(
-            List<DoubleParameter> carryingCapacity,
-            DoubleParameter minInitialCapacity,
-            DoubleParameter maxInitialCapacity, double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove,
-            LogisticGrowerInitializer grower,
-            List<BiomassAllocator> allocators) {
+            final List<DoubleParameter> carryingCapacity,
+            final DoubleParameter minInitialCapacity,
+            final DoubleParameter maxInitialCapacity, final double percentageLimitOnDailyMovement,
+            final double differentialPercentageToMove,
+            final LogisticGrowerInitializer grower,
+            final List<BiomassAllocator> allocators) {
         this.carryingCapacity = carryingCapacity;
         this.minInitialCapacity = minInitialCapacity;
         this.maxInitialCapacity = maxInitialCapacity;
@@ -97,7 +97,7 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
      */
     @Override
     public String[] getSpeciesNames() {
-        String[] names = new String[allocators.size()];
+        final String[] names = new String[allocators.size()];
         for(int i=0; i<allocators.size(); i++)
             names[i] = "Species " + i;
         return names;
@@ -115,16 +115,16 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile,
-            MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+            final GlobalBiology biology, final SeaTile seaTile,
+            final MersenneTwisterFast random, final int mapHeightInCells,
+            final int mapWidthInCells, final NauticalMap map) {
 
         //if there is no manager, we need to create and start it now
         if(manager == null)
         {
             //assume order of allocators is the same as order of species
-            Map<Species,BiomassAllocator> allocatorMap = new LinkedHashMap<>();
-            for(Species species : biology.getSpecies())
+            final Map<Species,BiomassAllocator> allocatorMap = new LinkedHashMap<>();
+            for(final Species species : biology.getSpecies())
                 allocatorMap.put(species,allocators.get(species.getIndex()));
 
             manager = new AllocatorManager(false,
@@ -134,21 +134,21 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
         }
 
         //create carrying capcities and put them in
-        double[] carringCapacities = new  double[biology.getSize()];
-        double[] currentCapacity = new double[biology.getSize()];
-        for(Species species : biology.getSpecies())
+        final double[] carringCapacities = new  double[biology.getSize()];
+        final double[] currentCapacity = new double[biology.getSize()];
+        for(final Species species : biology.getSpecies())
         {
-            double k = carryingCapacity.get(species.getIndex()).apply(random) *
+            final double k = carryingCapacity.get(species.getIndex()).applyAsDouble(random) *
                     manager.getWeight(species, seaTile,map ,random );
             carringCapacities[species.getIndex()] = k;
 
-            double min = minInitialCapacity.apply(random);
-            double max = maxInitialCapacity.apply(random);
+            final double min = minInitialCapacity.applyAsDouble(random);
+            final double max = maxInitialCapacity.applyAsDouble(random);
             currentCapacity[species.getIndex()] =
                     ((max - min)*random.nextDouble(true, true) + min)
                             * k;
         }
-        BiomassLocalBiology local = new BiomassLocalBiology(currentCapacity, carringCapacities);
+        final BiomassLocalBiology local = new BiomassLocalBiology(currentCapacity, carringCapacities);
         biologies.put(seaTile,local);
 
         return local;
@@ -166,13 +166,13 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+            final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model) {
 
-        for(Species species : biology.getSpecies())
+        for(final Species species : biology.getSpecies())
             grower.initializeGrower(biologies, model, random,species);
 
 
-        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
+        final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
                                                                          differentialPercentageToMove,
                                                                          percentageLimitOnDailyMovement);
 

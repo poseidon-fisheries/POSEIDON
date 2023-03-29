@@ -47,21 +47,22 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
      * @return the function result
      */
     @Override
-    public FisherEntryByProfits apply(FishState state) {
+    public FisherEntryByProfits apply(final FishState state) {
         return new FisherEntryByProfits(
-                profitDataColumnName,
-                costsFinalColumnName,
-                populationName,
-                profitRatioToEntrantsMultiplier.apply(state.getRandom()),
-                maxEntrantsPerYear.apply(state.getRandom()).intValue(),
-                fixedCostsToCover.apply(state.getRandom()));
+            profitDataColumnName,
+            costsFinalColumnName,
+            populationName,
+            profitRatioToEntrantsMultiplier.applyAsDouble(state.getRandom()),
+            (int) maxEntrantsPerYear.applyAsDouble(state.getRandom()),
+            fixedCostsToCover.applyAsDouble(state.getRandom())
+        );
     }
 
     public String getProfitDataColumnName() {
         return profitDataColumnName;
     }
 
-    public void setProfitDataColumnName(String profitDataColumnName) {
+    public void setProfitDataColumnName(final String profitDataColumnName) {
         this.profitDataColumnName = profitDataColumnName;
     }
 
@@ -69,7 +70,7 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
         return costsFinalColumnName;
     }
 
-    public void setCostsFinalColumnName(String costsFinalColumnName) {
+    public void setCostsFinalColumnName(final String costsFinalColumnName) {
         this.costsFinalColumnName = costsFinalColumnName;
     }
 
@@ -77,7 +78,7 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
         return populationName;
     }
 
-    public void setPopulationName(String populationName) {
+    public void setPopulationName(final String populationName) {
         this.populationName = populationName;
     }
 
@@ -86,7 +87,8 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
     }
 
     public void setProfitRatioToEntrantsMultiplier(
-            DoubleParameter profitRatioToEntrantsMultiplier) {
+        final DoubleParameter profitRatioToEntrantsMultiplier
+    ) {
         this.profitRatioToEntrantsMultiplier = profitRatioToEntrantsMultiplier;
     }
 
@@ -95,7 +97,7 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
         return maxEntrantsPerYear;
     }
 
-    public void setMaxEntrantsPerYear(DoubleParameter maxEntrantsPerYear) {
+    public void setMaxEntrantsPerYear(final DoubleParameter maxEntrantsPerYear) {
         this.maxEntrantsPerYear = maxEntrantsPerYear;
     }
 
@@ -113,7 +115,7 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
      *
      * @param fixedCostsToCover Value to set for property 'fixedCostsToCover'.
      */
-    public void setFixedCostsToCover(DoubleParameter fixedCostsToCover) {
+    public void setFixedCostsToCover(final DoubleParameter fixedCostsToCover) {
         this.fixedCostsToCover = fixedCostsToCover;
     }
 }

@@ -19,13 +19,13 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
     }
 
 
-    public CommonLogisticGrowerFactory(double steepness) {
+    public CommonLogisticGrowerFactory(final double steepness) {
         this.steepness = new FixedDoubleParameter(steepness);
     }
 
 
-    public CommonLogisticGrowerFactory(double low,double high) {
-        this.steepness =  new UniformDoubleParameter(low, high);
+    public CommonLogisticGrowerFactory(final double low, final double high) {
+        this.steepness = new UniformDoubleParameter(low, high);
     }
 
     /**
@@ -35,9 +35,11 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      * @return the function result
      */
     @Override
-    public CommonLogisticGrowerInitializer apply(FishState state) {
-        return new CommonLogisticGrowerInitializer(steepness.makeCopy(),
-                                                   distributionalWeight.apply(state.getRandom()));
+    public CommonLogisticGrowerInitializer apply(final FishState state) {
+        return new CommonLogisticGrowerInitializer(
+            steepness.makeCopy(),
+            distributionalWeight.applyAsDouble(state.getRandom())
+        );
     }
 
     /**
@@ -54,7 +56,7 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      *
      * @param steepness Value to set for property 'steepness'.
      */
-    public void setSteepness(DoubleParameter steepness) {
+    public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
 
@@ -73,7 +75,7 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      *
      * @param distributionalWeight Value to set for property 'distributionalWeight'.
      */
-    public void setDistributionalWeight(DoubleParameter distributionalWeight) {
+    public void setDistributionalWeight(final DoubleParameter distributionalWeight) {
         this.distributionalWeight = distributionalWeight;
     }
 

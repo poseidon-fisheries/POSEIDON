@@ -31,12 +31,11 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
  * Created by carrknight on 9/29/15.
  */
 public class RockyRectanglesHabitatFactory
-        implements AlgorithmFactory<RockyRectanglesHabitatInitializer>
-{
+    implements AlgorithmFactory<RockyRectanglesHabitatInitializer> {
 
 
-    private DoubleParameter rockyHeight = new UniformDoubleParameter(25,30);
-    private DoubleParameter rockyWidth = new UniformDoubleParameter(20,25);
+    private DoubleParameter rockyHeight = new UniformDoubleParameter(25, 30);
+    private DoubleParameter rockyWidth = new UniformDoubleParameter(20, 25);
 
     private DoubleParameter numberOfRectangles = new FixedDoubleParameter(1);
 
@@ -52,16 +51,17 @@ public class RockyRectanglesHabitatFactory
      * @return the function result
      */
     @Override
-    public RockyRectanglesHabitatInitializer apply(FishState state) {
-        return new RockyRectanglesHabitatInitializer(rockyHeight,rockyWidth,
-                                              numberOfRectangles.apply(state.getRandom()).intValue());
+    public RockyRectanglesHabitatInitializer apply(final FishState state) {
+        return new RockyRectanglesHabitatInitializer(rockyHeight, rockyWidth,
+            (int) numberOfRectangles.applyAsDouble(state.getRandom())
+        );
     }
 
     public DoubleParameter getRockyHeight() {
         return rockyHeight;
     }
 
-    public void setRockyHeight(DoubleParameter rockyHeight) {
+    public void setRockyHeight(final DoubleParameter rockyHeight) {
         this.rockyHeight = rockyHeight;
     }
 
@@ -69,7 +69,7 @@ public class RockyRectanglesHabitatFactory
         return rockyWidth;
     }
 
-    public void setRockyWidth(DoubleParameter rockyWidth) {
+    public void setRockyWidth(final DoubleParameter rockyWidth) {
         this.rockyWidth = rockyWidth;
     }
 
@@ -77,7 +77,7 @@ public class RockyRectanglesHabitatFactory
         return numberOfRectangles;
     }
 
-    public void setNumberOfRectangles(DoubleParameter numberOfRectangles) {
+    public void setNumberOfRectangles(final DoubleParameter numberOfRectangles) {
         this.numberOfRectangles = numberOfRectangles;
     }
 }

@@ -21,31 +21,55 @@ public class TemporaryRegulationFactory implements AlgorithmFactory<TemporaryReg
         this.delegate = delegate;
     }
 
-    @SuppressWarnings("unused") public TemporaryRegulationFactory() {
+    @SuppressWarnings("unused")
+    public TemporaryRegulationFactory() {
         this(1, 1, new ProtectedAreasOnlyFactory());
     }
 
-    @SuppressWarnings("unused") public DoubleParameter getStartDay() { return startDay; }
-    @SuppressWarnings("unused") public void setStartDay(DoubleParameter startDay) { this.startDay = startDay; }
-    @SuppressWarnings("unused") public DoubleParameter getEndDay() { return endDay; }
-    @SuppressWarnings("unused") public void setEndDay(DoubleParameter endDay) { this.endDay = endDay; }
-    public AlgorithmFactory<? extends Regulation> getDelegate() { return delegate; }
-    public void setDelegate(AlgorithmFactory<? extends Regulation> delegate) { this.delegate = delegate; }
+    @SuppressWarnings("unused")
+    public DoubleParameter getStartDay() {
+        return startDay;
+    }
+
+    @SuppressWarnings("unused")
+    public void setStartDay(DoubleParameter startDay) {
+        this.startDay = startDay;
+    }
+
+    @SuppressWarnings("unused")
+    public DoubleParameter getEndDay() {
+        return endDay;
+    }
+
+    @SuppressWarnings("unused")
+    public void setEndDay(DoubleParameter endDay) {
+        this.endDay = endDay;
+    }
+
+    public AlgorithmFactory<? extends Regulation> getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(AlgorithmFactory<? extends Regulation> delegate) {
+        this.delegate = delegate;
+    }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends Regulation> getInactiveDelegate() {
         return inactiveDelegate;
     }
+
     @SuppressWarnings("unused")
     public void setInactiveDelegate(AlgorithmFactory<? extends Regulation> inactiveDelegate) {
         this.inactiveDelegate = inactiveDelegate;
     }
 
-    @Override public TemporaryRegulation apply(FishState fishState) {
+    @Override
+    public TemporaryRegulation apply(FishState fishState) {
         final MersenneTwisterFast rng = fishState.getRandom();
         return new TemporaryRegulation(
-            startDay.apply(rng).intValue(),
-            endDay.apply(rng).intValue(),
+            (int) startDay.applyAsDouble(rng),
+            (int) endDay.applyAsDouble(rng),
             delegate.apply(fishState)
         );
     }

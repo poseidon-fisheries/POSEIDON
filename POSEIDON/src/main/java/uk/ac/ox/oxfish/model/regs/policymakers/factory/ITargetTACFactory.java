@@ -45,8 +45,8 @@ public class ITargetTACFactory  implements AlgorithmFactory<AdditionalStartable>
                                 final ITarget itarget = new ITarget(
                                         catchColumnName,
                                         indicatorColumnName,
-                                        precautionaryScaling.apply(model.getRandom()),
-                                        indicatorMultiplier.apply(model.getRandom()),
+                                        precautionaryScaling.applyAsDouble(model.getRandom()),
+                                        indicatorMultiplier.applyAsDouble(model.getRandom()),
                                         interval,
                                         interval * 2
                                 );

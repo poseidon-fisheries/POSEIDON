@@ -29,29 +29,26 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import java.util.ArrayList;
-
 /**
  * Creates the "chaser" biology with a school of fishers running around
  * Created by carrknight on 11/17/16.
  */
-public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfiniteSchoolsInitializer>
-{
+public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfiniteSchoolsInitializer> {
 
 
     private DoubleParameter numberOfSchools = new FixedDoubleParameter(1d);
 
     private String waypoints = "0,0 : 40,0 :  40,40: 0,40";
 
-    private DoubleParameter startingX = new UniformDoubleParameter(0,30);
+    private DoubleParameter startingX = new UniformDoubleParameter(0, 30);
 
-    private DoubleParameter startingY = new UniformDoubleParameter(0,30);
+    private DoubleParameter startingY = new UniformDoubleParameter(0, 30);
 
     private DoubleParameter diameter = new FixedDoubleParameter(4);
 
     private DoubleParameter speedInDays = new FixedDoubleParameter(10);
 
-    private DoubleParameter  biomassEach = new FixedDoubleParameter(10000);
+    private DoubleParameter biomassEach = new FixedDoubleParameter(10000);
 
 
     /**
@@ -61,31 +58,30 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
      * @return the function result
      */
     @Override
-    public OneSpeciesInfiniteSchoolsInitializer apply(FishState state) {
+    public OneSpeciesInfiniteSchoolsInitializer apply(final FishState state) {
 
 
-        String[] splitString = waypoints.split(":");
-        Pair<Integer,Integer>[] trueWayPoints = new Pair[splitString.length];
-        Preconditions.checkArgument(trueWayPoints.length>=2);
-        for(int i=0 ;i<trueWayPoints.length; i++)
-        {
-            String[] waypoint = splitString[i].split(",");
+        final String[] splitString = waypoints.split(":");
+        final Pair<Integer, Integer>[] trueWayPoints = new Pair[splitString.length];
+        Preconditions.checkArgument(trueWayPoints.length >= 2);
+        for (int i = 0; i < trueWayPoints.length; i++) {
+            final String[] waypoint = splitString[i].split(",");
             assert waypoint.length == 2;
             trueWayPoints[i] = new Pair<>(
-                    Integer.parseInt(waypoint[0].trim()),
-                    Integer.parseInt(waypoint[1].trim())
+                Integer.parseInt(waypoint[0].trim()),
+                Integer.parseInt(waypoint[1].trim())
             );
         }
 
 
         return new OneSpeciesInfiniteSchoolsInitializer(
-                numberOfSchools.apply(state.getRandom()).intValue(),
-                trueWayPoints,
-                startingX,
-                startingY,
-                diameter,
-                speedInDays,
-                biomassEach
+            (int) numberOfSchools.applyAsDouble(state.getRandom()),
+            trueWayPoints,
+            startingX,
+            startingY,
+            diameter,
+            speedInDays,
+            biomassEach
         );
 
     }
@@ -94,7 +90,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return numberOfSchools;
     }
 
-    public void setNumberOfSchools(DoubleParameter numberOfSchools) {
+    public void setNumberOfSchools(final DoubleParameter numberOfSchools) {
         this.numberOfSchools = numberOfSchools;
     }
 
@@ -102,7 +98,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return waypoints;
     }
 
-    public void setWaypoints(String waypoints) {
+    public void setWaypoints(final String waypoints) {
         this.waypoints = waypoints;
     }
 
@@ -110,7 +106,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return startingX;
     }
 
-    public void setStartingX(DoubleParameter startingX) {
+    public void setStartingX(final DoubleParameter startingX) {
         this.startingX = startingX;
     }
 
@@ -118,7 +114,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return startingY;
     }
 
-    public void setStartingY(DoubleParameter startingY) {
+    public void setStartingY(final DoubleParameter startingY) {
         this.startingY = startingY;
     }
 
@@ -126,7 +122,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return diameter;
     }
 
-    public void setDiameter(DoubleParameter diameter) {
+    public void setDiameter(final DoubleParameter diameter) {
         this.diameter = diameter;
     }
 
@@ -134,7 +130,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return speedInDays;
     }
 
-    public void setSpeedInDays(DoubleParameter speedInDays) {
+    public void setSpeedInDays(final DoubleParameter speedInDays) {
         this.speedInDays = speedInDays;
     }
 
@@ -142,7 +138,7 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
         return biomassEach;
     }
 
-    public void setBiomassEach(DoubleParameter biomassEach) {
+    public void setBiomassEach(final DoubleParameter biomassEach) {
         this.biomassEach = biomassEach;
     }
 }

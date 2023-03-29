@@ -23,19 +23,17 @@ package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.CongestedMarket;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket>
-{
+public class CongestedMarketFactory implements AlgorithmFactory<CongestedMarket> {
 
 
     /**
      * if in the market there is less than this biomass available, there is no penalty to price
      */
-    private DoubleParameter  acceptableBiomassThreshold = new FixedDoubleParameter(7000);
+    private DoubleParameter acceptableBiomassThreshold = new FixedDoubleParameter(7000);
 
 
     /**
@@ -54,9 +52,7 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
     private DoubleParameter dailyConsumption = new FixedDoubleParameter(8000);
 
 
-
     private DoubleParameter consumptionPeriod = new FixedDoubleParameter(1);
-
 
 
     /**
@@ -67,11 +63,13 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
      */
     @Override
     public CongestedMarket apply(FishState state) {
-        return new CongestedMarket(acceptableBiomassThreshold.apply(state.getRandom()),
-                                   maxPrice.apply(state.getRandom()),
-                                   demandSlope.apply(state.getRandom()),
-                                   dailyConsumption.apply(state.getRandom()),
-                                   consumptionPeriod.apply(state.getRandom()).intValue());
+        return new CongestedMarket(
+            acceptableBiomassThreshold.applyAsDouble(state.getRandom()),
+            maxPrice.applyAsDouble(state.getRandom()),
+            demandSlope.applyAsDouble(state.getRandom()),
+            dailyConsumption.applyAsDouble(state.getRandom()),
+            (int) consumptionPeriod.applyAsDouble(state.getRandom())
+        );
     }
 
 
@@ -80,7 +78,8 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
     }
 
     public void setAcceptableBiomassThreshold(
-            DoubleParameter acceptableBiomassThreshold) {
+        DoubleParameter acceptableBiomassThreshold
+    ) {
         this.acceptableBiomassThreshold = acceptableBiomassThreshold;
     }
 

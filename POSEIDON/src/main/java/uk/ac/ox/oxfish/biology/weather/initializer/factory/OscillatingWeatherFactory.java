@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Builds an OscillatingWeatherInitializer
  * Created by carrknight on 9/8/15.
  */
-public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWeatherInitializer>
-{
+public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWeatherInitializer> {
 
 
     private DoubleParameter minTemperature = new FixedDoubleParameter(20);
@@ -44,9 +43,11 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
     private DoubleParameter maxWindSpeed = new FixedDoubleParameter(10);
 
 
-
     private DoubleParameter oscillationPeriod = new FixedDoubleParameter(100);
 
+
+    public OscillatingWeatherFactory() {
+    }
 
     /**
      * Applies this function to the given argument.
@@ -55,27 +56,25 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
      * @return the function result
      */
     @Override
-    public OscillatingWeatherInitializer apply(FishState state) {
+    public OscillatingWeatherInitializer apply(final FishState state) {
 
         return new OscillatingWeatherInitializer(
-                minTemperature.apply(state.getRandom()),
-                maxTemperature.apply(state.getRandom()),
-                oscillationPeriod.apply(state.getRandom()).intValue(),
+            minTemperature.applyAsDouble(state.getRandom()),
+            maxTemperature.applyAsDouble(state.getRandom()),
+            (int) oscillationPeriod.applyAsDouble(state.getRandom()),
 
-                minWindSpeed.apply(state.getRandom()),
-                maxWindSpeed.apply(state.getRandom()));
+            minWindSpeed.applyAsDouble(state.getRandom()),
+            maxWindSpeed.applyAsDouble(state.getRandom())
+        );
 
 
-    }
-
-    public OscillatingWeatherFactory() {
     }
 
     public DoubleParameter getMinTemperature() {
         return minTemperature;
     }
 
-    public void setMinTemperature(DoubleParameter minTemperature) {
+    public void setMinTemperature(final DoubleParameter minTemperature) {
         this.minTemperature = minTemperature;
     }
 
@@ -83,7 +82,7 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
         return maxTemperature;
     }
 
-    public void setMaxTemperature(DoubleParameter maxTemperature) {
+    public void setMaxTemperature(final DoubleParameter maxTemperature) {
         this.maxTemperature = maxTemperature;
     }
 
@@ -91,7 +90,7 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
         return minWindSpeed;
     }
 
-    public void setMinWindSpeed(DoubleParameter minWindSpeed) {
+    public void setMinWindSpeed(final DoubleParameter minWindSpeed) {
         this.minWindSpeed = minWindSpeed;
     }
 
@@ -99,7 +98,7 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
         return maxWindSpeed;
     }
 
-    public void setMaxWindSpeed(DoubleParameter maxWindSpeed) {
+    public void setMaxWindSpeed(final DoubleParameter maxWindSpeed) {
         this.maxWindSpeed = maxWindSpeed;
     }
 
@@ -108,7 +107,7 @@ public class OscillatingWeatherFactory implements AlgorithmFactory<OscillatingWe
         return oscillationPeriod;
     }
 
-    public void setOscillationPeriod(DoubleParameter oscillationPeriod) {
+    public void setOscillationPeriod(final DoubleParameter oscillationPeriod) {
         this.oscillationPeriod = oscillationPeriod;
     }
 }

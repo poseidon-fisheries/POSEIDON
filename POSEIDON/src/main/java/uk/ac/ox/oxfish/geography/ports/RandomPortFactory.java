@@ -41,9 +41,9 @@ public class RandomPortFactory implements AlgorithmFactory<RandomPortInitializer
      * @return the function result
      */
     @Override
-    public RandomPortInitializer apply(FishState fishState) {
+    public RandomPortInitializer apply(final FishState fishState) {
         return new RandomPortInitializer(
-                numberOfPorts.apply(fishState.getRandom()).intValue() );
+            (int) numberOfPorts.applyAsDouble(fishState.getRandom()));
     }
 
     /**
@@ -60,7 +60,7 @@ public class RandomPortFactory implements AlgorithmFactory<RandomPortInitializer
      *
      * @param numberOfPorts Value to set for property 'ports'.
      */
-    public void setNumberOfPorts(DoubleParameter numberOfPorts) {
+    public void setNumberOfPorts(final DoubleParameter numberOfPorts) {
         this.numberOfPorts = numberOfPorts;
     }
 }

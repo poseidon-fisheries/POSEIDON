@@ -20,26 +20,21 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DailyLogisticDepartingStrategy;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.Season;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
  * Created by carrknight on 4/12/17.
  */
-public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy>
-{
+public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy> {
 
 
     private DoubleParameter intercept = new FixedDoubleParameter(-2.075184);
@@ -56,7 +51,6 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
     private DoubleParameter priceGagGrouper = new FixedDoubleParameter(0.649616);
 
 
-
     /**
      * creates the correct logit
      *
@@ -64,53 +58,51 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      * @return the function result
      */
     @Override
-    public DailyLogisticDepartingStrategy apply(FishState state) {
+    public DailyLogisticDepartingStrategy apply(final FishState state) {
 
-        LinkedHashMap<ObservationExtractor,Double> betas = new LinkedHashMap();
+        final LinkedHashMap<ObservationExtractor, Double> betas = new LinkedHashMap();
 
 
-
-        Double coefficient = intercept.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        Double coefficient = intercept.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new InterceptExtractor(), coefficient);
-        coefficient = spring.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = spring.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new SeasonExtractor(Season.SPRING), coefficient);
-        coefficient = summer.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = summer.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new SeasonExtractor(Season.SUMMER), coefficient);
-        coefficient = winter.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = winter.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new SeasonExtractor(Season.WINTER), coefficient);
-        coefficient = weekend.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = weekend.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new WeekendExtractor(), coefficient);
-        coefficient = windSpeedInKnots.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = windSpeedInKnots.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new WindSpeedExtractor(), coefficient);
 
-        coefficient = realDieselPrice.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
+        coefficient = realDieselPrice.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
             betas.put(new GasPriceExtractor(), coefficient);
 
-        coefficient = priceRedGrouper.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
-            betas.put( new FishPriceExtractor(state.getBiology().getSpecie("RedGrouper")), coefficient);
+        coefficient = priceRedGrouper.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
+            betas.put(new FishPriceExtractor(state.getBiology().getSpecie("RedGrouper")), coefficient);
 
-        coefficient = priceGagGrouper.apply(state.getRandom());
-        if(Double.isFinite(coefficient))
-            betas.put( new FishPriceExtractor(state.getBiology().getSpecie("GagGrouper")), coefficient);
-
-
+        coefficient = priceGagGrouper.applyAsDouble(state.getRandom());
+        if (Double.isFinite(coefficient))
+            betas.put(new FishPriceExtractor(state.getBiology().getSpecie("GagGrouper")), coefficient);
 
 
         return new DailyLogisticDepartingStrategy(
-                new LogisticClassifier(
-                        betas
-                ));
+            new LogisticClassifier(
+                betas
+            ));
 
 
     }
+
     /**
      * Getter for property 'intercept'.
      *
@@ -125,7 +117,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param intercept Value to set for property 'intercept'.
      */
-    public void setIntercept(DoubleParameter intercept) {
+    public void setIntercept(final DoubleParameter intercept) {
         this.intercept = intercept;
     }
 
@@ -143,7 +135,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param spring Value to set for property 'spring'.
      */
-    public void setSpring(DoubleParameter spring) {
+    public void setSpring(final DoubleParameter spring) {
         this.spring = spring;
     }
 
@@ -161,7 +153,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param summer Value to set for property 'summer'.
      */
-    public void setSummer(DoubleParameter summer) {
+    public void setSummer(final DoubleParameter summer) {
         this.summer = summer;
     }
 
@@ -179,7 +171,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param winter Value to set for property 'winter'.
      */
-    public void setWinter(DoubleParameter winter) {
+    public void setWinter(final DoubleParameter winter) {
         this.winter = winter;
     }
 
@@ -197,7 +189,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param weekend Value to set for property 'weekend'.
      */
-    public void setWeekend(DoubleParameter weekend) {
+    public void setWeekend(final DoubleParameter weekend) {
         this.weekend = weekend;
     }
 
@@ -215,7 +207,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param windSpeedInKnots Value to set for property 'windSpeedInKnots'.
      */
-    public void setWindSpeedInKnots(DoubleParameter windSpeedInKnots) {
+    public void setWindSpeedInKnots(final DoubleParameter windSpeedInKnots) {
         this.windSpeedInKnots = windSpeedInKnots;
     }
 
@@ -233,7 +225,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param realDieselPrice Value to set for property 'realDieselPrice'.
      */
-    public void setRealDieselPrice(DoubleParameter realDieselPrice) {
+    public void setRealDieselPrice(final DoubleParameter realDieselPrice) {
         this.realDieselPrice = realDieselPrice;
     }
 
@@ -251,7 +243,7 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param priceRedGrouper Value to set for property 'priceRedGrouper'.
      */
-    public void setPriceRedGrouper(DoubleParameter priceRedGrouper) {
+    public void setPriceRedGrouper(final DoubleParameter priceRedGrouper) {
         this.priceRedGrouper = priceRedGrouper;
     }
 
@@ -269,10 +261,9 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
      *
      * @param priceGagGrouper Value to set for property 'priceGagGrouper'.
      */
-    public void setPriceGagGrouper(DoubleParameter priceGagGrouper) {
+    public void setPriceGagGrouper(final DoubleParameter priceGagGrouper) {
         this.priceGagGrouper = priceGagGrouper;
     }
-
 
 
 }

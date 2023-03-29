@@ -20,16 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.FishPriceExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.WeekendExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.DailyReturnDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.LogitReturnStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -40,12 +37,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Implementation of the WFS logit regression
  * Created by carrknight on 4/19/17.
  */
-public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDecorator>{
+public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDecorator> {
 
     //these are the handline parameters by default
 
 
-    private DoubleParameter maximumDays = new FixedDoubleParameter(6d);
+    private final DoubleParameter maximumDays = new FixedDoubleParameter(6d);
 
     private DoubleParameter intercept = new FixedDoubleParameter(-3.47701);
 
@@ -65,58 +62,51 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      * @return the function result
      */
     @Override
-    public DailyReturnDecorator apply(FishState state) {
+    public DailyReturnDecorator apply(final FishState state) {
         return
-                //notice the chain of decorators
-                //it only checks once a day (daily return decorator)
-                //and it has a strict upper limit to the number of days to return (Maximum Days Strategy)
-                new DailyReturnDecorator(
-                        new MaximumDaysDecorator(
-                                new LogitReturnStrategy
-                                        (
-                                                new LogisticClassifier
-                                                        (
-                                                                //intercept:
-                                                                new Pair<>(
-                                                                        new InterceptExtractor()
-                                                                        ,intercept.apply(state.getRandom())),
-                                                                //price red grouper
-                                                                new Pair<>(
-                                                                        new FishPriceExtractor(
-                                                                                state.getBiology().getSpecie("RedGrouper")
-                                                                        ),
-                                                                        priceRedGrouper.apply(state.getRandom())
-                                                                ),
-                                                                //price gag grouper
-                                                                new Pair<>(
-                                                                        new FishPriceExtractor(
-                                                                                state.getBiology().getSpecie("GagGrouper")
-                                                                        ),
-                                                                        priceGagGrouper.apply(state.getRandom())
-                                                                ),
-                                                                //ratio catch to fish hold
-                                                                new Pair<>(
-                                                                        new ObservationExtractor() {
-                                                                            @Override
-                                                                            public double extract(
-                                                                                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                                                                                return agent.getTotalWeightOfCatchInHold() / agent.getMaximumHold();
-                                                                            }
-                                                                        },
-                                                                        ratioCatchToFishHold.apply(state.getRandom())
-
-
-                                                                ),
-                                                                //weekend dummy
-                                                                new Pair<>(
-                                                                        new WeekendExtractor(),
-                                                                        weekendDummy.apply(state.getRandom())
-                                                                )
-                                                        )
-
-
+            //notice the chain of decorators
+            //it only checks once a day (daily return decorator)
+            //and it has a strict upper limit to the number of days to return (Maximum Days Strategy)
+            new DailyReturnDecorator(
+                new MaximumDaysDecorator(
+                    new LogitReturnStrategy
+                        (
+                            new LogisticClassifier
+                                (
+                                    //intercept:
+                                    new Pair<>(
+                                        new InterceptExtractor()
+                                        , intercept.applyAsDouble(state.getRandom())),
+                                    //price red grouper
+                                    new Pair<>(
+                                        new FishPriceExtractor(
+                                            state.getBiology().getSpecie("RedGrouper")
                                         ),
-                                maximumDays.apply(state.getRandom()).intValue()));
+                                        priceRedGrouper.applyAsDouble(state.getRandom())
+                                    ),
+                                    //price gag grouper
+                                    new Pair<>(
+                                        new FishPriceExtractor(
+                                            state.getBiology().getSpecie("GagGrouper")
+                                        ),
+                                        priceGagGrouper.applyAsDouble(state.getRandom())
+                                    ),
+                                    //ratio catch to fish hold
+                                    new Pair<>(
+                                        (tile, timeOfObservation, agent, model) -> agent.getTotalWeightOfCatchInHold() / agent.getMaximumHold(),
+                                        ratioCatchToFishHold.applyAsDouble(state.getRandom())
+                                    ),
+                                    //weekend dummy
+                                    new Pair<>(
+                                        new WeekendExtractor(),
+                                        weekendDummy.applyAsDouble(state.getRandom())
+                                    )
+                                )
+
+
+                        ),
+                    (int) maximumDays.applyAsDouble(state.getRandom())
+                ));
     }
 
     /**
@@ -133,7 +123,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      *
      * @param intercept Value to set for property 'intercept'.
      */
-    public void setIntercept(DoubleParameter intercept) {
+    public void setIntercept(final DoubleParameter intercept) {
         this.intercept = intercept;
     }
 
@@ -151,7 +141,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      *
      * @param priceRedGrouper Value to set for property 'priceRedGrouper'.
      */
-    public void setPriceRedGrouper(DoubleParameter priceRedGrouper) {
+    public void setPriceRedGrouper(final DoubleParameter priceRedGrouper) {
         this.priceRedGrouper = priceRedGrouper;
     }
 
@@ -169,7 +159,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      *
      * @param priceGagGrouper Value to set for property 'priceGagGrouper'.
      */
-    public void setPriceGagGrouper(DoubleParameter priceGagGrouper) {
+    public void setPriceGagGrouper(final DoubleParameter priceGagGrouper) {
         this.priceGagGrouper = priceGagGrouper;
     }
 
@@ -187,7 +177,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      *
      * @param ratioCatchToFishHold Value to set for property 'ratioCatchToFishHold'.
      */
-    public void setRatioCatchToFishHold(DoubleParameter ratioCatchToFishHold) {
+    public void setRatioCatchToFishHold(final DoubleParameter ratioCatchToFishHold) {
         this.ratioCatchToFishHold = ratioCatchToFishHold;
     }
 
@@ -205,7 +195,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      *
      * @param weekendDummy Value to set for property 'weekendDummy'.
      */
-    public void setWeekendDummy(DoubleParameter weekendDummy) {
+    public void setWeekendDummy(final DoubleParameter weekendDummy) {
         this.weekendDummy = weekendDummy;
     }
 }

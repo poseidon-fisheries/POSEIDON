@@ -22,20 +22,16 @@ package uk.ac.ox.oxfish.utility.bandit.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
-import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Function;
 
 /**
  * Created by carrknight on 11/11/16.
  */
 public class SoftmaxBanditFactory implements
-        AlgorithmFactory<BanditSupplier> {
+    AlgorithmFactory<BanditSupplier> {
 
 
     private DoubleParameter initialTemperature = new FixedDoubleParameter(5d);
@@ -55,9 +51,9 @@ public class SoftmaxBanditFactory implements
             @Override
             public SoftmaxBanditAlgorithm apply(BanditAverage banditAverage) {
                 return new SoftmaxBanditAlgorithm(
-                        banditAverage,
-                        initialTemperature.apply(state.getRandom()),
-                        temperatureDecay.apply(state.getRandom())
+                    banditAverage,
+                    initialTemperature.applyAsDouble(state.getRandom()),
+                    temperatureDecay.applyAsDouble(state.getRandom())
                 );
             }
         };

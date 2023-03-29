@@ -15,9 +15,11 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
 
 
     @Override
-    public MirroredPyramidsAllocator apply(FishState state) {
-        return new MirroredPyramidsAllocator(delegate.apply(state),
-                noiseLevel.apply(state.getRandom()));
+    public MirroredPyramidsAllocator apply(final FishState state) {
+        return new MirroredPyramidsAllocator(
+            delegate.apply(state),
+            noiseLevel.applyAsDouble(state.getRandom())
+        );
     }
 
 
@@ -25,7 +27,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return noiseLevel;
     }
 
-    public void setNoiseLevel(DoubleParameter noiseLevel) {
+    public void setNoiseLevel(final DoubleParameter noiseLevel) {
         this.noiseLevel = noiseLevel;
     }
 
@@ -33,7 +35,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return delegate.getPeakX();
     }
 
-    public void setPeakX(DoubleParameter peakX) {
+    public void setPeakX(final DoubleParameter peakX) {
         delegate.setPeakX(peakX);
     }
 
@@ -41,7 +43,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return delegate.getPeakY();
     }
 
-    public void setPeakY(DoubleParameter peakY) {
+    public void setPeakY(final DoubleParameter peakY) {
         delegate.setPeakY(peakY);
     }
 
@@ -49,7 +51,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return delegate.getSmoothingValue();
     }
 
-    public void setSmoothingValue(DoubleParameter smoothingValue) {
+    public void setSmoothingValue(final DoubleParameter smoothingValue) {
         delegate.setSmoothingValue(smoothingValue);
     }
 
@@ -57,7 +59,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return delegate.getMaxSpread();
     }
 
-    public void setMaxSpread(int maxSpread) {
+    public void setMaxSpread(final int maxSpread) {
         delegate.setMaxSpread(maxSpread);
     }
 
@@ -65,7 +67,7 @@ public class MirroredPyramidsAllocatorFactory implements AlgorithmFactory<Mirror
         return delegate.getPeakBiomass();
     }
 
-    public void setPeakBiomass(DoubleParameter peakBiomass) {
+    public void setPeakBiomass(final DoubleParameter peakBiomass) {
         delegate.setPeakBiomass(peakBiomass);
     }
 }

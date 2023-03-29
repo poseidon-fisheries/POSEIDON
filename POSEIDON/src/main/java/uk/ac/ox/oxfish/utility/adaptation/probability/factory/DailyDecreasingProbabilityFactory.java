@@ -49,10 +49,10 @@ public class DailyDecreasingProbabilityFactory implements AlgorithmFactory<Daily
      */
     @Override
     public DailyDecreasingProbability apply(FishState state) {
-        return new DailyDecreasingProbability(explorationProbability.apply(state.getRandom()),
-                                              imitationProbability.apply(state.getRandom()),
-                                              dailyDecreaseMultiplier.apply(state.getRandom()),
-                                              explorationProbabilityMinimum.apply(state.getRandom()));
+        return new DailyDecreasingProbability(explorationProbability.applyAsDouble(state.getRandom()),
+                                              imitationProbability.applyAsDouble(state.getRandom()),
+                                              dailyDecreaseMultiplier.applyAsDouble(state.getRandom()),
+                                              explorationProbabilityMinimum.applyAsDouble(state.getRandom()));
     }
 
 

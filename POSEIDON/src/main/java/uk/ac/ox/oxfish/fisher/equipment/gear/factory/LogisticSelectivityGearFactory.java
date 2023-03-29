@@ -39,7 +39,6 @@ import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
 
 
-
     private boolean rounding = true;
     /**
      * the selectivity parameter A for the logistic
@@ -80,11 +79,12 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
     }
 
     public LogisticSelectivityGearFactory(
-            Double selectivityAParameter, Double selectivityBParameter,
-            Double retentionInflection, Double retentionSlope,
-            Double retentionAsymptote,
-            Double litersOfGasConsumedPerHour,
-            Double averageCatchability) {
+        final Double selectivityAParameter, final Double selectivityBParameter,
+        final Double retentionInflection, final Double retentionSlope,
+        final Double retentionAsymptote,
+        final Double litersOfGasConsumedPerHour,
+        final Double averageCatchability
+    ) {
         this.selectivityAParameter = new FixedDoubleParameter(selectivityAParameter);
         this.selectivityBParameter = new FixedDoubleParameter(selectivityBParameter);
         this.retentionInflection = new FixedDoubleParameter(retentionInflection);
@@ -95,9 +95,10 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
     }
 
     public LogisticSelectivityGearFactory(
-            Double selectivityAParameter, Double selectivityBParameter,
-            Double litersOfGasConsumedPerHour,
-            Double averageCatchability) {
+        final Double selectivityAParameter, final Double selectivityBParameter,
+        final Double litersOfGasConsumedPerHour,
+        final Double averageCatchability
+    ) {
         this.selectivityAParameter = new FixedDoubleParameter(selectivityAParameter);
         this.selectivityBParameter = new FixedDoubleParameter(selectivityBParameter);
         this.retentionInflection = null;
@@ -114,33 +115,37 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      * @return the function result
      */
     @Override
-    public HomogeneousAbundanceGear apply(FishState fishState) {
-        MersenneTwisterFast random = fishState.getRandom();
-        if(retentionAsymptote != null &&
-                !(retentionAsymptote instanceof NullParameter) &&
-                retentionSlope != null &&
-                !(retentionSlope instanceof NullParameter) &&
-                retentionInflection != null &&
-                !(retentionInflection instanceof NullParameter)
-                ) {
-            return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                                new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                                                new LogisticAbundanceFilter(selectivityAParameter.apply(random),
-                                                                            selectivityBParameter.apply(random),
-                                                                            true, rounding, logBaseTen),
-                                                new RetentionAbundanceFilter(true,
-                                                                             retentionInflection.apply(random),
-                                                                             retentionSlope.apply(random),
-                                                                             retentionAsymptote.apply(random), rounding)
+    public HomogeneousAbundanceGear apply(final FishState fishState) {
+        final MersenneTwisterFast random = fishState.getRandom();
+        if (retentionAsymptote != null &&
+            !(retentionAsymptote instanceof NullParameter) &&
+            retentionSlope != null &&
+            !(retentionSlope instanceof NullParameter) &&
+            retentionInflection != null &&
+            !(retentionInflection instanceof NullParameter)
+        ) {
+            return new SelectivityAbundanceGear(
+                litersOfGasConsumedPerHour.applyAsDouble(random),
+                new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
+                new LogisticAbundanceFilter(selectivityAParameter.applyAsDouble(random),
+                    selectivityBParameter.applyAsDouble(random),
+                    true, rounding, logBaseTen
+                ),
+                new RetentionAbundanceFilter(true,
+                    retentionInflection.applyAsDouble(random),
+                    retentionSlope.applyAsDouble(random),
+                    retentionAsymptote.applyAsDouble(random), rounding
+                )
             );
-        }
-        else
-        {
-            return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                                new FixedProportionFilter(averageCatchability.apply(random), rounding),
-                                                new LogisticAbundanceFilter(selectivityAParameter.apply(random),
-                                                                            selectivityBParameter.apply(random),
-                                                                            true, rounding, logBaseTen));
+        } else {
+            return new SelectivityAbundanceGear(
+                litersOfGasConsumedPerHour.applyAsDouble(random),
+                new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
+                new LogisticAbundanceFilter(selectivityAParameter.applyAsDouble(random),
+                    selectivityBParameter.applyAsDouble(random),
+                    true, rounding, logBaseTen
+                )
+            );
         }
     }
 
@@ -159,7 +164,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param selectivityAParameter Value to set for property 'selectivityAParameter'.
      */
-    public void setSelectivityAParameter(DoubleParameter selectivityAParameter) {
+    public void setSelectivityAParameter(final DoubleParameter selectivityAParameter) {
         this.selectivityAParameter = selectivityAParameter;
     }
 
@@ -177,7 +182,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param selectivityBParameter Value to set for property 'selectivityBParameter'.
      */
-    public void setSelectivityBParameter(DoubleParameter selectivityBParameter) {
+    public void setSelectivityBParameter(final DoubleParameter selectivityBParameter) {
         this.selectivityBParameter = selectivityBParameter;
     }
 
@@ -195,7 +200,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionInflection Value to set for property 'retentionInflection'.
      */
-    public void setRetentionInflection(DoubleParameter retentionInflection) {
+    public void setRetentionInflection(final DoubleParameter retentionInflection) {
         this.retentionInflection = retentionInflection;
     }
 
@@ -213,7 +218,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionSlope Value to set for property 'retentionSlope'.
      */
-    public void setRetentionSlope(DoubleParameter retentionSlope) {
+    public void setRetentionSlope(final DoubleParameter retentionSlope) {
         this.retentionSlope = retentionSlope;
     }
 
@@ -231,7 +236,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param retentionAsymptote Value to set for property 'retentionAsymptote'.
      */
-    public void setRetentionAsymptote(DoubleParameter retentionAsymptote) {
+    public void setRetentionAsymptote(final DoubleParameter retentionAsymptote) {
         this.retentionAsymptote = retentionAsymptote;
     }
 
@@ -250,7 +255,8 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      * @param litersOfGasConsumedPerHour Value to set for property 'litersOfGasConsumedPerHour'.
      */
     public void setLitersOfGasConsumedPerHour(
-            DoubleParameter litersOfGasConsumedPerHour) {
+        final DoubleParameter litersOfGasConsumedPerHour
+    ) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
     }
 
@@ -268,7 +274,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param averageCatchability Value to set for property 'averageCatchability'.
      */
-    public void setAverageCatchability(DoubleParameter averageCatchability) {
+    public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
 
@@ -287,7 +293,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      *
      * @param rounding Value to set for property 'rounding'.
      */
-    public void setRounding(boolean rounding) {
+    public void setRounding(final boolean rounding) {
         this.rounding = rounding;
     }
 
@@ -295,7 +301,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
         return logBaseTen;
     }
 
-    public void setLogBaseTen(boolean logBaseTen) {
+    public void setLogBaseTen(final boolean logBaseTen) {
         this.logBaseTen = logBaseTen;
     }
 }

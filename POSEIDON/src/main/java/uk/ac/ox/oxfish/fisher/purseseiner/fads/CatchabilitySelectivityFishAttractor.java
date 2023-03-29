@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toMap;
  * proportion (catchability) of the vulnerable population (i.e. the population that can be selected in a cell).
  * Each FAD also have a carrying capacity so that they cannot get any more full than a given amount
  */
-public class CatchabilitySelectivityFishAttractor implements FishAttractor<AbundanceLocalBiology,AbundanceFad>, FadRemovalListener{
+public class CatchabilitySelectivityFishAttractor implements FishAttractor<AbundanceLocalBiology, AbundanceFad>, FadRemovalListener {
 
 
     /**
@@ -53,7 +53,7 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
     /**
      * given a fad, returns its current catchability per species
      */
-    private final Function<AbstractFad,double[]> catchabilityPerSpeciesSupplier;
+    private final Function<AbstractFad, double[]> catchabilityPerSpeciesSupplier;
 
 
     /**
@@ -65,21 +65,22 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
     /**
      * if the fad has been attracting fish (potentially, anyway) for these many days, it stops attracting any more (but doesn't lose them, yet!)
      */
-    private int maximumAttractionDays;
+    private final int maximumAttractionDays;
 
     private final FishState model;
 
-    private final HashMap<AbstractFad,double[]> carryingCapacityPerFad = new HashMap<>();
+    private final HashMap<AbstractFad, double[]> carryingCapacityPerFad = new HashMap<>();
 
     private final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
 
     public CatchabilitySelectivityFishAttractor(
-            DoubleParameter[] carryingCapacitiesGenerator,
-            Function<AbstractFad,double[]> catchabilityPerSpeciesSupplier,
-            int daysInWaterBeforeAttraction,
-            int maximumAttractionDays,
-            FishState model,
-            Map<Species, NonMutatingArrayFilter> globalSelectivityCurves) {
+        final DoubleParameter[] carryingCapacitiesGenerator,
+        final Function<AbstractFad, double[]> catchabilityPerSpeciesSupplier,
+        final int daysInWaterBeforeAttraction,
+        final int maximumAttractionDays,
+        final FishState model,
+        final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
+    ) {
         this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
         this.catchabilityPerSpeciesSupplier = catchabilityPerSpeciesSupplier;
 
@@ -90,12 +91,13 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
     }
 
     public CatchabilitySelectivityFishAttractor(
-            DoubleParameter[] carryingCapacitiesGenerator,
-            double[] catchabilityPerSpecies,
-            int daysInWaterBeforeAttraction,
-            int maximumAttractionDays,
-            FishState model,
-            Map<Species, NonMutatingArrayFilter> globalSelectivityCurves) {
+        final DoubleParameter[] carryingCapacitiesGenerator,
+        final double[] catchabilityPerSpecies,
+        final int daysInWaterBeforeAttraction,
+        final int maximumAttractionDays,
+        final FishState model,
+        final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
+    ) {
         this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
         catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
 
@@ -108,20 +110,21 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
     @Nullable
     @Override
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
-            AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
+        final AbundanceLocalBiology seaTileBiology, final AbundanceFad fad
+    ) {
         //if it's too early or late don't bother
-        if(
-                model.getDay()- fad.getStepDeployed()/model.getStepsPerDay()<daysInWaterBeforeAttraction ||
-                        !fad.isActive() ||
-                        model.getDay()- fad.getStepDeployed()/model.getStepsPerDay()>daysInWaterBeforeAttraction +  maximumAttractionDays
+        if (
+            model.getDay() - fad.getStepDeployed() / model.getStepsPerDay() < daysInWaterBeforeAttraction ||
+                !fad.isActive() ||
+                model.getDay() - fad.getStepDeployed() / model.getStepsPerDay() > daysInWaterBeforeAttraction + maximumAttractionDays
         )
             return null;
-        SeaTile location = fad.getLocation();
-        LocalBiology biology = location.getBiology();
-        if(! (biology instanceof AbundanceLocalBiology))
+        final SeaTile location = fad.getLocation();
+        final LocalBiology biology = location.getBiology();
+        if (!(biology instanceof AbundanceLocalBiology))
             return null;
 
-        Map<Species, double[][]> abundanceHere = ((AbundanceLocalBiology) biology).getAbundance();
+        final Map<Species, double[][]> abundanceHere = ((AbundanceLocalBiology) biology).getAbundance();
         final Map<Species, double[][]> caughtHere =
             abundanceHere.entrySet().stream().collect(toMap(
                 Map.Entry::getKey,
@@ -130,66 +133,65 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
                     .toArray(double[][]::new)
             ));
         //get the carrying capacities or generate them if they don't exist
-        double[] carryingCapacityHere = getCarryingCapacities(fad);
-        for (Species species : model.getSpecies()) {
-            NonMutatingArrayFilter selectivity = globalSelectivityCurves.get(species);
+        final double[] carryingCapacityHere = getCarryingCapacities(fad);
+        for (final Species species : model.getSpecies()) {
+            final NonMutatingArrayFilter selectivity = globalSelectivityCurves.get(species);
 
             //set up catches
-            double[][] abundanceInTile = abundanceHere.get(species);
-            double[][] abundanceCaught = caughtHere.get(species);
-            caughtHere.put(species,abundanceCaught);
+            final double[][] abundanceInTile = abundanceHere.get(species);
+            final double[][] abundanceCaught = caughtHere.get(species);
+            caughtHere.put(species, abundanceCaught);
 
             //if you are full, ignore it!
-            if(carryingCapacityHere[species.getIndex()]<=fad.getBiomass()[species.getIndex()])
+            if (carryingCapacityHere[species.getIndex()] <= fad.getBiomass()[species.getIndex()])
                 continue;
 
             //start filling them up!
-            double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);
+            final double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);
             for (int subdivision = 0; subdivision < abundanceInTile.length; subdivision++) {
                 for (int bin = 0; bin < abundanceInTile[subdivision].length; bin++) {
                     abundanceCaught[subdivision][bin] = Math.max(
-                            catchabilityHere[species.getIndex()] *
-                            selectivity.getFilterValue(subdivision,bin) *
+                        catchabilityHere[species.getIndex()] *
+                            selectivity.getFilterValue(subdivision, bin) *
                             abundanceInTile[subdivision][bin],
-                            0);
+                        0
+                    );
 
                 }
             }
         }
-        AbundanceLocalBiology toReturn = new AbundanceLocalBiology(caughtHere);
-        return new WeightedObject<>(toReturn,toReturn.getTotalBiomass());
+        final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(caughtHere);
+        return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
 
 
     }
 
     @Override
-    public void onFadRemoval(AbstractFad fad) {
+    public void onFadRemoval(final AbstractFad fad) {
         carryingCapacityPerFad.remove(fad);
     }
 
-    public double[] getCarryingCapacities(AbundanceFad fad) {
+    public double[] getCarryingCapacities(final AbundanceFad fad) {
         double[] toReturn = carryingCapacityPerFad.get(fad);
-        if(toReturn==null)
-        {
-            toReturn = computeFadAttractions(fad,model);
+        if (toReturn == null) {
+            toReturn = computeFadAttractions(fad, model);
             assert carryingCapacityPerFad.get(fad) == toReturn;
         }
         return toReturn;
     }
 
-    private double[] computeFadAttractions(AbundanceFad fad,FishState model) {
+    private double[] computeFadAttractions(final AbundanceFad fad, final FishState model) {
         assert fad.getTotalCarryingCapacity() > 0;
         assert !carryingCapacityPerFad.containsKey(fad);
 
         //compute carrying capacity for fad
-        double[] carryingCapacityHere = new double[carryingCapacitiesGenerator.length];
+        final double[] carryingCapacityHere = new double[carryingCapacitiesGenerator.length];
         for (int i = 0; i < carryingCapacitiesGenerator.length; i++) {
-            carryingCapacityHere[i] = carryingCapacitiesGenerator[i].apply(model.getRandom());
+            carryingCapacityHere[i] = carryingCapacitiesGenerator[i].applyAsDouble(model.getRandom());
         }
         carryingCapacityPerFad.put(fad, carryingCapacityHere);
         return carryingCapacityHere;
     }
-
 
 
 }

@@ -5,7 +5,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -17,9 +16,9 @@ import java.util.function.Predicate;
  */
 public class SPRAgentBuilder implements CatchAtLengthFactory {
 
-    private  String surveyTag = "spr_agent";
+    private String surveyTag = "spr_agent";
 
-    private  String speciesName = "Species 0";
+    private String speciesName = "Species 0";
 
     /**
      * if more formulas come up we can turn this into a full strategy
@@ -27,50 +26,52 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
     private boolean useTNCFormula = true;
 
 
-    private  DoubleParameter probabilityOfSamplingEachBoat =
-            new FixedDoubleParameter(0.33);
+    private DoubleParameter probabilityOfSamplingEachBoat =
+        new FixedDoubleParameter(0.33);
 
     private DoubleParameter assumedLinf = new FixedDoubleParameter(86);
 
-    private  DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437) ;
+    private DoubleParameter assumedKParameter = new FixedDoubleParameter(0.4438437);
 
-    private  DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984) ;
+    private DoubleParameter assumedNaturalMortality = new FixedDoubleParameter(0.3775984);
 
-    private  DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100) ;
+    private DoubleParameter simulatedMaxAge = new FixedDoubleParameter(100);
 
     //these aren't "real" virgin recruits, this is just the number of simulated ones
     //used by Peter in his formula
-    private  DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000) ;
+    private DoubleParameter simulatedVirginRecruits = new FixedDoubleParameter(1000);
 
-    private  DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
+    private DoubleParameter assumedLengthBinCm = new FixedDoubleParameter(5);
 
-    private  DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
+    private DoubleParameter assumedVarA = new FixedDoubleParameter(0.00853);
 
-    private  DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
+    private DoubleParameter assumedVarB = new FixedDoubleParameter(3.137);
 
-    private  DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
+    private DoubleParameter assumedLengthAtMaturity = new FixedDoubleParameter(50);
 
     /**
      * if using TNC formula, shall we remove the smallest percentile of catches from the SPR?
      * Both in real world and in the simulated one, it tends to improve numerical stability by quite a lot
      */
-        private boolean removeSmallestPercentile = false;
+    private boolean removeSmallestPercentile = false;
 
 
     public SPRAgentBuilder() {
     }
 
-    public SPRAgentBuilder(String surveyTag, String speciesName,
-                           double probabilityOfSamplingEachBoat,
-                           double assumedLinf,
-                           double assumedKParameter,
-                           double assumedNaturalMortality,
-                           int simulatedMaxAge,
-                           double simulatedVirginRecruits,
-                           double assumedLengthBinCm,
-                           double assumedVarA,
-                           double assumedVarB,
-                           double assumedLengthAtMaturity) {
+    public SPRAgentBuilder(
+        final String surveyTag, final String speciesName,
+        final double probabilityOfSamplingEachBoat,
+        final double assumedLinf,
+        final double assumedKParameter,
+        final double assumedNaturalMortality,
+        final int simulatedMaxAge,
+        final double simulatedVirginRecruits,
+        final double assumedLengthBinCm,
+        final double assumedVarA,
+        final double assumedVarB,
+        final double assumedLengthAtMaturity
+    ) {
         this.surveyTag = surveyTag;
         this.speciesName = speciesName;
         this.probabilityOfSamplingEachBoat = new FixedDoubleParameter(probabilityOfSamplingEachBoat);
@@ -86,35 +87,36 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
     }
 
 
-
-
     @Override
-    public SPRAgent apply(FishState fishState) {
+    public SPRAgent apply(final FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
-        final double samplingProbability = probabilityOfSamplingEachBoat.apply(random);
+        final double samplingProbability = probabilityOfSamplingEachBoat.applyAsDouble(random);
 
-        Preconditions.checkArgument(fishState.getBiology().getSpecie(speciesName.trim())!=null,
-                "There is no species " + speciesName);
-        return new SPRAgent(surveyTag,
-                    fishState.getBiology().getSpecie(speciesName),
-                    new Predicate<Fisher>() {
-                        @Override
-                        public boolean test(Fisher fisher) {
-                            return random.nextDouble()<samplingProbability;
-                        }
-                    },
-                    assumedLinf.apply(random),
-                    assumedKParameter.apply(random),
-                    assumedNaturalMortality.apply(random),
-                    simulatedMaxAge.apply(random).intValue(),
-                    simulatedVirginRecruits.apply(random),
-                    assumedLengthBinCm.apply(random),
-                    assumedVarA.apply(random),
-                    assumedVarB.apply(random),
-                    assumedLengthAtMaturity.apply(random),
-                    useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
+        Preconditions.checkArgument(
+            fishState.getBiology().getSpecie(speciesName.trim()) != null,
+            "There is no species " + speciesName
+        );
+        return new SPRAgent(
+            surveyTag,
+            fishState.getBiology().getSpecie(speciesName),
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(final Fisher fisher) {
+                    return random.nextDouble() < samplingProbability;
+                }
+            },
+            assumedLinf.applyAsDouble(random),
+            assumedKParameter.applyAsDouble(random),
+            assumedNaturalMortality.applyAsDouble(random),
+            (int) simulatedMaxAge.applyAsDouble(random),
+            simulatedVirginRecruits.applyAsDouble(random),
+            assumedLengthBinCm.applyAsDouble(random),
+            assumedVarA.applyAsDouble(random),
+            assumedVarB.applyAsDouble(random),
+            assumedLengthAtMaturity.applyAsDouble(random),
+            useTNCFormula ? new SPR(removeSmallestPercentile) : new LbSPRFormula()
 
-                );
+        );
 
     }
 
@@ -122,7 +124,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return surveyTag;
     }
 
-    public void setSurveyTag(String surveyTag) {
+    public void setSurveyTag(final String surveyTag) {
         this.surveyTag = surveyTag;
     }
 
@@ -130,7 +132,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return speciesName;
     }
 
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -138,7 +140,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return probabilityOfSamplingEachBoat;
     }
 
-    public void setProbabilityOfSamplingEachBoat(DoubleParameter probabilityOfSamplingEachBoat) {
+    public void setProbabilityOfSamplingEachBoat(final DoubleParameter probabilityOfSamplingEachBoat) {
         this.probabilityOfSamplingEachBoat = probabilityOfSamplingEachBoat;
     }
 
@@ -146,7 +148,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedLinf;
     }
 
-    public void setAssumedLinf(DoubleParameter assumedLinf) {
+    public void setAssumedLinf(final DoubleParameter assumedLinf) {
         this.assumedLinf = assumedLinf;
     }
 
@@ -154,7 +156,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedKParameter;
     }
 
-    public void setAssumedKParameter(DoubleParameter assumedKParameter) {
+    public void setAssumedKParameter(final DoubleParameter assumedKParameter) {
         this.assumedKParameter = assumedKParameter;
     }
 
@@ -162,7 +164,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedNaturalMortality;
     }
 
-    public void setAssumedNaturalMortality(DoubleParameter assumedNaturalMortality) {
+    public void setAssumedNaturalMortality(final DoubleParameter assumedNaturalMortality) {
         this.assumedNaturalMortality = assumedNaturalMortality;
     }
 
@@ -170,7 +172,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return simulatedMaxAge;
     }
 
-    public void setSimulatedMaxAge(DoubleParameter simulatedMaxAge) {
+    public void setSimulatedMaxAge(final DoubleParameter simulatedMaxAge) {
         this.simulatedMaxAge = simulatedMaxAge;
     }
 
@@ -178,7 +180,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return simulatedVirginRecruits;
     }
 
-    public void setSimulatedVirginRecruits(DoubleParameter simulatedVirginRecruits) {
+    public void setSimulatedVirginRecruits(final DoubleParameter simulatedVirginRecruits) {
         this.simulatedVirginRecruits = simulatedVirginRecruits;
     }
 
@@ -186,7 +188,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedLengthBinCm;
     }
 
-    public void setAssumedLengthBinCm(DoubleParameter assumedLengthBinCm) {
+    public void setAssumedLengthBinCm(final DoubleParameter assumedLengthBinCm) {
         this.assumedLengthBinCm = assumedLengthBinCm;
     }
 
@@ -194,7 +196,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedVarA;
     }
 
-    public void setAssumedVarA(DoubleParameter assumedVarA) {
+    public void setAssumedVarA(final DoubleParameter assumedVarA) {
         this.assumedVarA = assumedVarA;
     }
 
@@ -202,7 +204,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedVarB;
     }
 
-    public void setAssumedVarB(DoubleParameter assumedVarB) {
+    public void setAssumedVarB(final DoubleParameter assumedVarB) {
         this.assumedVarB = assumedVarB;
     }
 
@@ -210,7 +212,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return assumedLengthAtMaturity;
     }
 
-    public void setAssumedLengthAtMaturity(DoubleParameter assumedLengthAtMaturity) {
+    public void setAssumedLengthAtMaturity(final DoubleParameter assumedLengthAtMaturity) {
         this.assumedLengthAtMaturity = assumedLengthAtMaturity;
     }
 
@@ -218,7 +220,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return useTNCFormula;
     }
 
-    public void setUseTNCFormula(boolean useTNCFormula) {
+    public void setUseTNCFormula(final boolean useTNCFormula) {
         this.useTNCFormula = useTNCFormula;
     }
 
@@ -226,7 +228,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return removeSmallestPercentile;
     }
 
-    public void setRemoveSmallestPercentile(boolean removeSmallestPercentile) {
+    public void setRemoveSmallestPercentile(final boolean removeSmallestPercentile) {
         this.removeSmallestPercentile = removeSmallestPercentile;
     }
 }

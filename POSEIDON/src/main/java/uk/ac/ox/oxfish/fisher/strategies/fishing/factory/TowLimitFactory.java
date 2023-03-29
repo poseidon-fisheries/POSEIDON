@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.TowLimitFishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -40,7 +39,6 @@ public class TowLimitFactory implements AlgorithmFactory<MaximumDaysDecorator> {
     private DoubleParameter maxDaysOut = new FixedDoubleParameter(5);
 
 
-
     /**
      * Applies this function to the given argument.
      *
@@ -48,12 +46,12 @@ public class TowLimitFactory implements AlgorithmFactory<MaximumDaysDecorator> {
      * @return the function result
      */
     @Override
-    public MaximumDaysDecorator apply(FishState state) {
+    public MaximumDaysDecorator apply(final FishState state) {
         return
-                new MaximumDaysDecorator(
-                new TowLimitFishingStrategy(towLimits.apply(state.getRandom()).intValue()),
-                maxDaysOut.apply(state.getRandom()).doubleValue()
-                );
+            new MaximumDaysDecorator(
+                new TowLimitFishingStrategy((int) towLimits.applyAsDouble(state.getRandom())),
+                maxDaysOut.applyAsDouble(state.getRandom())
+            );
     }
 
     /**
@@ -70,7 +68,7 @@ public class TowLimitFactory implements AlgorithmFactory<MaximumDaysDecorator> {
      *
      * @param towLimits Value to set for property 'towLimits'.
      */
-    public void setTowLimits(DoubleParameter towLimits) {
+    public void setTowLimits(final DoubleParameter towLimits) {
         this.towLimits = towLimits;
     }
 
@@ -88,7 +86,7 @@ public class TowLimitFactory implements AlgorithmFactory<MaximumDaysDecorator> {
      *
      * @param maxDaysOut Value to set for property 'maxDaysOut'.
      */
-    public void setMaxDaysOut(DoubleParameter maxDaysOut) {
+    public void setMaxDaysOut(final DoubleParameter maxDaysOut) {
         this.maxDaysOut = maxDaysOut;
     }
 }

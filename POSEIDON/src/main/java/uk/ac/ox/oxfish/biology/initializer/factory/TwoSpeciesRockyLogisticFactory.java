@@ -35,24 +35,21 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class TwoSpeciesRockyLogisticFactory implements AlgorithmFactory<TwoSpeciesRockyLogisticInitializer> {
 
 
-
-
     private DoubleParameter sandyCarryingCapacity = new FixedDoubleParameter(2000);
 
     private DoubleParameter rockyCarryingCapacity = new FixedDoubleParameter(10000);
 
 
-
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
-    private DoubleParameter percentageLimitOnDailyMovement =new FixedDoubleParameter(0.01);
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
 
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.001);
-
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
     /**
      * Applies this function to the given argument.
@@ -61,21 +58,22 @@ public class TwoSpeciesRockyLogisticFactory implements AlgorithmFactory<TwoSpeci
      * @return the function result
      */
     @Override
-    public TwoSpeciesRockyLogisticInitializer apply(FishState state) {
-        MersenneTwisterFast random = state.getRandom();
-        return new TwoSpeciesRockyLogisticInitializer(rockyCarryingCapacity,
-                                                      sandyCarryingCapacity,
-                                                      percentageLimitOnDailyMovement.apply(random),
-                                                      differentialPercentageToMove.apply(random),
-                                                      grower.apply(state));
+    public TwoSpeciesRockyLogisticInitializer apply(final FishState state) {
+        final MersenneTwisterFast random = state.getRandom();
+        return new TwoSpeciesRockyLogisticInitializer(
+            rockyCarryingCapacity,
+            sandyCarryingCapacity,
+            percentageLimitOnDailyMovement.applyAsDouble(random),
+            differentialPercentageToMove.applyAsDouble(random),
+            grower.apply(state)
+        );
     }
-
 
     public DoubleParameter getSandyCarryingCapacity() {
         return sandyCarryingCapacity;
     }
 
-    public void setSandyCarryingCapacity(DoubleParameter sandyCarryingCapacity) {
+    public void setSandyCarryingCapacity(final DoubleParameter sandyCarryingCapacity) {
         this.sandyCarryingCapacity = sandyCarryingCapacity;
     }
 
@@ -83,11 +81,9 @@ public class TwoSpeciesRockyLogisticFactory implements AlgorithmFactory<TwoSpeci
         return rockyCarryingCapacity;
     }
 
-    public void setRockyCarryingCapacity(DoubleParameter rockyCarryingCapacity) {
+    public void setRockyCarryingCapacity(final DoubleParameter rockyCarryingCapacity) {
         this.rockyCarryingCapacity = rockyCarryingCapacity;
     }
-
-    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
     /**
      * Getter for property 'grower'.
@@ -104,15 +100,18 @@ public class TwoSpeciesRockyLogisticFactory implements AlgorithmFactory<TwoSpeci
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        final AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
+
     public DoubleParameter getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;
     }
 
     public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
+        final DoubleParameter percentageLimitOnDailyMovement
+    ) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
@@ -121,11 +120,10 @@ public class TwoSpeciesRockyLogisticFactory implements AlgorithmFactory<TwoSpeci
     }
 
     public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
+        final DoubleParameter differentialPercentageToMove
+    ) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
-
-
 
 
 }

@@ -42,43 +42,46 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
     public AdditionalStartable apply(FishState fishState) {
 
         final Map<String, Actuator<FishState, Double>> effortActuators = LBSPREffortPolicyFactory.EFFORT_ACTUATORS;
-        Preconditions.checkArgument(effortActuators.containsKey(effortDefinition),
-                "The valid effort actuators are " + effortActuators.keySet());
+        Preconditions.checkArgument(
+            effortActuators.containsKey(effortDefinition),
+            "The valid effort actuators are " + effortActuators.keySet()
+        );
 
 
         return new AdditionalStartable() {
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                LTargetEffortPolicy ltargetE = new LTargetEffortPolicy(
-                                        meanLengthColumnName,
-                                        proportionAverageToTarget.apply(model.getRandom()),
-                                        yearsBackToAverage.apply(fishState.getRandom()).intValue(),
-                                        effortActuators.get(effortDefinition),
-                                        blockEntryWhenSeasonIsNotFull,
-                                        updateEffortPeriodInYears.apply(fishState.getRandom()).intValue());
-                                ltargetE.start(model);
-                                ltargetE.step(model);
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            LTargetEffortPolicy ltargetE = new LTargetEffortPolicy(
+                                meanLengthColumnName,
+                                proportionAverageToTarget.applyAsDouble(model.getRandom()),
+                                (int) yearsBackToAverage.applyAsDouble(fishState.getRandom()),
+                                effortActuators.get(effortDefinition),
+                                blockEntryWhenSeasonIsNotFull,
+                                (int) updateEffortPeriodInYears.applyAsDouble(fishState.getRandom())
+                            );
+                            ltargetE.start(model);
+                            ltargetE.step(model);
 
 
-                                //creaqte also a collector
-                                fishState.getYearlyDataSet().registerGatherer(
-                                        "LTargetE output",
-                                        new Gatherer<FishState>() {
-                                            @Override
-                                            public Double apply(FishState fishState) {
-                                                return ltargetE.getSuggestedEffort();
-                                            }
-                                        },
-                                        Double.NaN
-                                );
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365 * startingYear + 1
+                            //creaqte also a collector
+                            fishState.getYearlyDataSet().registerGatherer(
+                                "LTargetE output",
+                                new Gatherer<FishState>() {
+                                    @Override
+                                    public Double apply(FishState fishState) {
+                                        return ltargetE.getSuggestedEffort();
+                                    }
+                                },
+                                Double.NaN
+                            );
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
                 );
             }
         };

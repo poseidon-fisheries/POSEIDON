@@ -44,11 +44,12 @@ public class KnifeEdgeCashflowFactory implements AlgorithmFactory<KnifeEdgeCashf
      * @return the function result
      */
     @Override
-    public KnifeEdgeCashflowObjective apply(FishState fishState) {
-        CashFlowObjectiveFactory factory = new CashFlowObjectiveFactory(period);
+    public KnifeEdgeCashflowObjective apply(final FishState fishState) {
+        final CashFlowObjectiveFactory factory = new CashFlowObjectiveFactory(period);
         return new KnifeEdgeCashflowObjective(
-                threshold.apply(fishState.getRandom()),
-                factory.apply(fishState));
+            threshold.applyAsDouble(fishState.getRandom()),
+            factory.apply(fishState)
+        );
 
     }
 
@@ -66,7 +67,7 @@ public class KnifeEdgeCashflowFactory implements AlgorithmFactory<KnifeEdgeCashf
      *
      * @param period Value to set for property 'period'.
      */
-    public void setPeriod(DoubleParameter period) {
+    public void setPeriod(final DoubleParameter period) {
         this.period = period;
     }
 
@@ -84,7 +85,7 @@ public class KnifeEdgeCashflowFactory implements AlgorithmFactory<KnifeEdgeCashf
      *
      * @param threshold Value to set for property 'threshold'.
      */
-    public void setThreshold(DoubleParameter threshold) {
+    public void setThreshold(final DoubleParameter threshold) {
         this.threshold = threshold;
     }
 }

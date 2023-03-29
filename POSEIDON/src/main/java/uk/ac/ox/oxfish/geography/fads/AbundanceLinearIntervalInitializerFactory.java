@@ -18,10 +18,18 @@ public class AbundanceLinearIntervalInitializerFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
+    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
+    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
+    private LinkedHashMap<String, Double> carryingCapacityPerSpecies = new LinkedHashMap<>();
+    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
+    private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
+    private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
 
+    {
+        carryingCapacityPerSpecies.put("Species 0", 100000d);
+    }
     public AbundanceLinearIntervalInitializerFactory() {
     }
-
     public AbundanceLinearIntervalInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
@@ -36,22 +44,9 @@ public class AbundanceLinearIntervalInitializerFactory implements
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
-
-    private LinkedHashMap<String, Double> carryingCapacityPerSpecies = new LinkedHashMap<>();
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-    private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
-    private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
-
-    {
-        carryingCapacityPerSpecies.put("Species 0", 100000d);
-    }
-
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
-        final double probabilityOfFadBeingDud = fadDudRate.apply(fishState.getRandom());
+        final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(fishState.getRandom());
         final DoubleSupplier capacityGenerator;
         if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
             capacityGenerator = () -> Double.MAX_VALUE;
@@ -72,15 +67,15 @@ public class AbundanceLinearIntervalInitializerFactory implements
             fishState.getBiology(),
             capacityGenerator,
             new AbundanceLinearIntervalAttractor(
-                daysInWaterBeforeAttraction.apply(fishState.getRandom()).intValue(),
-                daysItTakesToFillUp.apply(fishState.getRandom()).intValue(),
+                (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
+                (int) daysItTakesToFillUp.applyAsDouble(fishState.getRandom()),
                 carryingCapacities,
-                minAbundanceThreshold.apply(fishState.getRandom()),
+                minAbundanceThreshold.applyAsDouble(fishState.getRandom()),
                 abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
                 fishState
 
             ),
-            fishReleaseProbabilityInPercent.apply(fishState.getRandom()) / 100d,
+            fishReleaseProbabilityInPercent.applyAsDouble(fishState.getRandom()) / 100d,
             fishState::getStep
         );
     }

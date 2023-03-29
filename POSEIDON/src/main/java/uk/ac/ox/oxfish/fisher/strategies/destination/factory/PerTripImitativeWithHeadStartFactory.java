@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
-import uk.ac.ox.oxfish.fisher.strategies.destination.ExploreExploitImitateDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.SelfDestructingIterativeDestinationStarter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -31,18 +30,15 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class PerTripImitativeWithHeadStartFactory implements
-        AlgorithmFactory<SelfDestructingIterativeDestinationStarter> {
+    AlgorithmFactory<SelfDestructingIterativeDestinationStarter> {
 
 
     private final PerTripImitativeDestinationFactory delegate =
-            new PerTripImitativeDestinationFactory();
+        new PerTripImitativeDestinationFactory();
 
-    private DoubleParameter maxHoursOut = new FixedDoubleParameter(24*5);
+    private DoubleParameter maxHoursOut = new FixedDoubleParameter(24 * 5);
 
     private DoubleParameter fractionOfTilesExploredInHeadStart = new FixedDoubleParameter(.25);
-
-
-
 
 
     /**
@@ -52,22 +48,22 @@ public class PerTripImitativeWithHeadStartFactory implements
      * @return the function result
      */
     @Override
-    public SelfDestructingIterativeDestinationStarter apply(FishState state) {
+    public SelfDestructingIterativeDestinationStarter apply(final FishState state) {
         return
-                new SelfDestructingIterativeDestinationStarter(
+            new SelfDestructingIterativeDestinationStarter(
 
-                        delegate.apply(state),
-                        maxHoursOut.apply(state.getRandom()),
-                        fractionOfTilesExploredInHeadStart.apply(state.getRandom())
+                delegate.apply(state),
+                maxHoursOut.applyAsDouble(state.getRandom()),
+                fractionOfTilesExploredInHeadStart.applyAsDouble(state.getRandom())
 
-                );
+            );
     }
 
     public DoubleParameter getStepSize() {
         return delegate.getStepSize();
     }
 
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         delegate.setStepSize(stepSize);
     }
 
@@ -75,7 +71,7 @@ public class PerTripImitativeWithHeadStartFactory implements
         return delegate.isIgnoreEdgeDirection();
     }
 
-    public void setIgnoreEdgeDirection(boolean ignoreEdgeDirection) {
+    public void setIgnoreEdgeDirection(final boolean ignoreEdgeDirection) {
         delegate.setIgnoreEdgeDirection(ignoreEdgeDirection);
     }
 
@@ -84,7 +80,8 @@ public class PerTripImitativeWithHeadStartFactory implements
     }
 
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        final AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         delegate.setProbability(probability);
     }
 
@@ -93,7 +90,8 @@ public class PerTripImitativeWithHeadStartFactory implements
     }
 
     public void setDropInUtilityNeededForUnfriend(
-            DoubleParameter dropInUtilityNeededForUnfriend) {
+        final DoubleParameter dropInUtilityNeededForUnfriend
+    ) {
         delegate.setDropInUtilityNeededForUnfriend(dropInUtilityNeededForUnfriend);
     }
 
@@ -101,7 +99,7 @@ public class PerTripImitativeWithHeadStartFactory implements
         return delegate.isAlwaysCopyBest();
     }
 
-    public void setAlwaysCopyBest(boolean alwaysCopyBest) {
+    public void setAlwaysCopyBest(final boolean alwaysCopyBest) {
         delegate.setAlwaysCopyBest(alwaysCopyBest);
     }
 
@@ -120,7 +118,8 @@ public class PerTripImitativeWithHeadStartFactory implements
      * @param objectiveFunction Value to set for property 'objectiveFunction'.
      */
     public void setObjectiveFunction(
-            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        final AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
+    ) {
         delegate.setObjectiveFunction(objectiveFunction);
     }
 
@@ -138,7 +137,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      *
      * @param backtracksOnBadExploration Value to set for property 'backtracksOnBadExploration'.
      */
-    public void setBacktracksOnBadExploration(boolean backtracksOnBadExploration) {
+    public void setBacktracksOnBadExploration(final boolean backtracksOnBadExploration) {
         delegate.setBacktracksOnBadExploration(backtracksOnBadExploration);
     }
 
@@ -156,7 +155,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      *
      * @param automaticallyIgnoreMPAs Value to set for property 'automaticallyIgnoreMPAs'.
      */
-    public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
+    public void setAutomaticallyIgnoreMPAs(final boolean automaticallyIgnoreMPAs) {
         delegate.setAutomaticallyIgnoreMPAs(automaticallyIgnoreMPAs);
     }
 
@@ -175,7 +174,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      * @param automaticallyIgnoreAreasWhereFishNeverGrows Value to set for property
      *                                                    'automaticallyIgnoreAreasWhereFishNeverGrows'.
      */
-    public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
+    public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(final boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
         delegate.setAutomaticallyIgnoreAreasWhereFishNeverGrows(automaticallyIgnoreAreasWhereFishNeverGrows);
     }
 
@@ -193,7 +192,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      *
      * @param ignoreFailedTrips Value to set for property 'ignoreFailedTrips'.
      */
-    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
+    public void setIgnoreFailedTrips(final boolean ignoreFailedTrips) {
         delegate.setIgnoreFailedTrips(ignoreFailedTrips);
     }
 
@@ -211,7 +210,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      *
      * @param maxInitialDistance Value to set for property 'maxInitialDistance'.
      */
-    public void setMaxInitialDistance(double maxInitialDistance) {
+    public void setMaxInitialDistance(final double maxInitialDistance) {
         delegate.setMaxInitialDistance(maxInitialDistance);
     }
 
@@ -229,7 +228,7 @@ public class PerTripImitativeWithHeadStartFactory implements
      *
      * @param maxHoursOut Value to set for property 'maxHoursOut'.
      */
-    public void setMaxHoursOut(DoubleParameter maxHoursOut) {
+    public void setMaxHoursOut(final DoubleParameter maxHoursOut) {
         this.maxHoursOut = maxHoursOut;
     }
 
@@ -248,7 +247,8 @@ public class PerTripImitativeWithHeadStartFactory implements
      * @param fractionOfTilesExploredInHeadStart Value to set for property 'fractionOfTilesExploredInHeadStart'.
      */
     public void setFractionOfTilesExploredInHeadStart(
-            DoubleParameter fractionOfTilesExploredInHeadStart) {
+        final DoubleParameter fractionOfTilesExploredInHeadStart
+    ) {
         this.fractionOfTilesExploredInHeadStart = fractionOfTilesExploredInHeadStart;
     }
 }

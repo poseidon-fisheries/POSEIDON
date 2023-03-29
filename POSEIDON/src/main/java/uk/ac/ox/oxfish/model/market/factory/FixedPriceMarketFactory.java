@@ -43,7 +43,7 @@ public class FixedPriceMarketFactory implements AlgorithmFactory<FixedPriceMarke
      */
     @Override
     public FixedPriceMarket apply(FishState state) {
-        return new FixedPriceMarket(marketPrice.apply(state.getRandom()));
+        return new FixedPriceMarket(marketPrice.applyAsDouble(state.getRandom()));
     }
 
 
