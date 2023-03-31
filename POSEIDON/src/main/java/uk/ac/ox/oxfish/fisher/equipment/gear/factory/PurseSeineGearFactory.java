@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.parameters.FreeParameter;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -92,6 +93,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         return fishValueCalculatorStandardDeviation;
     }
 
+    @FreeParameter(hardMaximum = 1.0, minimum = 0.1, maximum = 0.2)
     public void setFishValueCalculatorStandardDeviation(final DoubleParameter fishValueCalculatorStandardDeviation) {
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
     }
@@ -230,7 +232,11 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations,
-            new UnreliableFishValueCalculator(globalBiology, rng, fishValueCalculatorStandardDeviation.applyAsDouble(rng))
+            new UnreliableFishValueCalculator(
+                globalBiology,
+                rng,
+                fishValueCalculatorStandardDeviation.applyAsDouble(rng)
+            )
         );
         return fadManager;
     }

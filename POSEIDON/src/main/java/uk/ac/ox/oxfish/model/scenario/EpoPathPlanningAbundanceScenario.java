@@ -7,9 +7,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnvironmentalAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetFadModuleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
@@ -20,6 +18,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStr
 import uk.ac.ox.oxfish.geography.fads.FadZapper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
@@ -47,9 +46,9 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                         "Yellowfin tuna", 2.0
                     ),
                     ImmutableMap.of(
-                        "Skipjack tuna", 43382.94042870394,
-                        "Bigeye tuna", 16374.74063889846,
-                        "Yellowfin tuna", 71487.06619444962
+                        "Skipjack tuna", new CalibratedParameter(),
+                        "Bigeye tuna", new BigEyeCarryingCapacityScaleParameter(),
+                        "Yellowfin tuna", new CalibratedParameter()
                     ),
                     ImmutableMap.of(
                         "Skipjack tuna", 0.07370525744999998,
@@ -75,9 +74,9 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                         )
                     ),
                     ImmutableList.of(
-                        new FixedDoubleParameter(0.0938754550536813),
-                        new FixedDoubleParameter(28.0084),
-                        new FixedDoubleParameter(0)
+                        new ChlorophyllThresholdParameter(),
+                        new CalibratedParameter(),
+                        new CalibratedParameter()
                     ),
                     ImmutableList.of(
                         new FixedDoubleParameter(2),

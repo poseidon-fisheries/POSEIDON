@@ -58,7 +58,7 @@ public class WeibullLinearIntervalEnvironmentalAttractorFactory
         final DoubleParameter fadDudRate,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
+        final LinkedHashMap<String, DoubleParameter> carryingCapacityScaleParameters,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter daysItTakesToFillUp,
         final DoubleParameter minAbundanceThreshold,

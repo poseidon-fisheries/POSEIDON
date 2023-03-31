@@ -64,6 +64,62 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         this.maximum = maximum;
     }
 
+    public SimpleOptimizationParameter(
+        final String addressToModify,
+        final double minimum,
+        final double maximum,
+        final boolean alwaysPositive,
+        final boolean isRawNumber
+    ) {
+        this.addressToModify = addressToModify;
+        this.minimum = minimum;
+        this.maximum = maximum;
+        this.alwaysPositive = alwaysPositive;
+        this.isRawNumber = isRawNumber;
+    }
+
+    public static double computeNumericValueFromEVABounds(
+        double input, double minimum, double maximum,
+        boolean forcePositive
+    ) {
+        double realValue = minimum + ((maximum - minimum) / (10 - (-10))) * (input - (-10));
+        if (realValue < 0 & forcePositive)
+            realValue = 0;
+        return realValue;
+    }
+
+    public static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
+        try {
+            //try as double parameter
+            OptimizationParameter.navigateAndSet(
+                scenario, addressToModify, new FixedDoubleParameter(realValue)
+
+            );
+        } catch (Exception e) {
+            //try as raw number
+            try {
+                OptimizationParameter.navigateAndSet(
+                    scenario, addressToModify, realValue
+
+                );
+            } catch (Exception d) {
+                throw new RuntimeException(d);
+            }
+        }
+    }
+
+    public static void quickParametrizeRawNumber(Scenario scenario, double realValue, String addressToModify) {
+        //try as raw number
+        try {
+            OptimizationParameter.navigateAndSet(
+                scenario, addressToModify, realValue
+
+            );
+        } catch (Exception d) {
+            throw new RuntimeException(d);
+        }
+    }
+
     /**
      * number of parameters this object actually represents
      *
@@ -76,82 +132,38 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     /**
      * consume the scenario and add the parameters
-     *  @param scenario the scenario to modify
+     *
+     * @param scenario the scenario to modify
      * @param inputs   the numerical values of the parameters to set
      * @return
      */
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
 
-        Preconditions.checkArgument(maximum>=minimum, "invalid bounds " + addressToModify);
-        Preconditions.checkArgument(inputs.length==1);
+        Preconditions.checkArgument(maximum >= minimum, "invalid bounds " + addressToModify);
+        Preconditions.checkArgument(inputs.length == 1);
 
         double realValue = computeNumericValue(inputs[0]);
 
 
-        if(!isRawNumber)
+        if (!isRawNumber)
             quickParametrize(scenario, realValue, addressToModify);
         else
-            quickParametrizeRawNumber(scenario,realValue,addressToModify);
+            quickParametrizeRawNumber(scenario, realValue, addressToModify);
 
         return String.valueOf(realValue);
 
     }
 
     public double computeNumericValue(double input) {
-        return computeNumericValueFromEVABounds(input,minimum,maximum,alwaysPositive);
+        return computeNumericValueFromEVABounds(input, minimum, maximum, alwaysPositive);
     }
 
-
-    public static double computeNumericValueFromEVABounds(double input,double minimum, double maximum,
-                                                          boolean forcePositive) {
-        double realValue =minimum+((maximum-minimum)/(10-(-10)))*(input - (-10));
-        if(realValue < 0 & forcePositive)
-            realValue = 0;
-        return realValue;
-    }
-
-    public double parametrizeRealValue(Scenario scenario, double realValue)
-    {
+    public double parametrizeRealValue(Scenario scenario, double realValue) {
         quickParametrize(scenario, realValue, addressToModify);
         return realValue;
 
     }
-
-    public static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
-        try{
-            //try as double parameter
-            OptimizationParameter.navigateAndSet(
-                    scenario,addressToModify,new FixedDoubleParameter(realValue)
-
-            );
-        }catch (Exception e){
-            //try as raw number
-            try{
-            OptimizationParameter.navigateAndSet(
-                    scenario,addressToModify,realValue
-
-            );}
-            catch (Exception d)
-            {
-                throw new RuntimeException(d);
-            }
-        }
-    }
-
-    public static void quickParametrizeRawNumber(Scenario scenario, double realValue, String addressToModify) {
-        //try as raw number
-        try{
-            OptimizationParameter.navigateAndSet(
-                    scenario,addressToModify,realValue
-
-            );}
-        catch (Exception d)
-        {
-            throw new RuntimeException(d);
-        }
-    }
-
 
     /**
      * Getter for property 'addressToModify'.
@@ -228,5 +240,16 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     public void setRawNumber(boolean rawNumber) {
         isRawNumber = rawNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleOptimizationParameter{" +
+            "addressToModify='" + addressToModify + '\'' +
+            ", minimum=" + minimum +
+            ", maximum=" + maximum +
+            ", alwaysPositive=" + alwaysPositive +
+            ", isRawNumber=" + isRawNumber +
+            '}';
     }
 }

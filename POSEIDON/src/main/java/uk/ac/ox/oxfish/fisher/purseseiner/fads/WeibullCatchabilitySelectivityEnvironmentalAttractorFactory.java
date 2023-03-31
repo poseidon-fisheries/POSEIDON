@@ -38,7 +38,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
     private Map<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
-    private Map<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+    private Map<String, DoubleParameter> carryingCapacityScaleParameters = new LinkedHashMap<>();
     private Map<String, Double> catchabilities = new LinkedHashMap<>();
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
     private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
@@ -47,18 +47,6 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     private List<AdditionalMapFactory> environmentalMaps = new LinkedList<>();
     private List<DoubleParameter> environmentalThresholds = new LinkedList<>();
     private List<DoubleParameter> environmentalPenalties = new LinkedList<>();
-
-    {
-        carryingCapacityShapeParameters.put("Species 0", 0.5d);
-    }
-
-    {
-        carryingCapacityScaleParameters.put("Species 0", 100000d);
-    }
-
-    {
-        catchabilities.put("Species 0", 0.001d);
-    }
 
     {
         final AdditionalMapFactory e = new AdditionalMapFactory();
@@ -73,7 +61,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Map<String, Double> carryingCapacityShapeParameters,
-        final Map<String, Double> carryingCapacityScaleParameters,
+        final Map<String, DoubleParameter> carryingCapacityScaleParameters,
         final Map<String, Double> catchabilities,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
@@ -133,7 +121,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
                         carryingCapacityScaleParameters.containsKey(species.getName()) ?
                             new WeibullDoubleParameter(
                                 carryingCapacityShapeParameters.get(species.getName()),
-                                carryingCapacityScaleParameters.get(species.getName())
+                                carryingCapacityScaleParameters.get(species.getName()).applyAsDouble(rng)
                             ) : new FixedDoubleParameter(-1);
 
 
@@ -187,12 +175,12 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
     }
 
-    public Map<String, Double> getCarryingCapacityScaleParameters() {
+    public Map<String, DoubleParameter> getCarryingCapacityScaleParameters() {
         return carryingCapacityScaleParameters;
     }
 
     public void setCarryingCapacityScaleParameters(
-        final Map<String, Double> carryingCapacityScaleParameters
+        final Map<String, DoubleParameter> carryingCapacityScaleParameters
     ) {
         this.carryingCapacityScaleParameters = carryingCapacityScaleParameters;
     }

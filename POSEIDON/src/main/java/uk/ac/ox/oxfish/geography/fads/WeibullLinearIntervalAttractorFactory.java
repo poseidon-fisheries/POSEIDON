@@ -46,18 +46,10 @@ public class WeibullLinearIntervalAttractorFactory implements
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
     private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
+    private LinkedHashMap<String, DoubleParameter> carryingCapacityScaleParameters = new LinkedHashMap<String, DoubleParameter>();
     private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
     private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
     private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
-
-    {
-        carryingCapacityShapeParameters.put("Species 0", 0.5d);
-    }
-
-    {
-        carryingCapacityScaleParameters.put("Species 0", 100000d);
-    }
 
     public WeibullLinearIntervalAttractorFactory() {
     }
@@ -67,7 +59,7 @@ public class WeibullLinearIntervalAttractorFactory implements
         final DoubleParameter fadDudRate,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final LinkedHashMap<String, Double> carryingCapacityShapeParameters,
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters,
+        final LinkedHashMap<String, DoubleParameter> carryingCapacityScaleParameters,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter daysItTakesToFillUp,
         final DoubleParameter minAbundanceThreshold
@@ -134,7 +126,7 @@ public class WeibullLinearIntervalAttractorFactory implements
         for (final Species species : fishState.getBiology().getSpecies()) {
             carryingCapacities[species.getIndex()] = new WeibullDoubleParameter(
                 carryingCapacityShapeParameters.get(species.getName()),
-                carryingCapacityScaleParameters.get(species.getName())
+                carryingCapacityScaleParameters.get(species.getName()).applyAsDouble(fishState.getRandom())
             );
         }
         return new HeterogeneousLinearIntervalAttractor(
@@ -183,12 +175,12 @@ public class WeibullLinearIntervalAttractorFactory implements
         this.carryingCapacityShapeParameters = carryingCapacityShapeParameters;
     }
 
-    public LinkedHashMap<String, Double> getCarryingCapacityScaleParameters() {
+    public LinkedHashMap<String, DoubleParameter> getCarryingCapacityScaleParameters() {
         return carryingCapacityScaleParameters;
     }
 
     public void setCarryingCapacityScaleParameters(
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters
+        final LinkedHashMap<String, DoubleParameter> carryingCapacityScaleParameters
     ) {
         oneAttractorPerStateLocker.reset();
 

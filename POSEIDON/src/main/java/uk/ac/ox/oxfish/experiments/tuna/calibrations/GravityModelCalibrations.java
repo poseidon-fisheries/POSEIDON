@@ -37,11 +37,11 @@ public class GravityModelCalibrations {
                 "Yellowfin tuna", 9393.492049525945
             ));
 
-        final LinkedHashMap<String, Double> carryingCapacityScaleParameters =
+        final LinkedHashMap<String, DoubleParameter> carryingCapacityScaleParameters =
             new LinkedHashMap<>(ImmutableMap.of(
-                "Skipjack tuna", 0.7550522737541978,
-                "Bigeye tuna", 0.38856703429600276,
-                "Yellowfin tuna", 1.570847805276818
+                "Skipjack tuna", new FixedDoubleParameter(0.7550522737541978),
+                "Bigeye tuna", new FixedDoubleParameter(0.38856703429600276),
+                "Yellowfin tuna", new FixedDoubleParameter(1.570847805276818)
             ));
 
         final LinkedList<AdditionalMapFactory> environmentalMaps =
