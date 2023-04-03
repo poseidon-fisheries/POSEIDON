@@ -59,7 +59,12 @@ public class ParameterExtractor<R> {
     ) {
         return Streams
             .stream(Optional.ofNullable(object))
-            .filter(o -> !(o instanceof Path)) // Path objects iterate on themselves, creating an infinite loop
+            .filter(o ->
+                // Exclude problematic types from search:
+                // - Class objects have annotation getters that generate IllegalAccessException on newer JVMs
+                // - Path objects iterate on themselves, creating an infinite loop
+                !(o instanceof Class || o instanceof Path)
+            )
             .flatMap(o -> {
                 if (o instanceof Map) {
                     return getFreeParametersFromMap((Map<?, ?>) o, addressBuilder);

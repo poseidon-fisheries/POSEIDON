@@ -21,17 +21,17 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
 
-import java.util.regex.Pattern;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * A customized YAML reader to use with the model
  * Created by carrknight on 7/10/15.
  */
-public class FishYAML extends Yaml{
+public class FishYAML extends Yaml {
 
 
     private final YamlConstructor customConstructor;
@@ -44,19 +44,18 @@ public class FishYAML extends Yaml{
     public FishYAML() {
 
 
-
-        super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
+        super(new YamlConstructor(), new YamlRepresenter(), dumperOptions());
         this.customConstructor = ((YamlConstructor) super.constructor);
 //        this.addImplicitResolver(new Tag("!coord"),
 //                                 Pattern.compile("[\\s'\"]*x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*[\\s'\"]*"),
 //                                 null);
 
-     //   this.customConstructor.addTypeDescription(new TypeDescription())
+        //   this.customConstructor.addTypeDescription(new TypeDescription())
 
     }
 
     private static DumperOptions dumperOptions() {
-        DumperOptions options = new DumperOptions();
+        final DumperOptions options = new DumperOptions();
         options.setPrettyFlow(true);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
@@ -64,10 +63,13 @@ public class FishYAML extends Yaml{
     }
 
 
-
-
-
-
+    public void dump(final Object data, final Path path) {
+        try {
+            dump(data, new FileWriter(path.toFile()));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }

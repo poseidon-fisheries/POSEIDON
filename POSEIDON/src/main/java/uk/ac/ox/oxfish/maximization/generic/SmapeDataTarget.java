@@ -20,7 +20,21 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
 public class SmapeDataTarget extends AbstractLastStepFixedDataTarget {
+    public SmapeDataTarget(
+        final String columnName,
+        final double fixedTarget
+    ) {
+        super(
+            SymmetricMeanAbsolutePercentageErrorMeasure.INSTANCE,
+            columnName,
+            fixedTarget,
+            1.0,
+            false
+        );
+    }
 
-    public SmapeDataTarget() { super(SymmetricMeanAbsolutePercentageErrorMeasure.INSTANCE); }
+    public SmapeDataTarget() {
+        super(SymmetricMeanAbsolutePercentageErrorMeasure.INSTANCE);
+    }
 
 }
