@@ -17,8 +17,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSuppli
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.fads.FadZapper;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.model.plugins.ChlorophyllMapFactory;
+import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
+import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
@@ -41,48 +42,25 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                 new WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
                     getAbundanceFiltersFactory(),
                     ImmutableMap.of(
-                        "Skipjack tuna", 2.0,
-                        "Bigeye tuna", 1.0E-4,
-                        "Yellowfin tuna", 2.0
+                        "Skipjack tuna", new SkipjackTunaWeibullFadParameters(),
+                        "Bigeye tuna", new BigeyeTunaWeibullFadParameters(),
+                        "Yellowfin tuna", new YellowfinTunaWeibullFadParameters()
                     ),
-                    ImmutableMap.of(
-                        "Skipjack tuna", new CalibratedParameter(),
-                        "Bigeye tuna", new BigEyeCarryingCapacityScaleParameter(),
-                        "Yellowfin tuna", new CalibratedParameter()
-                    ),
-                    ImmutableMap.of(
-                        "Skipjack tuna", 0.07370525744999998,
-                        "Bigeye tuna", 0.16023563707903266,
-                        "Yellowfin tuna", 0.0205577772
+                    ImmutableList.of(
+                        new ChlorophyllMapFactory(
+                            getInputFolder().path("environmental_maps", "chlorophyll.csv")
+                        ),
+                        new TemperatureMapFactory(
+                            getInputFolder().path("environmental_maps", "temperature.csv")
+                        ),
+                        new FrontalIndexMapFactory(
+                            getInputFolder().path("environmental_maps", "frontal_index.csv")
+                        )
                     ),
                     new FixedDoubleParameter(0.0014337500000000001),
                     new FixedDoubleParameter(5),
                     new FixedDoubleParameter(41.6127216390614),
-                    new FixedDoubleParameter(3.401799402857515),
-                    ImmutableList.of(
-                        new AdditionalMapFactory(
-                            "Chlorophyll",
-                            getInputFolder().path("environmental_maps", "chlorophyll.csv")
-                        ),
-                        new AdditionalMapFactory(
-                            "Temperature",
-                            getInputFolder().path("environmental_maps", "temperature.csv")
-                        ),
-                        new AdditionalMapFactory(
-                            "FrontalIndex",
-                            getInputFolder().path("environmental_maps", "frontal_index.csv")
-                        )
-                    ),
-                    ImmutableList.of(
-                        new ChlorophyllThresholdParameter(),
-                        new CalibratedParameter(),
-                        new CalibratedParameter()
-                    ),
-                    ImmutableList.of(
-                        new FixedDoubleParameter(2),
-                        new FixedDoubleParameter(2),
-                        new FixedDoubleParameter(2)
-                    )
+                    new FixedDoubleParameter(3.401799402857515)
                 )
             ),
             new EPOPlannedStrategyFlexibleFactory(
@@ -102,6 +80,8 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
             ),
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );
+    private boolean zapper = false;
+    private boolean zapperAge = false;
 
     public PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
@@ -111,9 +91,6 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
     public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
-
-    private boolean zapper = false;
-    private boolean zapperAge = false;
 
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
         return abundanceFiltersFactory;

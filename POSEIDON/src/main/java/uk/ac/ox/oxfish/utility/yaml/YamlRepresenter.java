@@ -21,12 +21,6 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -40,85 +34,94 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NullParameter;
-import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.SinusoidalDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.*;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The customized representer YAML object, useful to show pretty yaml output. In reality this performs a something of a
  * intermediate step because to beautify it further we remove all the tags
  * Created by carrknight on 7/10/15.
  */
-public class YamlRepresenter extends Representer
-{
+public class YamlRepresenter extends Representer {
 
     public YamlRepresenter() {
 
         //go through all the double parameters and make them print as a single line "pretty" format
-        this.representers.put(FixedDoubleParameter.class,
-                              data -> representData(
-                                      String.valueOf(((FixedDoubleParameter) data).getFixedValue())));
+        this.representers.put(
+            FixedDoubleParameter.class,
+            data -> representData(String.valueOf(((FixedDoubleParameter) data).getFixedValue()))
+        );
+
+        this.multiRepresenters.put(
+            CalibratedParameter.class,
+            data -> representData(String.valueOf(((CalibratedParameter) data).getFixedValue()))
+        );
+
+        this.representers.put(
+            NullParameter.class,
+            data -> representData("nullparameter")
+        );
 
 
-        this.representers.put(NullParameter.class,
-                              data -> representData("nullparameter"));
+        this.representers.put(
+            NormalDoubleParameter.class,
+            data -> {
+                final NormalDoubleParameter normal = (NormalDoubleParameter) data;
+                return representData("normal " + normal.getMean() + " " + normal.getStandardDeviation());
+
+            }
+        );
 
 
-        this.representers.put(NormalDoubleParameter.class,
-                              data -> {
-                                  final NormalDoubleParameter normal = (NormalDoubleParameter) data;
-                                  return
-                                          representData("normal " +
-                                                                normal.getMean() + " " + normal.getStandardDeviation());
-
-                              });
-
-
-        this.representers.put(UniformDoubleParameter.class,
-                              data -> {
-                                  final UniformDoubleParameter normal = (UniformDoubleParameter) data;
-                                  return
-                                          representData("uniform " +
-                                                                normal.getMinimum() + " " + normal.getMaximum());
-                              });
+        this.representers.put(
+            UniformDoubleParameter.class,
+            data -> {
+                final UniformDoubleParameter normal = (UniformDoubleParameter) data;
+                return representData("uniform " + normal.getMinimum() + " " + normal.getMaximum());
+            }
+        );
 
 
-        this.representers.put(SelectDoubleParameter.class,
-                              data -> {
-                                  final SelectDoubleParameter select = (SelectDoubleParameter) data;
-                                  return
-                                          representData("select " +
-                                                                select.getValueString());
-                              });
+        this.representers.put(
+            SelectDoubleParameter.class,
+            data -> {
+                final SelectDoubleParameter select = (SelectDoubleParameter) data;
+                return representData("select " + select.getValueString());
+            }
+        );
 
 
-        this.representers.put(SinusoidalDoubleParameter.class,
-                              data -> {
-                                  final SinusoidalDoubleParameter sin = (SinusoidalDoubleParameter) data;
-                                  return
-                                          representData("sin " +
-                                                                sin.getAmplitude() + " " +
-                                                                sin.getFrequency());
-                              });
+        this.representers.put(
+            SinusoidalDoubleParameter.class,
+            data -> {
+                final SinusoidalDoubleParameter sin = (SinusoidalDoubleParameter) data;
+                return representData("sin " + sin.getAmplitude() + " " + sin.getFrequency());
+            }
+        );
 
         //do the same for the Path class
-        Represent pathRepresenter = data -> {
+        final Represent pathRepresenter = data -> {
             final Path path = (Path) data;
-            return
-                    representData(path.toString());
+            return representData(path.toString());
         };
-        this.multiRepresenters.put(Path.class,
-                                   pathRepresenter);
+        this.multiRepresenters.put(
+            Path.class,
+            pathRepresenter
+        );
 
         //do the same for the coordinate class
-        this.representers.put(Coordinate.class,
-                              data -> {
-                                  Coordinate data1 = (Coordinate) data;
-                                  return representData( data1.x +","+ data1.y);
-                              }
+        this.representers.put(
+            Coordinate.class,
+            data -> {
+                final Coordinate data1 = (Coordinate) data;
+                return representData(data1.x + "," + data1.y);
+            }
         );
 
 
@@ -129,11 +132,11 @@ public class YamlRepresenter extends Representer
         //including the super-class
         allAlgorithmFactories.add(AlgorithmFactory.class); //add the super class
         //for each class create a representer that shows it as a map
-        for (Class<? extends AlgorithmFactory> c : allAlgorithmFactories) {
+        for (final Class<? extends AlgorithmFactory> c : allAlgorithmFactories) {
             this.addClassTag(c, Tag.MAP);
             this.representers.put(c, new Represent() {
                 @Override
-                public Node representData(Object data) {
+                public Node representData(final Object data) {
                     //prepare the node
                     final Set<Property> properties = getProperties(data.getClass());
                     //if you have no properties don't bother making a map, just return your full name
@@ -145,11 +148,11 @@ public class YamlRepresenter extends Representer
 
                     //otherwise print as map
                     //first prepare the "value" which is just a node map representing our properties
-                    List<NodeTuple> value = new ArrayList<>(properties.size());
+                    final List<NodeTuple> value = new ArrayList<>(properties.size());
                     //tag yourself as MAP, which means there will be no visible tag but just "name":
-                    Tag tag = Tag.MAP;
+                    final Tag tag = Tag.MAP;
                     //create the holding node
-                    MappingNode node = new MappingNode(tag, value, false);
+                    final MappingNode node = new MappingNode(tag, value, false);
                     //here's the trick: this mapping contains a single node which is just the name of this factory
                     //in the constructor master list and then all the java-bean magic is a submap.
                     value.add(new NodeTuple(
@@ -165,20 +168,20 @@ public class YamlRepresenter extends Representer
         //this is easier in the sense that you don't need factories and the like
         //just plain PolicyScript
 
-        this.addClassTag(PolicyScript.class,Tag.MAP);
+        this.addClassTag(PolicyScript.class, Tag.MAP);
         this.representers.put(
             PolicyScript.class,
             data -> {
-                Node node;
+                final Node node;
                 //prepare the node
                 final Set<Property> properties;
                 properties = getProperties(PolicyScript.class);
                 if (properties.size() == 0) {
                     node = outer.representData(data);
                 } else {
-                    List<NodeTuple> value = new ArrayList<>(
+                    final List<NodeTuple> value = new ArrayList<>(
                         properties.size());
-                    Tag tag = Tag.MAP;
+                    final Tag tag = Tag.MAP;
                     node = new MappingNode(tag, value, false);
 
                     value.add(new NodeTuple(
@@ -194,22 +197,18 @@ public class YamlRepresenter extends Representer
         this.addClassTag(PolicyScripts.class, Tag.MAP);
 
 
-
-
-
-
         //get all the scenarios
         final List<Supplier<Scenario>> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
         //for each scenario create a representer that shows it as a map
-        for(Supplier<Scenario> s : scenarios) {
+        for (final Supplier<Scenario> s : scenarios) {
             this.addClassTag(s.get().getClass(), Tag.MAP);
 
             this.representers.put(
                 s.get().getClass(),
                 new Represent() {
                     @Override
-                    public Node representData(Object data) {
-                        Node node;
+                    public Node representData(final Object data) {
+                        final Node node;
 
                         //prepare the node
                         final Set<Property> properties;
@@ -224,10 +223,10 @@ public class YamlRepresenter extends Representer
                         } else {
                             //otherwise print as map
                             //first prepare the "value" which is just a node map representing our properties
-                            List<NodeTuple> value = new ArrayList<>(
+                            final List<NodeTuple> value = new ArrayList<>(
                                 properties.size());
                             //tag yourself as MAP, which means there will be no visible tag but just "name":
-                            Tag tag = Tag.MAP;
+                            final Tag tag = Tag.MAP;
                             //create the holding node
                             node = new MappingNode(tag, value, false);
                             //here's the trick: this mapping contains a single node which is just the name of this factory

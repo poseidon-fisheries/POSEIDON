@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnv
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
-import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
@@ -22,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -213,15 +211,11 @@ public class EpoSensitivityRuns {
                 .getPurseSeinerFleetFactory()
                 .getPurseSeineGearFactory()
                 .getFadInitializerFactory();
-        final int avoidanceMapIndex = fadInitializerFactory
-            .getEnvironmentalMaps()
-            .stream()
-            .map(AdditionalMapFactory::getMapVariableName)
-            .collect(Collectors.toList())
-            .indexOf(layerName);
         fadInitializerFactory
-            .getEnvironmentalThresholds()
-            .set(avoidanceMapIndex, new FixedDoubleParameter(threshold));
+            .getEnvironmentalMapFactories()
+            .stream()
+            .filter(factory -> factory.getMapVariableName().equals(layerName))
+            .forEach(factory -> factory.setThreshold(new FixedDoubleParameter(threshold)));
     }
 
 }
