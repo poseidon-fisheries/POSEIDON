@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -20,7 +19,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.ChlorophyllMapFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -46,21 +44,17 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
                         "Bigeye tuna", new BigeyeTunaWeibullFadParameters(),
                         "Yellowfin tuna", new YellowfinTunaWeibullFadParameters()
                     ),
-                    ImmutableList.of(
-                        new ChlorophyllMapFactory(
+                    ImmutableMap.of(
+                        "Chlorophyll", new ChlorophyllMapFactory(
                             getInputFolder().path("environmental_maps", "chlorophyll.csv")
                         ),
-                        new TemperatureMapFactory(
+                        "Temperature", new TemperatureMapFactory(
                             getInputFolder().path("environmental_maps", "temperature.csv")
                         ),
-                        new FrontalIndexMapFactory(
+                        "FrontalIndex", new FrontalIndexMapFactory(
                             getInputFolder().path("environmental_maps", "frontal_index.csv")
                         )
-                    ),
-                    new FixedDoubleParameter(0.0014337500000000001),
-                    new FixedDoubleParameter(5),
-                    new FixedDoubleParameter(41.6127216390614),
-                    new FixedDoubleParameter(3.401799402857515)
+                    )
                 )
             ),
             new EPOPlannedStrategyFlexibleFactory(

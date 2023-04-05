@@ -12,11 +12,10 @@ public class EpoPathPlanningAbundanceScenarioTest extends TestCase {
     public void testParameterAnnotationReading() {
         final EpoPathPlanningAbundanceScenario scenario = new EpoPathPlanningAbundanceScenario();
         final List<HardEdgeOptimizationParameter> freeParameters =
-            new ParameterExtractor<>(HardEdgeOptimizationParameter::new)
-                .getFreeParameters(scenario)
+            new ParameterExtractor()
+                .getParameters(scenario)
                 .collect(Collectors.toList());
         freeParameters.forEach(System.out::println);
     }
-
 
 }

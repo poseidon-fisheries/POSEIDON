@@ -10,8 +10,8 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.Locker;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
@@ -31,52 +31,63 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     /**
      * hours wasted after each DEL set
      */
-    private DoubleParameter additionalHourlyDelayDolphinSets = new FixedDoubleParameter(5);
+    private DoubleParameter additionalHourlyDelayDolphinSets =
+        new CalibratedParameter(11, 19, 0, 24, 16);
     /**
      * hours wasted after every DPL
      */
-    private DoubleParameter additionalHourlyDelayDeployment = new FixedDoubleParameter(0.1);
+    private DoubleParameter additionalHourlyDelayDeployment =
+        new CalibratedParameter(0, 5, 0, 24, 0);
     /**
      * hours wasted after every NOA
      */
-    private DoubleParameter additionalHourlyDelayNonAssociatedSets = new FixedDoubleParameter(5);
+    private DoubleParameter additionalHourlyDelayNonAssociatedSets =
+        new CalibratedParameter(0, 8, 0, 24, 6);
     /**
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
-    private DoubleParameter minimumValueOpportunisticFadSets = new FixedDoubleParameter(5000);
+    private DoubleParameter minimumValueOpportunisticFadSets =
+        new CalibratedParameter(0, 15000, 1000);
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
-    private DoubleParameter hoursWastedOnFailedSearches = new FixedDoubleParameter(20);
+    private DoubleParameter hoursWastedOnFailedSearches =
+        new CalibratedParameter(0, 20, 0);
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
-    private DoubleParameter planningHorizonInHours = new FixedDoubleParameter(24 * 7);
+    private DoubleParameter planningHorizonInHours =
+        new CalibratedParameter(24 * 5, 24 * 10, 24 * 7);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
-    private DoubleParameter ownFadActionWeightBias = new FixedDoubleParameter(1);
+    private DoubleParameter ownFadActionWeightBias =
+        new CalibratedParameter(1, 65, 22);
     /**
      * a multiplier applied to the action weight of DPL
      */
-    private DoubleParameter deploymentBias = new FixedDoubleParameter(1);
+    private DoubleParameter deploymentBias =
+        new CalibratedParameter(1, 15, 10);
     /**
      * a multiplier applied to the action weight of DPL
      */
-    private DoubleParameter noaBias = new FixedDoubleParameter(1);
-    /**
-     * a multiplier applied to the action weight of own fad (since it's quite low in the data)
-     */
-    private DoubleParameter minimumPercentageOfTripDurationAllowed = new FixedDoubleParameter(1);
+    private DoubleParameter noaBias =
+        new CalibratedParameter(0.2, 0.8, 0.6);
+    private DoubleParameter minimumPercentageOfTripDurationAllowed =
+        new CalibratedParameter(0.4, 0.7, 0, 1, 0.7);
     private boolean noaSetsCanPoachFads = false;
     private boolean purgeIllegalActionsImmediately = true;
-    private DoubleParameter noaSetsRangeInSeatiles = new FixedDoubleParameter(0);
-    private DoubleParameter delSetsRangeInSeatiles = new FixedDoubleParameter(0);
+    private DoubleParameter noaSetsRangeInSeatiles =
+        new CalibratedParameter(0, 5, 0, 5, 3);
+    private DoubleParameter delSetsRangeInSeatiles =
+        new CalibratedParameter(0, 5, 0, 5, 3);
     private boolean uniqueCatchSamplerForEachStrategy = false;
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
     private LocationValuesSupplier locationValuesSupplier;
+
     public EPOPlannedStrategyFlexibleFactory() {
     }
+
     public EPOPlannedStrategyFlexibleFactory(
         final int targetYear,
         final LocationValuesSupplier locationValuesSupplier,

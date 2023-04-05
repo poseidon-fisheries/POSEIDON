@@ -27,8 +27,8 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSetFadModule> {
 
@@ -36,11 +36,15 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
      * discretizes map so that when it is time to target FADs you just
      * go through a few relevant ones
      */
-    private AlgorithmFactory<? extends MapDiscretizer> discretization = new SquaresMapDiscretizerFactory(6, 3);
+    private AlgorithmFactory<? extends MapDiscretizer> discretization =
+        new SquaresMapDiscretizerFactory(6, 3);
 
-    private DoubleParameter dampen = new FixedDoubleParameter(-1d);
-    //0 gives no bias to the western waters. Increase this to increase the western bias
-    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.9);
+    private DoubleParameter dampen =
+        new CalibratedParameter(0, 1, 0, 1);
+
+    private DoubleParameter maxAllowableShear =
+        // TODO: This could be obtained empirically
+        new CalibratedParameter(0, 1, 0, 2.6, 0.9);
 
     public DoubleParameter getMaxAllowableShear() {
         return maxAllowableShear;

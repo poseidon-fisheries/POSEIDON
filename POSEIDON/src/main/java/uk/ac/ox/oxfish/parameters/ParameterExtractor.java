@@ -2,9 +2,10 @@ package uk.ac.ox.oxfish.parameters;
 
 import com.google.common.collect.Streams;
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -16,25 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParameterExtractor<R> {
-
-    private final BiFunction<? super String, ? super FreeParameter, ? extends R> extractor;
-
-    public ParameterExtractor(final BiFunction<? super String, ? super FreeParameter, ? extends R> extractor) {
-        this.extractor = extractor;
-    }
-
-    private static Object invoke(final Object object, final Method method) {
-        try {
-            return method.invoke(object);
-        } catch (final IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
+public class ParameterExtractor {
 
     @NotNull
     private static List<PropertyDescriptor> getPropertyDescriptors(final Object object) {
@@ -48,12 +34,20 @@ public class ParameterExtractor<R> {
         }
     }
 
-    public Stream<R> getFreeParameters(final Object object) {
-        return getFreeParameters(object, new ParameterAddressBuilder());
+    private static Object invoke(final Object object, final Method method) {
+        try {
+            return method.invoke(object);
+        } catch (final IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Stream<HardEdgeOptimizationParameter> getParameters(final Object object) {
+        return getParameters(object, new ParameterAddressBuilder());
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private Stream<R> getFreeParameters(
+    private Stream<HardEdgeOptimizationParameter> getParameters(
         final Object object,
         final ParameterAddressBuilder addressBuilder
     ) {
@@ -67,38 +61,48 @@ public class ParameterExtractor<R> {
             )
             .flatMap(o -> {
                 if (o instanceof Map) {
-                    return getFreeParametersFromMap((Map<?, ?>) o, addressBuilder);
+                    return getParametersFromMap((Map<?, ?>) o, addressBuilder);
                 } else if (o instanceof Iterable) {
-                    return getFreeParametersFromIterable((Iterable<?>) o, addressBuilder);
+                    return getParametersFromIterable((Iterable<?>) o, addressBuilder);
                 } else {
-                    return getFreeParametersFromObject(o, addressBuilder);
+                    return getParametersFromObject(o, addressBuilder);
                 }
             });
     }
 
     @NotNull
-    private Stream<R> getFreeParametersFromObject(
+    private Stream<HardEdgeOptimizationParameter> getParametersFromObject(
         final Object o,
         final ParameterAddressBuilder addressBuilder
     ) {
-        final List<PropertyDescriptor> propertyDescriptors = getPropertyDescriptors(o);
-        return Stream.concat(
-            propertyDescriptors.stream()
-                .filter(this::isFreeParameter)
-                .map(p -> extractor.apply(
-                    (o instanceof DoubleParameter ? addressBuilder : addressBuilder.add(p.getName())).get(),
-                    p.getWriteMethod().getAnnotation(FreeParameter.class)
-                )),
-            propertyDescriptors.stream()
-                .filter(p -> p.getReadMethod() != null)
-                .flatMap(p -> getFreeParameters(
-                    invoke(o, p.getReadMethod()),
-                    addressBuilder.add(p.getName())
-                ))
+        return getPropertyDescriptors(o)
+            .stream()
+            .filter(propertyDescriptor -> propertyDescriptor.getReadMethod() != null)
+            .flatMap(propertyDescriptor -> {
+                final Object object = invoke(o, propertyDescriptor.getReadMethod());
+                final ParameterAddressBuilder newAddressBuilder = addressBuilder.add(propertyDescriptor.getName());
+                return object instanceof CalibratedParameter
+                    ? Stream.of(extractParameter((CalibratedParameter) object, newAddressBuilder.get()))
+                    : getParameters(object, newAddressBuilder);
+            });
+    }
+
+    private HardEdgeOptimizationParameter extractParameter(
+        final CalibratedParameter calibratedParameter,
+        final String addressToModify
+    ) {
+        return new HardEdgeOptimizationParameter(
+            addressToModify,
+            calibratedParameter.getMinimum(),
+            calibratedParameter.getMaximum(),
+            calibratedParameter.getHardMinimum() >= 0,
+            false,
+            calibratedParameter.getHardMinimum(),
+            calibratedParameter.getHardMaximum()
         );
     }
 
-    private Stream<R> getFreeParametersFromMap(
+    private Stream<HardEdgeOptimizationParameter> getParametersFromMap(
         final Map<?, ?> objectMap,
         final ParameterAddressBuilder address
     ) {
@@ -106,14 +110,14 @@ public class ParameterExtractor<R> {
             .entrySet()
             .stream()
             .flatMap(entry ->
-                getFreeParameters(
+                getParameters(
                     entry.getValue(),
                     address.addKey(entry.getKey().toString())
                 )
             );
     }
 
-    private Stream<R> getFreeParametersFromIterable(
+    private Stream<HardEdgeOptimizationParameter> getParametersFromIterable(
         final Iterable<?> objects,
         final ParameterAddressBuilder address
     ) {
@@ -123,17 +127,11 @@ public class ParameterExtractor<R> {
                 FishStateUtilities::entry
             )
             .flatMap(entry ->
-                getFreeParameters(
+                getParameters(
                     entry.getKey(),
                     address.addIndex(entry.getValue())
                 )
             );
-    }
-
-    private boolean isFreeParameter(final PropertyDescriptor propertyDescriptor) {
-        return Optional.ofNullable(propertyDescriptor.getWriteMethod())
-            .map(method -> method.getAnnotation(FreeParameter.class))
-            .isPresent();
     }
 
 }

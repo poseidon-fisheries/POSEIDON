@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.geography.discretization;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -32,9 +33,11 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMapDiscretizer> {
 
 
-    private DoubleParameter horizontalSplits = new FixedDoubleParameter(2);
+    private DoubleParameter horizontalSplits =
+        new CalibratedParameter(1, 50, 1, 50, 1);
 
-    private DoubleParameter verticalSplits = new FixedDoubleParameter(2);
+    private DoubleParameter verticalSplits =
+        new CalibratedParameter(5, 50, 1, 50, 50);
 
 
     public SquaresMapDiscretizerFactory() {

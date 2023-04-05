@@ -213,9 +213,8 @@ public class EpoSensitivityRuns {
                 .getFadInitializerFactory();
         fadInitializerFactory
             .getEnvironmentalMapFactories()
-            .stream()
-            .filter(factory -> factory.getMapVariableName().equals(layerName))
-            .forEach(factory -> factory.setThreshold(new FixedDoubleParameter(threshold)));
+            .get(layerName)
+            .setThreshold(new FixedDoubleParameter(threshold));
     }
 
 }

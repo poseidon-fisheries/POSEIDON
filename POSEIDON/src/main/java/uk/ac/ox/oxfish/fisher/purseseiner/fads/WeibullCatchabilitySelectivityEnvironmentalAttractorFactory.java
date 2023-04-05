@@ -19,7 +19,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -29,18 +28,21 @@ import java.util.function.Function;
  */
 public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
-
     private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
-    private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
-
     private AbundanceFiltersFactory abundanceFiltersFactory;
-    private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-    private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
-    private DoubleParameter maximumDaysAttractions = new FixedDoubleParameter(30);
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(0.0);
     private Map<String, SpeciesParameters> speciesParameters;
-    private List<? extends EnvironmentalMapFactory> environmentalMapFactories;
+    private Map<String, EnvironmentalMapFactory> environmentalMapFactories;
+    private DoubleParameter fishValueCalculatorStandardDeviation =
+        new CalibratedParameter(0, 0.5, 0, 1, 0);
+    private DoubleParameter fadDudRate =
+        new CalibratedParameter(0, 0.35, 0, 1, 0.001);
+    private DoubleParameter daysInWaterBeforeAttraction =
+        new CalibratedParameter(0, 20, 0);
+    private DoubleParameter maximumDaysAttractions =
+        new FixedDoubleParameter(Integer.MAX_VALUE);
+    private DoubleParameter fishReleaseProbabilityInPercent =
+        new CalibratedParameter(0.0, 3.5, 0, 10, 3.3);
 
     public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory() {
     }
@@ -48,7 +50,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Map<String, SpeciesParameters> speciesParameters,
-        final List<? extends EnvironmentalMapFactory> environmentalMapFactories,
+        final Map<String, EnvironmentalMapFactory> environmentalMapFactories,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter maximumDaysAttractions,
@@ -63,11 +65,21 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
-    public List<? extends EnvironmentalMapFactory> getEnvironmentalMapFactories() {
+    public WeibullCatchabilitySelectivityEnvironmentalAttractorFactory(
+        final AbundanceFiltersFactory abundanceFiltersFactory,
+        final Map<String, SpeciesParameters> speciesParameters,
+        final Map<String, EnvironmentalMapFactory> environmentalMapFactories
+    ) {
+        this.abundanceFiltersFactory = abundanceFiltersFactory;
+        this.speciesParameters = speciesParameters;
+        this.environmentalMapFactories = environmentalMapFactories;
+    }
+
+    public Map<String, EnvironmentalMapFactory> getEnvironmentalMapFactories() {
         return environmentalMapFactories;
     }
 
-    public void setEnvironmentalMapFactories(final List<? extends EnvironmentalMapFactory> environmentalMapFactories) {
+    public void setEnvironmentalMapFactories(final Map<String, EnvironmentalMapFactory> environmentalMapFactories) {
         this.environmentalMapFactories = environmentalMapFactories;
     }
 
@@ -160,6 +172,38 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
 
     }
 
+    private Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
+        final FishState fishState
+    ) {
+        Function<SeaTile, Double> catchabilityPenaltyFunction = null;
+
+        for (final EnvironmentalMapFactory environmentalMapFactory : environmentalMapFactories.values()) {
+            final AdditionalStartable newMap = environmentalMapFactory.apply(fishState);
+            fishState.registerStartable(newMap);
+            final String mapName = environmentalMapFactory.getMapVariableName();
+            final double threshold = environmentalMapFactory.getThreshold().applyAsDouble(fishState.getRandom());
+            final double penalty = environmentalMapFactory.getPenalty().applyAsDouble(fishState.getRandom());
+
+            final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
+                final double valueHere =
+                    fishState.getMap()
+                        .getAdditionalMaps()
+                        .get(mapName)
+                        .get()
+                        .get(seaTile.getGridX(), seaTile.getGridY());
+                return Math.pow(Math.min(1d, valueHere / threshold), penalty);
+            };
+
+            if (catchabilityPenaltyFunction == null)
+                catchabilityPenaltyFunction = penaltyMultiplier;
+            else {
+                final Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
+                catchabilityPenaltyFunction = seaTile -> oldPenalty.apply(seaTile) * penaltyMultiplier.apply(seaTile);
+            }
+        }
+        return catchabilityPenaltyFunction;
+    }
+
     public DoubleParameter getDaysInWaterBeforeAttraction() {
         return daysInWaterBeforeAttraction;
     }
@@ -200,38 +244,6 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
 
     public void setFishValueCalculatorStandardDeviation(final DoubleParameter fishValueCalculatorStandardDeviation) {
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
-    }
-
-    private Function<SeaTile, Double> createEnvironmentalPenaltyAndStartEnvironmentalMaps(
-        final FishState fishState
-    ) {
-        Function<SeaTile, Double> catchabilityPenaltyFunction = null;
-
-        for (final EnvironmentalMapFactory environmentalMapFactory : environmentalMapFactories) {
-            final AdditionalStartable newMap = environmentalMapFactory.apply(fishState);
-            fishState.registerStartable(newMap);
-            final String mapName = environmentalMapFactory.getMapVariableName();
-            final double threshold = environmentalMapFactory.getThreshold().applyAsDouble(fishState.getRandom());
-            final double penalty = environmentalMapFactory.getPenalty().applyAsDouble(fishState.getRandom());
-
-            final Function<SeaTile, Double> penaltyMultiplier = seaTile -> {
-                final double valueHere =
-                    fishState.getMap()
-                        .getAdditionalMaps()
-                        .get(mapName)
-                        .get()
-                        .get(seaTile.getGridX(), seaTile.getGridY());
-                return Math.pow(Math.min(1d, valueHere / threshold), penalty);
-            };
-
-            if (catchabilityPenaltyFunction == null)
-                catchabilityPenaltyFunction = penaltyMultiplier;
-            else {
-                final Function<SeaTile, Double> oldPenalty = catchabilityPenaltyFunction;
-                catchabilityPenaltyFunction = seaTile -> oldPenalty.apply(seaTile) * penaltyMultiplier.apply(seaTile);
-            }
-        }
-        return catchabilityPenaltyFunction;
     }
 
     public static class SpeciesParameters {
