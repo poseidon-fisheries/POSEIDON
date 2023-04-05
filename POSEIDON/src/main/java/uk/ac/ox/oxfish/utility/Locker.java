@@ -27,9 +27,12 @@ import java.util.function.Supplier;
  * Very simple container. You can put an item in there with a key. If you give back the same key you get back
  * the same item, otherwise the item is destroyed
  * Created by carrknight on 11/15/16.
+ *
+ * @deprecated Use {@link uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState} or another Guava
+ * cache instead, as those allow multiple keys and have more flexible eviction policies.
  */
-public class Locker<K,I>
-{
+@Deprecated
+public class Locker<K, I> {
 
     private I itemHeld;
 
@@ -41,18 +44,16 @@ public class Locker<K,I>
 
     /**
      * if the key is recognized, the old item is given. Otherwise the supplier is used to get a new item out
-     * @param key key
+     *
+     * @param key         key
      * @param constructor used to create item if the key has changed
      * @return old item if the key is unchanged, new item otherwise
      */
-    public I presentKey(K key, Supplier<I> constructor){
-        if(this.key!= null && key.equals(this.key))
-        {
+    public I presentKey(final K key, final Supplier<I> constructor) {
+        if (key.equals(this.key)) {
             assert itemHeld != null;
             return itemHeld;
-        }
-        else
-        {
+        } else {
             itemHeld = constructor.get();
             this.key = key;
             return itemHeld;
@@ -68,9 +69,9 @@ public class Locker<K,I>
     }
 
 
-    public void reset(){
-        this.key=null;
-        this.itemHeld=null;
+    public void reset() {
+        this.key = null;
+        this.itemHeld = null;
     }
 
 }

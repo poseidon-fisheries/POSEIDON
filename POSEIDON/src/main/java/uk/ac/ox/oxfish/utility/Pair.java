@@ -20,20 +20,22 @@
 
 package uk.ac.ox.oxfish.utility;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.AbstractMap;
 
 /**
  * The simplest pair object
  * Created by carrknight on 5/4/15.
+ *
+ * @deprecated Use {@link AbstractMap.SimpleImmutableEntry} instead.
  */
-public class Pair<A,B> {
-
+@Deprecated
+public class Pair<A, B> {
+    
     final private A first;
 
     final private B second;
 
-    public Pair(A first, B second) {
+    public Pair(final A first, final B second) {
         this.first = first;
         this.second = second;
     }
@@ -47,19 +49,11 @@ public class Pair<A,B> {
         return second;
     }
 
-    /** Create a new pair from the first element of the pair and the result of a function applied to the second element */
-    public <R> Pair<A, R> mapSecond(Function<B, R> f) { return new Pair<>(first, f.apply(second)); }
-
-    /** Create a new pair from the first element of the pair and the result of a function applied to both elements */
-    public <R> Pair<A, R> mapSecond(BiFunction<A, B, R> f) { return new Pair<>(first, f.apply(first, second)); }
-
-
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Pair{");
-        sb.append("first=").append(first);
-        sb.append(", second=").append(second);
-        sb.append('}');
-        return sb.toString();
+        final String sb = "Pair{" + "first=" + first +
+            ", second=" + second +
+            '}';
+        return sb;
     }
 }
