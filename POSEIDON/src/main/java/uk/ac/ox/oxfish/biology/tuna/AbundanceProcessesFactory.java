@@ -5,12 +5,10 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
-import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -59,8 +57,7 @@ public class AbundanceProcessesFactory
                 ),
                 ImmutableMap.of(
                     "Bigeye tuna", ImmutableList.of(2.5, 15.0),
-                    // use the last two bins of SKJ as "medium" and "large"
-                    "Skipjack tuna", ImmutableList.of(2.5, 11.5019),
+                    "Skipjack tuna", ImmutableList.of(2.5, 3.0),
                     "Yellowfin tuna", ImmutableList.of(2.5, 15.0)
                 )
             );

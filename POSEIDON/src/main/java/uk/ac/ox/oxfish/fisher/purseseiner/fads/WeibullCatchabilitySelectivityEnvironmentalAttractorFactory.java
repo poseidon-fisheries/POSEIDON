@@ -38,7 +38,7 @@ public class WeibullCatchabilitySelectivityEnvironmentalAttractorFactory impleme
     private DoubleParameter fadDudRate =
         new CalibratedParameter(0, 0.35, 0, 1, 0.001);
     private DoubleParameter daysInWaterBeforeAttraction =
-        new CalibratedParameter(0, 20, 0);
+        new CalibratedParameter(7, 20, 14);
     private DoubleParameter maximumDaysAttractions =
         new FixedDoubleParameter(Integer.MAX_VALUE);
     private DoubleParameter fishReleaseProbabilityInPercent =

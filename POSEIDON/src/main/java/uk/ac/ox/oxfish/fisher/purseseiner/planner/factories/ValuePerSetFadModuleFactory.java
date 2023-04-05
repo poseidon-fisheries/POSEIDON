@@ -44,7 +44,7 @@ public class ValuePerSetFadModuleFactory implements AlgorithmFactory<ValuePerSet
 
     private DoubleParameter maxAllowableShear =
         // TODO: This could be obtained empirically
-        new CalibratedParameter(0, 1, 0, 2.6, 0.9);
+        new CalibratedParameter(0.8, 1.0, 0, 2.6, 0.9);
 
     public DoubleParameter getMaxAllowableShear() {
         return maxAllowableShear;

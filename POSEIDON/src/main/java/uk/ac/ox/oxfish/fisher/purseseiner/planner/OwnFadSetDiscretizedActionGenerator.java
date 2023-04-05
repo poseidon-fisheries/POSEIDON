@@ -34,18 +34,16 @@ public class OwnFadSetDiscretizedActionGenerator {
      * if a FAD has less than this in value, just ignore it!
      */
     private final double minimumFadValue;
+    //Set this value higher to allow vessels to set closer to the equator
+    private final double maxAllowableShear;
     private NauticalMap map;
     private PriorityQueue<ValuedFad>[] rankedFads;
-
     /**
      * when this is set to true, the generator will immediately remove all fads that are currently not
      * allowed to be caught. This is set to false because the standard procedure is to wait till the action
      * comes up in the plan before checking its validity.
      */
     private boolean filterOutCurrentlyInvalidFads = false;
-
-    //Set this value higher to allow vessels to set closer to the equator
-    private final double maxAllowableShear;
 
     //todo add minimum soaktime
 

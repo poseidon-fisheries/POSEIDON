@@ -51,5 +51,4 @@ public class CalibrationGenerator {
         final Path calibrationFile = calibrationFolder.resolve("calibration.yaml");
         yaml.dump(genericOptimization, calibrationFile);
     }
-
 }
