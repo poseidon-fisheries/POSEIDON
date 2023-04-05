@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
+import uk.ac.ox.oxfish.geography.fads.FadZapperFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
@@ -61,11 +62,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     implements TestableScenario {
 
-    private int targetYear = 2017;
-
     public static final MapExtent DEFAULT_MAP_EXTENT =
         MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
-
     public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
         DEFAULT_MAP_EXTENT,
         ImmutableMap.of(
@@ -75,15 +73,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
         )
     );
-
-    public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
-        return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
-    }
-
-    public int getTargetYear() {
-        return targetYear;
-    }
-
+    private int targetYear = 2017;
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     public SpeciesCodesFromFileFactory speciesCodesSupplier =
         new SpeciesCodesFromFileFactory(
@@ -102,12 +92,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
     private FadMapFactory<B, F> fadMapFactory;
     private List<AlgorithmFactory<? extends Startable>> additionalStartables =
         Stream.of(
+            new FadZapperFactory(),
             new EnvironmentalMapFactory(
                 "Shear",
                 getInputFolder().path("currents", "shear.csv")
             )
         ).collect(Collectors.toList());
-
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             getInputFolder().path("depth.csv"),
@@ -115,10 +105,18 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             0.5
         );
 
+    public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
+        return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
+    }
+
     public static String getBoatId(final Fisher fisher) {
         return fisher.getTags().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
+    }
+
+    public int getTargetYear() {
+        return targetYear;
     }
 
     public void setTargetYear(final int targetYear) {
@@ -131,15 +129,6 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<B> biologicalProcessesFactory) {
         this.biologicalProcessesFactory = biologicalProcessesFactory;
-    }
-
-    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
-        return mapInitializerFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setMapInitializerFactory(final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
-        this.mapInitializerFactory = mapInitializerFactory;
     }
 
     public InputPath testFolder() {
@@ -191,12 +180,12 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         );
     }
 
-    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return ImmutableList.of();
-    }
-
     public FadMapFactory<B, F> getFadMapFactory() {
         return this.fadMapFactory;
+    }
+
+    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
+        return ImmutableList.of();
     }
 
     public void setFadMapFactory(final FadMapFactory<B, F> fadMapFactory) {
@@ -245,5 +234,14 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, fishState.random, fishState);
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
+    }
+
+    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
+        return mapInitializerFactory;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMapInitializerFactory(final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
+        this.mapInitializerFactory = mapInitializerFactory;
     }
 }

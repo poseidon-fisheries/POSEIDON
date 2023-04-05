@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.DiscretizedOwnFadPla
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.GreedyInsertionFadPlanningFactory;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
+import uk.ac.ox.oxfish.geography.fads.FadZapperFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
@@ -23,156 +24,23 @@ import java.util.Set;
 
 public class TunaGeographicalSensitivity {
 
-    private final static Path MAIN_DIRECTORY = Paths.get(
-            "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/comparative_statics/"
-    );
-
-    private final static String originalScenario = "ga_hazard_2_forcedwaiting.yaml";
     public static final double MINIMUM_VALUE_FAD = 48120.70104;
+    private final static Path MAIN_DIRECTORY = Paths.get(
+        "docs/20220223 tuna_calibration/pathfinder_julydata/august_sensitivity/comparative_statics/"
+    );
+    private final static String originalScenario = "ga_hazard_2_forcedwaiting.yaml";
 
+    public static void main(final String[] args) throws IOException {
 
-    private static void runAndOutput(
-            double hazardRate,
-            boolean zapperAge,
-            double waitTime,
-            double catchabilityMultiplier,
-            Behaviour behaviour,
-            String scenarioName
-    ) throws IOException {
+        runAndOutput(
+            Double.NaN,
+            false,
+            Double.NaN,
+            0.5,
+            Behaviour.UNCHANGED,
 
-        for (int run = 0; run < 10; run++) {
-            ///set up the scenario
-            FishYAML yaml = new FishYAML();
-            EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
-                new FileReader(MAIN_DIRECTORY.resolve(originalScenario).toFile()),
-                EpoPathPlanningAbundanceScenario.class
-            );
-
-            if (Double.isFinite(hazardRate))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
-                    .getPurseSeinerFleetFactory()
-                    .getPurseSeineGearFactory()
-                    .getFadInitializerFactory()
-                ).setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
-
-            scenario.setZapperAge(zapperAge);
-
-            if (Double.isFinite(waitTime))
-                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
-                    .getPurseSeinerFleetFactory()
-                    .getPurseSeineGearFactory()
-                    .getFadInitializerFactory()
-                ).setDaysInWaterBeforeAttraction(new FixedDoubleParameter(waitTime));
-
-            if (Double.isFinite(catchabilityMultiplier)) {
-                LinkedHashMap<String, Double> catchabilities =
-                    ((WeibullCatchabilitySelectivityAttractorFactory) scenario
-                        .getPurseSeinerFleetFactory()
-                        .getPurseSeineGearFactory()
-                        .getFadInitializerFactory()
-                    ).getCatchabilities();
-                Set<String> species = catchabilities.keySet();
-                for (String tuna : species) {
-                    catchabilities.put(
-                        tuna,
-                        catchabilities.get(tuna) * catchabilityMultiplier
-                    );
-                }
-            }
-            GreedyInsertionFadPlanningFactory greedy;
-            SquaresMapDiscretizerFactory discretization;
-
-            switch (behaviour){
-
-                default:
-                case UNCHANGED :
-                    System.out.println("unchanged");
-                    break;
-                case GREEDY  :
-                    greedy = new GreedyInsertionFadPlanningFactory();
-                    discretization = new SquaresMapDiscretizerFactory();
-                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
-                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
-                    greedy.setDiscretization(discretization);
-                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
-                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
-                    break;
-                case GREEDY_0 :
-                    greedy = new GreedyInsertionFadPlanningFactory();
-                    discretization = new SquaresMapDiscretizerFactory();
-                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
-                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
-                    greedy.setDiscretization(discretization);
-                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(0));
-                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
-                    break;
-                case GREEDY_IDENTITY:
-                    greedy = new GreedyInsertionFadPlanningFactory();
-                    greedy.setDiscretization(new IdentityDiscretizerFactory());
-                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
-                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
-                    break;
-                case GREEDY_VERY_HIGH_MINFADVALUE :
-                    greedy = new GreedyInsertionFadPlanningFactory();
-                    discretization = new SquaresMapDiscretizerFactory();
-                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
-                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
-                    greedy.setDiscretization(discretization);
-                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
-                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(2000000));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
-                    break;
-                case GREEDY_HIGH_GREED_FACTOR:
-                    greedy = new GreedyInsertionFadPlanningFactory();
-                    discretization = new SquaresMapDiscretizerFactory();
-                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
-                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
-                    greedy.setDiscretization(discretization);
-                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(500));
-                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
-                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).setFadModuleFactory(greedy);
-                    break;
-                case NEGATIVE_CENTROID:
-                    ((DiscretizedOwnFadPlanningFactory) ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory().getDestinationStrategyFactory()).getFadModuleFactory()).setDistancePenalty(new FixedDoubleParameter(-1d));
-                    break;
-            }
-
-
-            //run it now
-            FishState model = new FishState(run);
-            model.setScenario(scenario);
-            model.start();
-            model.registerStartable(
-                    new RowProviderToOutputPluginAdaptor(
-                            new PurseSeineActionsLogger(model),
-                            "actions_"+run+".csv"
-                    )
-            );
-            while(model.getYear()<2){
-                model.schedule.step(model);
-            }
-            MAIN_DIRECTORY.resolve(scenarioName).toFile().mkdir();
-            FishStateUtilities.writeAdditionalOutputsToFolder(
-                    MAIN_DIRECTORY.resolve(scenarioName),
-                    model
-            );
-        }
-
-    }
-
-
-    public static void main(String[] args) throws IOException {
-
-        runAndOutput(Double.NaN,
-                false,
-                Double.NaN,
-                0.5,
-                Behaviour.UNCHANGED,
-
-                "lowcalibration");
+            "lowcalibration"
+        );
 
 //        runAndOutput(Double.NaN,
 //                false,
@@ -246,7 +114,152 @@ public class TunaGeographicalSensitivity {
 //                "negativeCentroid");
     }
 
-    enum Behaviour{
+    private static void runAndOutput(
+        final double hazardRate,
+        final boolean zapperAge,
+        final double waitTime,
+        final double catchabilityMultiplier,
+        final Behaviour behaviour,
+        final String scenarioName
+    ) throws IOException {
+
+        for (int run = 0; run < 10; run++) {
+            ///set up the scenario
+            final FishYAML yaml = new FishYAML();
+            final EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
+                new FileReader(MAIN_DIRECTORY.resolve(originalScenario).toFile()),
+                EpoPathPlanningAbundanceScenario.class
+            );
+
+            if (Double.isFinite(hazardRate))
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                    .getPurseSeinerFleetFactory()
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory()
+                ).setFishReleaseProbabilityInPercent(new FixedDoubleParameter(hazardRate));
+
+            scenario.getAdditionalStartables()
+                .stream()
+                .filter(algorithmFactory -> algorithmFactory instanceof FadZapperFactory)
+                .forEach(algorithmFactory ->
+                    ((FadZapperFactory) algorithmFactory)
+                        .setMaxFadAge(new FixedDoubleParameter(zapperAge ? 150.0 : Double.MAX_VALUE))
+                );
+
+            if (Double.isFinite(waitTime))
+                ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                    .getPurseSeinerFleetFactory()
+                    .getPurseSeineGearFactory()
+                    .getFadInitializerFactory()
+                ).setDaysInWaterBeforeAttraction(new FixedDoubleParameter(waitTime));
+
+            if (Double.isFinite(catchabilityMultiplier)) {
+                final LinkedHashMap<String, Double> catchabilities =
+                    ((WeibullCatchabilitySelectivityAttractorFactory) scenario
+                        .getPurseSeinerFleetFactory()
+                        .getPurseSeineGearFactory()
+                        .getFadInitializerFactory()
+                    ).getCatchabilities();
+                final Set<String> species = catchabilities.keySet();
+                for (final String tuna : species) {
+                    catchabilities.put(
+                        tuna,
+                        catchabilities.get(tuna) * catchabilityMultiplier
+                    );
+                }
+            }
+            final GreedyInsertionFadPlanningFactory greedy;
+            final SquaresMapDiscretizerFactory discretization;
+
+            switch (behaviour) {
+
+                default:
+                case UNCHANGED:
+                    System.out.println("unchanged");
+                    break;
+                case GREEDY:
+                    greedy = new GreedyInsertionFadPlanningFactory();
+                    discretization = new SquaresMapDiscretizerFactory();
+                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
+                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
+                    greedy.setDiscretization(discretization);
+                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
+                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).setFadModuleFactory(greedy);
+                    break;
+                case GREEDY_0:
+                    greedy = new GreedyInsertionFadPlanningFactory();
+                    discretization = new SquaresMapDiscretizerFactory();
+                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
+                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
+                    greedy.setDiscretization(discretization);
+                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(0));
+                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).setFadModuleFactory(greedy);
+                    break;
+                case GREEDY_IDENTITY:
+                    greedy = new GreedyInsertionFadPlanningFactory();
+                    greedy.setDiscretization(new IdentityDiscretizerFactory());
+                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
+                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).setFadModuleFactory(greedy);
+                    break;
+                case GREEDY_VERY_HIGH_MINFADVALUE:
+                    greedy = new GreedyInsertionFadPlanningFactory();
+                    discretization = new SquaresMapDiscretizerFactory();
+                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
+                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
+                    greedy.setDiscretization(discretization);
+                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(5));
+                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(2000000));
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).setFadModuleFactory(greedy);
+                    break;
+                case GREEDY_HIGH_GREED_FACTOR:
+                    greedy = new GreedyInsertionFadPlanningFactory();
+                    discretization = new SquaresMapDiscretizerFactory();
+                    discretization.setHorizontalSplits(new FixedDoubleParameter(20));
+                    discretization.setVerticalSplits(new FixedDoubleParameter(20));
+                    greedy.setDiscretization(discretization);
+                    greedy.setAdditionalFadInspected(new FixedDoubleParameter(500));
+                    greedy.setMinimumValueFadSets(new FixedDoubleParameter(MINIMUM_VALUE_FAD));
+                    ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).setFadModuleFactory(greedy);
+                    break;
+                case NEGATIVE_CENTROID:
+                    ((DiscretizedOwnFadPlanningFactory) ((EPOPlannedStrategyFlexibleFactory) scenario.getPurseSeinerFleetFactory()
+                        .getDestinationStrategyFactory()).getFadModuleFactory()).setDistancePenalty(new FixedDoubleParameter(
+                        -1d));
+                    break;
+            }
+
+
+            //run it now
+            final FishState model = new FishState(run);
+            model.setScenario(scenario);
+            model.start();
+            model.registerStartable(
+                new RowProviderToOutputPluginAdaptor(
+                    new PurseSeineActionsLogger(model),
+                    "actions_" + run + ".csv"
+                )
+            );
+            while (model.getYear() < 2) {
+                model.schedule.step(model);
+            }
+            MAIN_DIRECTORY.resolve(scenarioName).toFile().mkdir();
+            FishStateUtilities.writeAdditionalOutputsToFolder(
+                MAIN_DIRECTORY.resolve(scenarioName),
+                model
+            );
+        }
+
+    }
+
+    enum Behaviour {
 
         UNCHANGED,
 

@@ -14,14 +14,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
-import uk.ac.ox.oxfish.geography.fads.FadZapper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.ChlorophyllMapFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
 
@@ -74,8 +72,6 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
             ),
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );
-    private boolean zapper = false;
-    private boolean zapperAge = false;
 
     public PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
@@ -101,36 +97,8 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
     }
 
     @Override
-    public ScenarioPopulation populateModel(final FishState fishState) {
-        final ScenarioPopulation scenarioPopulation = super.populateModel(fishState);
-        if (zapper) {
-            final Predicate<AbstractFad> predicate = zapperAge ?
-                fad -> fad.getLocation().getGridX() <= 20 :
-                fad -> fad.getLocation().getGridX() <= 20 || fishState.getStep() - fad.getStepDeployed() > 150;
-            fishState.registerStartable(new FadZapper(predicate));
-        }
-        return scenarioPopulation;
-    }
-
-    @Override
     List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
         return purseSeinerFleetFactory.makeFishers(fishState, targetYear);
-    }
-
-    public boolean isZapper() {
-        return zapper;
-    }
-
-    public void setZapper(final boolean zapper) {
-        this.zapper = zapper;
-    }
-
-    public boolean isZapperAge() {
-        return zapperAge;
-    }
-
-    public void setZapperAge(final boolean zapperAge) {
-        this.zapperAge = zapperAge;
     }
 
 }
