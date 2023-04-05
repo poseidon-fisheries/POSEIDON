@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -122,10 +123,13 @@ public class ScheduledAbundanceProcessesFactory
     private Map<Integer, Collection<BiologicalProcess<AbundanceLocalBiology>>> buildSchedule(
         final FishState fishState
     ) {
-        final LocalDate startDate = LocalDate.parse(biologicalProcessesDates.get(0));
+        final List<LocalDate> dates = biologicalProcessesDates.stream()
+            .map(d -> "1970-" + d) // arbitrary non-leap year
+            .map(LocalDate::parse)
+            .collect(toImmutableList());
+        final LocalDate startDate = dates.get(0);
         final Set<Integer> processSteps =
-            biologicalProcessesDates.stream()
-                .map(LocalDate::parse)
+            dates.stream()
                 .map(date -> Math.toIntExact(DAYS.between(startDate, date)))
                 .collect(toImmutableSet());
 

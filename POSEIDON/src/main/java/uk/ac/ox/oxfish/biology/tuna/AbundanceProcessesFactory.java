@@ -41,7 +41,7 @@ public class AbundanceProcessesFactory
             ),
             new ScheduledAbundanceProcessesFactory(
                 speciesCodesSupplier,
-                ImmutableList.of("2017-01-01", "2017-04-01", "2017-07-01", "2017-10-01"),
+                ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
                 inputFolder.path("mortality.csv")
             )
         );
