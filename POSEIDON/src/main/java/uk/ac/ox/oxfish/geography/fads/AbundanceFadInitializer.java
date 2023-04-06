@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -33,7 +32,8 @@ public class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLoc
 
 
     public AbundanceFadInitializer(
-        final GlobalBiology globalBiology, final DoubleSupplier carryingCapacityGenerator,
+        final GlobalBiology globalBiology,
+        final DoubleSupplier carryingCapacityGenerator,
         final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier

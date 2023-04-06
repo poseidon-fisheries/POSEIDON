@@ -1,30 +1,44 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.apache.commons.math3.distribution.BetaDistribution;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
-import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-public class AbundanceFadInitializerBetaFactory extends AbstractCompressedAbundanceFadInitializerFactory {
+public class CompressedAbundanceFadInitializerFactory
+    extends AbstractCompressedAbundanceFadInitializerFactory {
 
-    private DoubleParameter parameterAlpha = new FixedDoubleParameter(.1);
-    private DoubleParameter parameterBeta = new FixedDoubleParameter(5);
 
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
 
 
-    public AbundanceFadInitializerBetaFactory() {
-//        this("Bigeye tuna", "Yellowfin tuna", "Skipjack tuna");
+    public CompressedAbundanceFadInitializerFactory() {
     }
 
-    public AbundanceFadInitializerBetaFactory(
+    public CompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
@@ -33,49 +47,26 @@ public class AbundanceFadInitializerBetaFactory extends AbstractCompressedAbunda
     }
 
     @NotNull
-    @Override
     protected DoubleSupplier buildCapacityGenerator(
         final MersenneTwisterFast rng,
         final double maximumCarryingCapacity
     ) {
-
-        final BetaDistribution distribution = new BetaDistribution(
-            new MTFApache(rng),
-            parameterAlpha.applyAsDouble(rng),
-            parameterBeta.applyAsDouble(rng)
-        );
-        final DoubleSupplier capacityGenerator;
         final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
+        final DoubleSupplier capacityGenerator;
         if (Double.isNaN(probabilityOfFadBeingDud) || probabilityOfFadBeingDud == 0)
-            capacityGenerator = () -> distribution.sample() * maximumCarryingCapacity;
+            capacityGenerator = () -> maximumCarryingCapacity;
         else
             capacityGenerator = () -> {
                 if (rng.nextFloat() <= probabilityOfFadBeingDud)
                     return 0;
                 else
-                    return distribution.sample() * maximumCarryingCapacity;
+                    return maximumCarryingCapacity;
             };
-
-
         return capacityGenerator;
     }
 
-    public DoubleParameter getParameterAlpha() {
-        return parameterAlpha;
-    }
 
-    public void setParameterAlpha(final DoubleParameter parameterAlpha) {
-        this.parameterAlpha = parameterAlpha;
-    }
-
-    public DoubleParameter getParameterBeta() {
-        return parameterBeta;
-    }
-
-    public void setParameterBeta(final DoubleParameter parameterBeta) {
-        this.parameterBeta = parameterBeta;
-    }
-
+    @SuppressWarnings("unused")
     public DoubleParameter getFadDudRate() {
         return fadDudRate;
     }

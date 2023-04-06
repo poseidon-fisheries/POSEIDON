@@ -30,7 +30,7 @@ import java.util.AbstractMap;
  */
 @Deprecated
 public class Pair<A, B> {
-    
+
     final private A first;
 
     final private B second;

@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.CompressedAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -37,7 +37,7 @@ public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
             getInputFolder().path("calibration", "fad_deployments.csv"),
-            new AbundanceFadInitializerFactory(
+            new CompressedAbundanceFadInitializerFactory(
                 new AbundanceFiltersFromFileFactory(
                     getInputFolder().path("abundance", "selectivity.csv"),
                     getSpeciesCodesSupplier()

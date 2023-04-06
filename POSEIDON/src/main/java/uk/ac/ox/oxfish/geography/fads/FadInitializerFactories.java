@@ -18,20 +18,20 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearClorophillAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttractorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearClorophillAttractorFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearEnvironmentalAttractorFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityAttractorFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullCatchabilitySelectivityEnvironmentalAttractorFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Constructors;
-
 public class FadInitializerFactories {
 
-    public static final Map<String, Supplier<AlgorithmFactory<? extends FadInitializerFactory>>>
+    public static final Map<String, Supplier<AlgorithmFactory<? extends CompressedExponentialFadInitializerFactory>>>
         CONSTRUCTORS;
 
     @SuppressWarnings("rawtypes")
@@ -39,27 +39,38 @@ public class FadInitializerFactories {
         new LinkedHashMap<>();
 
     static {
-        NAMES.put(AbundanceFadInitializerFactory.class, "Abundance FAD Initializer");
+        NAMES.put(CompressedAbundanceFadInitializerFactory.class, "Abundance FAD Initializer");
         NAMES.put(LinearAbundanceFadInitializerFactory.class, "Linear Abundance FAD Initializer");
-        NAMES.put(BiomassFadInitializerFactory.class, "Biomass FAD Initializer");
+        NAMES.put(CompressedBiomassFadInitializerFactory.class, "Biomass FAD Initializer");
 
         NAMES.put(AbundanceFadInitializerBetaFactory.class, "Abundance FAD Beta Initializer");
-        NAMES.put(AbundanceFadInitializerBetaFactoryWithExpiration.class, "Abundance FAD Beta Initializer With Expiration");
+        NAMES.put(
+            AbundanceFadInitializerBetaFactoryWithExpiration.class,
+            "Abundance FAD Beta Initializer With Expiration"
+        );
         //weibul linear intervals
-        NAMES.put(WeibullLinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
-        NAMES.put(WeibullLinearIntervalEnvironmentalAttractorFactory.class, "Weibull FAD Linear Interval Environmental Initializer");
+        NAMES.put(LinearIntervalAttractorFactory.class, "Weibull FAD Linear Interval Initializer");
         //weibull linear catchability
-        NAMES.put(WeibullCatchabilitySelectivityAttractorFactory.class, "Weibull FAD Catchability Selectivity Initializer");
-        NAMES.put(WeibullCatchabilitySelectivityEnvironmentalAttractorFactory.class,
-                  "Weibull FAD Catchability Selectivity Environmental Initializer");
+        NAMES.put(
+            WeibullCatchabilitySelectivityAttractorFactory.class,
+            "Weibull FAD Catchability Selectivity Initializer"
+        );
+        NAMES.put(
+            SelectivityAbundanceFadInitializerFactory.class,
+            "Weibull FAD Catchability Selectivity Environmental Initializer"
+        );
 
         //linear catchabilities
         NAMES.put(AbundanceLinearIntervalInitializerFactory.class, "Abundance FAD Linear Interval Initializer");
-        NAMES.put(LinearClorophillAttractorFactory.class,
-                "Linear FAD Catchability Selectivity Clorophill Initializer");
+        NAMES.put(
+            LinearClorophillAttractorFactory.class,
+            "Linear FAD Catchability Selectivity Clorophill Initializer"
+        );
 
-        NAMES.put(LinearEnvironmentalAttractorFactory.class,
-                  "Linear FAD Catchability Selectivity Environmental Initializer");
+        NAMES.put(
+            LinearEnvironmentalAttractorFactory.class,
+            "Linear FAD Catchability Selectivity Environmental Initializer"
+        );
 
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);

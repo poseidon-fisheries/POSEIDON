@@ -21,25 +21,9 @@
 package uk.ac.ox.oxfish.utility;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Supplier;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
-import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
-import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
-import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
-import uk.ac.ox.oxfish.biology.complicated.factory.AbundanceDiffusers;
-import uk.ac.ox.oxfish.biology.complicated.factory.Agings;
-import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundances;
-import uk.ac.ox.oxfish.biology.complicated.factory.MeristicFactories;
-import uk.ac.ox.oxfish.biology.complicated.factory.Mortalities;
-import uk.ac.ox.oxfish.biology.complicated.factory.Recruitments;
+import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.factory.*;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowers;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -50,16 +34,8 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.LegalityFeatureExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.ProfitFeatureExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.ProfitThresholdExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SafetyFeatureExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SocialAcceptabilityFeatureExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.LegalityFeatureExtractors;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.ProfitFeatureExtractors;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.ProfitThresholdsExtractors;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.SafetyFeatureExtractors;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.SocialAcceptabilityFeatureExtractors;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.AcquisitionFunctions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NumericalGeographicalRegressions;
@@ -86,8 +62,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizers;
+import uk.ac.ox.oxfish.geography.fads.CompressedExponentialFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactories;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -117,6 +93,12 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
@@ -240,13 +222,17 @@ public class AlgorithmFactories {
         );
         NAMES_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.NAMES);
 
-        CONSTRUCTOR_MAP.put(FadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
-        NAMES_MAP.put(FadInitializerFactory.class, FadInitializerFactories.NAMES);
+        CONSTRUCTOR_MAP.put(CompressedExponentialFadInitializerFactory.class, FadInitializerFactories.CONSTRUCTORS);
+        NAMES_MAP.put(CompressedExponentialFadInitializerFactory.class, FadInitializerFactories.NAMES);
 
-        CONSTRUCTOR_MAP.put(DiscretizedOwnFadPlanningModule.class,
-                FadPlanningFactories.CONSTRUCTORS);
-        NAMES_MAP.put(DiscretizedOwnFadPlanningModule.class,
-                FadPlanningFactories.NAMES);
+        CONSTRUCTOR_MAP.put(
+            DiscretizedOwnFadPlanningModule.class,
+            FadPlanningFactories.CONSTRUCTORS
+        );
+        NAMES_MAP.put(
+            DiscretizedOwnFadPlanningModule.class,
+            FadPlanningFactories.NAMES
+        );
     }
 
 
@@ -256,8 +242,8 @@ public class AlgorithmFactories {
      * @param name the name
      * @return the factory or null if there isn't any!
      */
-    public static AlgorithmFactory constructorLookup(String name) {
-        for (Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values()) {
+    public static AlgorithmFactory constructorLookup(final String name) {
+        for (final Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values()) {
             final Supplier<? extends AlgorithmFactory<?>> supplier = map.get(name);
             if (supplier != null) {
                 return supplier.get();
@@ -273,8 +259,8 @@ public class AlgorithmFactories {
      * @param factory the name
      * @return the factory or null if there isn't any!
      */
-    public static String nameLookup(Class<? extends AlgorithmFactory> factory) {
-        for (Map<Class<? extends AlgorithmFactory>, String> map : NAMES_MAP.values()) {
+    public static String nameLookup(final Class<? extends AlgorithmFactory> factory) {
+        for (final Map<Class<? extends AlgorithmFactory>, String> map : NAMES_MAP.values()) {
             final String name = map.get(factory);
             if (name != null) {
                 return name;
@@ -288,8 +274,8 @@ public class AlgorithmFactories {
      * returns a list with all the factories available in the constructor Maps
      */
     public static List<Class<? extends AlgorithmFactory>> getAllAlgorithmFactories() {
-        List<Class<? extends AlgorithmFactory>> classes = new LinkedList<>();
-        for (Map<Class<? extends AlgorithmFactory>, String> names : NAMES_MAP.values()) {
+        final List<Class<? extends AlgorithmFactory>> classes = new LinkedList<>();
+        for (final Map<Class<? extends AlgorithmFactory>, String> names : NAMES_MAP.values()) {
             classes.addAll(names.keySet());
         }
         return classes;

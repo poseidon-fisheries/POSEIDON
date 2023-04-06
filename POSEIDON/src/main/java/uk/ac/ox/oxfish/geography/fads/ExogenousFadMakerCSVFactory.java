@@ -19,7 +19,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
     private InputPath deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
 
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
-        new BiomassFadInitializerFactory(null);
+        new CompressedBiomassFadInitializerFactory(null);
 
     /**
      * Empty constructor for YAML initialization
@@ -30,7 +30,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
 
     public ExogenousFadMakerCSVFactory(
         final InputPath deploymentsFile,
-        @SuppressWarnings("rawtypes") final FadInitializerFactory fadInitializerFactory
+        @SuppressWarnings("rawtypes") final CompressedExponentialFadInitializerFactory fadInitializerFactory
     ) {
         this.deploymentsFile = deploymentsFile;
         this.fadInitializerFactory = fadInitializerFactory;

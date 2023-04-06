@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.function.Supplier;
 
-public class LinearAbundanceFadInitializerFactory extends AbundanceFadInitializerFactory {
+public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFadInitializerFactory {
     public LinearAbundanceFadInitializerFactory() {
     }
 

@@ -50,4 +50,8 @@ public class CacheByFishState<T> {
         return cache.getUnchecked(fishState);
     }
 
+    public void invalidateAll() {
+        cache.invalidateAll();
+    }
+
 }

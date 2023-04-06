@@ -99,7 +99,7 @@ public class ExogenousFadMakerTest {
         fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
         fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy.csv"));
-        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
+        ((CompressedBiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
             ImmutableMap.of(
                 "Species 0",
                 new FixedDoubleParameter(0.1)

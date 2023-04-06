@@ -17,12 +17,12 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractAbundanceFadInitializerFactory
-    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
+public abstract class AbstractCompressedAbundanceFadInitializerFactory
+    extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
-    public AbstractAbundanceFadInitializerFactory(
+    public AbstractCompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
@@ -31,14 +31,14 @@ public abstract class AbstractAbundanceFadInitializerFactory
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
-    }
-
     /**
      * Empty constructor for YAML
      */
-    public AbstractAbundanceFadInitializerFactory() {
+    public AbstractCompressedAbundanceFadInitializerFactory() {
+    }
+
+    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
+        return abundanceFiltersFactory;
     }
 
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {

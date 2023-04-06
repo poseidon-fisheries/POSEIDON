@@ -230,6 +230,57 @@ public class ExogenousFadSetterFromDataTest {
 
     }
 
+    @NotNull
+    private FishState generateAndRunOneYearOfAbstractFadScenario(
+        final InputPath setterFile,
+        final int neighborhoodSearchSize,
+        final int expectedFadsRemainingAfter10Steps
+    ) {
+        final FlexibleScenario scenario = new FlexibleScenario();
+        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setMaxLandWidth(new FixedDoubleParameter(1));
+        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setCoastalRoughness(new FixedDoubleParameter(0));
+        //two species
+        scenario.setBiologyInitializer(new SplitInitializerFactory());
+        scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
+
+        final FadDemoFactory fadDemo = new FadDemoFactory();
+        fadDemo.setBiomassOnly(true);
+        //assume a current that pushes you diagonally towards top-left
+        fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
+        fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
+        fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy2.csv"));
+        //they will all be empty!
+        ((CompressedBiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
+            ImmutableMap.of(
+                "Species 0",
+                new FixedDoubleParameter(0)
+            )
+        );
+        scenario.getPlugins().add(fadDemo);
+
+        //now add the fad setter
+        final ExogenousFadSetterCSVFactory setters = new ExogenousFadSetterCSVFactory();
+        setters.setNeighborhoodSearchSize(new FixedDoubleParameter(neighborhoodSearchSize));
+        setters.setSetsFile(setterFile);
+        setters.setDataInTonnes(true);
+        scenario.getPlugins().add(setters);
+
+        final FishState state = new FishState();
+        state.setScenario(scenario);
+        state.start();
+        while (state.getDay() <= 10)
+            state.schedule.step(state);
+        //there ought to be 2 fads left (4 dropped, 2 landed!)
+        Assert.assertEquals(
+            state.getFadMap().allFads().count(),
+            expectedFadsRemainingAfter10Steps
+        );
+
+        //go to the end of the year
+        while (state.getDay() <= 366)
+            state.schedule.step(state);
+        return state;
+    }
 
     @Test
     public void fadsAreDroppedButMissedInActualScenario() {
@@ -307,58 +358,6 @@ public class ExogenousFadSetterFromDataTest {
             .001d
         );
 
-    }
-
-    @NotNull
-    private FishState generateAndRunOneYearOfAbstractFadScenario(
-        final InputPath setterFile,
-        final int neighborhoodSearchSize,
-        final int expectedFadsRemainingAfter10Steps
-    ) {
-        final FlexibleScenario scenario = new FlexibleScenario();
-        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setMaxLandWidth(new FixedDoubleParameter(1));
-        ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setCoastalRoughness(new FixedDoubleParameter(0));
-        //two species
-        scenario.setBiologyInitializer(new SplitInitializerFactory());
-        scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
-
-        final FadDemoFactory fadDemo = new FadDemoFactory();
-        fadDemo.setBiomassOnly(true);
-        //assume a current that pushes you diagonally towards top-left
-        fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
-        fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
-        fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy2.csv"));
-        //they will all be empty!
-        ((BiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
-            ImmutableMap.of(
-                "Species 0",
-                new FixedDoubleParameter(0)
-            )
-        );
-        scenario.getPlugins().add(fadDemo);
-
-        //now add the fad setter
-        final ExogenousFadSetterCSVFactory setters = new ExogenousFadSetterCSVFactory();
-        setters.setNeighborhoodSearchSize(new FixedDoubleParameter(neighborhoodSearchSize));
-        setters.setSetsFile(setterFile);
-        setters.setDataInTonnes(true);
-        scenario.getPlugins().add(setters);
-
-        final FishState state = new FishState();
-        state.setScenario(scenario);
-        state.start();
-        while (state.getDay() <= 10)
-            state.schedule.step(state);
-        //there ought to be 2 fads left (4 dropped, 2 landed!)
-        Assert.assertEquals(
-            state.getFadMap().allFads().count(),
-            expectedFadsRemainingAfter10Steps
-        );
-
-        //go to the end of the year
-        while (state.getDay() <= 366)
-            state.schedule.step(state);
-        return state;
     }
 
 

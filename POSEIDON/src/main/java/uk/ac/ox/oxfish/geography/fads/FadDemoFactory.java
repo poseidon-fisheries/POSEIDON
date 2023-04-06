@@ -80,7 +80,7 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         return exogenousFadMaker.getFadInitializer();
     }
 
-    public void setFadInitializer(final FadInitializerFactory fadInitializer) {
+    public void setFadInitializer(final CompressedExponentialFadInitializerFactory fadInitializer) {
         exogenousFadMaker.setFadInitializer(fadInitializer);
     }
 }
