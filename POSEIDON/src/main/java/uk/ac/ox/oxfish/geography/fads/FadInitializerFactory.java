@@ -23,7 +23,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     private DoubleParameter fadDudRate =
         new CalibratedParameter(0, 0.35, 0, 1, 0.001);
     private DoubleParameter daysInWaterBeforeAttraction =
-        new CalibratedParameter(7, 20, 14);
+        new CalibratedParameter(13, 30, 13, 100, 14);
     private DoubleParameter maximumDaysAttractions =
         new FixedDoubleParameter(Integer.MAX_VALUE);
     private DoubleParameter fishReleaseProbabilityInPercent =
