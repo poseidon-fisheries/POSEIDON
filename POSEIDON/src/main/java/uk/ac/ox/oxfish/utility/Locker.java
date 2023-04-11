@@ -50,15 +50,14 @@ public class Locker<K, I> {
      * @return old item if the key is unchanged, new item otherwise
      */
     public I presentKey(final K key, final Supplier<I> constructor) {
-        if (key.equals(this.key)) {
+        //noinspection PointlessNullCheck
+        if (this.key != null && key.equals(this.key)) {
             assert itemHeld != null;
-            return itemHeld;
         } else {
             itemHeld = constructor.get();
             this.key = key;
-            return itemHeld;
         }
-
+        return itemHeld;
     }
 
     /**
