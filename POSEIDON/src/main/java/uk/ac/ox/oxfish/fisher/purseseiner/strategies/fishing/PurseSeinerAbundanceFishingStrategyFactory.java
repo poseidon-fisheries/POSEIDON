@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -39,12 +38,12 @@ import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 public class PurseSeinerAbundanceFishingStrategyFactory
-    extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology, AbundanceFad> {
+    extends PurseSeinerFishingStrategyFactory<AbundanceLocalBiology> {
 
     private boolean ageBasedSetDecisions = false;
 
     public PurseSeinerAbundanceFishingStrategyFactory() {
-        super(LocalDate.now().getYear(), AbundanceLocalBiology.class, AbundanceFad.class);
+        super(LocalDate.now().getYear(), AbundanceLocalBiology.class);
     }
 
     public PurseSeinerAbundanceFishingStrategyFactory(
@@ -59,7 +58,6 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         super(
             targetYear,
             AbundanceLocalBiology.class,
-            AbundanceFad.class,
             speciesCodesSupplier,
             actionWeightsFile,
             catchSamplersFactory,

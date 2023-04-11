@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
 public class GenericFadMapFactory extends FadMapFactory {
@@ -29,10 +28,10 @@ public class GenericFadMapFactory extends FadMapFactory {
     public GenericFadMapFactory(
         final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
-        super(LocalBiology.class, AbstractFad.class, currentPatternMapSupplier);
+        super(LocalBiology.class, currentPatternMapSupplier);
     }
 
     public GenericFadMapFactory() {
-        super(LocalBiology.class, AbstractFad.class);
+        super(LocalBiology.class);
     }
 }

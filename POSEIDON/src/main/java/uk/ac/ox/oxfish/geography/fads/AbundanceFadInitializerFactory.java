@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PerSpeciesCarryingCapacitiesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacity;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -10,13 +10,13 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbundanceFadInitializerFactory
-    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
+public abstract class AbundanceFadInitializerFactory<C extends CarryingCapacity>
+    extends FadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad<C>> {
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
     public AbundanceFadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<C> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter fishValueCalculatorStandardDeviation,
         final DoubleParameter fadDudRate,
@@ -26,7 +26,7 @@ public abstract class AbundanceFadInitializerFactory
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
         super(
-            carryingCapacitiesFactory,
+            carryingCapacityInitializerFactory,
             catchabilities,
             fishValueCalculatorStandardDeviation,
             fadDudRate,
@@ -38,7 +38,7 @@ public abstract class AbundanceFadInitializerFactory
     }
 
     protected AbundanceFadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<?> carryingCapacitiesFactory,
         final Map<String, DoubleParameter> catchabilities,
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {

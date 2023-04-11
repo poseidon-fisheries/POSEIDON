@@ -43,7 +43,7 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
 
     @Override
     CatchSampler<BiomassLocalBiology> makeCatchSampler(
-        FishState fishState, Class<? extends AbstractSetAction<?>> actionClass,
+        final FishState fishState, final Class<? extends AbstractSetAction> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {

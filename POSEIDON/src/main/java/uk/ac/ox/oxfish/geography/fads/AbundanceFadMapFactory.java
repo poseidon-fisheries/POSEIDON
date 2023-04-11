@@ -18,23 +18,22 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.nio.file.Path;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacity;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
-public class AbundanceFadMapFactory extends FadMapFactory<AbundanceLocalBiology, AbundanceFad> {
+public class AbundanceFadMapFactory
+    extends FadMapFactory<AbundanceLocalBiology, AbundanceAggregatingFad<CarryingCapacity>> {
 
     @SuppressWarnings("unused")
     public AbundanceFadMapFactory() {
-        super(AbundanceLocalBiology.class, AbundanceFad.class);
+        super(AbundanceLocalBiology.class);
     }
 
     public AbundanceFadMapFactory(
         final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
-        super(AbundanceLocalBiology.class, AbundanceFad.class, currentPatternMapSupplier);
+        super(AbundanceLocalBiology.class, currentPatternMapSupplier);
     }
 }

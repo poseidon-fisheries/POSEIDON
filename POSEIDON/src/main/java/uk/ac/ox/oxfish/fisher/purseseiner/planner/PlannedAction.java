@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -79,14 +79,6 @@ public interface PlannedAction {
         }
 
         @Override
-        public boolean isAllowedNow(final Fisher fisher) {
-            return fisher.isAllowedAtSea() &&
-                !FadManager.getFadManager(fisher)
-                    .getActionSpecificRegulations()
-                    .isForbidden(FadDeploymentAction.class, fisher);
-        }
-
-        @Override
         public Action[] actuate(final Fisher fisher) {
             if (isAllowedNow(fisher)) {
                 return delayInHours <= 0
@@ -102,6 +94,14 @@ public interface PlannedAction {
         }
 
         @Override
+        public boolean isAllowedNow(final Fisher fisher) {
+            return fisher.isAllowedAtSea() &&
+                !FadManager.getFadManager(fisher)
+                    .getActionSpecificRegulations()
+                    .isForbidden(FadDeploymentAction.class, fisher);
+        }
+
+        @Override
         public String toString() {
             return "PlannedDeploy{" +
                 "tile=" + tile +
@@ -109,21 +109,12 @@ public interface PlannedAction {
         }
     }
 
-    class FadSet<B extends LocalBiology, F extends AbstractFad<B, F>> implements PlannedAction {
+    class FadSet<B extends LocalBiology, F extends Fad<B, F>> implements PlannedAction {
 
         private final F fadWePlanToSetOn;
 
         public FadSet(final F fadWePlanToSetOn) {
             this.fadWePlanToSetOn = fadWePlanToSetOn;
-        }
-
-        public static boolean isFadSetAllowed(
-            final Fisher fisher,
-            final FadManager<?, ?> fadManager,
-            final AbstractFad<?, ?> set
-        ) {
-            return !set.isLost() && //the fad has not since been destroyed
-                isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);
         }
 
         @Override
@@ -132,13 +123,17 @@ public interface PlannedAction {
         }
 
         @Override
-        public double hoursItTake() {
-            return 1;
-        }
-
-        @Override
         public boolean isAllowedNow(final Fisher fisher) {
             return isFadSetAllowed(fisher, FadManager.getFadManager(fisher), fadWePlanToSetOn);
+        }
+
+        public static boolean isFadSetAllowed(
+            final Fisher fisher,
+            final FadManager<?, ?> fadManager,
+            final Fad<?, ?> set
+        ) {
+            return !set.isLost() && //the fad has not since been destroyed
+                isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);
         }
 
         @Override
@@ -150,6 +145,11 @@ public interface PlannedAction {
                     hoursItTake()
                 )
             };
+        }
+
+        @Override
+        public double hoursItTake() {
+            return 1;
         }
     }
 
@@ -183,12 +183,6 @@ public interface PlannedAction {
         }
 
         @Override
-        public SeaTile getLocation() {
-
-            return whereAreWeGoingToSearchForFads;
-        }
-
-        @Override
         public double hoursItTake() {
             //need to be pessimistic or you'll plan too many of these
             return hoursItTakesToSet + hoursWastedIfNoFadAround;
@@ -202,6 +196,12 @@ public interface PlannedAction {
                 FadManager.getFadManager(fisher),
                 OpportunisticFadSetAction.class
             );
+        }
+
+        @Override
+        public SeaTile getLocation() {
+
+            return whereAreWeGoingToSearchForFads;
         }
 
         @Override
@@ -353,18 +353,6 @@ public interface PlannedAction {
         }
 
         @Override
-        public SeaTile getLocation() {
-            return position;
-        }
-
-        public TargetBiologiesGrabber<B> getTargetBiologiesGrabber() {
-            return targetBiologiesGrabber;
-        }
-
-        @SuppressWarnings("rawtypes")
-        abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
-
-        @Override
         public double hoursItTake() {
             return setDurationInHours + searchTimeInHours;
         }
@@ -379,14 +367,13 @@ public interface PlannedAction {
             );
         }
 
-        abstract protected AbstractSetAction<B> createSet(
-            final B potentialCatch,
-            final List<B> targetBiologies,
-            final Fisher fisher,
-            final double fishingTime,
-            final SeaTile location,
-            final CatchMaker<B> catchMaker
-        );
+        @Override
+        public SeaTile getLocation() {
+            return position;
+        }
+
+        @SuppressWarnings("rawtypes")
+        abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
 
         /**
          * list of actions that need to take place for the planned action to take place
@@ -415,6 +402,19 @@ public interface PlannedAction {
             final List<B> targetBiologies = entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);
         }
+
+        public TargetBiologiesGrabber<B> getTargetBiologiesGrabber() {
+            return targetBiologiesGrabber;
+        }
+
+        abstract protected AbstractSetAction createSet(
+            final B potentialCatch,
+            final List<B> targetBiologies,
+            final Fisher fisher,
+            final double fishingTime,
+            final SeaTile location,
+            final CatchMaker<B> catchMaker
+        );
 
         @Override
         public String toString() {
@@ -487,7 +487,7 @@ public interface PlannedAction {
         }
 
         @Override
-        protected AbstractSetAction<B> createSet(
+        protected AbstractSetAction createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
             final Fisher fisher,
@@ -535,7 +535,7 @@ public interface PlannedAction {
         }
 
         @Override
-        protected AbstractSetAction<B> createSet(
+        protected AbstractSetAction createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
             final Fisher fisher,

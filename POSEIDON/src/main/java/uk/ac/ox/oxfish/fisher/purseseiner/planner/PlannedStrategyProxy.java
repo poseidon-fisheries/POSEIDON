@@ -40,7 +40,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     /**
      * object used to draw catches for DEL and NOA
      */
-    private final Map<Class<? extends AbstractSetAction<?>>,
+    private final Map<Class<? extends AbstractSetAction>,
         ? extends CatchSampler<? extends LocalBiology>> catchSamplers;
     /**
      * probability of any of these actions taking place next in a plan
@@ -118,7 +118,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
 
     public PlannedStrategyProxy(
-        final Map<Class<? extends AbstractSetAction<?>>,
+        final Map<Class<? extends AbstractSetAction>,
             ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeightsPerFisher,
         final ToDoubleFunction<Fisher> maxTravelTimeLoader,
@@ -321,17 +321,32 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     }
 
     @Override
-    public ActionResult act(final FishState model, final Fisher agent, final Regulation regulation, final double hoursLeft) {
+    public ActionResult act(
+        final FishState model,
+        final Fisher agent,
+        final Regulation regulation,
+        final double hoursLeft
+    ) {
         return delegate.act(model, agent, regulation, hoursLeft);
     }
 
     @Override
-    public SeaTile chooseDestination(final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction) {
+    public SeaTile chooseDestination(
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
+    ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
-    public boolean shouldFish(final Fisher fisher, final MersenneTwisterFast random, final FishState model, final TripRecord currentTrip) {
+    public boolean shouldFish(
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final TripRecord currentTrip
+    ) {
         return delegate.shouldFish(fisher, random, model, currentTrip);
     }
 

@@ -18,15 +18,16 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.lang.Math.exp;
-import static java.lang.Math.pow;
-
-import java.util.Arrays;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
-public class CompressedExponentialAttractionProbability<B extends LocalBiology, F extends Fad<B, F>>
-    implements AttractionProbabilityFunction<B, F> {
+import java.util.Arrays;
+
+import static java.lang.Math.exp;
+import static java.lang.Math.pow;
+
+public class CompressedExponentialAttractionProbability
+    implements AttractionProbabilityFunction {
 
     private final double[] compressionExponents;
     private final double[] attractableBiomassCoefficients;
@@ -45,8 +46,8 @@ public class CompressedExponentialAttractionProbability<B extends LocalBiology, 
     @Override
     public double apply(
         final Species species,
-        final B biology,
-        final Fad<B, F> fad
+        final LocalBiology biology,
+        final AggregatingFad<?, ?, ?> fad
     ) {
         return apply(
             species,

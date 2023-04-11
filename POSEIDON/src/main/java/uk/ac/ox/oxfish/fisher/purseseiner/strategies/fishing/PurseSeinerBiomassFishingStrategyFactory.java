@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -32,10 +31,10 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 
 public class PurseSeinerBiomassFishingStrategyFactory
-    extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology, BiomassFad> {
+    extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology> {
 
     public PurseSeinerBiomassFishingStrategyFactory() {
-        super(LocalDate.now().getYear(), BiomassLocalBiology.class, BiomassFad.class);
+        super(LocalDate.now().getYear(), BiomassLocalBiology.class);
     }
 
     public PurseSeinerBiomassFishingStrategyFactory(
@@ -50,7 +49,6 @@ public class PurseSeinerBiomassFishingStrategyFactory
         super(
             targetYear,
             BiomassLocalBiology.class,
-            BiomassFad.class,
             speciesCodesSupplier,
             actionWeightsFile,
             catchSamplersFactory,

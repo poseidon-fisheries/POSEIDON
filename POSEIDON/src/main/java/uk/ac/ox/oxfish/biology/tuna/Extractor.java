@@ -18,18 +18,19 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 import com.google.common.collect.Streams;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Basically a way to extract some or all of the local biologies (i.e., both sea tile biologies and
@@ -89,7 +90,7 @@ public class Extractor<B extends LocalBiology>
             : Stream.empty();
 
         final Stream<LocalBiology> fadBiologies = includeFads
-            ? fishState.getFadMap().allFads().map(AbstractFad::getBiology)
+            ? fishState.getFadMap().allFads().map(Fad::getBiology)
             : Stream.empty();
 
         return Streams.concat(seaTileBiologies, fadBiologies)

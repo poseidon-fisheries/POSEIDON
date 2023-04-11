@@ -19,9 +19,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 
 public class DummyFishBiomassAttractor
-    implements FishAttractor<BiomassLocalBiology, BiomassFad> {
+    implements FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
 
     private final int size;
 
@@ -31,10 +32,11 @@ public class DummyFishBiomassAttractor
 
     @Override
     public WeightedObject<BiomassLocalBiology> attractImplementation(
-        final BiomassLocalBiology seaTileBiology, final BiomassFad fad
+        final LocalBiology seaTileBiology, final BiomassAggregatingFad fad
     ) {
         return new WeightedObject<>(
-                new BiomassLocalBiology(new double[size]),
-                0);
+            new BiomassLocalBiology(new double[size]),
+            0
+        );
     }
 }

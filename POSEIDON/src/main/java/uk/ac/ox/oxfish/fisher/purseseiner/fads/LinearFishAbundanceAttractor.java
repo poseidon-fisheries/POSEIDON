@@ -19,20 +19,21 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 
 public class LinearFishAbundanceAttractor
     extends FishAbundanceAttractor {
 
     public LinearFishAbundanceAttractor(
         final Collection<Species> species,
-        final AttractionProbabilityFunction<AbundanceLocalBiology, AbundanceFad> attractionProbabilityFunction,
+        final AttractionProbabilityFunction attractionProbabilityFunction,
         final double[] attractionRates,
         final MersenneTwisterFast rng,
         final Map<Species, NonMutatingArrayFilter> selectivityFilters
@@ -43,8 +44,8 @@ public class LinearFishAbundanceAttractor
     @Override
     Entry<StructuredAbundance, Double> attractForSpecies(
         final Species species,
-        final AbundanceLocalBiology cellBiology,
-        final AbundanceFad fad
+        final LocalBiology cellBiology,
+        final AbundanceAggregatingFad fad
     ) {
         final NonMutatingArrayFilter selectivity = getSelectivityFilters().get(species);
         final StructuredAbundance fadAbundance = fad.getBiology().getAbundance(species);

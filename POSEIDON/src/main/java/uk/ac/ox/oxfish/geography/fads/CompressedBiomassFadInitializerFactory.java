@@ -3,17 +3,14 @@ package uk.ac.ox.oxfish.geography.fads;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishBiomassAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishBiomassAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class CompressedBiomassFadInitializerFactory
-    extends CompressedExponentialFadInitializerFactory<BiomassLocalBiology, BiomassFad> {
+    extends CompressedExponentialFadInitializerFactory<BiomassLocalBiology, BiomassAggregatingFad> {
 
     /**
      * Empty constructor for YAML
@@ -51,10 +48,10 @@ public class CompressedBiomassFadInitializerFactory
         final double totalCarryingCapacity = getTotalCarryingCapacity().applyAsDouble(rng);
         return new BiomassFadInitializer(
             fishState.getBiology(),
-            totalCarryingCapacity,
             makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
-            fishState::getStep
+            fishState::getStep,
+            new GlobalCarryingCapacityInitializer(0, getTotalCarryingCapacity())
         );
     }
 
@@ -83,7 +80,7 @@ public class CompressedBiomassFadInitializerFactory
             processParameterMap(getGrowthRates(), fishState.getBiology(), rng);
         return new LogisticFishBiomassAttractor(
             fishState.getBiology().getSpecies(),
-            new CompressedExponentialAttractionProbability<>(
+            new CompressedExponentialAttractionProbability(
                 compressionExponents,
                 attractableBiomassCoefficients,
                 biomassInteractionCoefficients

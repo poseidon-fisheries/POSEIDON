@@ -18,20 +18,21 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.stream;
-
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 
 public class GlobalBiomassLogger implements RowProvider {
 
@@ -86,20 +87,20 @@ public class GlobalBiomassLogger implements RowProvider {
             );
     }
 
-    private static ImmutableList<LocalBiology> getFadBiologies(final FishState fishState) {
-        return fishState
-            .getFadMap()
-            .allFads()
-            .map(AbstractFad::getBiology)
-            .collect(toImmutableList());
-    }
-
     private static ImmutableList<LocalBiology> getSeaTileBiologies(final FishState fishState) {
         return fishState
             .getMap()
             .getAllSeaTilesExcludingLandAsList()
             .stream()
             .map(SeaTile::getBiology)
+            .collect(toImmutableList());
+    }
+
+    private static ImmutableList<LocalBiology> getFadBiologies(final FishState fishState) {
+        return fishState
+            .getFadMap()
+            .allFads()
+            .map(Fad::getBiology)
             .collect(toImmutableList());
     }
 

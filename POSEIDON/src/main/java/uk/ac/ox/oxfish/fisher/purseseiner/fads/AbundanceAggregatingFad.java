@@ -27,23 +27,23 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
+public class AbundanceAggregatingFad<C extends CarryingCapacity>
+    extends AggregatingFad<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> {
 
-    public AbundanceFad(
-        final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
+    public AbundanceAggregatingFad(
+        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad<C>> owner,
         final AbundanceLocalBiology biology,
-        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double totalCarryingCapacity
+        final C carryingCapacity
     ) {
         super(
             owner,
@@ -52,13 +52,13 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            totalCarryingCapacity
+            carryingCapacity
         );
     }
 
     @Override
     public void releaseFish(
-        final Collection<Species> allSpecies,
+        final Collection<? extends Species> allSpecies,
         final LocalBiology seaTileBiology
     ) {
         getOwner().reactTo(
@@ -82,8 +82,8 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     }
 
     private AbundanceFadAttractionEvent makeReleaseEvent(
-        final Collection<Species> allSpecies,
-        LocalBiology seaTileBiology
+        final Collection<? extends Species> allSpecies,
+        final LocalBiology seaTileBiology
     ) {
         // If we're on a proper abundance tile, we grab that tile's biology directly.
         // Otherwise, we're probably on an empty biology, so we create an empty abundance
@@ -103,25 +103,25 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
     }
 
     @Override
-    public void releaseFish(final Collection<Species> allSpecies) {
+    public void releaseFish(final Collection<? extends Species> allSpecies) {
 
         double totalBiomassToRelease = 0;
         final Map<Species, Double> biomassLost = new HashMap<>(allSpecies.size());
-        for (Species species : allSpecies) {
-            double biomassHere = getBiology().getBiomass(species);
-            totalBiomassToRelease+=biomassHere;
+        for (final Species species : allSpecies) {
+            final double biomassHere = getBiology().getBiomass(species);
+            totalBiomassToRelease += biomassHere;
             biomassLost.put(species, biomassHere);
         }
 
-        if(totalBiomassToRelease>0) {
+        if (totalBiomassToRelease > 0) {
 
             getOwner().reactTo(new BiomassLostEvent(biomassLost));
             getOwner().getFadMap().getAbundanceLostObserver().observe(
-                    new AbundanceLostEvent(ImmutableAbundance.extractFrom(getBiology()))
+                new AbundanceLostEvent(ImmutableAbundance.extractFrom(getBiology()))
             );
             // directly reset the biology's abundance arrays to zero
             getBiology().getAbundance().values().stream().flatMap(Arrays::stream)
-                    .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));
+                .forEach(abundanceArray -> Arrays.fill(abundanceArray, 0));
         }
     }
 
@@ -140,27 +140,34 @@ public class AbundanceFad extends Fad<AbundanceLocalBiology, AbundanceFad> {
      */
     @Override
     public Catch addCatchesToFad(
-        final AbundanceLocalBiology seaTileBiology,
+        final LocalBiology seaTileBiology,
         final GlobalBiology globalBiology
     ) {
 
-        WeightedObject<AbundanceLocalBiology> attracted =attractFish(seaTileBiology);
+        final WeightedObject<AbundanceLocalBiology> attracted = attractFish(seaTileBiology);
 
         final AbundanceLocalBiology attractedFish =
             Optional.ofNullable(attracted)
                 .map(WeightedObject::getObjectBeingWeighted)
                 .orElseGet(() -> new AbundanceLocalBiology(globalBiology));
 
-        this.getOwner().reactTo(
-            new AbundanceFadAttractionEvent(this, seaTileBiology, attractedFish)
-        );
+        if (seaTileBiology instanceof AbundanceLocalBiology) {
+            this.getOwner().reactTo(
+                new AbundanceFadAttractionEvent(
+                    this,
+                    (AbundanceLocalBiology) seaTileBiology,
+                    attractedFish
+                )
+            );
+        }
 
-        if(attracted==null)
+
+        if (attracted == null)
             return null;
-        if(attracted.getTotalWeight()<0){
+        if (attracted.getTotalWeight() < 0) {
             //sometimes it is effectively 0
-            assert attracted.getTotalWeight()>-FishStateUtilities.EPSILON;
-            Preconditions.checkArgument(attracted.getTotalWeight()>-FishStateUtilities.EPSILON);
+            assert attracted.getTotalWeight() > -FishStateUtilities.EPSILON;
+            Preconditions.checkArgument(attracted.getTotalWeight() > -FishStateUtilities.EPSILON);
             return null;
         }
 

@@ -49,13 +49,15 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class CatchSamplersFactory<B extends LocalBiology>
-    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>>> {
+    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler<B>>> {
 
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath catchSamplesFile;
     private boolean yearlyReset = false;
+
     public CatchSamplersFactory() {
     }
+
     public CatchSamplersFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath catchSamplesFile
@@ -85,7 +87,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction<?>>, CatchSampler<B>> apply(final FishState fishState) {
+    public Map<Class<? extends AbstractSetAction>, CatchSampler<B>> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
         return recordStream(catchSamplesFile.get())
             .collect(toImmutableListMultimap(
@@ -105,13 +107,6 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
                 }
             ));
     }
-
-    abstract CatchSampler<B> makeCatchSampler(
-        final FishState fishState,
-        final Class<? extends AbstractSetAction<?>> actionClass,
-        final Collection<Collection<Double>> sample,
-        final MersenneTwisterFast rng
-    );
 
     @SuppressWarnings("UnstableApiUsage")
     private Collection<Double> getBiomasses(
@@ -136,6 +131,12 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             .values();
     }
 
+    abstract CatchSampler<B> makeCatchSampler(
+        final FishState fishState,
+        final Class<? extends AbstractSetAction> actionClass,
+        final Collection<Collection<Double>> sample,
+        final MersenneTwisterFast rng
+    );
 
     @SuppressWarnings("unused")
     public boolean isYearlyReset() {

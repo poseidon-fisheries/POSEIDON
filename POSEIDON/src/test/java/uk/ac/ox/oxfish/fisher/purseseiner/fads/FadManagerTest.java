@@ -18,9 +18,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import ec.util.MersenneTwisterFast;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -35,23 +32,26 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class FadManagerTest extends TestCase {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void testFadsGoBackInStockAfterSet() {
 
-        final FadInitializer<BiomassLocalBiology, BiomassFad> fadInitializer =
+        final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fadInitializer =
             (fadManager, owner, initialLocation) -> {
-                final BiomassFad fad = mock(BiomassFad.class);
+                final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getOwner()).thenReturn(fadManager);
-                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[] {0}));
+                when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{0}));
                 when(fad.getLocation()).thenReturn(initialLocation);
                 return fad;
             };
 
         final FadMap fadMap = mock(FadMap.class);
 
-        final FadManager<BiomassLocalBiology, BiomassFad> fadManager =
+        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager =
             new FadManager(fadMap, fadInitializer, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
@@ -76,7 +76,7 @@ public class FadManagerTest extends TestCase {
 
         fadManager.setFisher(fisher);
         fadManager.setNumFadsInStock(10);
-        final BiomassFad fad1 = fadManager.deployFad(seaTile);
+        final BiomassAggregatingFad fad1 = fadManager.deployFad(seaTile);
 
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(1, fadManager.getNumDeployedFads());
@@ -87,7 +87,7 @@ public class FadManagerTest extends TestCase {
             .act(fishState, fadManager.getFisher(), anarchy, 24);
         assertEquals(10, fadManager.getNumFadsInStock());
 
-        final BiomassFad fad2 = fadManager.deployFad(seaTile);
+        final BiomassAggregatingFad fad2 = fadManager.deployFad(seaTile);
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(2, fadManager.getNumDeployedFads());
 

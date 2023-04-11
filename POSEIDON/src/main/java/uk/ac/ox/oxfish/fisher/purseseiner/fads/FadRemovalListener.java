@@ -21,8 +21,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 public interface FadRemovalListener {
-
-
-    public void onFadRemoval(AbstractFad fad);
-
+    void onFadRemoval(Fad<?, ?> fad);
 }

@@ -5,7 +5,7 @@ import com.google.common.base.Supplier;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -84,7 +84,7 @@ public class OwnFadSetDiscretizedActionGenerator {
 
         //go through all your fads and rank them by profits
         for (Object fad : fadManager.getDeployedFads()) {
-            AbstractFad deployedFad = (AbstractFad) fad;
+            Fad deployedFad = (Fad) fad;
             Fisher fisher = fadManager.getFisher();
             final boolean fadSetAllowed = PlannedAction.FadSet.isFadSetAllowed(
                 fisher,
@@ -97,7 +97,7 @@ public class OwnFadSetDiscretizedActionGenerator {
             final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
             double value = fadManager.getFishValueCalculator().valueOf(deployedFad.getBiology(), prices);
 
-            SeaTile location = ((AbstractFad<?, ?>) fad).getLocation();
+            SeaTile location = ((Fad<?, ?>) fad).getLocation();
 
             // Check that the shear at this location is not too high, otherwise we'll have to skip the FAD
             final boolean shearIsSafe = maxShearMap
@@ -196,9 +196,9 @@ public class OwnFadSetDiscretizedActionGenerator {
         return minimumFadValue;
     }
 
-    public static class ValuedFad extends Pair<AbstractFad, Double> {
+    public static class ValuedFad extends Pair<Fad, Double> {
 
-        public ValuedFad(AbstractFad first, Double second) {
+        public ValuedFad(Fad first, Double second) {
             super(first, second);
         }
     }

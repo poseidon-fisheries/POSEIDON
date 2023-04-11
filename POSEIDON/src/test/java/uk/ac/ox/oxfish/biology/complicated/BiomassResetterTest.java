@@ -20,51 +20,42 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeMap;
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SnapshotBiomassAllocator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.ConstantAttractionProbabilityFunction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeMap;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.*;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class BiomassResetterTest {
@@ -80,7 +71,7 @@ public class BiomassResetterTest {
 
         final Species species = new Species(
             "test",
-            new FromListMeristics(new double[] {1, 10}, 2)
+            new FromListMeristics(new double[]{1, 10}, 2)
         );
         final GlobalBiology biology = new GlobalBiology(species);
 
@@ -176,12 +167,12 @@ public class BiomassResetterTest {
             fishState.getMap().getWidth(),
             fishState.getMap().getHeight()
         );
-        final FadMap<BiomassLocalBiology, BiomassFad> fadMap = new FadMap<>(
+        final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap = new FadMap<>(
             fishState.getMap(),
             currentVectors,
             globalBiology,
             BiomassLocalBiology.class,
-            BiomassFad.class
+            BiomassAggregatingFad.class
         );
         when(fishState.getFadMap()).thenReturn((FadMap) fadMap);
 
@@ -202,10 +193,10 @@ public class BiomassResetterTest {
 
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
-            carryingCapacity,
             fishBiomassAttractor,
             0,
-            () -> 0
+            () -> 0,
+            new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(carryingCapacity))
         );
 
         when(fishState.getBiology()).thenReturn(globalBiology);
@@ -216,7 +207,7 @@ public class BiomassResetterTest {
         seaTiles.forEach(seaTile -> {
             when(fisher.getLocation()).thenReturn(seaTile);
             fadMap.deployFad(
-                fadInitializer.makeFad(fadManager, fisher,seaTile ),
+                fadInitializer.makeFad(fadManager, fisher, seaTile),
                 seaTile
             );
         });
@@ -242,7 +233,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(Fad::getBiology).collect(toImmutableList());
+            fadMap.allFads().map(AggregatingFad::getBiology).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses =
             totalBiomasses(globalBiology, fadBiologies);
 

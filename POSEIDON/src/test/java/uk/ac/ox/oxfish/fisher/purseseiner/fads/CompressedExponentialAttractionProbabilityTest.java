@@ -28,11 +28,11 @@ public class CompressedExponentialAttractionProbabilityTest extends TestCase {
 
         final Species species = new Species("");
 
-        final CompressedExponentialAttractionProbability<BiomassLocalBiology, BiomassFad> f =
+        final CompressedExponentialAttractionProbability<BiomassLocalBiology, BiomassAggregatingFad> f =
             new CompressedExponentialAttractionProbability<>(
-                new double[] {2.0},
-                new double[] {1E-3},
-                new double[] {1E-5}
+                new double[]{2.0},
+                new double[]{1E-3},
+                new double[]{1E-5}
             );
 
         final double delta = 0.001;

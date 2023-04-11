@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
@@ -33,7 +32,7 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
             getSpeciesCodesSupplier()
         );
 
-    private PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory =
+    private PurseSeinerFleetFactory<AbundanceLocalBiology> purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
             getTargetYear(),
             getInputFolder(),
@@ -91,12 +90,12 @@ public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );
 
-    public PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> getPurseSeinerFleetFactory() {
+    public PurseSeinerFleetFactory<AbundanceLocalBiology> getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology, AbundanceFad> purseSeinerFleetFactory) {
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology> purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 

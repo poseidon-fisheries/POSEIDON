@@ -3,9 +3,8 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
-import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
@@ -46,8 +45,8 @@ public class AbundanceFadAttractionEventObserver
     }
 
     @Override
-    public void observe(AbundanceFadAttractionEvent event) {
-        final AbundanceFad fad = event.getFad();
+    public void observe(final AbundanceFadAttractionEvent event) {
+        final AbundanceAggregatingFad fad = event.getFad();
         final Coordinate coordinates = fad.getCoordinate();
         eventLogger.addRow(
             fad.getId(), event.getId(), fishState.getDate(), coordinates.x, coordinates.y

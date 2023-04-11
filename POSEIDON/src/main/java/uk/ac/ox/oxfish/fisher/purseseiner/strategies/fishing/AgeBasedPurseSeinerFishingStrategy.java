@@ -20,12 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -34,6 +28,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 /**
  * like purse seiner fishing strategy, but decides whether to set on own fads depending on their
@@ -66,19 +66,16 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
 
     @Override
     protected double valueOfSetAction(
-        @NotNull final AbstractSetAction<? extends LocalBiology> action,
+        @NotNull final AbstractSetAction action,
         final Collection<Species> species
     ) {
         //if we know it is a fad action (own fad, not opportunistic)
         if (action instanceof FadSetAction) {
-            assert ((AbstractFadSetAction<?, ?>) action).isOwnFad();
+            assert ((AbstractFadSetAction<?>) action).isOwnFad();
             final int stepItWasDeployed =
-                ((AbstractFadSetAction<?, ?>) action).getFad().getStepDeployed();
+                ((AbstractFadSetAction<?>) action).getFad().getStepDeployed();
             final int time = action.getFisher().grabState().getDay() - stepItWasDeployed;
             assert time >= 0;
-            if (time == 0) {
-                return 0;
-            }
             return time;
         } else {
             return super.valueOfSetAction(action, species);

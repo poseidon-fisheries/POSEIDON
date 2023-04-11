@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
@@ -103,7 +103,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         observers.forEach(observer -> observer.start(fishState));
     }
 
-    private Map<String, Double> getCatchPerSize(Species species, StructuredAbundance abundance) {
+    private Map<String, Double> getCatchPerSize(final Species species, final StructuredAbundance abundance) {
         final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
         final List<Map<String, List<Integer>>> weightBins = meristics.getWeightBins();
         return range(0, species.getNumberOfSubdivisions()).boxed()
@@ -112,13 +112,13 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                     .entrySet()
                     .stream()
                     .map(entry -> entry(
-                        entry.getKey(),
-                        entry.getValue()
-                            .stream()
-                            .mapToDouble(bin ->
-                                abundance.getAbundance(sub, bin) * meristics.getWeight(sub, bin)
-                            )
-                            .sum()
+                            entry.getKey(),
+                            entry.getValue()
+                                .stream()
+                                .mapToDouble(bin ->
+                                    abundance.getAbundance(sub, bin) * meristics.getWeight(sub, bin)
+                                )
+                                .sum()
                         )
                     )
             )
@@ -153,13 +153,13 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
             this.fadId = Optional.of(action)
                 .filter(a -> a instanceof FadRelatedAction<?, ?>)
                 .map(a -> ((FadRelatedAction<?, ?>) a).getFad())
-                .map(AbstractFad::getId)
+                .map(Fad::getId)
                 .map(Object::toString)
                 .orElse("NA");
             final TripRecord currentTrip = action.getFisher().getCurrentTrip();
             this.tripId = currentTrip.getTripId();
             if (action instanceof AbstractSetAction) {
-                ((AbstractSetAction<?>) action).getCatchesKept().ifPresent(catchesKept -> {
+                ((AbstractSetAction) action).getCatchesKept().ifPresent(catchesKept -> {
                     setCatches(catchesKept, "Bigeye tuna", x -> this.bet = x, x -> this.betCatchPerSize = x);
                     setCatches(catchesKept, "Skipjack tuna", x -> this.skj = x, x -> this.skjCatchPerSize = x);
                     setCatches(catchesKept, "Yellowfin tuna", x -> this.yft = x, x -> this.yftCatchPerSize = x);
@@ -168,10 +168,10 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         }
 
         private void setCatches(
-            Catch catchesKept,
-            String speciesName,
-            Consumer<Double> weightCaughtSetter,
-            Consumer<Map<String, Double>> catchPerSizeSetter
+            final Catch catchesKept,
+            final String speciesName,
+            final Consumer<Double> weightCaughtSetter,
+            final Consumer<Map<String, Double>> catchPerSizeSetter
         ) {
             final Species species = fishState.getSpecies(speciesName);
             weightCaughtSetter.accept(catchesKept.getWeightCaught(species));

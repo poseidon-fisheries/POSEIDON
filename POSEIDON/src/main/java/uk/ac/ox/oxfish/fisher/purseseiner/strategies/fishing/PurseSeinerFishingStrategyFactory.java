@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
@@ -64,7 +63,7 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerS
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B>>, Dummyable {
 
     private static final ActiveOpportunitiesFactory activeOpportunitiesFactory =
@@ -74,7 +73,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private static final CacheByFishState<ActiveOpportunities>
         activeNonAssociatedSetOpportunitiesCache =
         new CacheByFishState<>(activeOpportunitiesFactory);
-    private final Class<F> fadClass;
     private final Class<B> biologyClass;
     private final boolean noaSetsCanPoachFads = false;
     private final boolean delSetsCanPoachFads = false;
@@ -82,34 +80,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
     private final int delSetsRangeInSeaTiles = 0;
 
     private int targetYear;
-
-    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
-        final int targetYear,
-        final Path attractionWeightsFile
-    ) {
-        return fisher -> stream(ActionClass.values())
-            .map(ActionClass::getActionClass)
-            .collect(toImmutableMap(
-                identity(),
-                actionClass -> ActionWeightsCache.INSTANCE.get(
-                    attractionWeightsFile,
-                    targetYear,
-                    fisher,
-                    actionClass
-                )
-            ));
-    }
-
-    public Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
-        final Path attractionWeightsFile
-    ) {
-        return loadActionWeights(targetYear, attractionWeightsFile);
-    }
-
-    public int getTargetYear() {
-        return targetYear;
-    }
-
     private SetDurationSamplersFactory setDurationSamplersFactory;
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath actionWeightsFile;
@@ -150,11 +120,9 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         new LogisticFunctionSupplier(1E-6, 10);
     private InputPath maxCurrentSpeedsFile;
 
-
     PurseSeinerFishingStrategyFactory(
         final int targetYear,
         final Class<B> biologyClass,
-        final Class<F> fadClass,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath actionWeightsFile,
         final CatchSamplersFactory<B> catchSamplersFactory,
@@ -162,7 +130,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final InputPath maxCurrentSpeedsFile,
         final InputPath setCompositionWeightsFile
     ) {
-        this(targetYear, biologyClass, fadClass);
+        this(targetYear, biologyClass);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
         this.catchSamplersFactory = catchSamplersFactory;
@@ -173,12 +141,37 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
 
     PurseSeinerFishingStrategyFactory(
         final int targetYear,
-        final Class<B> biologyClass,
-        final Class<F> fadClass
+        final Class<B> biologyClass
     ) {
         this.targetYear = targetYear;
-        this.fadClass = fadClass;
         this.biologyClass = biologyClass;
+    }
+
+    public Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
+        final Path attractionWeightsFile
+    ) {
+        return loadActionWeights(targetYear, attractionWeightsFile);
+    }
+
+    public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
+        final int targetYear,
+        final Path attractionWeightsFile
+    ) {
+        return fisher -> stream(ActionClass.values())
+            .map(ActionClass::getActionClass)
+            .collect(toImmutableMap(
+                identity(),
+                actionClass -> ActionWeightsCache.INSTANCE.get(
+                    attractionWeightsFile,
+                    targetYear,
+                    fisher,
+                    actionClass
+                )
+            ));
+    }
+
+    public int getTargetYear() {
+        return targetYear;
     }
 
     public void setTargetYear(final int targetYear) {
@@ -431,28 +424,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         );
     }
 
-    /**
-     * Convert the max current speeds in m/s per seconds given in the input file into degrees per day.
-     * For the purpose of the conversion, we assume that we're at the equator. This means that the max
-     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator, and
-     * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
-     * difference is small enough to ignore and doing thing the right way would massively complicate things.
-     */
-    @NotNull
-    private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(final NauticalMap nauticalMap) {
-        final Coordinate coordinate = new Coordinate(0, 0);
-        final MapExtent mapExtent = nauticalMap.getMapExtent();
-        return PurseSeinerActionClassToDouble
-            .fromFile(maxCurrentSpeedsFile.get(), "action", "speed")
-            .mapValues(speed ->
-                metrePerSecondToXyPerDaysVector(
-                    new Double2D(speed, 0),
-                    coordinate,
-                    mapExtent
-                ).length()
-            );
-    }
-
     @NotNull
     protected PurseSeinerFishingStrategy<B> callConstructor(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
@@ -497,24 +468,22 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         final ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
             setCompositionWeights = loadSetCompositionWeights(fishState);
 
-        final Map<Class<? extends AbstractSetAction<?>>, DurationSampler> durationSamplers =
+        final Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers =
             setDurationSamplersFactory.apply(fishState);
 
-        final FadSetOpportunityGenerator<B, F, FadSetAction<B, F>>
+        final FadSetOpportunityGenerator<B, ?, FadSetAction<B>>
             fadSetOpportunityGenerator =
             new FadSetOpportunityGenerator<>(
-                fadClass,
                 (fisher1, fad) -> fad.getOwner() == getFadManager(fisher1),
-                FadSetAction<B, F>::new,
+                FadSetAction<B>::new,
                 durationSamplers.get(FadSetAction.class)
             );
 
-        final FadSetOpportunityGenerator<B, F, OpportunisticFadSetAction<B, F>>
+        final FadSetOpportunityGenerator<B, ?, OpportunisticFadSetAction<B>>
             opportunisticFadSetOpportunityGenerator =
             new FadSetOpportunityGenerator<>(
-                fadClass,
                 (fisher1, fad) -> fad.getOwner() != getFadManager(fisher1),
-                OpportunisticFadSetAction<B, F>::new,
+                OpportunisticFadSetAction<B>::new,
                 durationSamplers.get(FadSetAction.class)
             );
 
@@ -567,40 +536,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
         );
     }
 
-    abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
-
-    private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
-    loadSetCompositionWeights(
-        final FishState fishState
-    ) {
-        return recordStream(setCompositionWeightsFile.get())
-            .collect(groupingBy(r -> ActionClass.valueOf(r.getString("set_type"))
-                .getActionClass()))
-            .entrySet()
-            .stream()
-            .collect(toImmutableMap(
-                Map.Entry::getKey,
-                entry -> makeWeightMap(fishState, entry.getValue())
-            ));
-    }
-
-    private ImmutableMap<Species, Double> makeWeightMap(
-        final FishState fishState,
-        final Collection<Record> records
-    ) {
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
-        return
-            records.stream().collect(toImmutableMap(
-                r -> {
-                    final String speciesCode = r.getString("species_code").toUpperCase();
-                    final String speciesName = speciesCodes.getSpeciesName(speciesCode);
-                    return fishState.getBiology().getSpecie(speciesName);
-                },
-                r -> r.getDouble("weight")
-            ));
-
-    }
-
     private Map<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>
     makeActionValueFunctions() {
         return new ImmutableMap.Builder<Class<? extends PurseSeinerAction>, DoubleUnaryOperator>()
@@ -629,6 +564,62 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology, 
                 opportunisticFadSetActionValueFunction.get()
             )
             .build();
+    }
+
+    /**
+     * Convert the max current speeds in m/s per seconds given in the input file into degrees per day.
+     * For the purpose of the conversion, we assume that we're at the equator. This means that the max
+     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator, and
+     * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
+     * difference is small enough to ignore and doing thing the right way would massively complicate things.
+     */
+    @NotNull
+    private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(final NauticalMap nauticalMap) {
+        final Coordinate coordinate = new Coordinate(0, 0);
+        final MapExtent mapExtent = nauticalMap.getMapExtent();
+        return PurseSeinerActionClassToDouble
+            .fromFile(maxCurrentSpeedsFile.get(), "action", "speed")
+            .mapValues(speed ->
+                metrePerSecondToXyPerDaysVector(
+                    new Double2D(speed, 0),
+                    coordinate,
+                    mapExtent
+                ).length()
+            );
+    }
+
+    private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
+    loadSetCompositionWeights(
+        final FishState fishState
+    ) {
+        return recordStream(setCompositionWeightsFile.get())
+            .collect(groupingBy(r -> ActionClass.valueOf(r.getString("set_type"))
+                .getActionClass()))
+            .entrySet()
+            .stream()
+            .collect(toImmutableMap(
+                Map.Entry::getKey,
+                entry -> makeWeightMap(fishState, entry.getValue())
+            ));
+    }
+
+    abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
+
+    private ImmutableMap<Species, Double> makeWeightMap(
+        final FishState fishState,
+        final Collection<Record> records
+    ) {
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        return
+            records.stream().collect(toImmutableMap(
+                r -> {
+                    final String speciesCode = r.getString("species_code").toUpperCase();
+                    final String speciesName = speciesCodes.getSpeciesName(speciesCode);
+                    return fishState.getBiology().getSpecie(speciesName);
+                },
+                r -> r.getDouble("weight")
+            ));
+
     }
 
     @SuppressWarnings("unused")

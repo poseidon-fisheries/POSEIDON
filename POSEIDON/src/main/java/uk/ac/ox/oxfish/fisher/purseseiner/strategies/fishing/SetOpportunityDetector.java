@@ -19,24 +19,22 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.lang.Math.min;
-
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Math.min;
+
 public class SetOpportunityDetector<B extends LocalBiology> {
 
-    private final Map<SetOpportunityGenerator<B, ? extends AbstractSetAction<B>>, Double>
+    private final Map<SetOpportunityGenerator<B, ? extends AbstractSetAction>, Double>
         detectionProbabilities;
     private final double searchBonus;
 
@@ -48,7 +46,7 @@ public class SetOpportunityDetector<B extends LocalBiology> {
     public SetOpportunityDetector(
         final Fisher fisher,
         final Map<
-            SetOpportunityGenerator<B, ? extends AbstractSetAction<B>>,
+            SetOpportunityGenerator<B, ? extends AbstractSetAction>,
             Double> detectionProbabilities,
         final double searchBonus
     ) {
@@ -63,19 +61,19 @@ public class SetOpportunityDetector<B extends LocalBiology> {
     }
 
     @NotNull
-    Stream<AbstractSetAction<B>> possibleSetActions() {
+    Stream<AbstractSetAction> possibleSetActions() {
         final double bonus = hasSearched ? searchBonus : 0;
         hasSearched = false;
         return fisher.getHold().getPercentageFilled() >= 1
             ? Stream.of() // no possible sets when hold is full
             : detectionProbabilities
-                .entrySet()
-                .stream()
-                .flatMap(entry -> {
-                    final double p = min(1.0, entry.getValue() + bonus);
-                    return entry.getKey().apply(fisher).stream()
-                        .filter(__ -> rng.nextBoolean(p));
-                });
+            .entrySet()
+            .stream()
+            .flatMap(entry -> {
+                final double p = min(1.0, entry.getValue() + bonus);
+                return entry.getKey().apply(fisher).stream()
+                    .filter(__ -> rng.nextBoolean(p));
+            });
     }
 
     public void notifyOfSearch() {

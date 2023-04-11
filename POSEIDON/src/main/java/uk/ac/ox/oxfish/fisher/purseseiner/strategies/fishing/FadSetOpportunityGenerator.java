@@ -18,39 +18,35 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetActionMaker;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetActionMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadSetOpportunityGenerator<
-        B extends LocalBiology,
-        F extends Fad<B, F>,
-        A extends AbstractFadSetAction<B, F>>
-        extends SetOpportunityGenerator<B, A> {
+    B extends LocalBiology,
+    F extends Fad<B, F>,
+    A extends AbstractFadSetAction<B>>
+    extends SetOpportunityGenerator<B, A> {
 
-    private final Class<F> fadClass;
     private final BiPredicate<Fisher, F> fadPredicate;
-    private final FadSetActionMaker<B, F, A> actionMaker;
+    private final FadSetActionMaker<B, A> actionMaker;
 
     public FadSetOpportunityGenerator(
-            final Class<F> fadClass,
-            final BiPredicate<Fisher, F> fadPredicate,
-            final FadSetActionMaker<B, F, A> actionMaker,
-            final DoubleSupplier durationSampler
+        final BiPredicate<Fisher, F> fadPredicate,
+        final FadSetActionMaker<B, A> actionMaker,
+        final DoubleSupplier durationSampler
     ) {
         super(durationSampler);
-        this.fadClass = fadClass;
         this.fadPredicate = fadPredicate;
         this.actionMaker = actionMaker;
     }
@@ -58,12 +54,10 @@ public class FadSetOpportunityGenerator<
     @Override
     public Collection<A> apply(final Fisher fisher) {
         return getFadManager(fisher)
-                .getFadsAt(fisher.getLocation())
-                .filter(fadClass::isInstance)
-                .filter((Predicate<AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>>>) fad -> fad.isActive())
-                .map(fadClass::cast)
-                .filter(fad -> fadPredicate.test(fisher, fad))
-                .map(fad -> actionMaker.make(fad, fisher, getDurationSampler().getAsDouble()))
-                .collect(toImmutableList());
+            .getFadsAt(fisher.getLocation())
+            .filter((Predicate<Fad<? extends LocalBiology, ? extends Fad<?, ?>>>) Fad::isActive)
+            .filter(fad -> fadPredicate.test(fisher, (F) fad))
+            .map(fad -> actionMaker.make(fad, fisher, getDurationSampler().getAsDouble()))
+            .collect(toImmutableList());
     }
 }

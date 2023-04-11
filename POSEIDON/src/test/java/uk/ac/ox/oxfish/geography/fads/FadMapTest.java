@@ -1,26 +1,12 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
-import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-
 import ec.util.MersenneTwisterFast;
-import java.util.Optional;
 import org.junit.Test;
 import sim.engine.Schedule;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities;
@@ -30,13 +16,22 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+
 public class FadMapTest {
 
     @Test
     public void fadBeaching() {
 
         // Make a 3x3 map, with a one tile island in the middle
-        final NauticalMap nauticalMap = makeMap(new int[][] {
+        final NauticalMap nauticalMap = makeMap(new int[][]{
             {-1, -1, -1},
             {-1, 10, -1},
             {-1, -1, -1}
@@ -65,12 +60,12 @@ public class FadMapTest {
             0,
             () -> 0
         );
-        final FadMap<BiomassLocalBiology, BiomassFad> fadMap = new FadMap<>(
+        final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap = new FadMap<>(
             nauticalMap,
             currentVectors,
             globalBiology,
             BiomassLocalBiology.class,
-            BiomassFad.class
+            BiomassAggregatingFad.class
         );
 
         final Schedule schedule = mock(Schedule.class);
@@ -79,7 +74,7 @@ public class FadMapTest {
         when(fishState.getBiology()).thenReturn(globalBiology);
         fishState.schedule = schedule;
 
-        final FadManager<BiomassLocalBiology, BiomassFad> fadManager =
+        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager =
             new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
@@ -89,7 +84,7 @@ public class FadMapTest {
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final BiomassFad fad = fadManager.deployFad(startTile);
+        final BiomassAggregatingFad fad = fadManager.deployFad(startTile);
         fillBiomassFad(fad);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology =

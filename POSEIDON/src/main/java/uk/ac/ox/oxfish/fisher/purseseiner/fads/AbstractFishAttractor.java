@@ -18,31 +18,36 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static java.util.function.UnaryOperator.identity;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 
-public abstract class AbstractFishAttractor<A, B extends LocalBiology, F extends Fad<B, F>>
-    implements FishAttractor<B, F> {
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.function.UnaryOperator.identity;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
+public abstract class AbstractFishAttractor<
+    A,
+    B extends LocalBiology,
+    F extends AggregatingFad<B, GlobalCarryingCapacity, F>>
+    implements FishAttractor<B, GlobalCarryingCapacity, F> {
 
     private final double[] attractionRates;
     private final List<Species> species;
-    private final AttractionProbabilityFunction<B, F> attractionProbabilityFunction;
+    private final AttractionProbabilityFunction attractionProbabilityFunction;
     private final MersenneTwisterFast rng;
+
     AbstractFishAttractor(
         final Collection<Species> species,
-        final AttractionProbabilityFunction<B, F> attractionProbabilityFunction,
+        final AttractionProbabilityFunction attractionProbabilityFunction,
         final double[] attractionRates,
         final MersenneTwisterFast rng
     ) {
@@ -54,7 +59,7 @@ public abstract class AbstractFishAttractor<A, B extends LocalBiology, F extends
 
     @Override
     public WeightedObject<B> attractImplementation(
-        final B seaTileBiology,
+        final LocalBiology seaTileBiology,
         final F fad
     ) {
         final Set<Species> attractedSpecies = attractedSpecies(seaTileBiology, fad);
@@ -75,7 +80,10 @@ public abstract class AbstractFishAttractor<A, B extends LocalBiology, F extends
             : null;
     }
 
-    private Set<Species> attractedSpecies(final B seaTileBiology, final F fad) {
+    private Set<Species> attractedSpecies(
+        final LocalBiology seaTileBiology,
+        final AggregatingFad<?, ?, ?> fad
+    ) {
         return species
             .stream()
             .filter(species ->
@@ -89,7 +97,7 @@ public abstract class AbstractFishAttractor<A, B extends LocalBiology, F extends
             ).collect(toImmutableSet());
     }
 
-    abstract Entry<A, Double> attractForSpecies(Species species, B cellBiology, F fad);
+    abstract Entry<A, Double> attractForSpecies(Species species, LocalBiology cellBiology, F fad);
 
     abstract A attractNothing(Species species);
 

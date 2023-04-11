@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
+import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -40,9 +40,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class WeibullCatchabilitySelectivityAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
-    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker = new Locker<>();
+    private final Locker<FishState, AbundanceAggregatingFadInitializer> oneAttractorPerStateLocker = new Locker<>();
     private AbundanceFiltersFactory abundanceFiltersFactory;
     private LinkedHashMap<String, Double> carryingCapacityShapeParameters = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> carryingCapacityScaleParameters = new LinkedHashMap<>();
@@ -63,6 +63,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
     {
         catchabilities.put("Species 0", 0.001d);
     }
+
     public WeibullCatchabilitySelectivityAttractorFactory() {
     }
 
@@ -78,12 +79,12 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
-            new Supplier<AbundanceFadInitializer>() {
+            new Supplier<AbundanceAggregatingFadInitializer>() {
                 @Override
-                public AbundanceFadInitializer get() {
+                public AbundanceAggregatingFadInitializer get() {
                     final MersenneTwisterFast rng = fishState.getRandom();
                     final double probabilityOfFadBeingDud = fadDudRate.applyAsDouble(rng);
                     final DoubleSupplier capacityGenerator;
@@ -115,7 +116,7 @@ public class WeibullCatchabilitySelectivityAttractorFactory implements
                     }
 
 
-                    return new AbundanceFadInitializer(
+                    return new AbundanceAggregatingFadInitializer(
                         globalBiology,
                         capacityGenerator,
                         new CatchabilitySelectivityFishAttractor(

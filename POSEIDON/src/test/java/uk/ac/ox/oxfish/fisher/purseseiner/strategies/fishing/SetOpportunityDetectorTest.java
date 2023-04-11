@@ -19,26 +19,9 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.stream.Collectors.toList;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DEL;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.junit.Test;
 import sim.util.Bag;
 import sim.util.Int2D;
@@ -46,15 +29,29 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.toList;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
 
 public class SetOpportunityDetectorTest {
 
@@ -64,12 +61,12 @@ public class SetOpportunityDetectorTest {
 
         final MersenneTwisterFast rng = new MersenneTwisterFast();
         final Hold hold = mock(Hold.class);
-        final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear = mock(PurseSeineGear.class);
-        final FadManager<BiomassLocalBiology, BiomassFad> fadManager = mock(FadManager.class);
+        final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear = mock(PurseSeineGear.class);
+        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager = mock(FadManager.class);
         final Fisher fisher = mock(Fisher.class);
         final FishState fishState = mock(FishState.class);
-        final BiomassFad ownFad = mock(BiomassFad.class);
-        final BiomassFad otherFad = mock(BiomassFad.class);
+        final BiomassAggregatingFad ownFad = mock(BiomassAggregatingFad.class);
+        final BiomassAggregatingFad otherFad = mock(BiomassAggregatingFad.class);
         final ActiveActionRegulations actionSpecificRegulations =
             mock(ActiveActionRegulations.class);
         final Regulation regulation = mock(Regulation.class);
@@ -85,9 +82,9 @@ public class SetOpportunityDetectorTest {
         when(gear.getFadManager()).thenReturn(fadManager);
         when(ownFad.getOwner()).thenReturn(fadManager);
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
-        when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[] {ownFad, otherFad}));
+        when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[]{ownFad, otherFad}));
         when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);
-        when(actionSpecificRegulations.isForbidden(any(),any())).thenReturn(false);
+        when(actionSpecificRegulations.isForbidden(any(), any())).thenReturn(false);
         when(fisher.getRegulation()).thenReturn(regulation);
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
@@ -101,11 +98,11 @@ public class SetOpportunityDetectorTest {
         @SuppressWarnings("unchecked") final Map<SetOpportunityGenerator, Double>
             detectionProbabilities =
             ImmutableMap.of(
-                FAD, 1.0,
-                OFS, 0.0,
-                NOA, 0.0,
-                DEL, 0.0
-            )
+                    FAD, 1.0,
+                    OFS, 0.0,
+                    NOA, 0.0,
+                    DEL, 0.0
+                )
                 .entrySet()
                 .stream()
                 .collect(toImmutableMap(

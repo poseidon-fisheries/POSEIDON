@@ -3,8 +3,6 @@ package uk.ac.ox.oxfish.geography.fads;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.ConstantCurrentVector;
 import uk.ac.ox.oxfish.model.FishState;
@@ -19,16 +17,6 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap> {
 
     private DoubleParameter fixedXCurrent = new FixedDoubleParameter(+1);
     private DoubleParameter fixedYCurrent = new FixedDoubleParameter(-1);
-
-    @NotNull
-    protected ConstantCurrentVector getCurrentVectors(final FishState fishState, final NauticalMap map) {
-        return new ConstantCurrentVector(
-            fixedXCurrent.applyAsDouble(fishState.getRandom()),
-            fixedYCurrent.applyAsDouble(fishState.getRandom()),
-            map.getHeight(),
-            map.getWidth()
-        );
-    }
 
     public DoubleParameter getFixedXCurrent() {
         return fixedXCurrent;
@@ -55,13 +43,21 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap> {
             map,
             getCurrentVectors(fishState, map),
             fishState.getBiology(),
-            isBiomassOnly ? BiomassLocalBiology.class : AbundanceLocalBiology.class,
-            isBiomassOnly ? BiomassFad.class : AbundanceFad.class
+            isBiomassOnly ? BiomassLocalBiology.class : AbundanceLocalBiology.class
         );
 
 
     }
 
+    @NotNull
+    protected ConstantCurrentVector getCurrentVectors(final FishState fishState, final NauticalMap map) {
+        return new ConstantCurrentVector(
+            fixedXCurrent.applyAsDouble(fishState.getRandom()),
+            fixedYCurrent.applyAsDouble(fishState.getRandom()),
+            map.getHeight(),
+            map.getWidth()
+        );
+    }
 
     public boolean isBiomassOnly() {
         return isBiomassOnly;

@@ -39,19 +39,11 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
      * an object that is given a reference to the fishState and called each step to
      * returns a list of seatiles to dump fads in at that step
      */
-    private final Function<FishState, List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep;
+    private final Function<? super FishState, ? extends List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep;
     /**
      * the object that keeps track of how many fads are in the water due to us
      */
     private FadManager<B, F> fadManager;
-
-    public ExogenousFadMaker(
-        final FadInitializer<B, F> fadInitializer,
-        final Function<FishState, List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep
-    ) {
-        this.fadInitializer = fadInitializer;
-        this.generatorForFadDeploymentPositionsAtEachStep = generatorForFadDeploymentPositionsAtEachStep;
-    }
 
     /**
      * generates an exogenous map maper that reads from a mapping day--->list of coordinates
@@ -62,7 +54,7 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
      */
     public ExogenousFadMaker(
         final FadInitializer<B, F> fadInitializer,
-        final Map<Integer, Collection<Double2D>> dayToCoordinatesMap
+        final Map<Integer, ? extends Collection<Double2D>> dayToCoordinatesMap
     ) {
         this(fadInitializer, state -> {
 
@@ -76,6 +68,14 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
 
             return toReturn;
         });
+    }
+
+    public ExogenousFadMaker(
+        final FadInitializer<B, F> fadInitializer,
+        final Function<? super FishState, ? extends List<SeaTile>> generatorForFadDeploymentPositionsAtEachStep
+    ) {
+        this.fadInitializer = fadInitializer;
+        this.generatorForFadDeploymentPositionsAtEachStep = generatorForFadDeploymentPositionsAtEachStep;
     }
 
     @Override

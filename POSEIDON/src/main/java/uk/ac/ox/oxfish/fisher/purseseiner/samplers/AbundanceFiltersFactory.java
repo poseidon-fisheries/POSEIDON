@@ -9,10 +9,10 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.Map;
 
 public interface AbundanceFiltersFactory extends AlgorithmFactory<
-    Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>>
+    Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>>
     > {
     @Override
-    Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> apply(
+    Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> apply(
         FishState fishState
     );
 }

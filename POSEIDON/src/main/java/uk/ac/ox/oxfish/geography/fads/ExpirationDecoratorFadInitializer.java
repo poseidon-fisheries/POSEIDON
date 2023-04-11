@@ -22,36 +22,33 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-
-public class ExpirationDecoratorFadInitializer<B extends LocalBiology, F extends Fad<B, F>>
-        implements FadInitializer<B,F> {
+public class ExpirationDecoratorFadInitializer<
+    B extends LocalBiology,
+    F extends Fad<B, F>>
+    implements FadInitializer<B, F> {
 
     private final int daysOfActivity;
 
-    private FadInitializer<B,F> delegate;
+    private final FadInitializer<B, F> delegate;
 
     public ExpirationDecoratorFadInitializer(
-            int daysOfActivity, FadInitializer<B, F> delegate) {
+        final int daysOfActivity, final FadInitializer<B, F> delegate
+    ) {
         this.daysOfActivity = daysOfActivity;
         this.delegate = delegate;
     }
 
     @Override
     public F makeFad(
-            @NotNull FadManager<B, F> fadManager, @Nullable Fisher owner, @NotNull SeaTile initialLocation) {
-        F fad = delegate.makeFad(fadManager, owner, initialLocation);
+        @NotNull final FadManager<B, F> fadManager, @Nullable final Fisher owner, @NotNull final SeaTile initialLocation
+    ) {
+        final F fad = delegate.makeFad(fadManager, owner, initialLocation);
         fad.setDaysBeforeTurningOff(daysOfActivity);
         return fad;
     }

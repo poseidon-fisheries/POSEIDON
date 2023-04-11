@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.geography.fads;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PerSpeciesCarryingCapacitiesFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
@@ -12,12 +11,14 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
-public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class FadInitializerFactory<
+    B extends LocalBiology,
+    F extends Fad<B, F>>
     implements AlgorithmFactory<FadInitializer<B, F>> {
     private final CacheByFishState<FadInitializer<B, F>> cache =
         new CacheByFishState<>(this::makeFadInitializer);
     private Map<String, DoubleParameter> catchabilities;
-    private PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory;
+    private CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory;
     private DoubleParameter fishValueCalculatorStandardDeviation =
         new CalibratedParameter(0, 0.5, 0, 1, 0);
     private DoubleParameter fadDudRate =
@@ -30,7 +31,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         new CalibratedParameter(0.0, 3.5, 0, 10, 3.3);
 
     FadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter fishValueCalculatorStandardDeviation,
         final DoubleParameter fadDudRate,
@@ -38,7 +39,7 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
         final DoubleParameter maximumDaysAttractions,
         final DoubleParameter fishReleaseProbabilityInPercent
     ) {
-        this.carryingCapacitiesFactory = carryingCapacitiesFactory;
+        this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
         this.catchabilities = catchabilities;
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
         this.fadDudRate = fadDudRate;
@@ -51,10 +52,10 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     }
 
     public FadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities
     ) {
-        this.carryingCapacitiesFactory = carryingCapacitiesFactory;
+        this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
         this.catchabilities = catchabilities;
     }
 
@@ -64,14 +65,6 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
 
     public void setCatchabilities(final Map<String, DoubleParameter> catchabilities) {
         this.catchabilities = catchabilities;
-    }
-
-    public PerSpeciesCarryingCapacitiesFactory getCarryingCapacitiesFactory() {
-        return carryingCapacitiesFactory;
-    }
-
-    public void setCarryingCapacitiesFactory(final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory) {
-        this.carryingCapacitiesFactory = carryingCapacitiesFactory;
     }
 
     public DoubleParameter getFishValueCalculatorStandardDeviation() {
@@ -129,4 +122,12 @@ public abstract class FadInitializerFactory<B extends LocalBiology, F extends Fa
     }
 
     protected abstract FadInitializer<B, F> makeFadInitializer(FishState fishState);
+
+    public CarryingCapacityInitializerFactory<?> getCarryingCapacityInitializerFactory() {
+        return carryingCapacityInitializerFactory;
+    }
+
+    public void setCarryingCapacityInitializerFactory(final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory) {
+        this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
+    }
 }

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -17,9 +17,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class FadZapper implements Steppable, AdditionalStartable {
 
-    private final Predicate<? super AbstractFad<?, ?>> validator;
+    private final Predicate<? super Fad<?, ?>> validator;
 
-    public FadZapper(final Predicate<? super AbstractFad<?, ?>> validator) {
+    public FadZapper(final Predicate<? super Fad<?, ?>> validator) {
         this.validator = validator;
     }
 

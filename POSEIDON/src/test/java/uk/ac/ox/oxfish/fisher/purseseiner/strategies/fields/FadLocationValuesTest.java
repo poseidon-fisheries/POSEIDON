@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -57,11 +57,11 @@ public class FadLocationValuesTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(3, 3);
         final Fisher fisher = mock(Fisher.class);
-        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassFad> gear =
+        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear =
             mock(PurseSeineGear.class);
-        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassFad>
+        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassAggregatingFad>
             fadManager = mock(FadManager.class);
-        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassFad> fadMap =
+        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
             mock(FadMap.class);
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(gear.getFadManager()).thenReturn(fadManager);
@@ -79,9 +79,9 @@ public class FadLocationValuesTest {
         when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
 
         final BiomassLocalBiology biomassLocalBiology = mock(BiomassLocalBiology.class);
-        final List<BiomassFad> fads = range(0, 3)
+        final List<BiomassAggregatingFad> fads = range(0, 3)
             .mapToObj(__ -> {
-                final BiomassFad biomassFad = mock(BiomassFad.class);
+                final BiomassAggregatingFad biomassFad = mock(BiomassAggregatingFad.class);
                 when(biomassFad.getBiology()).thenReturn(biomassLocalBiology);
                 return biomassFad;
             })

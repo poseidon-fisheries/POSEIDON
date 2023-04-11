@@ -18,23 +18,24 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.util.Arrays.stream;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.util.concurrent.AtomicDouble;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.Arrays.stream;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
 public abstract class FishBiomassAttractor
-    extends AbstractFishAttractor<Double, BiomassLocalBiology, BiomassFad> {
+    extends AbstractFishAttractor<Double, BiomassLocalBiology, BiomassAggregatingFad> {
 
     FishBiomassAttractor(
         final Collection<Species> species,
-        final AttractionProbabilityFunction<BiomassLocalBiology, BiomassFad> attractionProbabilityFunction,
+        final AttractionProbabilityFunction attractionProbabilityFunction,
         final double[] attractionRates,
         final MersenneTwisterFast rng
     ) {
@@ -49,7 +50,7 @@ public abstract class FishBiomassAttractor
     @Override
     Entry<BiomassLocalBiology, Double> scale(
         final Map<Species, Entry<Double, Double>> attractedFish,
-        final BiomassFad fad
+        final BiomassAggregatingFad fad
     ) {
         final double[] biomassArray = new double[attractedFish.size()];
         final AtomicDouble totalBiomass = new AtomicDouble();
@@ -65,12 +66,12 @@ public abstract class FishBiomassAttractor
 
     private double[] scaleAttractedBiomass(
         final double[] attractedBiomass,
-        final BiomassFad fad
+        final BiomassAggregatingFad fad
     ) {
         final double scalingFactor = biomassScalingFactor(
             stream(attractedBiomass).sum(),
             fad.getBiology().getTotalBiomass(),
-            fad.getTotalCarryingCapacity()
+            fad.getCarryingCapacity().getTotal()
         );
         return stream(attractedBiomass).map(b -> b * scalingFactor).toArray();
     }

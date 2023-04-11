@@ -43,7 +43,7 @@ import java.util.Map;
  * @param <B>
  * @param <F>
  */
-public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFad<B, F>> extends AbstractFad<B, F> {
+public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B, F>> extends Fad<B, F> {
 
 
     //all this stuff really belongs to an attractor object, if I come up with different rules:
@@ -57,8 +57,11 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
     private FishState state;
 
     public LastMomentFad(
-        final TripRecord tripDeployed, final int stepDeployed, final Int2D locationDeployed,
-        final double fishReleaseProbability, final FadManager<B, F> owner,
+        final TripRecord tripDeployed,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final double fishReleaseProbability,
+        final FadManager<B, F> owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,
@@ -71,17 +74,21 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends AbstractFa
     }
 
     @Override
-    public void aggregateFish(final B seaTileBiology, final GlobalBiology globalBiology, final int currentStep) {
+    public void aggregateFish(
+        final LocalBiology seaTileBiology,
+        final GlobalBiology globalBiology,
+        final int currentStep
+    ) {
         //ignored
     }
 
     @Override
-    public void releaseFish(final Collection<Species> allSpecies, final LocalBiology seaTileBiology) {
+    public void releaseFish(final Collection<? extends Species> allSpecies, final LocalBiology seaTileBiology) {
         //nothing to release
     }
 
     @Override
-    public void releaseFish(final Collection<Species> allSpecies) {
+    public void releaseFish(final Collection<? extends Species> allSpecies) {
         //nothing to release
     }
 

@@ -10,8 +10,10 @@ import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.*;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -81,6 +83,21 @@ public class TunaEvaluator implements Runnable {
 
     }
 
+    private static Scenario makeScenario(
+        final GenericOptimization optimization,
+        final double[] optimalParameters
+    ) {
+        try {
+            return GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+        } catch (final FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public TunaEvaluator(final Path alreadyCalibratedScenario, final Path calibrationFilePath) {
 
         optimization = GenericOptimization.fromFile(calibrationFilePath);
@@ -100,21 +117,6 @@ public class TunaEvaluator implements Runnable {
             YearlyResultsRowProvider::new
         ).requestFisherYearlyData();
         runner.setParallel(false);
-    }
-
-    private static Scenario makeScenario(
-        final GenericOptimization optimization,
-        final double[] optimalParameters
-    ) {
-        try {
-            return GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-        } catch (final FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     public static void main(final String[] args) {
@@ -155,17 +157,6 @@ public class TunaEvaluator implements Runnable {
         }
     }
 
-    private static boolean isCalibrationFile(final Path path) {
-        try {
-            return Files.lines(path)
-                .findFirst()
-                .filter(line -> line.equals("!!uk.ac.ox.oxfish.maximization.GenericOptimization"))
-                .isPresent();
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     @SuppressWarnings("UnstableApiUsage")
     @NotNull
     static double[] extractSolution(final Path logFilePath) {
@@ -179,54 +170,6 @@ public class TunaEvaluator implements Runnable {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private static Path getCalibrationFolder(final String[] args) {
-        return stream(args)
-            .map(Paths::get)
-            .filter(Files::isDirectory)
-            .map(path -> {
-                try {
-                    return path.toRealPath();
-                } catch (final IOException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            })
-            .findFirst()
-            .orElse(DEFAULT_CALIBRATION_FOLDER);
-    }
-
-    @SuppressWarnings("unused")
-    public int getNumYearsToRuns() {
-        return numYearsToRuns;
-    }
-
-    @SuppressWarnings("unused")
-    public void setNumYearsToRuns(final int numYearsToRuns) {
-        this.numYearsToRuns = numYearsToRuns;
-    }
-
-    private void registerFadAttractionEventProviders() {
-        runner.setAfterStartConsumer(state -> {
-            final FishState fishState = state.getModel();
-            final EpoScenario<?, ?> scenario = (EpoScenario<?, ?>) state.getScenario();
-            final SpeciesCodes speciesCodes = scenario.getSpeciesCodesSupplier().get();
-            final AbundanceFadAttractionEventObserver observer =
-                new AbundanceFadAttractionEventObserver(fishState, speciesCodes);
-            fishState.getFishers().stream()
-                .filter(fisher -> boatsToTrack.contains(fisher.getTags().get(0)))
-                .map(FadManager::getFadManager)
-                .forEach(fadManager ->
-                    fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
-                );
-            if (completeOutput) {
-                ImmutableMap.of(
-                    "fad_attraction_events.csv", observer.getEventLogger(),
-                    "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
-                    "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
-                ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
-            }
-        });
     }
 
     @Override
@@ -253,6 +196,65 @@ public class TunaEvaluator implements Runnable {
         runner.registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new);
         runner.run(numYearsToRuns, 1, runCounter);
 
+    }
+
+    private static boolean isCalibrationFile(final Path path) {
+        try {
+            return Files.lines(path)
+                .findFirst()
+                .filter(line -> line.equals("!!uk.ac.ox.oxfish.maximization.GenericOptimization"))
+                .isPresent();
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private void registerFadAttractionEventProviders() {
+        runner.setAfterStartConsumer(state -> {
+            final FishState fishState = state.getModel();
+            final EpoScenario<?> scenario = (EpoScenario<?>) state.getScenario();
+            final SpeciesCodes speciesCodes = scenario.getSpeciesCodesSupplier().get();
+            final AbundanceFadAttractionEventObserver observer =
+                new AbundanceFadAttractionEventObserver(fishState, speciesCodes);
+            fishState.getFishers().stream()
+                .filter(fisher -> boatsToTrack.contains(fisher.getTags().get(0)))
+                .map(FadManager::getFadManager)
+                .forEach(fadManager ->
+                    fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
+                );
+            if (completeOutput) {
+                ImmutableMap.of(
+                    "fad_attraction_events.csv", observer.getEventLogger(),
+                    "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
+                    "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
+                ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
+            }
+        });
+    }
+
+    private static Path getCalibrationFolder(final String[] args) {
+        return stream(args)
+            .map(Paths::get)
+            .filter(Files::isDirectory)
+            .map(path -> {
+                try {
+                    return path.toRealPath();
+                } catch (final IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            })
+            .findFirst()
+            .orElse(DEFAULT_CALIBRATION_FOLDER);
+    }
+
+    @SuppressWarnings("unused")
+    public int getNumYearsToRuns() {
+        return numYearsToRuns;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNumYearsToRuns(final int numYearsToRuns) {
+        this.numYearsToRuns = numYearsToRuns;
     }
 
     public Runner<Scenario> getRunner() {

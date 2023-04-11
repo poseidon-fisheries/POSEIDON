@@ -96,37 +96,12 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
     }
 
-    @SuppressWarnings("rawtypes")
-    public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return allSetsObservers;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.allSetsObservers = allSetsObservers;
-    }
-
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
     public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return dolphinSetObservers;
-    }
-
-    public void setDolphinSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<DolphinSetAction>> dolphinSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.dolphinSetObservers = dolphinSetObservers;
     }
 
     @SuppressWarnings("unused")
@@ -167,48 +142,6 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         this.successfulSetProbability = successfulSetProbability;
     }
 
-    @SuppressWarnings("unused")
-    public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return fadDeploymentObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadDeploymentObservers(
-        final Set<Observer<FadDeploymentAction>> fadDeploymentObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.fadDeploymentObservers = fadDeploymentObservers;
-    }
-
-    @SuppressWarnings({"unused", "rawtypes"})
-    public Set<Observer<AbstractFadSetAction>> getFadSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return fadSetObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<AbstractFadSetAction>> fadSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.fadSetObservers = fadSetObservers;
-    }
-
-    @SuppressWarnings({"unused", "rawtypes"})
-    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return nonAssociatedSetObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setNonAssociatedSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.nonAssociatedSetObservers = nonAssociatedSetObservers;
-    }
-
     @NotNull
     FadManager<B, F> makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
@@ -221,7 +154,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
-            (FadMap<B, F>) fishState.getFadMap(),
+            (FadMap<B>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
             allSetsObserversCache.get(fishState),
@@ -251,5 +184,72 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
         getDolphinSetObservers()
             .addAll(monitors.getDolphinSetMonitors());
         setBiomassLostMonitor(monitors.getBiomassLostMonitor());
+    }
+
+    @SuppressWarnings("unused")
+    public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadDeploymentObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return allSetsObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.allSetsObservers = allSetsObservers;
+    }
+
+    @SuppressWarnings({"unused", "rawtypes"})
+    public Set<Observer<AbstractFadSetAction>> getFadSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<AbstractFadSetAction>> fadSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.fadSetObservers = fadSetObservers;
+    }
+
+    @SuppressWarnings({"unused", "rawtypes"})
+    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return nonAssociatedSetObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return dolphinSetObservers;
+    }
+
+    public void setDolphinSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<DolphinSetAction>> dolphinSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.dolphinSetObservers = dolphinSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNonAssociatedSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.nonAssociatedSetObservers = nonAssociatedSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadDeploymentObservers(
+        final Set<Observer<FadDeploymentAction>> fadDeploymentObservers
+    ) {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.fadDeploymentObservers = fadDeploymentObservers;
     }
 }

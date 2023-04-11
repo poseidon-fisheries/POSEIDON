@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAbundanceAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.LogisticFishAbundanceAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -18,7 +15,7 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractCompressedAbundanceFadInitializerFactory
-    extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceFad> {
+    extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad<GlobalCarryingCapacity>> {
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
@@ -46,23 +43,18 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
     }
 
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<GlobalCarryingCapacity>> apply(final FishState fishState) {
         checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
-        final double totalCarryingCapacity = getTotalCarryingCapacity().applyAsDouble(rng);
-        final DoubleSupplier capacityGenerator = buildCapacityGenerator(rng, totalCarryingCapacity);
 
-        return new AbundanceFadInitializer(
+        return new AbundanceAggregatingFadInitializer<>(
             fishState.getBiology(),
-            capacityGenerator,
             makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
-            fishState::getStep
+            fishState::getStep,
+            new GlobalCarryingCapacityInitializer(0, getTotalCarryingCapacity())
         );
     }
-
-    @NotNull
-    protected abstract DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity);
 
     private FishAbundanceAttractor makeFishAttractor(
         final FishState fishState,
@@ -106,7 +98,7 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
     ) {
         return new LogisticFishAbundanceAttractor(
             fishState.getBiology().getSpecies(),
-            new CompressedExponentialAttractionProbability<>(
+            new CompressedExponentialAttractionProbability(
                 compressionExponents,
                 attractableBiomassCoefficients,
                 biomassInteractionCoefficients
@@ -116,6 +108,9 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
         );
     }
+
+    @NotNull
+    protected abstract DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity);
 
 }
 

@@ -19,18 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.util.stream.Collectors.toMap;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-
 import com.google.common.collect.ImmutableMap;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -40,6 +29,18 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static java.util.stream.Collectors.toMap;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 /**
  * Just a bunch of statics to make testing stuff around FADs easier
@@ -70,7 +71,7 @@ public class TestUtilities {
         return new BiomassLocalBiology(biomass, carryingCapacity);
     }
 
-    public static void fillBiomassFad(final BiomassFad fad) {
+    public static void fillBiomassFad(final BiomassAggregatingFad fad) {
         final double[] biomassArray = fad.getBiology().getCurrentBiomass();
         Arrays.fill(biomassArray, fad.getTotalCarryingCapacity() / biomassArray.length);
     }

@@ -18,23 +18,20 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.nio.file.Path;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
-public class BiomassFadMapFactory extends FadMapFactory<BiomassLocalBiology, BiomassFad> {
+public class BiomassFadMapFactory extends FadMapFactory<BiomassLocalBiology, BiomassAggregatingFad> {
 
     @SuppressWarnings("unused")
     public BiomassFadMapFactory() {
-        super(BiomassLocalBiology.class, BiomassFad.class);
+        super(BiomassLocalBiology.class);
     }
 
     public BiomassFadMapFactory(
         final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
-        super(BiomassLocalBiology.class, BiomassFad.class, currentPatternMapSupplier);
+        super(BiomassLocalBiology.class, currentPatternMapSupplier);
     }
 }

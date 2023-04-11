@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
-
 import com.google.common.base.Preconditions;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.logging.log4j.Level;
@@ -10,7 +8,8 @@ import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -18,6 +17,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.List;
+
+import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 /**
  * an exogenous generator of fad set events which are unconnected to both fishers and FadManagers
@@ -40,27 +41,6 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
      */
     private Stoppable stoppable;
 
-    abstract protected List<AbstractFad> chooseWhichFadsToSetOnToday(
-            FadMap fadMap,
-            FishState model,
-            int day
-    );
-
-    @Override
-    public void step(SimState simState) {
-        FishState model = ((FishState) simState);
-        //get fads to set on
-        List<AbstractFad> allFadsToSetOn = chooseWhichFadsToSetOnToday(fadMap,
-                                                                       model,
-                                                                       model.getDay());
-        //set on them
-        for (AbstractFad fad : allFadsToSetOn) {
-            logFadRemoval(fad, model);
-            setOnFad(fad);
-        }
-        //done!
-    }
-
     public static void initFadRemovalLog() {
         addCsvLogger(
             Level.DEBUG,
@@ -69,7 +49,33 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
         );
     }
 
-    private static void logFadRemoval(final AbstractFad<? extends uk.ac.ox.oxfish.biology.LocalBiology,? extends AbstractFad<?,?>> fad, final FishState fishState) {
+    @Override
+    public void step(final SimState simState) {
+        final FishState model = ((FishState) simState);
+        //get fads to set on
+        final List<Fad> allFadsToSetOn = chooseWhichFadsToSetOnToday(
+            fadMap,
+            model,
+            model.getDay()
+        );
+        //set on them
+        for (final Fad fad : allFadsToSetOn) {
+            logFadRemoval(fad, model);
+            setOnFad(fad);
+        }
+        //done!
+    }
+
+    abstract protected List<Fad> chooseWhichFadsToSetOnToday(
+        FadMap fadMap,
+        FishState model,
+        int day
+    );
+
+    private static void logFadRemoval(
+        final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad,
+        final FishState fishState
+    ) {
         LogManager.getLogger("fad_removals").debug(() -> {
             final NauticalMap map = fishState.getMap();
             final Coordinate coordinatesDeployed =
@@ -87,38 +93,35 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
         });
     }
 
+    /**
+     * remove fad from circulation
+     *
+     * @param fad
+     */
+    private void setOnFad(final Fad fad) {
+        //remove it from the fadMap
+        fadMap.remove(fad);
+        //should have been removed automatically
+        final FadManager owner = fad.getOwner();
+        assert owner == null || !owner.getDeployedFads().contains(fad);
+        //probably pointless turn off
+        fad.getBiology().turnOff();
+
+
+    }
+
     @Override
-    public void start(FishState model) {
-        Preconditions.checkState(stoppable==null, "already started!");
+    public void start(final FishState model) {
+        Preconditions.checkState(stoppable == null, "already started!");
         fadMap = model.getFadMap();
         Preconditions.checkState(fadMap != null, "Exogenous Fad Setter cannot find reference to FadMap!");
         stoppable = model.scheduleEveryDay(this, EXOGENOUS_FAD_SETTER_STEPORDER);
 
     }
 
-    /**
-     * remove fad from circulation
-     * @param fad
-     */
-    private void setOnFad(AbstractFad fad){
-        //remove it from the fadMap
-        fadMap.remove(fad);
-        //should have been removed automatically
-        FadManager owner = fad.getOwner();
-        if(owner!=null)
-            assert !owner.getDeployedFads().contains(fad);
-        //probably pointless turn off
-        fad.getBiology().turnOff();
-
-
-
-    }
-
-
-
     @Override
     public void turnOff() {
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
 

@@ -8,11 +8,12 @@ public class AbundanceFadAttractionEvent {
 
     private static final AtomicLong nextId = new AtomicLong();
     private final long id = nextId.getAndIncrement();
-    private final AbundanceFad fad;
+    private final AbundanceAggregatingFad fad;
     private final AbundanceLocalBiology tileAbundanceBefore;
     private final AbundanceLocalBiology fadAbundanceDelta;
+
     public AbundanceFadAttractionEvent(
-        final AbundanceFad fad,
+        final AbundanceAggregatingFad fad,
         final AbundanceLocalBiology tileAbundanceBefore,
         final AbundanceLocalBiology fadAbundanceDelta
     ) {
@@ -25,7 +26,7 @@ public class AbundanceFadAttractionEvent {
         return id;
     }
 
-    public AbundanceFad getFad() {
+    public AbundanceAggregatingFad getFad() {
         return fad;
     }
 

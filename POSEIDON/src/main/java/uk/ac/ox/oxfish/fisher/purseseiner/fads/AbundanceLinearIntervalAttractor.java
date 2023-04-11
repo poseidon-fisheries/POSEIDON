@@ -36,48 +36,39 @@ import java.util.Map;
  */
 public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearIntervalAttractor {
 
-
-
-    private final int daysItTakesToFillUp;
-
-    final double[] carryingCapacitiesPerSpecies;
-
     final double[] dailyBiomassAttractedPerSpecies;
-
-    WeightedObject<AbundanceLocalBiology> dailyAttractionStep; //stored as a weighted object for speed
-
-    HashMap<Species,double[][]>  dailyAttractionThreshold; //this will just be dailyAttractionStep times minAbundanceThreshold; but easy t store and skip all computations
-
     final double minAbundanceThreshold;
-
-    final Map<Species,NonMutatingArrayFilter> globalSelectivityCurves;
-
+    final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
     final FishState model;
+    private final int daysItTakesToFillUp;
+    WeightedObject<AbundanceLocalBiology> dailyAttractionStep; //stored as a weighted object for speed
+    HashMap<Species, double[][]> dailyAttractionThreshold; //this will just be dailyAttractionStep times minAbundanceThreshold; but easy t store and skip all computations
 
     public AbundanceLinearIntervalAttractor(
-            int daysInWaterBeforeAttraction, int daysItTakesToFillUp, double[] carryingCapacitiesPerSpecies,
-            double minAbundanceThreshold,
-            Map<Species, NonMutatingArrayFilter> selectivityFilters,
-            FishState model
+        final int daysInWaterBeforeAttraction,
+        final int daysItTakesToFillUp,
+        final double[] carryingCapacitiesPerSpecies,
+        final double minAbundanceThreshold,
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters,
+        final FishState model
     ) {
         //there is only one rate of attraction, so it should be easy to compute this straight into the
         //
         super(selectivityFilters, model, daysInWaterBeforeAttraction);
-        Preconditions.checkArgument(minAbundanceThreshold>=1);
-        Preconditions.checkArgument(daysItTakesToFillUp>0);
+        Preconditions.checkArgument(minAbundanceThreshold >= 1);
+        Preconditions.checkArgument(daysItTakesToFillUp > 0);
         this.daysItTakesToFillUp = daysItTakesToFillUp;
-        this.carryingCapacitiesPerSpecies = carryingCapacitiesPerSpecies;
-        this.dailyBiomassAttractedPerSpecies= new double[carryingCapacitiesPerSpecies.length];
+        this.dailyBiomassAttractedPerSpecies = new double[carryingCapacitiesPerSpecies.length];
         for (int i = 0; i < carryingCapacitiesPerSpecies.length; i++) {
             this.dailyBiomassAttractedPerSpecies[i] =
-                    carryingCapacitiesPerSpecies[i]/(double)daysItTakesToFillUp;
+                carryingCapacitiesPerSpecies[i] / (double) daysItTakesToFillUp;
 
         }
         //turn biomass target into abundance target via selectivity
-        assert selectivityFilters.size()==carryingCapacitiesPerSpecies.length;
+        assert selectivityFilters.size() == carryingCapacitiesPerSpecies.length;
         globalSelectivityCurves = selectivityFilters;
 
-        this.model= model;
+        this.model = model;
         this.minAbundanceThreshold = minAbundanceThreshold;
 
 
@@ -85,22 +76,24 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
 
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         super.step(simState);
         //by construction here every FAD will have to attract the same daily kg, so we can just need to compute
         //one daily catch, save it as an abundance biology and just give it to any fad making contact
 
-        HashMap<Species,double[][]> dailyAbundance =  new HashMap<>();
+        final HashMap<Species, double[][]> dailyAbundance = new HashMap<>();
         dailyAttractionThreshold = new HashMap<>();
         HeterogeneousLinearIntervalAttractor.
-                fillUpAttractionAndThresholdAttractionMatrices(dailyBiomassAttractedPerSpecies,
-                                                               dailyAbundance,
-                                                               dailyAttractionThreshold,
-                                                               minAbundanceThreshold,
-                                                               super.globalSelectivityCurves,
-                                                               super.getAbundancePerDailyKgLanded());
-        AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundance);
-        dailyAttractionStep = new WeightedObject<>(toReturn,toReturn.getTotalBiomass());
+            fillUpAttractionAndThresholdAttractionMatrices(
+                dailyBiomassAttractedPerSpecies,
+                dailyAbundance,
+                dailyAttractionThreshold,
+                minAbundanceThreshold,
+                super.globalSelectivityCurves,
+                super.getAbundancePerDailyKgLanded()
+            );
+        final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundance);
+        dailyAttractionStep = new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
 
 
     }
@@ -108,7 +101,8 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
 
     @Override
     protected WeightedObject<AbundanceLocalBiology> attractDaily(
-            AbundanceLocalBiology seaTileBiology, AbundanceFad fad) {
+        final AbundanceLocalBiology seaTileBiology, final AbundanceAggregatingFad fad
+    ) {
         return dailyAttractionStep;
     }
 
@@ -117,11 +111,11 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
         return daysItTakesToFillUp;
     }
 
-    public double getCarryingCapacitiesPerSpecies(int speciesID) {
+    public double getCarryingCapacitiesPerSpecies(final int speciesID) {
         return carryingCapacitiesPerSpecies[speciesID];
     }
 
-    public double getDailyBiomassAttractedPerSpecies(int speciesID) {
+    public double getDailyBiomassAttractedPerSpecies(final int speciesID) {
         return dailyBiomassAttractedPerSpecies[speciesID];
     }
 
@@ -150,7 +144,7 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
      * @return
      */
     @Override
-    public double[] getCarryingCapacities(AbundanceFad fad) {
+    public double[] getCarryingCapacities(final AbundanceAggregatingFad fad) {
         return carryingCapacitiesPerSpecies;
     }
 
@@ -161,7 +155,7 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
      * @param fad
      */
     @Override
-    public HashMap<Species,double[][]> getDailyAttractionThreshold(AbundanceFad fad) {
+    public HashMap<Species, double[][]> getDailyAttractionThreshold(final AbundanceAggregatingFad fad) {
         return dailyAttractionThreshold;
     }
 }

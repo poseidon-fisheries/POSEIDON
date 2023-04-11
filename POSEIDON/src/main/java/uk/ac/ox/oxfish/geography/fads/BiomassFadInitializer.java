@@ -22,29 +22,22 @@ import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 
 import java.util.function.IntSupplier;
 import java.util.stream.DoubleStream;
 
-public class BiomassFadInitializer extends AbstractFadInitializer<BiomassLocalBiology, BiomassFad> {
+public class BiomassFadInitializer
+    extends AggregatingFadInitializer<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
 
     public BiomassFadInitializer(
         final GlobalBiology globalBiology,
-        final double totalCarryingCapacity,
-        final FishAttractor<BiomassLocalBiology, BiomassFad> fishBiomassAttractor,
+        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
+        final IntSupplier timeStepSupplier,
+        final CarryingCapacityInitializer<GlobalCarryingCapacity> carryingCapacityInitializer
     ) {
-        super(
-            globalBiology,
-            totalCarryingCapacity,
-            fishBiomassAttractor,
-            fishReleaseProbability,
-            timeStepSupplier
-        );
+        super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
     }
 
     @NotNull
@@ -56,25 +49,25 @@ public class BiomassFadInitializer extends AbstractFadInitializer<BiomassLocalBi
         return new BiomassLocalBiology(emptyBiomasses, carryingCapacities);
     }
 
-    @NotNull
-    public BiomassFad makeFad(
-        final FadManager<BiomassLocalBiology, BiomassFad> owner,
+    @Override
+    protected BiomassAggregatingFad makeFad(
+        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> owner,
         final BiomassLocalBiology biology,
-        final FishAttractor<BiomassLocalBiology, BiomassFad> fishBiomassAttractor,
+        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
-        final Int2D locationDeployed
+        final Int2D locationDeployed,
+        final GlobalCarryingCapacity carryingCapacity
     ) {
-        return new BiomassFad(
+        return new BiomassAggregatingFad(
             owner,
             biology,
-            fishBiomassAttractor,
+            fishAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            generateCarryingCapacity()
+            carryingCapacity
         );
     }
-
 
 }

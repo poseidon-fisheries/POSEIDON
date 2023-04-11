@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
+import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
@@ -44,9 +44,9 @@ import java.util.function.Function;
  * fads attract linearly, but can be penalized by environmental factors which are read as additional maps
  */
 public class LinearEnvironmentalAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
-    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
+    private final Locker<FishState, AbundanceAggregatingFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
     private EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory;
     private AbundanceFiltersFactory abundanceFiltersFactory;
@@ -94,7 +94,7 @@ public class LinearEnvironmentalAttractorFactory implements
     }
 
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
             () -> {
@@ -129,7 +129,7 @@ public class LinearEnvironmentalAttractorFactory implements
                 final Function<SeaTile, Double> finalCatchabilityPenaltyFunction =
                     environmentalPenaltyFunctionFactory.apply(fishState);
 
-                final Function<AbstractFad, double[]> catchabilitySupplier = abstractFad -> {
+                final Function<Fad, double[]> catchabilitySupplier = abstractFad -> {
 
                     final double[] cachability = new double[globalBiology.getSize()];
                     final SeaTile fadLocation = abstractFad.getLocation();
@@ -144,7 +144,7 @@ public class LinearEnvironmentalAttractorFactory implements
                 };
 
 
-                return new AbundanceFadInitializer(
+                return new AbundanceAggregatingFadInitializer(
                     globalBiology,
                     capacityGenerator,
                     new CatchabilitySelectivityFishAttractor(

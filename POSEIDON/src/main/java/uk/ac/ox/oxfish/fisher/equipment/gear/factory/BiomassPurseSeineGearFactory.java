@@ -21,13 +21,13 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class BiomassPurseSeineGearFactory
-    extends PurseSeineGearFactory<BiomassLocalBiology, BiomassFad> {
+    extends PurseSeineGearFactory<BiomassLocalBiology, BiomassAggregatingFad> {
 
     public BiomassPurseSeineGearFactory(
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
@@ -39,7 +39,7 @@ public class BiomassPurseSeineGearFactory
     }
 
     @Override
-    public PurseSeineGear<BiomassLocalBiology, BiomassFad> apply(final FishState fishState) {
+    public PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> apply(final FishState fishState) {
         return new BiomassPurseSeineGear(
             makeFadManager(fishState),
             getSuccessfulSetProbability().applyAsDouble(fishState.getRandom())

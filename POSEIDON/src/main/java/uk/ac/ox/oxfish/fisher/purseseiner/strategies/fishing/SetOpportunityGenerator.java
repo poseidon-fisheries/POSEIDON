@@ -18,14 +18,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import java.util.Collection;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
-public abstract class SetOpportunityGenerator<B extends LocalBiology, A extends AbstractSetAction<B>>
+import java.util.Collection;
+import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+
+public abstract class SetOpportunityGenerator<B extends LocalBiology, A extends AbstractSetAction>
     implements Function<Fisher, Collection<A>> {
 
     private final DoubleSupplier durationSampler;

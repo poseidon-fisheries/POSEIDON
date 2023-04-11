@@ -1,20 +1,24 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class MaximumPerSpeciesCarryingCapacitiesFactory extends PerSpeciesCarryingCapacitiesFactory {
-    public MaximumPerSpeciesCarryingCapacitiesFactory() {
-    }
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
-    public MaximumPerSpeciesCarryingCapacitiesFactory(final DoubleParameter probabilityOfFadBeingDud) {
-        super(probabilityOfFadBeingDud);
-    }
+public class MaximumPerSpeciesCarryingCapacitiesFactory
+    extends AbstractCarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     @Override
-    DoubleParameter makeSpeciesCarryingCapacityParameter(final Species species, final MersenneTwisterFast rng) {
-        return new FixedDoubleParameter(Double.MAX_VALUE);
+    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(
+        final FishState fishState
+    ) {
+        return new PerSpeciesCarryingCapacityInitializer(
+            getProbabilityOfFadBeingDud().applyAsDouble(fishState.getRandom()),
+            fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
+                identity(),
+                species -> new FixedDoubleParameter(Double.MAX_VALUE)
+            ))
+        );
     }
 }

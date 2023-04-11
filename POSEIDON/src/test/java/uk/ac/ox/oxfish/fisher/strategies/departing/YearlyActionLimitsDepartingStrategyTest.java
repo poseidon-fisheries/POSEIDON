@@ -19,34 +19,27 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
-
 import com.google.common.collect.ImmutableList;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.CUBIC_METRE;
 
 public class YearlyActionLimitsDepartingStrategyTest {
 
@@ -55,10 +48,10 @@ public class YearlyActionLimitsDepartingStrategyTest {
     public void shouldFisherLeavePort() {
 
         final FishState fishState = mock(FishState.class);
-        final BiomassFad fad = mock(BiomassFad.class);
+        final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
         final BiomassLocalBiology biology = mock(BiomassLocalBiology.class);
 
-        final PurseSeineGear<BiomassLocalBiology, BiomassFad> purseSeineGear =
+        final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> purseSeineGear =
             mock(PurseSeineGear.class);
 
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
@@ -68,7 +61,11 @@ public class YearlyActionLimitsDepartingStrategyTest {
         final FadInitializer fadInitializer = mock(FadInitializer.class, RETURNS_DEEP_STUBS);
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
-        final FadManager fadManager = new FadManager(null, fadInitializer, new ReliableFishValueCalculator(fishState.getBiology()));
+        final FadManager fadManager = new FadManager(
+            null,
+            fadInitializer,
+            new ReliableFishValueCalculator(fishState.getBiology())
+        );
         fadManager.setActionSpecificRegulations(Stream.of(setLimits));
         fadManager.setFisher(fisher);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

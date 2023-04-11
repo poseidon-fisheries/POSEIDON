@@ -18,30 +18,31 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+
 public abstract class FishAbundanceAttractor extends
     AbstractFishAttractor<
         StructuredAbundance,
         AbundanceLocalBiology,
-        AbundanceFad> {
+        AbundanceAggregatingFad<GlobalCarryingCapacity>> {
 
     private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
 
     FishAbundanceAttractor(
         final Collection<Species> species,
-        final AttractionProbabilityFunction<AbundanceLocalBiology, AbundanceFad> attractionProbabilityFunction,
+        final AttractionProbabilityFunction attractionProbabilityFunction,
         final MersenneTwisterFast rng,
         final Map<Species, NonMutatingArrayFilter> selectivityFilters,
         final double[] attractionRates
@@ -62,7 +63,7 @@ public abstract class FishAbundanceAttractor extends
     @Override
     Entry<AbundanceLocalBiology, Double> scale(
         final Map<Species, Entry<StructuredAbundance, Double>> attractedFish,
-        final AbundanceFad fad
+        final AbundanceAggregatingFad<GlobalCarryingCapacity> fad
     ) {
 
         final double attractedBiomass = attractedFish.values()
@@ -74,7 +75,7 @@ public abstract class FishAbundanceAttractor extends
         final double scalingFactor = biomassScalingFactor(
             attractedBiomass,
             originalBiomass,
-            fad.getTotalCarryingCapacity()
+            fad.getCarryingCapacity().getTotal()
         );
 
         return entry(

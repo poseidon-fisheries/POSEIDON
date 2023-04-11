@@ -34,7 +34,7 @@ public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFad
     ) {
         return new LinearFishAbundanceAttractor(
             fishState.getBiology().getSpecies(),
-            new CompressedExponentialAttractionProbability<>(
+            new CompressedExponentialAttractionProbability(
                 compressionExponents,
                 attractableBiomassCoefficients,
                 biomassInteractionCoefficients

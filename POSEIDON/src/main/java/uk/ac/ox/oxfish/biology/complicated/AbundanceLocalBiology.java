@@ -47,15 +47,20 @@ import static java.util.stream.Collectors.toCollection;
  * abundance data whenever a process takes place
  * Created by carrknight on 3/4/16.
  */
-public class AbundanceLocalBiology implements LocalBiology
-{
+public class AbundanceLocalBiology implements LocalBiology {
 
 
+    private static final boolean warned = false;
     /**
      * the hashmap contains for each species a table [age][male-female] corresponding to the number of fish of that
      * age and that sex
      */
     private final HashMap<Species, double[][]> abundance = new HashMap<>();
+    /**
+     * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
+     */
+    private double[] lastComputedBiomass;
+
 
     /**
      * Private empty constructor used for fast creation by
@@ -65,27 +70,22 @@ public class AbundanceLocalBiology implements LocalBiology
     }
 
     /**
-     * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
-     */
-    private double lastComputedBiomass[];
-
-
-
-    /**
      * creates an abundance based local biology that starts off as entirely empty
+     *
      * @param biology a GlobalBiology object containing a list of species
      */
-    public AbundanceLocalBiology(GlobalBiology biology) {
+    public AbundanceLocalBiology(final GlobalBiology biology) {
         this(biology.getSpecies());
     }
 
     /**
      * creates an abundance based local biology that starts off as entirely empty
+     *
      * @param biology a collection of species
      */
-    public AbundanceLocalBiology(Collection<Species> allSpecies) {
+    public AbundanceLocalBiology(final Collection<? extends Species> allSpecies) {
         //for each species create cohorts
-        for (Species species : allSpecies) {
+        for (final Species species : allSpecies) {
             abundance.put(species, makeAbundanceArray(species));
         }
         //done!
@@ -99,6 +99,16 @@ public class AbundanceLocalBiology implements LocalBiology
             abundanceArray[i] = new double[species.getNumberOfBins()];
         }
         return abundanceArray;
+    }
+
+    /**
+     * Constructs a new AbundanceLocalBiology by making a copy of another.
+     *
+     * @param other the other AbundanceLocalBiology object to make a copy of.
+     */
+    @SuppressWarnings("CopyConstructorMissesField") // the call to `this` takes care of that
+    public AbundanceLocalBiology(final AbundanceLocalBiology other) {
+        this(other.abundance);
     }
 
     /**
@@ -117,160 +127,6 @@ public class AbundanceLocalBiology implements LocalBiology
         );
         lastComputedBiomass = new double[abundance.size()];
         Arrays.fill(lastComputedBiomass, Double.NaN);
-    }
-
-    /**
-     * Constructs a new AbundanceLocalBiology by making a copy of another.
-     *
-     * @param other the other AbundanceLocalBiology object to make a copy of.
-     */
-    @SuppressWarnings("CopyConstructorMissesField") // the call to `this` takes care of that
-    public AbundanceLocalBiology(final AbundanceLocalBiology other) {
-        this(other.abundance);
-    }
-
-    /**
-     * the biomass at this location for a single species.
-     *
-     * @param species the species you care about
-     * @return the biomass of this species
-     */
-    @Override
-    public double getBiomass(Species species) {
-
-        if(Double.isNaN(lastComputedBiomass[species.getIndex()] )) {
-            lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
-                    abundance.get(species),
-                    species.getMeristics()
-            );
-            assert !Double.isNaN(lastComputedBiomass[species.getIndex()] );
-        }
-        return lastComputedBiomass[species.getIndex()];
-
-    }
-
-    /**
-     * Returns a copied array of the last computed biomass. This method shares name and
-     * specification with {@link VariableBiomassBasedBiology#getCurrentBiomass()}
-     * even if the current class doesn't implement that interface.
-     */
-    public double[] getCurrentBiomass() {
-
-        // This is a bit awkward, as we don't have access to the global biology
-        // to map indices to species, but should work just fine as long as
-        // the abundance map contains all the species (a safe assumption, I think).
-        return abundance.keySet()
-            .stream()
-            .sorted(comparingInt(Species::getIndex))
-            .mapToDouble(this::getBiomass)
-            .toArray();
-    }
-
-    public double getTotalBiomass() {
-        return stream(getCurrentBiomass()).sum();
-    }
-
-    /**
-     * ignored
-     *
-     * @param model the model
-     */
-    @Override
-    public void start(FishState model) {
-        Arrays.fill(lastComputedBiomass,Double.NaN);
-
-    }
-
-    /**
-     * ignored
-     */
-    @Override
-    public void turnOff() {
-
-    }
-
-
-    private static boolean warned = false;
-
-    /**
-     * Will only work if the catch object has biology information
-     * @param caught fish taken from the sea
-     * @param notDiscarded fish put in hold
-     * @param biology biology object
-     */
-    @Override
-    public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology)
-    {
-        Preconditions.checkArgument(caught.hasAbundanceInformation(), "This biology requires a gear that catches per bins rather than biomass directly!");
-
-        for(int index = 0; index < caught.numberOfSpecies(); index++) {
-            Species species = biology.getSpecie(index);
-            if(species.isImaginary()) //ignore imaginary catches
-                continue;
-
-            StructuredAbundance catches = caught.getAbundance(species);
-            Preconditions.checkArgument(catches.getSubdivisions()==species.getNumberOfSubdivisions(), "wrong number of cohorts/subdivisions");
-
-
-            final double[][] abundanceHere = this.abundance.get(species);
-
-
-            double[][] catchesMatrix = catches.asMatrix();
-            Preconditions.checkArgument(catchesMatrix.length == abundanceHere.length);
-            Preconditions.checkArgument(catchesMatrix[0].length == abundanceHere[0].length);
-            for(int subdivision =0;subdivision<catches.getSubdivisions(); subdivision++ ) {
-                for (int bin = 0; bin < catches.getBins(); bin++) {
-                    abundanceHere[subdivision][bin] -= catchesMatrix[subdivision][bin];
-//                    Preconditions.checkArgument(abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON,
-//                                                "There is now a negative amount of male fish left" );
-                    //overfished, but could be a numerical issue
-                    if(abundanceHere[subdivision][bin]<0)
-                    {
-                        //assert  abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON;
-                        abundanceHere[subdivision][bin]=0;
-                    }
-
-                }
-            }
-            lastComputedBiomass[species.getIndex()]=Double.NaN;
-        }
-
-
-    }
-
-
-    @Override
-    public StructuredAbundance getAbundance(Species species) {
-        Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
-
-        return new StructuredAbundance(abundance.get(species)
-        );
-
-    }
-
-    public Map<Species, StructuredAbundance> getStructuredAbundance() {
-        Arrays.fill(lastComputedBiomass, Double.NaN); // force a recount after calling this
-        return abundance.entrySet().stream().collect(toImmutableMap(
-            Entry::getKey,
-            entry -> new StructuredAbundance(entry.getValue())
-        ));
-    }
-
-    /**
-     * Returns an unmodifiable view of the abundance map, i.e., a map from each {@link Species} to
-     * the corresponding abundance matrix. Note that the map itself is unmodifiable but the exposed
-     * arrays are not. Mutating those should be done responsibly.
-     */
-    public Map<Species, double[][]> getAbundance() {
-        return Collections.unmodifiableMap(abundance);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("lastComputedBiomass", lastComputedBiomass)
-                .toString();
     }
 
     public static AbundanceLocalBiology aggregate(
@@ -303,13 +159,13 @@ public class AbundanceLocalBiology implements LocalBiology
             newBiology.abundance.put(species, newMatrix);
         });
         return newBiology;
-    };
+    }
 
     /**
      * Since recomputing biomass is so expensive, we try to take advantage of the
      * precomputed biomass of the biologies we are aggregating (provided we have them)
      */
-    private static double [] sumLastComputedBiomasses(
+    private static double[] sumLastComputedBiomasses(
         final Collection<AbundanceLocalBiology> biologies
     ) {
         assert !biologies.isEmpty();
@@ -326,6 +182,152 @@ public class AbundanceLocalBiology implements LocalBiology
             }
         }
         return newBiomassArray;
+    }
+
+    public double getTotalBiomass() {
+        return stream(getCurrentBiomass()).sum();
+    }
+
+    /**
+     * Returns a copied array of the last computed biomass. This method shares name and
+     * specification with {@link VariableBiomassBasedBiology#getCurrentBiomass()}
+     * even if the current class doesn't implement that interface.
+     */
+    public double[] getCurrentBiomass() {
+
+        // This is a bit awkward, as we don't have access to the global biology
+        // to map indices to species, but should work just fine as long as
+        // the abundance map contains all the species (a safe assumption, I think).
+        return abundance.keySet()
+            .stream()
+            .sorted(comparingInt(Species::getIndex))
+            .mapToDouble(this::getBiomass)
+            .toArray();
+    }
+
+    /**
+     * the biomass at this location for a single species.
+     *
+     * @param species the species you care about
+     * @return the biomass of this species
+     */
+    @Override
+    public double getBiomass(final Species species) {
+
+        if (Double.isNaN(lastComputedBiomass[species.getIndex()])) {
+            lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
+                abundance.get(species),
+                species.getMeristics()
+            );
+            assert !Double.isNaN(lastComputedBiomass[species.getIndex()]);
+        }
+        return lastComputedBiomass[species.getIndex()];
+
+    }
+
+    /**
+     * ignored
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(final FishState model) {
+        Arrays.fill(lastComputedBiomass, Double.NaN);
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
+
+    }
+
+    /**
+     * Will only work if the catch object has biology information
+     *
+     * @param caught       fish taken from the sea
+     * @param notDiscarded fish put in hold
+     * @param biology      biology object
+     */
+    @Override
+    public void reactToThisAmountOfBiomassBeingFished(
+        final Catch caught, final Catch notDiscarded, final GlobalBiology biology
+    ) {
+        Preconditions.checkArgument(
+            caught.hasAbundanceInformation(),
+            "This biology requires a gear that catches per bins rather than biomass directly!"
+        );
+
+        for (int index = 0; index < caught.numberOfSpecies(); index++) {
+            final Species species = biology.getSpecie(index);
+            if (species.isImaginary()) //ignore imaginary catches
+                continue;
+
+            final StructuredAbundance catches = caught.getAbundance(species);
+            Preconditions.checkArgument(
+                catches.getSubdivisions() == species.getNumberOfSubdivisions(),
+                "wrong number of cohorts/subdivisions"
+            );
+
+
+            final double[][] abundanceHere = this.abundance.get(species);
+
+
+            final double[][] catchesMatrix = catches.asMatrix();
+            Preconditions.checkArgument(catchesMatrix.length == abundanceHere.length);
+            Preconditions.checkArgument(catchesMatrix[0].length == abundanceHere[0].length);
+            for (int subdivision = 0; subdivision < catches.getSubdivisions(); subdivision++) {
+                for (int bin = 0; bin < catches.getBins(); bin++) {
+                    abundanceHere[subdivision][bin] -= catchesMatrix[subdivision][bin];
+//                    Preconditions.checkArgument(abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON,
+//                                                "There is now a negative amount of male fish left" );
+                    //overfished, but could be a numerical issue
+                    if (abundanceHere[subdivision][bin] < 0) {
+                        //assert  abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON;
+                        abundanceHere[subdivision][bin] = 0;
+                    }
+
+                }
+            }
+            lastComputedBiomass[species.getIndex()] = Double.NaN;
+        }
+
+
+    }
+
+    @Override
+    public StructuredAbundance getAbundance(final Species species) {
+        Arrays.fill(lastComputedBiomass, Double.NaN); //force a recount after calling this
+
+        return new StructuredAbundance(abundance.get(species)
+        );
+
+    }
+
+    public Map<Species, StructuredAbundance> getStructuredAbundance() {
+        Arrays.fill(lastComputedBiomass, Double.NaN); // force a recount after calling this
+        return abundance.entrySet().stream().collect(toImmutableMap(
+            Entry::getKey,
+            entry -> new StructuredAbundance(entry.getValue())
+        ));
+    }
+
+    /**
+     * Returns an unmodifiable view of the abundance map, i.e., a map from each {@link Species} to
+     * the corresponding abundance matrix. Note that the map itself is unmodifiable but the exposed
+     * arrays are not. Mutating those should be done responsibly.
+     */
+    public Map<Species, double[][]> getAbundance() {
+        return Collections.unmodifiableMap(abundance);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("lastComputedBiomass", lastComputedBiomass)
+            .toString();
     }
 
 }

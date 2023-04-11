@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
+import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
@@ -28,9 +28,9 @@ import java.util.function.Supplier;
  * till it's time to stop
  */
 public class LinearClorophillAttractorFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceFad>> {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
-    private final Locker<FishState, AbundanceFadInitializer> oneAttractorPerStateLocker =
+    private final Locker<FishState, AbundanceAggregatingFadInitializer> oneAttractorPerStateLocker =
         new Locker<>();
     private AbundanceFiltersFactory abundanceFiltersFactory;
     private LinkedHashMap<String, Double> maximumCarryingCapacities = new LinkedHashMap<>();
@@ -58,8 +58,10 @@ public class LinearClorophillAttractorFactory implements
     {
         catchabilities.put("Species 0", 0.001d);
     }
+
     public LinearClorophillAttractorFactory() {
     }
+
     public LinearClorophillAttractorFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
@@ -72,12 +74,12 @@ public class LinearClorophillAttractorFactory implements
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
         return oneAttractorPerStateLocker.presentKey(
             fishState,
-            new Supplier<AbundanceFadInitializer>() {
+            new Supplier<AbundanceAggregatingFadInitializer>() {
                 @Override
-                public AbundanceFadInitializer get() {
+                public AbundanceAggregatingFadInitializer get() {
                     //create the map
                     final AdditionalMapFactory factory = new AdditionalMapFactory(chlorophyllMapPath);
                     factory.setMapPeriod(chlorophyllMapPeriodInDays);
@@ -113,7 +115,7 @@ public class LinearClorophillAttractorFactory implements
 
 
                     }
-                    final Function<AbstractFad, double[]> catchabilitySupplier = abstractFad -> {
+                    final Function<Fad, double[]> catchabilitySupplier = abstractFad -> {
 
                         final double[] cachability = new double[globalBiology.getSize()];
                         final SeaTile fadLocation = abstractFad.getLocation();
@@ -132,7 +134,7 @@ public class LinearClorophillAttractorFactory implements
                     };
 
 
-                    return new AbundanceFadInitializer(
+                    return new AbundanceAggregatingFadInitializer(
                         globalBiology,
                         capacityGenerator,
                         new CatchabilitySelectivityFishAttractor(

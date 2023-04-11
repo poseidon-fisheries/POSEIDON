@@ -19,11 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
-
-import java.util.Optional;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -37,13 +32,19 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSeinerAction {
+import java.util.Optional;
 
-    private final B targetBiology;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
+
+public abstract class AbstractSetAction extends PurseSeinerAction {
+
+    private final LocalBiology targetBiology;
     private Catch catchesKept;
 
     AbstractSetAction(
-        final B targetBiology,
+        final LocalBiology targetBiology,
         final Fisher fisher,
         final double duration
     ) {
@@ -81,10 +82,10 @@ public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSei
         }
         setTime(hoursLeft);
         notify(purseSeineGear.getFadManager());
-        if(getDuration()<=hoursLeft)
+        if (getDuration() <= hoursLeft)
             return new ActionResult(new Arriving(), hoursLeft - getDuration());
         else
-            return new ActionResult(new Delaying(getDuration()-hoursLeft),0);
+            return new ActionResult(new Delaying(getDuration() - hoursLeft), 0);
     }
 
     abstract boolean checkSuccess();
@@ -95,7 +96,7 @@ public abstract class AbstractSetAction<B extends LocalBiology> extends PurseSei
 
     abstract void notify(FadManager<?, ?> fadManager);
 
-    public B getTargetBiology() {
+    public LocalBiology getTargetBiology() {
         return targetBiology;
     }
 

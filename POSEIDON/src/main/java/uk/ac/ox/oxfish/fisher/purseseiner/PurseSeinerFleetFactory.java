@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
@@ -45,14 +44,14 @@ import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>>
+public class PurseSeinerFleetFactory<B extends LocalBiology>
     implements Dummyable {
     private InputPath vesselsFile;
     private InputPath costsFile;
     private AlgorithmFactory<? extends MarketMap> marketMapFactory;
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory;
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private PurseSeineGearFactory<B, F> purseSeineGearFactory;
+    private PurseSeineGearFactory<B, ?> purseSeineGearFactory;
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
     private AlgorithmFactory<? extends Regulation> regulationsFactory;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
@@ -61,7 +60,7 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
     public PurseSeinerFleetFactory(
         final InputPath vesselsFile,
         final InputPath costsFile,
-        final PurseSeineGearFactory<B, F> purseSeineGearFactory,
+        final PurseSeineGearFactory<B, ?> purseSeineGearFactory,
         final AlgorithmFactory<? extends GearStrategy> gearStrategy,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory,
@@ -91,18 +90,6 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
 
     public void setPortInitializer(final PortInitializer portInitializer) {
         this.portInitializer = portInitializer;
-    }
-
-    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
-        return marketMapFactory;
-    }
-
-    public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
-        this.marketMapFactory = marketMapFactory;
-    }
-
-    public InputPath getVesselsFile() {
-        return vesselsFile;
     }
 
     public InputPath getCostsFile() {
@@ -153,12 +140,39 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
         this.departingStrategy = departingStrategy;
     }
 
-    public PurseSeineGearFactory<B, F> getPurseSeineGearFactory() {
-        return purseSeineGearFactory;
+    @Override
+    public void useDummyData(final InputPath dummyDataFolder) {
+        costsFile = dummyDataFolder.path("no_costs.csv");
+        vesselsFile = dummyDataFolder.path("dummy_boats.csv");
+        maybeUseDummyData(
+            dummyDataFolder,
+            purseSeineGearFactory,
+            gearStrategy,
+            destinationStrategyFactory,
+            fishingStrategyFactory,
+            regulationsFactory,
+            departingStrategy
+        );
     }
 
-    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B, F> purseSeineGearFactory) {
-        this.purseSeineGearFactory = purseSeineGearFactory;
+    public List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
+        addMonitors(fishState);
+        return new PurseSeineVesselReader(
+            getVesselsFile().get(),
+            targetYear,
+            makeFisherFactory(fishState),
+            buildPorts(fishState)
+        ).apply(fishState);
+    }
+
+    private void addMonitors(final FishState fishState) {
+        final Monitors monitors = new Monitors(fishState);
+        monitors.getMonitors().forEach(fishState::registerStartable);
+        getPurseSeineGearFactory().addMonitors(monitors);
+    }
+
+    public InputPath getVesselsFile() {
+        return vesselsFile;
     }
 
     public void setVesselsFile(final InputPath vesselsFile) {
@@ -222,6 +236,26 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
         return fisherFactory;
     }
 
+    List<Port> buildPorts(final FishState fishState) {
+        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
+        portInitializer.buildPorts(
+            fishState.getMap(),
+            fishState.random,
+            seaTile -> marketMap,
+            fishState,
+            new FixedGasPrice(0)
+        );
+        return fishState.getMap().getPorts();
+    }
+
+    public PurseSeineGearFactory<B, ?> getPurseSeineGearFactory() {
+        return purseSeineGearFactory;
+    }
+
+    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B, ?> purseSeineGearFactory) {
+        this.purseSeineGearFactory = purseSeineGearFactory;
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
@@ -241,46 +275,11 @@ public class PurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>
         };
     }
 
-    private void addMonitors(final FishState fishState) {
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
-        getPurseSeineGearFactory().addMonitors(monitors);
+    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
+        return marketMapFactory;
     }
 
-    @Override
-    public void useDummyData(final InputPath dummyDataFolder) {
-        costsFile = dummyDataFolder.path("no_costs.csv");
-        vesselsFile = dummyDataFolder.path("dummy_boats.csv");
-        maybeUseDummyData(
-            dummyDataFolder,
-            purseSeineGearFactory,
-            gearStrategy,
-            destinationStrategyFactory,
-            fishingStrategyFactory,
-            regulationsFactory,
-            departingStrategy
-        );
-    }
-
-    public List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        addMonitors(fishState);
-        return new PurseSeineVesselReader(
-            getVesselsFile().get(),
-            targetYear,
-            makeFisherFactory(fishState),
-            buildPorts(fishState)
-        ).apply(fishState);
-    }
-
-    List<Port> buildPorts(final FishState fishState) {
-        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
-        portInitializer.buildPorts(
-            fishState.getMap(),
-            fishState.random,
-            seaTile -> marketMap,
-            fishState,
-            new FixedGasPrice(0)
-        );
-        return fishState.getMap().getPorts();
+    public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
+        this.marketMapFactory = marketMapFactory;
     }
 }

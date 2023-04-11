@@ -19,13 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
-
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Int2D;
@@ -33,6 +26,11 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class FadTest {
@@ -46,7 +44,7 @@ public class FadTest {
         // Make a full FAD
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final BiomassFad fad = new BiomassFad(
+        final BiomassAggregatingFad fad = new BiomassAggregatingFad(
             fadManager,
             fadBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
@@ -98,7 +96,7 @@ public class FadTest {
     public void testAggregateFish() {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
-        final BiomassFad fad = new BiomassFad(
+        final BiomassAggregatingFad fad = new BiomassAggregatingFad(
             fadManager,
             fadBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),

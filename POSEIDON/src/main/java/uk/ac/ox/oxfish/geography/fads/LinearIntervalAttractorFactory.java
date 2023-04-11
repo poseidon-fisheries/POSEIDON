@@ -23,9 +23,9 @@ package uk.ac.ox.oxfish.geography.fads;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacitiesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.PerSpeciesCarryingCapacity;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPredicateFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
@@ -33,46 +33,39 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Optional;
 
-public class LinearIntervalAttractorFactory extends AbundanceFadInitializerFactory {
+public class LinearIntervalAttractorFactory
+    extends AbundanceFadInitializerFactory<PerSpeciesCarryingCapacity> {
 
-    private GlobalCarryingCapacitiesFactory globalCarryingCapacitiesFactory;
+    private CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> capacityCarryingCapacityInitializerFactory;
     private EnvironmentalPredicateFunctionFactory environmentalPredicateFunctionFactory;
     private DoubleParameter daysItTakesToFillUp = new CalibratedParameter(30);
     private DoubleParameter minAbundanceThreshold = new CalibratedParameter(100);
+
     public LinearIntervalAttractorFactory() {
     }
 
-    public GlobalCarryingCapacitiesFactory getGlobalCarryingCapacitiesFactory() {
-        return globalCarryingCapacitiesFactory;
-    }
-
-    public void setGlobalCarryingCapacitiesFactory(final GlobalCarryingCapacitiesFactory globalCarryingCapacitiesFactory) {
-        this.globalCarryingCapacitiesFactory = globalCarryingCapacitiesFactory;
-    }
 
     @Override
-    protected FadInitializer<AbundanceLocalBiology, AbundanceFad> makeFadInitializer(
+    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>> makeFadInitializer(
         final FishState fishState
     ) {
-        return new AbundanceFadInitializer(
+        return new AbundanceAggregatingFadInitializer<>(
             fishState.getBiology(),
-            globalCarryingCapacitiesFactory.apply(fishState),
             generateFishAttractor(fishState),
             getFishReleaseProbabilityInPercent().applyAsDouble(fishState.getRandom()) / 100d,
-            fishState::getStep
+            fishState::getStep,
+            capacityCarryingCapacityInitializerFactory.apply(fishState)
         );
     }
 
     @NotNull
     private HeterogeneousLinearIntervalAttractor generateFishAttractor(final FishState fishState) {
-        final DoubleParameter[] carryingCapacities = getCarryingCapacitiesFactory().apply(fishState);
         final HeterogeneousLinearIntervalAttractor attractor = new HeterogeneousLinearIntervalAttractor(
             (int) getDaysInWaterBeforeAttraction().applyAsDouble(fishState.getRandom()),
             (int) daysItTakesToFillUp.applyAsDouble(fishState.getRandom()),
             minAbundanceThreshold.applyAsDouble(fishState.getRandom()),
             getAbundanceFiltersFactory().apply(fishState).get(FadSetAction.class),
-            fishState,
-            carryingCapacities
+            fishState
         );
         Optional
             .ofNullable(environmentalPredicateFunctionFactory)

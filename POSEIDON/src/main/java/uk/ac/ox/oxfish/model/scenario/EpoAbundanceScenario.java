@@ -20,13 +20,12 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
  */
-public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology, AbundanceFad> {
+public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
 
     public EpoAbundanceScenario() {
         setBiologicalProcessesFactory(

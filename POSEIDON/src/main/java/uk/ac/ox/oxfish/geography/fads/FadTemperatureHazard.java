@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.base.Supplier;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -43,51 +42,53 @@ public class FadTemperatureHazard implements AdditionalStartable, Steppable {
     private final double hazardProbability;
 
     private final String nameOfMapToCheck;
+    private Stoppable stoppable;
 
     public FadTemperatureHazard(
-            int minimumDaysBeforeHazardCanTakePlace,
-            double valueBelowWhichHazardHappens,
-            double hazardProbability,
-            String nameOfMapToCheck) {
+        final int minimumDaysBeforeHazardCanTakePlace,
+        final double valueBelowWhichHazardHappens,
+        final double hazardProbability,
+        final String nameOfMapToCheck
+    ) {
         this.minimumDaysBeforeHazardCanTakePlace = minimumDaysBeforeHazardCanTakePlace;
         this.valueBelowWhichHazardHappens = valueBelowWhichHazardHappens;
         this.hazardProbability = hazardProbability;
         this.nameOfMapToCheck = nameOfMapToCheck;
     }
 
-    private Stoppable stoppable;
-
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         stoppable = model.scheduleEveryDay(this, StepOrder.POLICY_UPDATE);
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
-        DoubleGrid2D temperatureMap =
-                model.getMap().getAdditionalMaps().get(nameOfMapToCheck).get();
+        final FishState model = (FishState) simState;
+        final DoubleGrid2D temperatureMap =
+            model.getMap().getAdditionalMaps().get(nameOfMapToCheck).get();
 
         model.getFadMap().allFads().forEach(
-                (Consumer<AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>>) abstractFad -> {
+            (Consumer<Fad<? extends LocalBiology, ? extends Fad<?, ?>>>) abstractFad -> {
 
-                    //if it is active and in the water long enough
-                    if(abstractFad.isActive() &&
-                            abstractFad.getStepDeployed() >= minimumDaysBeforeHazardCanTakePlace
-                    ){
-                        //if it is too cold
-                        SeaTile location = abstractFad.getLocation();
-                        if(temperatureMap.get(location.getGridX(),
-                                              location.getGridY()) <= valueBelowWhichHazardHappens &&
-                                //you have a chance
-                                ((FishState) simState).getRandom().nextDouble() <= hazardProbability
-                        )
-                            //to lose the fish!
-                            abstractFad.releaseFish(((FishState) simState).getSpecies());
-                    }
-
+                //if it is active and in the water long enough
+                if (abstractFad.isActive() &&
+                    abstractFad.getStepDeployed() >= minimumDaysBeforeHazardCanTakePlace
+                ) {
+                    //if it is too cold
+                    final SeaTile location = abstractFad.getLocation();
+                    if (temperatureMap.get(
+                        location.getGridX(),
+                        location.getGridY()
+                    ) <= valueBelowWhichHazardHappens &&
+                        //you have a chance
+                        ((FishState) simState).getRandom().nextDouble() <= hazardProbability
+                    )
+                        //to lose the fish!
+                        abstractFad.releaseFish(((FishState) simState).getSpecies());
                 }
+
+            }
         );
 
 
@@ -95,7 +96,7 @@ public class FadTemperatureHazard implements AdditionalStartable, Steppable {
 
     @Override
     public void turnOff() {
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
 }

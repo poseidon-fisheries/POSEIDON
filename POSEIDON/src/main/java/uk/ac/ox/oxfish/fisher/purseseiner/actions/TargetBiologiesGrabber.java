@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.biology.tuna.AbundanceAggregator;
 import uk.ac.ox.oxfish.biology.tuna.Aggregator;
 import uk.ac.ox.oxfish.biology.tuna.BiomassAggregator;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -56,42 +56,20 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
     }
 
     /**
-     * grabs all fad biologies in the area + the local biology
+     * In order to allow school sets to meet their empirical targets, we need to give them access to more biologies,
+     * so we provide a list of biologies that can include neighbouring cell biologies and FAD biologies. We also
+     * provide a way to aggregate all those biologies into a single one, but since that's an expensive operation
+     * that we don't need all the time, we wrap this bit in a supplier.
      */
-    private Stream<B> getFadBiologiesAt(
-        final SeaTile tile,
-        final FadMap<B, ?> fadMap,
-        final MersenneTwisterFast rng
+    public Entry<List<B>, Supplier<B>> grabTargetBiologiesAndAggregator(
+        final SeaTile location,
+        final Fisher fisher
     ) {
-        final Stream<AbstractFad<B, ?>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
-        return fadsOnTile.map(AbstractFad::getBiology).collect(shufflingCollector(rng)).stream();
-    }
-
-    private Stream<B> filterBiologies(final Stream<LocalBiology> biologies) {
-        return biologies
-            .filter(localBiologyClass::isInstance)
-            .map(localBiologyClass::cast);
-    }
-
-    private Stream<B> getTileBiologiesInRange(
-        final SeaTile tile,
-        final NauticalMap nauticalMap,
-        final MersenneTwisterFast rng
-    ) {
-        final Stream<B> tileBiology = filterBiologies(Stream.of(tile.getBiology()));
-        return rangeInSeaTiles > 0
-            ? Stream.concat(tileBiology, getNeighbourBiologies(tile, nauticalMap, rng).stream())
-            : tileBiology;
-    }
-
-    @NotNull
-    private List<B> getNeighbourBiologies(
-        final SeaTile tile,
-        final NauticalMap nauticalMap,
-        final MersenneTwisterFast rng
-    ) {
-        final Stream<SeaTile> mooreNeighbors = bagToStream(nauticalMap.getMooreNeighbors(tile, rangeInSeaTiles));
-        return filterBiologies(mooreNeighbors.map(SeaTile::getBiology)).collect(shufflingCollector(rng));
+        final List<B> targetBiologies =
+            grabTargetBiologies(location, fisher);
+        final Supplier<B> aggregatedBiologySupplier =
+            memoize(() -> aggregator.apply(fisher.grabState().getBiology(), targetBiologies));
+        return entry(targetBiologies, aggregatedBiologySupplier);
     }
 
     private List<B> grabTargetBiologies(
@@ -107,28 +85,50 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
             canPoachFromFads
                 ? Stream.concat(
                 tileBiologiesInRange,
-                getFadBiologiesAt(location, (FadMap<B, ?>) fishState.getFadMap(), rng)
+                getFadBiologiesAt(location, (FadMap<B>) fishState.getFadMap(), rng)
             )
                 : tileBiologiesInRange;
 
         return targetBiologies.collect(toImmutableList());
     }
 
-    /**
-     * In order to allow school sets to meet their empirical targets, we need to give them access to more biologies,
-     * so we provide a list of biologies that can include neighbouring cell biologies and FAD biologies. We also
-     * provide a way to aggregate all those biologies into a single one, but since that's an expensive operation
-     * that we don't need all the time, we wrap this bit in a supplier.
-     */
-    public Entry<List<B>, Supplier<B>> grabTargetBiologiesAndAggregator(
-        final SeaTile location,
-        final Fisher fisher
+    private Stream<B> getTileBiologiesInRange(
+        final SeaTile tile,
+        final NauticalMap nauticalMap,
+        final MersenneTwisterFast rng
     ) {
-        final List<B> targetBiologies =
-            grabTargetBiologies(location, fisher);
-        final Supplier<B> aggregatedBiologySupplier =
-            memoize(() -> aggregator.apply(fisher.grabState().getBiology(), targetBiologies));
-        return entry(targetBiologies, aggregatedBiologySupplier);
+        final Stream<B> tileBiology = filterBiologies(Stream.of(tile.getBiology()));
+        return rangeInSeaTiles > 0
+            ? Stream.concat(tileBiology, getNeighbourBiologies(tile, nauticalMap, rng).stream())
+            : tileBiology;
+    }
+
+    /**
+     * grabs all fad biologies in the area + the local biology
+     */
+    private Stream<B> getFadBiologiesAt(
+        final SeaTile tile,
+        final FadMap<B> fadMap,
+        final MersenneTwisterFast rng
+    ) {
+        final Stream<Fad<B, ?>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
+        return fadsOnTile.map(Fad::getBiology).collect(shufflingCollector(rng)).stream();
+    }
+
+    private Stream<B> filterBiologies(final Stream<LocalBiology> biologies) {
+        return biologies
+            .filter(localBiologyClass::isInstance)
+            .map(localBiologyClass::cast);
+    }
+
+    @NotNull
+    private List<B> getNeighbourBiologies(
+        final SeaTile tile,
+        final NauticalMap nauticalMap,
+        final MersenneTwisterFast rng
+    ) {
+        final Stream<SeaTile> mooreNeighbors = bagToStream(nauticalMap.getMooreNeighbors(tile, rangeInSeaTiles));
+        return filterBiologies(mooreNeighbors.map(SeaTile::getBiology)).collect(shufflingCollector(rng));
     }
 
 }

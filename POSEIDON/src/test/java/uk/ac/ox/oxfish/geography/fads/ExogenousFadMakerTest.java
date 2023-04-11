@@ -7,8 +7,8 @@ import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
@@ -55,12 +55,12 @@ public class ExogenousFadMakerTest {
         state.registerStartable(actualMap);
         assertTrue(actualMap.isStarted()); //make sure the FADMap has started
         //and now let's add the exogenous fad maker: it is going to try and put a fad at day 3!
-        final FadInitializer<BiomassLocalBiology, BiomassFad> fakeFadInitializer = mock(FadInitializer.class);
+        final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fakeFadInitializer = mock(FadInitializer.class);
         //mason primitives are accessed by "setlocation"
         //which means that returning the same mock twice will result in the first being moved, rather than double deployment
         when(fakeFadInitializer.makeFad(any(), any(), any())).thenReturn(
-            mock(BiomassFad.class),
-            mock(BiomassFad.class)
+            mock(BiomassAggregatingFad.class),
+            mock(BiomassAggregatingFad.class)
         );
         final HashMap<Integer, Collection<Double2D>> dayToCoordinatesMap = new HashMap<>();
         dayToCoordinatesMap.put(
@@ -71,7 +71,7 @@ public class ExogenousFadMakerTest {
             )
 
         ); //only two fads, at seatile 0,4
-        final ExogenousFadMaker<BiomassLocalBiology, BiomassFad> fadMaker = new ExogenousFadMaker<>(
+        final ExogenousFadMaker<BiomassLocalBiology, BiomassAggregatingFad> fadMaker = new ExogenousFadMaker<>(
             fakeFadInitializer,
             dayToCoordinatesMap
         );
@@ -125,7 +125,7 @@ public class ExogenousFadMakerTest {
         //there should be at least one FAD out there that has attracted some biomass (probability of attraction is 63% per step per FAD)
         assertTrue(state.getFadMap()
             .allFads()
-            .mapToDouble((ToDoubleFunction<AbstractFad<? extends LocalBiology, ? extends AbstractFad<?, ?>>>) value -> value.getBiology()
+            .mapToDouble((ToDoubleFunction<Fad<? extends LocalBiology, ? extends Fad<?, ?>>>) value -> value.getBiology()
                 .getBiomass(state.getSpecies("Species 0")))
             .sum() > 0);
 

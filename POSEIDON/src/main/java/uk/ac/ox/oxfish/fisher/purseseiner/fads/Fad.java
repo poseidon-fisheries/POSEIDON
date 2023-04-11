@@ -1,119 +1,240 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ *     POSEIDON, an agent-based model of fisheries
+ *     Copyright (C) 2022  CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  */
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import ec.util.MersenneTwisterFast;
+import org.jetbrains.annotations.Nullable;
+import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
-/**
- * A fish aggregation device.
- *
- * @param <B> The type of local biology that is used by the FAD to aggreate fish.
- * @param <F> The type of the subclass extending this class. The declaration for this, {@code F
- *            extends Fad<B, F>}, gives us a "self recursive type". It allows us to ask for a {@code
- *            FadManager<B, F>}, where {@code F} is the actual subtype and not just a {@code
- *            Fad<B>}, which would lead to all sorts of trouble down the line.
- */
-public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> extends AbstractFad<B, F> {
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-    private final B biology;
-    private final FishAttractor<B, F> fishAttractor;
+public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implements Locatable {
+    protected static final AtomicLong idCounter = new AtomicLong(0);
 
-    private final double totalCarryingCapacity;
+    private final long id = idCounter.getAndIncrement();
+
+    final private TripRecord tripDeployed;
+    final private int stepDeployed;
+    final private Int2D locationDeployed;
+    final private double fishReleaseProbability;
+    private final FadManager<B, F> owner;
+
+    /**
+     * if this is set to anything more than 0, it means it'll stop attracting fish after this many days
+     */
+    private int daysBeforeTurningOff = -1;
+    /**
+     * as long as it is active and the totalCarryingCapacity is above 0, this will attract fish
+     */
+    private boolean isActive;
+    private boolean lost;
+
+    private Integer stepOfFirstAttraction = null;
 
     public Fad(
-        final FadManager<B, F> owner,
-        final B biology,
-        final FishAttractor<B, F> fishAttractor,
-        final double fishReleaseProbability,
+        final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double totalCarryingCapacity
+        final double fishReleaseProbability,
+        final FadManager<B, F> owner,
+        final boolean isActive
     ) {
-        super(
-            owner.getFisher() != null ? owner.getFisher().getCurrentTrip() : null,
-            stepDeployed,
-            locationDeployed,
-            fishReleaseProbability,
-            owner,
-            totalCarryingCapacity <= 0
-        );
-        this.biology = biology;
-        this.fishAttractor = fishAttractor;
-        this.totalCarryingCapacity = totalCarryingCapacity;
+        this.tripDeployed = tripDeployed;
+        this.stepDeployed = stepDeployed;
+        this.locationDeployed = locationDeployed;
+        this.fishReleaseProbability = fishReleaseProbability;
+        this.owner = owner;
+        this.lost = false;
+        this.isActive = isActive;
     }
 
-    protected WeightedObject<B> attractFish(final B seaTileBiology) {
-        return fishAttractor.attract(seaTileBiology, (F) this);
+    public long getId() {
+        return id;
     }
 
-    @Override
-    public B getBiology() {
-        return biology;
+
+    @Nullable
+    public TripRecord getTripDeployed() {
+        return tripDeployed;
     }
 
-    @Override
-    public void aggregateFish(
-        final B seaTileBiology,
-        final GlobalBiology globalBiology,
-        final int currentStep
+    public Int2D getLocationDeployed() {
+        return locationDeployed;
+    }
+
+    public void maybeReleaseFish(
+        final Collection<? extends Species> allSpecies,
+        final LocalBiology seaTileBiology,
+        final MersenneTwisterFast rng
     ) {
-        // add them to the FAD biology
-        final Catch catchObject = addCatchesToFad(seaTileBiology, globalBiology);
-        if (catchObject != null) {
-            // and remove the catches from the underlying biology:
-            seaTileBiology.reactToThisAmountOfBiomassBeingFished(
-                catchObject,
-                catchObject,
-                globalBiology
-            );
-            if (getStepOfFirstAttraction() == null && !this.isEmpty(globalBiology.getSpecies())) {
-                setStepOfFirstAttraction(currentStep);
-            }
+        if (rng.nextDouble() < fishReleaseProbability) {
+            releaseFish(allSpecies, seaTileBiology);
         }
     }
 
+    public abstract void releaseFish(final Collection<? extends Species> allSpecies, LocalBiology seaTileBiology);
 
-    public double getTotalCarryingCapacity() {
-        return totalCarryingCapacity;
+    public void maybeReleaseFish(
+        final Collection<? extends Species> allSpecies,
+        final MersenneTwisterFast rng
+    ) {
+        if (rng.nextDouble() < fishReleaseProbability) {
+            releaseFish(allSpecies);
+        }
     }
 
-    abstract Catch addCatchesToFad(B seaTileBiology, GlobalBiology globalBiology);
+    public abstract void releaseFish(final Collection<? extends Species> allSpecies);
 
-    /* This needs different implementations in the subclasses because {@link LocalBiology}
-     * doesn't have a {@code getBiomass()} method even if both {@link BiomassLocalBiology}
-     * and {@link AbundanceLocalBiology} happen to have one.
+    /**
+     * Infers the precise lon/lat coordinates of the FAD using a combination of the
+     * tile's geographical coordinates and the precise grid location of the FAD.
+     * This is a bit of hack and RELIES ON THE ASSUMPTION THAT WE HAVE A 1°x1° MAP.
+     * It's currently used to log FAD trajectories, but probably shouldn't be used
+     * to do anything that actually affects the model's behaviour.
      */
-    public abstract double[] getBiomass();
-
-
-    @Override
-    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
-
+    public Coordinate getCoordinate() {
+        final FadMap<B> fadMap = getOwner().getFadMap();
+        final NauticalMap nauticalMap = fadMap.getNauticalMap();
+        final Coordinate tileCoordinates = nauticalMap.getCoordinates(getLocation());
+        final Double2D gridLocation = getGridLocation();
+        return new Coordinate(
+            ((int) tileCoordinates.x) + (1 - (gridLocation.x % 1)),
+            ((int) tileCoordinates.y) + (1 - (gridLocation.y % 1))
+        );
     }
 
+    public FadManager<B, F> getOwner() {
+        return owner;
+    }
+
+    public SeaTile getLocation() {
+        return getOwner().getFadMap()
+            .getFadTile(this)
+            .orElse(null);
+    }
+
+    private Double2D getGridLocation() {
+        return getOwner().getFadMap().getFadLocation(this).orElse(null);
+    }
+
+    public abstract void aggregateFish(
+        LocalBiology seaTileBiology,
+        GlobalBiology globalBiology,
+        int currentStep
+    );
+
+    /**
+     * basically asks if this is a dud or deactivated or in any other way whether it can hypothetically attract more
+     * fish
+     * (without considering whether it is "full")
+     *
+     * @return true when the fad is functioning and is able to attract fish
+     */
+    public boolean canAttractFish() {
+        return isActive;
+    }
+
+    public boolean isLost() {
+        return lost;
+    }
+
+    public void lose() {
+        lost = true;
+        isActive = false;
+    }
+
+    /**
+     * checks for expiration
+     */
+    public void reactToStep(final FishState fishState) {
+        if (isActive && daysBeforeTurningOff > 0) {
+            if ((fishState.getDay() - this.stepDeployed / fishState.getStepsPerDay()) > daysBeforeTurningOff)
+                isActive = false;
+        }
+    }
+
+    /**
+     * Tells us is if the FAD is empty. Could be sped pu by overwriting in subclasses.
+     */
+    public boolean isEmpty(final Iterable<? extends Species> species) {
+        return getBiology().getTotalBiomass(species) > 0;
+    }
+
+    public abstract B getBiology();
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public abstract void reactToBeingFished(FishState state, Fisher fisher, SeaTile location);
+
+    @SuppressWarnings("unused")
+    public int getDaysBeforeTurningOff() {
+        return daysBeforeTurningOff;
+    }
+
+    public void setDaysBeforeTurningOff(final int daysBeforeTurningOff) {
+        this.daysBeforeTurningOff = daysBeforeTurningOff;
+    }
+
+    public int soakTimeInDays(final FishState model) {
+        return (model.getStep() - this.getStepDeployed()) / model.getStepsPerDay();
+    }
+
+    public int getStepDeployed() {
+        return stepDeployed;
+    }
+
+    Integer getStepOfFirstAttraction() {
+        return stepOfFirstAttraction;
+    }
+
+    void setStepOfFirstAttraction(final Integer stepOfFirstAttraction) {
+        checkState(
+            this.stepOfFirstAttraction == null,
+            "Step of first attraction can only be set once."
+        );
+        this.stepOfFirstAttraction = checkNotNull(stepOfFirstAttraction);
+    }
+
+    public Integer getStepsBeforeFirstAttraction() {
+        return stepOfFirstAttraction != null
+            ? stepOfFirstAttraction - getStepDeployed()
+            : null;
+    }
 
 }

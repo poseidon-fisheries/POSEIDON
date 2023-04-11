@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -42,7 +41,7 @@ import java.util.List;
  */
 public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
-    private PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory =
+    private PurseSeinerFleetFactory<BiomassLocalBiology> purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
             getTargetYear(),
             getInputFolder(),
@@ -99,12 +98,12 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
             )
         );
 
-    public PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> getPurseSeinerFleetFactory() {
+    public PurseSeinerFleetFactory<BiomassLocalBiology> getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<BiomassLocalBiology, BiomassFad> purseSeinerFleetFactory) {
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<BiomassLocalBiology> purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 

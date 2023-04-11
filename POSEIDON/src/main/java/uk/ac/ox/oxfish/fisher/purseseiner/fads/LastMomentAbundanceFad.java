@@ -43,12 +43,17 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
     private final GlobalBiology biology;
 
     public LastMomentAbundanceFad(
-        final TripRecord tripDeployed, final int stepDeployed, final Int2D locationDeployed,
-        final double fishReleaseProbability, final FadManager<AbundanceLocalBiology, LastMomentAbundanceFad> owner,
-        final int daysItTakesToFillUp, final int daysInWaterBeforeAttraction,
+        final TripRecord tripDeployed,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final double fishReleaseProbability,
+        final FadManager<AbundanceLocalBiology, LastMomentAbundanceFad> owner,
+        final int daysItTakesToFillUp,
+        final int daysInWaterBeforeAttraction,
         final boolean isDud,
         final double[] maxCatchabilityPerSpecies,
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters, final GlobalBiology biology
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters,
+        final GlobalBiology biology
     ) {
         super(
             tripDeployed,
@@ -64,6 +69,19 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
         this.selectivityFilters = selectivityFilters;
 
         this.biology = biology;
+    }
+
+    @Override
+    public AbundanceLocalBiology getBiology() {
+        final FishState state = super.getFishState();
+        if (state == null)
+            return new AbundanceLocalBiology(biology);
+        final double[] catchability = getCurrentCatchabilityPerSpecies();
+        if (catchability == null)
+            return new AbundanceLocalBiology(biology);
+
+        final LocalBiology biology = super.getLocation().getBiology();
+        return extractFadBiologyFromLocalBiology(state, catchability, biology, selectivityFilters);
     }
 
     @NotNull
@@ -95,19 +113,6 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
         }
 
         return new AbundanceLocalBiology(caughtAbundances);
-    }
-
-    @Override
-    public AbundanceLocalBiology getBiology() {
-        final FishState state = super.getFishState();
-        if (state == null)
-            return new AbundanceLocalBiology(biology);
-        final double[] catchability = getCurrentCatchabilityPerSpecies();
-        if (catchability == null)
-            return new AbundanceLocalBiology(biology);
-
-        final LocalBiology biology = super.getLocation().getBiology();
-        return extractFadBiologyFromLocalBiology(state, catchability, biology, selectivityFilters);
     }
 
     @Override

@@ -18,21 +18,22 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import static java.lang.Math.min;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+
 import java.util.Collection;
 import java.util.Map.Entry;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+
+import static java.lang.Math.min;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class LogisticFishBiomassAttractor
     extends FishBiomassAttractor {
 
     public LogisticFishBiomassAttractor(
         final Collection<Species> species,
-        final AttractionProbabilityFunction<BiomassLocalBiology, BiomassFad> attractionProbabilityFunction,
+        final AttractionProbabilityFunction attractionProbabilityFunction,
         final double[] attractionRates,
         final MersenneTwisterFast rng
     ) {
@@ -42,8 +43,8 @@ public class LogisticFishBiomassAttractor
     @Override
     Entry<Double, Double> attractForSpecies(
         final Species species,
-        final BiomassLocalBiology cellBiology,
-        final BiomassFad fad
+        final LocalBiology cellBiology,
+        final BiomassAggregatingFad fad
     ) {
         final double fadBiomass = fad.getBiology().getBiomass(species);
         final double cellBiomass = cellBiology.getBiomass(species);

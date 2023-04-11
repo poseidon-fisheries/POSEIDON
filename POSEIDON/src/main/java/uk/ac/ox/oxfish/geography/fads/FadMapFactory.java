@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -11,30 +11,26 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
-    implements AlgorithmFactory<FadMap<B, F>> {
+public class FadMapFactory<B extends LocalBiology, F extends Fad<B, F>>
+    implements AlgorithmFactory<FadMap<B>> {
 
     private final Class<B> localBiologyClass;
-    private final Class<F> fadClass;
     private CurrentPatternMapSupplier currentPatternMapSupplier;
     private boolean inputIsMetersPerSecond = true;
 
     FadMapFactory(
         final Class<B> localBiologyClass,
-        final Class<F> fadClass,
         final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
-        this(localBiologyClass, fadClass);
+        this(localBiologyClass);
         this.currentPatternMapSupplier = currentPatternMapSupplier;
     }
 
 
     FadMapFactory(
-        final Class<B> localBiologyClass,
-        final Class<F> fadClass
+        final Class<B> localBiologyClass
     ) {
         this.localBiologyClass = localBiologyClass;
-        this.fadClass = fadClass;
     }
 
     @SuppressWarnings("unused")
@@ -48,7 +44,7 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
     }
 
     @Override
-    public FadMap<B, F> apply(final FishState fishState) {
+    public FadMap<B> apply(final FishState fishState) {
         // The CurrentVectorsFactory cache works on the assumption that all cached CurrentVectors
         // objects work with the same number of steps per day (i.e., one). It would be feasible to
         // support different steps per day, but I don't see that happening any time soon.
@@ -59,8 +55,7 @@ public class FadMapFactory<B extends LocalBiology, F extends AbstractFad<B, F>>
             nauticalMap,
             currentVectors,
             fishState.getBiology(),
-            localBiologyClass,
-            fadClass
+            localBiologyClass
         );
     }
 

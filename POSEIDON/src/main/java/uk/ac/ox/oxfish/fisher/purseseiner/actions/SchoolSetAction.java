@@ -19,12 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Map.Entry;
-import java.util.Queue;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -33,8 +27,16 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSetAction<B> {
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Map.Entry;
+import java.util.Queue;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
+
+public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSetAction {
+
+    private final B targetBiology;
     private final CatchMaker<B> catchMaker;
     private final Queue<B> sourceBiologies;
 
@@ -46,6 +48,7 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
         final CatchMaker<B> catchMaker
     ) {
         super(targetBiology, fisher, setDuration);
+        this.targetBiology = targetBiology;
         this.catchMaker = catchMaker;
         this.sourceBiologies = new ArrayDeque<>(sourceBiologies);
     }
@@ -61,7 +64,7 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
     public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
 
         B biology = sourceBiologies.poll();
-        B uncaught = getTargetBiology();
+        B uncaught = targetBiology;
         while (!(biology == null || isEmpty(uncaught, fishState.getSpecies()))) {
             final Entry<Catch, B> caughtAndUncaught = catchMaker.apply(biology, uncaught);
             final Catch caught = caughtAndUncaught.getKey();
@@ -69,6 +72,10 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
             uncaught = caughtAndUncaught.getValue();
             biology = sourceBiologies.poll();
         }
+    }
+
+    private boolean isEmpty(final LocalBiology biology, final Iterable<Species> species) {
+        return biology.getTotalBiomass(species) < EPSILON;
     }
 
     @Override
@@ -79,10 +86,6 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
     @Override
     void notify(final FadManager<?, ?> fadManager) {
         fadManager.reactTo(this);
-    }
-
-    private boolean isEmpty(final B biology, final Iterable<Species> species) {
-        return biology.getTotalBiomass(species) < EPSILON;
     }
 
 }

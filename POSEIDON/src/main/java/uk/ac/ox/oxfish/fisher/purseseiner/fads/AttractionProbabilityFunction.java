@@ -22,12 +22,12 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
 @FunctionalInterface
-public interface AttractionProbabilityFunction<B extends LocalBiology, F extends Fad<B, F>> {
+public interface AttractionProbabilityFunction {
 
     double apply(
         Species species,
-        B biology,
-        Fad<B, F> fad
+        LocalBiology biology,
+        AggregatingFad<?, ?, ?> fad
     );
 
 }

@@ -21,30 +21,21 @@ package uk.ac.ox.oxfish.geography.fads;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
-public class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLocalBiology, AbundanceFad> {
+public class AbundanceAggregatingFadInitializer<C extends CarryingCapacity>
+    extends AggregatingFadInitializer<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> {
 
-
-    public AbundanceFadInitializer(
+    public AbundanceAggregatingFadInitializer(
         final GlobalBiology globalBiology,
-        final DoubleSupplier carryingCapacityGenerator,
-        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
         final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
+        final IntSupplier timeStepSupplier,
+        final CarryingCapacityInitializer<C> carryingCapacityInitializer
     ) {
-        super(
-            globalBiology,
-            carryingCapacityGenerator,
-            fishAttractor,
-            fishReleaseProbability,
-            timeStepSupplier
-        );
+        super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
     }
 
     @Override
@@ -53,24 +44,23 @@ public class AbundanceFadInitializer extends AbstractFadInitializer<AbundanceLoc
     }
 
     @Override
-    public AbundanceFad makeFad(
-        final FadManager<AbundanceLocalBiology, AbundanceFad> owner,
+    protected AbundanceAggregatingFad<C> makeFad(
+        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad<C>> owner,
         final AbundanceLocalBiology biology,
-        final FishAttractor<AbundanceLocalBiology, AbundanceFad> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
-        final Int2D locationDeployed
+        final Int2D locationDeployed,
+        final C carryingCapacity
     ) {
-        return new AbundanceFad(
+        return new AbundanceAggregatingFad<>(
             owner,
             biology,
             fishAttractor,
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            generateCarryingCapacity()
+            carryingCapacity
         );
     }
-
-
 }

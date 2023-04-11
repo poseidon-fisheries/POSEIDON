@@ -24,59 +24,38 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAttractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
-public abstract class AbstractFadInitializer<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class AggregatingFadInitializer<
+    B extends LocalBiology,
+    C extends CarryingCapacity,
+    F extends AggregatingFad<B, C, F>>
     implements FadInitializer<B, F> {
 
     final double[] emptyBiomasses;
     private final double fishReleaseProbability;
-    private final FishAttractor<B, F> fishAttractor;
+    private final FishAttractor<B, C, F> fishAttractor;
     private final IntSupplier timeStepSupplier;
-    private final DoubleSupplier carryingCapacityGenerator;
     private final GlobalBiology biology;
 
-    /**
-     * abstract fad initializer with fixed carrying capacity for all fads
-     */
-    AbstractFadInitializer(
-        final GlobalBiology globalBiology,
-        final double totalCarryingCapacity,
-        final FishAttractor<B, F> fishAttractor,
-        final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
-    ) {
-        this(
-            globalBiology,
-            () -> totalCarryingCapacity,
-            fishAttractor,
-            fishReleaseProbability,
-            timeStepSupplier
-        );
-    }
+    private final CarryingCapacityInitializer<C> carryingCapacityInitializer;
 
-    /**
-     * abstract fad initializer with fixed carrying capacity for all fads
-     */
-    AbstractFadInitializer(
+    AggregatingFadInitializer(
         final GlobalBiology globalBiology,
-        final DoubleSupplier carryingCapacityGenerator,
-        final FishAttractor<B, F> fishAttractor,
+        final FishAttractor<B, C, F> fishAttractor,
         final double fishReleaseProbability,
-        final IntSupplier timeStepSupplier
+        final IntSupplier timeStepSupplier,
+        final CarryingCapacityInitializer<C> carryingCapacityInitializer
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
         this.timeStepSupplier = timeStepSupplier;
         this.fishAttractor = fishAttractor;
         this.fishReleaseProbability = fishReleaseProbability;
-        this.carryingCapacityGenerator = carryingCapacityGenerator;
         this.biology = globalBiology;
+        this.carryingCapacityInitializer = carryingCapacityInitializer;
     }
 
     @Override
@@ -91,23 +70,22 @@ public abstract class AbstractFadInitializer<B extends LocalBiology, F extends F
             fishAttractor,
             fishReleaseProbability,
             timeStepSupplier.getAsInt(),
-            new Int2D(initialLocation.getGridX(), initialLocation.getGridY())
+            new Int2D(initialLocation.getGridX(), initialLocation.getGridY()),
+            carryingCapacityInitializer.apply(fadManager.getFisher().grabRandomizer())
         );
     }
 
     protected abstract F makeFad(
         FadManager<B, F> owner,
         B biology,
-        FishAttractor<B, F> fishAttractor,
+        FishAttractor<B, C, F> fishAttractor,
         double fishReleaseProbability,
         int stepDeployed,
-        Int2D locationDeployed
+        Int2D locationDeployed,
+        C carryingCapacity
     );
 
 
     protected abstract B makeBiology(GlobalBiology globalBiology);
 
-    public double generateCarryingCapacity() {
-        return carryingCapacityGenerator.getAsDouble();
-    }
 }

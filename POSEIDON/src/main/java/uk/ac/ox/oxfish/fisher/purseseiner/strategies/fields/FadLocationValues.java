@@ -55,7 +55,7 @@ public class FadLocationValues implements LocationValues {
 
         final FadManager<?, ?> fadManager = getFadManager(fisher);
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
-        final FadMap<?, ?> fadMap = fadManager.getFadMap();
+        final FadMap<?> fadMap = fadManager.getFadMap();
 
         //noinspection UnstableApiUsage
         return getFadManager(fisher)

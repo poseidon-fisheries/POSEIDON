@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
@@ -59,7 +58,7 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
+public abstract class EpoScenario<B extends LocalBiology>
     implements TestableScenario {
 
     public static final MapExtent DEFAULT_MAP_EXTENT =
@@ -89,7 +88,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
             Y2018, Paths.get("currents", "currents_2018.csv")
         )
     );
-    private FadMapFactory<B, F> fadMapFactory;
+    private FadMapFactory<B, ?> fadMapFactory;
     private List<AlgorithmFactory<? extends Startable>> additionalStartables =
         Stream.of(
             new FadZapperFactory(),
@@ -165,7 +164,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
-        final FadMap<B, F> fadMap = getFadMapFactory().apply(fishState);
+        final FadMap<B> fadMap = getFadMapFactory().apply(fishState);
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
 
@@ -180,7 +179,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         );
     }
 
-    public FadMapFactory<B, F> getFadMapFactory() {
+    public FadMapFactory<B, ?> getFadMapFactory() {
         return this.fadMapFactory;
     }
 
@@ -188,7 +187,7 @@ public abstract class EpoScenario<B extends LocalBiology, F extends Fad<B, F>>
         return ImmutableList.of();
     }
 
-    public void setFadMapFactory(final FadMapFactory<B, F> fadMapFactory) {
+    public void setFadMapFactory(final FadMapFactory<B, ?> fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
     }
 

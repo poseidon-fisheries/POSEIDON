@@ -2,13 +2,18 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 
 import java.util.Map;
 
-public class WeibullPerSpeciesCarryingCapacitiesFactory extends PerSpeciesCarryingCapacitiesFactory {
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+
+public class WeibullPerSpeciesCarryingCapacitiesFactory
+    extends AbstractCarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     private Map<String, DoubleParameter> shapeParameters;
     private Map<String, DoubleParameter> scaleParameters;
@@ -41,7 +46,24 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory extends PerSpeciesCarryi
     }
 
     @Override
-    DoubleParameter makeSpeciesCarryingCapacityParameter(
+    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(
+        final FishState fishState
+    ) {
+        final MersenneTwisterFast rng = fishState.getRandom();
+        return new PerSpeciesCarryingCapacityInitializer(
+            getProbabilityOfFadBeingDud().applyAsDouble(rng),
+            fishState
+                .getBiology()
+                .getSpecies()
+                .stream()
+                .collect(toImmutableMap(
+                    identity(),
+                    species -> makeSpeciesCarryingCapacityParameter(species, rng)
+                ))
+        );
+    }
+
+    private DoubleParameter makeSpeciesCarryingCapacityParameter(
         final Species species,
         final MersenneTwisterFast rng
     ) {

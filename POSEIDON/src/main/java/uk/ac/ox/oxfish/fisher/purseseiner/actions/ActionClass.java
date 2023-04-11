@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesByActionFromFileCache;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -26,18 +24,23 @@ public enum ActionClass {
     OFS(OpportunisticFadSetAction.class),
     DPL(FadDeploymentAction.class);
 
+    public static final Map<Class<? extends PurseSeinerAction>, ActionClass> classMap =
+        Arrays.stream(values()).collect(toImmutableMap(
+            ActionClass::getActionClass,
+            identity()
+        ));
     private final Class<? extends PurseSeinerAction> actionClass;
 
     ActionClass(final Class<? extends PurseSeinerAction> actionClass) {
         this.actionClass = actionClass;
     }
 
-    public static Class<? extends AbstractSetAction<?>> getSetActionClass(final String setActionCode) {
+    public static Class<? extends AbstractSetAction> getSetActionClass(final String setActionCode) {
         //noinspection unchecked
         return Optional
             .of(ActionClass.valueOf(setActionCode.toUpperCase()).getActionClass())
             .filter(AbstractSetAction.class::isAssignableFrom)
-            .map(clazz -> (Class<? extends AbstractSetAction<?>>) clazz)
+            .map(clazz -> (Class<? extends AbstractSetAction>) clazz)
             .orElseThrow(() -> new IllegalStateException(
                 "Unknown set action code: " + setActionCode));
     }
@@ -45,11 +48,5 @@ public enum ActionClass {
     public Class<? extends PurseSeinerAction> getActionClass() {
         return actionClass;
     }
-
-    public static final Map<Class<? extends PurseSeinerAction>, ActionClass> classMap =
-        Arrays.stream(values()).collect(toImmutableMap(
-            ActionClass::getActionClass,
-            identity()
-        ));
 
 }

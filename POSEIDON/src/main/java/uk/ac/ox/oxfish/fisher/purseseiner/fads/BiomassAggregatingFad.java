@@ -24,7 +24,6 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -33,16 +32,17 @@ import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
 
-public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
+public class BiomassAggregatingFad
+    extends AggregatingFad<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
 
-    public BiomassFad(
-        final FadManager<BiomassLocalBiology, BiomassFad> owner,
+    public BiomassAggregatingFad(
+        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> owner,
         final BiomassLocalBiology biology,
-        final FishAttractor<BiomassLocalBiology, BiomassFad> fishAttractor,
+        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double totalCarryingCapacity
+        final GlobalCarryingCapacity carryingCapacity
     ) {
         super(
             owner,
@@ -51,7 +51,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
             fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            totalCarryingCapacity
+            carryingCapacity
         );
     }
 
@@ -61,9 +61,9 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * is lost.
      */
     @Override
-    public void releaseFish(final Collection<Species> allSpecies, final LocalBiology seaTileBiology) {
+    public void releaseFish(final Collection<? extends Species> allSpecies, final LocalBiology seaTileBiology) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology) {
-            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
+            releaseFish(allSpecies, seaTileBiology);
         } else {
             releaseFish(allSpecies);
         }
@@ -74,7 +74,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
      */
     private void releaseFish(
-        final Collection<Species> allSpecies,
+        final Collection<? extends Species> allSpecies,
         final VariableBiomassBasedBiology seaTileBiology
     ) {
         allSpecies.forEach(species -> {
@@ -98,7 +98,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
      * losing the fish.
      */
     @Override
-    public void releaseFish(final Collection<Species> allSpecies) {
+    public void releaseFish(final Collection<? extends Species> allSpecies) {
         final Map<Species, Double> biomassLost =
             allSpecies.stream().collect(toImmutableMap(identity(), getBiology()::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
@@ -113,7 +113,7 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
     @NotNull
     @Override
     public Catch addCatchesToFad(
-        final BiomassLocalBiology seaTileBiology,
+        final LocalBiology seaTileBiology,
         final GlobalBiology globalBiology
     ) {
         final WeightedObject<BiomassLocalBiology> attracted = attractFish(seaTileBiology);
@@ -129,15 +129,6 @@ public class BiomassFad extends Fad<BiomassLocalBiology, BiomassFad> {
             fadBiomass[i] += catches[i];
         }
         return new Catch(catches);
-    }
-
-    /**
-     * This should be used instead of {@code getBiology().isFull()} since FADs use a global carrying
-     * capacity instead of a per-species carrying capacity.
-     */
-    public boolean isFull() {
-        final double totalBiomass = Arrays.stream(getBiology().getCurrentBiomass()).sum();
-        return totalBiomass >= getTotalCarryingCapacity();
     }
 
 }

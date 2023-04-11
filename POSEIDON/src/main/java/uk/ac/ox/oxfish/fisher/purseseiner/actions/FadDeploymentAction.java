@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public class FadDeploymentAction<B extends LocalBiology, F extends AbstractFad<B, F>> extends PurseSeinerAction
+public class FadDeploymentAction<B extends LocalBiology, F extends Fad<B, F>> extends PurseSeinerAction
     implements FadRelatedAction<B, F> {
 
     // TODO: this should ideally be configurable, but we'll need to implement
@@ -58,8 +58,7 @@ public class FadDeploymentAction<B extends LocalBiology, F extends AbstractFad<B
     ) {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
-        @SuppressWarnings("unchecked")
-        final FadManager<B, F> fadManager = (FadManager<B, F>) getFadManager(fisher);
+        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = (FadManager<B, F>) getFadManager(fisher);
         this.fad = fadManager.deployFad(getLocation(), fishState.random);
         setTime(hoursLeft);
         fadManager.reactTo(this);
@@ -72,11 +71,11 @@ public class FadDeploymentAction<B extends LocalBiology, F extends AbstractFad<B
      * regulation will be active at the specified step. It currently assumes that the regulation is some combination
      * of MultipleRegulations and TemporaryRegulation (meaning it wouldn't work with, e.g., ArbitraryPause).
      */
-    private boolean isNoFishingAtStep(Regulation regulation, int step) {
+    private boolean isNoFishingAtStep(final Regulation regulation, final int step) {
         if (regulation instanceof NoFishing)
             return true;
         else if (regulation instanceof TemporaryRegulation) {
-            Regulation reg = ((TemporaryRegulation) regulation).delegateAtStep(getFisher().grabState(), step);
+            final Regulation reg = ((TemporaryRegulation) regulation).delegateAtStep(getFisher().grabState(), step);
             return isNoFishingAtStep(reg, step);
         } else if (regulation instanceof MultipleRegulations)
             return ((MultipleRegulations) regulation)

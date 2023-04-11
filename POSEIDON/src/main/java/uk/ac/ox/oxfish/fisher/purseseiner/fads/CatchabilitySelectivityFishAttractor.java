@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -29,7 +28,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -41,19 +39,17 @@ import static java.util.stream.Collectors.toMap;
  * proportion (catchability) of the vulnerable population (i.e. the population that can be selected in a cell).
  * Each FAD also have a carrying capacity so that they cannot get any more full than a given amount
  */
-public class CatchabilitySelectivityFishAttractor implements FishAttractor<AbundanceLocalBiology, AbundanceFad>, FadRemovalListener {
-
-
-    /**
-     * generates carrying capacities; these are "weak" bounds as in the fad stops filling up when it passes over them
-     * but if the step is so large that there is more fish than carrying capacity available, the fish stays on the fad
-     */
-    private final DoubleParameter[] carryingCapacitiesGenerator;
+public class CatchabilitySelectivityFishAttractor
+    implements FishAttractor<
+    AbundanceLocalBiology,
+    PerSpeciesCarryingCapacity,
+    AbundanceAggregatingFad<PerSpeciesCarryingCapacity>
+    > {
 
     /**
      * given a fad, returns its current catchability per species
      */
-    private final Function<AbstractFad, double[]> catchabilityPerSpeciesSupplier;
+    private final Function<Fad, double[]> catchabilityPerSpeciesSupplier;
 
 
     /**
@@ -69,21 +65,16 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
 
     private final FishState model;
 
-    private final HashMap<AbstractFad, double[]> carryingCapacityPerFad = new HashMap<>();
-
     private final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
 
     public CatchabilitySelectivityFishAttractor(
-        final DoubleParameter[] carryingCapacitiesGenerator,
-        final Function<AbstractFad, double[]> catchabilityPerSpeciesSupplier,
+        final Function<Fad, double[]> catchabilityPerSpeciesSupplier,
         final int daysInWaterBeforeAttraction,
         final int maximumAttractionDays,
         final FishState model,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
     ) {
-        this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
         this.catchabilityPerSpeciesSupplier = catchabilityPerSpeciesSupplier;
-
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maximumAttractionDays = maximumAttractionDays;
         this.model = model;
@@ -98,19 +89,18 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
         final FishState model,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
     ) {
-        this.carryingCapacitiesGenerator = carryingCapacitiesGenerator;
-        catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
-
+        this.catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maximumAttractionDays = maximumAttractionDays;
         this.model = model;
         this.globalSelectivityCurves = globalSelectivityCurves;
     }
 
-    @Nullable
+
     @Override
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
-        final AbundanceLocalBiology seaTileBiology, final AbundanceFad fad
+        final LocalBiology seaTileBiology,
+        final AbundanceAggregatingFad<PerSpeciesCarryingCapacity> fad
     ) {
         //if it's too early or late don't bother
         if (
@@ -133,7 +123,7 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
                     .toArray(double[][]::new)
             ));
         //get the carrying capacities or generate them if they don't exist
-        final double[] carryingCapacityHere = getCarryingCapacities(fad);
+        final double[] carryingCapacityHere = fad.getCarryingCapacity().getCarryingCapacities();
         for (final Species species : model.getSpecies()) {
             final NonMutatingArrayFilter selectivity = globalSelectivityCurves.get(species);
 
@@ -165,33 +155,5 @@ public class CatchabilitySelectivityFishAttractor implements FishAttractor<Abund
 
 
     }
-
-    @Override
-    public void onFadRemoval(final AbstractFad fad) {
-        carryingCapacityPerFad.remove(fad);
-    }
-
-    public double[] getCarryingCapacities(final AbundanceFad fad) {
-        double[] toReturn = carryingCapacityPerFad.get(fad);
-        if (toReturn == null) {
-            toReturn = computeFadAttractions(fad, model);
-            assert carryingCapacityPerFad.get(fad) == toReturn;
-        }
-        return toReturn;
-    }
-
-    private double[] computeFadAttractions(final AbundanceFad fad, final FishState model) {
-        assert fad.getTotalCarryingCapacity() > 0;
-        assert !carryingCapacityPerFad.containsKey(fad);
-
-        //compute carrying capacity for fad
-        final double[] carryingCapacityHere = new double[carryingCapacitiesGenerator.length];
-        for (int i = 0; i < carryingCapacitiesGenerator.length; i++) {
-            carryingCapacityHere[i] = carryingCapacitiesGenerator[i].applyAsDouble(model.getRandom());
-        }
-        carryingCapacityPerFad.put(fad, carryingCapacityHere);
-        return carryingCapacityHere;
-    }
-
 
 }

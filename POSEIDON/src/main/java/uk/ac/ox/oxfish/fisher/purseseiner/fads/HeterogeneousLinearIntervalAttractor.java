@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,29 +35,78 @@ public class HeterogeneousLinearIntervalAttractor
     extends AbstractAbundanceLinearIntervalAttractor implements FadRemovalListener {
 
 
-    final double minAbundanceThreshold;
-    private final DoubleParameter[] carryingCapacitiesPerSpecies;
+    private final double minAbundanceThreshold;
     private final int daysItTakesToFillUp;
-    private final HashMap<AbstractFad, double[]> carryingCapacityPerFad = new HashMap<>();
-    private final HashMap<AbstractFad, HashMap<Species, double[][]>> dailyAttractionThreshold = new HashMap<>();
-    private final HashMap<AbstractFad, HashMap<Species, double[][]>> dailyAbundanceAttracted = new HashMap<>();
+    private final Map<Fad, HashMap<Species, double[][]>> dailyAttractionThreshold = new HashMap<>();
+    private final Map<Fad, HashMap<Species, double[][]>> dailyAbundanceAttracted = new HashMap<>();
 
     public HeterogeneousLinearIntervalAttractor(
         final int daysInWaterBeforeAttraction, final int daysItTakesToFillUp,
         final double minAbundanceThreshold, final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves,
-        final FishState model,
-        final DoubleParameter[] carryingCapacitiesPerSpecies
+        final FishState model
     ) {
         super(globalSelectivityCurves, model, daysInWaterBeforeAttraction);
-        this.carryingCapacitiesPerSpecies = carryingCapacitiesPerSpecies;
         this.daysItTakesToFillUp = daysItTakesToFillUp;
         this.minAbundanceThreshold = minAbundanceThreshold;
         model.getFadMap().getRemovalListeners().add(this);
     }
 
-    protected static void fillUpAttractionAndThresholdAttractionMatrices(
-        final double[] dailyBiomassAttractedPerSpecies, final HashMap<Species, double[][]> dailyAttractionHere,
-        final HashMap<Species, double[][]> dailyAttractionThresholdHere,
+    /**
+     * function that returns how much this fad will attract today in abundance given that all preliminary checks have
+     * passed
+     *
+     * @param seaTileBiology seatile underneath
+     * @param fad            fad object
+     */
+    @Override
+    protected WeightedObject<AbundanceLocalBiology> attractDaily(
+        final AbundanceLocalBiology seaTileBiology, final AbundanceAggregatingFad fad
+    ) {
+        assert dailyAbundanceAttracted.containsKey(fad); //shouldn't be called without carrying capacity intercepting it first
+        final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundanceAttracted.get(fad));
+        return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
+    }
+
+
+    /**
+     * compute what the fad ought to attract
+     *
+     * @param fad the fad to initialize
+     * @return the carrying capacity for this fad in kg
+     */
+    private void computeFadAttractions(
+        final AbundanceAggregatingFad<? extends PerSpeciesCarryingCapacity> fad
+    ) {
+        assert !dailyAttractionThreshold.containsKey(fad);
+        assert !dailyAbundanceAttracted.containsKey(fad);
+
+        final double[] carryingCapacities = fad.getCarryingCapacity().getCarryingCapacities();
+
+        //compute daily kg landed per fad
+        final double[] dailyBiomassAttractedPerSpecies = new double[carryingCapacities.length];
+        for (int i = 0; i < carryingCapacities.length; i++) {
+            dailyBiomassAttractedPerSpecies[i] =
+                carryingCapacities[i] / (double) daysItTakesToFillUp;
+        }
+
+        //turn that into abundance!
+        final HashMap<Species, double[][]> dailyAttractionHere = new HashMap<>();
+        final HashMap<Species, double[][]> dailyAttractionThresholdHere = new HashMap<>();
+        fillUpAttractionAndThresholdAttractionMatrices(
+            dailyBiomassAttractedPerSpecies,
+            dailyAttractionHere,
+            dailyAttractionThresholdHere,
+            minAbundanceThreshold,
+            super.globalSelectivityCurves,
+            super.getAbundancePerDailyKgLanded()
+        );
+        dailyAbundanceAttracted.put(fad, dailyAttractionHere);
+        dailyAttractionThreshold.put(fad, dailyAttractionThresholdHere);
+    }
+
+    static void fillUpAttractionAndThresholdAttractionMatrices(
+        final double[] dailyBiomassAttractedPerSpecies, final Map<? super Species, double[][]> dailyAttractionHere,
+        final Map<? super Species, double[][]> dailyAttractionThresholdHere,
         final double minAbundanceThreshold,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves,
         final HashMap<Species, double[][]> kgToAbundanceTransformer
@@ -85,100 +133,18 @@ public class HeterogeneousLinearIntervalAttractor
     }
 
     /**
-     * compute what the fad ought to attract
-     *
-     * @param fad the fad to initialize
-     * @return the carrying capacity for this fad in kg
-     */
-    private double[] computeFadAttractions(final AbundanceFad fad, final FishState model) {
-        assert fad.getTotalCarryingCapacity() > 0;
-        assert !carryingCapacityPerFad.containsKey(fad);
-        assert !dailyAttractionThreshold.containsKey(fad);
-        assert !dailyAbundanceAttracted.containsKey(fad);
-
-        //compute carrying capacity for fad
-        final double[] carryingCapacityHere = new double[carryingCapacitiesPerSpecies.length];
-        for (int i = 0; i < carryingCapacitiesPerSpecies.length; i++) {
-            carryingCapacityHere[i] = carryingCapacitiesPerSpecies[i].applyAsDouble(model.getRandom());
-        }
-        carryingCapacityPerFad.put(fad, carryingCapacityHere);
-
-        //compute daily kg landed per fad
-        final double[] dailyBiomassAttractedPerSpecies = new double[carryingCapacitiesPerSpecies.length];
-        for (int i = 0; i < carryingCapacityHere.length; i++) {
-            dailyBiomassAttractedPerSpecies[i] =
-                carryingCapacityHere[i] / (double) daysItTakesToFillUp;
-        }
-
-        //turn that into abundance!
-        final HashMap<Species, double[][]> dailyAttractionHere = new HashMap<>();
-        final HashMap<Species, double[][]> dailyAttractionThresholdHere = new HashMap<>();
-        fillUpAttractionAndThresholdAttractionMatrices(
-            dailyBiomassAttractedPerSpecies,
-            dailyAttractionHere,
-            dailyAttractionThresholdHere,
-            minAbundanceThreshold,
-            super.globalSelectivityCurves,
-            super.getAbundancePerDailyKgLanded()
-        );
-        dailyAbundanceAttracted.put(fad, dailyAttractionHere);
-        dailyAttractionThreshold.put(fad, dailyAttractionThresholdHere);
-
-
-        return carryingCapacityHere;
-    }
-
-    /**
-     * function that returns how much this fad will attract today in abundance given that all preliminary checks have
-     * passed
-     *
-     * @param seaTileBiology seatile underneath
-     * @param fad            fad object
-     * @return
-     */
-    @Override
-    protected WeightedObject<AbundanceLocalBiology> attractDaily(
-        final AbundanceLocalBiology seaTileBiology, final AbundanceFad fad
-    ) {
-        assert dailyAbundanceAttracted.containsKey(fad); //shouldn't be called without carrying capacity intercepting it first
-        final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundanceAttracted.get(fad));
-        return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
-    }
-
-    /**
-     * get carrying capacities per fad in terms of KG per species
-     *
-     * @param fad
-     * @return
-     */
-    @Override
-    public double[] getCarryingCapacities(final AbundanceFad fad) {
-        double[] toReturn = carryingCapacityPerFad.get(fad);
-        if (toReturn == null) {
-            toReturn = computeFadAttractions(fad, model);
-            assert carryingCapacityPerFad.get(fad) == toReturn;
-        }
-        return toReturn;
-    }
-
-    /**
      * get the minimum amount of abundance there needs to be in a cell for this species without which the FAD won't
      * attract!
-     *
-     * @param fad
      */
     @Override
-    public HashMap<Species, double[][]> getDailyAttractionThreshold(final AbundanceFad fad) {
+    public HashMap<Species, double[][]> getDailyAttractionThreshold(final AbundanceAggregatingFad fad) {
         return dailyAttractionThreshold.get(fad);
     }
 
 
     @Override
-    public void onFadRemoval(final AbstractFad fad) {
-        final double[] removed = carryingCapacityPerFad.remove(fad);
-        if (removed != null) {
-            dailyAttractionThreshold.remove(fad);
-            dailyAbundanceAttracted.remove(fad);
-        }
+    public void onFadRemoval(final Fad<?, ?> fad) {
+        dailyAttractionThreshold.remove(fad);
+        dailyAbundanceAttracted.remove(fad);
     }
 }

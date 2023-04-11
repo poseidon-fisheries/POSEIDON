@@ -1,9 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -15,7 +11,7 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadRemovalListener;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -24,34 +20,36 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
+
 /**
  * This class is mostly a wrapper around the DriftingObjectsMap class, but it adds a couple bits of
  * functionality: - It's a MASON Steppable, which applies drift when stepped. - It has methods for
  * deploying and removing FADs, setting the appropriate callback in the former case.
  */
-public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
+public class FadMap<B extends LocalBiology>
     implements AdditionalStartable, Steppable {
 
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
     private final Class<B> localBiologyClass;
-    private final Class<F> fadClass;
     private final AbundanceLostObserver abundanceLostObserver = new AbundanceLostObserver();
-    private Stoppable stoppable;
     final private LinkedList<FadRemovalListener> removalListeners = new LinkedList<>();
+    private Stoppable stoppable;
 
     public FadMap(
         final NauticalMap nauticalMap,
         final CurrentVectors currentVectors,
         final GlobalBiology globalBiology,
-        final Class<B> localBiologyClass,
-        final Class<F> fadClass
+        final Class<B> localBiologyClass
     ) {
         this.nauticalMap = nauticalMap;
         this.globalBiology = globalBiology;
         this.localBiologyClass = localBiologyClass;
-        this.fadClass = fadClass;
         this.driftingObjectsMap = new DriftingObjectsMap(currentVectors, nauticalMap);
     }
 
@@ -86,7 +84,9 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
         driftingObjectsMap.applyDrift(fishState.getStep());
         allFads().forEach(fad -> {
             fad.reactToStep(fishState);
-            final Optional<B> seaTileBiology = getFadTile(fad).flatMap(this::getTileBiology);
+            final Optional<B> seaTileBiology =
+                getFadTile(fad)
+                    .flatMap(this::getTileBiology);
             if (seaTileBiology.isPresent()) {
                 fad.aggregateFish(seaTileBiology.get(), globalBiology, fishState.getStep());
                 fad.maybeReleaseFish(
@@ -100,31 +100,15 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
         });
     }
 
-    public Stream<F> allFads() {
+    public Stream<Fad<?, ?>> allFads() {
         return driftingObjectsMap.objects()
-            .filter(fadClass::isInstance)
-            .map(fadClass::cast);
-    }
-
-    public Bag allFadsAsList() {
-        return driftingObjectsMap.getAllObjects();
+            .filter(Fad.class::isInstance)
+            .map(Fad.class::cast);
     }
 
     @NotNull
-    public Optional<SeaTile> getFadTile(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
+    public Optional<SeaTile> getFadTile(final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
-    }
-
-    @NotNull
-    public Optional<Double2D> getFadLocation(final AbstractFad<? extends LocalBiology,? extends AbstractFad<?,?>> fad) {
-        return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
-    }
-
-    @NotNull
-    private Optional<SeaTile> getSeaTile(final Double2D location) {
-        return Optional.ofNullable(
-            nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
-        );
     }
 
     @NotNull
@@ -135,20 +119,36 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
             .map(localBiologyClass::cast);
     }
 
+    @NotNull
+    public Optional<Double2D> getFadLocation(final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad) {
+        return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
+    }
+
+    @NotNull
+    private Optional<SeaTile> getSeaTile(final Double2D location) {
+        return Optional.ofNullable(
+            nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
+        );
+    }
+
+    public Bag allFadsAsList() {
+        return driftingObjectsMap.getAllObjects();
+    }
+
     /**
      * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the
      * tile
      */
-    public void deployFad(final F fad, final SeaTile seaTile) {
+    public void deployFad(final Fad<?, ?> fad, final SeaTile seaTile) {
         deployFad(fad, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
     }
 
-    public void deployFad(final F fad, final Double2D location) {
+    public void deployFad(final Fad<?, ?> fad, final Double2D location) {
         driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
     @NotNull
-    private BiConsumer<Double2D, Optional<Double2D>> onMove(final F fad) {
+    private BiConsumer<Double2D, Optional<Double2D>> onMove(final Fad<?, ?> fad) {
         return (oldLoc, newLoc) -> {
             final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
             if (newSeaTile.isPresent()) {
@@ -171,23 +171,26 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
         };
     }
 
-    public void destroyFad(AbstractFad fad) {
-        remove(fad);
+    public void remove(final Fad fad) {
+
+        driftingObjectsMap.remove(fad);
+        for (final FadRemovalListener removalListener : getRemovalListeners()) {
+            removalListener.onFadRemoval(fad);
+        }
     }
 
-
-    private void reactToLostFad(F fad) {
+    private void reactToLostFad(final Fad<?, ?> fad) {
         fad.releaseFish(globalBiology.getSpecies());
-        if(fad.getOwner()!=null)
+        if (fad.getOwner() != null)
             fad.getOwner().loseFad(fad);
     }
 
-    public void remove(final AbstractFad fad) {
+    public LinkedList<FadRemovalListener> getRemovalListeners() {
+        return removalListeners;
+    }
 
-        driftingObjectsMap.remove(fad);
-        for (FadRemovalListener removalListener : getRemovalListeners()) {
-            removalListener.onFadRemoval(fad);
-        }
+    public void destroyFad(final Fad<?, ?> fad) {
+        remove(fad);
     }
 
     @NotNull
@@ -219,13 +222,8 @@ public class FadMap<B extends LocalBiology, F extends AbstractFad<B, F>>
         return abundanceLostObserver;
     }
 
-    public boolean isStarted(){
-        return stoppable !=null;
-    }
-
-
-    public LinkedList<FadRemovalListener> getRemovalListeners() {
-        return removalListeners;
+    public boolean isStarted() {
+        return stoppable != null;
     }
 
 

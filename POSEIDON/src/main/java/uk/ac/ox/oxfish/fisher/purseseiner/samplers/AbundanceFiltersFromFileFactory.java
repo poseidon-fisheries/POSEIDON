@@ -60,14 +60,6 @@ public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory 
     public AbundanceFiltersFromFileFactory() {
     }
 
-    private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {
-        final List<Double> selectivities = records
-            .stream()
-            .map(r -> r.getDouble("selectivity"))
-            .collect(toImmutableList());
-        return new NonMutatingArrayFilter(ImmutableList.of(selectivities, selectivities));
-    }
-
     @SuppressWarnings("unused")
     public InputPath getSelectivityFile() {
         return selectivityFile;
@@ -87,7 +79,7 @@ public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory 
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction<?>>, Map<Species, NonMutatingArrayFilter>> apply(
+    public Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> apply(
         final FishState fishState
     ) {
         final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
@@ -114,5 +106,13 @@ public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory 
                         entry2 -> makeFilter(entry2.getValue())
                     ))
             ));
+    }
+
+    private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {
+        final List<Double> selectivities = records
+            .stream()
+            .map(r -> r.getDouble("selectivity"))
+            .collect(toImmutableList());
+        return new NonMutatingArrayFilter(ImmutableList.of(selectivities, selectivities));
     }
 }

@@ -18,21 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AggregatingFad;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
  * Objects of this class can take a collection of local biologies and "aggregate" then (i.e., sum
  * them) into a single local biology object.
  *
  * <p>In most cases, the collection of local biologies will be all the {@link SeaTile} biologies
- * plus all the {@link uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad} biologies.</p>
+ * plus all the {@link AggregatingFad} biologies.</p>
  *
  * @param <B> The type of local biology to aggregate.
  */

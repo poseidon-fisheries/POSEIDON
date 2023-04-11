@@ -94,50 +94,6 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         this.movingThreshold = movingThreshold;
     }
 
-    private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
-        final double sumOfWeights =
-            weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        return weightMap.entrySet().stream()
-            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
-    }
-
-    private static Double2D getCurrentVector(final Fisher fisher) {
-        final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        final int step = fisher.grabState().getStep();
-        return getFadManager(fisher)
-            .getFadMap()
-            .getDriftingObjectsMap()
-            .getCurrentVectors()
-            .getVector(step, gridLocation);
-    }
-
-    private static boolean isSafe(
-        final PurseSeinerAction actionObject,
-        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
-    ) {
-        return isSafe(actionObject.getClass(), safeActionClasses);
-    }
-
-    private static boolean isSafe(
-        final Class<? extends PurseSeinerAction> actionClass,
-        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
-    ) {
-        return safeActionClasses
-            .stream()
-            .anyMatch(safeActionClass -> safeActionClass.isAssignableFrom(actionClass));
-    }
-
-    private static double valueOfLocationBasedAction(
-        final int previousActionsHere,
-        final double locationValue,
-        final DoubleUnaryOperator valueFunction,
-        final double decayConstant
-    ) {
-        final double value = valueFunction.applyAsDouble(locationValue);
-        final double decay = exp(-decayConstant * previousActionsHere);
-        return value * decay;
-    }
-
     @Override
     public void start(final FishState model, final Fisher fisher) {
         actionWeights = normalizeWeights(actionWeightsLoader.apply(fisher));
@@ -156,6 +112,13 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
                 ActionAttractionField::getActionClass,
                 identity()
             ));
+    }
+
+    private static <T> Map<T, Double> normalizeWeights(final Map<T, Double> weightMap) {
+        final double sumOfWeights =
+            weightMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        return weightMap.entrySet().stream()
+            .collect(toImmutableMap(Entry::getKey, entry -> entry.getValue() / sumOfWeights));
     }
 
     @Override
@@ -188,12 +151,12 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
         final ImmutableSet<Class<? extends PurseSeinerAction>> safeActionClasses =
             safeActionClasses(getCurrentVector(fisher));
 
-        final List<AbstractSetAction<B>> possibleSetActions =
+        final List<AbstractSetAction> possibleSetActions =
             setOpportunityDetector.possibleSetActions()
                 .filter(actionObject -> isSafe(actionObject, safeActionClasses))
                 .collect(toImmutableList());
 
-        final Stream<WeightedAction<AbstractSetAction<B>>> weightedSetActions =
+        final Stream<WeightedAction<AbstractSetAction>> weightedSetActions =
             possibleSetActions.stream().map(action -> WeightedAction.from(
                 action,
                 valueOfSetAction(action, species),
@@ -273,8 +236,25 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             .collect(toImmutableSet());
     }
 
+    private static Double2D getCurrentVector(final Fisher fisher) {
+        final Int2D gridLocation = fisher.getLocation().getGridLocation();
+        final int step = fisher.grabState().getStep();
+        return getFadManager(fisher)
+            .getFadMap()
+            .getDriftingObjectsMap()
+            .getCurrentVectors()
+            .getVector(step, gridLocation);
+    }
+
+    private static boolean isSafe(
+        final PurseSeinerAction actionObject,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return isSafe(actionObject.getClass(), safeActionClasses);
+    }
+
     double valueOfSetAction(
-        @NotNull final AbstractSetAction<? extends LocalBiology> action,
+        @NotNull final AbstractSetAction action,
         final Collection<Species> species
     ) {
         final double totalBiomass = action.getTargetBiology().getTotalBiomass(species);
@@ -296,6 +276,26 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
             final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
             return getFadManager(fisher).getFishValueCalculator().valueOf(potentialCatch, prices);
         }
+    }
+
+    private static boolean isSafe(
+        final Class<? extends PurseSeinerAction> actionClass,
+        final Collection<Class<? extends PurseSeinerAction>> safeActionClasses
+    ) {
+        return safeActionClasses
+            .stream()
+            .anyMatch(safeActionClass -> safeActionClass.isAssignableFrom(actionClass));
+    }
+
+    private static double valueOfLocationBasedAction(
+        final int previousActionsHere,
+        final double locationValue,
+        final DoubleUnaryOperator valueFunction,
+        final double decayConstant
+    ) {
+        final double value = valueFunction.applyAsDouble(locationValue);
+        final double decay = exp(-decayConstant * previousActionsHere);
+        return value * decay;
     }
 
     @Override

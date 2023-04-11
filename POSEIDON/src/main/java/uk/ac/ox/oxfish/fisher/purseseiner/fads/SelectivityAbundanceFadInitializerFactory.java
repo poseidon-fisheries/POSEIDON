@@ -6,8 +6,9 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializer;
+import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
@@ -20,9 +21,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class SelectivityAbundanceFadInitializerFactory
-    extends AbundanceFadInitializerFactory {
+    extends AbundanceFadInitializerFactory<PerSpeciesCarryingCapacity> {
 
-    private GlobalCarryingCapacitiesFactory globalCarryingCapacitiesFactory;
     private EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory;
 
     public SelectivityAbundanceFadInitializerFactory() {
@@ -30,7 +30,7 @@ public class SelectivityAbundanceFadInitializerFactory
     }
 
     public SelectivityAbundanceFadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory,
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter fishValueCalculatorStandardDeviation,
         final DoubleParameter fadDudRate,
@@ -41,7 +41,7 @@ public class SelectivityAbundanceFadInitializerFactory
         final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory
     ) {
         super(
-            carryingCapacitiesFactory,
+            carryingCapacityInitializerFactory,
             catchabilities,
             fishValueCalculatorStandardDeviation,
             fadDudRate,
@@ -54,21 +54,13 @@ public class SelectivityAbundanceFadInitializerFactory
     }
 
     public SelectivityAbundanceFadInitializerFactory(
-        final PerSpeciesCarryingCapacitiesFactory carryingCapacitiesFactory,
+        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Map<String, DoubleParameter> catchabilities,
         final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory
     ) {
-        super(carryingCapacitiesFactory, catchabilities, abundanceFiltersFactory);
+        super(carryingCapacityInitializerFactory, catchabilities, abundanceFiltersFactory);
         this.environmentalPenaltyFunctionFactory = environmentalPenaltyFunctionFactory;
-    }
-
-    public GlobalCarryingCapacitiesFactory getGlobalCarryingCapacitiesFactory() {
-        return globalCarryingCapacitiesFactory;
-    }
-
-    public void setGlobalCarryingCapacitiesFactory(final GlobalCarryingCapacitiesFactory globalCarryingCapacitiesFactory) {
-        this.globalCarryingCapacitiesFactory = globalCarryingCapacitiesFactory;
     }
 
     public EnvironmentalPenaltyFunctionFactory getEnvironmentalPenaltyFunctionFactory() {
@@ -79,11 +71,11 @@ public class SelectivityAbundanceFadInitializerFactory
         this.environmentalPenaltyFunctionFactory = environmentalPenaltyFunctionFactory;
     }
 
-    protected FadInitializer<AbundanceLocalBiology, AbundanceFad> makeFadInitializer(final FishState fishState) {
+    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>> makeFadInitializer(
+        final FishState fishState
+    ) {
 
         final GlobalBiology globalBiology = fishState.getBiology();
-        final DoubleParameter[] carryingCapacities =
-            getCarryingCapacitiesFactory().apply(fishState);
 
         final Function<SeaTile, Double> finalCatchabilityPenaltyFunction =
             environmentalPenaltyFunctionFactory.apply(fishState);
@@ -99,10 +91,10 @@ public class SelectivityAbundanceFadInitializerFactory
                 )
                 .toArray();
 
-        final Function<AbstractFad, double[]> catchabilitySupplier =
+        final Function<Fad, double[]> catchabilitySupplier =
             Optional.ofNullable(environmentalPenaltyFunctionFactory)
                 .map(factory -> factory.apply(fishState))
-                .map(penalityFunction -> (Function<AbstractFad, double[]>) fad -> {
+                .map(penalityFunction -> (Function<Fad, double[]>) fad -> {
                     final SeaTile fadLocation = fad.getLocation();
                     final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
                     return (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
@@ -111,11 +103,9 @@ public class SelectivityAbundanceFadInitializerFactory
                 })
                 .orElse(fad -> catchabilityArray);
 
-        return new AbundanceFadInitializer(
+        return new AbundanceAggregatingFadInitializer(
             globalBiology,
-            globalCarryingCapacitiesFactory.apply(fishState),
             new CatchabilitySelectivityFishAttractor(
-                carryingCapacities,
                 catchabilitySupplier,
                 (int) getDaysInWaterBeforeAttraction().applyAsDouble(rng),
                 (int) getMaximumDaysAttractions().applyAsDouble(rng),
@@ -123,7 +113,8 @@ public class SelectivityAbundanceFadInitializerFactory
                 getAbundanceFiltersFactory().apply(fishState).get(FadSetAction.class)
             ),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
-            fishState::getStep
+            fishState::getStep,
+            getCarryingCapacityInitializerFactory().apply(fishState)
         );
     }
 

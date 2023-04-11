@@ -57,7 +57,7 @@ public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<Abundanc
     @Override
     CatchSampler<AbundanceLocalBiology> makeCatchSampler(
         final FishState fishState,
-        final Class<? extends AbstractSetAction<?>> actionClass,
+        final Class<? extends AbstractSetAction> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {

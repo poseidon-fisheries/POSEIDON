@@ -22,7 +22,8 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacity;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -46,8 +47,9 @@ public class AbundanceFadInitializerBetaFactoryWithExpiration
         super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
+
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceFad> apply(
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<GlobalCarryingCapacity>> apply(
         final FishState fishState
     ) {
         return new ExpirationDecoratorFadInitializer<>(

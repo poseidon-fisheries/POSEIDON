@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
-public class ConstantAttractionProbabilityFunction<B extends LocalBiology, F extends Fad<B, F>>
-    implements AttractionProbabilityFunction<B, F> {
+public class ConstantAttractionProbabilityFunction
+    implements AttractionProbabilityFunction {
 
     private final double attractionProbability;
 
@@ -15,9 +15,10 @@ public class ConstantAttractionProbabilityFunction<B extends LocalBiology, F ext
     @Override
     public double apply(
         final Species species,
-        final B biology,
-        final Fad<B, F> fad
+        final LocalBiology biology,
+        final AggregatingFad<?, ?, ?> fad
     ) {
         return attractionProbability;
     }
+
 }

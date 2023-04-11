@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbstractFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
-public interface FadRelatedAction<B extends LocalBiology, F extends AbstractFad<B, F>> {
+public interface FadRelatedAction<B extends LocalBiology, F extends Fad<B, F>> {
     F getFad();
 }

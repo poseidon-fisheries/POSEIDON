@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -29,14 +29,14 @@ public class AbundanceCompressedExponentialFadInitializerFactoryTest {
     }
 
     private long generateAndCountDuds(final double fadDudRate, final int numFadsToGenerate) {
-        final AbstractFadInitializer<?, ?> initializer =
-            (AbstractFadInitializer<?, ?>) generateFakeInitializer(fadDudRate);
+        final AggregatingFadInitializer<?, ?> initializer =
+            (AggregatingFadInitializer<?, ?>) generateFakeInitializer(fadDudRate);
         return range(0, numFadsToGenerate)
             .filter(__ -> initializer.generateCarryingCapacity() == 0)
             .count();
     }
 
-    private FadInitializer<AbundanceLocalBiology, AbundanceFad> generateFakeInitializer(final double fadDudRate) {
+    private FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> generateFakeInitializer(final double fadDudRate) {
         final String defaultConstructor =
             "Abundance FAD Initializer:\n" +
                 "  attractableBiomassCoefficients:\n" +
@@ -79,7 +79,7 @@ public class AbundanceCompressedExponentialFadInitializerFactoryTest {
             GlobalBiology.fromNames(speciesCodes.getSpeciesNames())
         );
 
-        final FadInitializer<AbundanceLocalBiology, AbundanceFad> initializer = factory.apply(fakeModel);
+        final FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> initializer = factory.apply(fakeModel);
         return initializer;
     }
 
