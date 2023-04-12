@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -17,7 +16,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.function.Supplier;
 
-public class EpoPurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B, F>> extends PurseSeinerFleetFactory<B> {
+public class EpoPurseSeinerFleetFactory<B extends LocalBiology> extends PurseSeinerFleetFactory<B> {
     public EpoPurseSeinerFleetFactory() {
     }
 
@@ -25,7 +24,7 @@ public class EpoPurseSeinerFleetFactory<B extends LocalBiology, F extends Fad<B,
         final int targetYear,
         final InputPath inputFolder,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final PurseSeineGearFactory<B, F> purseSeineGearFactory,
+        final PurseSeineGearFactory<B> purseSeineGearFactory,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {

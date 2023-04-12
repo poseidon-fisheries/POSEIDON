@@ -12,7 +12,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
@@ -39,8 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("unused")
-public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fad<B, F>>
-    implements AlgorithmFactory<PurseSeineGear<B, F>> {
+public abstract class PurseSeineGearFactory<B extends LocalBiology>
+    implements AlgorithmFactory<PurseSeineGear<B>> {
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
@@ -143,7 +142,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
     }
 
     @NotNull
-    FadManager<B, F> makeFadManager(final FishState fishState) {
+    FadManager<B, ?> makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
@@ -153,7 +152,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology, F extends Fa
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
-        @SuppressWarnings("unchecked") final FadManager<B, F> fadManager = new FadManager<>(
+        @SuppressWarnings("unchecked") final FadManager<B, ?> fadManager = new FadManager<>(
             (FadMap<B>) fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),

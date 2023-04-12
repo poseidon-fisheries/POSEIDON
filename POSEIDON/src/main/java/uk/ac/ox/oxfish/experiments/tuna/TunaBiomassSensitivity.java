@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -43,47 +43,48 @@ public class TunaBiomassSensitivity {
 
 
     private final static Path MAIN_DIRECTORY = Paths.get(
-            "docs/20220223 tuna_calibration/test_biomass/"
+        "docs/20220223 tuna_calibration/test_biomass/"
     );
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
         ///set up the scenario
-        FishYAML yaml = new FishYAML();
-        EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
-                new FileReader(MAIN_DIRECTORY.resolve("linear.yaml").toFile()),
-                EpoPathPlanningAbundanceScenario.class);
+        final FishYAML yaml = new FishYAML();
+        final EpoPathPlannerAbundanceScenario scenario = yaml.loadAs(
+            new FileReader(MAIN_DIRECTORY.resolve("linear.yaml").toFile()),
+            EpoPathPlannerAbundanceScenario.class
+        );
 
-        FishState model = new FishState(0);
+        final FishState model = new FishState(0);
         model.setScenario(scenario);
         model.start();
         model.registerStartable(
-                new RowProviderToOutputPluginAdaptor(
-                        new BiomassHeatmapGatherer(1,model.getSpecies("Skipjack tuna")),
-                        "skipjack.csv"
-                )
+            new RowProviderToOutputPluginAdaptor(
+                new BiomassHeatmapGatherer(1, model.getSpecies("Skipjack tuna")),
+                "skipjack.csv"
+            )
         );
         model.registerStartable(
-                new RowProviderToOutputPluginAdaptor(
-                        new BiomassHeatmapGatherer(1,model.getSpecies("Bigeye tuna")),
-                        "bigeye.csv"
-                )
+            new RowProviderToOutputPluginAdaptor(
+                new BiomassHeatmapGatherer(1, model.getSpecies("Bigeye tuna")),
+                "bigeye.csv"
+            )
         );
         model.registerStartable(
-                new RowProviderToOutputPluginAdaptor(
-                        new BiomassHeatmapGatherer(1,model.getSpecies("Yellowfin tuna")),
-                        "yellowfin.csv"
-                )
+            new RowProviderToOutputPluginAdaptor(
+                new BiomassHeatmapGatherer(1, model.getSpecies("Yellowfin tuna")),
+                "yellowfin.csv"
+            )
         );
         model.registerStartable(new Startable() {
             @Override
-            public void start(FishState model) {
-                for (Fisher fisher : model.getFishers()) {
-                    fisher.setRegulation(new FishingSeason(true,0));
+            public void start(final FishState model) {
+                for (final Fisher fisher : model.getFishers()) {
+                    fisher.setRegulation(new FishingSeason(true, 0));
                 }
             }
         });
-        while(model.getStep()<=365)
+        while (model.getStep() <= 365)
             model.schedule.step(model);
 //        model.schedule.step(model);
 //        model.schedule.step(model);
@@ -91,8 +92,8 @@ public class TunaBiomassSensitivity {
 //        model.schedule.step(model);
         MAIN_DIRECTORY.resolve("biomass_test_2").toFile().mkdir();
         FishStateUtilities.writeAdditionalOutputsToFolder(
-                MAIN_DIRECTORY.resolve("biomass_test_2"),
-                model
+            MAIN_DIRECTORY.resolve("biomass_test_2"),
+            model
         );
 
 

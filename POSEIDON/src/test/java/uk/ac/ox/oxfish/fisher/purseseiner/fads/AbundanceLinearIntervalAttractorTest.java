@@ -131,14 +131,18 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //too early!
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
-        when(fad.getTotalCarryingCapacity()).thenReturn(10000d);
+        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(10000d));
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
         final AbundanceLocalBiology localBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(3);
 
@@ -148,10 +152,14 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //too full
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{999999});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -161,10 +169,14 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //empty local biology
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{1, 1})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{1, 1})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -174,10 +186,14 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //valid
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 99999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 99999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);

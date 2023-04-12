@@ -63,7 +63,7 @@ public abstract class AbstractFadSetAction<B extends LocalBiology>
 
     @Override
     boolean checkSuccess() {
-        final PurseSeineGear<?, ?> purseSeineGear = (PurseSeineGear<?, ?>) getFisher().getGear();
+        final PurseSeineGear<?> purseSeineGear = (PurseSeineGear<?>) getFisher().getGear();
         return getFisher().grabRandomizer().nextDouble()
             < purseSeineGear.getSuccessfulFadSetProbability();
     }

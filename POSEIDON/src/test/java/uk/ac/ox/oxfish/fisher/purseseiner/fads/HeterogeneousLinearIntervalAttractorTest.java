@@ -29,8 +29,6 @@ import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,12 +66,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(state.getSpecies()).thenReturn(ImmutableList.of(species));
-        final HeterogeneousLinearIntervalAttractor attractor = new HeterogeneousLinearIntervalAttractor(
-            5, 10, 1, selectivityFilters,
-            state,
-            new DoubleParameter[]{new FixedDoubleParameter(800)}
-
-        );
+        final HeterogeneousLinearIntervalAttractor attractor =
+            new HeterogeneousLinearIntervalAttractor(
+                5,
+                10,
+                1,
+                selectivityFilters,
+                state
+            );
 
 
         //100 age 0, 2 age 1 fish
@@ -88,16 +88,22 @@ public class HeterogeneousLinearIntervalAttractorTest {
         final AbundanceLocalBiology localBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 99999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 99999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fad.getTotalCarryingCapacity()).thenReturn(1d);
+        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(1d));
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
@@ -162,18 +168,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(state.getSpecies()).thenReturn(allSpecies);
-        final HeterogeneousLinearIntervalAttractor attractor = new HeterogeneousLinearIntervalAttractor(
-            5, 10, 1, selectivityFilters,
-            state,
-            new DoubleParameter[]{
-                new FixedDoubleParameter(0),
-                new FixedDoubleParameter(800),
-                new FixedDoubleParameter(400)
-
-
-            }
-
-        );
+        final HeterogeneousLinearIntervalAttractor attractor =
+            new HeterogeneousLinearIntervalAttractor(
+                5,
+                10,
+                1,
+                selectivityFilters,
+                state
+            );
 
 
         //100 age 0, 2 age 1 fish
@@ -190,6 +192,9 @@ public class HeterogeneousLinearIntervalAttractorTest {
         final AbundanceLocalBiology localBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
+        when(fad.getCarryingCapacity()).thenReturn(new PerSpeciesCarryingCapacity(
+            new double[]{0, 800, 400}
+        ));
         final Map<Species, StructuredAbundance> fishHere = new HashMap<>();
         final Map<Species, StructuredAbundance> fishFad = new HashMap<>();
         for (final Species species : allSpecies) {
@@ -203,7 +208,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fad.getTotalCarryingCapacity()).thenReturn(1d);
+        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(1));
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
@@ -255,10 +260,11 @@ public class HeterogeneousLinearIntervalAttractorTest {
         final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(state.getSpecies()).thenReturn(ImmutableList.of(species));
         final HeterogeneousLinearIntervalAttractor attractor = new HeterogeneousLinearIntervalAttractor(
-            5, 10, 1, selectivityFilters,
-            state,
-            new DoubleParameter[]{new FixedDoubleParameter(800)}
-
+            5,
+            10,
+            1,
+            selectivityFilters,
+            state
         );
 
 
@@ -271,7 +277,11 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         //too early!
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
-        when(fad.getTotalCarryingCapacity()).thenReturn(10000d);
+        when(fad.getCarryingCapacity()).thenReturn(new PerSpeciesCarryingCapacity(
+            new double[]{800}
+        ));
+
+        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(10000d));
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         when(fad.getBiology()).thenReturn(fadBiology);
         when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
@@ -279,8 +289,10 @@ public class HeterogeneousLinearIntervalAttractorTest {
             new StructuredAbundance(new double[]{0, 0})
         ));
         final AbundanceLocalBiology localBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(3);
         when(fad.isActive()).thenReturn(true);
@@ -291,10 +303,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         //too full
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{999999});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 999999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 999999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -304,10 +320,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         //empty local biology
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{1, 1})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{1, 1})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
@@ -317,10 +337,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         //valid
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
-        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{0, 0})));
-        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(species,
-            new StructuredAbundance(new double[]{999999, 99999})));
+        when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{0, 0})
+        ));
+        when(localBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(
+            species,
+            new StructuredAbundance(new double[]{999999, 99999})
+        ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 

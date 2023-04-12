@@ -51,7 +51,7 @@ public class PurseSeinerFleetFactory<B extends LocalBiology>
     private AlgorithmFactory<? extends MarketMap> marketMapFactory;
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory;
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private PurseSeineGearFactory<B, ?> purseSeineGearFactory;
+    private PurseSeineGearFactory<B> purseSeineGearFactory;
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
     private AlgorithmFactory<? extends Regulation> regulationsFactory;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
@@ -60,7 +60,7 @@ public class PurseSeinerFleetFactory<B extends LocalBiology>
     public PurseSeinerFleetFactory(
         final InputPath vesselsFile,
         final InputPath costsFile,
-        final PurseSeineGearFactory<B, ?> purseSeineGearFactory,
+        final PurseSeineGearFactory<B> purseSeineGearFactory,
         final AlgorithmFactory<? extends GearStrategy> gearStrategy,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory,
@@ -205,7 +205,7 @@ public class PurseSeinerFleetFactory<B extends LocalBiology>
                 .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
                 .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
             addHourlyCosts(),
-            fisher -> ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setFisher(fisher),
+            fisher -> ((PurseSeineGear<?>) fisher.getGear()).getFadManager().setFisher(fisher),
             fisher -> fisher.getYearlyData().registerGatherer(
                 "Profits",
                 fisher1 -> fisher1.getYearlyCounterColumn(EARNINGS)
@@ -248,11 +248,11 @@ public class PurseSeinerFleetFactory<B extends LocalBiology>
         return fishState.getMap().getPorts();
     }
 
-    public PurseSeineGearFactory<B, ?> getPurseSeineGearFactory() {
+    public PurseSeineGearFactory<B> getPurseSeineGearFactory() {
         return purseSeineGearFactory;
     }
 
-    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B, ?> purseSeineGearFactory) {
+    public void setPurseSeineGearFactory(final PurseSeineGearFactory<B> purseSeineGearFactory) {
         this.purseSeineGearFactory = purseSeineGearFactory;
     }
 

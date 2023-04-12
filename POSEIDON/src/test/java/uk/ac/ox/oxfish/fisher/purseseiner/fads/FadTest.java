@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
@@ -51,7 +53,7 @@ public class FadTest {
             0.5,
             0,
             new Int2D(),
-            1.5
+            new GlobalCarryingCapacity(1.5)
         );
         fillBiomassFad(fad);
 
@@ -63,7 +65,7 @@ public class FadTest {
         when(rng.nextDouble()).thenReturn(1.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // check that the FAD is still full and the tile biology is still empty
-        assertTrue(fad.isFull());
+        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
         assertTrue(tileBiology.isEmpty());
 
         // release the FAD's fish into the tile biology
@@ -71,7 +73,7 @@ public class FadTest {
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // Check that the FAD is now empty and the tile has received the fish
         assertTrue(fadBiology.isEmpty());
-        assertEquals(tileBiology.getTotalBiomass(), fad.getTotalCarryingCapacity(), 0);
+        assertEquals(tileBiology.getTotalBiomass(), fad.getCarryingCapacity().getTotal(), 0);
 
         // Refill the FAD and release another batch of FAD fish into the tile biology
         fillBiomassFad(fad);
@@ -103,7 +105,7 @@ public class FadTest {
             0.5,
             10,
             new Int2D(),
-            1.5
+            new GlobalCarryingCapacity(1.5)
         );
         assertNull(fad.getStepOfFirstAttraction());
         assertNull(fad.getStepsBeforeFirstAttraction());

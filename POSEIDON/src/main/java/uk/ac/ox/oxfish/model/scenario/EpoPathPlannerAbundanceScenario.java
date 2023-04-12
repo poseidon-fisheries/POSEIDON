@@ -24,7 +24,7 @@ import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.util.List;
 
-public class EpoPathPlanningAbundanceScenario extends EpoAbundanceScenario {
+public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFromFileFactory(

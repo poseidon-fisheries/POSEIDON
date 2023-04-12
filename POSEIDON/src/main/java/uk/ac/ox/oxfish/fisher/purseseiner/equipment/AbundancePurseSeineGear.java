@@ -23,13 +23,12 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
-public class AbundancePurseSeineGear extends PurseSeineGear<AbundanceLocalBiology, AbundanceAggregatingFad> {
+public class AbundancePurseSeineGear extends PurseSeineGear<AbundanceLocalBiology> {
 
     public AbundancePurseSeineGear(
-        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad> fadManager,
+        final FadManager<AbundanceLocalBiology, ?> fadManager,
         final double successfulFadSetProbability
     ) {
         super(fadManager, successfulFadSetProbability);

@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.StandardIattcRegulationsFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -58,8 +58,8 @@ public class EpoSensitivityRuns {
             .parallel()
             .forEach(entry -> {
                 final Path outputFolder = baseOutputFolder.resolve(entry.getKey());
-                final Runner<EpoPathPlanningAbundanceScenario> runner =
-                    new Runner<>(EpoPathPlanningAbundanceScenario.class, baseScenario, outputFolder)
+                final Runner<EpoPathPlannerAbundanceScenario> runner =
+                    new Runner<>(EpoPathPlannerAbundanceScenario.class, baseScenario, outputFolder)
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
@@ -74,7 +74,7 @@ public class EpoSensitivityRuns {
             });
     }
 
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> fadLimitPolicies(final IntStream limits) {
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> fadLimitPolicies(final IntStream limits) {
         return limits
             .mapToDouble(i -> i / 100.0)
             .mapToObj(pctOfRegularLimit -> {
@@ -100,7 +100,7 @@ public class EpoSensitivityRuns {
     }
 
     @NotNull
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> betAvoidancePolicies() {
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> betAvoidancePolicies() {
         return makePolicyList(
             new Policy<>(
                 "With SKJ-BET layer",
@@ -111,14 +111,14 @@ public class EpoSensitivityRuns {
     }
 
     @SafeVarargs
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> makePolicyList(
-        final Policy<? super EpoPathPlanningAbundanceScenario>... policies
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> makePolicyList(
+        final Policy<? super EpoPathPlannerAbundanceScenario>... policies
     ) {
         return makePolicyList(Arrays.asList(policies));
     }
 
     private static void setLayerThreshold(
-        final EpoPathPlanningAbundanceScenario scenario,
+        final EpoPathPlannerAbundanceScenario scenario,
         final String layerName,
         final double threshold
     ) {
@@ -134,17 +134,17 @@ public class EpoSensitivityRuns {
             .setThreshold(new FixedDoubleParameter(threshold));
     }
 
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> makePolicyList(
-        final Iterable<Policy<? super EpoPathPlanningAbundanceScenario>> policies
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> makePolicyList(
+        final Iterable<Policy<? super EpoPathPlannerAbundanceScenario>> policies
     ) {
-        return ImmutableList.<Policy<? super EpoPathPlanningAbundanceScenario>>builder()
+        return ImmutableList.<Policy<? super EpoPathPlannerAbundanceScenario>>builder()
             .add(Policy.DEFAULT)
             .addAll(policies)
             .build();
     }
 
     @NotNull
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> noTemperatureLayerPolicies() {
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> noTemperatureLayerPolicies() {
         return makePolicyList(
             new Policy<>(
                 "No temperature layer",
@@ -154,7 +154,7 @@ public class EpoSensitivityRuns {
         );
     }
 
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> southernSpatialClosurePolicies() {
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> southernSpatialClosurePolicies() {
         final SpecificProtectedAreaFromCoordinatesFactory spatialClosureFactory =
             new SpecificProtectedAreaFromCoordinatesFactory(
                 -2, -135, -10, -85
@@ -170,7 +170,7 @@ public class EpoSensitivityRuns {
     }
 
     private static void addRegulation(
-        final EpoPathPlanningAbundanceScenario scenario,
+        final EpoPathPlannerAbundanceScenario scenario,
         final AlgorithmFactory<? extends Regulation> regulationFactory
     ) {
         scenario.getPurseSeinerFleetFactory().setRegulationsFactory(
@@ -190,7 +190,7 @@ public class EpoSensitivityRuns {
         );
     }
 
-    private static List<Policy<? super EpoPathPlanningAbundanceScenario>> spatialClosurePolicies() {
+    private static List<Policy<? super EpoPathPlannerAbundanceScenario>> spatialClosurePolicies() {
         final SpecificProtectedAreaFromCoordinatesFactory spatialClosureFactory =
             new SpecificProtectedAreaFromCoordinatesFactory(
                 5, -150, -5, -145

@@ -186,7 +186,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         return deployedFads.size();
     }
 
-    public Set<F> getDeployedFads() {
+    public Set<Fad<?, ?>> getDeployedFads() {
         return Collections.unmodifiableSet(deployedFads);
     }
 

@@ -32,14 +32,17 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacity;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
+import java.util.Arrays;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -76,7 +79,7 @@ public class MakeFadSetTest {
             0,
             0,
             new Int2D(1, 1),
-            carryingCapacity
+            new GlobalCarryingCapacity(carryingCapacity)
         );
         fillBiomassFad(fad);
         final VariableBiomassBasedBiology tileBiology =
@@ -100,7 +103,7 @@ public class MakeFadSetTest {
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
         // Before the set, FAD biology should be full and tile biology should be empty
-        assertTrue(fad.isFull());
+        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
         assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty

@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import junit.framework.TestCase;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 
 public class CompressedExponentialAttractionProbabilityTest extends TestCase {
@@ -28,8 +27,8 @@ public class CompressedExponentialAttractionProbabilityTest extends TestCase {
 
         final Species species = new Species("");
 
-        final CompressedExponentialAttractionProbability<BiomassLocalBiology, BiomassAggregatingFad> f =
-            new CompressedExponentialAttractionProbability<>(
+        final CompressedExponentialAttractionProbability f =
+            new CompressedExponentialAttractionProbability(
                 new double[]{2.0},
                 new double[]{1E-3},
                 new double[]{1E-5}

@@ -67,7 +67,7 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
 
-        final PurseSeineGear<?, ?> purseSeineGear = getPurseSeineGear(fisher);
+        final PurseSeineGear<?> purseSeineGear = getPurseSeineGear(fisher);
 
         if (checkSuccess()) {
             final GlobalBiology globalBiology = fishState.getBiology();

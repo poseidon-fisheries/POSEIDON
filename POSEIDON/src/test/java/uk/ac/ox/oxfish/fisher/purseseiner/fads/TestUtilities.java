@@ -73,7 +73,7 @@ public class TestUtilities {
 
     public static void fillBiomassFad(final BiomassAggregatingFad fad) {
         final double[] biomassArray = fad.getBiology().getCurrentBiomass();
-        Arrays.fill(biomassArray, fad.getTotalCarryingCapacity() / biomassArray.length);
+        Arrays.fill(biomassArray, fad.getCarryingCapacity().getTotal() / biomassArray.length);
     }
 
     public static CurrentVectors makeUniformCurrentVectors(

@@ -57,14 +57,11 @@ public class FadLocationValuesTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(3, 3);
         final Fisher fisher = mock(Fisher.class);
-        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear =
-            mock(PurseSeineGear.class);
-        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassAggregatingFad>
-            fadManager = mock(FadManager.class);
-        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
-            mock(FadMap.class);
+        final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
+        final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
+        when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
         when(fadManager.getFadMap()).thenReturn(fadMap);
-        when(gear.getFadManager()).thenReturn(fadManager);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);

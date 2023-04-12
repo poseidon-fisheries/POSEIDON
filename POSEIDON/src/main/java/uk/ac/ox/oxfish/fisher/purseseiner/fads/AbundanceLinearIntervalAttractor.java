@@ -111,14 +111,6 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
         return daysItTakesToFillUp;
     }
 
-    public double getCarryingCapacitiesPerSpecies(final int speciesID) {
-        return carryingCapacitiesPerSpecies[speciesID];
-    }
-
-    public double getDailyBiomassAttractedPerSpecies(final int speciesID) {
-        return dailyBiomassAttractedPerSpecies[speciesID];
-    }
-
     @VisibleForTesting
     public WeightedObject<AbundanceLocalBiology> getDailyAttractionStep() {
         return dailyAttractionStep;
@@ -135,17 +127,6 @@ public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearInt
 
     public Map<Species, NonMutatingArrayFilter> getGlobalSelectivityCurves() {
         return globalSelectivityCurves;
-    }
-
-    /**
-     * get carrying capacities per fad in terms of KG per species
-     *
-     * @param fad
-     * @return
-     */
-    @Override
-    public double[] getCarryingCapacities(final AbundanceAggregatingFad fad) {
-        return carryingCapacitiesPerSpecies;
     }
 
     /**

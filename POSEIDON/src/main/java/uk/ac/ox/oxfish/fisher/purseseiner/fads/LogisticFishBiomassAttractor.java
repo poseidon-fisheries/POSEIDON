@@ -49,7 +49,7 @@ public class LogisticFishBiomassAttractor
         final double fadBiomass = fad.getBiology().getBiomass(species);
         final double cellBiomass = cellBiology.getBiomass(species);
         final double attractionRate = getAttractionRate(species);
-        final double fadCarryingCapacity = fad.getTotalCarryingCapacity();
+        final double fadCarryingCapacity = fad.getCarryingCapacity().getTotal();
         final double caughtBiomass = min(
             cellBiomass,
             attractionRate *

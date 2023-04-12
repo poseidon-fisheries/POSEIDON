@@ -55,7 +55,7 @@ public class LogisticFishAbundanceAttractor
         final StructuredAbundance cellAbundance = cellBiology.getAbundance(species);
         final double attractionRate = getAttractionRate(species);
         final double space =
-            1 - fad.getBiology().getBiomass(species) / fad.getTotalCarryingCapacity();
+            1 - fad.getBiology().getBiomass(species) / fad.getCarryingCapacity().getTotal();
 
         return fadAbundance.mapAndWeigh(species, (subDivision, bin) ->
             max(min(

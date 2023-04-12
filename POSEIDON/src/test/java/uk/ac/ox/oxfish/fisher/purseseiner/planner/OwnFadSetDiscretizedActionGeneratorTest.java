@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -43,11 +44,12 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,15 +65,13 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
-        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear =
-            mock(PurseSeineGear.class);
-        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassAggregatingFad>
-            fadManager = mock(FadManager.class);
-        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
-            mock(FadMap.class);
+        final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
+        final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
+        when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
-        when(gear.getFadManager()).thenReturn(fadManager);
+
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -89,17 +89,17 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         );
         when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
 
-        final List<BiomassAggregatingFad> fads = range(0, 3)
+        final Set<Fad<?, ?>> fads = range(0, 3)
             .mapToObj(index -> {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
                 when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
                 return fad;
             })
-            .collect(toImmutableList());
+            .collect(toImmutableSet());
 
         when(fadManager.getDeployedFads())
-            .thenReturn(ImmutableSet.copyOf(fads));
+            .thenReturn(fads);
 
         //discretized map split into 2x2
         final MapDiscretization discretization = new MapDiscretization(
@@ -151,15 +151,10 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
-        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear =
-            mock(PurseSeineGear.class);
-        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassAggregatingFad>
-            fadManager = mock(FadManager.class);
-        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
-            mock(FadMap.class);
-        when(fadManager.getFadMap()).thenReturn(fadMap);
-        when(fadManager.getFisher()).thenReturn(fisher);
-        when(gear.getFadManager()).thenReturn(fadManager);
+        final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
+        final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
+        when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -212,15 +207,10 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
-        @SuppressWarnings("unchecked") final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> gear =
-            mock(PurseSeineGear.class);
-        @SuppressWarnings("unchecked") final FadManager<BiomassLocalBiology, BiomassAggregatingFad>
-            fadManager = mock(FadManager.class);
-        @SuppressWarnings("unchecked") final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
-            mock(FadMap.class);
-        when(fadManager.getFadMap()).thenReturn(fadMap);
-        when(fadManager.getFisher()).thenReturn(fisher);
-        when(gear.getFadManager()).thenReturn(fadManager);
+        final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
+        final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
+        when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);

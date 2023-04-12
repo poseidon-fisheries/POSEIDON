@@ -51,7 +51,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
         final BiomassLocalBiology biology = mock(BiomassLocalBiology.class);
 
-        final PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> purseSeineGear =
+        final PurseSeineGear<BiomassLocalBiology> purseSeineGear =
             mock(PurseSeineGear.class);
 
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);

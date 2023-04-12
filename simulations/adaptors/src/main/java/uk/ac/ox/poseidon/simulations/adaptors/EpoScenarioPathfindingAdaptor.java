@@ -1,12 +1,11 @@
 package uk.ac.ox.poseidon.simulations.adaptors;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
-import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 
 public class EpoScenarioPathfindingAdaptor
-    extends EpoScenarioAdaptor<AbundanceLocalBiology, AbundanceAggregatingFad, EpoPathPlanningAbundanceScenario> {
-    EpoScenarioPathfindingAdaptor(final EpoPathPlanningAbundanceScenario scenario) {
+    extends EpoScenarioAdaptor<AbundanceLocalBiology, EpoPathPlannerAbundanceScenario> {
+    EpoScenarioPathfindingAdaptor(final EpoPathPlannerAbundanceScenario scenario) {
         super(scenario);
     }
 }

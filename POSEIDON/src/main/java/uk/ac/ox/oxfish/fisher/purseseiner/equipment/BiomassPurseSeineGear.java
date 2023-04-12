@@ -23,13 +23,12 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
-public class BiomassPurseSeineGear extends PurseSeineGear<BiomassLocalBiology, BiomassAggregatingFad> {
+public class BiomassPurseSeineGear extends PurseSeineGear<BiomassLocalBiology> {
 
     public BiomassPurseSeineGear(
-        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager,
+        final FadManager<BiomassLocalBiology, ?> fadManager,
         final double successfulFadSetProbability
     ) {
         super(fadManager, successfulFadSetProbability);

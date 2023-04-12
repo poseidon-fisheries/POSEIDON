@@ -98,7 +98,7 @@ public class Scenarios {
         add(
             "EPO Abundance Pathfinding",
             "Like EPO Abundance but using an alternative decision process",
-            EpoPathPlanningAbundanceScenario::new
+            EpoPathPlannerAbundanceScenario::new
         );
         add(
             "EPO Abundance Biology Only",

@@ -21,13 +21,12 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class AbundancePurseSeineGearFactory
-    extends PurseSeineGearFactory<AbundanceLocalBiology, AbundanceAggregatingFad> {
+    extends PurseSeineGearFactory<AbundanceLocalBiology> {
 
     public AbundancePurseSeineGearFactory(
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
@@ -39,7 +38,7 @@ public class AbundancePurseSeineGearFactory
     }
 
     @Override
-    public PurseSeineGear<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
+    public PurseSeineGear<AbundanceLocalBiology> apply(final FishState fishState) {
         return new AbundancePurseSeineGear(
             makeFadManager(fishState),
             getSuccessfulSetProbability().applyAsDouble(fishState.getRandom())

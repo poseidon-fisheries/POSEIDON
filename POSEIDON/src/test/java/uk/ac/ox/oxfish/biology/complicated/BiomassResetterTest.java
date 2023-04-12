@@ -167,12 +167,11 @@ public class BiomassResetterTest {
             fishState.getMap().getWidth(),
             fishState.getMap().getHeight()
         );
-        final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap = new FadMap<>(
+        final FadMap<BiomassLocalBiology> fadMap = new FadMap<>(
             fishState.getMap(),
             currentVectors,
             globalBiology,
-            BiomassLocalBiology.class,
-            BiomassAggregatingFad.class
+            BiomassLocalBiology.class
         );
         when(fishState.getFadMap()).thenReturn((FadMap) fadMap);
 
@@ -186,7 +185,7 @@ public class BiomassResetterTest {
         final LinearFishBiomassAttractor fishBiomassAttractor =
             new LinearFishBiomassAttractor(
                 species,
-                new ConstantAttractionProbabilityFunction<>(1.0),
+                new ConstantAttractionProbabilityFunction(1.0),
                 attractionRates,
                 new MersenneTwisterFast()
             );
@@ -233,7 +232,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(AggregatingFad::getBiology).collect(toImmutableList());
+            fadMap.allFads().map(fad -> ((AggregatingFad) fad).getBiology()).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses =
             totalBiomasses(globalBiology, fadBiologies);
 

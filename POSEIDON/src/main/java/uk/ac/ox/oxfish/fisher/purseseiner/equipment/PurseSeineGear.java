@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -36,39 +35,39 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>> implements Gear {
+public abstract class PurseSeineGear<B extends LocalBiology> implements Gear {
 
-    private final FadManager<B, F> fadManager;
+    private final FadManager<B, ?> fadManager;
     private final double successfulFadSetProbability;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
-        final FadManager<B, F> fadManager,
+        final FadManager<B, ?> fadManager,
         final double successfulFadSetProbability
     ) {
         this.fadManager = fadManager;
         this.successfulFadSetProbability = successfulFadSetProbability;
     }
 
-    public static PurseSeineGear<?, ?> getPurseSeineGear(final Fisher fisher) {
+    public static PurseSeineGear<?> getPurseSeineGear(final Fisher fisher) {
         return maybeGetPurseSeineGear(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear not available. Fisher " +
                 fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
-    public static Optional<PurseSeineGear<?, ?>> maybeGetPurseSeineGear(final Fisher fisher) {
+    public static Optional<PurseSeineGear<?>> maybeGetPurseSeineGear(final Fisher fisher) {
         return Optional
             .ofNullable(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> (PurseSeineGear<?, ?>) gear);
+            .map(gear -> (PurseSeineGear<?>) gear);
     }
 
     public double getSuccessfulFadSetProbability() {
         return successfulFadSetProbability;
     }
 
-    public FadManager<B, F> getFadManager() {
+    public FadManager<B, ?> getFadManager() {
         return fadManager;
     }
 
@@ -117,7 +116,7 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final PurseSeineGear<?, ?> that = (PurseSeineGear<?, ?>) o;
+        final PurseSeineGear<?> that = (PurseSeineGear<?>) o;
         return
             Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0
                 && Objects.equals(fadManager, that.fadManager)
@@ -125,7 +124,6 @@ public abstract class PurseSeineGear<B extends LocalBiology, F extends Fad<B, F>
     }
 
     public void recordVisit(final Int2D gridLocation, final int timeStep) {
-
         lastVisits.put(gridLocation, timeStep);
     }
 

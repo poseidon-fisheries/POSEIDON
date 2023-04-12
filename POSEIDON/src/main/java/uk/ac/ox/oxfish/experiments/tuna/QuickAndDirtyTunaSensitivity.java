@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.geography.fads.FadZapperFactory;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.TunaEvaluator;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
-import uk.ac.ox.oxfish.model.scenario.EpoPathPlanningAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -64,9 +64,9 @@ public class QuickAndDirtyTunaSensitivity {
 
         final FishYAML yaml = new FishYAML();
 
-        final EpoPathPlanningAbundanceScenario scenario = yaml.loadAs(
+        final EpoPathPlannerAbundanceScenario scenario = yaml.loadAs(
             new FileReader(originalScenario.toFile()),
-            EpoPathPlanningAbundanceScenario.class
+            EpoPathPlannerAbundanceScenario.class
         );
         final GenericOptimization optimization = yaml.loadAs(
             new FileReader(originalCalibration.toFile()),
@@ -303,7 +303,9 @@ public class QuickAndDirtyTunaSensitivity {
         final Path solutionFile = calibrationFolder.resolve("local_solution.txt");
         final List<String> strings = Files.readAllLines(solutionFile);
         Preconditions.checkArgument(strings.size() == 1);
-        final double[] solution = Arrays.stream(strings.get(0).split(",")).mapToDouble(s -> Double.parseDouble(s)).toArray();
+        final double[] solution = Arrays.stream(strings.get(0).split(","))
+            .mapToDouble(s -> Double.parseDouble(s))
+            .toArray();
         final Path calibrationFile = calibrationFolder.resolve("local_calibration.yaml");
         final TunaEvaluator evaluator = new TunaEvaluator(calibrationFile, solution);
         evaluator.setNumRuns(1);

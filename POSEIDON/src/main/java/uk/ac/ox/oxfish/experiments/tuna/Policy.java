@@ -88,7 +88,7 @@ public class Policy<S extends Scenario> {
                 fishState.getFishers().forEach(fisher -> {
                     generalRegulationFactory.map(factory -> factory.apply(fishState)).ifPresent(fisher::setRegulation);
                     if (actionSpecificRegulationFactories != null) {
-                        ((PurseSeineGear<?, ?>) fisher.getGear()).getFadManager().setActionSpecificRegulations(
+                        ((PurseSeineGear<?>) fisher.getGear()).getFadManager().setActionSpecificRegulations(
                             actionSpecificRegulationFactories.stream().map(factory -> factory.apply(fishState))
                         );
                     }

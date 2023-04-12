@@ -8,11 +8,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.DummyFishBiomassAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacityInitializer;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -27,18 +29,17 @@ public class BiomassFadInitializerTest {
         final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
-            Double.POSITIVE_INFINITY,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
-            () -> 0
+            () -> 0,
+            new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(Double.POSITIVE_INFINITY))
         );
-        final FadMap<BiomassLocalBiology, BiomassAggregatingFad> fadMap =
+        final FadMap<BiomassLocalBiology> fadMap =
             new FadMap<>(
                 mock(NauticalMap.class),
                 mock(CurrentVectorsEPO.class),
                 globalBiology,
-                BiomassLocalBiology.class,
-                BiomassAggregatingFad.class
+                BiomassLocalBiology.class
             );
         final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager =
             new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));

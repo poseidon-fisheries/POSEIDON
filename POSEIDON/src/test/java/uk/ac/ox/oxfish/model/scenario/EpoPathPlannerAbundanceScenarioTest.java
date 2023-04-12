@@ -7,10 +7,10 @@ import uk.ac.ox.oxfish.parameters.ParameterExtractor;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EpoPathPlanningAbundanceScenarioTest extends TestCase {
+public class EpoPathPlannerAbundanceScenarioTest extends TestCase {
 
     public void testParameterAnnotationReading() {
-        final EpoPathPlanningAbundanceScenario scenario = new EpoPathPlanningAbundanceScenario();
+        final EpoPathPlannerAbundanceScenario scenario = new EpoPathPlannerAbundanceScenario();
         final List<HardEdgeOptimizationParameter> freeParameters =
             new ParameterExtractor()
                 .getParameters(scenario)
