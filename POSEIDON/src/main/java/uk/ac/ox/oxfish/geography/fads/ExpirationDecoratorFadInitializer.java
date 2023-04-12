@@ -20,8 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -46,9 +45,12 @@ public class ExpirationDecoratorFadInitializer<
 
     @Override
     public F makeFad(
-        @NotNull final FadManager<B, F> fadManager, @Nullable final Fisher owner, @NotNull final SeaTile initialLocation
+        final FadManager<B, F> fadManager,
+        final Fisher owner,
+        final SeaTile initialLocation,
+        final MersenneTwisterFast rng
     ) {
-        final F fad = delegate.makeFad(fadManager, owner, initialLocation);
+        final F fad = delegate.makeFad(fadManager, owner, initialLocation, rng);
         fad.setDaysBeforeTurningOff(daysOfActivity);
         return fad;
     }

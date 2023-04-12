@@ -55,7 +55,7 @@ public class ExogenousFadMakerTest {
         final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fakeFadInitializer = mock(FadInitializer.class);
         //mason primitives are accessed by "setlocation"
         //which means that returning the same mock twice will result in the first being moved, rather than double deployment
-        when(fakeFadInitializer.makeFad(any(), any(), any())).thenReturn(
+        when(fakeFadInitializer.makeFad(any(), any(), any(), any())).thenReturn(
             mock(BiomassAggregatingFad.class),
             mock(BiomassAggregatingFad.class)
         );
@@ -76,10 +76,10 @@ public class ExogenousFadMakerTest {
         state.schedule.step(state); //day 0
         state.schedule.step(state);
         state.schedule.step(state);
-        verify(fakeFadInitializer, never()).makeFad(any(), any(), any());
+        verify(fakeFadInitializer, never()).makeFad(any(), any(), any(), any());
         state.schedule.step(state);
         //you should have deployed 2 fads, both at 0,4
-        verify(fakeFadInitializer, times(2)).makeFad(any(), any(), any());
+        verify(fakeFadInitializer, times(2)).makeFad(any(), any(), any(), any());
         assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(0, 4)).size(), 2);
         assertEquals(state.getFadMap().getDriftingObjectsMap().getField().allObjects.size(), 2);
         assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(1, 1)).size(), 0);

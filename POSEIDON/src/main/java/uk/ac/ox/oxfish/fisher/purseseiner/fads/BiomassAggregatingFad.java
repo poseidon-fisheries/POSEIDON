@@ -63,7 +63,7 @@ public class BiomassAggregatingFad
     @Override
     public void releaseFish(final Collection<? extends Species> allSpecies, final LocalBiology seaTileBiology) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology) {
-            releaseFish(allSpecies, seaTileBiology);
+            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
         } else {
             releaseFish(allSpecies);
         }

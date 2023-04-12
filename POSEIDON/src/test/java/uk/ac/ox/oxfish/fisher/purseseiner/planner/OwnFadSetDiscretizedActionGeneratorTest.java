@@ -155,6 +155,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
         final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -211,6 +212,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FadMap<BiomassLocalBiology> fadMap = mock(FadMap.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
         final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);

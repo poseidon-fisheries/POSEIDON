@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -53,7 +54,8 @@ public class BiomassFadInitializerTest {
         when(fisher.grabState()).thenReturn(fishState);
         fadManager.setFisher(fisher);
 
-        final BiomassAggregatingFad fad = fadInitializer.makeFad(fadManager, null, seaTile);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final BiomassAggregatingFad fad = fadInitializer.makeFad(fadManager, null, seaTile, rng);
         for (final Species species : globalBiology.getSpecies()) {
             assertEquals(fad.getBiology().getBiomass(species), 0, 0);
         }

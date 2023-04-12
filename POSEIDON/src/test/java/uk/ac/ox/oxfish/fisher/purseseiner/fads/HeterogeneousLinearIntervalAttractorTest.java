@@ -103,7 +103,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         ));
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(1d));
+        when(fad.getCarryingCapacity()).thenReturn(new PerSpeciesCarryingCapacity(new double[]{800}));
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
@@ -208,7 +208,6 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
         when(fad.getStepDeployed()).thenReturn(1);
         when(fad.getBiology()).thenReturn(fadBiology);
-        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(1));
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
@@ -280,8 +279,6 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getCarryingCapacity()).thenReturn(new PerSpeciesCarryingCapacity(
             new double[]{800}
         ));
-
-        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(10000d));
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         when(fad.getBiology()).thenReturn(fadBiology);
         when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(

@@ -209,24 +209,25 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         fad.lose();
     }
 
-    public F deployFad(final SeaTile seaTile) {
+    public F deployFadInCenterOfTile(final SeaTile seaTile, final MersenneTwisterFast rng) {
         final Double2D location = new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5);
-        return deployFad(seaTile, location);
+        return deployFad(seaTile, location, rng);
     }
 
-    public F deployFad(final SeaTile seaTile, final Double2D location) {
-        final F newFad = initFad(seaTile);
+    public F deployFad(final SeaTile seaTile, final Double2D location, final MersenneTwisterFast rng) {
+        final F newFad = initFad(seaTile, rng);
         fadMap.deployFad(newFad, location);
         return newFad;
     }
 
-    private F initFad(final SeaTile tile) {
+    private F initFad(final SeaTile tile, final MersenneTwisterFast rng) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
         final F newFad = fadInitializer.makeFad(
             this,
             fisher,
-            tile
+            tile,
+            rng
         );
         deployedFads.add(newFad);
         return newFad;
@@ -240,7 +241,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
         );
-        return deployFad(seaTile, location);
+        return deployFad(seaTile, location, random);
     }
 
     public <O> void reactTo(final O observable) {

@@ -131,7 +131,7 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //too early!
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
-        when(fad.getCarryingCapacity()).thenReturn(new GlobalCarryingCapacity(10000d));
+        when(fad.getCarryingCapacity()).thenReturn(new PerSpeciesCarryingCapacity(new double[]{800}));
         final AbundanceLocalBiology fadBiology = mock(AbundanceLocalBiology.class, RETURNS_DEEP_STUBS);
         when(fad.getBiology()).thenReturn(fadBiology);
         when(fadBiology.getStructuredAbundance()).thenReturn(ImmutableMap.of(

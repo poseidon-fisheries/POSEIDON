@@ -41,7 +41,7 @@ public class FadManagerTest extends TestCase {
     public void testFadsGoBackInStockAfterSet() {
 
         final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fadInitializer =
-            (fadManager, owner, initialLocation) -> {
+            (fadManager, owner, initialLocation, rng) -> {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getOwner()).thenReturn(fadManager);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{0}));
@@ -76,7 +76,7 @@ public class FadManagerTest extends TestCase {
 
         fadManager.setFisher(fisher);
         fadManager.setNumFadsInStock(10);
-        final BiomassAggregatingFad fad1 = fadManager.deployFad(seaTile);
+        final BiomassAggregatingFad fad1 = fadManager.deployFadInCenterOfTile(seaTile, rng);
 
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(1, fadManager.getNumDeployedFads());
@@ -87,7 +87,7 @@ public class FadManagerTest extends TestCase {
             .act(fishState, fadManager.getFisher(), anarchy, 24);
         assertEquals(10, fadManager.getNumFadsInStock());
 
-        final BiomassAggregatingFad fad2 = fadManager.deployFad(seaTile);
+        final BiomassAggregatingFad fad2 = fadManager.deployFadInCenterOfTile(seaTile, rng);
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(2, fadManager.getNumDeployedFads());
 

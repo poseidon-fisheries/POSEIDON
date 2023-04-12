@@ -201,12 +201,13 @@ public class BiomassResetterTest {
         when(fishState.getBiology()).thenReturn(globalBiology);
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabState()).thenReturn(fishState);
+        when(fisher.grabRandomizer()).thenReturn(rng);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
         when(fadManager.getFisher()).thenReturn(fisher);
         seaTiles.forEach(seaTile -> {
             when(fisher.getLocation()).thenReturn(seaTile);
             fadMap.deployFad(
-                fadInitializer.makeFad(fadManager, fisher, seaTile),
+                fadInitializer.makeFad(fadManager, fisher, seaTile, rng),
                 seaTile
             );
         });

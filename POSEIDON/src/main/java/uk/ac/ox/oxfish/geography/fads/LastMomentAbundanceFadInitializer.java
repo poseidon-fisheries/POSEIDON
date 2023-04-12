@@ -20,8 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -61,11 +60,11 @@ public class LastMomentAbundanceFadInitializer implements FadInitializer<Abundan
 
     @Override
     public LastMomentAbundanceFad makeFad(
-        @NotNull final FadManager<AbundanceLocalBiology, LastMomentAbundanceFad> fadManager,
-        @Nullable final Fisher owner,
-        @NotNull final SeaTile initialLocation
+        final FadManager<AbundanceLocalBiology, LastMomentAbundanceFad> fadManager,
+        final Fisher owner,
+        final SeaTile initialLocation,
+        final MersenneTwisterFast rng
     ) {
-
         return new LastMomentAbundanceFad(
             owner != null ? owner.getCurrentTrip() : null,
             owner.grabState().getStep(),
@@ -74,7 +73,7 @@ public class LastMomentAbundanceFadInitializer implements FadInitializer<Abundan
             fadManager,
             daysItTakeToFillUp,
             daysInWaterBeforeAttraction,
-            owner.grabRandomizer().nextBoolean(dudProbability),
+            rng.nextBoolean(dudProbability),
             maxCatchabilityPerSpecies,
             selectivityFilters,
             biology

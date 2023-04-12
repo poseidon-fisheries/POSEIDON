@@ -41,8 +41,10 @@ public class HeterogeneousLinearIntervalAttractor
     private final Map<Fad, HashMap<Species, double[][]>> dailyAbundanceAttracted = new HashMap<>();
 
     public HeterogeneousLinearIntervalAttractor(
-        final int daysInWaterBeforeAttraction, final int daysItTakesToFillUp,
-        final double minAbundanceThreshold, final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves,
+        final int daysInWaterBeforeAttraction,
+        final int daysItTakesToFillUp,
+        final double minAbundanceThreshold,
+        final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves,
         final FishState model
     ) {
         super(globalSelectivityCurves, model, daysInWaterBeforeAttraction);
@@ -60,9 +62,12 @@ public class HeterogeneousLinearIntervalAttractor
      */
     @Override
     protected WeightedObject<AbundanceLocalBiology> attractDaily(
-        final AbundanceLocalBiology seaTileBiology, final AbundanceAggregatingFad fad
+        final AbundanceLocalBiology seaTileBiology,
+        final AbundanceAggregatingFad fad
     ) {
-        assert dailyAbundanceAttracted.containsKey(fad); //shouldn't be called without carrying capacity intercepting it first
+        if (!dailyAbundanceAttracted.containsKey(fad)) {
+            computeFadAttractions(fad);
+        }
         final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(dailyAbundanceAttracted.get(fad));
         return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
     }
@@ -138,6 +143,9 @@ public class HeterogeneousLinearIntervalAttractor
      */
     @Override
     public HashMap<Species, double[][]> getDailyAttractionThreshold(final AbundanceAggregatingFad fad) {
+        if (!dailyAbundanceAttracted.containsKey(fad)) {
+            computeFadAttractions(fad);
+        }
         return dailyAttractionThreshold.get(fad);
     }
 

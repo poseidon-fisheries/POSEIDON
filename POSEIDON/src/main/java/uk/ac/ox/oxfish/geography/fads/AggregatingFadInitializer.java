@@ -19,7 +19,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
+import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -60,9 +60,10 @@ public abstract class AggregatingFadInitializer<
 
     @Override
     public F makeFad(
-        @NotNull final FadManager<B, F> fadManager,
+        final FadManager<B, F> fadManager,
         final Fisher owner,
-        @NotNull final SeaTile initialLocation
+        final SeaTile initialLocation,
+        final MersenneTwisterFast rng
     ) {
         return makeFad(
             fadManager,
@@ -71,7 +72,7 @@ public abstract class AggregatingFadInitializer<
             fishReleaseProbability,
             timeStepSupplier.getAsInt(),
             new Int2D(initialLocation.getGridX(), initialLocation.getGridY()),
-            carryingCapacityInitializer.apply(fadManager.getFisher().grabRandomizer())
+            carryingCapacityInitializer.apply(rng)
         );
     }
 

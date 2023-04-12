@@ -82,7 +82,7 @@ public class FadMapTest {
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final BiomassAggregatingFad fad = fadManager.deployFad(startTile);
+        final BiomassAggregatingFad fad = fadManager.deployFadInCenterOfTile(startTile, rng);
         fillBiomassFad(fad);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology =

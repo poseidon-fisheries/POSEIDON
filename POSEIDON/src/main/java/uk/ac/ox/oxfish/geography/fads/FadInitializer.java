@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -12,9 +11,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public interface FadInitializer<B extends LocalBiology, F extends Fad<B, F>> {
 
     F makeFad(
-        @NotNull final FadManager<B, F> fadManager,
-        @Nullable Fisher owner,
-        @NotNull SeaTile initialLocation
+        final FadManager<B, F> fadManager,
+        Fisher owner,
+        SeaTile initialLocation,
+        MersenneTwisterFast rng
     );
 
 }
