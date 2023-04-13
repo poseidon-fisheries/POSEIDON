@@ -28,22 +28,17 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * this is a FAD that doesn't "store" fish in itself. It creates local biologies "on the fly" by attracting whatever
  * it finds under the particular cell it is in at that moment. <br>
  * Instead of loading up on fish, what it does is simply increasing its catchability
- *
- * @param <B>
- * @param <F>
  */
-public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B>> extends Fad<B> {
+public abstract class LastMomentFad extends Fad {
 
 
     //all this stuff really belongs to an attractor object, if I come up with different rules:
@@ -96,12 +91,11 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B>> ex
     public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
 
         //basically everything that is in the biology needs to be turned into a catch and then destroyed
-        final B fishUnderTheFad = getBiology();
-        final Map.Entry<Catch, B> caught = getCatchMaker().apply(fishUnderTheFad, fishUnderTheFad);
-        location.reactToThisAmountOfBiomassBeingFished(caught.getKey(), caught.getKey(), state.getBiology());
+        final Catch theCatch = makeCatch();
+        location.reactToThisAmountOfBiomassBeingFished(theCatch, theCatch, state.getBiology());
     }
 
-    protected abstract CatchMaker<B> getCatchMaker();
+    protected abstract Catch makeCatch();
 
     @Override
     public void reactToStep(final FishState fishState) {

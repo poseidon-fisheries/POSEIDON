@@ -101,7 +101,7 @@ public class OwnFadSetDiscretizedActionGenerator {
             final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
             double value = fadManager.getFishValueCalculator().valueOf(deployedFad.getBiology(), prices);
 
-            SeaTile location = ((Fad<?>) fad).getLocation();
+            SeaTile location = ((Fad) fad).getLocation();
 
             // Check that the shear at this location is not too high, otherwise we'll have to skip the FAD
             final boolean shearIsSafe = maxShearMap

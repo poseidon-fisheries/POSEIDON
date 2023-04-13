@@ -38,7 +38,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
     //       temporary regulation at the action specific level for that.
     private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
 
-    private Fad<?> fad;
+    private Fad fad;
 
     public FadDeploymentAction(final Fisher fisher) {
         super(
@@ -93,7 +93,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
     }
 
     @Override
-    public Fad<?> getFad() {
+    public Fad getFad() {
         return fad;
     }
 }

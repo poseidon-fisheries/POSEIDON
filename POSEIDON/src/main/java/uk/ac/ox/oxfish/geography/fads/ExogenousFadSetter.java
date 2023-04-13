@@ -8,7 +8,6 @@ import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -73,7 +72,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
     );
 
     private static void logFadRemoval(
-        final Fad<? extends LocalBiology> fad,
+        final Fad fad,
         final FishState fishState
     ) {
         LogManager.getLogger("fad_removals").debug(() -> {

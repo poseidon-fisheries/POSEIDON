@@ -109,7 +109,7 @@ public interface PlannedAction {
         }
     }
 
-    class FadSet<B extends LocalBiology, F extends Fad<B>> implements PlannedAction {
+    class FadSet<B extends LocalBiology, F extends Fad> implements PlannedAction {
 
         private final F fadWePlanToSetOn;
 
@@ -130,7 +130,7 @@ public interface PlannedAction {
         public static boolean isFadSetAllowed(
             final Fisher fisher,
             final FadManager fadManager,
-            final Fad<?> set
+            final Fad set
         ) {
             return !set.isLost() && //the fad has not since been destroyed
                 isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);

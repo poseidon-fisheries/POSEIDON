@@ -90,7 +90,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         );
         when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
 
-        final Set<Fad<?>> fads = range(0, 3)
+        final Set<Fad> fads = range(0, 3)
             .mapToObj(index -> {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public abstract class FadInitializerFactory<
     B extends LocalBiology,
-    F extends Fad<B>>
+    F extends Fad>
     implements AlgorithmFactory<FadInitializer<B, F>> {
     private final CacheByFishState<FadInitializer<B, F>> cache =
         new CacheByFishState<>(this::makeFadInitializer);

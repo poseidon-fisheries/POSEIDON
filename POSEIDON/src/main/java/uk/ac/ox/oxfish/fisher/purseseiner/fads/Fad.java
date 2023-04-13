@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class Fad<B extends LocalBiology> implements Locatable {
+public abstract class Fad implements Locatable {
     protected static final AtomicLong idCounter = new AtomicLong(0);
 
     private final long id = idCounter.getAndIncrement();
@@ -194,7 +194,7 @@ public abstract class Fad<B extends LocalBiology> implements Locatable {
         return getBiology().getTotalBiomass(species) > 0;
     }
 
-    public abstract B getBiology();
+    public abstract LocalBiology getBiology();
 
     public boolean isActive() {
         return isActive;

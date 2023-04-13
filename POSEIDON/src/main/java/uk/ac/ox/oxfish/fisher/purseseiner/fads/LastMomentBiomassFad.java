@@ -24,15 +24,16 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-public class LastMomentBiomassFad extends LastMomentFad<BiomassLocalBiology, LastMomentBiomassFad> {
+public class LastMomentBiomassFad extends LastMomentFad {
 
     private final GlobalBiology globalBiology;
+    private final BiomassCatchMaker catchMaker;
 
 
     public LastMomentBiomassFad(
@@ -59,6 +60,13 @@ public class LastMomentBiomassFad extends LastMomentFad<BiomassLocalBiology, Las
             isDud
         );
         this.globalBiology = globalBiology;
+        this.catchMaker = new BiomassCatchMaker(globalBiology);
+    }
+
+    @Override
+    protected Catch makeCatch() {
+        final BiomassLocalBiology fishUnderTheFad = getBiology();
+        return catchMaker.apply(fishUnderTheFad, fishUnderTheFad).getKey();
     }
 
     @Override
@@ -83,10 +91,5 @@ public class LastMomentBiomassFad extends LastMomentFad<BiomassLocalBiology, Las
 
         }
         return new BiomassLocalBiology(caught);
-    }
-
-    @Override
-    protected CatchMaker<BiomassLocalBiology> getCatchMaker() {
-        return new BiomassCatchMaker(super.getFishState().getBiology());
     }
 }

@@ -25,5 +25,5 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 @FunctionalInterface
 public interface FadSetActionMaker<A extends AbstractFadSetAction> {
 
-    A make(Fad<?> target, Fisher fisher, double duration);
+    A make(Fad target, Fisher fisher, double duration);
 }

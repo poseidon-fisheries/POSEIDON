@@ -27,20 +27,21 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology, LastMomentAbundanceFad> {
+public class LastMomentAbundanceFad extends LastMomentFad {
 
     private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
 
     private final GlobalBiology biology;
+    private final AbundanceCatchMaker catchMaker;
 
     public LastMomentAbundanceFad(
         final TripRecord tripDeployed,
@@ -67,8 +68,14 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
             isDud
         );
         this.selectivityFilters = selectivityFilters;
-
         this.biology = biology;
+        this.catchMaker = new AbundanceCatchMaker(biology);
+    }
+
+    @Override
+    protected Catch makeCatch() {
+        final AbundanceLocalBiology fishUnderTheFad = getBiology();
+        return catchMaker.apply(fishUnderTheFad, fishUnderTheFad).getKey();
     }
 
     @Override
@@ -113,10 +120,5 @@ public class LastMomentAbundanceFad extends LastMomentFad<AbundanceLocalBiology,
         }
 
         return new AbundanceLocalBiology(caughtAbundances);
-    }
-
-    @Override
-    protected CatchMaker<AbundanceLocalBiology> getCatchMaker() {
-        return new AbundanceCatchMaker(biology);
     }
 }

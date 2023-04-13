@@ -17,9 +17,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class FadZapper implements Steppable, AdditionalStartable {
 
-    private final Predicate<? super Fad<?>> validator;
+    private final Predicate<? super Fad> validator;
 
-    public FadZapper(final Predicate<? super Fad<?>> validator) {
+    public FadZapper(final Predicate<? super Fad> validator) {
         this.validator = validator;
     }
 

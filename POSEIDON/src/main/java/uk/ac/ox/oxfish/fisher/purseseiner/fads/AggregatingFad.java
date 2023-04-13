@@ -38,7 +38,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public abstract class AggregatingFad<
     B extends LocalBiology,
     F extends AggregatingFad<B, F>
-    > extends Fad<B> {
+    > extends Fad {
 
     private final B biology;
     private final FishAttractor<B, F> fishAttractor;

@@ -44,7 +44,7 @@ import java.util.Map;
  * like the lastmoment fad with abundance, but this fad doesn't sample only its own cell but those around it too.
  * Keeps track of how much it catches in each area and then if fishing does occur, kills off the right amount in each area
  */
-public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> {
+public class LastMomentAbundanceFadWithRange extends LastMomentFad {
 
 
     private final static AbundanceAggregator AGGREGATOR = new AbundanceAggregator();
@@ -54,7 +54,7 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
     private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
 
     private final GlobalBiology biology;
-
+    private final CatchMaker<AbundanceLocalBiology> catchMaker;
     /**
      * here we store the (temporary) mapping linking back the local biology we have extracted (and that could potentially
      * be caught)
@@ -88,9 +88,30 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
         );
         this.selectivityFilters = selectivityFilters;
         this.biology = biology;
-
+        this.catchMaker = new AbundanceCatchMaker(biology);
         Preconditions.checkArgument(rangeInSeatiles >= 1);
         this.rangeInSeatiles = rangeInSeatiles;
+    }
+
+    @Override
+    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
+
+        for (final Map.Entry<AbundanceLocalBiology, SeaTile> catches : catchPerTile.entrySet()) {
+            final AbundanceLocalBiology catchHere = catches.getKey();
+            final Map.Entry<Catch, AbundanceLocalBiology> caughtHere = catchMaker.apply(
+                catchHere,
+                catchHere
+            );//all of it is caught all the time
+            catches.getValue().reactToThisAmountOfBiomassBeingFished(
+                caughtHere.getKey(), caughtHere.getKey(), biology
+            );
+        }
+    }
+
+    @Override
+    protected Catch makeCatch() {
+        final AbundanceLocalBiology fishUnderTheFad = getBiology();
+        return catchMaker.apply(fishUnderTheFad, fishUnderTheFad).getKey();
     }
 
     @Override
@@ -133,27 +154,6 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
 
         return AGGREGATOR.apply(biology, catchPerTile.keySet());
 
-    }
-
-
-    @Override
-    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
-
-        for (final Map.Entry<AbundanceLocalBiology, SeaTile> catches : catchPerTile.entrySet()) {
-            final AbundanceLocalBiology catchHere = catches.getKey();
-            final Map.Entry<Catch, AbundanceLocalBiology> caughtHere = getCatchMaker().apply(
-                catchHere,
-                catchHere
-            );//all of it is caught all the time
-            catches.getValue().reactToThisAmountOfBiomassBeingFished(
-                caughtHere.getKey(), caughtHere.getKey(), biology
-            );
-        }
-    }
-
-    @Override
-    protected CatchMaker<AbundanceLocalBiology> getCatchMaker() {
-        return new AbundanceCatchMaker(biology);
     }
 
     @Override

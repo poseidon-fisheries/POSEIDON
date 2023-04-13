@@ -24,7 +24,7 @@ import java.util.function.Function;
  * it is useful to generate exogenous FAD setting other for microsimulation purposes, calibration or
  * demoes
  */
-public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B>> implements Startable, Steppable {
+public class ExogenousFadMaker<B extends LocalBiology, F extends Fad> implements Startable, Steppable {
 
 
     /**
