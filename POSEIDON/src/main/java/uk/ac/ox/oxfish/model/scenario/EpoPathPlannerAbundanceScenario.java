@@ -85,7 +85,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     getInputFolder().path("set_samples.csv")
                 ),
                 getInputFolder().path("action_weights.csv"),
-                getInputFolder().path("boats.csv")
+                getInputFolder().path("vessels.csv")
             ),
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );

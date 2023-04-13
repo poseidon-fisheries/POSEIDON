@@ -18,31 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static si.uom.NonSI.KNOT;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
-
 import com.google.common.collect.ImmutableList;
-
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import javax.measure.quantity.Speed;
-import javax.measure.quantity.Volume;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
@@ -56,6 +32,27 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Speed;
+import javax.measure.quantity.Volume;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static si.uom.NonSI.KNOT;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.*;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+
 public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
 
     private final Path vesselsFilePath;
@@ -68,7 +65,8 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         final Path vesselsFilePath,
         final int targetYear,
         final FisherFactory fisherFactory,
-        final Collection<Port> ports) {
+        final Collection<Port> ports
+    ) {
         this.vesselsFilePath = vesselsFilePath;
         this.targetYear = targetYear;
         this.fisherFactory = fisherFactory;
@@ -140,6 +138,9 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                     fisher.getDepartingStrategy(),
                     record.getDouble("mean_time_at_port_in_hours")
                 );
+                if (record.getBoolean("has_del_license")) {
+                    fisher.getTags().add("has_del_license");
+                }
                 if (record.getMetaData().containsColumn("closure")) {
                     chooseClosurePeriod(fisher, record.getString("closure"));
                 }

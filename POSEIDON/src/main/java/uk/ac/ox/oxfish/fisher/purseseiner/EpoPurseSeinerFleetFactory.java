@@ -29,7 +29,7 @@ public class EpoPurseSeinerFleetFactory<B extends LocalBiology> extends PurseSei
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {
         super(
-            inputFolder.path("boats.csv"),
+            inputFolder.path("vessels.csv"),
             inputFolder.path("costs.csv"),
             purseSeineGearFactory,
             new FadRefillGearStrategyFactory(

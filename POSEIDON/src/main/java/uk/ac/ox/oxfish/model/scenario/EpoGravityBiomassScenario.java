@@ -75,7 +75,7 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
             new GravityDestinationStrategyFactory(
                 getTargetYear(),
                 getInputFolder().path("action_weights.csv"),
-                getInputFolder().path("boats.csv"),
+                getInputFolder().path("vessels.csv"),
                 new AttractionFieldsSupplier(
                     new LocationValuesSupplier(
                         getInputFolder().path("location_values.csv"),
