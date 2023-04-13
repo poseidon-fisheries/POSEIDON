@@ -32,13 +32,11 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMapDiscretizer> {
 
-
     private DoubleParameter horizontalSplits =
-        new CalibratedParameter(1, 50, 1, 50, 1);
+        new CalibratedParameter(1, 50, 1, 50, 6);
 
     private DoubleParameter verticalSplits =
-        new CalibratedParameter(5, 50, 1, 50, 50);
-
+        new CalibratedParameter(5, 50, 1, 50, 3);
 
     public SquaresMapDiscretizerFactory() {
     }

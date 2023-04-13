@@ -20,16 +20,34 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.MarginalValueFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.ValuePerSetFadModule;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-public class MarginalValueFadPlanningModuleFactory extends PlanningModuleFactory<MarginalValueFadPlanningModule> {
+public class ValuePerSetPlanningModuleFactory extends PlanningModuleFactory<ValuePerSetFadModule> {
+
+    private DoubleParameter dampen =
+        new CalibratedParameter(0, 1, 0, 1);
+
     @Override
-    protected MarginalValueFadPlanningModule makePlanningModule(
+    protected ValuePerSetFadModule makePlanningModule(
         final FishState fishState,
         final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
-        return new MarginalValueFadPlanningModule(optionsGenerator);
+        return new ValuePerSetFadModule(
+            optionsGenerator,
+            dampen.applyAsDouble(fishState.getRandom())
+        );
     }
+
+    public DoubleParameter getDampen() {
+        return dampen;
+    }
+
+    public void setDampen(final DoubleParameter dampen) {
+        this.dampen = dampen;
+    }
+
 }

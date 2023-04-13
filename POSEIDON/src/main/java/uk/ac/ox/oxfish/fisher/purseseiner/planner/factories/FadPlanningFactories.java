@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.MarginalValueFadPlanningModule;
-import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -14,17 +12,17 @@ public class FadPlanningFactories {
 
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule>>>
-            CONSTRUCTORS;
+        CONSTRUCTORS;
 
     @SuppressWarnings("rawtypes")
     public static final Map<Class<? extends AlgorithmFactory>, String> NAMES =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
 
     static {
         NAMES.put(DiscretizedOwnFadPlanningFactory.class, "Centroid FAD Planning");
         NAMES.put(GreedyInsertionFadPlanningFactory.class, "Greedy FAD Module");
         NAMES.put(MarginalValueFadPlanningModuleFactory.class, "MVT FAD Module");
-        NAMES.put(ValuePerSetFadModuleFactory.class, "VPS FAD Module");
+        NAMES.put(ValuePerSetPlanningModuleFactory.class, "VPS FAD Module");
         NAMES.put(WhereFadsAreFadModuleFactory.class, "Where Fads Are FAD Module");
         NAMES.put(WhereMoneyIsPlanningFactory.class, "Where Money Is FAD Module");
 
