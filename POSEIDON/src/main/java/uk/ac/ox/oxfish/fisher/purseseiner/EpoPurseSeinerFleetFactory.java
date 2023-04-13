@@ -24,7 +24,7 @@ public class EpoPurseSeinerFleetFactory<B extends LocalBiology> extends PurseSei
         final int targetYear,
         final InputPath inputFolder,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
-        final PurseSeineGearFactory<B> purseSeineGearFactory,
+        final PurseSeineGearFactory purseSeineGearFactory,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {

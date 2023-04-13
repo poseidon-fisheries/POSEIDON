@@ -51,7 +51,7 @@ public class BiomassFadInitializer
 
     @Override
     protected BiomassAggregatingFad makeFad(
-        final FadManager<BiomassLocalBiology> owner,
+        final FadManager owner,
         final BiomassLocalBiology biology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,

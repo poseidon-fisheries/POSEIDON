@@ -45,7 +45,7 @@ public class ExpirationDecoratorFadInitializer<
 
     @Override
     public F makeFad(
-        final FadManager<B> fadManager,
+        final FadManager fadManager,
         final Fisher owner,
         final SeaTile initialLocation,
         final MersenneTwisterFast rng

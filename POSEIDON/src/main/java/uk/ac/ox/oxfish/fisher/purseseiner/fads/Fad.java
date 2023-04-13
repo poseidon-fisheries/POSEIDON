@@ -51,7 +51,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
     final private int stepDeployed;
     final private Int2D locationDeployed;
     final private double fishReleaseProbability;
-    private final FadManager<B> owner;
+    private final FadManager owner;
 
     /**
      * if this is set to anything more than 0, it means it'll stop attracting fish after this many days
@@ -70,7 +70,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         final int stepDeployed,
         final Int2D locationDeployed,
         final double fishReleaseProbability,
-        final FadManager<B> owner,
+        final FadManager owner,
         final boolean isActive
     ) {
         this.tripDeployed = tripDeployed;
@@ -137,7 +137,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
         );
     }
 
-    public FadManager<B> getOwner() {
+    public FadManager getOwner() {
         return owner;
     }
 

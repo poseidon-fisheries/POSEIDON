@@ -42,7 +42,7 @@ public class FadLocationValues implements LocationValues {
     @Override
     public double getValueAt(final Int2D location) {
         final SeaTile seaTile = fisher.grabState().getMap().getSeaTile(location);
-        final FadManager<?> fadManager = getFadManager(fisher);
+        final FadManager fadManager = getFadManager(fisher);
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
         return fadManager
             .getFadsAt(seaTile)
@@ -53,7 +53,7 @@ public class FadLocationValues implements LocationValues {
     @Override
     public Set<Entry<Int2D, Double>> getValues() {
 
-        final FadManager<?> fadManager = getFadManager(fisher);
+        final FadManager fadManager = getFadManager(fisher);
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
         final FadMap fadMap = fadManager.getFadMap();
 

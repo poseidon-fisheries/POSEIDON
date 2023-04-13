@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.util.Bag;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -61,9 +60,9 @@ public class SetOpportunityDetectorTest {
 
         final MersenneTwisterFast rng = new MersenneTwisterFast();
         final Hold hold = mock(Hold.class);
-        final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
+        final PurseSeineGear gear = mock(PurseSeineGear.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
+        final FadManager fadManager = gear.getFadManager();
         final Fisher fisher = mock(Fisher.class);
         final FishState fishState = mock(FishState.class);
         final BiomassAggregatingFad ownFad = mock(BiomassAggregatingFad.class);

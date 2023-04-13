@@ -25,7 +25,7 @@ public interface PlannedAction {
     static boolean isActionAllowed(
         final Fisher fisher,
         final SeaTile location,
-        final FadManager<?> fadManager,
+        final FadManager fadManager,
         final Class<? extends PurseSeinerAction> actionClass
     ) {
         return fisher.isAllowedAtSea() &&
@@ -82,8 +82,8 @@ public interface PlannedAction {
         public Action[] actuate(final Fisher fisher) {
             if (isAllowedNow(fisher)) {
                 return delayInHours <= 0
-                    ? new Action[]{new FadDeploymentAction<>(fisher)}
-                    : new Action[]{new FadDeploymentAction<>(fisher), new Delaying(delayInHours)};
+                    ? new Action[]{new FadDeploymentAction(fisher)}
+                    : new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)};
             } else {
                 // Sometimes a deployment that we planned for is not allowed anymore
                 // when we actually get to it. If that's the case, we just don't take
@@ -129,7 +129,7 @@ public interface PlannedAction {
 
         public static boolean isFadSetAllowed(
             final Fisher fisher,
-            final FadManager<?> fadManager,
+            final FadManager fadManager,
             final Fad<?, ?> set
         ) {
             return !set.isLost() && //the fad has not since been destroyed

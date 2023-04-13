@@ -40,7 +40,7 @@ public class LastMomentBiomassFad extends LastMomentFad<BiomassLocalBiology, Las
         final int stepDeployed,
         final Int2D locationDeployed,
         final double fishReleaseProbability,
-        final FadManager<BiomassLocalBiology> owner,
+        final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,

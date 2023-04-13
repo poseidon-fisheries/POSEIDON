@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
@@ -28,8 +27,7 @@ public class GlobalDeploymentAttractionModulator implements GlobalAttractionModu
     }
 
     private static double getPctActiveFads(final Fisher fisher) {
-        final FadManager<? extends LocalBiology> fadManager =
-            FadManager.getFadManager(fisher);
+        final FadManager fadManager = FadManager.getFadManager(fisher);
         return fadManager
             .getActionSpecificRegulations()
             .getActiveFadLimits()

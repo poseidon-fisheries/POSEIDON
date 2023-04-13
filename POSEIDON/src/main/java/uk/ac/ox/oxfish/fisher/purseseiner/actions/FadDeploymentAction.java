@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -33,9 +32,7 @@ import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public class FadDeploymentAction<B extends LocalBiology>
-    extends PurseSeinerAction
-    implements FadRelatedAction {
+public class FadDeploymentAction extends PurseSeinerAction implements FadRelatedAction {
 
     // TODO: this should ideally be configurable, but we'll need to implement
     //       temporary regulation at the action specific level for that.
@@ -59,7 +56,7 @@ public class FadDeploymentAction<B extends LocalBiology>
     ) {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
-        @SuppressWarnings("unchecked") final FadManager<B> fadManager = (FadManager<B>) getFadManager(fisher);
+        final FadManager fadManager = getFadManager(fisher);
         this.fad = fadManager.deployFad(getLocation(), fishState.random);
         setTime(hoursLeft);
         fadManager.reactTo(this);

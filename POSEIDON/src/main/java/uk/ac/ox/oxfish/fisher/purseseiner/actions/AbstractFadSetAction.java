@@ -62,7 +62,7 @@ public abstract class AbstractFadSetAction
 
     @Override
     boolean checkSuccess() {
-        final PurseSeineGear<?> purseSeineGear = (PurseSeineGear<?>) getFisher().getGear();
+        final PurseSeineGear purseSeineGear = (PurseSeineGear) getFisher().getGear();
         return getFisher().grabRandomizer().nextDouble()
             < purseSeineGear.getSuccessfulFadSetProbability();
     }
@@ -86,7 +86,7 @@ public abstract class AbstractFadSetAction
     }
 
     @Override
-    void notify(final FadManager<?> fadManager) {
+    void notify(final FadManager fadManager) {
         fadManager.reactTo(this);
     }
 

@@ -42,8 +42,8 @@ public class BiomassFadInitializerTest {
                 globalBiology,
                 BiomassLocalBiology.class
             );
-        final FadManager<BiomassLocalBiology> fadManager =
-            new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
+        final FadManager fadManager =
+            new FadManager(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final SeaTile seaTile = mock(SeaTile.class);
         when(seaTile.getGridX()).thenReturn(0);
         when(seaTile.getGridY()).thenReturn(0);

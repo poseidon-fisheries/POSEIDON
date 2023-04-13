@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
@@ -54,7 +53,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeG
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class FadManager<B extends LocalBiology> {
+public class FadManager {
 
     private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
         ImmutableList.of(
@@ -68,7 +67,7 @@ public class FadManager<B extends LocalBiology> {
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
         biomassLostMonitor;
     private final ListOrderedSet<Fad<?, ?>> deployedFads = new ListOrderedSet<>();
-    private final FadInitializer<B, ?> fadInitializer;
+    private final FadInitializer<?, ?> fadInitializer;
     private final FishValueCalculator fishValueCalculator;
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
@@ -76,7 +75,7 @@ public class FadManager<B extends LocalBiology> {
 
     public FadManager(
         final FadMap fadMap,
-        final FadInitializer<B, ?> fadInitializer,
+        final FadInitializer<?, ?> fadInitializer,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
@@ -101,7 +100,7 @@ public class FadManager<B extends LocalBiology> {
     @SuppressWarnings("rawtypes")
     public FadManager(
         final FadMap fadMap,
-        final FadInitializer<B, ?> fadInitializer,
+        final FadInitializer<?, ?> fadInitializer,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractSetAction>> allSetsObservers,
         final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
@@ -153,7 +152,7 @@ public class FadManager<B extends LocalBiology> {
         observers.register(observedClass, observer);
     }
 
-    public static FadManager<? extends LocalBiology> getFadManager(
+    public static FadManager getFadManager(
         final Fisher fisher
     ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
@@ -162,9 +161,7 @@ public class FadManager<B extends LocalBiology> {
         ));
     }
 
-    public static Optional<
-        FadManager<? extends LocalBiology>
-        > maybeGetFadManager(
+    public static Optional<FadManager> maybeGetFadManager(
         final Fisher fisher
     ) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);

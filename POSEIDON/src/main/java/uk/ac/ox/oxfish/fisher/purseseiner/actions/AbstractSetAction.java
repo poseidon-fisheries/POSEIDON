@@ -67,7 +67,7 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
 
-        final PurseSeineGear<?> purseSeineGear = getPurseSeineGear(fisher);
+        final PurseSeineGear purseSeineGear = getPurseSeineGear(fisher);
 
         if (checkSuccess()) {
             final GlobalBiology globalBiology = fishState.getBiology();
@@ -94,7 +94,7 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
 
     abstract void reactToFailedSet(FishState model, SeaTile locationOfSet);
 
-    abstract void notify(FadManager<?> fadManager);
+    abstract void notify(FadManager fadManager);
 
     public LocalBiology getTargetBiology() {
         return targetBiology;

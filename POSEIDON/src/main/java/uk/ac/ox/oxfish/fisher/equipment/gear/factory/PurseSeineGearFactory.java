@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
@@ -37,8 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("unused")
-public abstract class PurseSeineGearFactory<B extends LocalBiology>
-    implements AlgorithmFactory<PurseSeineGear<B>> {
+public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
@@ -141,7 +139,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology>
     }
 
     @NotNull
-    FadManager<B> makeFadManager(final FishState fishState) {
+    FadManager makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
@@ -151,7 +149,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology>
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
-        @SuppressWarnings("unchecked") final FadManager<B> fadManager = new FadManager<>(
+        @SuppressWarnings("unchecked") final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),

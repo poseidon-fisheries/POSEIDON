@@ -37,7 +37,6 @@ import static org.mockito.Mockito.when;
 
 public class FadManagerTest extends TestCase {
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public void testFadsGoBackInStockAfterSet() {
 
         final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fadInitializer =
@@ -51,7 +50,7 @@ public class FadManagerTest extends TestCase {
 
         final FadMap fadMap = mock(FadMap.class);
 
-        final FadManager<BiomassLocalBiology> fadManager =
+        final FadManager fadManager =
             new FadManager(fadMap, fadInitializer, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);

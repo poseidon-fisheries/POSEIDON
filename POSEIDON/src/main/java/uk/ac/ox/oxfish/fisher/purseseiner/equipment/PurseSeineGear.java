@@ -35,39 +35,39 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class PurseSeineGear<B extends LocalBiology> implements Gear {
+public abstract class PurseSeineGear implements Gear {
 
-    private final FadManager<B> fadManager;
+    private final FadManager fadManager;
     private final double successfulFadSetProbability;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
-        final FadManager<B> fadManager,
+        final FadManager fadManager,
         final double successfulFadSetProbability
     ) {
         this.fadManager = fadManager;
         this.successfulFadSetProbability = successfulFadSetProbability;
     }
 
-    public static PurseSeineGear<?> getPurseSeineGear(final Fisher fisher) {
+    public static PurseSeineGear getPurseSeineGear(final Fisher fisher) {
         return maybeGetPurseSeineGear(fisher).orElseThrow(() -> new IllegalArgumentException(
             "PurseSeineGear not available. Fisher " +
                 fisher + " is using " + fisher.getGear().getClass() + "."
         ));
     }
 
-    public static Optional<PurseSeineGear<?>> maybeGetPurseSeineGear(final Fisher fisher) {
+    public static Optional<PurseSeineGear> maybeGetPurseSeineGear(final Fisher fisher) {
         return Optional
             .ofNullable(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> (PurseSeineGear<?>) gear);
+            .map(gear -> (PurseSeineGear) gear);
     }
 
     public double getSuccessfulFadSetProbability() {
         return successfulFadSetProbability;
     }
 
-    public FadManager<B> getFadManager() {
+    public FadManager getFadManager() {
         return fadManager;
     }
 
@@ -116,7 +116,7 @@ public abstract class PurseSeineGear<B extends LocalBiology> implements Gear {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final PurseSeineGear<?> that = (PurseSeineGear<?>) o;
+        final PurseSeineGear that = (PurseSeineGear) o;
         return
             Double.compare(that.successfulFadSetProbability, successfulFadSetProbability) == 0
                 && Objects.equals(fadManager, that.fadManager)

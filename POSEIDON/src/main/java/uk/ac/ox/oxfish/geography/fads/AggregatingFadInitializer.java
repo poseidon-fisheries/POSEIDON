@@ -58,7 +58,7 @@ public abstract class AggregatingFadInitializer<
 
     @Override
     public F makeFad(
-        final FadManager<B> fadManager,
+        final FadManager fadManager,
         final Fisher owner,
         final SeaTile initialLocation,
         final MersenneTwisterFast rng
@@ -75,7 +75,7 @@ public abstract class AggregatingFadInitializer<
     }
 
     protected abstract F makeFad(
-        FadManager<B> owner,
+        FadManager owner,
         B biology,
         FishAttractor<B, F> fishAttractor,
         double fishReleaseProbability,

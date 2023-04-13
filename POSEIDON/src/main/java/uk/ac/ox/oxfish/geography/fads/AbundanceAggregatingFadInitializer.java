@@ -45,7 +45,7 @@ public class AbundanceAggregatingFadInitializer
 
     @Override
     protected AbundanceAggregatingFad makeFad(
-        final FadManager<AbundanceLocalBiology> owner,
+        final FadManager owner,
         final AbundanceLocalBiology biology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final double fishReleaseProbability,

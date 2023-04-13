@@ -72,8 +72,8 @@ public class FadMapTest {
         when(fishState.getBiology()).thenReturn(globalBiology);
         fishState.schedule = schedule;
 
-        final FadManager<BiomassLocalBiology> fadManager =
-            new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
+        final FadManager fadManager =
+            new FadManager(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         when(fisher.grabState()).thenReturn(fishState);

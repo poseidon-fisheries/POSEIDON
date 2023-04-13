@@ -49,7 +49,7 @@ public class FadRefillGearStrategy implements GearStrategy {
         final FishState model,
         final Action currentAction
     ) {
-        final FadManager<?> fadManager = getFadManager(fisher);
+        final FadManager fadManager = getFadManager(fisher);
         final String boatId = getBoatId(fisher);
         final int maxFads = checkNotNull(
             maxFadsPerFisher.get(boatId),

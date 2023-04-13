@@ -60,7 +60,7 @@ public class LastMomentAbundanceFadInitializer implements FadInitializer<Abundan
 
     @Override
     public LastMomentAbundanceFad makeFad(
-        final FadManager<AbundanceLocalBiology> fadManager,
+        final FadManager fadManager,
         final Fisher owner,
         final SeaTile initialLocation,
         final MersenneTwisterFast rng

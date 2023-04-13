@@ -66,7 +66,7 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
         final int stepDeployed,
         final Int2D locationDeployed,
         final double fishReleaseProbability,
-        final FadManager<AbundanceLocalBiology> owner,
+        final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,

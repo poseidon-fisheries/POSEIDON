@@ -61,7 +61,7 @@ public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B, F>>
         final int stepDeployed,
         final Int2D locationDeployed,
         final double fishReleaseProbability,
-        final FadManager<B> owner,
+        final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,
