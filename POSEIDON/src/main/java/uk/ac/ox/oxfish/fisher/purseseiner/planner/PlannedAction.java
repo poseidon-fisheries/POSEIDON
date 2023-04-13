@@ -109,7 +109,7 @@ public interface PlannedAction {
         }
     }
 
-    class FadSet<B extends LocalBiology, F extends Fad> implements PlannedAction {
+    class FadSet<F extends Fad> implements PlannedAction {
 
         private final F fadWePlanToSetOn;
 
