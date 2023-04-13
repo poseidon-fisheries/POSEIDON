@@ -84,11 +84,11 @@ public class ValuePerSetFadModule
             double avgGridX = 0;
             //sum up the raw $ amount you expect to make
             for (final OwnFadSetDiscretizedActionGenerator.ValuedFad fadInGroup : option.getFirst()) {
-                if (Double.isFinite(fadInGroup.getSecond())) {
+                if (Double.isFinite(fadInGroup.getValue())) {
                     //int x=fadInGroup.getFirst().getLocation().getGridX();
                     //int width = model.getMap().getWidth();
-                    avgGridX += fadInGroup.getFirst().getLocation().getGridX();
-                    totalValueOfOption += fadInGroup.getSecond();
+                    avgGridX += fadInGroup.getKey().getLocation().getGridX();
+                    totalValueOfOption += fadInGroup.getValue();
                 }
                 numberOfOptions++;
             }

@@ -13,7 +13,11 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import javax.annotation.Nonnull;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * generates a list of possible fads to set on.
@@ -27,7 +31,7 @@ import java.util.*;
 public class OwnFadSetDiscretizedActionGenerator {
 
     private final static Comparator<ValuedFad> COMPARATOR =
-        (o1, o2) -> -Double.compare(o1.getSecond(), o2.getSecond());
+        (o1, o2) -> -Double.compare(o1.getValue(), o2.getValue());
 
     private final MapDiscretization discretization;
     /**
@@ -121,17 +125,17 @@ public class OwnFadSetDiscretizedActionGenerator {
      * @return
      */
     @Nonnull
-    public List<Pair<ValuedFad, Integer>> generateBestFadOpportunities() {
+    public List<Entry<ValuedFad, Integer>> generateBestFadOpportunities() {
 
         //you may be here asking: "why isn't this a map?".
         //the answer, my friend, is blowing in the wind
 
         assert rankedFads != null : "not started";
-        List<Pair<ValuedFad, Integer>> toReturn = new LinkedList<>();
+        List<Entry<ValuedFad, Integer>> toReturn = new LinkedList<>();
         //for each group retrieve the best
         for (int group = 0; group < rankedFads.length; group++) {
             if (rankedFads[group].size() > 0)
-                toReturn.add(new Pair<>(rankedFads[group].peek(), group));
+                toReturn.add(entry(rankedFads[group].peek(), group));
         }
         return toReturn;
     }
@@ -142,7 +146,7 @@ public class OwnFadSetDiscretizedActionGenerator {
      */
     public double getValueOfThisOption(int groupID) {
         if (rankedFads[groupID].size() > 0)
-            return rankedFads[groupID].peek().getSecond();
+            return rankedFads[groupID].peek().getValue();
         return Double.NaN;
     }
 
@@ -168,7 +172,7 @@ public class OwnFadSetDiscretizedActionGenerator {
     public PlannedAction.FadSet chooseFad(Integer discretizationGroup) {
         ValuedFad selectedFad = rankedFads[discretizationGroup].poll();
         Preconditions.checkState(selectedFad != null);
-        return new PlannedAction.FadSet(selectedFad.getFirst());
+        return new PlannedAction.FadSet(selectedFad.getKey());
 
     }
 
@@ -196,7 +200,7 @@ public class OwnFadSetDiscretizedActionGenerator {
         return minimumFadValue;
     }
 
-    public static class ValuedFad extends Pair<Fad, Double> {
+    public static class ValuedFad extends SimpleImmutableEntry<Fad, Double> {
 
         public ValuedFad(Fad first, Double second) {
             super(first, second);

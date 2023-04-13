@@ -25,9 +25,11 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator.ValuedFad;
 
 /**
  * pick the best fads in each quadrant through OwnFadSetDiscretizedActionGenerator and then apply an idea from Feillet (2005): pick the action
@@ -70,17 +72,16 @@ public class DiscretizedOwnFadCentroidPlanningModule
     ) {
 
 
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> options =
+        final List<Entry<ValuedFad, Integer>> options =
             optionsGenerator.generateBestFadOpportunities();
 
         //if there are no options, don't bother
         if (options == null || options.isEmpty())
             return null;
         //if there is only one option, also don't bother
-        if(options.size()==1)
-        {
-            if(options.get(0).getSecond()>0)
-                return optionsGenerator.chooseFad(options.get(0).getSecond());
+        if (options.size() == 1) {
+            if (options.get(0).getValue() > 0)
+                return optionsGenerator.chooseFad(options.get(0).getValue());
             else return null;
         }
 
@@ -94,26 +95,24 @@ public class DiscretizedOwnFadCentroidPlanningModule
         //pick the best value as a distance to centroid
         double discountedValue = Double.MIN_VALUE;
         Integer fadGroupChosen = null;
-        for (final Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> option : options) {
+        for (final Entry<ValuedFad, Integer> option : options) {
             final double hoursSpentTravellingToThere =
-                map.distance(centroid, option.getFirst().getFirst().getLocation()) / speedInKmPerHours;
-            assert option.getFirst().getSecond() >= 0;
-            final double currentDiscountValue = option.getFirst().getSecond() /
+                map.distance(centroid, option.getKey().getKey().getLocation()) / speedInKmPerHours;
+            assert option.getKey().getValue() >= 0;
+            final double currentDiscountValue = option.getKey().getValue() /
                 Math.pow(hoursSpentTravellingToThere + 1, distancePenalty);
             if (currentDiscountValue >= discountedValue) {
-                fadGroupChosen = option.getSecond();
+                fadGroupChosen = option.getValue();
                 discountedValue = currentDiscountValue;
             }
         }
 
         //all fads are empty, don't bother setting on any!
-        if(fadGroupChosen==null || fadGroupChosen<0 || fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
+        if (fadGroupChosen == null || fadGroupChosen < 0 || fadGroupChosen >= optionsGenerator.getNumberOfGroups())
             return null;
         return optionsGenerator.chooseFad(fadGroupChosen);
 
     }
-
-
 
 
 }

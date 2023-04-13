@@ -41,9 +41,9 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -54,6 +54,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
+import static uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator.ValuedFad;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class OwnFadSetDiscretizedActionGeneratorTest {
@@ -113,36 +114,36 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
+        final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
         //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
-        Assert.assertEquals(0, (int) initialOptions.get(0).getSecond());
-        Assert.assertEquals(3, (int) initialOptions.get(1).getSecond());
+        Assert.assertEquals(0, (int) initialOptions.get(0).getValue());
+        Assert.assertEquals(3, (int) initialOptions.get(1).getValue());
 
-        Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> firstGuess = initialOptions.get(0);
-        Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer> secondGuess = initialOptions.get(1);
+        Entry<ValuedFad, Integer> firstGuess = initialOptions.get(0);
+        Entry<ValuedFad, Integer> secondGuess = initialOptions.get(1);
 
         //you should have only chosen the best!
-        assertEquals(firstGuess.getFirst().getSecond(), 1.0);
-        assertEquals(secondGuess.getFirst().getSecond(), 2.0);
+        assertEquals(firstGuess.getKey().getValue(), 1.0);
+        assertEquals(secondGuess.getKey().getValue(), 2.0);
 
         //if I pick one option, next time I choose it shouldn't be present anymore
         final PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
-        assertEquals(plannedFadSet.getLocation(), firstGuess.getFirst().getFirst().getLocation());
+        assertEquals(plannedFadSet.getLocation(), firstGuess.getKey().getKey().getLocation());
 
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();
+        final List<Entry<ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();
         firstGuess = newOptions.get(0);
         secondGuess = newOptions.get(1);
 
         //the 1$ fad should have gone
-        assertEquals(firstGuess.getFirst().getSecond(), 0.0);
-        assertEquals(secondGuess.getFirst().getSecond(), 2.0);
+        assertEquals(firstGuess.getKey().getValue(), 0.0);
+        assertEquals(secondGuess.getKey().getValue(), 2.0);
 
         //if you empty a queue, the group won't appear again
         generator.chooseFad(0);
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
+        final List<Entry<ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
         assertEquals(finalOptions.size(), 1);
-        Assert.assertEquals(3, (int) finalOptions.get(0).getSecond());
+        Assert.assertEquals(3, (int) finalOptions.get(0).getValue());
 
     }
 
@@ -196,9 +197,9 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
+        final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         assertEquals(initialOptions.size(), 1);
-        Assert.assertEquals(3, (int) initialOptions.get(0).getSecond());
+        Assert.assertEquals(3, (int) initialOptions.get(0).getValue());
     }
 
 
@@ -260,9 +261,9 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         map.getAdditionalMaps().put("Shear", () -> shearGrid);
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), map);
-        final List<Pair<OwnFadSetDiscretizedActionGenerator.ValuedFad, Integer>> initialOptions =
+        final List<Entry<ValuedFad, Integer>> initialOptions =
             generator.generateBestFadOpportunities();
         assertEquals(1, initialOptions.size());
-        Assert.assertEquals(3, (int) initialOptions.get(0).getSecond());
+        Assert.assertEquals(3, (int) initialOptions.get(0).getValue());
     }
 }
