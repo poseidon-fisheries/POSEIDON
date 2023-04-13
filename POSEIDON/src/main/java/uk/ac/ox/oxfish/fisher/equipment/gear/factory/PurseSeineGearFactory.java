@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
@@ -153,7 +152,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology>
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         @SuppressWarnings("unchecked") final FadManager<B, ?> fadManager = new FadManager<>(
-            (FadMap<B>) fishState.getFadMap(),
+            fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
             allSetsObserversCache.get(fishState),

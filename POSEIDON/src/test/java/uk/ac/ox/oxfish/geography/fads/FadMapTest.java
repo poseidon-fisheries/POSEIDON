@@ -59,7 +59,7 @@ public class FadMapTest {
             () -> 0,
             new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(2.0))
         );
-        final FadMap<BiomassLocalBiology> fadMap = new FadMap<>(
+        final FadMap fadMap = new FadMap(
             nauticalMap,
             currentVectors,
             globalBiology,

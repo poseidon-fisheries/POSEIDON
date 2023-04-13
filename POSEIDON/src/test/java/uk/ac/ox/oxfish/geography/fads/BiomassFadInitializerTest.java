@@ -35,8 +35,8 @@ public class BiomassFadInitializerTest {
             () -> 0,
             new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(Double.POSITIVE_INFINITY))
         );
-        final FadMap<BiomassLocalBiology> fadMap =
-            new FadMap<>(
+        final FadMap fadMap =
+            new FadMap(
                 mock(NauticalMap.class),
                 mock(CurrentVectorsEPO.class),
                 globalBiology,

@@ -34,7 +34,6 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -132,7 +131,7 @@ public class FishState extends SimState {
     /**
      * may contain the fad map, if fads are used in the scenario (null otherwise)
      */
-    private FadMap<? extends LocalBiology> fadMap = null;
+    private FadMap fadMap = null;
     /**
      * created by the scenario (optionally, could be null) this object is used to add fishers on the fly.
      */
@@ -878,11 +877,11 @@ public class FishState extends SimState {
 
     }
 
-    public FadMap<? extends LocalBiology> getFadMap() {
+    public FadMap getFadMap() {
         return fadMap;
     }
 
-    public void setFadMap(final FadMap<? extends LocalBiology> fadMap) {
+    public void setFadMap(final FadMap fadMap) {
         this.fadMap = fadMap;
     }
 

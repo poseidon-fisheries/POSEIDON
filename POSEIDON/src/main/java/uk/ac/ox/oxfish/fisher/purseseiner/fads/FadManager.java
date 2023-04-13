@@ -63,7 +63,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
-    private final FadMap<B> fadMap;
+    private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
         biomassLostMonitor;
@@ -75,7 +75,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     private int numFadsInStock;
 
     public FadManager(
-        final FadMap<B> fadMap,
+        final FadMap fadMap,
         final FadInitializer<B, F> fadInitializer,
         final FishValueCalculator fishValueCalculator
     ) {
@@ -100,7 +100,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final FadMap<B> fadMap,
+        final FadMap fadMap,
         final FadInitializer<B, F> fadInitializer,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractSetAction>> allSetsObservers,
@@ -262,7 +262,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         return getFadMap().fadsAt(seaTile);
     }
 
-    public FadMap<B> getFadMap() {
+    public FadMap getFadMap() {
         return fadMap;
     }
 

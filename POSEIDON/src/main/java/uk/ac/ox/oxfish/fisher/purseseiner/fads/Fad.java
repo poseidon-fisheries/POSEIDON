@@ -127,7 +127,7 @@ public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implement
      * to do anything that actually affects the model's behaviour.
      */
     public Coordinate getCoordinate() {
-        final FadMap<B> fadMap = getOwner().getFadMap();
+        final FadMap fadMap = getOwner().getFadMap();
         final NauticalMap nauticalMap = fadMap.getNauticalMap();
         final Coordinate tileCoordinates = nauticalMap.getCoordinates(getLocation());
         final Double2D gridLocation = getGridLocation();

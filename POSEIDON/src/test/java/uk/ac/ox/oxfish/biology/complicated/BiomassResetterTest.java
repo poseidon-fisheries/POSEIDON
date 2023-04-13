@@ -167,13 +167,13 @@ public class BiomassResetterTest {
             fishState.getMap().getWidth(),
             fishState.getMap().getHeight()
         );
-        final FadMap<BiomassLocalBiology> fadMap = new FadMap<>(
+        final FadMap fadMap = new FadMap(
             fishState.getMap(),
             currentVectors,
             globalBiology,
             BiomassLocalBiology.class
         );
-        when(fishState.getFadMap()).thenReturn((FadMap) fadMap);
+        when(fishState.getFadMap()).thenReturn(fadMap);
 
         // deploy one FAD in the center of each tile
         final double carryingCapacity = 1000;

@@ -19,10 +19,9 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
-public class BiomassFadMapFactory extends FadMapFactory<BiomassLocalBiology, BiomassAggregatingFad> {
+public class BiomassFadMapFactory extends FadMapFactory {
 
     @SuppressWarnings("unused")
     public BiomassFadMapFactory() {

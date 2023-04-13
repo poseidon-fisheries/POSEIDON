@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -11,15 +10,14 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public class FadMapFactory<B extends LocalBiology, F extends Fad<B, F>>
-    implements AlgorithmFactory<FadMap<B>> {
+public class FadMapFactory implements AlgorithmFactory<FadMap> {
 
-    private final Class<B> localBiologyClass;
+    private final Class<? extends LocalBiology> localBiologyClass;
     private CurrentPatternMapSupplier currentPatternMapSupplier;
     private boolean inputIsMetersPerSecond = true;
 
     FadMapFactory(
-        final Class<B> localBiologyClass,
+        final Class<? extends LocalBiology> localBiologyClass,
         final CurrentPatternMapSupplier currentPatternMapSupplier
     ) {
         this(localBiologyClass);
@@ -28,7 +26,7 @@ public class FadMapFactory<B extends LocalBiology, F extends Fad<B, F>>
 
 
     FadMapFactory(
-        final Class<B> localBiologyClass
+        final Class<? extends LocalBiology> localBiologyClass
     ) {
         this.localBiologyClass = localBiologyClass;
     }
@@ -44,14 +42,14 @@ public class FadMapFactory<B extends LocalBiology, F extends Fad<B, F>>
     }
 
     @Override
-    public FadMap<B> apply(final FishState fishState) {
+    public FadMap apply(final FishState fishState) {
         // The CurrentVectorsFactory cache works on the assumption that all cached CurrentVectors
         // objects work with the same number of steps per day (i.e., one). It would be feasible to
         // support different steps per day, but I don't see that happening any time soon.
         checkState(fishState.getStepsPerDay() == CurrentVectorsFactory.STEPS_PER_DAY);
         final NauticalMap nauticalMap = fishState.getMap();
         final CurrentVectors currentVectors = buildCurrentVectors(fishState);
-        return new FadMap<>(
+        return new FadMap(
             nauticalMap,
             currentVectors,
             fishState.getBiology(),

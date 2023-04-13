@@ -19,12 +19,9 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacity;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 
-public class AbundanceFadMapFactory
-    extends FadMapFactory<AbundanceLocalBiology, AbundanceAggregatingFad<CarryingCapacity>> {
+public class AbundanceFadMapFactory extends FadMapFactory {
 
     @SuppressWarnings("unused")
     public AbundanceFadMapFactory() {

@@ -30,13 +30,13 @@ import java.util.stream.Stream;
  * functionality: - It's a MASON Steppable, which applies drift when stepped. - It has methods for
  * deploying and removing FADs, setting the appropriate callback in the former case.
  */
-public class FadMap<B extends LocalBiology>
+public class FadMap
     implements AdditionalStartable, Steppable {
 
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
-    private final Class<B> localBiologyClass;
+    private final Class<? extends LocalBiology> localBiologyClass;
     private final AbundanceLostObserver abundanceLostObserver = new AbundanceLostObserver();
     final private LinkedList<FadRemovalListener> removalListeners = new LinkedList<>();
     private Stoppable stoppable;
@@ -45,7 +45,7 @@ public class FadMap<B extends LocalBiology>
         final NauticalMap nauticalMap,
         final CurrentVectors currentVectors,
         final GlobalBiology globalBiology,
-        final Class<B> localBiologyClass
+        final Class<? extends LocalBiology> localBiologyClass
     ) {
         this.nauticalMap = nauticalMap;
         this.globalBiology = globalBiology;
@@ -84,7 +84,7 @@ public class FadMap<B extends LocalBiology>
         driftingObjectsMap.applyDrift(fishState.getStep());
         allFads().forEach(fad -> {
             fad.reactToStep(fishState);
-            final Optional<B> seaTileBiology =
+            final Optional<LocalBiology> seaTileBiology =
                 getFadTile(fad)
                     .flatMap(this::getTileBiology);
             if (seaTileBiology.isPresent()) {
@@ -112,7 +112,7 @@ public class FadMap<B extends LocalBiology>
     }
 
     @NotNull
-    private Optional<B> getTileBiology(final SeaTile seaTile) {
+    private Optional<LocalBiology> getTileBiology(final SeaTile seaTile) {
         return Optional.of(seaTile)
             .map(SeaTile::getBiology)
             .filter(localBiologyClass::isInstance)
@@ -129,10 +129,6 @@ public class FadMap<B extends LocalBiology>
         return Optional.ofNullable(
             nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
         );
-    }
-
-    public Bag allFadsAsList() {
-        return driftingObjectsMap.getAllObjects();
     }
 
     /**
@@ -171,8 +167,7 @@ public class FadMap<B extends LocalBiology>
         };
     }
 
-    public void remove(final Fad fad) {
-
+    public void remove(final Fad<?, ?> fad) {
         driftingObjectsMap.remove(fad);
         for (final FadRemovalListener removalListener : getRemovalListeners()) {
             removalListener.onFadRemoval(fad);

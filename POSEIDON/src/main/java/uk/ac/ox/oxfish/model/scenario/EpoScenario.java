@@ -88,7 +88,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             Y2018, Paths.get("currents", "currents_2018.csv")
         )
     );
-    private FadMapFactory<B, ?> fadMapFactory;
+    private FadMapFactory fadMapFactory;
     private List<AlgorithmFactory<? extends Startable>> additionalStartables =
         Stream.of(
             new FadZapperFactory(),
@@ -164,7 +164,7 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
-        final FadMap<B> fadMap = getFadMapFactory().apply(fishState);
+        final FadMap fadMap = getFadMapFactory().apply(fishState);
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
 
@@ -179,7 +179,7 @@ public abstract class EpoScenario<B extends LocalBiology>
         );
     }
 
-    public FadMapFactory<B, ?> getFadMapFactory() {
+    public FadMapFactory getFadMapFactory() {
         return this.fadMapFactory;
     }
 
@@ -187,7 +187,7 @@ public abstract class EpoScenario<B extends LocalBiology>
         return ImmutableList.of();
     }
 
-    public void setFadMapFactory(final FadMapFactory<B, ?> fadMapFactory) {
+    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
         this.fadMapFactory = fadMapFactory;
     }
 

@@ -85,7 +85,7 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
             canPoachFromFads
                 ? Stream.concat(
                 tileBiologiesInRange,
-                getFadBiologiesAt(location, (FadMap<B>) fishState.getFadMap(), rng)
+                getFadBiologiesAt(location, fishState.getFadMap(), rng)
             )
                 : tileBiologiesInRange;
 
@@ -108,7 +108,7 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
      */
     private Stream<B> getFadBiologiesAt(
         final SeaTile tile,
-        final FadMap<B> fadMap,
+        final FadMap fadMap,
         final MersenneTwisterFast rng
     ) {
         final Stream<Fad<B, ?>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
