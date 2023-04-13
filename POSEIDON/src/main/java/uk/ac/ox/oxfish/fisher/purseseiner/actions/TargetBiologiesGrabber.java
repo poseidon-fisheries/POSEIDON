@@ -111,7 +111,7 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
         final FadMap fadMap,
         final MersenneTwisterFast rng
     ) {
-        final Stream<Fad<B, ?>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
+        final Stream<Fad<B>> fadsOnTile = bagToStream(fadMap.fadsAt(tile));
         return fadsOnTile.map(Fad::getBiology).collect(shufflingCollector(rng)).stream();
     }
 

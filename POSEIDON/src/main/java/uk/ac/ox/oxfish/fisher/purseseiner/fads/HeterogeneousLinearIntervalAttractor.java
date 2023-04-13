@@ -151,7 +151,7 @@ public class HeterogeneousLinearIntervalAttractor
 
 
     @Override
-    public void onFadRemoval(final Fad<?, ?> fad) {
+    public void onFadRemoval(final Fad<?> fad) {
         dailyAttractionThreshold.remove(fad);
         dailyAbundanceAttracted.remove(fad);
     }

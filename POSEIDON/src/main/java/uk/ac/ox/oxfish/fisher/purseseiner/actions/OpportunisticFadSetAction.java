@@ -28,7 +28,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public class OpportunisticFadSetAction extends AbstractFadSetAction {
 
     public OpportunisticFadSetAction(
-        final Fad<?, ?> fad,
+        final Fad<?> fad,
         final Fisher fisher,
         final double duration
     ) {

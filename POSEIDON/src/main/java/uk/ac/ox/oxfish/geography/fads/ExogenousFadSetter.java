@@ -73,7 +73,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
     );
 
     private static void logFadRemoval(
-        final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad,
+        final Fad<? extends LocalBiology> fad,
         final FishState fishState
     ) {
         LogManager.getLogger("fad_removals").debug(() -> {

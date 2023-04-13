@@ -69,7 +69,7 @@ public class FadTemperatureHazard implements AdditionalStartable, Steppable {
             model.getMap().getAdditionalMaps().get(nameOfMapToCheck).get();
 
         model.getFadMap().allFads().forEach(
-            (Consumer<Fad<? extends LocalBiology, ? extends Fad<?, ?>>>) abstractFad -> {
+            abstractFad -> {
 
                 //if it is active and in the water long enough
                 if (abstractFad.isActive() &&

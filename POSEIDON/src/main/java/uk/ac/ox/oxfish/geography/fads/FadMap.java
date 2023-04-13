@@ -100,14 +100,14 @@ public class FadMap
         });
     }
 
-    public Stream<Fad<?, ?>> allFads() {
+    public Stream<Fad<?>> allFads() {
         return driftingObjectsMap.objects()
             .filter(Fad.class::isInstance)
             .map(Fad.class::cast);
     }
 
     @NotNull
-    public Optional<SeaTile> getFadTile(final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad) {
+    public Optional<SeaTile> getFadTile(final Fad<? extends LocalBiology> fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
     }
 
@@ -120,7 +120,7 @@ public class FadMap
     }
 
     @NotNull
-    public Optional<Double2D> getFadLocation(final Fad<? extends LocalBiology, ? extends Fad<?, ?>> fad) {
+    public Optional<Double2D> getFadLocation(final Fad<? extends LocalBiology> fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
@@ -135,16 +135,16 @@ public class FadMap
      * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the
      * tile
      */
-    public void deployFad(final Fad<?, ?> fad, final SeaTile seaTile) {
+    public void deployFad(final Fad<?> fad, final SeaTile seaTile) {
         deployFad(fad, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
     }
 
-    public void deployFad(final Fad<?, ?> fad, final Double2D location) {
+    public void deployFad(final Fad<?> fad, final Double2D location) {
         driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
     @NotNull
-    private BiConsumer<Double2D, Optional<Double2D>> onMove(final Fad<?, ?> fad) {
+    private BiConsumer<Double2D, Optional<Double2D>> onMove(final Fad<?> fad) {
         return (oldLoc, newLoc) -> {
             final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
             if (newSeaTile.isPresent()) {
@@ -167,14 +167,14 @@ public class FadMap
         };
     }
 
-    public void remove(final Fad<?, ?> fad) {
+    public void remove(final Fad<?> fad) {
         driftingObjectsMap.remove(fad);
         for (final FadRemovalListener removalListener : getRemovalListeners()) {
             removalListener.onFadRemoval(fad);
         }
     }
 
-    private void reactToLostFad(final Fad<?, ?> fad) {
+    private void reactToLostFad(final Fad<?> fad) {
         fad.releaseFish(globalBiology.getSpecies());
         if (fad.getOwner() != null)
             fad.getOwner().loseFad(fad);
@@ -184,7 +184,7 @@ public class FadMap
         return removalListeners;
     }
 
-    public void destroyFad(final Fad<?, ?> fad) {
+    public void destroyFad(final Fad<?> fad) {
         remove(fad);
     }
 

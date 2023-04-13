@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class Fad<B extends LocalBiology, F extends Fad<B, F>> implements Locatable {
+public abstract class Fad<B extends LocalBiology> implements Locatable {
     protected static final AtomicLong idCounter = new AtomicLong(0);
 
     private final long id = idCounter.getAndIncrement();

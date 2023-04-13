@@ -33,7 +33,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadSetOpportunityGenerator<
     B extends LocalBiology,
-    F extends Fad<B, F>,
+    F extends Fad<B>,
     A extends AbstractFadSetAction>
     extends SetOpportunityGenerator<B, A> {
 

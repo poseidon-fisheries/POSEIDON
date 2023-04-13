@@ -43,7 +43,7 @@ import java.util.Map;
  * @param <B>
  * @param <F>
  */
-public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B, F>> extends Fad<B, F> {
+public abstract class LastMomentFad<B extends LocalBiology, F extends Fad<B>> extends Fad<B> {
 
 
     //all this stuff really belongs to an attractor object, if I come up with different rules:

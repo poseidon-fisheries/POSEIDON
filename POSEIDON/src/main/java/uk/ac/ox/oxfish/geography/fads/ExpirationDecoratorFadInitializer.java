@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 public class ExpirationDecoratorFadInitializer<
     B extends LocalBiology,
-    F extends Fad<B, F>>
+    F extends Fad<B>>
     implements FadInitializer<B, F> {
 
     private final int daysOfActivity;

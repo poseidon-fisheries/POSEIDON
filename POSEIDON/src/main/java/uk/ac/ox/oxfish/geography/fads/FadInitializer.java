@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 @FunctionalInterface
-public interface FadInitializer<B extends LocalBiology, F extends Fad<B, F>> {
+public interface FadInitializer<B extends LocalBiology, F extends Fad<B>> {
 
     F makeFad(
         final FadManager fadManager,

@@ -33,10 +33,10 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public abstract class AbstractFadSetAction
     extends AbstractSetAction implements FadRelatedAction {
 
-    private final Fad<?, ?> fad;
+    private final Fad<?> fad;
 
     public AbstractFadSetAction(
-        final Fad<?, ?> fad,
+        final Fad<?> fad,
         final Fisher fisher,
         final double duration
     ) {
@@ -48,7 +48,7 @@ public abstract class AbstractFadSetAction
         this.fad = fad;
     }
 
-    public Fad<?, ?> getFad() {
+    public Fad<?> getFad() {
         return fad;
     }
 
