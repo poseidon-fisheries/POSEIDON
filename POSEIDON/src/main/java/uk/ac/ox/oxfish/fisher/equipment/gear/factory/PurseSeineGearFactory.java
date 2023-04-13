@@ -44,14 +44,10 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
-    @SuppressWarnings("rawtypes")
     private Set<Observer<AbstractSetAction>> allSetsObservers = new LinkedHashSet<>();
-    @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<AbstractSetAction>>>
         allSetsObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(allSetsObservers));
-    @SuppressWarnings("rawtypes")
     private Set<Observer<AbstractFadSetAction>> fadSetObservers = new LinkedHashSet<>();
-    @SuppressWarnings("rawtypes")
     private final CacheByFishState<Set<Observer<AbstractFadSetAction>>>
         fadSetObserversCache = new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadSetObservers));
     @SuppressWarnings("rawtypes")
@@ -149,7 +145,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
-        @SuppressWarnings("unchecked") final FadManager fadManager = new FadManager(
+        final FadManager fadManager = new FadManager(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),
@@ -188,19 +184,17 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         return fadDeploymentObservers;
     }
 
-    @SuppressWarnings("rawtypes")
     public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return allSetsObservers;
     }
 
-    @SuppressWarnings("rawtypes")
     public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.allSetsObservers = allSetsObservers;
     }
 
-    @SuppressWarnings({"unused", "rawtypes"})
+    @SuppressWarnings({"unused"})
     public Set<Observer<AbstractFadSetAction>> getFadSetObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return fadSetObservers;
@@ -208,7 +202,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     @SuppressWarnings("unused")
     public void setFadSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<AbstractFadSetAction>> fadSetObservers
+        final Set<Observer<AbstractFadSetAction>> fadSetObservers
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.fadSetObservers = fadSetObservers;

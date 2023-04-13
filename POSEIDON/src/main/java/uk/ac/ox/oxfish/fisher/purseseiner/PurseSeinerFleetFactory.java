@@ -5,7 +5,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
@@ -44,7 +43,7 @@ import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class PurseSeinerFleetFactory<B extends LocalBiology>
+public class PurseSeinerFleetFactory
     implements Dummyable {
     private InputPath vesselsFile;
     private InputPath costsFile;

@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
@@ -47,7 +46,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
             getSpeciesCodesSupplier()
         );
 
-    private PurseSeinerFleetFactory<AbundanceLocalBiology> purseSeinerFleetFactory =
+    private PurseSeinerFleetFactory purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
             getTargetYear(),
             getInputFolder(),
@@ -88,12 +87,12 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
             )
         );
 
-    public PurseSeinerFleetFactory<AbundanceLocalBiology> getPurseSeinerFleetFactory() {
+    public PurseSeinerFleetFactory getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<AbundanceLocalBiology> purseSeinerFleetFactory) {
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 

@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
-    private PurseSeinerFleetFactory<BiomassLocalBiology> purseSeinerFleetFactory =
+    private PurseSeinerFleetFactory purseSeinerFleetFactory =
         new EpoPurseSeinerFleetFactory<>(
             getTargetYear(),
             getInputFolder(),
@@ -98,12 +97,12 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
             )
         );
 
-    public PurseSeinerFleetFactory<BiomassLocalBiology> getPurseSeinerFleetFactory() {
+    public PurseSeinerFleetFactory getPurseSeinerFleetFactory() {
         return purseSeinerFleetFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory<BiomassLocalBiology> purseSeinerFleetFactory) {
+    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 

@@ -16,7 +16,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.function.Supplier;
 
-public class EpoPurseSeinerFleetFactory<B extends LocalBiology> extends PurseSeinerFleetFactory<B> {
+public class EpoPurseSeinerFleetFactory<B extends LocalBiology> extends PurseSeinerFleetFactory {
     public EpoPurseSeinerFleetFactory() {
     }
 
