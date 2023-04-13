@@ -107,7 +107,7 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
             litersOfGasConsumedPerHour.applyAsDouble(random),
             new FixedProportionFilter(averageCatchability.applyAsDouble(random), rounding),
             selectivity.presentKey(
-                state.getHopefullyUniqueID(),
+                state.getUniqueID(),
                 () -> new ArrayFilter(
                     true, Arrays.copyOf(MALE, MALE.length),
                     Arrays.copyOf(FEMALE, FEMALE.length)

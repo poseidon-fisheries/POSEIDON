@@ -34,7 +34,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
-import java.util.function.Supplier;
 
 /**
  * Logit destination strategy using RPUE - travel costs with full knowledge
@@ -69,16 +68,12 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
         final MapDiscretization discretization = discretizationLocker.
             presentKey(
-                state.getHopefullyUniqueID(),
-                new Supplier<MapDiscretization>() {
-                    @Override
-                    public MapDiscretization get() {
-
-                        final MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                        final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                        toReturn.discretize(state.getMap());
-                        return toReturn;
-                    }
+                state.getUniqueID(),
+                () -> {
+                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                    toReturn.discretize(state.getMap());
+                    return toReturn;
                 }
             );
 

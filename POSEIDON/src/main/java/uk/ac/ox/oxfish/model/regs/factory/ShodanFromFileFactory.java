@@ -32,23 +32,19 @@ import uk.ac.ox.oxfish.utility.Locker;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.function.Supplier;
 
 /**
  * Reads QPlanner from xml file and uses it to run the model
  * Created by carrknight on 1/3/17.
  */
-public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenCloseSeason>{
+public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenCloseSeason> {
 
-
-
-    private String pathToXml = "/home/carrknight/code/oxfish/inputs/biomassQ.xml";
 
     /**
      * locker where we keep a single controller per state
      */
-    private final Locker<String,ShodanController> locker = new Locker<>();
-
+    private final Locker<String, ShodanController> locker = new Locker<>();
+    private String pathToXml = "/home/carrknight/code/oxfish/inputs/biomassQ.xml";
 
     /**
      * Applies this function to the given argument.
@@ -57,42 +53,40 @@ public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenClose
      * @return the function result
      */
     @Override
-    public ExternalOpenCloseSeason apply(FishState fishState) {
+    public ExternalOpenCloseSeason apply(final FishState fishState) {
 
 
-        ShodanController controller = locker.presentKey(
-                fishState.getHopefullyUniqueID(),
-                new Supplier<ShodanController>() {
-                    @Override
-                    public ShodanController get() {
-                        //create regulation object
-                        ExternalOpenCloseSeason season = new ExternalOpenCloseSeason();
+        final ShodanController controller = locker.presentKey(
+            fishState.getUniqueID(),
+            () -> {
+                //create regulation object
+                final ExternalOpenCloseSeason season = new ExternalOpenCloseSeason();
 
 
-                        //read q table from file
+                //read q table from file
 
-                        try {
-                            XStream xstream = new XStream(new StaxDriver());
-                            String xml = null;
-                            byte[] saves = new byte[0];
-                            saves = Files.readAllBytes(Paths.get(pathToXml));
-                            xml = new String(saves);
+                try {
+                    final XStream xstream = new XStream(new StaxDriver());
+                    String xml = null;
+                    byte[] saves = new byte[0];
+                    saves = Files.readAllBytes(Paths.get(pathToXml));
+                    xml = new String(saves);
 
-                            //put it straight into the controller
-                            ShodanController shodan =
-                                    new ShodanController((QProvider) xstream.fromXML(xml), season);
+                    //put it straight into the controller
+                    final ShodanController shodan =
+                        new ShodanController((QProvider) xstream.fromXML(xml), season);
 
-                            //set controller to start
-                            fishState.registerStartable(shodan);
+                    //set controller to start
+                    fishState.registerStartable(shodan);
 
-                            //return it
-                            return shodan;
-                        } catch (IOException e) {
-                            throw new RuntimeException("couldn't read/find the xml containing the Q-Provider");
-                        }
+                    //return it
+                    return shodan;
+                } catch (final IOException e) {
+                    throw new RuntimeException("couldn't read/find the xml containing the Q-Provider");
+                }
 
-                    }
-                });
+            }
+        );
 
         return controller.getRegulation();
     }
@@ -112,7 +106,7 @@ public class ShodanFromFileFactory implements AlgorithmFactory<ExternalOpenClose
      *
      * @param pathToXml Value to set for property 'pathToXml'.
      */
-    public void setPathToXml(String pathToXml) {
+    public void setPathToXml(final String pathToXml) {
         this.pathToXml = pathToXml;
     }
 }

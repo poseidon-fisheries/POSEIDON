@@ -37,13 +37,12 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
      * This provides a static singleton instance that will be used when building the list of constructors in the
      * {@link uk.ac.ox.oxfish.model.regs.factory.Regulations} class, so all the TACs are forced to remain connected.
      */
-    private static TACMonoFactory instance = new TACMonoFactory();
+    private static final TACMonoFactory instance = new TACMonoFactory();
     /**
      * for each model there is only one quota object being shared
      */
     private final Locker<String, MonoQuotaRegulation> modelQuota = new Locker<>();
 
-    ;
     /**
      * the quota to use
      */
@@ -61,13 +60,13 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public MonoQuotaRegulation apply(FishState state) {
+    public MonoQuotaRegulation apply(final FishState state) {
 
 
         final Double yearlyQuota = quota.applyAsDouble(state.random);
         final MonoQuotaRegulation quotaRegulation =
             modelQuota.presentKey(
-                state.getHopefullyUniqueID(),
+                state.getUniqueID(),
                 () -> new MonoQuotaRegulation(yearlyQuota)
             );
 
@@ -93,7 +92,7 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
     }
 
 
-    public void setQuota(DoubleParameter quota) {
+    public void setQuota(final DoubleParameter quota) {
         this.quota = quota;
     }
 

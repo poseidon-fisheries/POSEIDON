@@ -30,55 +30,33 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.ArrayList;
-import java.util.function.Supplier;
 
 public class LogisticLogbookFactory
-        implements AlgorithmFactory<LogisticLogbookInitializer>
-{
+    implements AlgorithmFactory<LogisticLogbookInitializer> {
     private final int maxHoursOut = 5 * 24;
 
     //each flag represents a pre-made extractor
-
+    private final Locker<String, MapDiscretization> locker = new Locker<>();
     private boolean dayOfTheYear = false;
-
     private boolean gasPrice = false;
-
     private boolean gridX = false;
-
     private boolean gridY = false;
-
     private boolean habitat = false;
-
     private boolean intercept = true;
-
     private boolean timeOfObservation = false;
-
     private boolean portDistance = false;
-
     private boolean simulatedCost = false;
-
     private boolean simulatedRevenue = false;
-
     private boolean simulatedProfits = false;
-
     private boolean windSpeed = false;
-
     private int periodHabit = -1;
-
     private int periodHabitContinuous = -1;
-
     /**
      * useful (in fact, needed) if you have multiple logbooks running at once!
      */
     private String identifier = "";
-
-
     private AlgorithmFactory<? extends MapDiscretizer> discretization
-            = new IdentityDiscretizerFactory();
-
-
-    private Locker<String, MapDiscretization> locker = new Locker<>() ;
-
+        = new IdentityDiscretizerFactory();
     /**
      * if this is positive, that's when the histogrammer starts
      */
@@ -91,100 +69,86 @@ public class LogisticLogbookFactory
      * @return the function result
      */
     @Override
-    public LogisticLogbookInitializer apply(FishState state) {
+    public LogisticLogbookInitializer apply(final FishState state) {
 
-        ArrayList<ObservationExtractor> extractors = new ArrayList<>();
-        ArrayList<String> names = new ArrayList<>();
+        final ArrayList<ObservationExtractor> extractors = new ArrayList<>();
+        final ArrayList<String> names = new ArrayList<>();
 
-        MapDiscretization discretized =
-                locker.presentKey(state.getHopefullyUniqueID(),
-                                  new Supplier<MapDiscretization>() {
-                                      @Override
-                                      public MapDiscretization get() {
-                                          MapDiscretization toReturn =
-                                                  new MapDiscretization(discretization.apply(state));
-                                          toReturn.discretize(state.getMap());
-                                          return toReturn;
-                                      }
-                                  });
+        final MapDiscretization discretized =
+            locker.presentKey(
+                state.getUniqueID(),
+                () -> {
+                    final MapDiscretization toReturn =
+                        new MapDiscretization(discretization.apply(state));
+                    toReturn.discretize(state.getMap());
+                    return toReturn;
+                }
+            );
 
-        if(dayOfTheYear)
-        {
+        if (dayOfTheYear) {
             extractors.add(new DayOfTheYearExtractor());
             names.add("day_of_the_year");
         }
 
-        if(gasPrice)
-        {
+        if (gasPrice) {
             extractors.add(new GasPriceExtractor());
             names.add("gas_price");
         }
 
 
-        if(gridX)
-        {
+        if (gridX) {
             extractors.add(new GridXExtractor());
             names.add("grid_x");
         }
-        if(gridY)
-        {
+        if (gridY) {
             extractors.add(new GridYExtractor());
             names.add("grid_y");
         }
 
-        if(habitat)
-        {
+        if (habitat) {
             extractors.add(new HabitatExtractor());
             names.add("habitat");
         }
 
-        if(intercept)
-        {
+        if (intercept) {
             extractors.add(new InterceptExtractor());
             names.add("intercept");
         }
 
 
-        if(timeOfObservation)
-        {
+        if (timeOfObservation) {
             extractors.add(new ObservationTimeExtractor());
             names.add("observation_time");
         }
 
 
-        if(portDistance)
-        {
+        if (portDistance) {
             extractors.add(new PortDistanceExtractor());
             names.add("port_distance");
         }
 
         //todo put max hours out somehwere else
 
-        if(simulatedCost)
-        {
+        if (simulatedCost) {
             extractors.add(new SimulatedHourlyCostExtractor(maxHoursOut));
             names.add("simulated_cost");
         }
-        if(simulatedRevenue)
-        {
+        if (simulatedRevenue) {
             extractors.add(new SimulatedHourlyRevenueExtractor(maxHoursOut));
             names.add("simulated_revenue");
         }
-        if(simulatedProfits)
-        {
+        if (simulatedProfits) {
             extractors.add(new SimulatedHourlyProfitExtractor(maxHoursOut));
             names.add("simulated_profits");
 
         }
 
-        if(windSpeed)
-        {
+        if (windSpeed) {
             extractors.add(new WindSpeedExtractor());
             names.add("wind_speed");
         }
 
-        if(periodHabit>0)
-        {
+        if (periodHabit > 0) {
             extractors.add(new PeriodHabitBooleanExtractor(discretized, periodHabit));
             names.add("habit");
             //the logit discretized memory this extractor depends on is produced by
@@ -192,8 +156,7 @@ public class LogisticLogbookFactory
 
         }
 
-        if(periodHabitContinuous>0)
-        {
+        if (periodHabitContinuous > 0) {
             extractors.add(new PeriodHabitContinuousExtractor(discretized, periodHabitContinuous));
             names.add("habit_continuous");
             //the logit discretized memory this extractor depends on is produced by
@@ -202,22 +165,18 @@ public class LogisticLogbookFactory
         }
 
 
-        String[] nameArray =
-                names.toArray(new String[names.size()]);
-        ObservationExtractor[] observations =
-                extractors.toArray(new ObservationExtractor[extractors.size()]);
-
+        final String[] nameArray =
+            names.toArray(new String[names.size()]);
+        final ObservationExtractor[] observations =
+            extractors.toArray(new ObservationExtractor[extractors.size()]);
 
 
         return new LogisticLogbookInitializer(
-                discretized,
-                observations,
-                nameArray,
-                histogrammerStartYear, identifier
+            discretized,
+            observations,
+            nameArray,
+            histogrammerStartYear, identifier
         );
-
-
-
 
 
     }
@@ -236,7 +195,7 @@ public class LogisticLogbookFactory
      *
      * @param dayOfTheYear Value to set for property 'dayOfTheYear'.
      */
-    public void setDayOfTheYear(boolean dayOfTheYear) {
+    public void setDayOfTheYear(final boolean dayOfTheYear) {
         this.dayOfTheYear = dayOfTheYear;
     }
 
@@ -254,7 +213,7 @@ public class LogisticLogbookFactory
      *
      * @param gasPrice Value to set for property 'gasPrice'.
      */
-    public void setGasPrice(boolean gasPrice) {
+    public void setGasPrice(final boolean gasPrice) {
         this.gasPrice = gasPrice;
     }
 
@@ -272,7 +231,7 @@ public class LogisticLogbookFactory
      *
      * @param gridX Value to set for property 'gridX'.
      */
-    public void setGridX(boolean gridX) {
+    public void setGridX(final boolean gridX) {
         this.gridX = gridX;
     }
 
@@ -290,7 +249,7 @@ public class LogisticLogbookFactory
      *
      * @param gridY Value to set for property 'gridY'.
      */
-    public void setGridY(boolean gridY) {
+    public void setGridY(final boolean gridY) {
         this.gridY = gridY;
     }
 
@@ -308,7 +267,7 @@ public class LogisticLogbookFactory
      *
      * @param habitat Value to set for property 'habitat'.
      */
-    public void setHabitat(boolean habitat) {
+    public void setHabitat(final boolean habitat) {
         this.habitat = habitat;
     }
 
@@ -326,7 +285,7 @@ public class LogisticLogbookFactory
      *
      * @param intercept Value to set for property 'intercept'.
      */
-    public void setIntercept(boolean intercept) {
+    public void setIntercept(final boolean intercept) {
         this.intercept = intercept;
     }
 
@@ -344,7 +303,7 @@ public class LogisticLogbookFactory
      *
      * @param timeOfObservation Value to set for property 'timeOfObservation'.
      */
-    public void setTimeOfObservation(boolean timeOfObservation) {
+    public void setTimeOfObservation(final boolean timeOfObservation) {
         this.timeOfObservation = timeOfObservation;
     }
 
@@ -362,7 +321,7 @@ public class LogisticLogbookFactory
      *
      * @param portDistance Value to set for property 'portDistance'.
      */
-    public void setPortDistance(boolean portDistance) {
+    public void setPortDistance(final boolean portDistance) {
         this.portDistance = portDistance;
     }
 
@@ -380,7 +339,7 @@ public class LogisticLogbookFactory
      *
      * @param simulatedCost Value to set for property 'simulatedCost'.
      */
-    public void setSimulatedCost(boolean simulatedCost) {
+    public void setSimulatedCost(final boolean simulatedCost) {
         this.simulatedCost = simulatedCost;
     }
 
@@ -398,7 +357,7 @@ public class LogisticLogbookFactory
      *
      * @param simulatedRevenue Value to set for property 'simulatedRevenue'.
      */
-    public void setSimulatedRevenue(boolean simulatedRevenue) {
+    public void setSimulatedRevenue(final boolean simulatedRevenue) {
         this.simulatedRevenue = simulatedRevenue;
     }
 
@@ -416,7 +375,7 @@ public class LogisticLogbookFactory
      *
      * @param windSpeed Value to set for property 'windSpeed'.
      */
-    public void setWindSpeed(boolean windSpeed) {
+    public void setWindSpeed(final boolean windSpeed) {
         this.windSpeed = windSpeed;
     }
 
@@ -435,7 +394,8 @@ public class LogisticLogbookFactory
      * @param discretization Value to set for property 'discretization'.
      */
     public void setDiscretization(
-            AlgorithmFactory<? extends MapDiscretizer> discretization) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
         this.discretization = discretization;
     }
 
@@ -453,7 +413,7 @@ public class LogisticLogbookFactory
      *
      * @param periodHabit Value to set for property 'periodHabit'.
      */
-    public void setPeriodHabit(int periodHabit) {
+    public void setPeriodHabit(final int periodHabit) {
         this.periodHabit = periodHabit;
     }
 
@@ -471,7 +431,7 @@ public class LogisticLogbookFactory
      *
      * @param periodHabitContinuous Value to set for property 'periodHabitContinuous'.
      */
-    public void setPeriodHabitContinuous(int periodHabitContinuous) {
+    public void setPeriodHabitContinuous(final int periodHabitContinuous) {
         this.periodHabitContinuous = periodHabitContinuous;
     }
 
@@ -479,7 +439,7 @@ public class LogisticLogbookFactory
         return identifier;
     }
 
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
 
@@ -497,7 +457,7 @@ public class LogisticLogbookFactory
      *
      * @param histogrammerStartYear Value to set for property 'histogrammerStartYear'.
      */
-    public void setHistogrammerStartYear(int histogrammerStartYear) {
+    public void setHistogrammerStartYear(final int histogrammerStartYear) {
         this.histogrammerStartYear = histogrammerStartYear;
     }
 
@@ -524,7 +484,7 @@ public class LogisticLogbookFactory
      *
      * @param simulatedProfits Value to set for property 'simulatedProfits'.
      */
-    public void setSimulatedProfits(boolean simulatedProfits) {
+    public void setSimulatedProfits(final boolean simulatedProfits) {
         this.simulatedProfits = simulatedProfits;
     }
 }

@@ -76,19 +76,21 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      * @return the function result
      */
     @Override
-    public MultiQuotaITQRegulation apply(FishState state) {
+    public MultiQuotaITQRegulation apply(final FishState state) {
 
-        int numberOfSpecies = state.getSpecies().size();
+        final int numberOfSpecies = state.getSpecies().size();
         //create map of quotas
-        Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
+        final Map<String, String> quotasInputted = Splitter.on(",")
+            .withKeyValueSeparator(":")
+            .split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the ITQ!");
 
         //here we store the quotas
-        double[] quotas = new double[numberOfSpecies];
+        final double[] quotas = new double[numberOfSpecies];
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //read them in
-        for (Map.Entry<String, String> input : quotasInputted.entrySet()) {
-            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
+        for (final Map.Entry<String, String> input : quotasInputted.entrySet()) {
+            final Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
                 .applyAsDouble(state.getRandom());
             Preconditions.checkArgument(yearlyQuota > 0);
             Preconditions.checkArgument(!yearlyQuota.isNaN());
@@ -97,9 +99,9 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
 
 
         //create function of tick sizes
-        Function<Integer, Integer> volumePerMatch;
+        final Function<Integer, Integer> volumePerMatch;
         if (minimumQuotaTraded.contains(":")) {
-            Map<String, String> volumesIn = Splitter.on(",")
+            final Map<String, String> volumesIn = Splitter.on(",")
                 .withKeyValueSeparator(":")
                 .split(minimumQuotaTraded.trim());
             Preconditions.checkArgument(
@@ -110,9 +112,9 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
                 volumesIn.keySet().equals(quotasInputted.keySet()),
                 "Mismatch between keys, some markets do not have minimimum quota trades or viceversa"
             );
-            int[] tradeTicks = new int[numberOfSpecies];
-            for (Map.Entry<String, String> input : volumesIn.entrySet()) {
-                int tradeTick = (int) Double.parseDouble(input.getValue().trim());
+            final int[] tradeTicks = new int[numberOfSpecies];
+            for (final Map.Entry<String, String> input : volumesIn.entrySet()) {
+                final int tradeTick = (int) Double.parseDouble(input.getValue().trim());
                 Preconditions.checkArgument(tradeTick > 0);
                 tradeTicks[Integer.parseInt(input.getKey().trim())] = tradeTick;
             }
@@ -138,16 +140,16 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
          */
 
         //grab the markets and its builders
-        HashMap<Integer, ITQOrderBook> markets =
+        final HashMap<Integer, ITQOrderBook> markets =
             orderBooks.presentKey(
-                state.getHopefullyUniqueID(),
+                state.getUniqueID(),
                 HashMap::new
             );
 
 
-        ITQMarketBuilder[] builders = orderBooksBuilder.
+        final ITQMarketBuilder[] builders = orderBooksBuilder.
             presentKey(
-                state.getHopefullyUniqueID(),
+                state.getUniqueID(),
                 () -> new ITQMarketBuilder[numberOfSpecies]
             );
 
@@ -157,10 +159,10 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         );
 
 
-        MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
+        final MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
             markets
         );
-        for (ITQMarketBuilder builder : builders)
+        for (final ITQMarketBuilder builder : builders)
             if (builder != null)
                 builder.addTrader(multiQuotaITQRegulation);
 
@@ -173,7 +175,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         return yearlyQuotaMaps;
     }
 
-    public void setYearlyQuotaMaps(String yearlyQuotaMaps) {
+    public void setYearlyQuotaMaps(final String yearlyQuotaMaps) {
         this.yearlyQuotaMaps = yearlyQuotaMaps;
     }
 
@@ -191,7 +193,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      *
      * @param allowMultipleTrades Value to set for property 'allowMultipleTrades'.
      */
-    public void setAllowMultipleTrades(boolean allowMultipleTrades) {
+    public void setAllowMultipleTrades(final boolean allowMultipleTrades) {
         this.allowMultipleTrades = allowMultipleTrades;
     }
 
@@ -210,7 +212,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      *
      * @param minimumQuotaTraded Value to set for property 'minimumQuotaTraded'.
      */
-    public void setMinimumQuotaTraded(String minimumQuotaTraded) {
+    public void setMinimumQuotaTraded(final String minimumQuotaTraded) {
         this.minimumQuotaTraded = minimumQuotaTraded;
     }
 

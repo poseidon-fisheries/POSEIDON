@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
@@ -47,13 +46,31 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
      */
     private String yearlyQuotaMaps = "0:500000";
 
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public MultiQuotaRegulation apply(final FishState state) {
+
+
+        return modelQuota.presentKey(
+            state.getUniqueID(),
+            () -> createInstance(state, MultiTACStringFactory.this.yearlyQuotaMaps)
+        );
+
+
+    }
+
     public static MultiQuotaRegulation createInstance(
-        FishState state, final String yearlyQuotaMaps
+        final FishState state, final String yearlyQuotaMaps
     ) {
 
-        double[] quotas = turnStringIntoQuotaArray(state, yearlyQuotaMaps);
+        final double[] quotas = turnStringIntoQuotaArray(state, yearlyQuotaMaps);
 
-        MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
+        final MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
         //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
         //  state.registerStartable(manager);
@@ -61,17 +78,19 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         return regulations;
     }
 
-    public static double[] turnStringIntoQuotaArray(FishState state, String yearlyQuotaMaps) {
-        Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
+    public static double[] turnStringIntoQuotaArray(final FishState state, final String yearlyQuotaMaps) {
+        final Map<String, String> quotasInputted = Splitter.on(",")
+            .withKeyValueSeparator(":")
+            .split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the TAC!");
 
         //here we store the quotas
-        double[] quotas = new double[state.getSpecies().size()];
+        final double[] quotas = new double[state.getSpecies().size()];
         //start them as non-binding
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //go for each input and read the results
-        for (Map.Entry<String, String> input : quotasInputted.entrySet()) {
-            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
+        for (final Map.Entry<String, String> input : quotasInputted.entrySet()) {
+            final Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
                 .applyAsDouble(state.getRandom());
             Preconditions.checkArgument(yearlyQuota > 0, "quotas must start above 0!");
             Preconditions.checkArgument(!yearlyQuota.isNaN());
@@ -80,35 +99,11 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         return quotas;
     }
 
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param state the function argument
-     * @return the function result
-     */
-    @Override
-    public MultiQuotaRegulation apply(FishState state) {
-
-
-        return modelQuota.presentKey(
-            state.getHopefullyUniqueID(),
-            new Supplier<MultiQuotaRegulation>() {
-                @Override
-                public MultiQuotaRegulation get() {
-                    return createInstance(
-                        state, MultiTACStringFactory.this.yearlyQuotaMaps);
-                }
-            }
-        );
-
-
-    }
-
     public String getYearlyQuotaMaps() {
         return yearlyQuotaMaps;
     }
 
-    public void setYearlyQuotaMaps(String yearlyQuotaMaps) {
+    public void setYearlyQuotaMaps(final String yearlyQuotaMaps) {
         this.yearlyQuotaMaps = yearlyQuotaMaps;
     }
 

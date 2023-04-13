@@ -29,21 +29,15 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.function.Supplier;
-
 /**
  * Created by carrknight on 6/28/17.
  */
-public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
+public class DepthMPAFactory implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
+    private final Locker<String, ProtectedAreasOnly> locker = new Locker<>();
     private DoubleParameter minDepth = new FixedDoubleParameter(0);
-
     private DoubleParameter maxDepth = new FixedDoubleParameter(200);
-
-
-    private Locker<String,ProtectedAreasOnly> locker = new Locker<>();
-
 
     /**
      * Applies this function to the given argument.
@@ -52,21 +46,18 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
      * @return the function result
      */
     @Override
-    public ProtectedAreasOnly apply(FishState state) {
+    public ProtectedAreasOnly apply(final FishState state) {
 
-        return locker.presentKey(state.getHopefullyUniqueID(),
-                new Supplier<ProtectedAreasOnly>() {
-            @Override
-            public ProtectedAreasOnly get() {
+        return locker.presentKey(
+            state.getUniqueID(),
+            () -> {
 
                 //go through the map and put an mpa in each area that qualifies
 
-                double minDepth = -getMinDepth().applyAsDouble(state.getRandom());
-                double maxDepth = -getMaxDepth().applyAsDouble(state.getRandom());
-                for(SeaTile tile : state.getMap().getAllSeaTilesAsList())
-                {
-                    if(tile.getAltitude()<=minDepth && tile.getAltitude()>=maxDepth)
-                    {
+                final double minDepth = -getMinDepth().applyAsDouble(state.getRandom());
+                final double maxDepth = -getMaxDepth().applyAsDouble(state.getRandom());
+                for (final SeaTile tile : state.getMap().getAllSeaTilesAsList()) {
+                    if (tile.getAltitude() <= minDepth && tile.getAltitude() >= maxDepth) {
                         tile.assignMpa(new MasonGeometry());
                     }
                 }
@@ -75,7 +66,7 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
 
 
             }
-        });
+        );
 
 
     }
@@ -94,7 +85,7 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
      *
      * @param minDepth Value to set for property 'minDepth'.
      */
-    public void setMinDepth(DoubleParameter minDepth) {
+    public void setMinDepth(final DoubleParameter minDepth) {
         this.minDepth = minDepth;
     }
 
@@ -112,7 +103,7 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
      *
      * @param maxDepth Value to set for property 'maxDepth'.
      */
-    public void setMaxDepth(DoubleParameter maxDepth) {
+    public void setMaxDepth(final DoubleParameter maxDepth) {
         this.maxDepth = maxDepth;
     }
 }

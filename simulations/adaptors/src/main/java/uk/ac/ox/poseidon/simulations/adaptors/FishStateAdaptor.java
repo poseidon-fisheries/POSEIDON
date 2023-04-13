@@ -35,7 +35,7 @@ public class FishStateAdaptor implements Simulation {
 
     @Override
     public String getId() {
-        return fishState.getTrulyUniqueID();
+        return fishState.getUniqueID();
     }
 
     @Override

@@ -79,7 +79,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
 
         //add data gathering if necessary
         if (!state.equals(locker.getCurrentKey())) {
-            locker.presentKey(state.getHopefullyUniqueID(), () -> null);
+            locker.presentKey(state.getUniqueID(), () -> null);
             addDataGatherers(state);
             assert locker.getCurrentKey().equals(state);
         }

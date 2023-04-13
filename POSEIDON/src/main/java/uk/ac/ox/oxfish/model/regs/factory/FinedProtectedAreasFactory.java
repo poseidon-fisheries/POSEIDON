@@ -32,31 +32,26 @@ import uk.ac.ox.oxfish.utility.Locker;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * Created by carrknight on 2/13/17.
  */
-public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtectedAreas>{
+public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtectedAreas> {
 
-
-
-    private String beingCaughtProbability = "1,.2";
-
-    private String hourlyFines = "100,2000";
-
-    private boolean canContemplateCheating = false;
 
     /**
      * makes sure you only schedule yourself to build the MPAs once
      */
-    private final Locker<String,FinedProtectedAreas> mpaBuilder = new Locker<>();
-
+    private final Locker<String, FinedProtectedAreas> mpaBuilder = new Locker<>();
+    private String beingCaughtProbability = "1,.2";
+    private String hourlyFines = "100,2000";
+    private boolean canContemplateCheating = false;
     private List<StartingMPA> mpas = new LinkedList<>();
+
     {
-        mpas.add(new StartingMPA(0,0,5,5));
-        mpas.add(new StartingMPA(20,20,5,5));
+        mpas.add(new StartingMPA(0, 0, 5, 5));
+        mpas.add(new StartingMPA(20, 20, 5, 5));
 
     }
 
@@ -68,55 +63,54 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      * @return the function result
      */
     @Override
-    public FinedProtectedAreas apply(FishState state) {
+    public FinedProtectedAreas apply(final FishState state) {
 
 
         return mpaBuilder.presentKey(
-                state.getHopefullyUniqueID(),
-                new Supplier<FinedProtectedAreas>() {
+            state.getUniqueID(),
+            () -> {
+
+                final FinedProtectedAreas regs = new FinedProtectedAreas(state.getRandom(), canContemplateCheating);
+
+
+                final List<Double> probabilities =
+                    Arrays.stream(beingCaughtProbability.trim().split(",")).
+                        map(Double::parseDouble).
+                        collect(Collectors.toList());
+
+                final List<Double> fines =
+                    Arrays.stream(hourlyFines.trim().split(",")).
+                        map(Double::parseDouble).
+                        collect(Collectors.toList());
+
+                Preconditions.checkArgument(probabilities.size() == fines.size());
+                Preconditions.checkArgument(probabilities.size() == mpas.size());
+
+
+                final Startable startable = new Startable() {
                     @Override
-                    public FinedProtectedAreas get() {
+                    public void start(final FishState model) {
+                        for (int i = 0; i < mpas.size(); i++) {
+                            final MasonGeometry geometry = mpas.get(i).buildMPA(model.getMap());
+                            regs.registerEnforcement(
+                                geometry,
+                                probabilities.get(i),
+                                fines.get(i)
+                            );
 
-                        FinedProtectedAreas regs = new FinedProtectedAreas(state.getRandom(),canContemplateCheating);
+                        }
+                    }
 
-
-                        List<Double> probabilities =
-                                Arrays.stream(beingCaughtProbability.trim().split(",")).
-                                        map(Double::parseDouble).
-                                        collect(Collectors.toList());
-
-                        List<Double> fines =
-                                Arrays.stream(hourlyFines.trim().split(",")).
-                                        map(Double::parseDouble).
-                                        collect(Collectors.toList());
-
-                        Preconditions.checkArgument(probabilities.size() == fines.size());
-                        Preconditions.checkArgument(probabilities.size() == mpas.size());
-
-
-                        Startable startable = new Startable() {
-                            @Override
-                            public void start(FishState model) {
-                                for (int i=0; i<mpas.size(); i++) {
-                                    MasonGeometry geometry = mpas.get(i).buildMPA(model.getMap());
-                                    regs.registerEnforcement(geometry,
-                                                             probabilities.get(i),
-                                                             fines.get(i));
-
-                                }
-                            }
-
-                            @Override
-                            public void turnOff() {
-
-                            }
-                        };
-                        state.registerStartable(startable);
-                        return regs;
+                    @Override
+                    public void turnOff() {
 
                     }
-                });
+                };
+                state.registerStartable(startable);
+                return regs;
 
+            }
+        );
 
 
     }
@@ -136,7 +130,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      *
      * @param beingCaughtProbability Value to set for property 'beingCaughtProbability'.
      */
-    public void setBeingCaughtProbability(String beingCaughtProbability) {
+    public void setBeingCaughtProbability(final String beingCaughtProbability) {
         this.beingCaughtProbability = beingCaughtProbability;
     }
 
@@ -154,7 +148,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      *
      * @param hourlyFines Value to set for property 'hourlyFines'.
      */
-    public void setHourlyFines(String hourlyFines) {
+    public void setHourlyFines(final String hourlyFines) {
         this.hourlyFines = hourlyFines;
     }
 
@@ -172,7 +166,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      *
      * @param mpas Value to set for property 'mpas'.
      */
-    public void setMpas(List<StartingMPA> mpas) {
+    public void setMpas(final List<StartingMPA> mpas) {
         this.mpas = mpas;
     }
 
@@ -190,7 +184,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      *
      * @param canContemplateCheating Value to set for property 'canContemplateCheating'.
      */
-    public void setCanContemplateCheating(boolean canContemplateCheating) {
+    public void setCanContemplateCheating(final boolean canContemplateCheating) {
         this.canContemplateCheating = canContemplateCheating;
     }
 }

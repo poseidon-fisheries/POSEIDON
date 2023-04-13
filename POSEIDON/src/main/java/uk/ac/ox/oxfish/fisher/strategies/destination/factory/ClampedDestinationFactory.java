@@ -32,8 +32,6 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.function.Supplier;
-
 public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestinationStrategy> {
 
     /**
@@ -71,15 +69,12 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
 
         //create the discretization
         final MapDiscretization discretization = discretizationLocker.presentKey(
-            state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
-                @Override
-                public MapDiscretization get() {
-                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                    toReturn.discretize(state.getMap());
-                    return toReturn;
+            state.getUniqueID(), () -> {
+                final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                toReturn.discretize(state.getMap());
+                return toReturn;
 
-                }
             }
         );
 

@@ -77,8 +77,7 @@ import static java.util.function.Function.identity;
 public class FishState extends SimState {
 
     public static final String DEFAULT_POPULATION_NAME = "default_population";
-    private final String hopefullyUniqueID;
-    private final String trulyUniqueID;
+    private final String uniqueID = UUID.randomUUID().toString();
     /**
      * Dataset of all the columns that are updated daily
      */
@@ -164,8 +163,6 @@ public class FishState extends SimState {
     public FishState(final long seed, final int stepsPerDay) {
         super(seed);
         this.stepsPerDay = stepsPerDay;
-        this.hopefullyUniqueID = seed + "_" + System.nanoTime() + "_" + FishStateUtilities.getComputerName();
-        this.trulyUniqueID = UUID.randomUUID().toString();
 
         toStart = new LinkedList<>();
 
@@ -889,12 +886,8 @@ public class FishState extends SimState {
         return ImmutableList.copyOf(toStart);
     }
 
-    public String getHopefullyUniqueID() {
-        return hopefullyUniqueID;
-    }
-
-    public String getTrulyUniqueID() {
-        return trulyUniqueID;
+    public String getUniqueID() {
+        return uniqueID;
     }
 
     public List<EntryPlugin> getEntryPlugins() {

@@ -40,11 +40,10 @@ import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 /**
  * Created by carrknight on 11/10/16.
  */
-public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinationStrategy>{
+public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinationStrategy> {
 
 
-
-    private static Locker<String,MapDiscretization> locker = new Locker();
+    private static final Locker<String, MapDiscretization> locker = new Locker();
 
     private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
 
@@ -54,8 +53,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new SquaresMapDiscretizerFactory();
 
     private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
-            new HourlyProfitObjectiveFactory(true);
-
+        new HourlyProfitObjectiveFactory(true);
 
 
     private boolean automaticallyIgnoreMPAs = true;
@@ -72,36 +70,36 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      * @return the function result
      */
     @Override
-    public BanditDestinationStrategy apply(FishState state)
-    {
+    public BanditDestinationStrategy apply(final FishState state) {
 
-        MapDiscretization map =  locker.
-                presentKey(state.getHopefullyUniqueID(),
-                           () -> {
-                               MapDiscretization discretization =
-                                       new MapDiscretization(
-                                               discretizer.apply(state));
-                               discretization.discretize(state.getMap());
-                               return discretization;
-                           }
-                );
+        final MapDiscretization map = locker.
+            presentKey(
+                state.getUniqueID(),
+                () -> {
+                    final MapDiscretization discretization =
+                        new MapDiscretization(
+                            discretizer.apply(state));
+                    discretization.discretize(state.getMap());
+                    return discretization;
+                }
+            );
 
 
-        BanditDestinationStrategy banditDestinationStrategy = new BanditDestinationStrategy(
-                arms -> new BanditAverage(
-                        arms,
-                        average,
-                        state
-                ),
-                bandit.apply(state),
-                map,
-                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                objectiveFunction.apply(state),
-                automaticallyIgnoreMPAs, automaticallyIgnoreWastelands);
+        final BanditDestinationStrategy banditDestinationStrategy = new BanditDestinationStrategy(
+            arms -> new BanditAverage(
+                arms,
+                average,
+                state
+            ),
+            bandit.apply(state),
+            map,
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+            objectiveFunction.apply(state),
+            automaticallyIgnoreMPAs, automaticallyIgnoreWastelands
+        );
         banditDestinationStrategy.setImitate(imitate);
         return banditDestinationStrategy;
     }
-
 
 
     /**
@@ -118,7 +116,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @param average Value to set for property 'average'.
      */
-    public void setAverage(AlgorithmFactory<? extends Averager> average) {
+    public void setAverage(final AlgorithmFactory<? extends Averager> average) {
         this.average = average;
     }
 
@@ -137,7 +135,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      * @param bandit Value to set for property 'bandit'.
      */
     public void setBandit(
-            AlgorithmFactory<? extends BanditSupplier> bandit) {
+        final AlgorithmFactory<? extends BanditSupplier> bandit
+    ) {
         this.bandit = bandit;
     }
 
@@ -156,7 +155,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      * @param discretizer Value to set for property 'discretizer'.
      */
     public void setDiscretizer(
-            AlgorithmFactory<? extends MapDiscretizer> discretizer) {
+        final AlgorithmFactory<? extends MapDiscretizer> discretizer
+    ) {
         this.discretizer = discretizer;
     }
 
@@ -174,7 +174,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @param automaticallyIgnoreMPAs Value to set for property 'respectMPA'.
      */
-    public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
+    public void setAutomaticallyIgnoreMPAs(final boolean automaticallyIgnoreMPAs) {
         this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
     }
 
@@ -192,7 +192,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @param automaticallyIgnoreWastelands Value to set for property 'automaticallyIgnoreWastelands'.
      */
-    public void setAutomaticallyIgnoreWastelands(boolean automaticallyIgnoreWastelands) {
+    public void setAutomaticallyIgnoreWastelands(final boolean automaticallyIgnoreWastelands) {
         this.automaticallyIgnoreWastelands = automaticallyIgnoreWastelands;
     }
 
@@ -210,7 +210,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @param imitate Value to set for property 'imitate'.
      */
-    public void setImitate(boolean imitate) {
+    public void setImitate(final boolean imitate) {
         this.imitate = imitate;
     }
 
@@ -230,7 +230,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      * @param objectiveFunction Value to set for property 'objectiveFunction'.
      */
     public void setObjectiveFunction(
-            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        final AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
+    ) {
         this.objectiveFunction = objectiveFunction;
     }
 }

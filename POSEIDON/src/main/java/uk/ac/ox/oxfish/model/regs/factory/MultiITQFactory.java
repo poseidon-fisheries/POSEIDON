@@ -84,6 +84,58 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
     private int minimumQuotaTraded = 100;
 
     /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public MultiQuotaITQRegulation apply(final FishState state) {
+        final int numberOfSpecies = state.getSpecies().size();
+        assert numberOfSpecies > 0;
+        final double[] quotas = new double[numberOfSpecies];
+        quotas[0] = quotaFirstSpecie.applyAsDouble(state.getRandom());
+        for (int i = 1; i < numberOfSpecies; i++)
+            quotas[i] = quotaOtherSpecies.applyAsDouble(state.getRandom());
+
+
+        //grab the markets and its builders
+        final HashMap<Integer, ITQOrderBook> markets =
+            orderBooks.presentKey(
+                state.getUniqueID(),
+                HashMap::new
+            );
+
+
+        final ITQMarketBuilder[] builders = orderBooksBuilder.
+            presentKey(
+                state.getUniqueID(),
+                () -> new ITQMarketBuilder[numberOfSpecies]
+            );
+
+
+        /***
+         *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
+         *     |  \/  | /_\ | _ \ |/ / __|_   _| | _ ) | | |_ _| |  |   \| __| _ \/ __|
+         *     | |\/| |/ _ \|   / ' <| _|  | |   | _ \ |_| || || |__| |) | _||   /\__ \
+         *     |_|  |_/_/ \_\_|_\_|\_\___| |_|   |___/\___/|___|____|___/|___|_|_\|___/
+         *
+         */
+        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, markets, builders,
+            allowMultipleTrades, integer -> minimumQuotaTraded
+        );
+
+        final MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
+            markets
+        );
+
+        for (final ITQMarketBuilder builder : builders)
+            if (builder != null)
+                builder.addTrader(multiQuotaITQRegulation);
+        return multiQuotaITQRegulation;
+    }
+
+    /**
      * creates ITQ markets by instantiating and registering an ITQMarketBuilder for all species where the current fisher
      * has non-infinite yearly quotas. Avoids building a market if it is already registered
      *
@@ -96,9 +148,9 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
      * @param unitsTradedPerMatch          the size of quotas exchanged at each trade (in kg) as a function index of species ---> size of quota
      */
     public static void buildITQMarketsIfNeeded(
-        FishState state, int numberOfSpecies, double[] quotas,
-        HashMap<Integer, ITQOrderBook> markets,
-        ITQMarketBuilder[] builders, final boolean allowMultipleTradesPerFisher,
+        final FishState state, final int numberOfSpecies, final double[] quotas,
+        final HashMap<Integer, ITQOrderBook> markets,
+        final ITQMarketBuilder[] builders, final boolean allowMultipleTradesPerFisher,
         final Function<Integer, Integer> unitsTradedPerMatch
     ) {
 
@@ -112,7 +164,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
             //if this particular market needs to be instantiated
             if (builders[i] == null) {
                 //and at least this guy isn't given infinite quotas:
-                double quotaGiven = quotas[i];
+                final double quotaGiven = quotas[i];
                 Preconditions.checkArgument(quotaGiven >= 0);
                 Preconditions.checkArgument(!Double.isNaN(quotaGiven));
                 if (Double.isFinite(quotaGiven)) {
@@ -130,7 +182,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                                     //what it is because we are supplying it now
                                     new Sensor<Fisher, Double>() {
                                         @Override
-                                        public Double scan(Fisher fisher) {
+                                        public Double scan(final Fisher fisher) {
                                             return ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
                                                 specieIndex);
                                         }
@@ -140,11 +192,11 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                         }
                     );
                     final int speciesIndex = i;
-                    Startable setupStep = new Startable() {
+                    final Startable setupStep = new Startable() {
                         @Override
-                        public void start(FishState model) {
+                        public void start(final FishState model) {
                             builders[speciesIndex].start(model);
-                            ITQOrderBook market = builders[specieIndex].getMarket();
+                            final ITQOrderBook market = builders[specieIndex].getMarket();
                             markets.put(specieIndex, market);
                             market.setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
                             market.setUnitsTradedPerMatch(unitsTradedPerMatch.apply(specieIndex));
@@ -162,7 +214,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                     } else {
                         state.scheduleOnce(new Steppable() {
                             @Override
-                            public void step(SimState simState) {
+                            public void step(final SimState simState) {
                                 setupStep.start(state);
                             }
                         }, StepOrder.DAWN);
@@ -172,63 +224,11 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         }
     }
 
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param state the function argument
-     * @return the function result
-     */
-    @Override
-    public MultiQuotaITQRegulation apply(FishState state) {
-        int numberOfSpecies = state.getSpecies().size();
-        assert numberOfSpecies > 0;
-        double[] quotas = new double[numberOfSpecies];
-        quotas[0] = quotaFirstSpecie.applyAsDouble(state.getRandom());
-        for (int i = 1; i < numberOfSpecies; i++)
-            quotas[i] = quotaOtherSpecies.applyAsDouble(state.getRandom());
-
-
-        //grab the markets and its builders
-        HashMap<Integer, ITQOrderBook> markets =
-            orderBooks.presentKey(
-                state.getHopefullyUniqueID(),
-                HashMap::new
-            );
-
-
-        ITQMarketBuilder[] builders = orderBooksBuilder.
-            presentKey(
-                state.getHopefullyUniqueID(),
-                () -> new ITQMarketBuilder[numberOfSpecies]
-            );
-
-
-        /***
-         *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
-         *     |  \/  | /_\ | _ \ |/ / __|_   _| | _ ) | | |_ _| |  |   \| __| _ \/ __|
-         *     | |\/| |/ _ \|   / ' <| _|  | |   | _ \ |_| || || |__| |) | _||   /\__ \
-         *     |_|  |_/_/ \_\_|_\_|\_\___| |_|   |___/\___/|___|____|___/|___|_|_\|___/
-         *
-         */
-        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, markets, builders,
-            allowMultipleTrades, integer -> minimumQuotaTraded
-        );
-
-        MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
-            markets
-        );
-
-        for (ITQMarketBuilder builder : builders)
-            if (builder != null)
-                builder.addTrader(multiQuotaITQRegulation);
-        return multiQuotaITQRegulation;
-    }
-
     public DoubleParameter getQuotaFirstSpecie() {
         return quotaFirstSpecie;
     }
 
-    public void setQuotaFirstSpecie(DoubleParameter quotaFirstSpecie) {
+    public void setQuotaFirstSpecie(final DoubleParameter quotaFirstSpecie) {
         this.quotaFirstSpecie = quotaFirstSpecie;
     }
 
@@ -236,7 +236,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         return quotaOtherSpecies;
     }
 
-    public void setQuotaOtherSpecies(DoubleParameter quotaOtherSpecies) {
+    public void setQuotaOtherSpecies(final DoubleParameter quotaOtherSpecies) {
         this.quotaOtherSpecies = quotaOtherSpecies;
     }
 
@@ -244,7 +244,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         return allowMultipleTrades;
     }
 
-    public void setAllowMultipleTrades(boolean allowMultipleTrades) {
+    public void setAllowMultipleTrades(final boolean allowMultipleTrades) {
         this.allowMultipleTrades = allowMultipleTrades;
     }
 
@@ -252,7 +252,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         return minimumQuotaTraded;
     }
 
-    public void setMinimumQuotaTraded(int minimumQuotaTraded) {
+    public void setMinimumQuotaTraded(final int minimumQuotaTraded) {
         this.minimumQuotaTraded = minimumQuotaTraded;
     }
 }

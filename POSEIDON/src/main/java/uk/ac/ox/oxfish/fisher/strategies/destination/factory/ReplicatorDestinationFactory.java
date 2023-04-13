@@ -35,7 +35,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class ReplicatorDestinationFactory implements AlgorithmFactory<ReplicatorDrivenDestinationStrategy> {
 
@@ -60,51 +59,47 @@ public class ReplicatorDestinationFactory implements AlgorithmFactory<Replicator
 
         final StrategyReplicator replicator =
             this.replicator.presentKey(
-                state.getHopefullyUniqueID(),
-                new Supplier<StrategyReplicator>() {
-                    @Override
+                state.getUniqueID(),
+                () -> {
 
-                    public StrategyReplicator get() {
+                    final StrategyReplicator replicator1 = new StrategyReplicator(
+                        options,
+                        new CashFlowObjective(60),
+                        inertia.applyAsDouble(
+                            state.getRandom())
+                    );
 
-                        final StrategyReplicator replicator = new StrategyReplicator(
-                            options,
-                            new CashFlowObjective(60),
-                            inertia.applyAsDouble(
-                                state.getRandom())
-                        );
-
-                        state.registerStartable(replicator);
+                    state.registerStartable(replicator1);
 
 
-                        for (int strategy = 0; strategy < options.size(); strategy++) {
-                            final int finalStrategy = strategy;
-                            state.getDailyDataSet().
-                                registerGatherer(
-                                    "Fishers using strategy " + strategy,
-                                    (Gatherer<FishState>) state1 -> {
-                                        double count = 0;
-                                        for (final Fisher fisher : state1.getFishers()) {
-                                            if (((ReplicatorDrivenDestinationStrategy) fisher.getDestinationStrategy()).getStrategyIndex() == finalStrategy)
-                                                count++;
-                                        }
-                                        return count;
+                    for (int strategy = 0; strategy < options.size(); strategy++) {
+                        final int finalStrategy = strategy;
+                        state.getDailyDataSet().
+                            registerGatherer(
+                                "Fishers using strategy " + strategy,
+                                (Gatherer<FishState>) state1 -> {
+                                    double count = 0;
+                                    for (final Fisher fisher : state1.getFishers()) {
+                                        if (((ReplicatorDrivenDestinationStrategy) fisher.getDestinationStrategy()).getStrategyIndex() == finalStrategy)
+                                            count++;
+                                    }
+                                    return count;
 
-                                    }, Double.NaN
-                                );
-                            final int finalStrategy1 = strategy;
-                            state.getDailyDataSet().
-                                registerGatherer(
-                                    "Fitness of strategy " + strategy,
-                                    new Gatherer<FishState>() {
-                                        @Override
-                                        public Double apply(final FishState state) {
-                                            return replicator.getLastObservedFitnesses()[finalStrategy1];
-                                        }
-                                    }, Double.NaN
-                                );
-                        }
-                        return replicator;
+                                }, Double.NaN
+                            );
+                        final int finalStrategy1 = strategy;
+                        state.getDailyDataSet().
+                            registerGatherer(
+                                "Fitness of strategy " + strategy,
+                                new Gatherer<FishState>() {
+                                    @Override
+                                    public Double apply(final FishState state12) {
+                                        return replicator1.getLastObservedFitnesses()[finalStrategy1];
+                                    }
+                                }, Double.NaN
+                            );
                     }
+                    return replicator1;
                 }
             );
 

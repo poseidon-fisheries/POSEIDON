@@ -16,129 +16,51 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 
-import java.util.function.Supplier;
-
 /**
  * a gear strategy with little re-use I am afraid.
  * Basically changes selectivity of the gear while keeping the catchability and retention fixed
  */
-public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy>{
-
-    /**
-     * probability this gets activated
-     */
-    private AlgorithmFactory<? extends AdaptationProbability>
-            probability = new FixedProbabilityFactory(.2, .6);
-
-
-    /**
-     * when this is false, the agent will change bi-monthly
-     */
-    private boolean yearly = false;
-
-    /**
-     * locker to make sure data collectors are done only once
-     */
-    private final Locker<String,Startable> locker = new Locker<>();
-
-    private double maxPercentageChangeA = .1;
-
-    private double maxPercentageChangeB = .1;
-
-
-
-    @Override
-    public PeriodicUpdateGearStrategy apply(FishState model) {
-
-        locker.presentKey(
-                model.getHopefullyUniqueID(),
-                new Supplier<Startable>() {
-                    @Override
-                    public Startable get() {
-
-                        model.registerStartable(SELECTIVITY_DATA_GATHERERS);
-                        return SELECTIVITY_DATA_GATHERERS;
-
-                    }
-                }
-        );
-        return new PeriodicUpdateGearStrategy
-                (
-                        yearly,
-                        new RandomStep<Gear>() {
-                            @Override
-                            public Gear randomStep(FishState state,
-                                                   MersenneTwisterFast random,
-                                                   Fisher fisher,
-                                                   Gear current) {
-                                SelectivityAbundanceGear actualGear =
-                                        (SelectivityAbundanceGear)
-                                                DecoratorGearPair.getActualGear(current).getDecorated();
-
-
-                                double newAParameter = actualGear.getaParameter() *(1d-maxPercentageChangeA + 2 * random.nextDouble()*maxPercentageChangeA);
-                                double newBParameter = actualGear.getbParameter() *(1d-maxPercentageChangeB + 2 * random.nextDouble()*maxPercentageChangeB);
-                                if(actualGear.getRetention()==null)
-                                    return new SelectivityAbundanceGear(
-                                            actualGear.getLitersOfGasConsumedEachHourFishing(),
-                                            actualGear.getCatchabilityFilter(),
-                                            new LogisticAbundanceFilter(newAParameter,newBParameter,
-                                                    actualGear.getSelectivity().isMemoization(),
-                                                    actualGear.getSelectivity().isRounding(), true)
-                                    );
-                                else
-                                    return new SelectivityAbundanceGear(
-                                            actualGear.getLitersOfGasConsumedEachHourFishing(),
-                                            actualGear.getCatchabilityFilter(),
-                                            new LogisticAbundanceFilter(newAParameter,newBParameter,
-                                                    actualGear.getSelectivity().isMemoization(),
-                                                    actualGear.getSelectivity().isRounding(), true),
-                                            actualGear.getRetention()
-                                    );
-                            }
-                        },
-                        probability.apply(model)
-                );
-
-
-    }
+public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
 
     public final static Startable SELECTIVITY_DATA_GATHERERS = new Startable() {
         @Override
-        public void start(FishState model) {
+        public void start(final FishState model) {
             //first add data gatherers
-            Gatherer<FishState> aParameterGatherer = state -> {
-                double size = state.getFishers().size();
+            final Gatherer<FishState> aParameterGatherer = state -> {
+                final double size = state.getFishers().size();
                 if (size == 0)
                     return Double.NaN;
                 else {
                     double total = 0;
-                    for (Fisher fisher1 : state.getFishers())
-                        total += ((SelectivityAbundanceGear) DecoratorGearPair.getActualGear(fisher1.getGear()).getDecorated()).
-                                getaParameter();
+                    for (final Fisher fisher1 : state.getFishers())
+                        total += ((SelectivityAbundanceGear) DecoratorGearPair.getActualGear(fisher1.getGear())
+                            .getDecorated()).
+                            getaParameter();
                     return total / size;
                 }
             };
             model.getDailyDataSet().registerGatherer("Average Selectivity A Parameter", aParameterGatherer, Double.NaN);
-            model.getYearlyDataSet().registerGatherer("Average Selectivity A Parameter", aParameterGatherer, Double.NaN);
+            model.getYearlyDataSet()
+                .registerGatherer("Average Selectivity A Parameter", aParameterGatherer, Double.NaN);
 
-            Gatherer<FishState> bParameterGatherer = state -> {
-                double size = state.getFishers().size();
+            final Gatherer<FishState> bParameterGatherer = state -> {
+                final double size = state.getFishers().size();
                 if (size == 0)
                     return Double.NaN;
                 else {
                     double total = 0;
-                    for (Fisher fisher1 : state.getFishers())
-                        total += ((SelectivityAbundanceGear) DecoratorGearPair.getActualGear(fisher1.getGear()).getDecorated()).
-                                getbParameter();
+                    for (final Fisher fisher1 : state.getFishers())
+                        total += ((SelectivityAbundanceGear) DecoratorGearPair.getActualGear(fisher1.getGear())
+                            .getDecorated()).
+                            getbParameter();
                     return total / size;
                 }
             };
             model.getDailyDataSet().registerGatherer("Average Selectivity B Parameter", bParameterGatherer, Double.NaN);
-            model.getYearlyDataSet().registerGatherer("Average Selectivity B Parameter", bParameterGatherer, Double.NaN);
+            model.getYearlyDataSet()
+                .registerGatherer("Average Selectivity B Parameter", bParameterGatherer, Double.NaN);
 
         }
-
 
 
         @Override
@@ -146,13 +68,84 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
 
         }
     };
+    /**
+     * locker to make sure data collectors are done only once
+     */
+    private final Locker<String, Startable> locker = new Locker<>();
+    /**
+     * probability this gets activated
+     */
+    private AlgorithmFactory<? extends AdaptationProbability>
+        probability = new FixedProbabilityFactory(.2, .6);
+    /**
+     * when this is false, the agent will change bi-monthly
+     */
+    private boolean yearly = false;
+    private double maxPercentageChangeA = .1;
+    private double maxPercentageChangeB = .1;
 
+    @Override
+    public PeriodicUpdateGearStrategy apply(final FishState model) {
+
+        locker.presentKey(
+            model.getUniqueID(),
+            () -> {
+
+                model.registerStartable(SELECTIVITY_DATA_GATHERERS);
+                return SELECTIVITY_DATA_GATHERERS;
+
+            }
+        );
+        return new PeriodicUpdateGearStrategy
+            (
+                yearly,
+                new RandomStep<Gear>() {
+                    @Override
+                    public Gear randomStep(
+                        final FishState state,
+                        final MersenneTwisterFast random,
+                        final Fisher fisher,
+                        final Gear current
+                    ) {
+                        final SelectivityAbundanceGear actualGear =
+                            (SelectivityAbundanceGear)
+                                DecoratorGearPair.getActualGear(current).getDecorated();
+
+
+                        final double newAParameter = actualGear.getaParameter() * (1d - maxPercentageChangeA + 2 * random.nextDouble() * maxPercentageChangeA);
+                        final double newBParameter = actualGear.getbParameter() * (1d - maxPercentageChangeB + 2 * random.nextDouble() * maxPercentageChangeB);
+                        if (actualGear.getRetention() == null)
+                            return new SelectivityAbundanceGear(
+                                actualGear.getLitersOfGasConsumedEachHourFishing(),
+                                actualGear.getCatchabilityFilter(),
+                                new LogisticAbundanceFilter(newAParameter, newBParameter,
+                                    actualGear.getSelectivity().isMemoization(),
+                                    actualGear.getSelectivity().isRounding(), true
+                                )
+                            );
+                        else
+                            return new SelectivityAbundanceGear(
+                                actualGear.getLitersOfGasConsumedEachHourFishing(),
+                                actualGear.getCatchabilityFilter(),
+                                new LogisticAbundanceFilter(newAParameter, newBParameter,
+                                    actualGear.getSelectivity().isMemoization(),
+                                    actualGear.getSelectivity().isRounding(), true
+                                ),
+                                actualGear.getRetention()
+                            );
+                    }
+                },
+                probability.apply(model)
+            );
+
+
+    }
 
     public AlgorithmFactory<? extends AdaptationProbability> getProbability() {
         return probability;
     }
 
-    public void setProbability(AlgorithmFactory<? extends AdaptationProbability> probability) {
+    public void setProbability(final AlgorithmFactory<? extends AdaptationProbability> probability) {
         this.probability = probability;
     }
 
@@ -160,7 +153,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
         return yearly;
     }
 
-    public void setYearly(boolean yearly) {
+    public void setYearly(final boolean yearly) {
         this.yearly = yearly;
     }
 
@@ -168,7 +161,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
         return maxPercentageChangeA;
     }
 
-    public void setMaxPercentageChangeA(double maxPercentageChangeA) {
+    public void setMaxPercentageChangeA(final double maxPercentageChangeA) {
         this.maxPercentageChangeA = maxPercentageChangeA;
     }
 
@@ -176,7 +169,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
         return maxPercentageChangeB;
     }
 
-    public void setMaxPercentageChangeB(double maxPercentageChangeB) {
+    public void setMaxPercentageChangeB(final double maxPercentageChangeB) {
         this.maxPercentageChangeB = maxPercentageChangeB;
     }
 }

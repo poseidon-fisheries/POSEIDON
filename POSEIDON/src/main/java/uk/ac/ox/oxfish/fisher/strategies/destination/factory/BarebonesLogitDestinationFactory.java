@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 7/17/17.
@@ -69,15 +68,12 @@ public abstract class BarebonesLogitDestinationFactory implements
     public LogitDestinationStrategy apply(final FishState state) {
         //create the discretization
         final MapDiscretization discretization = discretizationLocker.presentKey(
-            state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
-                @Override
-                public MapDiscretization get() {
-                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                    toReturn.discretize(state.getMap());
-                    return toReturn;
+            state.getUniqueID(), () -> {
+                final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                toReturn.discretize(state.getMap());
+                return toReturn;
 
-                }
             }
         );
 
@@ -108,6 +104,18 @@ public abstract class BarebonesLogitDestinationFactory implements
 
     }
 
+    protected double[][] buildBetas(final FishState state, final int areas, final List<Integer> validAreas) {
+        //the same parameters for all the choices
+        final double[][] betas = new double[areas][2];
+        betas[0][0] = habitIntercept.applyAsDouble(state.getRandom());
+        betas[0][1] = distanceInKm.applyAsDouble(state.getRandom());
+        for (int i = 1; i < areas; i++) {
+            betas[i][0] = betas[0][0];
+            betas[i][1] = betas[0][1];
+        }
+        return betas;
+    }
+
     @NotNull
     protected ObservationExtractor[][] buildExtractors(
         final FishState state, final MapDiscretization discretization, final int areas, final double[][] betas
@@ -126,20 +134,26 @@ public abstract class BarebonesLogitDestinationFactory implements
         return extractors;
     }
 
-    protected double[][] buildBetas(final FishState state, final int areas, final List<Integer> validAreas) {
-        //the same parameters for all the choices
-        final double[][] betas = new double[areas][2];
-        betas[0][0] = habitIntercept.applyAsDouble(state.getRandom());
-        betas[0][1] = distanceInKm.applyAsDouble(state.getRandom());
-        for (int i = 1; i < areas; i++) {
-            betas[i][0] = betas[0][0];
-            betas[i][1] = betas[0][1];
-        }
-        return betas;
-    }
-
     @NotNull
     public abstract ObservationExtractor buildHabitExtractor(MapDiscretization discretization, int period);
+
+    /**
+     * Getter for property 'habitPeriodInDays'.
+     *
+     * @return Value for property 'habitPeriodInDays'.
+     */
+    public DoubleParameter getHabitPeriodInDays() {
+        return habitPeriodInDays;
+    }
+
+    /**
+     * Setter for property 'habitPeriodInDays'.
+     *
+     * @param habitPeriodInDays Value to set for property 'habitPeriodInDays'.
+     */
+    public void setHabitPeriodInDays(final DoubleParameter habitPeriodInDays) {
+        this.habitPeriodInDays = habitPeriodInDays;
+    }
 
     /**
      * Getter for property 'habitIntercept'.
@@ -196,25 +210,6 @@ public abstract class BarebonesLogitDestinationFactory implements
     ) {
         this.discretizer = discretizer;
     }
-
-    /**
-     * Getter for property 'habitPeriodInDays'.
-     *
-     * @return Value for property 'habitPeriodInDays'.
-     */
-    public DoubleParameter getHabitPeriodInDays() {
-        return habitPeriodInDays;
-    }
-
-    /**
-     * Setter for property 'habitPeriodInDays'.
-     *
-     * @param habitPeriodInDays Value to set for property 'habitPeriodInDays'.
-     */
-    public void setHabitPeriodInDays(final DoubleParameter habitPeriodInDays) {
-        this.habitPeriodInDays = habitPeriodInDays;
-    }
-
 
     /**
      * Getter for property 'automaticallyAvoidMPA'.

@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * A factory for the kitchen sink regulation, it is itself just a collection of factories
@@ -38,16 +37,11 @@ import java.util.function.Supplier;
  */
 public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulation> {
 
-    boolean individualTradeableQuotas = true;
-
-
     final private TemporaryProtectedAreasFactory mpa = new TemporaryProtectedAreasFactory();
-
     final private FishingSeasonFactory seasons = new FishingSeasonFactory();
-
     final private MultiITQStringFactory itqFactory = new MultiITQStringFactory();
-
     final private MultiTACStringFactory tacFactory = new MultiTACStringFactory();
+    boolean individualTradeableQuotas = true;
 
     public KitchenSinkFactory() {
         //we are going to sync them
@@ -63,28 +57,32 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      * @return the function result
      */
     @Override
-    public KitchenSinkRegulation apply(FishState fishState) {
-        TemporaryProtectedArea subcomponent1 = mpa.apply(fishState);
-        FishingSeason subcomponent2 = seasons.apply(fishState);
+    public KitchenSinkRegulation apply(final FishState fishState) {
+        final TemporaryProtectedArea subcomponent1 = mpa.apply(fishState);
+        final FishingSeason subcomponent2 = seasons.apply(fishState);
 
-        MultiQuotaRegulation subcomponent3;
-        if(individualTradeableQuotas)
+        final MultiQuotaRegulation subcomponent3;
+        if (individualTradeableQuotas)
             subcomponent3 = itqFactory.apply(fishState);
         else
             subcomponent3 = tacFactory.apply(fishState);
 
-        KitchenSinkRegulation reg = new KitchenSinkRegulation(subcomponent1,
-                                                              subcomponent2,
-                                                              subcomponent3);
+        final KitchenSinkRegulation reg = new KitchenSinkRegulation(
+            subcomponent1,
+            subcomponent2,
+            subcomponent3
+        );
 
-        if(individualTradeableQuotas) {
+        if (individualTradeableQuotas) {
             //initializes
             itqFactory.apply(fishState);
-            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().presentKey(fishState.getHopefullyUniqueID(),
-                                                                                        () -> {
-                                                                                            throw new RuntimeException("Should be initialized already!!!");
-                                                                                        }))
-                if(builder!=null)
+            for (final ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().presentKey(
+                fishState.getUniqueID(),
+                () -> {
+                    throw new RuntimeException("Should be initialized already!!!");
+                }
+            ))
+                if (builder != null)
                     builder.addTrader(reg);
         }
         return reg;
@@ -96,7 +94,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         return individualTradeableQuotas;
     }
 
-    public void setIndividualTradeableQuotas(boolean individualTradeableQuotas) {
+    public void setIndividualTradeableQuotas(final boolean individualTradeableQuotas) {
         this.individualTradeableQuotas = individualTradeableQuotas;
     }
 
@@ -104,7 +102,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         return seasons.getSeasonLength();
     }
 
-    public void setSeasonLength(DoubleParameter seasonLength) {
+    public void setSeasonLength(final DoubleParameter seasonLength) {
         seasons.setSeasonLength(seasonLength);
     }
 
@@ -112,7 +110,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         return itqFactory.getYearlyQuotaMaps();
     }
 
-    public void setYearlyQuotaMaps(String yearlyQuotaMaps) {
+    public void setYearlyQuotaMaps(final String yearlyQuotaMaps) {
         itqFactory.setYearlyQuotaMaps(yearlyQuotaMaps);
         tacFactory.setYearlyQuotaMaps(yearlyQuotaMaps);
     }
@@ -131,7 +129,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      *
      * @param startDay Value to set for property 'startDay'.
      */
-    public void setStartDay(DoubleParameter startDay) {
+    public void setStartDay(final DoubleParameter startDay) {
         mpa.setStartDay(startDay);
     }
 
@@ -149,7 +147,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      *
      * @param startingMPAs Value to set for property 'startingMPAs'.
      */
-    public void setStartingMPAs(List<StartingMPA> startingMPAs) {
+    public void setStartingMPAs(final List<StartingMPA> startingMPAs) {
         mpa.setStartingMPAs(startingMPAs);
     }
 
@@ -168,7 +166,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      *
      * @param duration Value to set for property 'duration'.
      */
-    public void setDuration(DoubleParameter duration) {
+    public void setDuration(final DoubleParameter duration) {
         mpa.setDuration(duration);
     }
 }

@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Creates both individual quotas like the IQMonoFactory and a quota market for fishers to trade in
@@ -71,16 +70,13 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
 
         final ITQMarketBuilder marketBuilder =
             marketBuilders.presentKey(
-                state.getHopefullyUniqueID(),
-                new Supplier<ITQMarketBuilder>() {
-                    @Override
-                    public ITQMarketBuilder get() {
-                        //if not, create it!
-                        final ITQMarketBuilder initializer = new ITQMarketBuilder(0);
-                        //make sure it will start with the model
-                        state.registerStartable(initializer);
-                        return initializer;
-                    }
+                state.getUniqueID(),
+                () -> {
+                    //if not, create it!
+                    final ITQMarketBuilder initializer = new ITQMarketBuilder(0);
+                    //make sure it will start with the model
+                    state.registerStartable(initializer);
+                    return initializer;
                 }
             );
 

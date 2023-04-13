@@ -21,14 +21,11 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import uk.ac.ox.oxfish.biology.initializer.YellowBycatchInitializer;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Function;
 
 /**
  * Created by carrknight on 1/21/17.
@@ -74,7 +71,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     public YellowBycatchInitializer apply(final FishState state) {
         final int northSouthSeparator = (int) this.northSouthSeparator.applyAsDouble(state.getRandom());
         return instance.presentKey(
-            state.getHopefullyUniqueID(),
+            state.getUniqueID(),
             () -> new YellowBycatchInitializer(
                 separateBycatchStock,
                 targetSpeciesName,
@@ -97,7 +94,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
                 targetInitialRecruits.applyAsDouble(state.getRandom()),
                 (int) verticalSeparator.applyAsDouble(state.getRandom()),
                 northSouthSeparator,
-                (Function<SeaTile, Double>) seaTile -> {
+                seaTile -> {
                     if (seaTile.getGridY() < northSouthSeparator)
                         return proportionOfBycatchNorth.applyAsDouble(state.getRandom());
                     else

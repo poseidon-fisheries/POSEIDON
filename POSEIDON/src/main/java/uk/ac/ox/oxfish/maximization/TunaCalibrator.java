@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.maximization;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableIntArray;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
@@ -132,34 +131,12 @@ public class TunaCalibrator {
         }));
     }
 
-    static void evaluateSolutionAndPrintOutErrors(
-        final Path calibrationFilePath,
-        final double[] solution
-    ) {
-        saveCalibratedScenario(solution, calibrationFilePath);
-        new TunaEvaluator(calibrationFilePath, solution).run();
-    }
-
-    private static void saveCalibratedScenario(
-        final double[] optimalParameters,
-        final Path calibrationFilePath
-    ) {
-
-        final Path calibratedScenarioPath =
-            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            final GenericOptimization optimization =
-                GenericOptimization.fromFile(calibrationFilePath);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public double[] run() {
+        final Path calibrationFilePath =
+            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
+        final double[] solution = calibrate(calibrationFilePath);
+        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+        return solution;
     }
 
     private static Path copyToFolder(final Path sourceFile, final Path targetFolder) {
@@ -168,25 +145,6 @@ public class TunaCalibrator {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public static void logCurrentTime(final SimState simState) {
-        LogManager.getLogger("run_timer").debug(() ->
-            new ObjectArrayMessage(
-                Thread.currentThread().getId(),
-                ((FishState) simState).getTrulyUniqueID(),
-                ((FishState) simState).getStep(),
-                System.currentTimeMillis()
-            )
-        );
-    }
-
-    public double[] run() {
-        final Path calibrationFilePath =
-            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
-        final double[] solution = calibrate(calibrationFilePath);
-        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
-        return solution;
     }
 
     @NotNull
@@ -309,6 +267,47 @@ public class TunaCalibrator {
 
     }
 
+    static void evaluateSolutionAndPrintOutErrors(
+        final Path calibrationFilePath,
+        final double[] solution
+    ) {
+        saveCalibratedScenario(solution, calibrationFilePath);
+        new TunaEvaluator(calibrationFilePath, solution).run();
+    }
+
+    private static void saveCalibratedScenario(
+        final double[] optimalParameters,
+        final Path calibrationFilePath
+    ) {
+
+        final Path calibratedScenarioPath =
+            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
+
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization =
+                GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static void logCurrentTime(final SimState simState) {
+        LogManager.getLogger("run_timer").debug(() ->
+            new ObjectArrayMessage(
+                Thread.currentThread().getId(),
+                ((FishState) simState).getUniqueID(),
+                ((FishState) simState).getStep(),
+                System.currentTimeMillis()
+            )
+        );
+    }
+
     @SuppressWarnings("unused")
     public boolean isVerbose() {
         return verbose;
@@ -381,7 +380,7 @@ public class TunaCalibrator {
         return optimizationRoutine;
     }
 
-    public void setOptimizationRoutine(OptimizationRoutine optimizationRoutine) {
+    public void setOptimizationRoutine(final OptimizationRoutine optimizationRoutine) {
         this.optimizationRoutine = optimizationRoutine;
     }
 
@@ -405,7 +404,7 @@ public class TunaCalibrator {
         this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
     }
 
-    public static enum OptimizationRoutine {
+    public enum OptimizationRoutine {
 
         NELDER_MEAD,
 

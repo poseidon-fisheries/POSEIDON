@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * creates a simple RUM a la Abbot and Wilen (2011) and cognates; with revenue, distance, habit and CPUE as covariates
@@ -79,15 +78,12 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
         //create the discretization
         final MapDiscretization discretization = discretizationLocker.presentKey(
-            state.getHopefullyUniqueID(), new Supplier<MapDiscretization>() {
-                @Override
-                public MapDiscretization get() {
-                    final MapDiscretizer mapDiscretizer = discretizer.apply(state);
-                    final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
-                    toReturn.discretize(state.getMap());
-                    return toReturn;
+            state.getUniqueID(), () -> {
+                final MapDiscretizer mapDiscretizer = discretizer.apply(state);
+                final MapDiscretization toReturn = new MapDiscretization(mapDiscretizer);
+                toReturn.discretize(state.getMap());
+                return toReturn;
 
-                }
             }
         );
 
@@ -122,16 +118,13 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
         if (logToFile) {
             final LogisticLogs logs = logLocker.presentKey(
-                state.getHopefullyUniqueID(),
-                new Supplier<LogisticLogs>() {
-                    @Override
-                    public LogisticLogs get() {
-                        final LogisticLogs logisticLogs = new LogisticLogs();
-                        logisticLogs.setFileName("simpleRUM.csv");
-                        state.getOutputPlugins().add(logisticLogs);
-                        return logisticLogs;
+                state.getUniqueID(),
+                () -> {
+                    final LogisticLogs logisticLogs = new LogisticLogs();
+                    logisticLogs.setFileName("simpleRUM.csv");
+                    state.getOutputPlugins().add(logisticLogs);
+                    return logisticLogs;
 
-                    }
                 }
             );
             final String[] columnNames = new String[betaCPUE.size() + 4];
@@ -217,7 +210,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
             return buildTripLaggedExtractors(discretization, state);
         else
             return fleetWideLocker.presentKey(
-                state.getHopefullyUniqueID(),
+                state.getUniqueID(),
                 () -> buildTripLaggedExtractors(discretization, state)
             );
 
