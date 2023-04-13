@@ -36,7 +36,7 @@ public class BiomassAggregatingFad
     extends AggregatingFad<BiomassLocalBiology, BiomassAggregatingFad> {
 
     public BiomassAggregatingFad(
-        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> owner,
+        final FadManager<BiomassLocalBiology> owner,
         final BiomassLocalBiology biology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,

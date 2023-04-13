@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 public class BiomassPurseSeineGear extends PurseSeineGear<BiomassLocalBiology> {
 
     public BiomassPurseSeineGear(
-        final FadManager<BiomassLocalBiology, ?> fadManager,
+        final FadManager<BiomassLocalBiology> fadManager,
         final double successfulFadSetProbability
     ) {
         super(fadManager, successfulFadSetProbability);

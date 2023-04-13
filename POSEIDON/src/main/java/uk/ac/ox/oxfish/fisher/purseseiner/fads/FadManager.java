@@ -54,7 +54,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeG
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
+public class FadManager<B extends LocalBiology> {
 
     private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
         ImmutableList.of(
@@ -67,8 +67,8 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
         biomassLostMonitor;
-    private final ListOrderedSet<F> deployedFads = new ListOrderedSet<>();
-    private final FadInitializer<B, F> fadInitializer;
+    private final ListOrderedSet<Fad<?, ?>> deployedFads = new ListOrderedSet<>();
+    private final FadInitializer<B, ?> fadInitializer;
     private final FishValueCalculator fishValueCalculator;
     private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
@@ -76,7 +76,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
 
     public FadManager(
         final FadMap fadMap,
-        final FadInitializer<B, F> fadInitializer,
+        final FadInitializer<B, ?> fadInitializer,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
@@ -101,7 +101,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     @SuppressWarnings("rawtypes")
     public FadManager(
         final FadMap fadMap,
-        final FadInitializer<B, F> fadInitializer,
+        final FadInitializer<B, ?> fadInitializer,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractSetAction>> allSetsObservers,
         final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
@@ -153,7 +153,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         observers.register(observedClass, observer);
     }
 
-    public static FadManager<? extends LocalBiology, ? extends Fad<? extends LocalBiology, ? extends Fad<?, ?>>> getFadManager(
+    public static FadManager<? extends LocalBiology> getFadManager(
         final Fisher fisher
     ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
@@ -163,7 +163,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     }
 
     public static Optional<
-        FadManager<? extends LocalBiology, ? extends Fad<? extends LocalBiology, ? extends Fad<?, ?>>>
+        FadManager<? extends LocalBiology>
         > maybeGetFadManager(
         final Fisher fisher
     ) {
@@ -199,7 +199,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         this.fisher = fisher;
     }
 
-    public Stream<F> getFadsAt(final SeaTile location) {
+    public Stream<Fad<?, ?>> getFadsAt(final SeaTile location) {
         return bagToStream(fadMap.fadsAt(location));
     }
 
@@ -209,21 +209,21 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
         fad.lose();
     }
 
-    public F deployFadInCenterOfTile(final SeaTile seaTile, final MersenneTwisterFast rng) {
+    public Fad<?, ?> deployFadInCenterOfTile(final SeaTile seaTile, final MersenneTwisterFast rng) {
         final Double2D location = new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5);
         return deployFad(seaTile, location, rng);
     }
 
-    public F deployFad(final SeaTile seaTile, final Double2D location, final MersenneTwisterFast rng) {
-        final F newFad = initFad(seaTile, rng);
+    public Fad<?, ?> deployFad(final SeaTile seaTile, final Double2D location, final MersenneTwisterFast rng) {
+        final Fad<?, ?> newFad = initFad(seaTile, rng);
         fadMap.deployFad(newFad, location);
         return newFad;
     }
 
-    private F initFad(final SeaTile tile, final MersenneTwisterFast rng) {
+    private Fad<?, ?> initFad(final SeaTile tile, final MersenneTwisterFast rng) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
-        final F newFad = fadInitializer.makeFad(
+        final Fad<?, ?> newFad = fadInitializer.makeFad(
             this,
             fisher,
             tile,
@@ -236,7 +236,7 @@ public class FadManager<B extends LocalBiology, F extends Fad<B, F>> {
     /**
      * Deploys a FAD at a random position in the given sea tile.
      */
-    public F deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
+    public Fad<?, ?> deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
         final Double2D location = new Double2D(
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()

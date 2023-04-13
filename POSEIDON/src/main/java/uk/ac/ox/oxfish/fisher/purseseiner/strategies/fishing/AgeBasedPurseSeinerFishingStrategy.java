@@ -71,9 +71,9 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
     ) {
         //if we know it is a fad action (own fad, not opportunistic)
         if (action instanceof FadSetAction) {
-            assert ((AbstractFadSetAction<?>) action).isOwnFad();
+            assert ((AbstractFadSetAction) action).isOwnFad();
             final int stepItWasDeployed =
-                ((AbstractFadSetAction<?>) action).getFad().getStepDeployed();
+                ((AbstractFadSetAction) action).getFad().getStepDeployed();
             final int time = action.getFisher().grabState().getDay() - stepItWasDeployed;
             assert time >= 0;
             return time;

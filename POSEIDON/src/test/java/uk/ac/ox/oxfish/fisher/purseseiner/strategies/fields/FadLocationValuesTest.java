@@ -60,7 +60,7 @@ public class FadLocationValuesTest {
         final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
         final FadMap fadMap = mock(FadMap.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);

@@ -151,8 +151,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 .map(action.getDate()::atTime)
                 .orElseThrow(() -> new IllegalStateException("Time not set for action: " + action));
             this.fadId = Optional.of(action)
-                .filter(a -> a instanceof FadRelatedAction<?, ?>)
-                .map(a -> ((FadRelatedAction<?, ?>) a).getFad())
+                .filter(a -> a instanceof FadRelatedAction)
+                .map(a -> ((FadRelatedAction) a).getFad())
                 .map(Fad::getId)
                 .map(Object::toString)
                 .orElse("NA");

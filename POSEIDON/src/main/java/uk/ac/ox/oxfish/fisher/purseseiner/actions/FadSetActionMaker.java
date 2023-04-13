@@ -19,14 +19,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 @FunctionalInterface
-public interface FadSetActionMaker<
-    B extends LocalBiology,
-    A extends AbstractFadSetAction<B>> {
+public interface FadSetActionMaker<A extends AbstractFadSetAction> {
 
     A make(Fad<?, ?> target, Fisher fisher, double duration);
 }

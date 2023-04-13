@@ -27,13 +27,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 
 import java.util.function.BiPredicate;
 
-public class BiomassFadSetOpportunityGenerator<
-    A extends FadSetAction<BiomassLocalBiology>
-    > extends FadSetOpportunityGenerator<BiomassLocalBiology, BiomassAggregatingFad, A> {
+public class BiomassFadSetOpportunityGenerator<A extends FadSetAction>
+    extends FadSetOpportunityGenerator<BiomassLocalBiology, BiomassAggregatingFad, A> {
 
     public BiomassFadSetOpportunityGenerator(
         final BiPredicate<Fisher, BiomassAggregatingFad> fadPredicate,
-        final FadSetActionMaker<BiomassLocalBiology, A> actionMaker,
+        final FadSetActionMaker<A> actionMaker,
         final DurationSampler durationSampler
     ) {
         super(fadPredicate, actionMaker, durationSampler);

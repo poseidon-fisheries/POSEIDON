@@ -63,7 +63,7 @@ public class SetOpportunityDetectorTest {
         final Hold hold = mock(Hold.class);
         final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
         final Fisher fisher = mock(Fisher.class);
         final FishState fishState = mock(FishState.class);
         final BiomassAggregatingFad ownFad = mock(BiomassAggregatingFad.class);
@@ -80,7 +80,7 @@ public class SetOpportunityDetectorTest {
         when(fisher.getLocation()).thenReturn(seaTile);
         when(seaTile.getGridLocation()).thenReturn(new Int2D(0, 0));
         when(seaTile.getBiology()).thenReturn(new EmptyLocalBiology());
-        when(ownFad.getOwner()).thenReturn((FadManager<BiomassLocalBiology, BiomassAggregatingFad>) fadManager);
+        when(ownFad.getOwner()).thenReturn(fadManager);
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[]{ownFad, otherFad}));
         when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);

@@ -84,7 +84,7 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
     }
 
     @Override
-    void notify(final FadManager<?, ?> fadManager) {
+    void notify(final FadManager<?> fadManager) {
         fadManager.reactTo(this);
     }
 

@@ -43,7 +43,7 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad<B, F>> impl
     /**
      * the object that keeps track of how many fads are in the water due to us
      */
-    private FadManager<B, F> fadManager;
+    private FadManager<B> fadManager;
 
     /**
      * generates an exogenous map maper that reads from a mapping day--->list of coordinates

@@ -55,19 +55,20 @@ import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * The main model object. Like all the other simstates it holds the reference
@@ -89,7 +90,7 @@ public class FishState extends SimState {
     /**
      * all the objects that need to be started when this model starts but also need a reference to the original fisher
      */
-    private final List<Pair<Fisher, FisherStartable>> fisherStartables = new LinkedList<>();
+    private final List<Entry<Fisher, FisherStartable>> fisherStartables = new LinkedList<>();
     /**
      * x steps equal 1 day
      */
@@ -233,9 +234,9 @@ public class FishState extends SimState {
 
         //schedule aggregate steppables
 
-        for (final Map.Entry<StepOrder, AggregateSteppable> steppable : aggregateYearlySteppables.entrySet())
+        for (final Entry<StepOrder, AggregateSteppable> steppable : aggregateYearlySteppables.entrySet())
             schedule.scheduleRepeating(steppable.getValue(), steppable.getKey().ordinal(), stepsPerDay * 365);
-        for (final Map.Entry<StepOrder, AggregateSteppable> steppable : aggregateDailySteppables.entrySet())
+        for (final Entry<StepOrder, AggregateSteppable> steppable : aggregateDailySteppables.entrySet())
             schedule.scheduleRepeating(steppable.getValue(), steppable.getKey().ordinal(), stepsPerDay);
 
         this.startDate = scenario.getStartDate();
@@ -284,8 +285,9 @@ public class FishState extends SimState {
         for (final Startable startable : toStart)
             startable.start(this);
 
-        for (final Pair<Fisher, FisherStartable> startable : fisherStartables)
-            startable.getSecond().start(this, startable.getFirst());
+        fisherStartables.forEach(entry ->
+            entry.getValue().start(this, entry.getKey())
+        );
         dailyDataSet.start(this, this);
         yearlyDataSet.start(this, this);
         started = true;
@@ -544,7 +546,7 @@ public class FishState extends SimState {
         if (started)
             startable.start(this, fisher);
         else
-            fisherStartables.add(new Pair<>(fisher, startable));
+            fisherStartables.add(entry(fisher, startable));
     }
 
     /**
@@ -666,7 +668,7 @@ public class FishState extends SimState {
 
     }
 
-    public Set<Map.Entry<String, FisherFactory>> getFisherFactories() {
+    public Set<Entry<String, FisherFactory>> getFisherFactories() {
         return fisherFactory.entrySet();
 
     }

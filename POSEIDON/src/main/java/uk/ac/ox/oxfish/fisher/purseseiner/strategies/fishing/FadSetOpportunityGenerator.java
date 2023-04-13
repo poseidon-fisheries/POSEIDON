@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
@@ -35,15 +34,15 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public class FadSetOpportunityGenerator<
     B extends LocalBiology,
     F extends Fad<B, F>,
-    A extends AbstractFadSetAction<B>>
+    A extends AbstractFadSetAction>
     extends SetOpportunityGenerator<B, A> {
 
     private final BiPredicate<Fisher, F> fadPredicate;
-    private final FadSetActionMaker<B, A> actionMaker;
+    private final FadSetActionMaker<A> actionMaker;
 
     public FadSetOpportunityGenerator(
         final BiPredicate<Fisher, F> fadPredicate,
-        final FadSetActionMaker<B, A> actionMaker,
+        final FadSetActionMaker<A> actionMaker,
         final DoubleSupplier durationSampler
     ) {
         super(durationSampler);
@@ -55,7 +54,7 @@ public class FadSetOpportunityGenerator<
     public Collection<A> apply(final Fisher fisher) {
         return getFadManager(fisher)
             .getFadsAt(fisher.getLocation())
-            .filter((Predicate<Fad<? extends LocalBiology, ? extends Fad<?, ?>>>) Fad::isActive)
+            .filter(Fad::isActive)
             .filter(fad -> fadPredicate.test(fisher, (F) fad))
             .map(fad -> actionMaker.make(fad, fisher, getDurationSampler().getAsDouble()))
             .collect(toImmutableList());

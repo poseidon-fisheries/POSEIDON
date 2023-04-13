@@ -37,12 +37,12 @@ import java.util.Optional;
 
 public abstract class PurseSeineGear<B extends LocalBiology> implements Gear {
 
-    private final FadManager<B, ?> fadManager;
+    private final FadManager<B> fadManager;
     private final double successfulFadSetProbability;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
-        final FadManager<B, ?> fadManager,
+        final FadManager<B> fadManager,
         final double successfulFadSetProbability
     ) {
         this.fadManager = fadManager;
@@ -67,7 +67,7 @@ public abstract class PurseSeineGear<B extends LocalBiology> implements Gear {
         return successfulFadSetProbability;
     }
 
-    public FadManager<B, ?> getFadManager() {
+    public FadManager<B> getFadManager() {
         return fadManager;
     }
 

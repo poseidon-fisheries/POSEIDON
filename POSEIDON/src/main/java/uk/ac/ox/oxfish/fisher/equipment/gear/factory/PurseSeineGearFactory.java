@@ -141,7 +141,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology>
     }
 
     @NotNull
-    FadManager<B, ?> makeFadManager(final FishState fishState) {
+    FadManager<B> makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
             this.actionSpecificRegulations.stream()
@@ -151,7 +151,7 @@ public abstract class PurseSeineGearFactory<B extends LocalBiology>
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
-        @SuppressWarnings("unchecked") final FadManager<B, ?> fadManager = new FadManager<>(
+        @SuppressWarnings("unchecked") final FadManager<B> fadManager = new FadManager<>(
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             fadDeploymentObserversCache.get(fishState),

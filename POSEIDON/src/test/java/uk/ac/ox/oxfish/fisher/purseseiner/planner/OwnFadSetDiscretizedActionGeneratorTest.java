@@ -68,7 +68,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
         final FadMap fadMap = mock(FadMap.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
 
@@ -153,7 +153,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
@@ -209,7 +209,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear<BiomassLocalBiology> gear = mock(PurseSeineGear.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
-        final FadManager<BiomassLocalBiology, ?> fadManager = gear.getFadManager();
+        final FadManager<BiomassLocalBiology> fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);

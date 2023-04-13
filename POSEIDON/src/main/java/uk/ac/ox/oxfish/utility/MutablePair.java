@@ -22,15 +22,20 @@ package uk.ac.ox.oxfish.utility;
 
 /**
  * Created by carrknight on 10/6/16.
+ *
+ * @deprecated Use {@link java.util.AbstractMap.SimpleImmutableEntry} for immutable pairs
+ * (easily created with {@link FishStateUtilities#entry(Object, Object) entry}), or a
+ * two-element array if you really need mutability.
  */
-public class MutablePair<A,B> {
+@Deprecated
+public class MutablePair<A, B> {
 
 
     private A first;
 
     private B second;
 
-    public MutablePair(A first, B second) {
+    public MutablePair(final A first, final B second) {
         this.first = first;
         this.second = second;
     }
@@ -40,17 +45,17 @@ public class MutablePair<A,B> {
         return first;
     }
 
-    public B getSecond() {
-        return second;
-    }
-
     /**
      * Setter for property 'first'.
      *
      * @param first Value to set for property 'first'.
      */
-    public void setFirst(A first) {
+    public void setFirst(final A first) {
         this.first = first;
+    }
+
+    public B getSecond() {
+        return second;
     }
 
     /**
@@ -58,7 +63,7 @@ public class MutablePair<A,B> {
      *
      * @param second Value to set for property 'second'.
      */
-    public void setSecond(B second) {
+    public void setSecond(final B second) {
         this.second = second;
     }
 }

@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public interface FadInitializer<B extends LocalBiology, F extends Fad<B, F>> {
 
     F makeFad(
-        final FadManager<B, F> fadManager,
+        final FadManager<B> fadManager,
         Fisher owner,
         SeaTile initialLocation,
         MersenneTwisterFast rng

@@ -66,7 +66,7 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
         final int stepDeployed,
         final Int2D locationDeployed,
         final double fishReleaseProbability,
-        final FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> owner,
+        final FadManager<AbundanceLocalBiology> owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,
@@ -152,13 +152,13 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad<AbundanceLoca
     }
 
     @Override
-    public void reactToStep(final FishState fishState) {
-        super.reactToStep(fishState);
-        catchPerTile = null;
+    protected CatchMaker<AbundanceLocalBiology> getCatchMaker() {
+        return new AbundanceCatchMaker(biology);
     }
 
     @Override
-    protected CatchMaker<AbundanceLocalBiology> getCatchMaker() {
-        return new AbundanceCatchMaker(biology);
+    public void reactToStep(final FishState fishState) {
+        super.reactToStep(fishState);
+        catchPerTile = null;
     }
 }

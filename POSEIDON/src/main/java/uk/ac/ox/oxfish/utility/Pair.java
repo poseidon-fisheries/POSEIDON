@@ -26,7 +26,8 @@ import java.util.AbstractMap;
  * The simplest pair object
  * Created by carrknight on 5/4/15.
  *
- * @deprecated Use {@link AbstractMap.SimpleImmutableEntry} instead.
+ * @deprecated Use {@link AbstractMap.SimpleImmutableEntry}
+ * (easily created with {@link FishStateUtilities#entry(Object, Object) entry}) instead.
  */
 @Deprecated
 public class Pair<A, B> {

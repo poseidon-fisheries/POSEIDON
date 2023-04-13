@@ -24,7 +24,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -77,8 +76,7 @@ public class DeploymentFromLocationValuePlanningModule
         // (1) the amount of fads in your boat
         // (2) the amount of deploy actions you are still allowed to make this year
         // (3) the number of active FAD sets this year
-        final FadManager<? extends LocalBiology, ? extends Fad<? extends LocalBiology, ? extends Fad<?, ?>>> fadManager = FadManager.getFadManager(
-            fisher);
+        final FadManager<? extends LocalBiology> fadManager = FadManager.getFadManager(fisher);
         return Math.min(
             Math.min(
                 fadManager.getNumFadsInStock(),

@@ -19,15 +19,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public class OpportunisticFadSetAction<B extends LocalBiology>
-    extends AbstractFadSetAction<B> {
+public class OpportunisticFadSetAction extends AbstractFadSetAction {
 
     public OpportunisticFadSetAction(
         final Fad<?, ?> fad,

@@ -51,7 +51,7 @@ public class FadSearchAction implements Action {
             else
                 return new ActionResult(new Arriving(), hoursLeft);
 
-        final FadManager<?, ?> fadManager = getFadManager(fisher);
+        final FadManager<?> fadManager = getFadManager(fisher);
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
 
         //grab a random, non owned fad

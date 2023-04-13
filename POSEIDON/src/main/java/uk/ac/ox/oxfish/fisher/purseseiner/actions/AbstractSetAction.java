@@ -94,7 +94,7 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
 
     abstract void reactToFailedSet(FishState model, SeaTile locationOfSet);
 
-    abstract void notify(FadManager<?, ?> fadManager);
+    abstract void notify(FadManager<?> fadManager);
 
     public LocalBiology getTargetBiology() {
         return targetBiology;

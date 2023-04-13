@@ -37,7 +37,7 @@ public class AbundanceAggregatingFad
     extends AggregatingFad<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
     public AbundanceAggregatingFad(
-        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad> owner,
+        final FadManager<AbundanceLocalBiology> owner,
         final AbundanceLocalBiology biology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final double fishReleaseProbability,

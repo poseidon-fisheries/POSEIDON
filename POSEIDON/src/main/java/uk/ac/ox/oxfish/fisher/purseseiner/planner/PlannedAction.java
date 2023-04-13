@@ -25,7 +25,7 @@ public interface PlannedAction {
     static boolean isActionAllowed(
         final Fisher fisher,
         final SeaTile location,
-        final FadManager<?, ?> fadManager,
+        final FadManager<?> fadManager,
         final Class<? extends PurseSeinerAction> actionClass
     ) {
         return fisher.isAllowedAtSea() &&
@@ -129,7 +129,7 @@ public interface PlannedAction {
 
         public static boolean isFadSetAllowed(
             final Fisher fisher,
-            final FadManager<?, ?> fadManager,
+            final FadManager<?> fadManager,
             final Fad<?, ?> set
         ) {
             return !set.isLost() && //the fad has not since been destroyed
@@ -139,7 +139,7 @@ public interface PlannedAction {
         @Override
         public Action[] actuate(final Fisher fisher) {
             return new Action[]{
-                new FadSetAction<>(
+                new FadSetAction(
                     fadWePlanToSetOn,
                     fisher,
                     hoursItTake()

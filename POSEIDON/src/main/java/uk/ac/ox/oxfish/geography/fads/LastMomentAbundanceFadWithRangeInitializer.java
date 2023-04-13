@@ -68,7 +68,7 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
 
     @Override
     public LastMomentAbundanceFadWithRange makeFad(
-        final FadManager<AbundanceLocalBiology, LastMomentAbundanceFadWithRange> fadManager,
+        final FadManager<AbundanceLocalBiology> fadManager,
         final Fisher owner,
         final SeaTile initialLocation,
         final MersenneTwisterFast rng

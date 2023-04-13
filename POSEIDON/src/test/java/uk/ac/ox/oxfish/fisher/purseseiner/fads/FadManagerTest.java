@@ -51,7 +51,7 @@ public class FadManagerTest extends TestCase {
 
         final FadMap fadMap = mock(FadMap.class);
 
-        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager =
+        final FadManager<BiomassLocalBiology> fadManager =
             new FadManager(fadMap, fadInitializer, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
@@ -76,24 +76,24 @@ public class FadManagerTest extends TestCase {
 
         fadManager.setFisher(fisher);
         fadManager.setNumFadsInStock(10);
-        final BiomassAggregatingFad fad1 = fadManager.deployFadInCenterOfTile(seaTile, rng);
+        final BiomassAggregatingFad fad1 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
 
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(1, fadManager.getNumDeployedFads());
 
         // try a successful set
         when(rng.nextDouble()).thenReturn(1.0);
-        new FadSetAction<>(fad1, fisher, 1.0)
+        new FadSetAction(fad1, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
         assertEquals(10, fadManager.getNumFadsInStock());
 
-        final BiomassAggregatingFad fad2 = fadManager.deployFadInCenterOfTile(seaTile, rng);
+        final BiomassAggregatingFad fad2 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
         assertEquals(9, fadManager.getNumFadsInStock());
         assertEquals(2, fadManager.getNumDeployedFads());
 
         // try with a failed set
         when(rng.nextDouble()).thenReturn(1.0);
-        new FadSetAction<>(fad2, fisher, 1.0)
+        new FadSetAction(fad2, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
         assertEquals(10, fadManager.getNumFadsInStock());
 

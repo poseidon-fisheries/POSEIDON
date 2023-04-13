@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 public class AbundancePurseSeineGear extends PurseSeineGear<AbundanceLocalBiology> {
 
     public AbundancePurseSeineGear(
-        final FadManager<AbundanceLocalBiology, ?> fadManager,
+        final FadManager<AbundanceLocalBiology> fadManager,
         final double successfulFadSetProbability
     ) {
         super(fadManager, successfulFadSetProbability);

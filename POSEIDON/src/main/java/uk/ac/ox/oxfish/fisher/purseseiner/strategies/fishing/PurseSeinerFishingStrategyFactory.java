@@ -471,19 +471,19 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         final Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers =
             setDurationSamplersFactory.apply(fishState);
 
-        final FadSetOpportunityGenerator<B, ?, FadSetAction<B>>
+        final FadSetOpportunityGenerator<B, ?, FadSetAction>
             fadSetOpportunityGenerator =
             new FadSetOpportunityGenerator<>(
                 (fisher1, fad) -> fad.getOwner() == getFadManager(fisher1),
-                FadSetAction<B>::new,
+                FadSetAction::new,
                 durationSamplers.get(FadSetAction.class)
             );
 
-        final FadSetOpportunityGenerator<B, ?, OpportunisticFadSetAction<B>>
+        final FadSetOpportunityGenerator<B, ?, OpportunisticFadSetAction>
             opportunisticFadSetOpportunityGenerator =
             new FadSetOpportunityGenerator<>(
                 (fisher1, fad) -> fad.getOwner() != getFadManager(fisher1),
-                OpportunisticFadSetAction<B>::new,
+                OpportunisticFadSetAction::new,
                 durationSamplers.get(FadSetAction.class)
             );
 

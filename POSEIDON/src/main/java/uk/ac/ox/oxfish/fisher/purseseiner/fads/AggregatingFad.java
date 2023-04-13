@@ -45,7 +45,7 @@ public abstract class AggregatingFad<
     private final CarryingCapacity carryingCapacity;
 
     public AggregatingFad(
-        final FadManager<B, F> owner,
+        final FadManager<B> owner,
         final B biology,
         final FishAttractor<B, F> fishAttractor,
         final double fishReleaseProbability,

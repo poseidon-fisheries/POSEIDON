@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
@@ -31,7 +30,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public abstract class AbstractFadSetAction<B extends LocalBiology>
+public abstract class AbstractFadSetAction
     extends AbstractSetAction implements FadRelatedAction {
 
     private final Fad<?, ?> fad;
@@ -87,7 +86,7 @@ public abstract class AbstractFadSetAction<B extends LocalBiology>
     }
 
     @Override
-    void notify(final FadManager<?, ?> fadManager) {
+    void notify(final FadManager<?> fadManager) {
         fadManager.reactTo(this);
     }
 

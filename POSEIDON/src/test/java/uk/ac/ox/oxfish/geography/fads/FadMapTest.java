@@ -72,7 +72,7 @@ public class FadMapTest {
         when(fishState.getBiology()).thenReturn(globalBiology);
         fishState.schedule = schedule;
 
-        final FadManager<BiomassLocalBiology, BiomassAggregatingFad> fadManager =
+        final FadManager<BiomassLocalBiology> fadManager =
             new FadManager<>(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
@@ -82,7 +82,7 @@ public class FadMapTest {
 
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
-        final BiomassAggregatingFad fad = fadManager.deployFadInCenterOfTile(startTile, rng);
+        final BiomassAggregatingFad fad = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(startTile, rng);
         fillBiomassFad(fad);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology =
