@@ -21,6 +21,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
+import uk.ac.ox.oxfish.model.regs.fads.DelLicenseRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -64,7 +65,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
-        ImmutableList.of(new ActiveFadLimitsFactory());
+        ImmutableList.of(new ActiveFadLimitsFactory(), new DelLicenseRegulationFactory());
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
