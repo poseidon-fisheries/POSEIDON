@@ -33,16 +33,16 @@ import static java.lang.StrictMath.min;
 import static java.util.function.Function.identity;
 
 public class BiomassAggregatingFad
-    extends AggregatingFad<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
+    extends AggregatingFad<BiomassLocalBiology, BiomassAggregatingFad> {
 
     public BiomassAggregatingFad(
         final FadManager<BiomassLocalBiology, BiomassAggregatingFad> owner,
         final BiomassLocalBiology biology,
-        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
+        final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final GlobalCarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity
     ) {
         super(
             owner,

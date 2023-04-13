@@ -22,7 +22,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 
 public class DummyFishBiomassAttractor
-    implements FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
+    implements FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> {
 
     private final int size;
 

@@ -25,15 +25,15 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 
 import java.util.function.IntSupplier;
 
-public class AbundanceAggregatingFadInitializer<C extends CarryingCapacity>
-    extends AggregatingFadInitializer<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> {
+public class AbundanceAggregatingFadInitializer
+    extends AggregatingFadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
     public AbundanceAggregatingFadInitializer(
         final GlobalBiology globalBiology,
-        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<C> carryingCapacityInitializer
+        final CarryingCapacityInitializer<?> carryingCapacityInitializer
     ) {
         super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
     }
@@ -44,16 +44,16 @@ public class AbundanceAggregatingFadInitializer<C extends CarryingCapacity>
     }
 
     @Override
-    protected AbundanceAggregatingFad<C> makeFad(
-        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad<C>> owner,
+    protected AbundanceAggregatingFad makeFad(
+        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad> owner,
         final AbundanceLocalBiology biology,
-        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final C carryingCapacity
+        final CarryingCapacity carryingCapacity
     ) {
-        return new AbundanceAggregatingFad<>(
+        return new AbundanceAggregatingFad(
             owner,
             biology,
             fishAttractor,

@@ -37,8 +37,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public abstract class AbstractFishAttractor<
     A,
     B extends LocalBiology,
-    F extends AggregatingFad<B, GlobalCarryingCapacity, F>>
-    implements FishAttractor<B, GlobalCarryingCapacity, F> {
+    F extends AggregatingFad<B, F>>
+    implements FishAttractor<B, F> {
 
     private final double[] attractionRates;
     private final List<Species> species;
@@ -82,7 +82,7 @@ public abstract class AbstractFishAttractor<
 
     private Set<Species> attractedSpecies(
         final LocalBiology seaTileBiology,
-        final AggregatingFad<?, ?, ?> fad
+        final AggregatingFad<?, ?> fad
     ) {
         return species
             .stream()

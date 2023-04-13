@@ -37,22 +37,21 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public abstract class AggregatingFad<
     B extends LocalBiology,
-    C extends CarryingCapacity,
-    F extends AggregatingFad<B, C, F>
+    F extends AggregatingFad<B, F>
     > extends Fad<B, F> {
 
     private final B biology;
-    private final FishAttractor<B, C, F> fishAttractor;
-    private final C carryingCapacity;
+    private final FishAttractor<B, F> fishAttractor;
+    private final CarryingCapacity carryingCapacity;
 
     public AggregatingFad(
         final FadManager<B, F> owner,
         final B biology,
-        final FishAttractor<B, C, F> fishAttractor,
+        final FishAttractor<B, F> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final C carryingCapacity
+        final CarryingCapacity carryingCapacity
     ) {
         super(
             owner.getFisher() != null ? owner.getFisher().getCurrentTrip() : null,
@@ -67,7 +66,7 @@ public abstract class AggregatingFad<
         this.carryingCapacity = carryingCapacity;
     }
 
-    public C getCarryingCapacity() {
+    public CarryingCapacity getCarryingCapacity() {
         return carryingCapacity;
     }
 

@@ -80,7 +80,7 @@ public class HeterogeneousLinearIntervalAttractor
      * @return the carrying capacity for this fad in kg
      */
     private void computeFadAttractions(
-        final AbundanceAggregatingFad<? extends PerSpeciesCarryingCapacity> fad
+        final AbundanceAggregatingFad fad
     ) {
         assert !dailyAttractionThreshold.containsKey(fad);
         assert !dailyAbundanceAttracted.containsKey(fad);

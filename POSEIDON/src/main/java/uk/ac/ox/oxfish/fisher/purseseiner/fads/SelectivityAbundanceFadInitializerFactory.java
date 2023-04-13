@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class SelectivityAbundanceFadInitializerFactory
-    extends AbundanceFadInitializerFactory<PerSpeciesCarryingCapacity> {
+    extends AbundanceFadInitializerFactory {
 
     private EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory;
 
@@ -71,7 +71,7 @@ public class SelectivityAbundanceFadInitializerFactory
         this.environmentalPenaltyFunctionFactory = environmentalPenaltyFunctionFactory;
     }
 
-    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>> makeFadInitializer(
+    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> makeFadInitializer(
         final FishState fishState
     ) {
 

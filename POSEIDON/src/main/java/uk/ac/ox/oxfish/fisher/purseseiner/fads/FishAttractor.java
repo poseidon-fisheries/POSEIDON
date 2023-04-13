@@ -27,8 +27,7 @@ import static java.lang.Math.min;
 @FunctionalInterface
 public interface FishAttractor<
     B extends LocalBiology,
-    C extends CarryingCapacity,
-    F extends AggregatingFad<B, C, F>
+    F extends AggregatingFad<B, F>
     > {
 
     @Nullable

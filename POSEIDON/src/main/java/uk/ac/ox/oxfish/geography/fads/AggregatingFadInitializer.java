@@ -31,24 +31,22 @@ import java.util.function.IntSupplier;
 
 public abstract class AggregatingFadInitializer<
     B extends LocalBiology,
-    C extends CarryingCapacity,
-    F extends AggregatingFad<B, C, F>>
+    F extends AggregatingFad<B, F>>
     implements FadInitializer<B, F> {
 
     final double[] emptyBiomasses;
     private final double fishReleaseProbability;
-    private final FishAttractor<B, C, F> fishAttractor;
+    private final FishAttractor<B, F> fishAttractor;
     private final IntSupplier timeStepSupplier;
     private final GlobalBiology biology;
-
-    private final CarryingCapacityInitializer<C> carryingCapacityInitializer;
+    private final CarryingCapacityInitializer<?> carryingCapacityInitializer;
 
     AggregatingFadInitializer(
         final GlobalBiology globalBiology,
-        final FishAttractor<B, C, F> fishAttractor,
+        final FishAttractor<B, F> fishAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<C> carryingCapacityInitializer
+        final CarryingCapacityInitializer<?> carryingCapacityInitializer
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
         this.timeStepSupplier = timeStepSupplier;
@@ -79,11 +77,11 @@ public abstract class AggregatingFadInitializer<
     protected abstract F makeFad(
         FadManager<B, F> owner,
         B biology,
-        FishAttractor<B, C, F> fishAttractor,
+        FishAttractor<B, F> fishAttractor,
         double fishReleaseProbability,
         int stepDeployed,
         Int2D locationDeployed,
-        C carryingCapacity
+        CarryingCapacity carryingCapacity
     );
 
 

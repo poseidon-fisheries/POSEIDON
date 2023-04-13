@@ -11,4 +11,10 @@ public class GlobalCarryingCapacity implements CarryingCapacity {
     public double getTotal() {
         return carryingCapacity;
     }
+
+    @Override
+    public double[] getCarryingCapacities() {
+        throw new UnsupportedOperationException();
+    }
+
 }

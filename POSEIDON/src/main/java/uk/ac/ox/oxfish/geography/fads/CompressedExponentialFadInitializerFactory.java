@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AggregatingFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacity;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -41,7 +40,7 @@ import static java.util.stream.Collectors.toMap;
 
 public abstract class CompressedExponentialFadInitializerFactory<
     B extends LocalBiology,
-    F extends AggregatingFad<B, GlobalCarryingCapacity, F>
+    F extends AggregatingFad<B, F>
     >
     implements AlgorithmFactory<FadInitializer<B, F>> {
 

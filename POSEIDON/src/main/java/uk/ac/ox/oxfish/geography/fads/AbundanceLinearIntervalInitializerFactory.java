@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class AbundanceLinearIntervalInitializerFactory implements
-    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>>> {
+    AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
     private CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory;
 
@@ -42,7 +42,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
     }
 
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
         // This is all a bit awkward because the AbundanceLinearIntervalAttractor wants
         // to know the carrying capacities up-front, but the AbundanceAggregatingFadInitializer
         // also wants a CarryingCapacityInitializer to init its carrying capacities, which will
@@ -57,7 +57,7 @@ public class AbundanceLinearIntervalInitializerFactory implements
             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
             fishState
         );
-        return new AbundanceAggregatingFadInitializer<>(
+        return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             abundanceLinearIntervalAttractor,
             fishReleaseProbabilityInPercent.applyAsDouble(fishState.getRandom()) / 100d,

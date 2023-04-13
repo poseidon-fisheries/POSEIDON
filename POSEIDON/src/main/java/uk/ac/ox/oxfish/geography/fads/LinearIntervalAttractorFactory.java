@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import java.util.Optional;
 
 public class LinearIntervalAttractorFactory
-    extends AbundanceFadInitializerFactory<PerSpeciesCarryingCapacity> {
+    extends AbundanceFadInitializerFactory {
 
     private CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> capacityCarryingCapacityInitializerFactory;
     private EnvironmentalPredicateFunctionFactory environmentalPredicateFunctionFactory;
@@ -46,10 +46,10 @@ public class LinearIntervalAttractorFactory
 
 
     @Override
-    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<PerSpeciesCarryingCapacity>> makeFadInitializer(
+    protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> makeFadInitializer(
         final FishState fishState
     ) {
-        return new AbundanceAggregatingFadInitializer<>(
+        return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             generateFishAttractor(fishState),
             getFishReleaseProbabilityInPercent().applyAsDouble(fishState.getRandom()) / 100d,

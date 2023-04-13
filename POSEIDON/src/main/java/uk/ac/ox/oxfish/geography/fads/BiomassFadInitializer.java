@@ -28,11 +28,11 @@ import java.util.function.IntSupplier;
 import java.util.stream.DoubleStream;
 
 public class BiomassFadInitializer
-    extends AggregatingFadInitializer<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> {
+    extends AggregatingFadInitializer<BiomassLocalBiology, BiomassAggregatingFad> {
 
     public BiomassFadInitializer(
         final GlobalBiology globalBiology,
-        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
+        final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
         final CarryingCapacityInitializer<GlobalCarryingCapacity> carryingCapacityInitializer
@@ -53,11 +53,11 @@ public class BiomassFadInitializer
     protected BiomassAggregatingFad makeFad(
         final FadManager<BiomassLocalBiology, BiomassAggregatingFad> owner,
         final BiomassLocalBiology biology,
-        final FishAttractor<BiomassLocalBiology, GlobalCarryingCapacity, BiomassAggregatingFad> fishAttractor,
+        final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final GlobalCarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity
     ) {
         return new BiomassAggregatingFad(
             owner,

@@ -36,7 +36,7 @@ public abstract class FishAbundanceAttractor extends
     AbstractFishAttractor<
         StructuredAbundance,
         AbundanceLocalBiology,
-        AbundanceAggregatingFad<GlobalCarryingCapacity>> {
+        AbundanceAggregatingFad> {
 
     private final Map<Species, NonMutatingArrayFilter> selectivityFilters;
 
@@ -63,7 +63,7 @@ public abstract class FishAbundanceAttractor extends
     @Override
     Entry<AbundanceLocalBiology, Double> scale(
         final Map<Species, Entry<StructuredAbundance, Double>> attractedFish,
-        final AbundanceAggregatingFad<GlobalCarryingCapacity> fad
+        final AbundanceAggregatingFad fad
     ) {
 
         final double attractedBiomass = attractedFish.values()

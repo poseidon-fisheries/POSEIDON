@@ -47,10 +47,7 @@ import java.util.function.Predicate;
  * of # of fish per bin.
  */
 public abstract class AbstractAbundanceLinearIntervalAttractor
-    implements FishAttractor<
-    AbundanceLocalBiology,
-    PerSpeciesCarryingCapacity,
-    AbundanceAggregatingFad<PerSpeciesCarryingCapacity>>,
+    implements FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad>,
     Steppable {
 
     protected final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
@@ -101,7 +98,7 @@ public abstract class AbstractAbundanceLinearIntervalAttractor
 
     protected boolean shouldICancelTheAttractionToday(
         final AbundanceLocalBiology seaTileBiology,
-        final AbundanceAggregatingFad<PerSpeciesCarryingCapacity> fad
+        final AbundanceAggregatingFad fad
     ) {
         if (!additionalAttractionHurdle.test(fad.getLocation()))
             return true;

@@ -40,11 +40,7 @@ import static java.util.stream.Collectors.toMap;
  * Each FAD also have a carrying capacity so that they cannot get any more full than a given amount
  */
 public class CatchabilitySelectivityFishAttractor
-    implements FishAttractor<
-    AbundanceLocalBiology,
-    PerSpeciesCarryingCapacity,
-    AbundanceAggregatingFad<PerSpeciesCarryingCapacity>
-    > {
+    implements FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
     /**
      * given a fad, returns its current catchability per species
@@ -100,7 +96,7 @@ public class CatchabilitySelectivityFishAttractor
     @Override
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
         final LocalBiology seaTileBiology,
-        final AbundanceAggregatingFad<PerSpeciesCarryingCapacity> fad
+        final AbundanceAggregatingFad fad
     ) {
         //if it's too early or late don't bother
         if (

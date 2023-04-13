@@ -47,7 +47,7 @@ public class CompressedExponentialAttractionProbability
     public double apply(
         final Species species,
         final LocalBiology biology,
-        final AggregatingFad<?, ?, ?> fad
+        final AggregatingFad<?, ?> fad
     ) {
         return apply(
             species,

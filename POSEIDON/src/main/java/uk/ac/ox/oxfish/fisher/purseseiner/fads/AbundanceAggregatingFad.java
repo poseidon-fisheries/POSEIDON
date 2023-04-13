@@ -33,17 +33,17 @@ import java.util.*;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-public class AbundanceAggregatingFad<C extends CarryingCapacity>
-    extends AggregatingFad<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> {
+public class AbundanceAggregatingFad
+    extends AggregatingFad<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
     public AbundanceAggregatingFad(
-        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad<C>> owner,
+        final FadManager<AbundanceLocalBiology, AbundanceAggregatingFad> owner,
         final AbundanceLocalBiology biology,
-        final FishAttractor<AbundanceLocalBiology, C, AbundanceAggregatingFad<C>> fishAttractor,
+        final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final C carryingCapacity
+        final CarryingCapacity carryingCapacity
     ) {
         super(
             owner,

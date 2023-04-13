@@ -6,4 +6,6 @@ public interface CarryingCapacity {
     }
 
     double getTotal();
+
+    double[] getCarryingCapacities();
 }

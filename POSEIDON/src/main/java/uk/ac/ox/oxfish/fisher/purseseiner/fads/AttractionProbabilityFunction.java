@@ -27,7 +27,7 @@ public interface AttractionProbabilityFunction {
     double apply(
         Species species,
         LocalBiology biology,
-        AggregatingFad<?, ?, ?> fad
+        AggregatingFad<?, ?> fad
     );
 
 }

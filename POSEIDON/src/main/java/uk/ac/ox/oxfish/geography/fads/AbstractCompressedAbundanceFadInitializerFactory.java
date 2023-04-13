@@ -9,13 +9,12 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractCompressedAbundanceFadInitializerFactory
-    extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad<GlobalCarryingCapacity>> {
+    extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
@@ -43,11 +42,11 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
     }
 
     @Override
-    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad<GlobalCarryingCapacity>> apply(final FishState fishState) {
+    public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
         checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
 
-        return new AbundanceAggregatingFadInitializer<>(
+        return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
@@ -108,10 +107,6 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
             abundanceFiltersFactory.apply(fishState).get(FadSetAction.class)
         );
     }
-
-    @NotNull
-    protected abstract DoubleSupplier buildCapacityGenerator(MersenneTwisterFast rng, double maximumCarryingCapacity);
-
 }
 
 
