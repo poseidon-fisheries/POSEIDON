@@ -18,17 +18,13 @@ public abstract class PlanningModuleFactory<T extends PlanningModule> implements
      */
     private AlgorithmFactory<? extends MapDiscretizer> discretization =
         new SquaresMapDiscretizerFactory(6, 3);
-    private DoubleParameter maxAllowableShear =
-        // TODO: This could be obtained empirically
-        new CalibratedParameter(0.8, 1.0, 0, 2.6, 0.9);
 
     @Override
     public T apply(final FishState fishState) {
         final OwnFadSetDiscretizedActionGenerator optionsGenerator =
             new OwnFadSetDiscretizedActionGenerator(
                 new MapDiscretization(getDiscretization().apply(fishState)),
-                getMinimumValueFadSets().applyAsDouble(fishState.getRandom()),
-                getMaxAllowableShear().applyAsDouble(fishState.getRandom())
+                getMinimumValueFadSets().applyAsDouble(fishState.getRandom())
             );
         return makePlanningModule(fishState, optionsGenerator);
     }
@@ -47,15 +43,7 @@ public abstract class PlanningModuleFactory<T extends PlanningModule> implements
         return minimumValueFadSets;
     }
 
-    public DoubleParameter getMaxAllowableShear() {
-        return maxAllowableShear;
-    }
-
     protected abstract T makePlanningModule(FishState fishState, OwnFadSetDiscretizedActionGenerator optionsGenerator);
-
-    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
-        this.maxAllowableShear = maxAllowableShear;
-    }
 
     public void setMinimumValueFadSets(final DoubleParameter minimumValueFadSets) {
         this.minimumValueFadSets = minimumValueFadSets;

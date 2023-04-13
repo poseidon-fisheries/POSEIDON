@@ -23,10 +23,12 @@ import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -34,19 +36,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
     private final double successfulFadSetProbability;
+    private final double maxAllowableShear;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
         final FadManager fadManager,
-        final double successfulFadSetProbability
+        final double successfulFadSetProbability,
+        final double maxAllowableShear
     ) {
         this.fadManager = fadManager;
         this.successfulFadSetProbability = successfulFadSetProbability;
+        this.maxAllowableShear = maxAllowableShear;
     }
 
     public static PurseSeineGear getPurseSeineGear(final Fisher fisher) {
@@ -61,6 +67,10 @@ public abstract class PurseSeineGear implements Gear {
             .ofNullable(fisher.getGear())
             .filter(gear -> gear instanceof PurseSeineGear)
             .map(gear -> (PurseSeineGear) gear);
+    }
+
+    public double getMaxAllowableShear() {
+        return maxAllowableShear;
     }
 
     public double getSuccessfulFadSetProbability() {
@@ -129,6 +139,28 @@ public abstract class PurseSeineGear implements Gear {
 
     public Optional<Integer> getLastVisit(final Int2D gridLocation) {
         return Optional.ofNullable(lastVisits.get(gridLocation));
+    }
+
+    @Override
+    public boolean isSafe(final Action action) {
+        if (action instanceof AbstractSetAction) {
+            final AbstractSetAction setAction = (AbstractSetAction) action;
+            final SeaTile tile = setAction.getLocation();
+            return Optional
+                .ofNullable(
+                    setAction.getFisher()
+                        .grabState()
+                        .getMap()
+                        .getAdditionalMaps()
+                        .getOrDefault("Shear", null)
+                )
+                .map(Supplier::get)
+                .map(shearMap -> shearMap.get(tile.getGridX(), tile.getGridY()))
+                .map(shear -> shear <= maxAllowableShear)
+                .orElse(true);
+        } else {
+            return true;
+        }
     }
 
 }

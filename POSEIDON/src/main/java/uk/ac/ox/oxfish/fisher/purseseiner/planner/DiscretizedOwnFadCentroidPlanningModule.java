@@ -48,10 +48,9 @@ public class DiscretizedOwnFadCentroidPlanningModule
     public DiscretizedOwnFadCentroidPlanningModule(
         final MapDiscretization discretization,
         final double minimumValueOfFadBeforeBeingPickedUp,
-        final double distancePenalty,
-        final double maxAllowableShear
+        final double distancePenalty
     ) {
-        super(discretization, minimumValueOfFadBeforeBeingPickedUp, maxAllowableShear);
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
         this.distancePenalty = distancePenalty;
     }
 

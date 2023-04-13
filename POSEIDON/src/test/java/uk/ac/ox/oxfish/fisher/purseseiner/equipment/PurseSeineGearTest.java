@@ -54,7 +54,8 @@ public class PurseSeineGearTest {
         when(fishState.getBiology()).thenReturn(new GlobalBiology());
         purseSeineGear = new BiomassPurseSeineGear(
             mock(FadManager.class),
-            1
+            1,
+            0.9
         );
     }
 
@@ -87,7 +88,7 @@ public class PurseSeineGearTest {
         final GlobalBiology globalBiology =
             GlobalBiology.genericListOfSpecies(2);
         final LocalBiology localBiology =
-            new BiomassLocalBiology(new double[] {1, 1}, new double[] {1, 1});
+            new BiomassLocalBiology(new double[]{1, 1}, new double[]{1, 1});
         final SeaTile seaTile = mock(SeaTile.class);
         final Fisher fisher = mock(Fisher.class);
         final Hold hold = mock(Hold.class);

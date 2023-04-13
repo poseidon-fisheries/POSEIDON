@@ -39,7 +39,8 @@ public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
     public PurseSeineGear apply(final FishState fishState) {
         return new BiomassPurseSeineGear(
             makeFadManager(fishState),
-            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom())
+            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom()),
+            getMaxAllowableShear().applyAsDouble(fishState.getRandom())
         );
     }
 

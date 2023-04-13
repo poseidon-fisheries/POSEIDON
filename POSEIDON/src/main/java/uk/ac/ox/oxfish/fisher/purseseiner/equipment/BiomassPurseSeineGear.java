@@ -28,9 +28,10 @@ public class BiomassPurseSeineGear extends PurseSeineGear {
 
     public BiomassPurseSeineGear(
         final FadManager fadManager,
-        final double successfulFadSetProbability
+        final double successfulFadSetProbability,
+        final double maxAllowableShear
     ) {
-        super(fadManager, successfulFadSetProbability);
+        super(fadManager, successfulFadSetProbability, maxAllowableShear);
     }
 
     @Override
@@ -50,7 +51,8 @@ public class BiomassPurseSeineGear extends PurseSeineGear {
     public Gear makeCopy() {
         return new BiomassPurseSeineGear(
             getFadManager(),
-            getSuccessfulFadSetProbability()
+            getSuccessfulFadSetProbability(),
+            getMaxAllowableShear()
         );
     }
 }

@@ -19,8 +19,6 @@ public abstract class FadInitializerFactory<
         new CacheByFishState<>(this::makeFadInitializer);
     private Map<String, DoubleParameter> catchabilities;
     private CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory;
-    private DoubleParameter fishValueCalculatorStandardDeviation =
-        new CalibratedParameter(0, 0.5, 0, 1, 0);
     private DoubleParameter fadDudRate =
         new CalibratedParameter(0, 0.35, 0, 1, 0.001);
     private DoubleParameter daysInWaterBeforeAttraction =
@@ -33,7 +31,6 @@ public abstract class FadInitializerFactory<
     FadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
-        final DoubleParameter fishValueCalculatorStandardDeviation,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter maximumDaysAttractions,
@@ -41,7 +38,6 @@ public abstract class FadInitializerFactory<
     ) {
         this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
         this.catchabilities = catchabilities;
-        this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
         this.fadDudRate = fadDudRate;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maximumDaysAttractions = maximumDaysAttractions;
@@ -67,19 +63,6 @@ public abstract class FadInitializerFactory<
         this.catchabilities = catchabilities;
     }
 
-    public DoubleParameter getFishValueCalculatorStandardDeviation() {
-        return fishValueCalculatorStandardDeviation;
-    }
-
-    public void setFishValueCalculatorStandardDeviation(final DoubleParameter fishValueCalculatorStandardDeviation) {
-        invalidateCache();
-        this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
-    }
-
-    void invalidateCache() {
-        cache.invalidateAll();
-    }
-
     public DoubleParameter getFadDudRate() {
         return fadDudRate;
     }
@@ -87,6 +70,10 @@ public abstract class FadInitializerFactory<
     public void setFadDudRate(final DoubleParameter fadDudRate) {
         invalidateCache();
         this.fadDudRate = fadDudRate;
+    }
+
+    void invalidateCache() {
+        cache.invalidateAll();
     }
 
     public DoubleParameter getDaysInWaterBeforeAttraction() {

@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
@@ -43,15 +44,29 @@ public abstract class PurseSeinerAction implements Action, Locatable {
 
     protected PurseSeinerAction(
         final Fisher fisher,
+        final SeaTile location,
         final double duration
     ) {
         this.fisher = fisher;
-        this.location = fisher.getLocation();
+        this.location = location;
         final FishState fishState = fisher.grabState();
         this.step = fishState.getStep();
         this.date = fishState.getDate();
         this.duration = duration;
         this.permitted = checkIfPermitted();
+    }
+
+    public boolean checkIfPermitted() {
+        final boolean forbidden =
+            Optional.of(getFadManager(getFisher()))
+                .map(FadManager::getActionSpecificRegulations)
+                .map(reg -> reg.isForbidden(this.getClass(), getFisher()))
+                .orElse(false);
+        return !forbidden;
+    }
+
+    public Fisher getFisher() {
+        return fisher;
     }
 
     public Optional<LocalTime> getTime() {
@@ -64,7 +79,7 @@ public abstract class PurseSeinerAction implements Action, Locatable {
         this.setTime(LocalTime.ofSecondOfDay((long) second));
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(final LocalTime time) {
         this.time = time;
     }
 
@@ -76,10 +91,6 @@ public abstract class PurseSeinerAction implements Action, Locatable {
         return duration;
     }
 
-    public Fisher getFisher() {
-        return fisher;
-    }
-
     public boolean isPermitted() {
         return permitted;
     }
@@ -87,10 +98,6 @@ public abstract class PurseSeinerAction implements Action, Locatable {
     @Override
     public SeaTile getLocation() {
         return location;
-    }
-
-    public boolean checkIfPermitted() {
-        return !getFadManager(fisher).getActionSpecificRegulations().isForbidden(this.getClass(), getFisher());
     }
 
     /**

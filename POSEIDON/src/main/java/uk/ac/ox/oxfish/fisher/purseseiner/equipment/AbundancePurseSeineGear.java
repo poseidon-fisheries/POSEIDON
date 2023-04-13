@@ -29,16 +29,18 @@ public class AbundancePurseSeineGear extends PurseSeineGear {
 
     public AbundancePurseSeineGear(
         final FadManager fadManager,
-        final double successfulFadSetProbability
+        final double successfulFadSetProbability,
+        final double maxAllowableShear
     ) {
-        super(fadManager, successfulFadSetProbability);
+        super(fadManager, successfulFadSetProbability, maxAllowableShear);
     }
 
     @Override
     public Gear makeCopy() {
         return new AbundancePurseSeineGear(
             getFadManager(),
-            getSuccessfulFadSetProbability()
+            getSuccessfulFadSetProbability(),
+            getMaxAllowableShear()
         );
     }
 

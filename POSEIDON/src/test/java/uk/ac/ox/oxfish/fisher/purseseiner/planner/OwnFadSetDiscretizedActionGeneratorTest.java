@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -69,6 +70,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final PurseSeineGear gear = mock(PurseSeineGear.class);
         final FadMap fadMap = mock(FadMap.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
@@ -95,6 +97,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
                 when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                when(fad.getOwner()).thenReturn(fadManager);
                 return fad;
             })
             .collect(toImmutableSet());
@@ -107,11 +110,11 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
             new SquaresMapDiscretizer(1, 1)
         );
         discretization.discretize(map);
-        final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
-            discretization,
-            -100,
-            0.90
-        );
+        final OwnFadSetDiscretizedActionGenerator generator =
+            new OwnFadSetDiscretizedActionGenerator(
+                discretization,
+                -100
+            );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
         final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
@@ -154,6 +157,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear = mock(PurseSeineGear.class);
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
@@ -178,6 +182,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
                 when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                when(fad.getOwner()).thenReturn(fadManager);
                 return fad;
             })
             .collect(toImmutableList());
@@ -192,8 +197,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         discretization.discretize(map);
         final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
             discretization,
-            2,
-            0.90
+            2
         );
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
@@ -208,8 +212,12 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
-        final PurseSeineGear gear = mock(PurseSeineGear.class);
-        when(gear.getFadManager()).thenReturn(mock(FadManager.class));
+        final PurseSeineGear gear =
+            new BiomassPurseSeineGear(
+                mock(FadManager.class),
+                1.0,
+                0.9
+            );
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
         when(fisher.getGear()).thenReturn(gear);
@@ -229,17 +237,17 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         );
         when(fadManager.getFishValueCalculator()).thenReturn(fishValueCalculator);
 
-        final List<BiomassAggregatingFad> fads = range(0, 3)
+        final Set<Fad> fads = range(0, 3)
             .mapToObj(index -> {
                 final BiomassAggregatingFad fad = mock(BiomassAggregatingFad.class);
                 when(fad.getBiology()).thenReturn(new BiomassLocalBiology(new double[]{index}));
                 when(fad.getLocation()).thenReturn(map.getSeaTile(index, index));
+                when(fad.getOwner()).thenReturn(fadManager);
                 return fad;
             })
-            .collect(toImmutableList());
+            .collect(toImmutableSet());
 
-        when(fadManager.getDeployedFads())
-            .thenReturn(ImmutableSet.copyOf(fads));
+        when(fadManager.getDeployedFads()).thenReturn(fads);
 
         //discretized map split into 2x2
         final MapDiscretization discretization = new MapDiscretization(
@@ -248,8 +256,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         discretization.discretize(map);
         final OwnFadSetDiscretizedActionGenerator generator = new OwnFadSetDiscretizedActionGenerator(
             discretization,
-            0,
-            0.9
+            0
         );
 
         final DoubleGrid2D shearGrid = new DoubleGrid2D(4, 4);

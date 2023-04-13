@@ -43,6 +43,7 @@ public abstract class AbstractFadSetAction
         super(
             fad.getBiology(),
             fisher,
+            fad.getLocation(),
             duration
         );
         this.fad = fad;

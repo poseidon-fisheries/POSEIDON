@@ -34,8 +34,9 @@ public class SearchAction extends PurseSeinerAction {
     public SearchAction(
         final Fisher fisher,
         final SetOpportunityDetector setOpportunityDetector,
-        Class<? extends PurseSeinerAction> classForWeighting) {
-        super(fisher, 1);
+        final Class<? extends PurseSeinerAction> classForWeighting
+    ) {
+        super(fisher, fisher.getLocation(), 1);
         this.setOpportunityDetector = setOpportunityDetector;
         this.classForWeighting = classForWeighting;
     }

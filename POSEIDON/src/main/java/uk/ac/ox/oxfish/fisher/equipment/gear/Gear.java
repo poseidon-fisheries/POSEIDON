@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -34,28 +35,31 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public interface Gear {
 
     Catch fish(
-            Fisher fisher,
-            LocalBiology localBiology,
-            SeaTile context, int hoursSpentFishing,
-            GlobalBiology modelBiology);
+        Fisher fisher,
+        LocalBiology localBiology,
+        SeaTile context, int hoursSpentFishing,
+        GlobalBiology modelBiology
+    );
 
     /**
      * get how much gas is consumed by fishing a spot with this gear
-     * @param fisher  the dude fishing
-     * @param where the location being fished
+     *
+     * @param fisher the dude fishing
+     * @param where  the location being fished
      * @return liters of gas consumed for every hour spent fishing
      */
     double getFuelConsumptionPerHourOfFishing(
-            Fisher fisher,
-            Boat boat,
-            SeaTile where);
+        Fisher fisher,
+        Boat boat,
+        SeaTile where
+    );
 
 
     double[] expectedHourlyCatch(
-            Fisher fisher,
-            SeaTile where,
-            int hoursSpentFishing,
-            GlobalBiology modelBiology
+        Fisher fisher,
+        SeaTile where,
+        int hoursSpentFishing,
+        GlobalBiology modelBiology
     );
 
 
@@ -63,8 +67,13 @@ public interface Gear {
 
     /**
      * are the two gears the same (keeping away from modifying equals)
+     *
      * @param o gear we are comparing to
      * @return
      */
-    public boolean isSame(Gear o);
+    boolean isSame(Gear o);
+
+    default boolean isSafe(final Action action) {
+        return true;
+    }
 }

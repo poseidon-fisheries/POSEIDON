@@ -43,6 +43,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
     public FadDeploymentAction(final Fisher fisher) {
         super(
             fisher,
+            fisher.getLocation(),
             5.0 / 60 // see https://github.com/poseidon-fisheries/tuna/issues/6
         );
     }

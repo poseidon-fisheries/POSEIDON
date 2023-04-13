@@ -46,10 +46,11 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
     AbstractSetAction(
         final LocalBiology targetBiology,
         final Fisher fisher,
+        final SeaTile location,
         final double duration
     ) {
         // fisher.fishHere weirdly wants an int duration, so we have to round it
-        super(fisher, max(1.0, round(duration)));
+        super(fisher, location, max(1.0, round(duration)));
         this.targetBiology = targetBiology;
     }
 
@@ -102,11 +103,11 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
 
     @Override
     public boolean checkIfPermitted() {
-        return super.checkIfPermitted() && getFisher().getRegulation().canFishHere(
-            getFisher(),
-            getLocation(),
-            getFisher().grabState(),
-            getStep()
-        );
+        final boolean canFishHere =
+            Optional.of(getFisher())
+                .map(Fisher::getRegulation)
+                .map(reg -> reg.canFishHere(getFisher(), getLocation(), getFisher().grabState(), getStep()))
+                .orElse(true);
+        return canFishHere && super.checkIfPermitted();
     }
 }

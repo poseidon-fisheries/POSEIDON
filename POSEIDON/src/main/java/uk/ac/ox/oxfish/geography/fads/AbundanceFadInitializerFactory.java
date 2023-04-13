@@ -17,7 +17,6 @@ public abstract class AbundanceFadInitializerFactory
     public AbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
-        final DoubleParameter fishValueCalculatorStandardDeviation,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter maximumDaysAttractions,
@@ -27,7 +26,6 @@ public abstract class AbundanceFadInitializerFactory
         super(
             carryingCapacityInitializerFactory,
             catchabilities,
-            fishValueCalculatorStandardDeviation,
             fadDudRate,
             daysInWaterBeforeAttraction,
             maximumDaysAttractions,
@@ -42,12 +40,6 @@ public abstract class AbundanceFadInitializerFactory
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
         super(carryingCapacitiesFactory, catchabilities);
-        this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
-    }
-
-    public AbundanceFadInitializerFactory(
-        final AbundanceFiltersFactory abundanceFiltersFactory
-    ) {
         this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
     }
 

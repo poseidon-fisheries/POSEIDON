@@ -109,11 +109,11 @@ public interface PlannedAction {
         }
     }
 
-    class FadSet<F extends Fad> implements PlannedAction {
+    class FadSet implements PlannedAction {
 
-        private final F fadWePlanToSetOn;
+        private final Fad fadWePlanToSetOn;
 
-        public FadSet(final F fadWePlanToSetOn) {
+        public FadSet(final Fad fadWePlanToSetOn) {
             this.fadWePlanToSetOn = fadWePlanToSetOn;
         }
 
@@ -372,7 +372,6 @@ public interface PlannedAction {
             return position;
         }
 
-        @SuppressWarnings("rawtypes")
         abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
 
         /**
@@ -380,8 +379,6 @@ public interface PlannedAction {
          */
         @Override
         public Action[] actuate(final Fisher fisher) {
-
-
             if (searchTimeInHours <= 0) {
                 return new Action[]{
                     new PotentialSetAction<>(this, fisher)
@@ -481,7 +478,6 @@ public interface PlannedAction {
         }
 
         @Override
-        @SuppressWarnings("rawtypes")
         protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
             return DolphinSetAction.class;
         }
@@ -528,7 +524,6 @@ public interface PlannedAction {
             );
         }
 
-        @SuppressWarnings("rawtypes")
         @Override
         protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
             return NonAssociatedSetAction.class;

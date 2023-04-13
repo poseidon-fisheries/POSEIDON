@@ -35,7 +35,7 @@ import java.util.PriorityQueue;
  * A caricature of what a fisher who read the marginal value theorem literature would do.
  */
 public class MarginalValueFadPlanningModule
-        extends DiscretizedOwnFadPlanningModule {
+    extends DiscretizedOwnFadPlanningModule {
 
 
     /**
@@ -46,10 +46,9 @@ public class MarginalValueFadPlanningModule
 
     public MarginalValueFadPlanningModule(
         final MapDiscretization discretization,
-        final double minimumValueOfFadBeforeBeingPickedUp,
-        final double maxAllowableShear
+        final double minimumValueOfFadBeforeBeingPickedUp
     ) {
-        super(discretization, minimumValueOfFadBeforeBeingPickedUp, maxAllowableShear);
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
     }
 
     public MarginalValueFadPlanningModule(final OwnFadSetDiscretizedActionGenerator optionsGenerator) {
@@ -72,23 +71,21 @@ public class MarginalValueFadPlanningModule
             if (options.get(0).getSecond() > 0) {
                 lastFadGroupChosen = options.get(0).getSecond();
                 return optionsGenerator.chooseFad(options.get(0).getSecond());
-            }
-            else return null;
+            } else return null;
         }
 
 
         //if you can pick the same place you were fishing before, do so now
-        if(lastFadGroupChosen >=0){
+        if (lastFadGroupChosen >= 0) {
             final double valueIfFishingRemainsInThisArea = optionsGenerator.getValueOfThisOption(lastFadGroupChosen);
 
-            if(Double.isFinite(valueIfFishingRemainsInThisArea))
-            {
+            if (Double.isFinite(valueIfFishingRemainsInThisArea)) {
                 return optionsGenerator.chooseFad(lastFadGroupChosen);
             }
 
         }
         //need to pick a new spot.
-        lastFadGroupChosen = - 1;
+        lastFadGroupChosen = -1;
 
 
         final int fadGroupChosen = GreedyInsertionFadPlanningModule.selectFadByCheapestInsertion(
@@ -97,12 +94,12 @@ public class MarginalValueFadPlanningModule
         );
 
         //all fads are empty, don't bother setting on any!
-        if(fadGroupChosen<0 ||
-                fadGroupChosen >= optionsGenerator.getNumberOfGroups() )
+        if (fadGroupChosen < 0 ||
+            fadGroupChosen >= optionsGenerator.getNumberOfGroups())
             return null;
         lastFadGroupChosen = fadGroupChosen;
-        return optionsGenerator.chooseFad(fadGroupChosen);    }
-
+        return optionsGenerator.chooseFad(fadGroupChosen);
+    }
 
 
     public int getLastFadGroupChosen() {

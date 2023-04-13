@@ -12,11 +12,8 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     private static final int MAX_OWN_FAD_SETS = 1000;
     final protected OwnFadSetDiscretizedActionGenerator optionsGenerator;
-
-    private NauticalMap map;
-
     protected double speedInKmPerHours;
-
+    private NauticalMap map;
     private Fisher fisher;
 
     private FishState fishState;
@@ -24,14 +21,12 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     public DiscretizedOwnFadPlanningModule(
         final MapDiscretization discretization,
-        final double minimumValueOfFadBeforeBeingPickedUp,
-        final double maxAllowableShear
+        final double minimumValueOfFadBeforeBeingPickedUp
     ) {
         this(
             new OwnFadSetDiscretizedActionGenerator(
                 discretization,
-                minimumValueOfFadBeforeBeingPickedUp,
-                maxAllowableShear
+                minimumValueOfFadBeforeBeingPickedUp
             )
         );
     }
@@ -39,8 +34,7 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
     public DiscretizedOwnFadPlanningModule(
         final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
-        this.optionsGenerator =
-            optionsGenerator;
+        this.optionsGenerator = optionsGenerator;
     }
 
     @Override
@@ -57,27 +51,13 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     }
 
-    protected abstract PlannedAction chooseFadSet(Plan currentPlanSoFar,
-                                                  Fisher fisher,
-                                                  FishState model,
-                                                  NauticalMap map,
-                                                  OwnFadSetDiscretizedActionGenerator optionsGenerator
-                                                  );
-
-
-    @Override
-    public void start(final FishState model, final Fisher fisher) {
-        optionsGenerator.startOrReset(
-            FadManager.getFadManager(fisher),
-            model.getRandom(),
-            model.getMap()
-        );
-        map = model.getMap();
-        speedInKmPerHours = fisher.getBoat().getSpeedInKph();
-        this.fisher = fisher;
-        this.fishState = model;
-
-    }
+    protected abstract PlannedAction chooseFadSet(
+        Plan currentPlanSoFar,
+        Fisher fisher,
+        FishState model,
+        NauticalMap map,
+        OwnFadSetDiscretizedActionGenerator optionsGenerator
+    );
 
     @Override
     public void turnOff(final Fisher fisher) {
@@ -102,6 +82,20 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
     public void prepareForReplanning(final FishState state, final Fisher fisher) {
         start(state, fisher);
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
+    }
+
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
+        optionsGenerator.startOrReset(
+            FadManager.getFadManager(fisher),
+            model.getRandom(),
+            model.getMap()
+        );
+        map = model.getMap();
+        speedInKmPerHours = fisher.getBoat().getSpeedInKph();
+        this.fisher = fisher;
+        this.fishState = model;
+
     }
 
     /**

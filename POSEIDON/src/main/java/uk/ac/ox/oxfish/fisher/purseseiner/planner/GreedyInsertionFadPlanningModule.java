@@ -26,10 +26,9 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
     public GreedyInsertionFadPlanningModule(
         final MapDiscretization discretization,
         final double minimumValueOfFadBeforeBeingPickedUp,
-        final int additionalFadInspected,
-        final double maxAllowableShear
+        final int additionalFadInspected
     ) {
-        super(discretization, minimumValueOfFadBeforeBeingPickedUp, maxAllowableShear);
+        super(discretization, minimumValueOfFadBeforeBeingPickedUp);
         this.additionalFadInspected = additionalFadInspected;
     }
 

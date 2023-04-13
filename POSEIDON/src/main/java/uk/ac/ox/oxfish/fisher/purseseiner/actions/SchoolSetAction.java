@@ -47,7 +47,7 @@ public abstract class SchoolSetAction<B extends LocalBiology> extends AbstractSe
         final Collection<B> sourceBiologies,
         final CatchMaker<B> catchMaker
     ) {
-        super(targetBiology, fisher, setDuration);
+        super(targetBiology, fisher, fisher.getLocation(), setDuration);
         this.targetBiology = targetBiology;
         this.catchMaker = catchMaker;
         this.sourceBiologies = new ArrayDeque<>(sourceBiologies);

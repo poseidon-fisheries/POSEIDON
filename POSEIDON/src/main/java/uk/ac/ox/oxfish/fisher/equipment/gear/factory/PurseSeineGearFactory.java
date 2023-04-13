@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.DelLicenseRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -41,7 +42,9 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
-
+    private final DoubleParameter maxAllowableShear =
+        // TODO: This could be obtained empirically
+        new CalibratedParameter(0.8, 1.0, 0, 2.6, 0.9);
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
@@ -70,15 +73,21 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
-    private DoubleParameter fishValueCalculatorStandardDeviation = new FixedDoubleParameter(0);
+    private DoubleParameter fishValueCalculatorStandardDeviation =
+        new CalibratedParameter(0, 0.5, 0, 1, 0);
 
     public PurseSeineGearFactory() {
     }
+
 
     public PurseSeineGearFactory(
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
+    }
+
+    public DoubleParameter getMaxAllowableShear() {
+        return maxAllowableShear;
     }
 
     public DoubleParameter getFishValueCalculatorStandardDeviation() {

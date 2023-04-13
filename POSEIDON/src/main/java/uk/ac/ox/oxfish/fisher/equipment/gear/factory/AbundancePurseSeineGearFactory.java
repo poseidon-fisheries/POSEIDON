@@ -39,7 +39,8 @@ public class AbundancePurseSeineGearFactory extends PurseSeineGearFactory {
     public PurseSeineGear apply(final FishState fishState) {
         return new AbundancePurseSeineGear(
             makeFadManager(fishState),
-            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom())
+            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom()),
+            getMaxAllowableShear().applyAsDouble(fishState.getRandom())
         );
     }
 }

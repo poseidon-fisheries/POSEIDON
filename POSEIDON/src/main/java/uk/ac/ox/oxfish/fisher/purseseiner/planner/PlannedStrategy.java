@@ -102,19 +102,22 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         assert agent.getLocation() == actionInProgress.getLocation() ||
             //there is an exception here when we have just finished setting on a fad
             //which gets then destroyed: then the action location is null
-            actionQueueInProgress[actionQueueIndex] instanceof FadSetAction && actionInProgress instanceof PlannedAction.FadSet
-            ;
-
+            actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
+                actionInProgress instanceof PlannedAction.FadSet;
 
         //we may have just arrived, if so get the queue of actions we need to take
         if (actionQueueInProgress == null)
             actionQueueInProgress = actionInProgress.actuate(agent);
         actionQueueIndex++;
         //okay, are there still actions to take? if so take it!
-        if (actionQueueIndex < actionQueueInProgress.length)
-            return
-                new ActionResult(actionQueueInProgress[actionQueueIndex], hoursLeft);
-        else {
+        if (actionQueueIndex < actionQueueInProgress.length) {
+            final Action actionToTake = actionQueueInProgress[actionQueueIndex];
+            return agent.getGear().isSafe(actionToTake)
+                // If the action is safe to take, take it
+                ? new ActionResult(actionToTake, hoursLeft)
+                // Otherwise move on to next action
+                : act(model, agent, regulation, hoursLeft);
+        } else {
             //you have finished the queue!
             resetActionQueue();
             //is it time for a replan?
@@ -126,11 +129,12 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 actionInProgress = currentPlan.pollNextAction();
             }
             //if it's here, start over
-            if (actionInProgress.getLocation() == agent.getLocation())
+            if (actionInProgress.getLocation() == agent.getLocation()) {
                 return act(model, agent, regulation, hoursLeft);
-            //otherwise move
-            return
-                new ActionResult(new Moving(), hoursLeft);
+            } else {
+                //otherwise move
+                return new ActionResult(new Moving(), hoursLeft);
+            }
         }
 
     }
@@ -163,16 +167,23 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
             //check for the case when you just finished setting a fad that was destroyed (by you or others)
             //in that case it will say that the location is unknown, but it you just need to be here a second longer
-            if (actionQueueInProgress != null &&
-                actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
-                currentAction instanceof Arriving)
+            if (
+                actionQueueInProgress != null &&
+                    actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
+                    currentAction instanceof Arriving
+            ) {
                 return fisher.getLocation();
+            }
 
             //unless you are at port (probably because you beelined here after you were told to go home)
-            if (fisher.getLocation() != fisher.getHomePort().getLocation() || fisher.getHoursAtSea() <= 0)
+            if (
+                fisher.getLocation() != fisher.getHomePort().getLocation() ||
+                    fisher.getHoursAtSea() <= 0
+            ) {
                 replan(fisher, model);
-            else
+            } else {
                 return fisher.getHomePort().getLocation();
+            }
         }
         //otherwise, you are going where the plan tells you to
         return actionInProgress.getLocation();
