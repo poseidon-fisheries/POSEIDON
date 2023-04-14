@@ -42,7 +42,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
-    private final DoubleParameter maxAllowableShear =
+    private DoubleParameter maxAllowableShear =
         // TODO: This could be obtained empirically
         new CalibratedParameter(0.8, 1.0, 0, 2.6, 0.9);
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
@@ -75,10 +75,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private DoubleParameter fishValueCalculatorStandardDeviation =
         new CalibratedParameter(0, 0.5, 0, 1, 0);
-
     public PurseSeineGearFactory() {
     }
-
 
     public PurseSeineGearFactory(
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
@@ -86,8 +84,16 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
+    public void setLocationValuesFile(final InputPath locationValuesFile) {
+        this.locationValuesFile = locationValuesFile;
+    }
+
     public DoubleParameter getMaxAllowableShear() {
         return maxAllowableShear;
+    }
+
+    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
+        this.maxAllowableShear = maxAllowableShear;
     }
 
     public DoubleParameter getFishValueCalculatorStandardDeviation() {
