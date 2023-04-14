@@ -11,56 +11,20 @@ public class TwoPunchCalibration {
     public static void main(final String[] args) throws IOException {
         runAll(
             Paths.get(args[0]),
-            Integer.parseInt(args[1])
+            Integer.parseInt(args[1]),
+            args.length > 2 ? Integer.parseInt(args[2]) : 2000,
+            args.length > 3 ? Integer.parseInt(args[3]) : 5000
         );
     }
 
-    public static double[] stepOne(
+    private static void runAll(
         final Path calibrationFile,
-        final int nProcs
-    ) throws IOException {
-
-        final TunaCalibrationConsole firstStep = new TunaCalibrationConsole();
-        firstStep.setLocalSearch(false);
-        firstStep.setPSO(false);
-        firstStep.setPopulationSize(200);
-        firstStep.setMaxProcessorsToUse(nProcs);
-        firstStep.setNumberOfRunsPerSettingOverride(1);
-        firstStep.setMaxFitnessCalls(2000);
-        firstStep.setParameterRange(15);
-        firstStep.setRunNickName("global");
-        firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
-//        --pop 200 --maxProcs 4 --runs 3000 --range 10 --runsPerSetting 1
-        return firstStep.generateCalibratorProblem().run();
-    }
-
-    public static double[] stepTwo(
-        final Path calibrationFile,
-        final int nProcs
-    ) throws IOException {
-
-        final TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
-        secondStep.setLocalSearch(false);
-        secondStep.setPSO(true);
-        secondStep.setBestGuessesTextFile(
-            calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
-        );
-        secondStep.setPopulationSize(50);
-        secondStep.setMaxProcessorsToUse(nProcs);
-        secondStep.setNumberOfRunsPerSettingOverride(2);
-        secondStep.setMaxFitnessCalls(5000);
-        secondStep.setParameterRange(17);
-        secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
-        secondStep.setRunNickName("local");
-        return secondStep.generateCalibratorProblem().run();
-    }
-
-    public static void runAll(
-        final Path calibrationFile,
-        final int nProcs
+        final int nProcs,
+        final int stepOneFitnessCalls,
+        final int stepTwoFitnessCalls
     ) throws IOException {
         //run GA
-        final double[] gaSolution = stepOne(calibrationFile, nProcs);
+        final double[] gaSolution = stepOne(calibrationFile, nProcs, stepOneFitnessCalls);
         writeSolutionOut(calibrationFile, gaSolution, "ga_solution.txt");
         final double[] zeros = new double[gaSolution.length];
         Arrays.fill(zeros, 0d);
@@ -75,7 +39,8 @@ public class TwoPunchCalibration {
         final Path localCalibrationFile = calibrationFile.getParent().resolve("local_calibration.yaml");
         final double[] localSolution = stepTwo(
             localCalibrationFile,
-            nProcs
+            nProcs,
+            stepTwoFitnessCalls
         );
         writeSolutionOut(localCalibrationFile, localSolution, "local_solution.txt");
 
@@ -86,6 +51,26 @@ public class TwoPunchCalibration {
         evaluator.run();
 
 
+    }
+
+    private static double[] stepOne(
+        final Path calibrationFile,
+        final int nProcs,
+        final int maxFitnessCalls
+    ) throws IOException {
+
+        final TunaCalibrationConsole firstStep = new TunaCalibrationConsole();
+        firstStep.setLocalSearch(false);
+        firstStep.setPSO(false);
+        firstStep.setPopulationSize(200);
+        firstStep.setMaxProcessorsToUse(nProcs);
+        firstStep.setNumberOfRunsPerSettingOverride(1);
+        firstStep.setMaxFitnessCalls(maxFitnessCalls);
+        firstStep.setParameterRange(15);
+        firstStep.setRunNickName("global");
+        firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
+//        --pop 200 --maxProcs 4 --runs 3000 --range 10 --runsPerSetting 1
+        return firstStep.generateCalibratorProblem().run();
     }
 
     private static void writeSolutionOut(
@@ -100,6 +85,28 @@ public class TwoPunchCalibration {
             writer.write(Double.toString(gaSolution[i]));
         }
         writer.close();
+    }
+
+    public static double[] stepTwo(
+        final Path calibrationFile,
+        final int nProcs,
+        final int maxFitnessCalls
+    ) throws IOException {
+
+        final TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
+        secondStep.setLocalSearch(false);
+        secondStep.setPSO(true);
+        secondStep.setBestGuessesTextFile(
+            calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
+        );
+        secondStep.setPopulationSize(50);
+        secondStep.setMaxProcessorsToUse(nProcs);
+        secondStep.setNumberOfRunsPerSettingOverride(2);
+        secondStep.setMaxFitnessCalls(maxFitnessCalls);
+        secondStep.setParameterRange(17);
+        secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
+        secondStep.setRunNickName("local");
+        return secondStep.generateCalibratorProblem().run();
     }
 
 }
