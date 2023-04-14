@@ -25,11 +25,16 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.ValuePerSetFadModule;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class ValuePerSetPlanningModuleFactory extends PlanningModuleFactory<ValuePerSetFadModule> {
 
     private DoubleParameter dampen =
         new CalibratedParameter(0, 1, 0, 1);
+
+    public ValuePerSetPlanningModuleFactory() {
+        setMinimumValueFadSets(new FixedDoubleParameter(0));
+    }
 
     @Override
     protected ValuePerSetFadModule makePlanningModule(
