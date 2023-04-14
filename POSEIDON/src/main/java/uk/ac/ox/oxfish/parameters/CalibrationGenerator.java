@@ -3,9 +3,11 @@ package uk.ac.ox.oxfish.parameters;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.DataTarget;
+import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.nio.file.Path;
@@ -29,8 +31,17 @@ public class CalibrationGenerator {
         final Path scenarioFile = calibrationFolder.resolve("scenario.yaml");
         yaml.dump(scenario, scenarioFile);
         final List<OptimizationParameter> parameters =
-            new ParameterExtractor()
+            new ParameterExtractor<>(CalibratedParameter.class)
                 .getParameters(scenario)
+                .map(parameter -> new HardEdgeOptimizationParameter(
+                    parameter.getAddress(),
+                    parameter.getObject().getMinimum(),
+                    parameter.getObject().getMaximum(),
+                    parameter.getObject().getHardMinimum() >= 0,
+                    false,
+                    parameter.getObject().getHardMinimum(),
+                    parameter.getObject().getHardMaximum()
+                ))
                 .collect(Collectors.toList());
         final ImmutableList<DataTarget> targets =
             recordStream(targetsFile)

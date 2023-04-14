@@ -2,10 +2,9 @@ package uk.ac.ox.oxfish.parameters;
 
 import com.google.common.collect.Streams;
 import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -20,7 +19,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParameterExtractor {
+public class ParameterExtractor<P extends DoubleParameter> {
+
+    private final Class<? extends P> parameterClass;
+
+    public ParameterExtractor(final Class<? extends P> parameterClass) {
+        this.parameterClass = parameterClass;
+    }
 
     @NotNull
     private static List<PropertyDescriptor> getPropertyDescriptors(final Object object) {
@@ -42,12 +47,12 @@ public class ParameterExtractor {
         }
     }
 
-    public Stream<HardEdgeOptimizationParameter> getParameters(final Object object) {
+    public Stream<Parameter> getParameters(final Object object) {
         return getParameters(object, new ParameterAddressBuilder());
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private Stream<HardEdgeOptimizationParameter> getParameters(
+    private Stream<Parameter> getParameters(
         final Object object,
         final ParameterAddressBuilder addressBuilder
     ) {
@@ -71,7 +76,7 @@ public class ParameterExtractor {
     }
 
     @NotNull
-    private Stream<HardEdgeOptimizationParameter> getParametersFromObject(
+    private Stream<Parameter> getParametersFromObject(
         final Object o,
         final ParameterAddressBuilder addressBuilder
     ) {
@@ -81,28 +86,13 @@ public class ParameterExtractor {
             .flatMap(propertyDescriptor -> {
                 final Object object = invoke(o, propertyDescriptor.getReadMethod());
                 final ParameterAddressBuilder newAddressBuilder = addressBuilder.add(propertyDescriptor.getName());
-                return object instanceof CalibratedParameter
-                    ? Stream.of(extractParameter((CalibratedParameter) object, newAddressBuilder.get()))
+                return parameterClass.isAssignableFrom(object.getClass())
+                    ? Stream.of(new Parameter(newAddressBuilder.get(), propertyDescriptor, parameterClass.cast(object)))
                     : getParameters(object, newAddressBuilder);
             });
     }
 
-    private HardEdgeOptimizationParameter extractParameter(
-        final CalibratedParameter calibratedParameter,
-        final String addressToModify
-    ) {
-        return new HardEdgeOptimizationParameter(
-            addressToModify,
-            calibratedParameter.getMinimum(),
-            calibratedParameter.getMaximum(),
-            calibratedParameter.getHardMinimum() >= 0,
-            false,
-            calibratedParameter.getHardMinimum(),
-            calibratedParameter.getHardMaximum()
-        );
-    }
-
-    private Stream<HardEdgeOptimizationParameter> getParametersFromMap(
+    private Stream<Parameter> getParametersFromMap(
         final Map<?, ?> objectMap,
         final ParameterAddressBuilder address
     ) {
@@ -117,7 +107,7 @@ public class ParameterExtractor {
             );
     }
 
-    private Stream<HardEdgeOptimizationParameter> getParametersFromIterable(
+    private Stream<Parameter> getParametersFromIterable(
         final Iterable<?> objects,
         final ParameterAddressBuilder address
     ) {
@@ -132,6 +122,30 @@ public class ParameterExtractor {
                     address.addIndex(entry.getValue())
                 )
             );
+    }
+
+    public class Parameter {
+        private final String address;
+        private final PropertyDescriptor propertyDescriptor;
+        private final P object;
+
+        public Parameter(final String address, final PropertyDescriptor propertyDescriptor, final P object) {
+            this.address = address;
+            this.propertyDescriptor = propertyDescriptor;
+            this.object = object;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public PropertyDescriptor getPropertyDescriptor() {
+            return propertyDescriptor;
+        }
+
+        public P getObject() {
+            return object;
+        }
     }
 
 }
