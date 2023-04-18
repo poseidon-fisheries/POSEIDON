@@ -53,12 +53,6 @@ public class CatchabilitySelectivityFishAttractor
      */
     private final int daysInWaterBeforeAttraction;
 
-
-    /**
-     * if the fad has been attracting fish (potentially, anyway) for these many days, it stops attracting any more (but doesn't lose them, yet!)
-     */
-    private final int maximumAttractionDays;
-
     private final FishState model;
 
     private final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
@@ -66,13 +60,11 @@ public class CatchabilitySelectivityFishAttractor
     public CatchabilitySelectivityFishAttractor(
         final Function<Fad, double[]> catchabilityPerSpeciesSupplier,
         final int daysInWaterBeforeAttraction,
-        final int maximumAttractionDays,
         final FishState model,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
     ) {
         this.catchabilityPerSpeciesSupplier = catchabilityPerSpeciesSupplier;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-        this.maximumAttractionDays = maximumAttractionDays;
         this.model = model;
         this.globalSelectivityCurves = globalSelectivityCurves;
     }
@@ -81,13 +73,11 @@ public class CatchabilitySelectivityFishAttractor
         final DoubleParameter[] carryingCapacitiesGenerator,
         final double[] catchabilityPerSpecies,
         final int daysInWaterBeforeAttraction,
-        final int maximumAttractionDays,
         final FishState model,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
     ) {
         this.catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-        this.maximumAttractionDays = maximumAttractionDays;
         this.model = model;
         this.globalSelectivityCurves = globalSelectivityCurves;
     }
@@ -98,11 +88,10 @@ public class CatchabilitySelectivityFishAttractor
         final LocalBiology seaTileBiology,
         final AbundanceAggregatingFad fad
     ) {
-        //if it's too early or late don't bother
+        //if it's too early don't bother
         if (
             model.getDay() - fad.getStepDeployed() / model.getStepsPerDay() < daysInWaterBeforeAttraction ||
-                !fad.isActive() ||
-                model.getDay() - fad.getStepDeployed() / model.getStepsPerDay() > daysInWaterBeforeAttraction + maximumAttractionDays
+                !fad.isActive()
         )
             return null;
         final SeaTile location = fad.getLocation();

@@ -34,7 +34,6 @@ public class SelectivityAbundanceFadInitializerFactory
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter maximumDaysAttractions,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final Map<String, DoubleParameter> catchabilities,
         final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunctionFactory
@@ -44,7 +43,6 @@ public class SelectivityAbundanceFadInitializerFactory
             catchabilities,
             fadDudRate,
             daysInWaterBeforeAttraction,
-            maximumDaysAttractions,
             fishReleaseProbabilityInPercent,
             abundanceFiltersFactory
         );
@@ -106,7 +104,6 @@ public class SelectivityAbundanceFadInitializerFactory
             new CatchabilitySelectivityFishAttractor(
                 catchabilitySupplier,
                 (int) getDaysInWaterBeforeAttraction().applyAsDouble(rng),
-                (int) getMaximumDaysAttractions().applyAsDouble(rng),
                 fishState,
                 getAbundanceFiltersFactory().apply(fishState).get(FadSetAction.class)
             ),

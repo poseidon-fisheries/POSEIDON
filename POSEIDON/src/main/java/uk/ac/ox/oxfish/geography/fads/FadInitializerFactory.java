@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
@@ -23,8 +22,6 @@ public abstract class FadInitializerFactory<
         new CalibratedParameter(0, 0.35, 0, 1, 0.001);
     private DoubleParameter daysInWaterBeforeAttraction =
         new CalibratedParameter(13, 30, 5, 60, 14);
-    private DoubleParameter maximumDaysAttractions =
-        new FixedDoubleParameter(Integer.MAX_VALUE);
     private DoubleParameter fishReleaseProbabilityInPercent =
         new CalibratedParameter(0.0, 3.5, 0, 10, 3.3);
 
@@ -33,14 +30,12 @@ public abstract class FadInitializerFactory<
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter maximumDaysAttractions,
         final DoubleParameter fishReleaseProbabilityInPercent
     ) {
         this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
         this.catchabilities = catchabilities;
         this.fadDudRate = fadDudRate;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-        this.maximumDaysAttractions = maximumDaysAttractions;
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
@@ -83,15 +78,6 @@ public abstract class FadInitializerFactory<
     public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
         invalidateCache();
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-    }
-
-    public DoubleParameter getMaximumDaysAttractions() {
-        return maximumDaysAttractions;
-    }
-
-    public void setMaximumDaysAttractions(final DoubleParameter maximumDaysAttractions) {
-        invalidateCache();
-        this.maximumDaysAttractions = maximumDaysAttractions;
     }
 
     public DoubleParameter getFishReleaseProbabilityInPercent() {

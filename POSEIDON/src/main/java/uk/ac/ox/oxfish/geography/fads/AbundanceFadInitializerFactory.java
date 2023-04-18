@@ -19,7 +19,6 @@ public abstract class AbundanceFadInitializerFactory
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter maximumDaysAttractions,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
@@ -28,7 +27,6 @@ public abstract class AbundanceFadInitializerFactory
             catchabilities,
             fadDudRate,
             daysInWaterBeforeAttraction,
-            maximumDaysAttractions,
             fishReleaseProbabilityInPercent
         );
         this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
