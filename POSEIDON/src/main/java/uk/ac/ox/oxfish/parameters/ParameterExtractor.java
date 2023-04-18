@@ -86,7 +86,7 @@ public class ParameterExtractor<P extends DoubleParameter> {
             .flatMap(propertyDescriptor -> {
                 final Object object = invoke(o, propertyDescriptor.getReadMethod());
                 final ParameterAddressBuilder newAddressBuilder = addressBuilder.add(propertyDescriptor.getName());
-                return parameterClass.isAssignableFrom(object.getClass())
+                return object != null && parameterClass.isAssignableFrom(object.getClass())
                     ? Stream.of(new Parameter(newAddressBuilder.get(), propertyDescriptor, parameterClass.cast(object)))
                     : getParameters(object, newAddressBuilder);
             });
