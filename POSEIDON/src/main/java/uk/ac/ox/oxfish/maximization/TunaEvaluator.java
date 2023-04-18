@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.maximization;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
@@ -28,17 +27,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.io.Files.getFileExtension;
-import static java.lang.Double.parseDouble;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
-import static java.util.Comparator.comparingDouble;
 
 public class TunaEvaluator implements Runnable {
 
@@ -134,7 +129,7 @@ public class TunaEvaluator implements Runnable {
             final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
             final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
 
-            final double[] solution = extractSolution(logFilePath);
+            final double[] solution = new SolutionExtractor(logFilePath).bestSolution().getKey();
             final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
             tunaEvaluator.setNumRuns(8);
             tunaEvaluator.setParallel(true);
@@ -152,21 +147,6 @@ public class TunaEvaluator implements Runnable {
             checkState(!calibrationFiles.isEmpty(), "No calibration files found in %s", folder);
             checkState(calibrationFiles.size() == 1, "More than one calibration files found in %s", folder);
             return calibrationFiles.get(0);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    @NotNull
-    static double[] extractSolution(final Path logFilePath) {
-        try (final Stream<String> lines = Files.lines(logFilePath)) {
-            final Pattern p = Pattern.compile("^\\| \\d+ \\| ([\\d.]+) \\|.*\\{(.*)}.*$");
-            return lines.map(p::matcher)
-                .filter(Matcher::matches)
-                .min(comparingDouble(m -> parseDouble(m.group(1))))
-                .map(m -> Stream.of(m.group(2).split(",")).mapToDouble(Double::parseDouble).toArray())
-                .orElseThrow(() -> new IllegalStateException("Best solution not found in " + logFilePath));
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
