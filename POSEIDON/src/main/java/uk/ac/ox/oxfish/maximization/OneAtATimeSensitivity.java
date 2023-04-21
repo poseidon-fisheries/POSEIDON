@@ -1,5 +1,8 @@
 package uk.ac.ox.oxfish.maximization;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.converters.PathConverter;
 import com.univocity.parsers.annotations.Parsed;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
@@ -7,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
@@ -20,47 +24,69 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.writeBeans;
 
 public class OneAtATimeSensitivity {
 
-    private final GenericOptimization genericOptimization;
-    private final double[] solution;
+    @Parameter(names = {"-c", "--calibration_file"}, converter = PathConverter.class)
+    private Path calibrationFile;
+    @Parameter(names = {"-l", "--log_file"}, converter = PathConverter.class)
+    private Path logFile;
+    @Parameter(names = {"-o", "--output_path"}, converter = PathConverter.class)
+    private Path outputFolder = Paths.get(".");
+    @Parameter(names = {"-s", "--steps"})
+    private int steps;
+    @Parameter(names = {"-i", "--iterations"})
+    private int iterations;
+    @Parameter(names = {"-y", "--num_year_to_run"})
+    private int numYearsToRun;
+
+    @SuppressWarnings("WeakerAccess")
+    public OneAtATimeSensitivity() {
+    }
 
     public OneAtATimeSensitivity(
-        final GenericOptimization genericOptimization,
-        final double[] solution
-    ) {
-        this.genericOptimization = genericOptimization;
-        this.solution = solution;
-    }
-
-    public static OneAtATimeSensitivity from(final Path calibrationFile, final Path logFile) {
-        return new OneAtATimeSensitivity(
-            GenericOptimization.fromFile(calibrationFile),
-            new SolutionExtractor(logFile).bestSolution().getKey()
-        );
-    }
-
-    public void run(
+        final Path calibrationFile,
+        final Path logFile,
+        final Path outputFolder,
         final int steps,
         final int iterations,
-        final int numYearsToRun,
-        final Path outputFolder
+        final int numYearsToRun
     ) {
-        final List<Variation> variations = buildVariations(steps).collect(toImmutableList());
+        this.calibrationFile = calibrationFile;
+        this.logFile = logFile;
+        this.outputFolder = outputFolder;
+        this.steps = steps;
+        this.iterations = iterations;
+        this.numYearsToRun = numYearsToRun;
+    }
+
+    public static void main(final String[] args) {
+        final OneAtATimeSensitivity oneAtATimeSensitivity = new OneAtATimeSensitivity();
+        JCommander.newBuilder()
+            .addObject(oneAtATimeSensitivity)
+            .build()
+            .parse(args);
+        oneAtATimeSensitivity.run();
+    }
+
+    public void run() {
+        final GenericOptimization genericOptimization = GenericOptimization.fromFile(calibrationFile);
+        final List<Variation> variations = buildVariations(genericOptimization).collect(toImmutableList());
         writeBeans(outputFolder.resolve("variations.csv"), variations, Variation.class);
-        final Stream<Result> results = getResults(variations, iterations, numYearsToRun);
+        final Stream<Result> results = getResults(genericOptimization, variations);
         writeBeans(outputFolder.resolve("results.csv"), results::iterator, Result.class);
     }
 
-    public Stream<Variation> buildVariations(
-        final int steps
+    private Stream<Variation> buildVariations(
+        final GenericOptimization genericOptimization
     ) {
+        final double[] solution = new SolutionExtractor(logFile).bestSolution().getKey();
+
         return mapWithIndex(
-            getParameters().stream().flatMap(parameter ->
-                valueRange(baseScenario(), parameter, steps).mapToObj(value ->
+            getParameters(genericOptimization).stream().flatMap(parameter ->
+                valueRange(genericOptimization.buildScenario(solution), parameter, steps).mapToObj(value ->
                     entry(parameter, value)
                 )
             ),
             (parameterAndValue, index) -> {
-                final Scenario scenario = baseScenario();
+                final Scenario scenario = genericOptimization.buildScenario(solution);
                 parameterAndValue.getKey().getSetter(scenario).accept(parameterAndValue.getValue());
                 return new Variation(
                     index,
@@ -72,10 +98,9 @@ public class OneAtATimeSensitivity {
         );
     }
 
-    public Stream<Result> getResults(
-        final Iterable<Variation> variations,
-        final int iterations,
-        final int numYearsToRun
+    private Stream<Result> getResults(
+        final GenericOptimization genericOptimization,
+        final Iterable<Variation> variations
     ) {
         return stream(variations)
             .parallel()
@@ -83,7 +108,7 @@ public class OneAtATimeSensitivity {
                 range(0, iterations).boxed()
                     .flatMap(iteration -> {
                         final FishState fishState = variation.run(numYearsToRun);
-                        return getTargets().stream().map(t ->
+                        return getTargets(genericOptimization).stream().map(t ->
                             new Result(
                                 variation.variationId,
                                 iteration,
@@ -96,7 +121,9 @@ public class OneAtATimeSensitivity {
             );
     }
 
-    public List<SimpleOptimizationParameter> getParameters() {
+    public List<SimpleOptimizationParameter> getParameters(
+        final GenericOptimization genericOptimization
+    ) {
         return genericOptimization.getParameters()
             .stream()
             .filter(p -> p instanceof SimpleOptimizationParameter)
@@ -104,7 +131,7 @@ public class OneAtATimeSensitivity {
             .collect(toImmutableList());
     }
 
-    public DoubleStream valueRange(
+    private DoubleStream valueRange(
         final Scenario scenario,
         final SimpleOptimizationParameter parameter,
         final int steps
@@ -119,11 +146,7 @@ public class OneAtATimeSensitivity {
         );
     }
 
-    public Scenario baseScenario() {
-        return genericOptimization.buildScenario(solution);
-    }
-
-    public List<FixedDataTarget> getTargets() {
+    private List<FixedDataTarget> getTargets(final GenericOptimization genericOptimization) {
         return genericOptimization.getTargets()
             .stream()
             .filter(t -> t instanceof FixedDataTarget)
@@ -145,6 +168,59 @@ public class OneAtATimeSensitivity {
         return range(0, steps).mapToDouble(i -> start + delta * ((double) i / (steps - 1)));
     }
 
+    public Path getOutputFolder() {
+        return outputFolder;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public void setSteps(final int steps) {
+        this.steps = steps;
+    }
+
+    @SuppressWarnings("unused")
+    public int getIterations() {
+        return iterations;
+    }
+
+    @SuppressWarnings("unused")
+    public void setIterations(final int iterations) {
+        this.iterations = iterations;
+    }
+
+    @SuppressWarnings("unused")
+    public int getNumYearsToRun() {
+        return numYearsToRun;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNumYearsToRun(final int numYearsToRun) {
+        this.numYearsToRun = numYearsToRun;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getCalibrationFile() {
+        return calibrationFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCalibrationFile(final Path calibrationFile) {
+        this.calibrationFile = calibrationFile;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getLogFile() {
+        return logFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setLogFile(final Path logFile) {
+        this.logFile = logFile;
+    }
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     public static class Variation {
         @Parsed
         private final long variationId;
@@ -154,6 +230,7 @@ public class OneAtATimeSensitivity {
         private final Double variedParameterValue;
         private final Scenario scenario;
 
+        @SuppressWarnings("WeakerAccess")
         public Variation(
             final long id,
             final String variedParameterAddress,
@@ -177,6 +254,7 @@ public class OneAtATimeSensitivity {
         }
     }
 
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     public static class Result {
         @Parsed
         private final long variationId;
@@ -191,6 +269,7 @@ public class OneAtATimeSensitivity {
         @Parsed
         private final double error;
 
+        @SuppressWarnings("WeakerAccess")
         public Result(
             final long variationId,
             final long iteration,

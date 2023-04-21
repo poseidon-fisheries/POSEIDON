@@ -19,11 +19,15 @@ public class OneAtATimeSensitivityTest extends TestCase {
 
     public void testRun() {
         final OneAtATimeSensitivity oneAtATimeSensitivity =
-            OneAtATimeSensitivity.from(
+            new OneAtATimeSensitivity(
                 calibrationFolder.resolve("calibration.yaml"),
-                calibrationFolder.resolve("calibration_log.md")
+                calibrationFolder.resolve("calibration_log.md"),
+                calibrationFolder.resolve("sensitivity"),
+                5,
+                8,
+                3
             );
-        oneAtATimeSensitivity.run(2, 2, 2, Paths.get("inputs", "tests"));
+        oneAtATimeSensitivity.run();
     }
 
     public void testValueRange() {
