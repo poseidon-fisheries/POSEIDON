@@ -179,6 +179,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         }
     }
 
+    public Scenario buildScenario(final double[] solution) {
+        try {
+            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
+        } catch (final FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Return the problem dimension.
      *

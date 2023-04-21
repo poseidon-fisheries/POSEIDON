@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  *
@@ -58,7 +60,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     public SimpleOptimizationParameter() {
     }
 
-    public SimpleOptimizationParameter(String addressToModify, double minimum, double maximum) {
+    public SimpleOptimizationParameter(final String addressToModify, final double minimum, final double maximum) {
         this.addressToModify = addressToModify;
         this.minimum = minimum;
         this.maximum = maximum;
@@ -76,48 +78,6 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         this.maximum = maximum;
         this.alwaysPositive = alwaysPositive;
         this.isRawNumber = isRawNumber;
-    }
-
-    public static double computeNumericValueFromEVABounds(
-        double input, double minimum, double maximum,
-        boolean forcePositive
-    ) {
-        double realValue = minimum + ((maximum - minimum) / (10 - (-10))) * (input - (-10));
-        if (realValue < 0 & forcePositive)
-            realValue = 0;
-        return realValue;
-    }
-
-    public static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
-        try {
-            //try as double parameter
-            OptimizationParameter.navigateAndSet(
-                scenario, addressToModify, new FixedDoubleParameter(realValue)
-
-            );
-        } catch (Exception e) {
-            //try as raw number
-            try {
-                OptimizationParameter.navigateAndSet(
-                    scenario, addressToModify, realValue
-
-                );
-            } catch (Exception d) {
-                throw new RuntimeException(d);
-            }
-        }
-    }
-
-    public static void quickParametrizeRawNumber(Scenario scenario, double realValue, String addressToModify) {
-        //try as raw number
-        try {
-            OptimizationParameter.navigateAndSet(
-                scenario, addressToModify, realValue
-
-            );
-        } catch (Exception d) {
-            throw new RuntimeException(d);
-        }
     }
 
     /**
@@ -138,12 +98,12 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
      * @return
      */
     @Override
-    public String parametrize(Scenario scenario, double[] inputs) {
+    public String parametrize(final Scenario scenario, final double[] inputs) {
 
         Preconditions.checkArgument(maximum >= minimum, "invalid bounds " + addressToModify);
         Preconditions.checkArgument(inputs.length == 1);
 
-        double realValue = computeNumericValue(inputs[0]);
+        final double realValue = computeNumericValue(inputs[0]);
 
 
         if (!isRawNumber)
@@ -155,32 +115,60 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     }
 
-    public double computeNumericValue(double input) {
+    public double computeNumericValue(final double input) {
         return computeNumericValueFromEVABounds(input, minimum, maximum, alwaysPositive);
     }
 
-    public double parametrizeRealValue(Scenario scenario, double realValue) {
+    public static void quickParametrize(final Scenario scenario, final double realValue, final String addressToModify) {
+        try {
+            //try as double parameter
+            OptimizationParameter.navigateAndSet(
+                scenario, addressToModify, new FixedDoubleParameter(realValue)
+
+            );
+        } catch (final Exception e) {
+            //try as raw number
+            try {
+                OptimizationParameter.navigateAndSet(
+                    scenario, addressToModify, realValue
+
+                );
+            } catch (final Exception d) {
+                throw new RuntimeException(d);
+            }
+        }
+    }
+
+    public static void quickParametrizeRawNumber(
+        final Scenario scenario,
+        final double realValue,
+        final String addressToModify
+    ) {
+        //try as raw number
+        try {
+            OptimizationParameter.navigateAndSet(
+                scenario, addressToModify, realValue
+
+            );
+        } catch (final Exception d) {
+            throw new RuntimeException(d);
+        }
+    }
+
+    public static double computeNumericValueFromEVABounds(
+        final double input, final double minimum, final double maximum,
+        final boolean forcePositive
+    ) {
+        double realValue = minimum + ((maximum - minimum) / (10 - (-10))) * (input - (-10));
+        if (realValue < 0 & forcePositive)
+            realValue = 0;
+        return realValue;
+    }
+
+    public double parametrizeRealValue(final Scenario scenario, final double realValue) {
         quickParametrize(scenario, realValue, addressToModify);
         return realValue;
 
-    }
-
-    /**
-     * Getter for property 'addressToModify'.
-     *
-     * @return Value for property 'addressToModify'.
-     */
-    public String getAddressToModify() {
-        return addressToModify;
-    }
-
-    /**
-     * Setter for property 'addressToModify'.
-     *
-     * @param addressToModify Value to set for property 'addressToModify'.
-     */
-    public void setAddressToModify(String addressToModify) {
-        this.addressToModify = addressToModify;
     }
 
     /**
@@ -197,7 +185,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
      *
      * @param minimum Value to set for property 'minimum'.
      */
-    public void setMinimum(double minimum) {
+    public void setMinimum(final double minimum) {
         this.minimum = minimum;
     }
 
@@ -215,31 +203,63 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
      *
      * @param maximum Value to set for property 'maximum'.
      */
-    public void setMaximum(double maximum) {
+    public void setMaximum(final double maximum) {
         this.maximum = maximum;
     }
-
 
     public boolean isAlwaysPositive() {
         return alwaysPositive;
     }
 
-    public void setAlwaysPositive(boolean alwaysPositive) {
+    public void setAlwaysPositive(final boolean alwaysPositive) {
         this.alwaysPositive = alwaysPositive;
     }
-
 
     @Override
     public String getName() {
         return getAddressToModify();
     }
 
+    /**
+     * Getter for property 'addressToModify'.
+     *
+     * @return Value for property 'addressToModify'.
+     */
+    public String getAddressToModify() {
+        return addressToModify;
+    }
+
+    /**
+     * Setter for property 'addressToModify'.
+     *
+     * @param addressToModify Value to set for property 'addressToModify'.
+     */
+    public void setAddressToModify(final String addressToModify) {
+        this.addressToModify = addressToModify;
+    }
+
     public boolean isRawNumber() {
         return isRawNumber;
     }
 
-    public void setRawNumber(boolean rawNumber) {
+    public void setRawNumber(final boolean rawNumber) {
         isRawNumber = rawNumber;
+    }
+
+    public double getValue(final Scenario scenario) {
+        return getGetter(scenario).get();
+    }
+
+    public Supplier<Double> getGetter(final Scenario scenario) {
+        final Supplier<Object> getter = new ParameterAddress(addressToModify).getGetter(scenario);
+        return () -> ((FixedDoubleParameter) getter.get()).getFixedValue();
+    }
+
+    public Consumer<Double> getSetter(final Scenario scenario) {
+        return value ->
+            new ParameterAddress(addressToModify)
+                .getSetter(scenario)
+                .accept(new FixedDoubleParameter(value));
     }
 
     @Override
