@@ -24,12 +24,12 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.writeBeans;
 
 public class OneAtATimeSensitivity {
 
-    @Parameter(names = {"-c", "--calibration_file"}, converter = PathConverter.class)
-    private Path calibrationFile;
-    @Parameter(names = {"-l", "--log_file"}, converter = PathConverter.class)
-    private Path logFile;
-    @Parameter(names = {"-o", "--output_path"}, converter = PathConverter.class)
-    private Path outputFolder = Paths.get(".");
+    @Parameter(names = {"-c", "--calibration_file"})
+    private String calibrationFile = "calibration.yaml";
+    @Parameter(names = {"-l", "--log_file"})
+    private String logFile = "calibration_log.md";
+    @Parameter(names = {"-f", "--folder"}, converter = PathConverter.class)
+    private Path folder = Paths.get(".");
     @Parameter(names = {"-s", "--steps"})
     private int steps;
     @Parameter(names = {"-i", "--iterations"})
@@ -42,16 +42,16 @@ public class OneAtATimeSensitivity {
     }
 
     public OneAtATimeSensitivity(
-        final Path calibrationFile,
-        final Path logFile,
-        final Path outputFolder,
+        final String calibrationFile,
+        final String logFile,
+        final Path folder,
         final int steps,
         final int iterations,
         final int numYearsToRun
     ) {
         this.calibrationFile = calibrationFile;
         this.logFile = logFile;
-        this.outputFolder = outputFolder;
+        this.folder = folder;
         this.steps = steps;
         this.iterations = iterations;
         this.numYearsToRun = numYearsToRun;
@@ -67,17 +67,17 @@ public class OneAtATimeSensitivity {
     }
 
     public void run() {
-        final GenericOptimization genericOptimization = GenericOptimization.fromFile(calibrationFile);
+        final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
         final List<Variation> variations = buildVariations(genericOptimization).collect(toImmutableList());
-        writeBeans(outputFolder.resolve("variations.csv"), variations, Variation.class);
+        writeBeans(folder.resolve("variations.csv"), variations, Variation.class);
         final Stream<Result> results = getResults(genericOptimization, variations);
-        writeBeans(outputFolder.resolve("results.csv"), results::iterator, Result.class);
+        writeBeans(folder.resolve("results.csv"), results::iterator, Result.class);
     }
 
     private Stream<Variation> buildVariations(
         final GenericOptimization genericOptimization
     ) {
-        final double[] solution = new SolutionExtractor(logFile).bestSolution().getKey();
+        final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
 
         return mapWithIndex(
             getParameters(genericOptimization).stream().flatMap(parameter ->
@@ -168,8 +168,8 @@ public class OneAtATimeSensitivity {
         return range(0, steps).mapToDouble(i -> start + delta * ((double) i / (steps - 1)));
     }
 
-    public Path getOutputFolder() {
-        return outputFolder;
+    public Path getFolder() {
+        return folder;
     }
 
     public int getSteps() {
@@ -201,22 +201,22 @@ public class OneAtATimeSensitivity {
     }
 
     @SuppressWarnings("unused")
-    public Path getCalibrationFile() {
+    public String getCalibrationFile() {
         return calibrationFile;
     }
 
     @SuppressWarnings("unused")
-    public void setCalibrationFile(final Path calibrationFile) {
+    public void setCalibrationFile(final String calibrationFile) {
         this.calibrationFile = calibrationFile;
     }
 
     @SuppressWarnings("unused")
-    public Path getLogFile() {
+    public String getLogFile() {
         return logFile;
     }
 
     @SuppressWarnings("unused")
-    public void setLogFile(final Path logFile) {
+    public void setLogFile(final String logFile) {
         this.logFile = logFile;
     }
 

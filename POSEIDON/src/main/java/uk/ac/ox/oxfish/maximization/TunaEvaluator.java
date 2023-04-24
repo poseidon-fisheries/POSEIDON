@@ -130,7 +130,7 @@ public class TunaEvaluator implements Runnable {
 
             final double[] solution = new SolutionExtractor(logFilePath).bestSolution().getKey();
             final TunaEvaluator tunaEvaluator = new TunaEvaluator(calibrationFilePath, solution);
-            tunaEvaluator.setNumRuns(8);
+            tunaEvaluator.setNumRuns(16);
             tunaEvaluator.setParallel(true);
             tunaEvaluator.run();
         });
