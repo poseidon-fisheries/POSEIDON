@@ -19,24 +19,24 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider.writeRows;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherDailyData;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyYearlyData;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -48,16 +48,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherDailyData;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyYearlyData;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider.writeRows;
 
 public final class Runner<S extends Scenario> {
 
@@ -249,8 +244,8 @@ public final class Runner<S extends Scenario> {
             final Collection<RowProvider> activeProviders = isFinalStep
                 ? providers
                 : providers.stream()
-                    .filter(RowProvider::isEveryStep)
-                    .collect(toImmutableList());
+                .filter(RowProvider::isEveryStep)
+                .collect(toImmutableList());
             if (!activeProviders.isEmpty()) {
                 synchronized (overwriteFiles) {
                     final boolean overwrite = overwriteFiles
@@ -288,6 +283,15 @@ public final class Runner<S extends Scenario> {
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
+    Runner<S> registerRowProviders(
+        final String fileName,
+        final AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
+    ) {
+        rowProviderFactories.put(outputPath.resolve(fileName), rowProvidersFactory);
+        return this;
+    }
+
     public Runner<S> requestFisherDailyData() {
         return registerRowProviders(FISHER_DAILY_DATA_FILENAME, fishState ->
             fishState.getFishers().stream()
@@ -297,15 +301,6 @@ public final class Runner<S extends Scenario> {
                 ))
                 .collect(toImmutableList())
         );
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    Runner<S> registerRowProviders(
-        final String fileName,
-        final AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
-    ) {
-        rowProviderFactories.put(outputPath.resolve(fileName), rowProvidersFactory);
-        return this;
     }
 
     public Runner<S> requestYearlyData() {
@@ -325,7 +320,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    public Runner<S> setPolicies(final Iterable<Policy<? super S>> policies) {
+    public Runner<S> setPolicies(final Iterable<? extends Policy<? super S>> policies) {
         this.policies = ImmutableList.copyOf(policies);
         return this;
     }

@@ -3,21 +3,25 @@ package uk.ac.ox.oxfish.maximization;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
+import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.annotations.Parsed;
+import uk.ac.ox.oxfish.experiments.tuna.Policy;
+import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.mapWithIndex;
-import static com.google.common.collect.Streams.stream;
 import static java.util.stream.LongStream.range;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.writeBeans;
@@ -68,60 +72,36 @@ public class OneAtATimeSensitivity {
 
     public void run() {
         final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
-        final List<Variation> variations = buildVariations(genericOptimization).collect(toImmutableList());
+        final List<Variation> variations = buildVariations(genericOptimization);
         writeBeans(folder.resolve("variations.csv"), variations, Variation.class);
-        final Stream<Result> results = getResults(genericOptimization, variations);
-        writeBeans(folder.resolve("results.csv"), results::iterator, Result.class);
+        final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
+        final Runner<Scenario> runner = new Runner<>(() -> genericOptimization.buildScenario(solution), folder);
+        runner.setPolicies(buildVariations(genericOptimization));
+        runner.run(numYearsToRun, iterations);
+        runner.registerRowProvider(
+            "results.csv",
+            fishState -> new ResultsProvider(genericOptimization, fishState)
+        );
     }
 
-    private Stream<Variation> buildVariations(
+    private List<Variation> buildVariations(
         final GenericOptimization genericOptimization
     ) {
-        final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
-
         return mapWithIndex(
             getParameters(genericOptimization).stream().flatMap(parameter ->
                 valueRange(parameter, steps).mapToObj(value ->
                     entry(parameter, value)
                 )
             ),
-            (parameterAndValue, index) -> {
-                final Scenario scenario = genericOptimization.buildScenario(solution);
-                parameterAndValue.getKey().getSetter(scenario).accept(parameterAndValue.getValue());
-                return new Variation(
+            (parameterAndValue, index) ->
+                new Variation(
                     index,
                     parameterAndValue.getKey().getAddressToModify(),
                     parameterAndValue.getValue(),
-                    scenario
-                );
-            }
-        );
-    }
-
-    private Stream<Result> getResults(
-        final GenericOptimization genericOptimization,
-        final Iterable<Variation> variations
-    ) {
-        return stream(variations)
-            .parallel()
-            .flatMap(variation ->
-                range(0, iterations)
-                    .boxed()
-                    .parallel()
-                    .flatMap(iteration -> {
-                        System.out.println("Starting iteration " + iteration + ", " + variation);
-                        final FishState fishState = variation.run(numYearsToRun);
-                        return getTargets(genericOptimization).stream().map(t ->
-                            new Result(
-                                variation.variationId,
-                                iteration,
-                                t.getColumnName(),
-                                t.getFixedTarget(),
-                                t.getValue(fishState)
-                            )
-                        );
-                    })
-            );
+                    scenario -> parameterAndValue.getKey().getSetter(scenario).accept(parameterAndValue.getValue()
+                    )
+                )
+        ).collect(toImmutableList());
     }
 
     public List<SimpleOptimizationParameter> getParameters(
@@ -145,14 +125,6 @@ public class OneAtATimeSensitivity {
         );
     }
 
-    private List<FixedDataTarget> getTargets(final GenericOptimization genericOptimization) {
-        return genericOptimization.getTargets()
-            .stream()
-            .filter(t -> t instanceof FixedDataTarget)
-            .map(t -> (FixedDataTarget) t)
-            .collect(toImmutableList());
-    }
-
     static DoubleStream valueRange(
         final double minimum,
         final double maximum,
@@ -160,6 +132,14 @@ public class OneAtATimeSensitivity {
     ) {
         final double delta = maximum - minimum;
         return range(0, steps).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1)));
+    }
+
+    private List<FixedDataTarget> getTargets(final GenericOptimization genericOptimization) {
+        return genericOptimization.getTargets()
+            .stream()
+            .filter(t -> t instanceof FixedDataTarget)
+            .map(t -> (FixedDataTarget) t)
+            .collect(toImmutableList());
     }
 
     public Path getFolder() {
@@ -215,46 +195,22 @@ public class OneAtATimeSensitivity {
     }
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
-    public static class Variation {
-        @Parsed
-        private final long variationId;
+    public static class Variation extends Policy<Scenario> {
         @Parsed
         private final String variedParameterAddress;
         @Parsed
         private final Double variedParameterValue;
-        private final Scenario scenario;
 
         @SuppressWarnings("WeakerAccess")
         public Variation(
             final long id,
             final String variedParameterAddress,
             final Double variedParameterValue,
-            final Scenario scenario
+            final Consumer<Scenario> scenarioConsumer
         ) {
-            this.variationId = id;
+            super(String.valueOf(id), scenarioConsumer);
             this.variedParameterAddress = variedParameterAddress;
             this.variedParameterValue = variedParameterValue;
-            this.scenario = scenario;
-        }
-
-        public FishState run(final int numYearsToRun) {
-            final FishState fishState = new FishState();
-            fishState.setScenario(scenario);
-            fishState.start();
-            do {
-                System.out.println("Step " + fishState.getStep() + 1 + ", " + this);
-                fishState.schedule.step(fishState);
-            } while (fishState.getYear() < numYearsToRun);
-            return fishState;
-        }
-
-        @Override
-        public String toString() {
-            return "Variation{" +
-                "variationId=" + variationId +
-                ", variedParameterAddress='" + variedParameterAddress + '\'' +
-                ", variedParameterValue=" + variedParameterValue +
-                '}';
         }
     }
 
@@ -288,6 +244,33 @@ public class OneAtATimeSensitivity {
             this.value = value;
             this.error = value - target;
         }
+    }
+
+    class ResultsProvider implements RowProvider {
+        private final GenericOptimization genericOptimization;
+        private final FishState fishState;
+
+        ResultsProvider(final GenericOptimization genericOptimization, final FishState fishState) {
+            this.genericOptimization = genericOptimization;
+            this.fishState = fishState;
+        }
+
+        @Override
+        public List<String> getHeaders() {
+            return ImmutableList.of("column_name", "target", "value");
+        }
+
+        @Override
+        public Iterable<? extends Collection<?>> getRows() {
+            return getTargets(genericOptimization).stream().map(t ->
+                ImmutableList.of(
+                    t.getColumnName(),
+                    t.getFixedTarget(),
+                    t.getValue(fishState)
+                )
+            ).collect(toImmutableList());
+        }
+
     }
 
 }
