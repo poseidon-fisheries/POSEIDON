@@ -109,6 +109,7 @@ public class OneAtATimeSensitivity {
                     .boxed()
                     .parallel()
                     .flatMap(iteration -> {
+                        System.out.println("Starting iteration " + iteration + ", " + variation);
                         final FishState fishState = variation.run(numYearsToRun);
                         return getTargets(genericOptimization).stream().map(t ->
                             new Result(
@@ -241,9 +242,19 @@ public class OneAtATimeSensitivity {
             fishState.setScenario(scenario);
             fishState.start();
             do {
+                System.out.println("Step " + fishState.getStep() + 1 + ", " + this);
                 fishState.schedule.step(fishState);
             } while (fishState.getYear() < numYearsToRun);
             return fishState;
+        }
+
+        @Override
+        public String toString() {
+            return "Variation{" +
+                "variationId=" + variationId +
+                ", variedParameterAddress='" + variedParameterAddress + '\'' +
+                ", variedParameterValue=" + variedParameterValue +
+                '}';
         }
     }
 
