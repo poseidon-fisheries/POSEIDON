@@ -81,7 +81,7 @@ public class OneAtATimeSensitivity {
 
         return mapWithIndex(
             getParameters(genericOptimization).stream().flatMap(parameter ->
-                valueRange(genericOptimization.buildScenario(solution), parameter, steps).mapToObj(value ->
+                valueRange(parameter, steps).mapToObj(value ->
                     entry(parameter, value)
                 )
             ),
@@ -105,7 +105,9 @@ public class OneAtATimeSensitivity {
         return stream(variations)
             .parallel()
             .flatMap(variation ->
-                range(0, iterations).boxed()
+                range(0, iterations)
+                    .boxed()
+                    .parallel()
                     .flatMap(iteration -> {
                         final FishState fishState = variation.run(numYearsToRun);
                         return getTargets(genericOptimization).stream().map(t ->
@@ -132,14 +134,10 @@ public class OneAtATimeSensitivity {
     }
 
     private DoubleStream valueRange(
-        final Scenario scenario,
         final SimpleOptimizationParameter parameter,
         final int steps
     ) {
         return valueRange(
-            parameter.getValue(scenario),
-            parameter.getMinimum(),
-            parameter.getMaximum(),
             parameter.getMinimum(),
             parameter.getMaximum(),
             steps
@@ -155,17 +153,12 @@ public class OneAtATimeSensitivity {
     }
 
     static DoubleStream valueRange(
-        final double value,
         final double minimum,
         final double maximum,
-        final double low,
-        final double high,
         final int steps
     ) {
-        final double start = Math.max(minimum, value * low);
-        final double end = Math.min(maximum, value * high);
-        final double delta = (end > 0 ? end : maximum) - start;
-        return range(0, steps).mapToDouble(i -> start + delta * ((double) i / (steps - 1)));
+        final double delta = maximum - minimum;
+        return range(0, steps).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1)));
     }
 
     public Path getFolder() {
