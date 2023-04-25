@@ -17,7 +17,6 @@ public abstract class AbundanceFadInitializerFactory
     public AbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
-        final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final AbundanceFiltersFactory abundanceFiltersFactory
@@ -25,7 +24,6 @@ public abstract class AbundanceFadInitializerFactory
         super(
             carryingCapacityInitializerFactory,
             catchabilities,
-            fadDudRate,
             daysInWaterBeforeAttraction,
             fishReleaseProbabilityInPercent
         );

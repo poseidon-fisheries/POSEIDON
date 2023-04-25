@@ -18,8 +18,6 @@ public abstract class FadInitializerFactory<
         new CacheByFishState<>(this::makeFadInitializer);
     private Map<String, DoubleParameter> catchabilities;
     private CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory;
-    private DoubleParameter fadDudRate =
-        new CalibratedParameter(0, 0.35, 0, 1, 0.001);
     private DoubleParameter daysInWaterBeforeAttraction =
         new CalibratedParameter(13, 30, 5, 60, 14);
     private DoubleParameter fishReleaseProbabilityInPercent =
@@ -28,13 +26,11 @@ public abstract class FadInitializerFactory<
     FadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
-        final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter fishReleaseProbabilityInPercent
     ) {
         this.carryingCapacityInitializerFactory = carryingCapacityInitializerFactory;
         this.catchabilities = catchabilities;
-        this.fadDudRate = fadDudRate;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
@@ -58,19 +54,6 @@ public abstract class FadInitializerFactory<
         this.catchabilities = catchabilities;
     }
 
-    public DoubleParameter getFadDudRate() {
-        return fadDudRate;
-    }
-
-    public void setFadDudRate(final DoubleParameter fadDudRate) {
-        invalidateCache();
-        this.fadDudRate = fadDudRate;
-    }
-
-    void invalidateCache() {
-        cache.invalidateAll();
-    }
-
     public DoubleParameter getDaysInWaterBeforeAttraction() {
         return daysInWaterBeforeAttraction;
     }
@@ -78,6 +61,10 @@ public abstract class FadInitializerFactory<
     public void setDaysInWaterBeforeAttraction(final DoubleParameter daysInWaterBeforeAttraction) {
         invalidateCache();
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+    }
+
+    void invalidateCache() {
+        cache.invalidateAll();
     }
 
     public DoubleParameter getFishReleaseProbabilityInPercent() {

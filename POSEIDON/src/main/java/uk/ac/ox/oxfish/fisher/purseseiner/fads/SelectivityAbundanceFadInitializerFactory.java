@@ -32,7 +32,6 @@ public class SelectivityAbundanceFadInitializerFactory
     public SelectivityAbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory,
         final AbundanceFiltersFactory abundanceFiltersFactory,
-        final DoubleParameter fadDudRate,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter fishReleaseProbabilityInPercent,
         final Map<String, DoubleParameter> catchabilities,
@@ -41,7 +40,6 @@ public class SelectivityAbundanceFadInitializerFactory
         super(
             carryingCapacityInitializerFactory,
             catchabilities,
-            fadDudRate,
             daysInWaterBeforeAttraction,
             fishReleaseProbabilityInPercent,
             abundanceFiltersFactory
