@@ -61,10 +61,11 @@ public final class Runner<S extends Scenario> {
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
     private static final String FISHER_DAILY_DATA_FILENAME = "fisher_daily_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
+    private static final String POLICIES_FILENAME = "policies.csv";
 
     private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
 
-    private final Supplier<S> scenarioSupplier;
+    private final Supplier<? extends S> scenarioSupplier;
     private final Path outputPath;
     private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>>
         rowProviderFactories =
@@ -72,9 +73,9 @@ public final class Runner<S extends Scenario> {
     private boolean parallel = true;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
     private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
-    private Consumer<State> beforeStartConsumer = __ -> {
+    private Consumer<? super State> beforeStartConsumer = __ -> {
     };
-    private Consumer<State> afterStartConsumer = __ -> {
+    private Consumer<? super State> afterStartConsumer = __ -> {
     };
     private Consumer<State> afterStepConsumer = __ -> {
     };
@@ -82,7 +83,7 @@ public final class Runner<S extends Scenario> {
     };
 
     public Runner(
-        final Supplier<S> scenarioSupplier,
+        final Supplier<? extends S> scenarioSupplier,
         final Path outputPath
     ) {
         this.scenarioSupplier = scenarioSupplier;
@@ -107,7 +108,7 @@ public final class Runner<S extends Scenario> {
 
     private static <S extends Scenario> Supplier<S> makeScenarioSupplier(
         final Path scenarioPath,
-        final Class<S> scenarioClass
+        final Class<? extends S> scenarioClass
     ) {
         return () -> {
             try (final FileReader fileReader = new FileReader(scenarioPath.toFile())) {
@@ -121,6 +122,7 @@ public final class Runner<S extends Scenario> {
         };
     }
 
+    @SuppressWarnings("unused")
     public Path getOutputPath() {
         return outputPath;
     }
@@ -143,13 +145,13 @@ public final class Runner<S extends Scenario> {
     }
 
     @SuppressWarnings({"unused", "UnusedReturnValue"})
-    public Runner<S> setBeforeStartConsumer(final Consumer<State> beforeStartConsumer) {
+    public Runner<S> setBeforeStartConsumer(final Consumer<? super State> beforeStartConsumer) {
         this.beforeStartConsumer = beforeStartConsumer;
         return this;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Runner<S> setAfterStartConsumer(final Consumer<State> afterStartConsumer) {
+    public Runner<S> setAfterStartConsumer(final Consumer<? super State> afterStartConsumer) {
         this.afterStartConsumer = afterStartConsumer;
         return this;
     }
@@ -160,7 +162,7 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public Runner<S> setAfterRunConsumer(final Consumer<State> afterRunConsumer) {
         this.afterRunConsumer = checkNotNull(afterRunConsumer);
         return this;
@@ -222,6 +224,7 @@ public final class Runner<S extends Scenario> {
         final ImmutableMultimap.Builder<Path, RowProvider> rowProviders =
             ImmutableMultimap.builder();
         rowProviders.put(outputPath.resolve(RUNS_FILENAME), state);
+        rowProviders.put(outputPath.resolve(POLICIES_FILENAME), state.policy);
         rowProviderFactories.forEach((path, factory) ->
             factory.apply(state.model).forEach(rowProvider -> {
                 if (rowProvider instanceof Startable) {
@@ -235,7 +238,7 @@ public final class Runner<S extends Scenario> {
 
     private void writeOutputs(
         final int runNumber,
-        final Multimap<Path, RowProvider> rowProviders,
+        final Multimap<? extends Path, RowProvider> rowProviders,
         final boolean isFinalStep
     ) {
         rowProviders.asMap().forEach((outputPath, providers) -> {
@@ -303,6 +306,7 @@ public final class Runner<S extends Scenario> {
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Runner<S> requestYearlyData() {
         return registerRowProvider(YEARLY_DATA_FILENAME, fishState ->
             new TidyYearlyData(fishState.getYearlyDataSet())
@@ -402,13 +406,12 @@ public final class Runner<S extends Scenario> {
 
         @Override
         public List<String> getHeaders() {
-            return ImmutableList.of("policy", "run_start", "run_end");
+            return ImmutableList.of("run_start", "run_end");
         }
 
         @Override
         public Iterable<? extends Collection<?>> getRows() {
             return ImmutableList.of(ImmutableList.of(
-                policy.getName(),
                 startTime,
                 LocalDateTime.now()
             ));

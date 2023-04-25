@@ -124,14 +124,14 @@ public class SetLimitsVsActiveFadsSweep {
     }
 
     private Policy<EpoGravityBiomassScenario> makePolicy(
-        String policyName,
-        Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        Function<EpoGravityBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
+        final String policyName,
+        final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
+        final Function<EpoGravityBiomassScenario, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory
     ) {
-        Consumer<EpoGravityBiomassScenario> scenarioConsumer = scenario -> {
+        final Consumer<EpoGravityBiomassScenario> scenarioConsumer = scenario -> {
             final Optional<AlgorithmFactory<? extends Regulation>> generalRegulationFactory =
                 Optional.ofNullable(makeGeneralRegulationFactory).map(factory -> factory.apply(scenario));
-            Steppable setRegulations = simState -> {
+            final Steppable setRegulations = simState -> {
                 final FishState fishState = (FishState) simState;
                 System.out.println("Setting regulations to " + policyName + " for all fishers at day " + simState.schedule
                     .getSteps());
@@ -146,7 +146,7 @@ public class SetLimitsVsActiveFadsSweep {
                 fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, POLICY_KICK_IN_YEAR)
             );
         };
-        return new Policy<>(policyName, policyName, scenarioConsumer);
+        return new Policy<>(policyName, scenarioConsumer);
     }
 
 }

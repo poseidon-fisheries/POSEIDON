@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import com.univocity.parsers.annotations.Parsed;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
@@ -21,10 +22,7 @@ import java.util.function.Consumer;
 import java.util.stream.DoubleStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.Streams.mapWithIndex;
 import static java.util.stream.LongStream.range;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.writeBeans;
 
 public class OneAtATimeSensitivity {
 
@@ -72,36 +70,30 @@ public class OneAtATimeSensitivity {
 
     public void run() {
         final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
-        final List<Variation> variations = buildVariations(genericOptimization);
-        writeBeans(folder.resolve("variations.csv"), variations, Variation.class);
         final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
-        final Runner<Scenario> runner = new Runner<>(() -> genericOptimization.buildScenario(solution), folder);
-        runner.setPolicies(buildVariations(genericOptimization));
-        runner.run(numYearsToRun, iterations);
-        runner.registerRowProvider(
-            "results.csv",
-            fishState -> new ResultsProvider(genericOptimization, fishState)
-        );
+        new Runner<>(() -> genericOptimization.buildScenario(solution), folder.resolve("ofat_outputs"))
+            .setPolicies(buildVariations(genericOptimization))
+            .registerRowProvider(
+                "results.csv",
+                fishState -> new ResultsProvider(genericOptimization, fishState)
+            )
+            .run(numYearsToRun, iterations);
     }
 
     private List<Variation> buildVariations(
         final GenericOptimization genericOptimization
     ) {
-        return mapWithIndex(
-            getParameters(genericOptimization).stream().flatMap(parameter ->
+        return getParameters(genericOptimization)
+            .stream()
+            .flatMap(parameter ->
                 valueRange(parameter, steps).mapToObj(value ->
-                    entry(parameter, value)
-                )
-            ),
-            (parameterAndValue, index) ->
-                new Variation(
-                    index,
-                    parameterAndValue.getKey().getAddressToModify(),
-                    parameterAndValue.getValue(),
-                    scenario -> parameterAndValue.getKey().getSetter(scenario).accept(parameterAndValue.getValue()
+                    new Variation(
+                        parameter.getAddressToModify(),
+                        value,
+                        scenario -> parameter.getSetter(scenario).accept(value)
                     )
                 )
-        ).collect(toImmutableList());
+            ).collect(toImmutableList());
     }
 
     public List<SimpleOptimizationParameter> getParameters(
@@ -197,52 +189,34 @@ public class OneAtATimeSensitivity {
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     public static class Variation extends Policy<Scenario> {
         @Parsed
-        private final String variedParameterAddress;
-        @Parsed
         private final Double variedParameterValue;
 
         @SuppressWarnings("WeakerAccess")
         public Variation(
-            final long id,
             final String variedParameterAddress,
             final Double variedParameterValue,
             final Consumer<Scenario> scenarioConsumer
         ) {
-            super(String.valueOf(id), scenarioConsumer);
-            this.variedParameterAddress = variedParameterAddress;
+            super(variedParameterAddress, scenarioConsumer);
             this.variedParameterValue = variedParameterValue;
         }
-    }
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    public static class Result {
-        @Parsed
-        private final long variationId;
-        @Parsed
-        private final long iteration;
-        @Parsed
-        private final String columnName;
-        @Parsed
-        private final double target;
-        @Parsed
-        private final double value;
-        @Parsed
-        private final double error;
+        @Override
+        public List<String> getHeaders() {
+            return ImmutableList.<String>builder()
+                .addAll(super.getHeaders())
+                .add("parameter_value")
+                .build();
+        }
 
-        @SuppressWarnings("WeakerAccess")
-        public Result(
-            final long variationId,
-            final long iteration,
-            final String columnName,
-            final double target,
-            final double value
-        ) {
-            this.variationId = variationId;
-            this.iteration = iteration;
-            this.columnName = columnName;
-            this.target = target;
-            this.value = value;
-            this.error = value - target;
+        @Override
+        public Iterable<? extends Collection<?>> getRows() {
+            return Streams.stream(super.getRows()).map(row ->
+                ImmutableList.builder()
+                    .addAll(row)
+                    .add(variedParameterValue)
+                    .build()
+            ).collect(toImmutableList());
         }
     }
 

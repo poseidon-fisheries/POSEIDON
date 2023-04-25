@@ -159,7 +159,7 @@ public class TunaEvaluator implements Runnable {
 
         scenarioConsumer.ifPresent(consumer ->
             runner.setPolicies(ImmutableList.of(
-                new Policy<>("Modified scenario", "", consumer)
+                new Policy<>("Modified scenario", consumer)
             ))
         );
 

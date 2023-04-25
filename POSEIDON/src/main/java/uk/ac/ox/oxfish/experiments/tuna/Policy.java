@@ -19,10 +19,12 @@
 
 package uk.ac.ox.oxfish.experiments.tuna;
 
+import com.google.common.collect.ImmutableList;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
@@ -30,39 +32,28 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Policy<S extends Scenario> {
+public class Policy<S extends Scenario> implements RowProvider {
 
-    public static final Policy<Scenario> DEFAULT = new Policy<>(
-        "Default",
-        "No changes to the default scenario",
-        scenario -> {
-        }
-    );
+    public static final Policy<Scenario> DEFAULT =
+        new Policy<>(
+            "Default",
+            scenario -> {
+            }
+        );
 
     private final String name;
-    private final String description;
     private final Consumer<S> scenarioConsumer;
 
     public Policy(
         final String name,
-        final String description,
         final Consumer<S> scenarioConsumer
     ) {
         this.name = name;
-        this.description = description;
-        this.scenarioConsumer = scenarioConsumer;
-    }
-
-    public Policy(
-        final String name,
-        final Consumer<S> scenarioConsumer
-    ) {
-        this.name = name;
-        this.description = name;
         this.scenarioConsumer = scenarioConsumer;
     }
 
@@ -72,8 +63,8 @@ public class Policy<S extends Scenario> {
      */
     public static <S extends EpoScenario<?>> Policy<S> makeDelayedRegulationsPolicy(
         final String policyName,
-        final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
-        final Function<S, AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory,
+        final Collection<? extends AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulationFactories,
+        final Function<? super S, ? extends AlgorithmFactory<? extends Regulation>> makeGeneralRegulationFactory,
         final int yearsBeforePoliciesKickIn
     ) {
         final Consumer<S> scenarioConsumer = scenario -> {
@@ -102,19 +93,24 @@ public class Policy<S extends Scenario> {
                 )
             );
         };
-        return new Policy<>(policyName, policyName, scenarioConsumer);
+        return new Policy<>(policyName, scenarioConsumer);
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public Consumer<S> getScenarioConsumer() {
         return scenarioConsumer;
     }
 
+    @Override
+    public List<String> getHeaders() {
+        return ImmutableList.of("name");
+    }
+
+    @Override
+    public Iterable<? extends Collection<?>> getRows() {
+        return ImmutableList.of(ImmutableList.of(name));
+    }
 }

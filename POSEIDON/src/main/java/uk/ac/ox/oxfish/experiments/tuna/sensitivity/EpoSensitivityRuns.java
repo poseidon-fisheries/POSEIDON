@@ -104,7 +104,6 @@ public class EpoSensitivityRuns {
         return makePolicyList(
             new Policy<>(
                 "With SKJ-BET layer",
-                "SKJ-BET layer turned on",
                 scenario -> setLayerThreshold(scenario, "SKJMINUSBET", 0.2258513514917878)
             )
         );
@@ -148,7 +147,6 @@ public class EpoSensitivityRuns {
         return makePolicyList(
             new Policy<>(
                 "No temperature layer",
-                "Temperature layer turned off",
                 scenario -> setLayerThreshold(scenario, "Temperature", 0)
             )
         );

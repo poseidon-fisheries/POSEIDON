@@ -58,7 +58,7 @@ public class Slice1Sweeps {
     private static final int NUM_RUNS_PER_POLICY = 10;
     private static final int NUM_YEARS_TO_RUN = 6;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         final ActionSpecificRegulation currentFadLimits =
             new ActiveFadLimitsFactory().apply(null);
@@ -80,7 +80,7 @@ public class Slice1Sweeps {
                 opt -> opt.map(limit -> limit + " sets limit").orElse("No set limit")
             ));
 
-        ImmutableList.Builder<Policy<? super EpoGravityBiomassScenario>> policies = ImmutableList.builder();
+        final ImmutableList.Builder<Policy<? super EpoGravityBiomassScenario>> policies = ImmutableList.builder();
         fadLimits.forEach((activeFadLimits, fadLimitsName) ->
             setLimits.forEach((generalSetLimits, setLimitsName) ->
                 policies.add(makePolicy(
@@ -115,10 +115,10 @@ public class Slice1Sweeps {
     }
 
     private static Policy<EpoGravityBiomassScenario> makePolicy(
-        Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
-        String policyName
+        final Collection<AlgorithmFactory<? extends ActionSpecificRegulation>> policyRegulations,
+        final String policyName
     ) {
-        Steppable setRegulations = simState -> {
+        final Steppable setRegulations = simState -> {
             System.out.println("Changing regulations to " + policyName + " for all fishers at day " + simState.schedule.getSteps());
             final FishState fishState = (FishState) simState;
             fishState.getFishers().forEach(fisher ->
@@ -127,7 +127,7 @@ public class Slice1Sweeps {
                 )
             );
         };
-        return new Policy<>(policyName, "", scenario ->
+        return new Policy<>(policyName, scenario ->
             scenario.getAdditionalStartables().add(fishState ->
                 __ -> fishState.scheduleOnceAtTheBeginningOfYear(setRegulations, StepOrder.AFTER_DATA, 1)
             )
