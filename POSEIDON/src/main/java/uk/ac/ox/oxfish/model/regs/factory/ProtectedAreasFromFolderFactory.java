@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -25,8 +26,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<MultipleRegulations> {
 
-    final CacheByFile<Map<String, AlgorithmFactory<? extends Regulation>>> factoriesCache =
-        new CacheByFile<>(this::loadShapeFiles);
+    private static final CacheByFile<Map<String, AlgorithmFactory<? extends Regulation>>> factoriesCache =
+        new CacheByFile<>(ProtectedAreasFromFolderFactory::loadShapeFiles);
     private InputPath shapefilesInputPath;
     private InputPath tagsFile;
 
@@ -43,12 +44,12 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
         this.tagsFile = tagsFile;
     }
 
-    private ImmutableMap<String, AlgorithmFactory<? extends Regulation>> loadShapeFiles(
+    @SuppressWarnings("UnstableApiUsage")
+    private static ImmutableMap<String, AlgorithmFactory<? extends Regulation>> loadShapeFiles(
         final Path shapefilesFolder
     ) {
-        try {
-            //noinspection UnstableApiUsage
-            return Files.list(shapefilesFolder)
+        try (final Stream<Path> files = Files.list(shapefilesFolder)) {
+            return files
                 .filter(path -> getFileExtension(path).equals("shp"))
                 .collect(toImmutableMap(
                     path -> getNameWithoutExtension(path.getFileName()),
@@ -57,24 +58,6 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public InputPath getShapefilesFolder() {
-        return shapefilesInputPath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setShapefilesFolder(final InputPath shapefilesInputPath) {
-        this.shapefilesInputPath = shapefilesInputPath;
-    }
-
-    public InputPath getTagsFile() {
-        return tagsFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setTagsFile(final InputPath tagsFile) {
-        this.tagsFile = tagsFile;
     }
 
     @Override
@@ -95,5 +78,23 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
 
         return new MultipleRegulations(factoriesByTag);
 
+    }
+
+    public InputPath getShapefilesFolder() {
+        return shapefilesInputPath;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapefilesFolder(final InputPath shapefilesInputPath) {
+        this.shapefilesInputPath = shapefilesInputPath;
+    }
+
+    public InputPath getTagsFile() {
+        return tagsFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setTagsFile(final InputPath tagsFile) {
+        this.tagsFile = tagsFile;
     }
 }
