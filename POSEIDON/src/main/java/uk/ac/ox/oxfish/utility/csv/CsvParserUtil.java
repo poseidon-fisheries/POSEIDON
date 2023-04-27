@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -112,6 +113,21 @@ public class CsvParserUtil {
             final CsvWriter csvWriter = new CsvWriter(outputstream, csvWriterSettings);
             csvWriter.writeHeaders();
             csvWriter.processRecordsAndClose(beans);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <C extends Collection<?>> void writeRows(
+        final Path outputFile,
+        final Collection<?> headers,
+        final Iterable<C> rows
+    ) {
+        try (final OutputStream outputstream = Files.newOutputStream(outputFile)) {
+            final CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
+            final CsvWriter csvWriter = new CsvWriter(outputstream, csvWriterSettings);
+            csvWriter.writeHeaders(headers);
+            csvWriter.writeRowsAndClose(rows);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

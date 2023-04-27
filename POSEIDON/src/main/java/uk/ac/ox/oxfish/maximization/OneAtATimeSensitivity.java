@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.LongStream.range;
@@ -71,13 +73,39 @@ public class OneAtATimeSensitivity {
     public void run() {
         final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
         final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
-        new Runner<>(() -> genericOptimization.buildScenario(solution), folder.resolve("ofat_outputs"))
+        final Path outputFolder = folder.resolve("ofat_outputs");
+        writeBounds(genericOptimization, solution, outputFolder.resolve("bounds.csv"));
+        new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
             .setPolicies(buildVariations(genericOptimization))
             .registerRowProvider(
                 "results.csv",
                 fishState -> new ResultsProvider(genericOptimization, fishState)
             )
             .run(numYearsToRun, iterations);
+    }
+
+    private void writeBounds(
+        final GenericOptimization genericOptimization,
+        final double[] solution,
+        final Path outputFile
+    ) {
+        final Scenario scenario = genericOptimization.buildScenario(solution);
+        final Stream<List<?>> rows =
+            genericOptimization.getParameters()
+                .stream()
+                .filter(p -> p instanceof SimpleOptimizationParameter)
+                .map(p -> (SimpleOptimizationParameter) p)
+                .map(p -> ImmutableList.of(
+                    p.getAddressToModify(),
+                    p.getMinimum(),
+                    p.getMaximum(),
+                    p.getValue(scenario)
+                ));
+        CsvParserUtil.writeRows(
+            outputFile,
+            ImmutableList.of("parameter", "minimum", "maximum", "value"),
+            rows::iterator
+        );
     }
 
     private List<Variation> buildVariations(
