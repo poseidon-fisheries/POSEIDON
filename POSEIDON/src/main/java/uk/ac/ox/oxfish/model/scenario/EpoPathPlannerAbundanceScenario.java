@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFacto
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.plugins.ChlorophyllMapFactory;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
@@ -58,9 +57,6 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     ),
                     new EnvironmentalPenaltyFunctionFactory(
                         ImmutableMap.of(
-                            "Chlorophyll", new ChlorophyllMapFactory(
-                                getInputFolder().path("environmental_maps", "chlorophyll.csv")
-                            ),
                             "Temperature", new TemperatureMapFactory(
                                 getInputFolder().path("environmental_maps", "temperature.csv")
                             ),
