@@ -32,7 +32,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after each DEL set
      */
     private DoubleParameter additionalHourlyDelayDolphinSets =
-        new CalibratedParameter(11, 19, 0, 24, 16);
+        new CalibratedParameter(11, 20, 0, 24, 16);
     /**
      * hours wasted after every DPL
      */
@@ -42,7 +42,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after every NOA
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets =
-        new CalibratedParameter(0, 8, 0, 24, 6);
+        new CalibratedParameter(0, 15, 0, 24, 6);
     /**
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
@@ -57,24 +57,21 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * how many hours does it take for a plan to go stale and need replanning
      */
     private DoubleParameter planningHorizonInHours =
-        new CalibratedParameter(24 * 5, 24 * 10, 24 * 7);
+        new CalibratedParameter(24 * 5, 24 * 10, 24, 24 * 28, 24 * 7);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(1, 65, 22);
+        new CalibratedParameter(1, 180, 22);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(1, 15, 10);
-    /**
-     * a multiplier applied to the action weight of DPL
-     */
+        new CalibratedParameter(1, 75, 10);
     private DoubleParameter noaBias =
-        new CalibratedParameter(0.2, 0.8, 0.6);
+        new CalibratedParameter(0.2, 1.1, 0.6);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
-        new CalibratedParameter(0.4, 0.7, 0, 1, 0.7);
+        new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
     private boolean noaSetsCanPoachFads = false;
     private boolean purgeIllegalActionsImmediately = true;
     private DoubleParameter noaSetsRangeInSeatiles =

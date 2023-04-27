@@ -14,8 +14,8 @@ public class TemperatureMapFactory extends EnvironmentalMapFactory {
         super(
             "Temperature",
             gridFile,
-            new CalibratedParameter(10, 35, 10, 35, 28),
-            new CalibratedParameter(1, 3, 1, 3, 2)
+            new CalibratedParameter(10, 35, 10, 40, 28),
+            new CalibratedParameter(1, 4, 1, 4, 2)
         );
     }
 

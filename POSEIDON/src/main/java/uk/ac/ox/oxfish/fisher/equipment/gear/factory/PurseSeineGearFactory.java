@@ -74,7 +74,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private DoubleParameter fishValueCalculatorStandardDeviation =
-        new CalibratedParameter(0, 0.5, 0, 1, 0);
+        new CalibratedParameter(0, 1, 0, 1, 0);
+
     public PurseSeineGearFactory() {
     }
 
