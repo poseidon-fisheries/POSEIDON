@@ -23,6 +23,7 @@ public class ParameterExtractor<P extends DoubleParameter> {
 
     private final Class<? extends P> parameterClass;
 
+    @SuppressWarnings("WeakerAccess")
     public ParameterExtractor(final Class<? extends P> parameterClass) {
         this.parameterClass = parameterClass;
     }
@@ -65,7 +66,9 @@ public class ParameterExtractor<P extends DoubleParameter> {
                 !(o instanceof Class || o instanceof Path)
             )
             .flatMap(o -> {
-                if (o instanceof Map) {
+                if (parameterClass.isAssignableFrom(o.getClass())) {
+                    return Stream.of(new Parameter(addressBuilder.get(), parameterClass.cast(o)));
+                } else if (o instanceof Map) {
                     return getParametersFromMap((Map<?, ?>) o, addressBuilder);
                 } else if (o instanceof Iterable) {
                     return getParametersFromIterable((Iterable<?>) o, addressBuilder);
@@ -83,13 +86,10 @@ public class ParameterExtractor<P extends DoubleParameter> {
         return getPropertyDescriptors(o)
             .stream()
             .filter(propertyDescriptor -> propertyDescriptor.getReadMethod() != null)
-            .flatMap(propertyDescriptor -> {
-                final Object object = invoke(o, propertyDescriptor.getReadMethod());
-                final ParameterAddressBuilder newAddressBuilder = addressBuilder.add(propertyDescriptor.getName());
-                return object != null && parameterClass.isAssignableFrom(object.getClass())
-                    ? Stream.of(new Parameter(newAddressBuilder.get(), propertyDescriptor, parameterClass.cast(object)))
-                    : getParameters(object, newAddressBuilder);
-            });
+            .flatMap(propertyDescriptor -> getParameters(
+                invoke(o, propertyDescriptor.getReadMethod()),
+                addressBuilder.add(propertyDescriptor.getName())
+            ));
     }
 
     private Stream<Parameter> getParametersFromMap(
@@ -126,21 +126,16 @@ public class ParameterExtractor<P extends DoubleParameter> {
 
     public class Parameter {
         private final String address;
-        private final PropertyDescriptor propertyDescriptor;
         private final P object;
 
-        public Parameter(final String address, final PropertyDescriptor propertyDescriptor, final P object) {
+        public Parameter(final String address, final P object) {
             this.address = address;
-            this.propertyDescriptor = propertyDescriptor;
             this.object = object;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public String getAddress() {
             return address;
-        }
-
-        public PropertyDescriptor getPropertyDescriptor() {
-            return propertyDescriptor;
         }
 
         public P getObject() {
