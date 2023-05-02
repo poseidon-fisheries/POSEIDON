@@ -33,54 +33,51 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by carrknight on 5/2/16.
  */
-public class BetterThanAverageEroteticDestinationFactoryTest
-{
+public class BetterThanAverageEroteticDestinationFactoryTest {
 
+    private static final int MAX_STEPS = 2000;
 
     @Test
-    public void plainThresholdDoesNotClearMap() throws Exception {
+    public void plainThresholdDoesNotClearMap() {
 
-        int timesItWasTrue=0;
-        for(int i=0; i<3; i++) {
-            long seed = System.currentTimeMillis();
-            int steps = stepsItTookErotetic(2000, seed, false);
-            int steps2 = stepsItTookErotetic(2000, seed, true);
-            if(steps>steps2)
+        int timesItWasTrue = 0;
+        for (int i = 0; i < 3; i++) {
+            final int steps = stepsItTookErotetic(i, false);
+            final int steps2 = stepsItTookErotetic(i, true);
+            if (steps > steps2)
                 timesItWasTrue++;
         }
-        assertTrue(timesItWasTrue>1);
+        assertTrue(timesItWasTrue > 1);
 
     }
 
 
-    public static int stepsItTookErotetic(
-            int maxSteps,
-            final long seed,
-            final boolean adaptive) {
-
-
+    private static int stepsItTookErotetic(
+        final long seed,
+        final boolean adaptive
+    ) {
         Log.set(Log.LEVEL_INFO);
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new IndependentLogisticFactory()); //skip migration which should make this faster.
         scenario.setFishers(300);
-        if(adaptive)
+        if (adaptive)
             scenario.setDestinationStrategy(new BetterThanAverageEroteticDestinationFactory());
         else {
-            ThresholdEroteticDestinationFactory plainThreshold = new ThresholdEroteticDestinationFactory();
+            final ThresholdEroteticDestinationFactory plainThreshold = new ThresholdEroteticDestinationFactory();
             plainThreshold.setProfitThreshold(new FixedDoubleParameter(0d));
             scenario.setDestinationStrategy(plainThreshold);
         }
 
-        FishState state = new FishState(seed, 1);
+        final FishState state = new FishState(seed, 1);
         state.setScenario(scenario);
         state.start();
-        Species onlySpecies = state.getBiology().getSpecie(0);
+        final Species onlySpecies = state.getBiology().getSpecie(0);
         final double minimumBiomass = state.getTotalBiomass(
-                onlySpecies) * .1; //how much does it take to eat 90% of all the fish?
+            onlySpecies) * .1; //how much does it take to eat 90% of all the fish?
 
 
         int steps;
-        for (steps = 0; steps < maxSteps; steps++) {
+        for (steps = 0; steps < MAX_STEPS; steps++) {
             state.schedule.step(state);
             if (state.getTotalBiomass(onlySpecies) <= minimumBiomass)
                 break;
