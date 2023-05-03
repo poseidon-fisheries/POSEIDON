@@ -1,0 +1,394 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id 'java-library'
+    id 'application'
+    id 'jacoco'
+    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.spotbugs" version "4.7.2"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+application {
+    mainClass = 'uk.ac.ox.oxfish.Main'
+    applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx2048m"]
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/resources'
+        }
+    }
+}
+
+//here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
+dependencies {
+    //mason libraries. They aren't on maven so we have to lug their jars around
+    api fileTree(dir: 'libs/mason', include: '*.jar')
+    api fileTree(dir: 'libs/geomason', include: '*.jar')
+
+    //fx collections; needed for sanity
+    implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
+
+
+    //csv helper
+    implementation "com.opencsv:opencsv:3.8"
+    implementation "com.univocity:univocity-parsers:2.9.1"
+
+    //logger:
+    implementation "com.esotericsoftware:minlog:1.3.0"
+
+    // Dependencies for log4j2. commons-csv is needed for CSV logs
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+
+    //serializer
+    implementation fileTree(dir: 'libs/xstream/lib', include: '*.jar')
+    implementation "org.ogce:xpp3:1.1.6"
+
+    //kd tree
+    implementation fileTree(dir: 'libs/rednaxela', include: '*.jar')
+
+    //jung social network:
+    implementation "net.sf.jung:jung-api:2.0.1"
+    implementation 'net.sf.jung:jung-graph-impl:2.0.1'
+    implementation 'net.sf.jung:jung-io:2.0.1'
+    implementation 'net.sf.jung:jung-algorithms:2.0.1'
+
+    //yaml parser, useful for reading configuration files
+    implementation 'org.yaml:snakeyaml:1.29'
+    //jcommander, useful to parse command line arguments
+    implementation "com.beust:jcommander:1.81"
+
+    //commons math
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+    //burlap : Reinforcement Learning helper
+    implementation group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
+
+    //discrete choosers
+    implementation fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
+
+    // maximizer
+    implementation group: 'de.openea', name: 'eva2', version: '2.2.0'
+
+    //annotations
+    implementation group: 'com.intellij', name: 'annotations', version: '12.0'
+
+    //testing:
+    testImplementation "junit:junit:4.13.2"
+    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
+
+    //guava. Useful for PreConditions and sometimes specialized collections
+    implementation "com.google.guava:guava:31.1-jre"
+
+    // Reference implementation of JSR-385 for units of measure
+    implementation 'si.uom:si-quantity:2.1'
+    implementation 'si.uom:si-units:2.1'
+}
+
+processTestResources.doFirst {
+    // explicitly allow overriding files when copying resources
+    duplicatesStrategy = "include"
+}
+
+// Duplicate handling strategy need to be explicitly specified as of Gradle 6
+processResources { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distTar { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+distZip { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
+
+//this makes tests multi-threaded when called from gradle. Useful!
+test {
+    minHeapSize = "1024m"
+    maxHeapSize = "4G" // GitHub actions was crashing on 6GB, let's see if 4GB fixes it...
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
+}
+
+tasks.withType(Test) {
+    testLogging {
+        exceptionFormat = 'full'
+
+        // Optionally do:
+        showStackTraces = true
+    }
+}
+
+task shadowJarFoo(type: ShadowJar) {
+    archiveFileName = 'foo.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [configurations.runtime] //tells the task to shadow in the jars files in the 'runtime' scope
+}
+
+//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
+//distributed
+task fatJar(type: ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_executable.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.Main'
+    }
+}
+
+task deployFatJar(type: Copy, dependsOn: fatJar) {
+    from 'build/libs/'
+    //into '.'
+    includeEmptyDirs = false
+    include 'oxfish_executable.jar'
+}
+
+task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'maximizer.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.MainOptimizer'
+    }
+}
+
+task optimizerConsoleJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'console_optimizer.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.OptimizerConsole'
+    }
+}
+
+
+task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'indirectInference.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
+    }
+}
+
+//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
+//distributed
+task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+
+    mergeServiceFiles()
+    archiveFileName = 'yamler.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.YamlMain'
+    }
+
+}
+
+//this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
+//to make optimization.py work correctly
+task deployHeadless(type: Copy, dependsOn: buildHeadless) {
+    from 'build/libs/'
+    into 'runs/optimization/'
+    include 'yamler.jar'
+}
+
+task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_batch.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
+    }
+}
+
+task fatJarMeraSlice1(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_meraslice1.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.mera.comparisons.MeraOneSpeciesSlice1'
+    }
+}
+
+task fatJarSalehBay(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_salehbay_policy.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.mera.comparisons.SalehBayPolicy'
+    }
+}
+
+task q(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_nodata718slice7.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice7Policy'
+    }
+}
+
+task fatJar718Iterative(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'oxfish_nodata718slice6_iterative.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.limited.NoData718Slice6Iterative'
+    }
+}
+
+task fatJarTunaCalibrator(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'tuna_calibrator.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.TunaCalibrationConsole'
+    }
+}
+
+
+task fatJarTunaTwoPunchCalibrator(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'tuna_calibrator_twopunch.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.TwoPunchCalibration'
+    }
+}
+
+task fatJarTunaTwoPunchCalibratorMini(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveFileName = 'tuna_calibrator_twopunch_mini.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.maximization.TwoPunchCalibrationMini'
+    }
+}
+
+
+//this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
+task buildSampleFiles(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
+}
+
+task optimizer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'uk.ac.ox.oxfish.MainOptimizer'
+}
+
+task sample_inputs(type: JavaExec) {
+    mainClass = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task appendix(type: JavaExec) {
+    mainClass = 'uk.ac.ox.oxfish.experiments.FirstPaper'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task execute(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "package.MyDefaultMain"
+    jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
+}
+
+task algorithms(type: JavaExec) {
+    mainClass = 'uk.ac.ox.oxfish.experiments.SocialTuningExercise'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task batch(type: JavaExec) {
+    mainClass = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+test {
+    useJUnit()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+if (hasProperty('buildScan')) {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}
+
+spotbugs {
+    ignoreFailures = true
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+check.dependsOn jacocoTestReport

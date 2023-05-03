@@ -142,3 +142,5 @@ eva/generic.yaml
 
 # backup files from the meld mergetool
 *.orig
+# Ignore Gradle build output directory
+build
