@@ -7,7 +7,7 @@ public abstract class Adaptor<D> {
         this.delegate = delegate;
     }
 
-    protected D getDelegate() {
+    public D getDelegate() {
         return delegate;
     }
 
