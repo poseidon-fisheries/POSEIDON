@@ -1,4 +1,4 @@
-rootProject.name = "poseidon"
+rootProject.name = "POSEIDON"
 include("simulations:api")
 include("simulations:adaptors")
 include("datasets:api")

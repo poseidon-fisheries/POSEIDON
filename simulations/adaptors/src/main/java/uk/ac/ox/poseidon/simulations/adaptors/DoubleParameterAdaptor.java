@@ -4,8 +4,11 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddress;
 import uk.ac.ox.oxfish.parameters.ParameterExtractor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.common.Adaptor;
 import uk.ac.ox.poseidon.simulations.api.Parameter;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class DoubleParameterAdaptor
     extends Adaptor<ParameterExtractor<DoubleParameter>.Parameter>
@@ -38,9 +41,15 @@ public class DoubleParameterAdaptor
 
     @Override
     public void setValue(final Object value) {
+        checkArgument(
+            value instanceof Double,
+            "Value of parameter %s needs to be of type Double but got %s",
+            getName(),
+            value.getClass()
+        );
         new ParameterAddress(getName())
             .getSetter(scenarioAdaptor.getDelegate())
-            .accept(value);
+            .accept(new FixedDoubleParameter((Double) value));
     }
 
     @Override

@@ -123,6 +123,8 @@ public class CsvParserUtil {
         final Collection<?> headers,
         final Iterable<C> rows
     ) {
+        //noinspection ResultOfMethodCallIgnored
+        outputFile.getParent().toFile().mkdirs();
         try (final OutputStream outputstream = Files.newOutputStream(outputFile)) {
             final CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
             final CsvWriter csvWriter = new CsvWriter(outputstream, csvWriterSettings);

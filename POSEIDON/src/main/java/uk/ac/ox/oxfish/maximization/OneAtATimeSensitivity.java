@@ -35,11 +35,11 @@ public class OneAtATimeSensitivity {
     @Parameter(names = {"-f", "--folder"}, converter = PathConverter.class)
     private Path folder = Paths.get(".");
     @Parameter(names = {"-s", "--steps"})
-    private int steps;
+    private int steps = 20;
     @Parameter(names = {"-i", "--iterations"})
-    private int iterations;
+    private int iterations = 5;
     @Parameter(names = {"-y", "--num_year_to_run"})
-    private int numYearsToRun;
+    private int numYearsToRun = 3;
 
     @SuppressWarnings("WeakerAccess")
     public OneAtATimeSensitivity() {

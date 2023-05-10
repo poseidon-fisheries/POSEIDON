@@ -119,7 +119,7 @@ public class TunaEvaluator implements Runnable {
         // Finds the first argument that is a folder name and uses it as the calibration folder
         //final Path calibrationFolder = getCalibrationFolder(args);
         ImmutableList.of(
-            "2023_april_run/cenv0729/2023-04-20_14.32.52_local"
+            "2023-04-27/cenv0729/2023-04-28_22.33.56_local"
         ).forEach(folderName -> {
             final Path calibrationFolder = DEFAULT_CALIBRATION_FOLDER.resolve(folderName);
 
