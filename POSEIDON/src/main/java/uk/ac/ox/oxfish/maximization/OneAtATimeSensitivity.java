@@ -39,7 +39,7 @@ public class OneAtATimeSensitivity {
     @Parameter(names = {"-i", "--iterations"})
     private int iterations = 5;
     @Parameter(names = {"-y", "--num_year_to_run"})
-    private int numYearsToRun = 3;
+    private int numYearsToRun = 2;
 
     @SuppressWarnings("WeakerAccess")
     public OneAtATimeSensitivity() {
